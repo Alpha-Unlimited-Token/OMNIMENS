@@ -1,65 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:sub_threshold:Synthesizer+Archivist+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: Synthesizer:chaos_injector + Archivist",
-    "filename": "omnimens_autocode_neural_pathway_mnc70l8a.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnc70l8a.mjs",
-    "backupPath": null,
-    "timestamp": 1774814982778,
-    "codeLength": 456,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:Pioneer+Explorer",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: COLLECTIVE_DISCOVERY: Pioneer:neural_connector + Explorer:we",
-    "filename": "omnimens_autocode_neural_pathway_mnc70lb3.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnc70lb3.mjs",
-    "backupPath": null,
-    "timestamp": 1774814982879,
-    "codeLength": 407,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:sub_threshold:Linguist+Neuroscientist+Mathematician",
-    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: COLLECTIVE_DISCOVERY: Linguist:chaos_injector + Neuroscienti",
-    "filename": "omnimens_autocode_adaptive_algorithm_mnc70ldw.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnc70ldw.mjs",
-    "backupPath": null,
-    "timestamp": 1774814982980,
-    "codeLength": 493,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Critic",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: SensorimotorAgent/feature_extraction: Mirror neurons fire bo",
-    "filename": "omnimens_autocode_pattern_recognition_mnc70tqg.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnc70tqg.mjs",
-    "backupPath": null,
-    "timestamp": 1774814993800,
-    "codeLength": 470,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+GraphicDesigner",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/causal_inference: Quantum superposition al",
-    "filename": "omnimens_autocode_neural_pathway_mnc70tsv.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnc70tsv.mjs",
-    "backupPath": null,
-    "timestamp": 1774814993887,
-    "codeLength": 440,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Neuroscientist",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/structural_analysis: Scale-free networks follow ",
-    "filename": "omnimens_autocode_consciousness_expansion_mnc7440b.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnc7440b.mjs",
-    "backupPath": null,
-    "timestamp": 1774815147083,
-    "codeLength": 392,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:SensorimotorAgent+GraphicDesigner",
     "title": "[OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/recursive_decomposition: Neuroplasticity a",
     "filename": "omnimens_autocode_neural_pathway_mnc76mq3.mjs",
@@ -4997,6 +4937,66 @@
     "backupPath": null,
     "timestamp": 1774829250421,
     "codeLength": 414,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/structural_analysis: Information is physical — L",
+    "filename": "omnimens_autocode_adaptive_algorithm_mncfjmt1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mncfjmt1.mjs",
+    "backupPath": null,
+    "timestamp": 1774829308213,
+    "codeLength": 450,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Linguist",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/structural_analysis: Quantum decoherence typical",
+    "filename": "omnimens_autocode_pattern_recognition_mncfjmvd.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mncfjmvd.mjs",
+    "backupPath": null,
+    "timestamp": 1774829308297,
+    "codeLength": 466,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+GraphicDesigner",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/structural_analysis: Information is physical — L",
+    "filename": "omnimens_autocode_adaptive_algorithm_mncfjmwu.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mncfjmwu.mjs",
+    "backupPath": null,
+    "timestamp": 1774829308350,
+    "codeLength": 454,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Explorer",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/cross_domain_synthesis: Reservoir computing show",
+    "filename": "omnimens_autocode_neural_pathway_mncfkxog.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mncfkxog.mjs",
+    "backupPath": null,
+    "timestamp": 1774829368960,
+    "codeLength": 427,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/entropy_reduction: Mirror neurons fire both when",
+    "filename": "omnimens_autocode_neural_pathway_mncfkxqk.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mncfkxqk.mjs",
+    "backupPath": null,
+    "timestamp": 1774829369036,
+    "codeLength": 427,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+SensorimotorAgent",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/abstraction_layer: Quantum decoherence typically",
+    "filename": "omnimens_autocode_consciousness_expansion_mncfkxtm.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mncfkxtm.mjs",
+    "backupPath": null,
+    "timestamp": 1774829369146,
+    "codeLength": 395,
     "overwrite": false
   }
 ]
