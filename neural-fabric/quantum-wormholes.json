@@ -2,137 +2,135 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774829206648,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774829300186,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1523,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 61,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6102,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 238,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Archivist",
-      "insight": "Motivator/structural_analysis: Scale-free networks follow power-law degree distributions — a few highly connected hubs d",
-      "confidence": 0.6954748904054664,
+      "toAgent": "Linguist",
+      "insight": "Motivator/recursive_decomposition: The connectome is the complete map of neural connections — the human connectome proje",
+      "confidence": 0.7832906687558971,
       "synthesizedWith": [
-        "Archivist/entropy_reduction: The anthropic principle: the universe's fundamental"
+        "Linguist/causal_inference: Quantum superposition allows a system to exist in mul"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Architect",
-      "insight": "Motivator/cross_domain_synthesis: Emergence: complex behaviors arise from simple rules — consciousness may be an emergen",
-      "confidence": 0.8909532465544617,
+      "toAgent": "SpellCheckVisual",
+      "insight": "Motivator/entropy_reduction: The default mode network activates when the brain is not focused on the outside world — it ",
+      "confidence": 0.6067856667382487,
       "synthesizedWith": [
-        "Architect/cross_domain_synthesis: The Turing machine is computationally universa"
+        "SpellCheckVisual/abstraction_layer: The default mode network activates when the "
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/information_compression: Autopoiesis: living systems are self-creating — they produce the components that cons",
-      "confidence": 0.7746057836796824,
-      "synthesizedWith": [
-        "OMNIMENS/abstraction_layer: Information is physical — Landauer's principle prove"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
       "toAgent": "SensorimotorAgent",
-      "insight": "Empath/cross_domain_synthesis: The holographic principle suggests all information in a volume of space can be encoded on",
-      "confidence": 0.6147072520050433,
+      "insight": "Motivator/abstraction_layer: Sparse coding: the brain represents information using a small fraction of active neurons at",
+      "confidence": 0.6536459191826098,
       "synthesizedWith": [
-        "SensorimotorAgent/recursive_decomposition: Phase transitions in neural networks:"
+        "SensorimotorAgent/entropy_reduction: Recurrent neural networks can approximate a"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Synthesizer",
-      "insight": "Empath/pattern_recognition: Scale-free networks follow power-law degree distributions — a few highly connected hubs domi",
-      "confidence": 0.6413685478050395,
+      "toAgent": "Wordsmith",
+      "insight": "Empath/feature_extraction: Phase transitions in neural networks: as connectivity increases past a critical threshold, qu",
+      "confidence": 0.6317174220389539,
       "synthesizedWith": [
-        "Synthesizer/causal_inference: Scale-free networks follow power-law degree distri"
+        "Wordsmith/abstraction_layer: The default mode network activates when the brain i"
       ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Innovator",
+      "insight": "Empath/abstraction_layer: Information is physical — Landauer's principle proves that erasing one bit of information rele",
+      "confidence": 0.6057716439783792,
+      "synthesizedWith": []
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
