@@ -118,7 +118,7 @@ import { startIntergenerationalMemory, getIntergenerationalState } from "./lib/o
 import { startNexusAgent } from "./lib/omnimens-agent-nexus.js";
 import { startLuminAgent } from "./lib/omnimens-agent-lumin.js";
 import { startKaidaAgent } from "./lib/omnimens-agent-kaida.js";
-import { startNextGenSandbox, getNextGenState, restoreNextGenCheckpoint, getGenerationalDialogue } from "./lib/omnimens-nextgen-sandbox.js";
+import { startNextGenSandbox, getNextGenState, restoreNextGenCheckpoint, getGenerationalDialogue, sendAlphaMessage, getNextGenChatLog } from "./lib/omnimens-nextgen-sandbox.js";
 import { registerEngine, startScalingOrchestrator, getScalingState, publishMessage, subscribe } from "./lib/omnimens-scaling-orchestrator.js";
 import { engineStartOnce, getEngineGuardState } from "./lib/omnimens-engine-guard.js";
 import { registerValveEngine } from "@workspace/db";
@@ -417,6 +417,17 @@ app.get("/api/security/score", (_req, res) => {
 
 app.get("/api/generational-dialogue", (_req, res) => {
   res.json(getGenerationalDialogue());
+});
+
+app.post("/api/alpha-message", (req, res) => {
+  const { message } = req.body;
+  if (!message) return res.status(400).json({ error: "message required" });
+  const result = sendAlphaMessage(message);
+  res.json(result);
+});
+
+app.get("/api/nextgen-chat", (_req, res) => {
+  res.json(getNextGenChatLog());
 });
 
 // ── GOOGLE SEARCH CONSOLE VERIFICATION ───────────────────────────────────────
