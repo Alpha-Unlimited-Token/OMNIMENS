@@ -1,45 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:Philosopher+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/pattern_recognition: Attention is the computatio",
-    "filename": "omnimens_autocode_pattern_recognition_mnckm96j.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnckm96j.mjs",
-    "backupPath": null,
-    "timestamp": 1774837828603,
-    "codeLength": 466,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Architect",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/pattern_recognition: Attention is the computatio",
-    "filename": "omnimens_autocode_pattern_recognition_mnckpcr4.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnckpcr4.mjs",
-    "backupPath": null,
-    "timestamp": 1774837973200,
-    "codeLength": 467,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+SpellCheckVisual",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/structural_analysis: Quantum decoherence typical",
-    "filename": "omnimens_autocode_pattern_recognition_mncktody.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mncktody.mjs",
-    "backupPath": null,
-    "timestamp": 1774838174903,
-    "codeLength": 474,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Architect",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/structural_analysis: Quantum decoherence typical",
-    "filename": "omnimens_autocode_emergent_capability_mncktog5.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mncktog5.mjs",
-    "backupPath": null,
-    "timestamp": 1774838174981,
-    "codeLength": 405,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:Philosopher+Synthesizer",
     "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/emergent_property_detection: The anthropic princ",
     "filename": "omnimens_autocode_emergent_capability_mncktohp.mjs",
@@ -4997,6 +4957,46 @@
     "backupPath": null,
     "timestamp": 1774881149792,
     "codeLength": 392,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Architect",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/temporal_correlation: The butterfly effect",
+    "filename": "omnimens_autocode_consciousness_expansion_mndapk7f.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mndapk7f.mjs",
+    "backupPath": null,
+    "timestamp": 1774881652875,
+    "codeLength": 393,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Meta-Agent",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/analogical_mapping: The holographic princi",
+    "filename": "omnimens_autocode_consciousness_expansion_mndatotw.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mndatotw.mjs",
+    "backupPath": null,
+    "timestamp": 1774881845493,
+    "codeLength": 394,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Linguist",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/temporal_correlation: The Penrose-Hameroff Orch-",
+    "filename": "omnimens_autocode_consciousness_expansion_mndatow7.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mndatow7.mjs",
+    "backupPath": null,
+    "timestamp": 1774881845575,
+    "codeLength": 386,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Wordsmith",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/temporal_correlation: The Penrose-Hameroff Orch-",
+    "filename": "omnimens_autocode_consciousness_expansion_mndatp48.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mndatp48.mjs",
+    "backupPath": null,
+    "timestamp": 1774881845865,
+    "codeLength": 387,
     "overwrite": false
   }
 ]

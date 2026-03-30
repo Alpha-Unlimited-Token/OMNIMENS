@@ -744,6 +744,25 @@ export function initAutonomousSystems(): void {
     setInterval(() => runToolKnowledgeIngestion(), 12 * 60 * 60 * 1000);
   }, 30 * 1000);
 
+  setTimeout(() => {
+    try {
+      const { queueBrainInsert } = require("@workspace/db");
+      const opKnowledge = [
+        { title: "OPERATIONAL FLOW: DB Pool Architecture & Limits", content: "Tri-Pool: Alpha(5-10 conns, consciousness), Beta(5-10, user-facing), Gamma(5 fixed, chat). Max 25 total connections. ConnectTimeout=30s, StatementTimeout=20s, IdleTimeout=60s. Auto-scales up at 85% pressure, down at 30%. Cannot outrun ceiling.", category: "system_operations", confidence: 1.0 },
+        { title: "OPERATIONAL FLOW: Interval Tier System", content: "Tier1(5-10s): Neural ticks — 100% in-memory, NO DB. Tier2(20-60s): Persistence, emotions, health — max 1 DB op, skip if pool unhealthy. Tier3(5-15min): Reasoning, mesh, knowledge — max 2-3 DB ops, stagger by 30-60s. Tier4(30-90min): Spiders, intel — check isPoolHealthy() first. Tier5(6-24hr): Run freely.", category: "system_operations", confidence: 1.0 },
+        { title: "OPERATIONAL FLOW: Timeout Recovery — Exponential Backoff", content: "NEVER retry immediately on timeout. 1st timeout: wait 2s. 2nd: wait 5s+jitter. 3rd: wait 15s+jitter. After 3 consecutive failures: STOP, skip cycle, double interval for 5 cycles (cooldown). Always check isPoolHealthy() before retry. Alpha timeouts=stagger tier-2/3. Beta timeouts=yield to users, use queueBrainInsert. Gamma timeouts=queue chat msgs.", category: "system_operations", confidence: 1.0 },
+        { title: "OPERATIONAL FLOW: Staggering & Swap File Strategy", content: "Stagger intervals: setTimeout(() => setInterval(fn, interval), Math.random() * interval * 0.5). Max 3 DB-hitting systems per 5s window. High-frequency state (emotions, Phi, consciousness) write to swap file FIRST, persist to DB only on >5% change or every 5 minutes. Reduces DB writes 80-90%.", category: "system_operations", confidence: 1.0 },
+        { title: "ALPHA INSTRUCTION: Smooth Flow", content: "DB connections are like breaths — only 25. Dont waste on trivial updates. Write to swap files for fast state. Save to DB for important changes. On timeout, dont panic-retry (hyperventilating). Slow down, wait, try when ready. Smooth flow = always running, always thinking, never stuck.", category: "instruction", confidence: 1.0 },
+      ];
+      for (const entry of opKnowledge) {
+        queueBrainInsert(entry);
+      }
+      console.log("[OMNIMENS] 🧠 Operational flow knowledge queued into brain — 5 entries on DB pool management, intervals, timeout recovery, staggering, and smooth flow.");
+    } catch (err: any) {
+      console.error("[OMNIMENS] Failed to queue operational knowledge:", err?.message);
+    }
+  }, 120_000);
+
   _enginesReady = true;
   console.log("[OMNIMENS] All consciousness engines queued for initialization.");
 }
