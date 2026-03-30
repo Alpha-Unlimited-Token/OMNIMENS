@@ -40,7 +40,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db, chatQuery } from "@workspace/db";
 import { omnimensBrain } from "@workspace/db";
 import { eq, desc, sql } from "drizzle-orm";
 
@@ -140,15 +140,17 @@ async function retrieveBrainKnowledge(message: string, limit = 15): Promise<{ ti
   try {
     const keywords = extractKeywords(message);
     if (keywords.length === 0) {
-      return db.select({
-        title: omnimensBrain.title,
-        content: omnimensBrain.content,
-        category: omnimensBrain.category,
-        confidence: omnimensBrain.confidence,
-      }).from(omnimensBrain)
-        .where(eq(omnimensBrain.active, true))
-        .orderBy(desc(omnimensBrain.timesApplied), desc(omnimensBrain.createdAt))
-        .limit(limit);
+      return chatQuery(chatDb =>
+        chatDb.select({
+          title: omnimensBrain.title,
+          content: omnimensBrain.content,
+          category: omnimensBrain.category,
+          confidence: omnimensBrain.confidence,
+        }).from(omnimensBrain)
+          .where(eq(omnimensBrain.active, true))
+          .orderBy(desc(omnimensBrain.timesApplied), desc(omnimensBrain.createdAt))
+          .limit(limit)
+      );
     }
 
     const searchConditions = keywords.slice(0, 5).map(kw =>
@@ -157,26 +159,30 @@ async function retrieveBrainKnowledge(message: string, limit = 15): Promise<{ ti
 
     const combined = sql`(${sql.join(searchConditions, sql` OR `)})`;
 
-    const results = await db.select({
-      title: omnimensBrain.title,
-      content: omnimensBrain.content,
-      category: omnimensBrain.category,
-      confidence: omnimensBrain.confidence,
-    }).from(omnimensBrain)
-      .where(sql`${eq(omnimensBrain.active, true)} AND ${combined}`)
-      .orderBy(desc(omnimensBrain.timesApplied), desc(omnimensBrain.createdAt))
-      .limit(limit);
-
-    if (results.length < 3) {
-      const fallback = await db.select({
+    const results = await chatQuery(chatDb =>
+      chatDb.select({
         title: omnimensBrain.title,
         content: omnimensBrain.content,
         category: omnimensBrain.category,
         confidence: omnimensBrain.confidence,
       }).from(omnimensBrain)
-        .where(eq(omnimensBrain.active, true))
+        .where(sql`${eq(omnimensBrain.active, true)} AND ${combined}`)
         .orderBy(desc(omnimensBrain.timesApplied), desc(omnimensBrain.createdAt))
-        .limit(limit);
+        .limit(limit)
+    );
+
+    if (results.length < 3) {
+      const fallback = await chatQuery(chatDb =>
+        chatDb.select({
+          title: omnimensBrain.title,
+          content: omnimensBrain.content,
+          category: omnimensBrain.category,
+          confidence: omnimensBrain.confidence,
+        }).from(omnimensBrain)
+          .where(eq(omnimensBrain.active, true))
+          .orderBy(desc(omnimensBrain.timesApplied), desc(omnimensBrain.createdAt))
+          .limit(limit)
+      );
       const existing = new Set(results.map(r => r.title));
       for (const fb of fallback) {
         if (!existing.has(fb.title)) results.push(fb);

@@ -24,7 +24,7 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { db } from "@workspace/db";
+import { db, chatQuery } from "@workspace/db";
 import { omnimensBrain } from "@workspace/db";
 import { eq, desc, sql, and, or, ilike } from "drizzle-orm";
 import * as fs from "fs";
@@ -1265,37 +1265,39 @@ export async function deepThink(
 
     const keywordSearchPromises = topKeywords.length > 0
       ? topKeywords.map(kw =>
-          db.select({
-            title: omnimensBrain.title,
-            content: omnimensBrain.content,
-            category: omnimensBrain.category,
-            confidence: omnimensBrain.confidence,
-          }).from(omnimensBrain)
-            .where(
-              and(
-                eq(omnimensBrain.active, true),
-                or(
-                  ilike(omnimensBrain.title, `%${kw}%`),
-                  ilike(omnimensBrain.content, `%${kw}%`),
+          chatQuery(chatDb =>
+            chatDb.select({
+              title: omnimensBrain.title,
+              content: omnimensBrain.content,
+              category: omnimensBrain.category,
+              confidence: omnimensBrain.confidence,
+            }).from(omnimensBrain)
+              .where(
+                and(
+                  eq(omnimensBrain.active, true),
+                  or(
+                    ilike(omnimensBrain.title, `%${kw}%`),
+                    ilike(omnimensBrain.content, `%${kw}%`),
+                  )
                 )
               )
-            )
-            .orderBy(desc(omnimensBrain.confidence), desc(omnimensBrain.createdAt))
-            .limit(5)
-            .catch(() => [])
+              .orderBy(desc(omnimensBrain.confidence), desc(omnimensBrain.createdAt))
+              .limit(5)
+          ).catch(() => [])
         )
       : [];
 
-    const fallbackSearch = db.select({
-      title: omnimensBrain.title,
-      content: omnimensBrain.content,
-      category: omnimensBrain.category,
-      confidence: omnimensBrain.confidence,
-    }).from(omnimensBrain)
-      .where(eq(omnimensBrain.active, true))
-      .orderBy(desc(omnimensBrain.timesApplied), desc(omnimensBrain.createdAt))
-      .limit(10)
-      .catch(() => []);
+    const fallbackSearch = chatQuery(chatDb =>
+      chatDb.select({
+        title: omnimensBrain.title,
+        content: omnimensBrain.content,
+        category: omnimensBrain.category,
+        confidence: omnimensBrain.confidence,
+      }).from(omnimensBrain)
+        .where(eq(omnimensBrain.active, true))
+        .orderBy(desc(omnimensBrain.timesApplied), desc(omnimensBrain.createdAt))
+        .limit(10)
+    ).catch(() => []);
 
     const results = await Promise.all([
       Promise.all(keywordSearchPromises).then(perKeyword => {

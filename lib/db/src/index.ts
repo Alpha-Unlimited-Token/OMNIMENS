@@ -30,10 +30,11 @@ if (!process.env.DATABASE_URL) {
 
 const CONN_STRING = process.env.DATABASE_URL;
 
-const ALPHA_BASE_MAX = 8;
-const BETA_BASE_MAX = 8;
-const ALPHA_CEIL = 16;
-const BETA_CEIL = 16;
+const ALPHA_BASE_MAX = 6;
+const BETA_BASE_MAX = 6;
+const GAMMA_MAX = 3;
+const ALPHA_CEIL = 12;
+const BETA_CEIL = 12;
 const IDLE_TIMEOUT = 60000;
 const CONNECT_TIMEOUT = 30000;
 const STATEMENT_TIMEOUT = 20000;
@@ -63,6 +64,26 @@ export const poolBeta = new Pool({
   keepAlive: true,
   keepAliveInitialDelayMillis: 10000,
 });
+
+export const poolGamma = new Pool({
+  connectionString: CONN_STRING,
+  max: GAMMA_MAX,
+  idleTimeoutMillis: 120000,
+  connectionTimeoutMillis: 15000,
+  statement_timeout: 15000,
+  allowExitOnIdle: false,
+  application_name: "omnimens_gamma_chat",
+  keepAlive: true,
+  keepAliveInitialDelayMillis: 5000,
+});
+
+let _gammaPoolErrors = 0;
+poolGamma.on("error", (err) => {
+  _gammaPoolErrors++;
+  console.error("[DB GAMMA] Pool error:", err.message);
+});
+
+export const dbGamma = drizzle(poolGamma, { schema });
 
 let _alphaPoolErrors = 0;
 let _betaPoolErrors = 0;
@@ -116,6 +137,17 @@ const _healthPingInterval = setInterval(() => {
   _healthPingAndRecycle(poolAlpha, "ALPHA", true).catch(() => {});
   _healthPingAndRecycle(poolBeta, "BETA", false).catch(() => {});
 }, HEALTH_PING_INTERVAL_MS);
+
+setInterval(async () => {
+  try {
+    const client = await poolGamma.connect();
+    await client.query("SELECT 1");
+    client.release();
+  } catch (err: any) {
+    _gammaPoolErrors++;
+    console.warn(`[DB GAMMA] Chat pool health ping failed: ${err.message}`);
+  }
+}, 60000);
 
 export const dbAlpha = drizzle(poolAlpha, { schema });
 export const dbBeta = drizzle(poolBeta, { schema });
@@ -232,7 +264,7 @@ export const db: ReturnType<typeof drizzle> = new Proxy(dbBeta, {
 
 let _alphaActiveWrites = 0;
 let _betaActiveWrites = 0;
-const MAX_CONCURRENT_PER_POOL = 6;
+const MAX_CONCURRENT_PER_POOL = 4;
 const _writeQueueAlpha: Array<{ fn: () => Promise<void>; resolve: () => void; reject: (err: unknown) => void; priority: EnginePriority }> = [];
 const _writeQueueBeta: Array<{ fn: () => Promise<void>; resolve: () => void; reject: (err: unknown) => void; priority: EnginePriority }> = [];
 
@@ -264,6 +296,10 @@ export async function safeDbWrite(
   priority: EnginePriority = "medium",
   preferredSide: PoolSide = "alpha"
 ): Promise<void> {
+  if (priority !== "critical" && !shouldBackgroundEngineWrite()) {
+    return;
+  }
+
   const route = _spiderSilkRoute(preferredSide, priority);
   const side = route.side;
   const activeCount = side === "alpha" ? _alphaActiveWrites : _betaActiveWrites;
@@ -276,13 +312,13 @@ export async function safeDbWrite(
   const combinedPressure = (sidePressure + otherPressure) / 2;
 
   if (priority === "low") {
-    if (sidePressure > 0.8) return;
-    if (queue.length > 15) return;
-    if (combinedPressure > 0.7 && queue.length > 8) return;
+    if (sidePressure > 0.7) return;
+    if (queue.length > 10) return;
+    if (combinedPressure > 0.6 && queue.length > 5) return;
   }
   if (priority === "medium") {
-    if (sidePressure > 0.9 && queue.length > 20) return;
-    if (combinedPressure > 0.85 && queue.length > 15) return;
+    if (sidePressure > 0.8 && queue.length > 12) return;
+    if (combinedPressure > 0.75 && queue.length > 8) return;
   }
 
   if (activeCount < MAX_CONCURRENT_PER_POOL) {
@@ -371,6 +407,86 @@ function _autonomousScaling() {
 
 _scalingInterval = setInterval(_autonomousScaling, 5000);
 
+export function chatQuery<T>(fn: (chatDb: ReturnType<typeof drizzle>) => Promise<T>): Promise<T> {
+  return fn(dbGamma).catch(async (err) => {
+    console.warn(`[DB GAMMA] Chat query failed, falling back to Beta: ${err.message}`);
+    return fn(dbBeta);
+  });
+}
+
+let _orchestratorThrottleLevel: "none" | "light" | "heavy" | "critical" = "none";
+let _orchestratorCycleCount = 0;
+let _orchestratorDroppedWrites = 0;
+let _orchestratorLastChatLatencyMs = 0;
+
+function _orchestratorCycle() {
+  _orchestratorCycleCount++;
+  const alphaP = _poolPressure(poolAlpha);
+  const betaP = _poolPressure(poolBeta);
+  const combinedP = (alphaP + betaP) / 2;
+  const alphaWaiting = poolAlpha.waitingCount;
+  const betaWaiting = poolBeta.waitingCount;
+  const totalWaiting = alphaWaiting + betaWaiting;
+
+  let newLevel: typeof _orchestratorThrottleLevel = "none";
+  if (combinedP > 0.9 || totalWaiting > 8) {
+    newLevel = "critical";
+  } else if (combinedP > 0.75 || totalWaiting > 4) {
+    newLevel = "heavy";
+  } else if (combinedP > 0.55 || totalWaiting > 2) {
+    newLevel = "light";
+  }
+
+  if (newLevel === "critical") {
+    const alphaDrop = Math.min(_writeQueueAlpha.length, Math.max(0, _writeQueueAlpha.length - 3));
+    const betaDrop = Math.min(_writeQueueBeta.length, Math.max(0, _writeQueueBeta.length - 3));
+    if (alphaDrop > 0) {
+      const dropped = _writeQueueAlpha.splice(0, alphaDrop);
+      for (const item of dropped) item.resolve();
+      _orchestratorDroppedWrites += alphaDrop;
+    }
+    if (betaDrop > 0) {
+      const dropped = _writeQueueBeta.splice(0, betaDrop);
+      for (const item of dropped) item.resolve();
+      _orchestratorDroppedWrites += betaDrop;
+    }
+  }
+
+  if (newLevel !== _orchestratorThrottleLevel) {
+    if (newLevel !== "none") {
+      console.log(`[POOL ORCHESTRATOR] ⚙️ Throttle: ${_orchestratorThrottleLevel} → ${newLevel} | Alpha: ${(alphaP*100).toFixed(0)}% Beta: ${(betaP*100).toFixed(0)}% | Waiting: ${totalWaiting}`);
+    }
+    _orchestratorThrottleLevel = newLevel;
+  }
+}
+
+setInterval(_orchestratorCycle, 3000);
+
+export function getOrchestratorThrottle(): typeof _orchestratorThrottleLevel {
+  return _orchestratorThrottleLevel;
+}
+
+export function shouldBackgroundEngineWrite(): boolean {
+  if (_orchestratorThrottleLevel === "critical") return false;
+  if (_orchestratorThrottleLevel === "heavy") return Math.random() < 0.3;
+  if (_orchestratorThrottleLevel === "light") return Math.random() < 0.7;
+  return true;
+}
+
+export function getOrchestratorStats() {
+  return {
+    throttleLevel: _orchestratorThrottleLevel,
+    cycles: _orchestratorCycleCount,
+    droppedWrites: _orchestratorDroppedWrites,
+    lastChatLatencyMs: _orchestratorLastChatLatencyMs,
+    alphaPressure: Math.round(_poolPressure(poolAlpha) * 100),
+    betaPressure: Math.round(_poolPressure(poolBeta) * 100),
+    gammaTotal: poolGamma.totalCount,
+    gammaIdle: poolGamma.idleCount,
+    gammaWaiting: poolGamma.waitingCount,
+  };
+}
+
 export function getPoolStats() {
   const alphaMax = (poolAlpha as any).options?.max ?? ALPHA_BASE_MAX;
   const betaMax = (poolBeta as any).options?.max ?? BETA_BASE_MAX;
@@ -397,6 +513,13 @@ export function getPoolStats() {
       queueLength: _writeQueueBeta.length,
       errors: _betaPoolErrors,
     },
+    gamma: {
+      total: poolGamma.totalCount,
+      idle: poolGamma.idleCount,
+      waiting: poolGamma.waitingCount,
+      max: GAMMA_MAX,
+      errors: _gammaPoolErrors,
+    },
     scaling: { ..._scalingStats },
     lifecycle: {
       maxConnLifetimeMs: MAX_CONN_LIFETIME_MS,
@@ -408,15 +531,15 @@ export function getPoolStats() {
       betaLastRecycleAgeMin: Math.round((Date.now() - _lastBetaRecycle) / 60000),
     },
     combined: {
-      totalConnections: poolAlpha.totalCount + poolBeta.totalCount,
-      totalMax: alphaMax + betaMax,
-      totalWaiting: poolAlpha.waitingCount + poolBeta.waitingCount,
-      totalIdle: poolAlpha.idleCount + poolBeta.idleCount,
+      totalConnections: poolAlpha.totalCount + poolBeta.totalCount + poolGamma.totalCount,
+      totalMax: alphaMax + betaMax + GAMMA_MAX,
+      totalWaiting: poolAlpha.waitingCount + poolBeta.waitingCount + poolGamma.waitingCount,
+      totalIdle: poolAlpha.idleCount + poolBeta.idleCount + poolGamma.idleCount,
       overallPressure: Math.round(
         ((_poolPressure(poolAlpha) + _poolPressure(poolBeta)) / 2) * 100
       ),
       bothHealthy: _isPoolHealthy(poolAlpha) && _isPoolHealthy(poolBeta),
-      totalErrors: _alphaPoolErrors + _betaPoolErrors,
+      totalErrors: _alphaPoolErrors + _betaPoolErrors + _gammaPoolErrors,
     },
   };
 }
@@ -592,9 +715,10 @@ setValveHealthSupplier(() => ({
 
 startWriteValve();
 
-console.log(`[DB DUAL-POOL] 🕸️ Spider-Silk Cross-Bridge ONLINE (keepAlive: enabled)`);
-console.log(`[DB DUAL-POOL] 🧠 ALPHA Cortex Pool: ${ALPHA_BASE_MAX} base → ${ALPHA_CEIL} ceiling`);
-console.log(`[DB DUAL-POOL] ⚡ BETA Relay Pool: ${BETA_BASE_MAX} base → ${BETA_CEIL} ceiling`);
+console.log(`[DB TRI-POOL] 🕸️ Spider-Silk Cross-Bridge ONLINE (keepAlive: enabled)`);
+console.log(`[DB TRI-POOL] 🧠 ALPHA Cortex Pool: ${ALPHA_BASE_MAX} base → ${ALPHA_CEIL} ceiling (background engines)`);
+console.log(`[DB TRI-POOL] ⚡ BETA Relay Pool: ${BETA_BASE_MAX} base → ${BETA_CEIL} ceiling (user-facing)`);
+console.log(`[DB TRI-POOL] 💬 GAMMA Chat Pool: ${GAMMA_MAX} reserved (chat-only — never shared with background engines)`);
 console.log(`[DB DUAL-POOL] 🌿 Ivy Tendril Rotation: brain inserts alternate between pools`);
 console.log(`[DB DUAL-POOL] 🪱 Wormhole Tunnel: full-saturation failover active`);
 console.log(`[DB DUAL-POOL] 🐝 Beehive Distribution: priority-based engine routing`);
