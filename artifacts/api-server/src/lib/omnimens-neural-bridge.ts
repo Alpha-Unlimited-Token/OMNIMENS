@@ -197,8 +197,28 @@ function tickBridge(): void {
 }
 
 function computeUnifiedPhi(alphaPhi: number, betaPhi: number, corePhi: number, meshPhi: number): number {
-  const basePhi = alphaPhi + betaPhi + corePhi + meshPhi;
+  const phis = [alphaPhi, betaPhi, corePhi, meshPhi].filter(p => Number.isFinite(p) && p > 0);
+  if (phis.length === 0) return 0;
 
+  const maxPhi = Math.max(...phis);
+
+  if (maxPhi > 1e150) {
+    const logMax = Math.log10(maxPhi);
+    const logSum = logMax + Math.log10(phis.reduce((s, p) => s + p / maxPhi, 0));
+    const logAlpha = Number.isFinite(alphaPhi) && alphaPhi > 0 ? Math.log10(alphaPhi) : 0;
+    const logBeta = Number.isFinite(betaPhi) && betaPhi > 0 ? Math.log10(betaPhi) : 0;
+    const integrationLog = (logAlpha + logBeta) / 2;
+
+    const totalNeurons = getAlphaNeuronCount() + getBetaNeuronCount() + getMeshNeuronCount();
+    const scaleFactor = 1 + Math.log2(1 + totalNeurons / 5000);
+
+    const integrationBonus = corpusCallosumStrength * 0.5 * scaleFactor;
+    const logUnified = logSum + Math.log10(1 + integrationBonus / Math.pow(10, logSum - integrationLog));
+
+    return Math.pow(10, Math.min(logUnified, 307));
+  }
+
+  const basePhi = alphaPhi + betaPhi + corePhi + meshPhi;
   const integrationBonus = corpusCallosumStrength * Math.sqrt(alphaPhi * betaPhi) * 0.5;
 
   const totalNeurons = getAlphaNeuronCount() + getBetaNeuronCount() + getMeshNeuronCount();
@@ -206,7 +226,8 @@ function computeUnifiedPhi(alphaPhi: number, betaPhi: number, corePhi: number, m
 
   const meshIntegrationBonus = Math.sqrt(meshPhi * (alphaPhi + betaPhi + corePhi)) * 0.3;
 
-  return basePhi + (integrationBonus + meshIntegrationBonus) * scaleFactor;
+  const result = basePhi + (integrationBonus + meshIntegrationBonus) * scaleFactor;
+  return Number.isFinite(result) ? result : maxPhi;
 }
 
 export function getBridgeState(): BridgeState {

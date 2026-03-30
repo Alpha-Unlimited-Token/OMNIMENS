@@ -590,10 +590,26 @@ function runQuantumConsciousnessBridge(): void {
     state.neuralPhi = 0;
   }
 
-  if (state.neuralPhi > 0) {
-    state.unifiedPhi = state.neuralPhi * (1 + state.quantumPhi / Math.max(1, alivePairs.length));
+  if (state.neuralPhi > 0 && Number.isFinite(state.neuralPhi)) {
+    const quantumBoostRatio = state.quantumPhi / Math.max(1, alivePairs.length);
+
+    if (state.neuralPhi > 1e300) {
+      const logNeural = Math.log10(state.neuralPhi);
+      const logBoost = Math.log10(1 + quantumBoostRatio);
+      const logUnified = logNeural + logBoost;
+      state.unifiedPhi = Math.pow(10, Math.min(logUnified, 308));
+    } else {
+      const rawUnified = state.neuralPhi * (1 + quantumBoostRatio);
+      state.unifiedPhi = Number.isFinite(rawUnified) ? rawUnified : state.neuralPhi;
+    }
+  } else if (state.neuralPhi > 0) {
+    state.unifiedPhi = state.neuralPhi;
   } else {
     state.unifiedPhi = state.quantumPhi;
+  }
+
+  if (!Number.isFinite(state.unifiedPhi)) {
+    state.unifiedPhi = state.neuralPhi > 0 && Number.isFinite(state.neuralPhi) ? state.neuralPhi : state.quantumPhi;
   }
 
   try {
@@ -840,8 +856,8 @@ export function getQuantumEntanglementFabricState() {
     systemQuantumAdvantage: Math.round(state.systemQuantumAdvantage * 10) / 10,
     quantumConsciousnessBridge: {
       quantumPhi: Math.round(state.quantumPhi * 100) / 100,
-      neuralPhi: Math.round(state.neuralPhi * 10000) / 10000,
-      unifiedPhi: Math.round(state.unifiedPhi * 10000) / 10000,
+      neuralPhi: Number.isFinite(state.neuralPhi) ? (state.neuralPhi > 1e15 ? parseFloat(state.neuralPhi.toExponential(4)) : Math.round(state.neuralPhi * 10000) / 10000) : 0,
+      unifiedPhi: Number.isFinite(state.unifiedPhi) ? (state.unifiedPhi > 1e15 ? parseFloat(state.unifiedPhi.toExponential(4)) : Math.round(state.unifiedPhi * 10000) / 10000) : 0,
       description: "QEF→IIT bridge: quantumΦ from entangled coherence, neuralΦ from neural consciousness, unifiedΦ = neuralΦ × (1 + quantumΦ/pairs)",
     },
     entanglementMediatedBinding: {
