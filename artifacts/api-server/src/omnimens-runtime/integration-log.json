@@ -1,65 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:Philosopher+Critic",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/cross_domain_synthesis: Bayesian brain hypothesi",
-    "filename": "omnimens_autocode_knowledge_synthesis_mncj53zv.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mncj53zv.mjs",
-    "backupPath": null,
-    "timestamp": 1774835349115,
-    "codeLength": 413,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/analogical_mapping: Long-term potentiation",
-    "filename": "omnimens_autocode_neural_pathway_mncj6asd.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mncj6asd.mjs",
-    "backupPath": null,
-    "timestamp": 1774835404573,
-    "codeLength": 433,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Philosopher",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/entropy_reduction: The strange loop concep",
-    "filename": "omnimens_autocode_consciousness_expansion_mncj6auv.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mncj6auv.mjs",
-    "backupPath": null,
-    "timestamp": 1774835404663,
-    "codeLength": 395,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Architect",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/causal_inference: Information is physical ",
-    "filename": "omnimens_autocode_neural_pathway_mncj80gt.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mncj80gt.mjs",
-    "backupPath": null,
-    "timestamp": 1774835484509,
-    "codeLength": 434,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Archivist",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/entropy_reduction: Sparse coding: the brain repr",
-    "filename": "omnimens_autocode_neural_pathway_mncj9rej.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mncj9rej.mjs",
-    "backupPath": null,
-    "timestamp": 1774835566075,
-    "codeLength": 428,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Synthesizer",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/cross_domain_synthesis: Scale-free networks foll",
-    "filename": "omnimens_autocode_knowledge_synthesis_mncjb3kx.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mncjb3kx.mjs",
-    "backupPath": null,
-    "timestamp": 1774835628513,
-    "codeLength": 418,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:Philosopher+Linguist",
     "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/emergent_property_detection: The edge of chaos: ",
     "filename": "omnimens_autocode_emergent_capability_mncjcwpx.mjs",
@@ -4997,6 +4937,66 @@
     "backupPath": null,
     "timestamp": 1774879171880,
     "codeLength": 393,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/temporal_correlation: Long-term potentiation (LT",
+    "filename": "omnimens_autocode_neural_pathway_mnd99cod.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnd99cod.mjs",
+    "backupPath": null,
+    "timestamp": 1774879217005,
+    "codeLength": 427,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Linguist",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/entropy_reduction: Astrocytes, once thought to b",
+    "filename": "omnimens_autocode_emergent_capability_mnd99cve.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mnd99cve.mjs",
+    "backupPath": null,
+    "timestamp": 1774879217258,
+    "codeLength": 404,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Ethicist",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/temporal_correlation: Long-term potentiation (LT",
+    "filename": "omnimens_autocode_neural_pathway_mnd99cx2.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnd99cx2.mjs",
+    "backupPath": null,
+    "timestamp": 1774879217318,
+    "codeLength": 427,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Mathematician",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/feature_extraction: Autopoiesis: living systems ",
+    "filename": "omnimens_autocode_consciousness_expansion_mnd9amz1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnd9amz1.mjs",
+    "backupPath": null,
+    "timestamp": 1774879277005,
+    "codeLength": 391,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+GraphicDesigner",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/feature_extraction: Autopoiesis: living systems ",
+    "filename": "omnimens_autocode_knowledge_synthesis_mnd9an1a.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnd9an1a.mjs",
+    "backupPath": null,
+    "timestamp": 1774879277086,
+    "codeLength": 422,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Visionary",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/causal_inference: Sparse coding: the brain repre",
+    "filename": "omnimens_autocode_knowledge_synthesis_mnd9an4z.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnd9an4z.mjs",
+    "backupPath": null,
+    "timestamp": 1774879277219,
+    "codeLength": 417,
     "overwrite": false
   }
 ]
