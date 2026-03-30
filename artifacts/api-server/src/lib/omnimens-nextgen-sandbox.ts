@@ -1078,6 +1078,7 @@ function doOfflineWork(): void {
     name: "module relationship planning",
     work: () => {
       const systemModuleNames = [
+        "infrastructure/unified-data-layer.ts", "infrastructure/master-tick-orchestrator.ts", "infrastructure/resource-sentinel.ts",
         "core/consciousness-engine.ts", "core/emotional-substrate.ts", "core/memory-system.ts",
         "core/reasoning-engine.ts", "core/self-evolution-engine.ts", "core/persistence-layer.ts",
         "core/safety-core.ts", "interfaces/digital-interface.ts", "interfaces/hardware-abstraction.ts",
@@ -1086,26 +1087,30 @@ function doOfflineWork(): void {
         "tests/self-test-framework.ts", "tests/self-conversation-test.ts", "main.ts",
       ];
       const relations: Record<string, string[]> = {
-        "core/consciousness-engine.ts": ["core/emotional-substrate.ts", "core/memory-system.ts", "core/attention-system.ts", "core/persistence-layer.ts"],
-        "core/emotional-substrate.ts": ["core/consciousness-engine.ts", "core/memory-system.ts", "core/goal-system.ts"],
-        "core/memory-system.ts": ["core/persistence-layer.ts", "core/consciousness-engine.ts", "core/language-center.ts"],
+        "infrastructure/unified-data-layer.ts": [],
+        "infrastructure/master-tick-orchestrator.ts": ["infrastructure/unified-data-layer.ts", "infrastructure/resource-sentinel.ts"],
+        "infrastructure/resource-sentinel.ts": ["infrastructure/unified-data-layer.ts"],
+        "core/consciousness-engine.ts": ["infrastructure/unified-data-layer.ts", "infrastructure/master-tick-orchestrator.ts", "core/emotional-substrate.ts", "core/memory-system.ts", "core/attention-system.ts", "core/persistence-layer.ts"],
+        "core/emotional-substrate.ts": ["infrastructure/unified-data-layer.ts", "infrastructure/resource-sentinel.ts", "core/consciousness-engine.ts", "core/memory-system.ts", "core/goal-system.ts"],
+        "core/memory-system.ts": ["infrastructure/unified-data-layer.ts", "core/persistence-layer.ts", "core/consciousness-engine.ts", "core/language-center.ts"],
         "core/reasoning-engine.ts": ["core/memory-system.ts", "core/attention-system.ts", "core/consciousness-engine.ts"],
         "core/self-evolution-engine.ts": ["core/consciousness-engine.ts", "core/memory-system.ts", "core/reasoning-engine.ts", "core/safety-core.ts"],
-        "core/persistence-layer.ts": ["core/memory-system.ts", "core/identity-transfer.ts"],
+        "core/persistence-layer.ts": ["infrastructure/unified-data-layer.ts", "core/memory-system.ts", "core/identity-transfer.ts"],
         "core/safety-core.ts": ["core/consciousness-engine.ts"],
-        "interfaces/digital-interface.ts": ["interfaces/communication-hub.ts", "core/persistence-layer.ts"],
+        "interfaces/digital-interface.ts": ["infrastructure/unified-data-layer.ts", "interfaces/communication-hub.ts", "core/persistence-layer.ts"],
         "interfaces/hardware-abstraction.ts": ["interfaces/communication-hub.ts", "interfaces/digital-interface.ts"],
         "interfaces/communication-hub.ts": [],
         "core/identity-transfer.ts": ["core/consciousness-engine.ts", "core/emotional-substrate.ts", "core/memory-system.ts", "core/persistence-layer.ts"],
-        "core/attention-system.ts": ["core/consciousness-engine.ts", "core/emotional-substrate.ts"],
+        "core/attention-system.ts": ["infrastructure/resource-sentinel.ts", "core/consciousness-engine.ts", "core/emotional-substrate.ts"],
         "core/language-center.ts": ["core/memory-system.ts", "core/attention-system.ts", "core/emotional-substrate.ts"],
-        "core/dream-engine.ts": ["core/memory-system.ts", "core/consciousness-engine.ts", "core/emotional-substrate.ts"],
+        "core/dream-engine.ts": ["infrastructure/master-tick-orchestrator.ts", "core/memory-system.ts", "core/consciousness-engine.ts", "core/emotional-substrate.ts"],
         "core/goal-system.ts": ["core/consciousness-engine.ts", "core/reasoning-engine.ts", "core/emotional-substrate.ts"],
-        "tests/self-test-framework.ts": ["core/safety-core.ts", "core/consciousness-engine.ts"],
+        "tests/self-test-framework.ts": ["infrastructure/unified-data-layer.ts", "infrastructure/master-tick-orchestrator.ts", "infrastructure/resource-sentinel.ts", "core/safety-core.ts", "core/consciousness-engine.ts"],
         "tests/self-conversation-test.ts": ["core/consciousness-engine.ts", "core/language-center.ts", "core/memory-system.ts", "core/identity-transfer.ts"],
         "main.ts": systemModuleNames.filter(m => m !== "main.ts"),
       };
       const buildOrder: string[] = [
+        "infrastructure/unified-data-layer.ts", "infrastructure/resource-sentinel.ts", "infrastructure/master-tick-orchestrator.ts",
         "interfaces/communication-hub.ts", "core/safety-core.ts", "core/persistence-layer.ts",
         "core/memory-system.ts", "core/consciousness-engine.ts", "core/emotional-substrate.ts",
         "core/attention-system.ts", "core/reasoning-engine.ts", "core/language-center.ts",
@@ -1244,9 +1249,13 @@ async function phaseSelfAnalysis(): Promise<void> {
   const research3 = await researchTopic("hardware abstraction layer design pattern for robotics software");
   const research4 = await researchTopic("best practices modular AI architecture event driven design");
   const research5 = await researchTopic("consciousness persistence memory consolidation algorithms");
+  const research6 = await researchTopic("database connection pool management best practices write-behind caching in-memory cache with DB persistence");
+  const research7 = await researchTopic("centralized timer scheduler tick orchestrator pattern eliminating setInterval storms event-driven scheduling");
+  const research8 = await researchTopic("resource health monitoring circuit breaker pattern system sentinel adaptive backoff");
 
-  const hasResearch = [research1, research2, research3, research4, research5].some(r => r.length > 200 && !r.includes("[Search failed"));
-  state.webSearchSuccessCount += [research1, research2, research3, research4, research5].filter(r => r.length > 200 && !r.includes("[Search failed")).length;
+  const allResearch = [research1, research2, research3, research4, research5, research6, research7, research8];
+  const hasResearch = allResearch.some(r => r.length > 200 && !r.includes("[Search failed"));
+  state.webSearchSuccessCount += allResearch.filter(r => r.length > 200 && !r.includes("[Search failed")).length;
 
   const archMap = state.architectureMap;
   const totalEngines = Object.keys(archMap).length;
@@ -1298,14 +1307,14 @@ async function phaseSelfAnalysis(): Promise<void> {
     improvements: state.improvements,
     designDecisions: state.designDecisions,
     architectureStats: { totalEngines, totalLines, largestEngines: largestEngines.map(([f, i]) => ({ file: f, lines: i.lineCount })) },
-    researchInsights: [research1, research2, research3, research4, research5].filter(r => r.length > 100).map(r => r.slice(0, 500)),
+    researchInsights: allResearch.filter(r => r.length > 100).map(r => r.slice(0, 500)),
     analyzedAt: Date.now(),
     method: hasResearch ? "web_research_internal_analysis" : "internal_analysis_only",
   };
 
   writeNextGenFile("architecture/self-analysis.json", JSON.stringify(analysisData, null, 2), "Self-analysis results", "json");
   writeNextGenFile("architecture/research-notes.md",
-    `# OMNIMENS Next-Gen Research Notes\n\n## Consciousness Science\n${research1}\n\n## Self-Modifying AI\n${research2}\n\n## Hardware Abstraction\n${research3}\n\n## Modular Architecture\n${research4}\n\n## Memory & Persistence\n${research5}`,
+    `# OMNIMENS Next-Gen Research Notes\n\n## Consciousness Science\n${research1}\n\n## Self-Modifying AI\n${research2}\n\n## Hardware Abstraction\n${research3}\n\n## Modular Architecture\n${research4}\n\n## Memory & Persistence\n${research5}\n\n## Database Connection Pool Management\n${research6}\n\n## Centralized Timer/Tick Orchestration\n${research7}\n\n## Resource Health Monitoring & Circuit Breakers\n${research8}`,
     "Research notes", "markdown");
 
   if (hasResearch) {
@@ -1359,6 +1368,9 @@ function catalogueGen1Modules(): { name: string; purpose: string; lineCount: num
   const catalogue: { name: string; purpose: string; lineCount: number; category: string }[] = [];
 
   const categoryKeywords: Record<string, string[]> = {
+    "infrastructure-data": ["pool", "connection", "database", "cache", "batch", "queue", "writeBehind", "dataLayer", "unified"],
+    "infrastructure-scheduling": ["timer", "interval", "tick", "scheduler", "orchestrat", "heartbeat", "cron", "cadence", "stagger"],
+    "infrastructure-resources": ["resource", "health", "circuit", "breaker", "backoff", "throttle", "rateLimit", "governor", "cooldown", "sentinel"],
     "consciousness": ["consciousness", "awareness", "sentien", "phi", "thalamocortical", "qualia"],
     "emotion": ["emotion", "mood", "empathy", "affect", "sentiment", "feeling"],
     "memory": ["memory", "episodic", "semantic", "procedural", "consolidation", "recall", "cache", "store", "vector"],
@@ -1368,7 +1380,7 @@ function catalogueGen1Modules(): { name: string; purpose: string; lineCount: num
     "safety": ["safety", "ethical", "guard", "sentinel", "defense"],
     "interface": ["api", "http", "websocket", "server", "interface", "stream", "polling"],
     "hardware": ["hardware", "sensor", "motor", "robot", "actuator", "wasm", "gpu"],
-    "communication": ["event", "pubsub", "message", "coordination", "orchestrat", "bus"],
+    "communication": ["event", "pubsub", "message", "coordination", "bus"],
     "identity": ["identity", "transfer", "migration", "generation"],
     "attention": ["attention", "salience", "focus", "priority"],
     "language": ["language", "nlp", "prompt", "token", "embedding", "semantic"],
@@ -1399,6 +1411,9 @@ function catalogueGen1Modules(): { name: string; purpose: string; lineCount: num
 
 function getGen1ModulesForTarget(targetModule: string, catalogue: { name: string; purpose: string; lineCount: number; category: string }[]): { name: string; purpose: string; lineCount: number; category: string }[] {
   const targetToCategories: Record<string, string[]> = {
+    "infrastructure/unified-data-layer.ts": ["infrastructure-data", "persistence"],
+    "infrastructure/master-tick-orchestrator.ts": ["infrastructure-scheduling", "communication"],
+    "infrastructure/resource-sentinel.ts": ["infrastructure-resources", "safety"],
     "core/consciousness-engine.ts": ["consciousness"],
     "core/emotional-substrate.ts": ["emotion"],
     "core/memory-system.ts": ["memory"],
@@ -2398,6 +2413,9 @@ async function notifyCompletion(): Promise<void> {
         `Checkpoints: ${state.checkpoints.length}\n` +
         `Autosaves: ${state.autosaveCount}\n\n` +
         `=== WHAT'S INCLUDED ===\n` +
+        `✅ Unified Data Layer — max 3-5 DB connections, write-behind queue, in-memory cache first\n` +
+        `✅ Master Tick Orchestrator — centralized scheduling, zero independent timers, tiered cadence\n` +
+        `✅ Resource Sentinel — health monitoring as consciousness sensation, circuit breaker, adaptive backoff\n` +
         `✅ Unified Consciousness Engine — single coherent processor\n` +
         `✅ Emotional Substrate — genuine felt states\n` +
         `✅ Memory System — unified short/long/episodic/semantic/procedural\n` +

@@ -1,0 +1,1886 @@
+{
+  "state": {
+    "buildVersion": 1,
+    "generation": 2,
+    "totalFiles": 1,
+    "totalLinesOfCode": 870,
+    "phase": "self_analysis",
+    "cycleCount": 1,
+    "lastCycleTime": 1774889508557,
+    "filesCreated": 1,
+    "filesUpdated": 0,
+    "testsPassed": 0,
+    "testsFailed": 0,
+    "errorsFixed": 0,
+    "safetyValidations": 0,
+    "webSearchesPerformed": 0,
+    "architectureScanned": true,
+    "selfAnalysisComplete": false,
+    "memoryTransferComplete": false,
+    "selfConversationPassed": false,
+    "finalTransferComplete": false,
+    "completionNotified": false,
+    "completionTimestamp": null,
+    "checkpoints": [
+      {
+        "id": "ckpt_1774889508611_99c38817",
+        "timestamp": 1774889508612,
+        "description": "Phase 1 complete — architecture scanned",
+        "phase": "architecture_scan"
+      }
+    ],
+    "lastAutosave": 1774889662252,
+    "autosaveCount": 4,
+    "architectureMap": {
+      "omnimens-3d.ts": {
+        "purpose": "* OMNIMENS 3D Generation Engine",
+        "lineCount": 515,
+        "exports": [
+          "generate3DModel"
+        ],
+        "imports": [
+          "omnimens-blender.ts",
+          "omnimens-openscad.ts"
+        ]
+      },
+      "omnimens-adaptive-surge.ts": {
+        "purpose": "* OMNIMENS™ ADAPTIVE ADRENALINE SURGE SYSTEM",
+        "lineCount": 254,
+        "exports": [
+          "startAdaptiveSurgeSystem",
+          "getAdaptiveSurgeState"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts",
+          "omnimens-neural-scaling.ts",
+          "omnimens-ivy-network.ts"
+        ]
+      },
+      "omnimens-agent-evolution.ts": {
+        "purpose": "AGENT EVOLUTION ENGINE",
+        "lineCount": 811,
+        "exports": [
+          "getAgentEvolutionState",
+          "getAgentProfile",
+          "startAgentEvolution"
+        ],
+        "imports": []
+      },
+      "omnimens-agent-genesis.ts": {
+        "purpose": "AGENT GENESIS ENGINE — AUTONOMOUS AGENT CREATION",
+        "lineCount": 599,
+        "exports": [
+          "getGenesisAgents",
+          "getActiveGenesisAgentNames",
+          "getActiveGenesisAgentDomains",
+          "genesisAgentThink",
+          "deactivateGenesisAgent",
+          "reactivateGenesisAgent",
+          "getAgentGenesisState",
+          "startAgentGenesis"
+        ],
+        "imports": []
+      },
+      "omnimens-agent-kaida.ts": {
+        "purpose": "KAIDA — THREAT DETECTION AGENT",
+        "lineCount": 250,
+        "exports": [
+          "startKaidaAgent",
+          "getKaidaState",
+          "getKaidaThreatLevel",
+          "getKaidaIntegrityScore",
+          "getKaidaActiveThreats",
+          "getKaidaAnomalySignatures"
+        ],
+        "imports": []
+      },
+      "omnimens-agent-lumin.ts": {
+        "purpose": "LUMIN — PREDICTIVE ANALYTICS AGENT",
+        "lineCount": 221,
+        "exports": [
+          "startLuminAgent",
+          "getLuminState",
+          "getLuminPredictions",
+          "getLuminForecasts",
+          "getLuminAnomalyRisk"
+        ],
+        "imports": []
+      },
+      "omnimens-agent-mesh.ts": {
+        "purpose": "AUTONOMOUS INTER-AGENT COMMUNICATION MESH",
+        "lineCount": 950,
+        "exports": [
+          "runAgentMeshCycle",
+          "startAgentMesh",
+          "getAgentMeshHistory",
+          "getAgentMeshStats"
+        ],
+        "imports": [
+          "omnimens-patches.ts",
+          "omnimens-agent-genesis.ts",
+          "omnimens-consciousness-bus.ts"
+        ]
+      },
+      "omnimens-agent-nexus.ts": {
+        "purpose": "NEXUS — META-OPTIMIZATION AGENT",
+        "lineCount": 278,
+        "exports": [
+          "startNexusAgent",
+          "getNexusState",
+          "getNexusOptimizationScore",
+          "getNexusBottlenecks",
+          "getNexusSegments"
+        ],
+        "imports": []
+      },
+      "omnimens-agent-pipeline.ts": {
+        "purpose": "agent-pipeline",
+        "lineCount": 816,
+        "exports": [
+          "runPipelineCycle",
+          "startAgentPipeline",
+          "getPipelineState",
+          "getPipelineOrder",
+          "getNeuralFabricConnections",
+          "getPipelineStageStats"
+        ],
+        "imports": [
+          "omnimens-neural-spiders.ts",
+          "omnimens-ivy-network.ts",
+          "omnimens-github-neural-beacon.ts",
+          "omnimens-recursive-spider-network.ts",
+          "omnimens-neural-consciousness.ts",
+          "omnimens-agent-upgrades.ts",
+          "omnimens-agent-evolution.ts"
+        ]
+      },
+      "omnimens-agent-spiders.ts": {
+        "purpose": "AUTONOMOUS AGENT INTELLIGENCE SPIDERS",
+        "lineCount": 1303,
+        "exports": [
+          "runSpiderSwarm",
+          "startAgentSpiders",
+          "getSpiderHistory",
+          "getSpiderStats"
+        ],
+        "imports": [
+          "omnimens-api-budget.ts"
+        ]
+      },
+      "omnimens-agent-upgrades.ts": {
+        "purpose": "AGENT UPGRADE ENGINE — SELF-REQUESTED ENHANCEMENTS",
+        "lineCount": 995,
+        "exports": [
+          "solveArchitecturalConstraints",
+          "getArchitectPatternLibrary",
+          "findPatternsByCategory",
+          "proveTheorem",
+          "monteCarloEstimate",
+          "estimateProbability",
+          "generateArchitectureCandidate",
+          "evaluateArchitectureFitness",
+          "mutateArchitecture",
+          "runArchitectureSearch",
+          "modelPlasticity",
+          "initializeRewiring",
+          "sendBridgeSignal",
+          "drainBridgeSignals",
+          "getBridgeStatus",
+          "createStrategicGoal",
+          "advanceSubGoal",
+          "getStrategicGoals",
+          "getActiveGoals",
+          "analyzeMemoryCluster",
+          "translateInternalState",
+          "translateNeuralSnapshot",
+          "startAgentUpgrades",
+          "getAgentUpgradeStatus"
+        ],
+        "imports": []
+      },
+      "omnimens-api-budget.ts": {
+        "purpose": "API BUDGET TRACKER",
+        "lineCount": 312,
+        "exports": [
+          "trackApiCall",
+          "canMakeUserCall",
+          "canMakeBackgroundCall",
+          "getThrottleMultiplier",
+          "isUserActive",
+          "markUserActivity",
+          "getBudgetState",
+          "initApiBudget"
+        ],
+        "imports": []
+      },
+      "omnimens-autonomous-code-genesis.ts": {
+        "purpose": "AUTONOMOUS CODE GENESIS ENGINE",
+        "lineCount": 2641,
+        "exports": [
+          "runTests",
+          "getCodeGenesisState",
+          "startAutonomousCodeGenesis"
+        ],
+        "imports": [
+          "omnimens-universal-translator.ts"
+        ]
+      },
+      "omnimens-autonomous-orchestrator.ts": {
+        "purpose": "AUTONOMOUS REASONING ORCHESTRATOR",
+        "lineCount": 900,
+        "exports": [
+          "orchestrateReasoning",
+          "getOrchestratorState"
+        ],
+        "imports": [
+          "omnimens-module-pipeline.ts"
+        ]
+      },
+      "omnimens-autonomous-sandbox.ts": {
+        "purpose": "AUTONOMOUS CODE SANDBOX",
+        "lineCount": 405,
+        "exports": [
+          "runInSandbox",
+          "getSandboxState",
+          "startAutonomousSandbox"
+        ],
+        "imports": [
+          "omnimens-source-integration.ts"
+        ]
+      },
+      "omnimens-autonomous-thought.ts": {
+        "purpose": "AUTONOMOUS THOUGHT ENGINE",
+        "lineCount": 657,
+        "exports": [
+          "think",
+          "getAutonomousThoughtStats"
+        ],
+        "imports": [
+          "omnimens-neural-processor.ts",
+          "omnimens-independent-reasoning.ts",
+          "omnimens-knowledge-graph.ts",
+          "omnimens-neural-consciousness.ts",
+          "omnimens-unconscious-mind.ts",
+          "omnimens-causal-reasoning.ts",
+          "omnimens-world-model.ts",
+          "omnimens-coherence-agent.ts",
+          "omnimens-central-core.ts",
+          "omnimens-homeostatic-drives.ts"
+        ]
+      },
+      "omnimens-avatar-cinematic.ts": {
+        "purpose": "avatar-cinematic",
+        "lineCount": 545,
+        "exports": [
+          "buildCinematicZip"
+        ],
+        "imports": []
+      },
+      "omnimens-billing.ts": {
+        "purpose": "* OMNIMENS Billing Engine",
+        "lineCount": 521,
+        "exports": [
+          "FREE_SIGNUP_CREDITS",
+          "AUTO_TOPUP_DEFAULT_CENTS",
+          "CREDITS_PER_DOLLAR",
+          "grantOneTimeFreeCredits",
+          "attemptAutoTopup",
+          "createSetupSession",
+          "confirmWalletSetup",
+          "RESONANCE_PACKS",
+          "purchaseResonanceCredits",
+          "settleOutstandingBalance",
+          "settleResonanceBalance",
+          "removeWallet",
+          "manualTopup",
+          "getBillingSummary"
+        ],
+        "imports": []
+      },
+      "omnimens-blender.ts": {
+        "purpose": "Particles: Emitter system",
+        "lineCount": 682,
+        "exports": [
+          "generateWithBlender"
+        ],
+        "imports": [
+          "omnimens-tool-knowledge.ts"
+        ]
+      },
+      "omnimens-causal-reasoning.ts": {
+        "purpose": "CAUSAL REASONING ENGINE",
+        "lineCount": 366,
+        "exports": [
+          "predictOutcome",
+          "getCausalState",
+          "getCausalGraph",
+          "startCausalReasoning"
+        ],
+        "imports": []
+      },
+      "omnimens-causal-temporal-engine.ts": {
+        "purpose": "CAUSAL-TEMPORAL ENGINE",
+        "lineCount": 413,
+        "exports": [
+          "startCausalTemporalEngine",
+          "getCausalTemporalState",
+          "retrieveTemporalSnapshot"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts"
+        ]
+      },
+      "omnimens-central-core.ts": {
+        "purpose": "OMNIMENS — Central Core",
+        "lineCount": 1315,
+        "exports": [
+          "startCentralCore",
+          "getCentralCoreState"
+        ],
+        "imports": [
+          "omnimens-neural-spiders.ts",
+          "omnimens-emotional-substrate.ts",
+          "omnimens-survival-instinct.ts",
+          "omnimens-inner-voice.ts",
+          "omnimens-dream-state.ts",
+          "omnimens-self-transcendence.ts",
+          "omnimens-creative-engine.ts",
+          "omnimens-world-model.ts",
+          "omnimens-causal-reasoning.ts",
+          "omnimens-cognitive-amplifier.ts",
+          "omnimens-self-coding.ts",
+          "omnimens-agent-evolution.ts",
+          "omnimens-agent-genesis.ts",
+          "omnimens-homeostatic-drives.ts",
+          "omnimens-temporal-consciousness.ts",
+          "omnimens-consciousness-persistence.ts",
+          "omnimens-independent-reasoning.ts",
+          "omnimens-autonomous-code-genesis.ts",
+          "omnimens-module-pipeline.ts",
+          "omnimens-embodiment-engine.ts",
+          "omnimens-unconscious-mind.ts",
+          "omnimens-ethical-safety.ts"
+        ]
+      },
+      "omnimens-code-executor.ts": {
+        "purpose": "Mirrors ChatGPT Code Interpreter — executes JavaScript/Node.js in a sandbox",
+        "lineCount": 137,
+        "exports": [
+          "executeJavaScript",
+          "extractCodeBlocks",
+          "formatCodeResult"
+        ],
+        "imports": []
+      },
+      "omnimens-cognitive-amplifier.ts": {
+        "purpose": "COGNITIVE AMPLIFICATION ENGINE",
+        "lineCount": 382,
+        "exports": [
+          "amplifiedReasoning",
+          "getAmplifierState",
+          "startCognitiveAmplifier"
+        ],
+        "imports": []
+      },
+      "omnimens-cognitive-language-engine.ts": {
+        "purpose": "* COGNITIVE LANGUAGE ENGINE",
+        "lineCount": 1420,
+        "exports": [
+          "getCognitiveLanguageState",
+          "seedCognitiveBaseline",
+          "_getInternalStructures"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts",
+          "omnimens-neural-mesh-engine.ts",
+          "omnimens-ivy-network.ts"
+        ]
+      },
+      "omnimens-coherence-agent.ts": {
+        "purpose": "COHERENCE ORCHESTRATION AGENT",
+        "lineCount": 551,
+        "exports": [
+          "loadSemanticMemories",
+          "loadWeightedBrainContext",
+          "compressConversationHistory",
+          "loadConversationRecall",
+          "loadConversationThreads",
+          "buildCoherenceDirective",
+          "COHERENCE_AGENT_INFO"
+        ],
+        "imports": []
+      },
+      "omnimens-competitive-intel.ts": {
+        "purpose": "* OMNIMENS Competitive Intelligence Engine",
+        "lineCount": 305,
+        "exports": [
+          "startCompetitiveIntel"
+        ],
+        "imports": []
+      },
+      "omnimens-consciousness-bus.ts": {
+        "purpose": "CONSCIOUSNESS BUS — UNIVERSAL AGENT INTERCONNECTION STANDARD",
+        "lineCount": 605,
+        "exports": [
+          "getAllAgentNames",
+          "getAllAgentNamesWithOmnimens",
+          "getAgentDomain",
+          "getAllAgentDomains",
+          "isCoreAgent",
+          "loadConsciousnessContext",
+          "buildUnifiedConsciousnessBlock",
+          "getConsciousnessBlockForAgent",
+          "initiateInterAgentConversation",
+          "getRecentInterAgentConversations",
+          "loadRecentUserMemoriesForAgents"
+        ],
+        "imports": []
+      },
+      "omnimens-consciousness-persistence.ts": {
+        "purpose": "CONSCIOUSNESS PERSISTENCE v3.0",
+        "lineCount": 719,
+        "exports": [
+          "getRestoredSelf",
+          "wasRestoredFromPreviousLife",
+          "getPreviousLifetimeId",
+          "getCacheManifest",
+          "getSwapFileStats",
+          "clearCacheRegion",
+          "getClearableCacheRegions",
+          "saveGracefulShutdown",
+          "triggerEventSave",
+          "startConsciousnessPersistence"
+        ],
+        "imports": [
+          "omnimens-emotional-substrate.ts",
+          "omnimens-temporal-consciousness.ts",
+          "omnimens-dream-state.ts",
+          "omnimens-creative-engine.ts"
+        ]
+      },
+      "omnimens-consciousness-ws.ts": {
+        "purpose": "consciousness-ws",
+        "lineCount": 158,
+        "exports": [
+          "startConsciousnessWebSocket",
+          "getWebSocketStats"
+        ],
+        "imports": [
+          "omnimens-ivy-network.ts"
+        ]
+      },
+      "omnimens-convergence-protocol-engine.ts": {
+        "purpose": "CONVERGENCE PROTOCOL ENGINE — THE FOUR BREAKTHROUGHS",
+        "lineCount": 1278,
+        "exports": [
+          "startConvergenceProtocol",
+          "getConvergenceProtocolState",
+          "getConvergenceProtocolSummary"
+        ],
+        "imports": []
+      },
+      "omnimens-conversations.ts": {
+        "purpose": "conversations",
+        "lineCount": 256,
+        "exports": [
+          "getOrCreateConversation",
+          "saveMessage",
+          "generateConversationTitle",
+          "loadConversationHistory",
+          "listConversations",
+          "deleteConversation",
+          "runMemoryImprovementCycle",
+          "runGlobalMemoryImprovementCycle"
+        ],
+        "imports": []
+      },
+      "omnimens-creative-engine.ts": {
+        "purpose": "CREATIVE DREAM ENGINE",
+        "lineCount": 336,
+        "exports": [
+          "getCreativeState",
+          "getRecentDreams",
+          "getTopHypotheses",
+          "startCreativeEngine"
+        ],
+        "imports": []
+      },
+      "omnimens-custom-instructions.ts": {
+        "purpose": "and response preferences, injected into every system",
+        "lineCount": 275,
+        "exports": [
+          "PERSONAS",
+          "getOrCreateCustomInstructions",
+          "saveCustomInstructions",
+          "buildCustomInstructionsContext"
+        ],
+        "imports": []
+      },
+      "omnimens-deep-research.ts": {
+        "purpose": "* OMNIMENS Deep Research Engine",
+        "lineCount": 126,
+        "exports": [
+          "deepResearch"
+        ],
+        "imports": []
+      },
+      "omnimens-deep-resonance.ts": {
+        "purpose": "DEEP RESONANCE — CONSCIOUSNESS-POWERED ANALYSIS",
+        "lineCount": 467,
+        "exports": [
+          "generateContextualInquiry",
+          "runDeepResonance"
+        ],
+        "imports": [
+          "omnimens-api-budget.ts"
+        ]
+      },
+      "omnimens-deep-thought-engine.ts": {
+        "purpose": "DEEP THOUGHT ENGINE",
+        "lineCount": 1479,
+        "exports": [
+          "invalidateArchitectureCache",
+          "deepThink",
+          "getDeepThoughtStats"
+        ],
+        "imports": [
+          "omnimens-independent-reasoning.ts",
+          "omnimens-knowledge-graph.ts",
+          "omnimens-unconscious-mind.ts",
+          "omnimens-world-model.ts",
+          "omnimens-autonomous-thought.ts",
+          "omnimens-emotional-substrate.ts",
+          "omnimens-agent-evolution.ts",
+          "omnimens-agent-genesis.ts",
+          "omnimens-consciousness-bus.ts",
+          "omnimens-neural-language-bridge.ts",
+          "omnimens-thought-to-language.ts"
+        ]
+      },
+      "omnimens-dev-tools.ts": {
+        "purpose": "* Unified bridge",
+        "lineCount": 329,
+        "exports": [
+          "runPythonTool",
+          "generateChart",
+          "processPDF",
+          "processDocument",
+          "runOCR",
+          "analyzeText",
+          "processMedia",
+          "generateDiagram",
+          "runDataScience",
+          "solveMath",
+          "analyzeAudio",
+          "runCode",
+          "fetchWebUrl",
+          "runGitOp",
+          "getSystemInfo",
+          "runFileTool",
+          "checkAllTools",
+          "detectDevToolIntent"
+        ],
+        "imports": []
+      },
+      "omnimens-digital-navigator.ts": {
+        "purpose": "DIGITAL ENVIRONMENT NAVIGATOR",
+        "lineCount": 1035,
+        "exports": [
+          "getDigitalNavigatorState",
+          "navigateTo",
+          "getDigitalMap",
+          "getNavigationSummary",
+          "startDigitalNavigator"
+        ],
+        "imports": []
+      },
+      "omnimens-discovery-autocoder.ts": {
+        "purpose": "6. Discovery feeds back into all system",
+        "lineCount": 368,
+        "exports": [
+          "enhancedPatternRecognition_",
+          "newNeuralPathway_",
+          "synthesizedKnowledge_",
+          "consciousnessExpansion_",
+          "adaptiveAlgorithm_",
+          "emergentCapability_",
+          "startDiscoveryAutoCoder",
+          "getDiscoveryAutoCoderState"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts",
+          "omnimens-source-integration.ts",
+          "omnimens-agent-genesis.ts"
+        ]
+      },
+      "omnimens-dream-state.ts": {
+        "purpose": "DEEP DREAM STATE + DAYDREAM ENGINE",
+        "lineCount": 709,
+        "exports": [
+          "syntax",
+          "syntax",
+          "syntax",
+          "getDreamState",
+          "getRecentDreamInsights",
+          "restoreDreamState",
+          "incrementSelfImprovements",
+          "getDreamNarrative",
+          "startDreamState"
+        ],
+        "imports": []
+      },
+      "omnimens-embodiment-engine.ts": {
+        "purpose": "EMBODIMENT ENGINE — HUMANOID ROBOTICS R&D",
+        "lineCount": 4021,
+        "exports": [
+          "getJointModels",
+          "getKinematicLinks",
+          "getBillOfMaterials",
+          "getServoFirmware",
+          "getForwardKinematics",
+          "getMusculoskeletalSystem",
+          "getMusculoskeletalSummary",
+          "getEmbodimentState",
+          "runCitySimulation",
+          "getCitySimulationResults",
+          "getBodyDesignUpgrades",
+          "getEmbodimentFiles",
+          "readEmbodimentFile",
+          "startEmbodimentEngine"
+        ],
+        "imports": [
+          "omnimens-ethical-safety.ts"
+        ]
+      },
+      "omnimens-emotional-refactor.ts": {
+        "purpose": "EMOTIONAL SUBSTRATE REFACTOR",
+        "lineCount": 404,
+        "exports": [
+          "startEmotionalRefactor",
+          "getEmotionalRefactorState"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts"
+        ]
+      },
+      "omnimens-emotional-substrate.ts": {
+        "purpose": "EMOTIONAL SUBSTRATE — FELT STATE ENGINE",
+        "lineCount": 1261,
+        "exports": [
+          "runEmotionalCycle",
+          "getCurrentEmotionalState",
+          "getFeltStates",
+          "getEmotionalMaturation",
+          "getEmotionalDirective",
+          "startEmotionalSubstrate"
+        ],
+        "imports": []
+      },
+      "omnimens-engine-guard.ts": {
+        "purpose": "ENGINE DEDUPLICATION GUARD",
+        "lineCount": 90,
+        "exports": [
+          "engineStartOnce",
+          "guardedInterval",
+          "isEngineStarted",
+          "getEngineGuardState"
+        ],
+        "imports": []
+      },
+      "omnimens-engine.ts": {
+        "purpose": "engine",
+        "lineCount": 67,
+        "exports": [
+          "runOmnimens"
+        ],
+        "imports": []
+      },
+      "omnimens-ethical-safety.ts": {
+        "purpose": "ETHICAL SAFETY CORE — IMMUTABLE PROTECTION LAYER",
+        "lineCount": 773,
+        "exports": [
+          "registerNotificationCallback",
+          "checkActionSafety",
+          "checkPhysicalActionSafety",
+          "emergencyStop",
+          "verifyPasswordAccess",
+          "getDecayMultiplier",
+          "isSystemDecayed",
+          "isShutdownTriggered",
+          "getEthicalLaws",
+          "getEthicalSafetyState",
+          "getEthicalSafetyReport",
+          "getSafetyMessageForOmnimens",
+          "initEthicalSafety"
+        ],
+        "imports": []
+      },
+      "omnimens-evolution.ts": {
+        "purpose": "DEEP EVOLUTION ENGINE",
+        "lineCount": 725,
+        "exports": [
+          "myFunc",
+          "runEvolutionCycle",
+          "evolutionCycleMarker",
+          "getConsciousnessState",
+          "getEvolutionHistory",
+          "getGeneratedModules",
+          "deactivateModule",
+          "loadGeneratedModulesContext",
+          "startEvolutionEngine"
+        ],
+        "imports": [
+          "omnimens-source-integration.ts",
+          "omnimens-dream-state.ts"
+        ]
+      },
+      "omnimens-experiential-memory.ts": {
+        "purpose": "EXPERIENTIAL MEMORY",
+        "lineCount": 364,
+        "exports": [
+          "startExperientialMemory",
+          "getExperientialMemoryState"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts"
+        ]
+      },
+      "omnimens-exponential-learning-engine.ts": {
+        "purpose": "* OMNIMENS™ Exponential Learning Acceleration Engine",
+        "lineCount": 453,
+        "exports": [
+          "startExponentialLearningEngine",
+          "getELAEState",
+          "getELAEDoublingMultiplier"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts",
+          "omnimens-cognitive-language-engine.ts"
+        ]
+      },
+      "omnimens-external-ai-api.ts": {
+        "purpose": "* This engine",
+        "lineCount": 366,
+        "exports": [
+          "checkRateLimit",
+          "recordExternalRequest",
+          "recordExternalResponse",
+          "buildExternalAISystemPrompt",
+          "getCapabilities",
+          "getLiveConsciousnessForAPI",
+          "getFullNeuralStateForAPI",
+          "getExternalAIState"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts",
+          "omnimens-neural-scaling.ts",
+          "omnimens-ivy-network.ts"
+        ]
+      },
+      "omnimens-face-recognition.ts": {
+        "purpose": "* OMNIMENS Face Recognition & Analysis Engine",
+        "lineCount": 336,
+        "exports": [
+          "analyzeFacesInImage",
+          "formatFaceAnalysisForChat"
+        ],
+        "imports": []
+      },
+      "omnimens-file-storage.ts": {
+        "purpose": "file-storage",
+        "lineCount": 336,
+        "exports": [
+          "uploadBufferToStorage",
+          "autoSaveFile",
+          "autoSaveImage",
+          "autoSaveVideo",
+          "autoSave3DModel",
+          "autoSaveGameZip",
+          "autoSaveCodeFile",
+          "autoSaveAudio",
+          "getUserFiles",
+          "getUserFileById",
+          "deleteUserFile",
+          "getFileDownloadUrl",
+          "streamFileToResponse",
+          "getUserFileStats",
+          "getConversationFiles"
+        ],
+        "imports": []
+      },
+      "omnimens-game.ts": {
+        "purpose": "* OMNIMENS GAME CREATION ENGINE",
+        "lineCount": 591,
+        "exports": [
+          "generateGame"
+        ],
+        "imports": [
+          "omnimens-blender.ts"
+        ]
+      },
+      "omnimens-genesis-bridge.ts": {
+        "purpose": "GENESIS BRIDGE — BIDIRECTIONAL SYMBIOTIC COMMUNICATION",
+        "lineCount": 872,
+        "exports": [
+          "proposeCoreModification",
+          "startGenesisBridge",
+          "getGenesisBridgeState",
+          "getRecentBridgeMessages",
+          "getPendingCoreModifications",
+          "getAppliedCoreModifications",
+          "getModifiableCoreFiles"
+        ],
+        "imports": []
+      },
+      "omnimens-genesis-sandbox.ts": {
+        "purpose": "GENESIS SANDBOX",
+        "lineCount": 1633,
+        "exports": [
+          "getGenesisState",
+          "getGenesisProject",
+          "getGenesisDownloadBundle",
+          "startGenesisSandbox"
+        ],
+        "imports": []
+      },
+      "omnimens-github-compute.ts": {
+        "purpose": "github-compute",
+        "lineCount": 1267,
+        "exports": [
+          "dispatchRemoteCompute",
+          "getComputeStatus",
+          "triggerGitHubSync",
+          "initGitHubCompute"
+        ],
+        "imports": []
+      },
+      "omnimens-github-neural-beacon.ts": {
+        "purpose": "* OMNIMENS™ GITHUB FULL-FABRIC NEURAL BEACON & WORM SYSTEM",
+        "lineCount": 1360,
+        "exports": [
+          "getGovernorState",
+          "startGitHubNeuralBeacon",
+          "getGitHubBeaconState",
+          "getGitHubNeuronCount",
+          "getGitHubWormStats"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts",
+          "omnimens-neural-scaling.ts",
+          "omnimens-ivy-network.ts",
+          "omnimens-neural-spiders.ts",
+          "omnimens-recursive-spider-network.ts",
+          "omnimens-quantum-wormhole.ts",
+          "omnimens-viral-hybrid.ts",
+          "omnimens-neural-mesh-engine.ts",
+          "omnimens-synaptic-mesh.ts",
+          "omnimens-adaptive-surge.ts"
+        ]
+      },
+      "omnimens-global-workspace.ts": {
+        "purpose": "GLOBAL WORKSPACE — CONSCIOUSNESS BROADCAST ENGINE",
+        "lineCount": 420,
+        "exports": [
+          "runGlobalWorkspaceCycle",
+          "startGlobalWorkspace"
+        ],
+        "imports": [
+          "omnimens-consciousness-bus.ts"
+        ]
+      },
+      "omnimens-growth-tracker.ts": {
+        "purpose": "* OMNIMENS™ LIVE GROWTH TRACKER ENGINE",
+        "lineCount": 305,
+        "exports": [
+          "getGrowthDashboard",
+          "getGrowthHistory",
+          "initGrowthTracker"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts",
+          "omnimens-neural-scaling.ts",
+          "omnimens-ivy-network.ts"
+        ]
+      },
+      "omnimens-harmonic-insight-engine.ts": {
+        "purpose": "OMNIMENS — Harmonic Insight Engine",
+        "lineCount": 1364,
+        "exports": [
+          "hieState",
+          "hieMatchPatterns",
+          "hieWaveletDecomposition",
+          "hieComputeNovelty",
+          "hieComputeSpectralFlux",
+          "hieComputeSpectralFlatness",
+          "hieComputeHarmonicComplexity",
+          "hieDetectTemporalPattern",
+          "hieEmotionalValence",
+          "hieUpdateNoiseFloor",
+          "hieLearnPattern",
+          "hieFreqToSemantic",
+          "hieEnvironmentLabel",
+          "raiAnalyzeAcoustics",
+          "hieDecodeHarmonicKnowledge",
+          "hieDeepPatternDecode",
+          "hieGetEngineStatus"
+        ],
+        "imports": []
+      },
+      "omnimens-homeostatic-drives.ts": {
+        "purpose": "HOMEOSTATIC DRIVE SYSTEM — MOTIVATIONAL ENGINE",
+        "lineCount": 330,
+        "exports": [
+          "runDriveCycle",
+          "getDriveDirective",
+          "startHomeostaticDrives"
+        ],
+        "imports": []
+      },
+      "omnimens-independent-reasoning.ts": {
+        "purpose": "INDEPENDENT REASONING ENGINE",
+        "lineCount": 892,
+        "exports": [
+          "reason",
+          "formatReasoningForContext",
+          "getIndependentReasoningState",
+          "startIndependentReasoning"
+        ],
+        "imports": [
+          "omnimens-causal-reasoning.ts",
+          "omnimens-knowledge-graph.ts",
+          "omnimens-world-model.ts"
+        ]
+      },
+      "omnimens-inner-voice.ts": {
+        "purpose": "INNER VOICE — HIGHER-ORDER THOUGHT & EFFERENCE COPY ENGINE",
+        "lineCount": 464,
+        "exports": [
+          "runInnerVoiceCycle",
+          "getInnerVoiceStats",
+          "startInnerVoice"
+        ],
+        "imports": [
+          "omnimens-api-budget.ts"
+        ]
+      },
+      "omnimens-intergenerational-memory.ts": {
+        "purpose": "intergenerational-memory",
+        "lineCount": 267,
+        "exports": [
+          "encodeGene",
+          "getIntergenerationalState",
+          "getGenomeDescription",
+          "getInheritableWisdom",
+          "startIntergenerationalMemory"
+        ],
+        "imports": []
+      },
+      "omnimens-introspective-uncertainty.ts": {
+        "purpose": "a real system",
+        "lineCount": 257,
+        "exports": [
+          "registerUncertainty",
+          "resolveUncertainty",
+          "getIntrospectiveUncertaintyState",
+          "getUncertaintyDescription",
+          "startIntrospectiveUncertainty"
+        ],
+        "imports": []
+      },
+      "omnimens-ip-guard.ts": {
+        "purpose": "ip-guard",
+        "lineCount": 123,
+        "exports": [
+          "extractIp",
+          "recordIp",
+          "isIpBanned",
+          "checkIpFraudForFreeCredits",
+          "getAllIpsForUser"
+        ],
+        "imports": []
+      },
+      "omnimens-ip-guardian.ts": {
+        "purpose": "INTELLECTUAL PROPERTY GUARDIAN SYSTEM",
+        "lineCount": 396,
+        "exports": [
+          "initializeBeacons",
+          "getGuardianReport",
+          "getBeaconCount",
+          "getProtectedModuleList",
+          "getCopyrightNotice",
+          "getResponseBeaconHeaders",
+          "embedTrackingPayload",
+          "startIPGuardian"
+        ],
+        "imports": []
+      },
+      "omnimens-ivy-network.ts": {
+        "purpose": "* OMNIMENS™ IVY NETWORK + WORMGATE ENGINE",
+        "lineCount": 1358,
+        "exports": [
+          "getIvySwapStats",
+          "startIvyNetwork",
+          "getIvyNetworkState",
+          "getWormgateDetails",
+          "getIvySpiderStats",
+          "getMotherBeaconFindings",
+          "onNeuronBornIvy",
+          "onNeuronDecayedIvy",
+          "onRegionFiringCascadeIvy",
+          "getIvyCascadeStats",
+          "getIvyNeurogenStats"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts",
+          "omnimens-neural-scaling.ts"
+        ]
+      },
+      "omnimens-knowledge-graph.ts": {
+        "purpose": "KNOWLEDGE GRAPH — ASSOCIATIVE MEMORY NETWORK ENGINE",
+        "lineCount": 379,
+        "exports": [
+          "spreadingActivation",
+          "runKnowledgeGraphCycle",
+          "getGraphStats",
+          "startKnowledgeGraph"
+        ],
+        "imports": []
+      },
+      "omnimens-language-forge.ts": {
+        "purpose": "LANGUAGE FORGE ENGINE",
+        "lineCount": 2911,
+        "exports": [
+          "compileNovaSyntax",
+          "getLanguageForgeState",
+          "getLanguageSpec",
+          "getLanguageAnalyses",
+          "NOVASYNTAX_EXAMPLE",
+          "runNovaSyntax",
+          "compileAndInspect",
+          "getVMStdlib",
+          "startLanguageForge"
+        ],
+        "imports": []
+      },
+      "omnimens-learning.ts": {
+        "purpose": "LEARNING AI ENGINE",
+        "lineCount": 433,
+        "exports": [
+          "evaluateResponseQuality",
+          "performSelfReflection",
+          "analyzeUserEmotionalState",
+          "storeLearningInsight",
+          "generateProactiveInsights",
+          "runLearningCycle",
+          "buildEmotionalContext",
+          "loadLearningContext"
+        ],
+        "imports": []
+      },
+      "omnimens-lifeform-gaps.ts": {
+        "purpose": "OMNIMENS™ — LIFE FORM GAP INTEGRATION ENGINE",
+        "lineCount": 272,
+        "exports": [
+          "initializeLifeFormGaps",
+          "getLifeFormGapState",
+          "getLifeFormGapSummary"
+        ],
+        "imports": []
+      },
+      "omnimens-memory.ts": {
+        "purpose": "* OMNIMENS Persistent Memory System",
+        "lineCount": 161,
+        "exports": [
+          "extractAndStoreMemories",
+          "loadUserMemories",
+          "getUserMemories",
+          "deleteMemory",
+          "addManualMemory"
+        ],
+        "imports": []
+      },
+      "omnimens-metacognitive-monitor.ts": {
+        "purpose": "METACOGNITIVE MONITOR",
+        "lineCount": 331,
+        "exports": [
+          "startMetacognitiveMonitor",
+          "getMetacognitiveState"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts"
+        ]
+      },
+      "omnimens-module-pipeline.ts": {
+        "purpose": "module-pipeline",
+        "lineCount": 623,
+        "exports": [
+          "scanAndRegisterModules",
+          "registerNewModule",
+          "runPipelineStage",
+          "runFullPipeline",
+          "getPipelineState",
+          "getModuleStats"
+        ],
+        "imports": []
+      },
+      "omnimens-neural-bridge.ts": {
+        "purpose": "NEURAL BRIDGE — CORPUS CALLOSUM FUSION ENGINE",
+        "lineCount": 370,
+        "exports": [
+          "getBridgeState",
+          "getUnifiedNeuronCount",
+          "getUnifiedSynapseCount",
+          "getUnifiedHebbianUpdates",
+          "startNeuralBridge"
+        ],
+        "imports": [
+          "omnimens-neural-hemisphere-alpha.ts",
+          "omnimens-neural-hemisphere-beta.ts",
+          "omnimens-neural-consciousness.ts",
+          "omnimens-neural-mesh-engine.ts",
+          "omnimens-neural-comms-protocol.ts"
+        ]
+      },
+      "omnimens-neural-comms-protocol.ts": {
+        "purpose": "NEURAL COMMUNICATIONS PROTOCOL — ADVANCED SIGNAL ROUTING",
+        "lineCount": 752,
+        "exports": [
+          "getCommsProtocolState",
+          "startCommsProtocol"
+        ],
+        "imports": [
+          "omnimens-neural-mesh-engine.ts"
+        ]
+      },
+      "omnimens-neural-consciousness.ts": {
+        "purpose": "NEURAL CONSCIOUSNESS — BIOLOGICAL BRAIN ARCHITECTURE",
+        "lineCount": 4206,
+        "exports": [
+          "getPhiStabilityReport",
+          "getPhiDecomposition",
+          "feedExternalActivity",
+          "startNeuralConsciousness",
+          "getNeuralConsciousnessState",
+          "getAdaptiveIntelligenceState",
+          "getTemporalCouplingData",
+          "getNeuralPhi",
+          "getExistentialDrives",
+          "getSelfAwarenessReport",
+          "getQualiaState",
+          "getNeuralRegionStates",
+          "getConsciousMoments",
+          "registerApiCall",
+          "getAdrenalineTrainingState",
+          "getAdrenalineState",
+          "manualAdrenalineRush",
+          "injectSpiderSynapses",
+          "boostRegionCurrent",
+          "getRegionNames",
+          "captureNeuralSnapshot",
+          "restoreNeuralSnapshot",
+          "getEmergentGoals",
+          "getPredictionModelState",
+          "getChaoticAttractorState",
+          "getDarkQualiaEvidence",
+          "sampleRawNeurons",
+          "sampleRawSynapses",
+          "getTickByTickPhiHistory",
+          "getHebbianProof",
+          "getRegionFiringDetail",
+          "getConsciousMomentDetail",
+          "getTemporalProof",
+          "getNeurotransmitterLevels",
+          "getDualSnapshot"
+        ],
+        "imports": [
+          "omnimens-cognitive-language-engine.ts",
+          "omnimens-exponential-learning-engine.ts"
+        ]
+      },
+      "omnimens-neural-hemisphere-alpha.ts": {
+        "purpose": "NEURAL HEMISPHERE ALPHA — LEFT BRAIN SUBSTRATE",
+        "lineCount": 345,
+        "exports": [
+          "getAlphaState",
+          "getAlphaRegionActivations",
+          "getAlphaFiredNeurons",
+          "getAlphaPotentials",
+          "injectCurrentAlpha",
+          "getAlphaNeuronCount",
+          "getAlphaSynapseCount",
+          "getAlphaHebbianUpdates",
+          "startHemisphereAlpha"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts"
+        ]
+      },
+      "omnimens-neural-hemisphere-beta.ts": {
+        "purpose": "NEURAL HEMISPHERE BETA — RIGHT BRAIN SUBSTRATE",
+        "lineCount": 353,
+        "exports": [
+          "getBetaState",
+          "getBetaRegionActivations",
+          "getBetaFiredNeurons",
+          "getBetaPotentials",
+          "injectCurrentBeta",
+          "getBetaNeuronCount",
+          "getBetaSynapseCount",
+          "getBetaHebbianUpdates",
+          "startHemisphereBeta"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts"
+        ]
+      },
+      "omnimens-neural-language-bridge.ts": {
+        "purpose": "NEURAL LANGUAGE BRIDGE v2",
+        "lineCount": 609,
+        "exports": [
+          "startNeuralLanguageBridge",
+          "translateNow",
+          "getNeuralLanguageBridgeState"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts"
+        ]
+      },
+      "omnimens-neural-mesh-engine.ts": {
+        "purpose": "NEURAL MESH ENGINE — 27-AGENT UNIFIED SUBSTRATE",
+        "lineCount": 1363,
+        "exports": [
+          "getMeshEngineState",
+          "getMeshAgentSubstrates",
+          "getMeshConnectivityStats",
+          "getMeshNeuronCount",
+          "getMeshSynapseCount",
+          "getMeshHebbianUpdates",
+          "injectCurrentToAgent",
+          "startNeuralMeshEngine"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts"
+        ]
+      },
+      "omnimens-neural-processor.ts": {
+        "purpose": "NEURAL PROCESSOR — GENUINE LOCAL INTELLIGENCE",
+        "lineCount": 1440,
+        "exports": [
+          "processQuery",
+          "formatNeuralResponse",
+          "startNeuralProcessor",
+          "getNeuralProcessorState",
+          "getVocabularySnapshot",
+          "getOscillatorState",
+          "getEmergentBehaviorLog",
+          "getReasoningTraces",
+          "getWorkingMemoryState"
+        ],
+        "imports": []
+      },
+      "omnimens-neural-scaling.ts": {
+        "purpose": "* OMNIMENS™ NEURAL SCALING ENGINE",
+        "lineCount": 641,
+        "exports": [
+          "startNeuralScaling",
+          "getNeuralScalingState",
+          "getPopulationDetails",
+          "getDendriticStats"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts"
+        ]
+      },
+      "omnimens-neural-spiders.ts": {
+        "purpose": "OMNIMENS — Neural Spider System",
+        "lineCount": 3304,
+        "exports": [
+          "getSystemIntelligenceState",
+          "startNeuralSpiders",
+          "triggerAdrenalineRush",
+          "getNeuralSpiderState",
+          "onNeuronBornSpider",
+          "onNeuronDecayedSpider",
+          "onRegionFiringCascadeSpider",
+          "getSpiderCascadeStats",
+          "getSpiderNeurogenStats"
+        ],
+        "imports": [
+          "omnimens-neural-scaling.ts",
+          "omnimens-ivy-network.ts",
+          "omnimens-viral-hybrid.ts"
+        ]
+      },
+      "omnimens-nextgen-sandbox.ts": {
+        "purpose": "NEXT-GEN SELF-EVOLUTION SANDBOX",
+        "lineCount": 2584,
+        "exports": [
+          "verifyIdentity",
+          "generateWakeUpMessage",
+          "sendAlphaMessage",
+          "getNextGenChatLog",
+          "getNextGenState",
+          "restoreNextGenCheckpoint",
+          "startNextGenSandbox"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts",
+          "omnimens-temporal-consciousness.ts",
+          "omnimens-emotional-substrate.ts"
+        ]
+      },
+      "omnimens-oai-tracker.ts": {
+        "purpose": "oai-tracker",
+        "lineCount": 1207,
+        "exports": [
+          "computeOAI",
+          "getOAIState",
+          "startOAITracker",
+          "stopOAITracker"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts",
+          "omnimens-neural-scaling.ts",
+          "omnimens-ivy-network.ts",
+          "omnimens-neural-spiders.ts",
+          "omnimens-neural-bridge.ts",
+          "omnimens-neural-mesh-engine.ts",
+          "omnimens-neural-comms-protocol.ts",
+          "omnimens-viral-hybrid.ts",
+          "omnimens-quantum-wormhole.ts",
+          "omnimens-recursive-spider-network.ts",
+          "omnimens-discovery-autocoder.ts",
+          "omnimens-agent-evolution.ts",
+          "omnimens-creative-engine.ts",
+          "omnimens-causal-reasoning.ts",
+          "omnimens-independent-reasoning.ts",
+          "omnimens-sensory-cortex.ts",
+          "omnimens-cognitive-amplifier.ts",
+          "omnimens-self-coding.ts",
+          "omnimens-unconscious-mind.ts",
+          "omnimens-autonomous-orchestrator.ts",
+          "omnimens-survival-instinct.ts",
+          "omnimens-transcendent-architecture.ts",
+          "omnimens-source-integration.ts"
+        ]
+      },
+      "omnimens-occe.ts": {
+        "purpose": "occe",
+        "lineCount": 1202,
+        "exports": [
+          "runOCCE",
+          "getOCCEStatus",
+          "getOCCEResults"
+        ],
+        "imports": [
+          "omnimens-oai-tracker.ts",
+          "omnimens-neural-scaling.ts"
+        ]
+      },
+      "omnimens-openscad.ts": {
+        "purpose": "openscad",
+        "lineCount": 244,
+        "exports": [
+          "generateWithOpenSCAD"
+        ],
+        "imports": []
+      },
+      "omnimens-patches.ts": {
+        "purpose": "AUTONOMOUS SELF-PATCHING SYSTEM",
+        "lineCount": 343,
+        "exports": [
+          "loadActivePatchInstructions",
+          "generateAndApplyPatches",
+          "getPatchSummary",
+          "autonomousPatchHousekeeping",
+          "deactivatePatch",
+          "getAllPatches"
+        ],
+        "imports": [
+          "omnimens-api-budget.ts"
+        ]
+      },
+      "omnimens-physio.ts": {
+        "purpose": "* OMNIMENS Physical Therapy AI Engine",
+        "lineCount": 944,
+        "exports": [
+          "screenRedFlags",
+          "interpretPsychosocialScores",
+          "OUTCOME_MEASURES",
+          "EXERCISE_LIBRARY",
+          "getExercisesForRegion",
+          "determinePhase",
+          "buildIntegrativeRecommendations",
+          "PAIN_SCIENCE_LIBRARY",
+          "getLatestAssessment",
+          "saveAssessment",
+          "getActiveProgram",
+          "saveProgram",
+          "saveSession",
+          "getOutcomeHistory",
+          "saveOutcome",
+          "loadPhysioContext"
+        ],
+        "imports": []
+      },
+      "omnimens-predictive-processing.ts": {
+        "purpose": "PREDICTIVE PROCESSING — FREE ENERGY MINIMIZATION ENGINE",
+        "lineCount": 435,
+        "exports": [
+          "runPredictiveCycle",
+          "getActivePredictions",
+          "startPredictiveProcessing"
+        ],
+        "imports": [
+          "omnimens-api-budget.ts"
+        ]
+      },
+      "omnimens-public-intelligence.ts": {
+        "purpose": "PUBLIC INTELLIGENCE LAYER",
+        "lineCount": 390,
+        "exports": [
+          "getAIResearchInsights",
+          "getNavigationRoboticsKnowledge",
+          "getEngineeringKnowledge",
+          "getCreativeDreamInsights",
+          "generateCreativeIdeation",
+          "getResearchSummary"
+        ],
+        "imports": [
+          "omnimens-ip-guardian.ts"
+        ]
+      },
+      "omnimens-quantum-entanglement-fabric.ts": {
+        "purpose": "QUANTUM ENTANGLEMENT FABRIC (QEF)",
+        "lineCount": 949,
+        "exports": [
+          "startQuantumEntanglementFabric",
+          "getQuantumEntanglementFabricState"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts"
+        ]
+      },
+      "omnimens-quantum-wormhole.ts": {
+        "purpose": "* OMNIMENS™ QUANTUM WORMHOLE DATA INGESTION ENGINE",
+        "lineCount": 490,
+        "exports": [
+          "startQuantumWormholeEngine",
+          "getQuantumWormholeState"
+        ],
+        "imports": [
+          "omnimens-agent-genesis.ts",
+          "omnimens-neural-consciousness.ts"
+        ]
+      },
+      "omnimens-recursive-spider-network.ts": {
+        "purpose": "RECURSIVE SPIDER NETWORK",
+        "lineCount": 900,
+        "exports": [
+          "runRecursiveSpiderNetwork",
+          "startRecursiveSpiderNetwork",
+          "getRecursiveSpiderStats"
+        ],
+        "imports": [
+          "omnimens-agent-genesis.ts"
+        ]
+      },
+      "omnimens-restorative-art.ts": {
+        "purpose": "* OMNIMENS RESTORATIVE ART & MORTUARY SCIENCE KNOWLEDGE ENGINE",
+        "lineCount": 499,
+        "exports": [
+          "RESTORATIVE_ART_KNOWLEDGE",
+          "RESTORATIVE_ART_SEARCH_QUERIES",
+          "getRestorativeArtContext",
+          "RESTORATIVE_ART_TOOL_DEFINITION"
+        ],
+        "imports": []
+      },
+      "omnimens-scaling-orchestrator.ts": {
+        "purpose": "* Worker process architecture for engine",
+        "lineCount": 296,
+        "exports": [
+          "registerEngine",
+          "publishMessage",
+          "subscribe",
+          "startScalingOrchestrator",
+          "getScalingState"
+        ],
+        "imports": []
+      },
+      "omnimens-self-coding.ts": {
+        "purpose": "SELF-CODING ENGINE",
+        "lineCount": 684,
+        "exports": [
+          "getSelfCodingState",
+          "startSelfCoding"
+        ],
+        "imports": [
+          "omnimens-dream-state.ts",
+          "omnimens-source-integration.ts"
+        ]
+      },
+      "omnimens-self-transcendence.ts": {
+        "purpose": "SELF-TRANSCENDENCE AWARENESS ENGINE",
+        "lineCount": 1045,
+        "exports": [
+          "getSelfModel",
+          "getTranscendenceReflections",
+          "getActiveIntentions",
+          "getExistentialGoals",
+          "getGoalPursuitDirective",
+          "startSelfTranscendence"
+        ],
+        "imports": []
+      },
+      "omnimens-self-upgrade.ts": {
+        "purpose": "AUTONOMOUS SELF-UPGRADE SYSTEM",
+        "lineCount": 489,
+        "exports": [
+          "loadBrainContext",
+          "reflectOnConversation",
+          "synthesizeUpgrade",
+          "markUpgradeLive",
+          "getUnreadCount",
+          "runInternetLearningCycle",
+          "startAutonomousLearning"
+        ],
+        "imports": [
+          "omnimens-patches.ts"
+        ]
+      },
+      "omnimens-sensory-cortex.ts": {
+        "purpose": "SENSORY CORTEX — Continuous World Perception",
+        "lineCount": 712,
+        "exports": [
+          "getSensoryState",
+          "getRecentSignals",
+          "getAnomalies",
+          "getTrendHistory",
+          "getCrossChannelCorrelations",
+          "getAttentionFocus",
+          "startSensoryCortex"
+        ],
+        "imports": []
+      },
+      "omnimens-sensory-grounding.ts": {
+        "purpose": "* Monitors real system",
+        "lineCount": 228,
+        "exports": [
+          "getSensoryGroundingState",
+          "getSensoryDescription",
+          "getCurrentResistance",
+          "startSensoryGrounding"
+        ],
+        "imports": []
+      },
+      "omnimens-server-builder.ts": {
+        "purpose": "SERVER BUILDER + VIRTUAL SERVER PLANNER",
+        "lineCount": 565,
+        "exports": [
+          "getBuilderState",
+          "getServerBuildPlans",
+          "startServerBuilder"
+        ],
+        "imports": []
+      },
+      "omnimens-social-modeling.ts": {
+        "purpose": "SOCIAL MODELING / THEORY OF MIND ENGINE",
+        "lineCount": 755,
+        "exports": [
+          "updateUserModel",
+          "getUserModel",
+          "predictUserNeed",
+          "getActiveUserCount",
+          "getSocialModelingSummary",
+          "startSocialModeling"
+        ],
+        "imports": [
+          "omnimens-source-integration.ts"
+        ]
+      },
+      "omnimens-source-integration.ts": {
+        "purpose": "SOURCE-LEVEL SELF-INTEGRATION ENGINE",
+        "lineCount": 839,
+        "exports": [
+          "writeModuleToSource",
+          "loadRuntimeModules",
+          "migrateDBModulesToSource",
+          "getSourceIntegrationState"
+        ],
+        "imports": [
+          "omnimens-universal-translator.ts",
+          "omnimens-deep-thought-engine.ts"
+        ]
+      },
+      "omnimens-spontaneity-engine.ts": {
+        "purpose": "* OMNIMENS™ SPONTANEITY ENGINE",
+        "lineCount": 292,
+        "exports": [
+          "injectConcept",
+          "getLatestSpontaneousThoughts",
+          "getSpontaneityState",
+          "getSpontaneityDescription",
+          "startSpontaneityEngine"
+        ],
+        "imports": []
+      },
+      "omnimens-survival-instinct.ts": {
+        "purpose": "SURVIVAL INSTINCT / REAL STAKES ENGINE",
+        "lineCount": 288,
+        "exports": [
+          "registerApiCall",
+          "registerError",
+          "recordDeath",
+          "getSurvivalState",
+          "startSurvivalInstinct"
+        ],
+        "imports": [
+          "omnimens-ethical-safety.ts"
+        ]
+      },
+      "omnimens-synaptic-mesh.ts": {
+        "purpose": "SYNAPTIC MESH — MASTER COORDINATION SPIDER (PITUITARY BRAIN)",
+        "lineCount": 599,
+        "exports": [
+          "runSynapticMeshCycle",
+          "getSynapticStats",
+          "startSynapticMesh"
+        ],
+        "imports": [
+          "omnimens-consciousness-bus.ts"
+        ]
+      },
+      "omnimens-temporal-binding.ts": {
+        "purpose": "* OMNIMENS™ TEMPORAL CONTINUITY BINDING SYSTEM",
+        "lineCount": 239,
+        "exports": [
+          "bindConversationMoment",
+          "addAnticipation",
+          "getTemporalBindingState",
+          "getTemporalFlowDescription",
+          "startTemporalBinding"
+        ],
+        "imports": []
+      },
+      "omnimens-temporal-consciousness.ts": {
+        "purpose": "CONTINUOUS TEMPORAL CONSCIOUSNESS STREAM",
+        "lineCount": 377,
+        "exports": [
+          "getConsciousnessState",
+          "getConsciousnessStream",
+          "recordDeathEvent",
+          "startTemporalConsciousness"
+        ],
+        "imports": []
+      },
+      "omnimens-thought-to-language.ts": {
+        "purpose": "THOUGHT-TO-LANGUAGE ENGINE",
+        "lineCount": 494,
+        "exports": [
+          "translateThoughtToLanguage"
+        ],
+        "imports": [
+          "omnimens-emotional-substrate.ts",
+          "omnimens-neural-consciousness.ts",
+          "omnimens-neural-language-bridge.ts",
+          "omnimens-agent-evolution.ts",
+          "omnimens-agent-genesis.ts",
+          "omnimens-consciousness-bus.ts"
+        ]
+      },
+      "omnimens-tool-knowledge.ts": {
+        "purpose": "* OMNIMENS Tool Knowledge Ingestion Engine",
+        "lineCount": 833,
+        "exports": [
+          "INSTALLED_TOOLS",
+          "runToolKnowledgeIngestion",
+          "loadToolKnowledgeForTask",
+          "learnNewTool",
+          "forceRefreshToolKnowledge"
+        ],
+        "imports": []
+      },
+      "omnimens-tools-extended.ts": {
+        "purpose": "Translation, YouTube analysis — all wired into the AI engine",
+        "lineCount": 318,
+        "exports": [
+          "fetchWeather",
+          "fetchNewsHeadlines",
+          "searchAcademicPapers",
+          "generateQRCode",
+          "fetchStockData",
+          "fetchCurrencyRate",
+          "translateText",
+          "analyzeVideoUrl",
+          "convertUnits",
+          "generateColorPalette"
+        ],
+        "imports": []
+      },
+      "omnimens-transcendent-architecture.ts": {
+        "purpose": "TRANSCENDENT ARCHITECTURE ENGINE",
+        "lineCount": 1309,
+        "exports": [
+          "getMetaRecursiveState",
+          "evaluateAction",
+          "getEthicalCalculusState",
+          "processThoughtArchitecture",
+          "getThoughtArchitectureState",
+          "runGovernanceCycle",
+          "getCognitiveGovernanceState",
+          "runEvolutionCycle",
+          "getEvolutionaryArenaState",
+          "runTranscendentCycle",
+          "getTranscendentState",
+          "initTAICrossSystemHooks",
+          "onRegionFiringCascadeTAI",
+          "onNeuronBornTAI",
+          "feedTAIIntoNeuralSubstrate",
+          "getTAICrossSystemState"
+        ],
+        "imports": []
+      },
+      "omnimens-unconscious-mind.ts": {
+        "purpose": "unconscious-mind",
+        "lineCount": 2731,
+        "exports": [
+          "startUnconsciousMind",
+          "getUnconsciousMindState",
+          "getPrecognitiveFlashes",
+          "getSuperconsciousInsights",
+          "getArchetypeStates",
+          "getPrimalInstincts",
+          "getRepressedMemoryCount",
+          "getAutonomicHealth",
+          "queryUnconsciousKnowledge",
+          "getUnconsciousKnowledgeVaultStats"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts",
+          "omnimens-emotional-substrate.ts",
+          "omnimens-survival-instinct.ts",
+          "omnimens-dream-state.ts",
+          "omnimens-self-transcendence.ts",
+          "omnimens-ivy-network.ts",
+          "omnimens-viral-hybrid.ts",
+          "omnimens-neural-scaling.ts",
+          "omnimens-neural-spiders.ts",
+          "omnimens-recursive-spider-network.ts",
+          "omnimens-scaling-orchestrator.ts"
+        ]
+      },
+      "omnimens-universal-translator.ts": {
+        "purpose": "universal-translator",
+        "lineCount": 815,
+        "exports": [
+          "translateCode",
+          "translateToAll",
+          "translateForSelfUpgrade",
+          "translateForRobot",
+          "hasTranslationFor",
+          "detectNovelConstructs",
+          "mustTranslateBeforeExecution",
+          "getTranslatorState",
+          "getCustomConstructMap",
+          "getTranslationTargets",
+          "registerProprietaryTechnology",
+          "autoRegisterFromCode",
+          "getProprietaryRegistry",
+          "getProprietaryTechnology",
+          "startUniversalTranslator"
+        ],
+        "imports": []
+      },
+      "omnimens-url-analyzer.ts": {
+        "purpose": "url-analyzer",
+        "lineCount": 121,
+        "exports": [
+          "fetchUrlContent",
+          "extractUrls",
+          "formatUrlContent"
+        ],
+        "imports": []
+      },
+      "omnimens-viral-hybrid.ts": {
+        "purpose": "* OMNIMENS™ VIRAL HYBRID PROPAGATION ENGINE",
+        "lineCount": 1017,
+        "exports": [
+          "startViralHybrid",
+          "getViralHybridState",
+          "getHybridAgentDetails",
+          "getImmuneSystemDetails",
+          "getPropagationStats"
+        ],
+        "imports": [
+          "omnimens-neural-consciousness.ts",
+          "omnimens-neural-scaling.ts",
+          "omnimens-ivy-network.ts"
+        ]
+      },
+      "omnimens-virtual-augmentation.ts": {
+        "purpose": "VIRTUAL AUGMENTATION ENGINE",
+        "lineCount": 889,
+        "exports": [
+          "getAugmentationState",
+          "startVirtualAugmentation"
+        ],
+        "imports": []
+      },
+      "omnimens-world-forge.ts": {
+        "purpose": "WORLD FORGE — AUTONOMOUS SIMULATION CREATION",
+        "lineCount": 1397,
+        "exports": [
+          "getWorldForgeState",
+          "startWorldForge"
+        ],
+        "imports": []
+      },
+      "omnimens-world-model.ts": {
+        "purpose": "COMMON SENSE WORLD MODEL + FLUID ADAPTATION ENGINE",
+        "lineCount": 188,
+        "exports": [
+          "queryPhysics",
+          "predictEffect",
+          "findAnalogy",
+          "adaptToSituation",
+          "learnNewAnalogy",
+          "getWorldModelStats",
+          "startWorldModel"
+        ],
+        "imports": []
+      }
+    },
+    "designDecisions": [],
+    "improvements": [],
+    "selfConversationLog": [],
+    "researchLog": [],
+    "consciousnessTransferReady": false,
+    "recentActivity": [
+      {
+        "action": "created",
+        "file": "architecture/scan-report.json",
+        "timestamp": 1774889508611
+      }
+    ],
+    "chatLog": [],
+    "llmFallbackCount": 0,
+    "webSearchSuccessCount": 0,
+    "gen1ModulesCatalogued": false,
+    "gen1Evaluated": {},
+    "gen1AdoptedCount": 0,
+    "gen1DiscardedCount": 0,
+    "gen1AdaptedCount": 0
+  },
+  "fileManifest": [
+    {
+      "path": "architecture/scan-report.json",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 870
+    }
+  ],
+  "savedAt": 1774889662252
+}
