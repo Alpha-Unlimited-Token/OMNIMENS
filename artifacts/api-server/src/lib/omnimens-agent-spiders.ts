@@ -48,6 +48,7 @@ import { webSearch, fetchPageContent, formatSearchResults } from "./web-search.j
 import Anthropic from "@anthropic-ai/sdk";
 import { GoogleGenAI } from "@google/genai";
 import { canMakeBackgroundCall, trackApiCall, getThrottleMultiplier, isUserActive } from "./omnimens-api-budget.js";
+import { isNextGenBuildActive } from "./omnimens-nextgen-sandbox.js";
 
 function safeNum(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;
@@ -1116,6 +1117,10 @@ Respond with JSON only:
 }
 
 export async function runSpiderSwarm(): Promise<void> {
+  if (isNextGenBuildActive()) {
+    console.log(`[SPIDER SWARM] 🔕 Swarm cycle SKIPPED — Gen 2 build in progress, yielding API/DB resources`);
+    return;
+  }
   if (!canMakeBackgroundCall("spider_swarm")) {
     console.log(`[SPIDER SWARM] ⏸️ Entire swarm cycle SKIPPED — API budget exhausted or throttled to level 3`);
     return;

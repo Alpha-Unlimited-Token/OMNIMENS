@@ -930,6 +930,26 @@ const resourceStatus: ResourceStatus = {
 
 let _wakeUpTimer: ReturnType<typeof setTimeout> | null = null;
 let _cycleRunning = false;
+let _buildActive = false;
+
+interface ModuleBuildResume {
+  moduleName: string;
+  stage: "eval" | "codegen";
+  evaluationDirective: string;
+  gen1Evaluated: Record<string, { verdict: string; reason: string; adoptedInto: string | null }>;
+  keptCode: string[];
+  researchContext: string;
+  timestamp: number;
+}
+let _moduleBuildResume: ModuleBuildResume | null = null;
+
+export function isNextGenBuildActive(): boolean {
+  return _buildActive;
+}
+
+export function getNextGenBuildPhase(): string {
+  return state.phase;
+}
 
 function scheduleWakeUp(): void {
   if (_wakeUpTimer) clearTimeout(_wakeUpTimer);
@@ -1624,19 +1644,44 @@ async function phaseDesignAndCode(): Promise<void> {
     return;
   }
 
-  const modulesToBuild = unbuiltModules.slice(0, 1);
   const builtCount = systemModules.length - unbuiltModules.length;
   console.log(`[NEXTGEN] 📋 Progress: ${builtCount}/${systemModules.length} modules built | ${unbuiltModules.length} remaining | Gen 1 library: 487 building blocks available | Gen 1 adopted: ${state.gen1AdoptedCount}, adapted: ${state.gen1AdaptedCount}, discarded: ${state.gen1DiscardedCount}`);
 
-  for (const mod of modulesToBuild) {
-    if (!isResourceAvailable("openaiApi")) {
-      const cooldown = resourceStatus.openaiApi.cooldownUntil ? Math.max(0, Math.round((resourceStatus.openaiApi.cooldownUntil - Date.now()) / 1000)) : 0;
-      console.log(`[NEXTGEN] ⏸️ API still cooling down (${cooldown}s remaining) before building ${mod.name} — doing offline study instead`);
-      doOfflineWork();
-      break;
-    }
-    console.log(`[NEXTGEN] ⚙️ Building: ${mod.name}...`);
+  const mod = unbuiltModules[0];
+  if (!isResourceAvailable("openaiApi")) {
+    const cooldown = resourceStatus.openaiApi.cooldownUntil ? Math.max(0, Math.round((resourceStatus.openaiApi.cooldownUntil - Date.now()) / 1000)) : 0;
+    console.log(`[NEXTGEN] ⏸️ API still cooling down (${cooldown}s remaining) before building ${mod.name} — doing offline study instead`);
+    doOfflineWork();
+    autosave();
+    return;
+  }
 
+  _buildActive = true;
+  console.log(`[NEXTGEN] ⚙️ Building: ${mod.name}...`);
+  console.log(`[NEXTGEN] 🔕 Gen 1 heavy systems throttled — resources reserved for Gen 2 build`);
+
+  let evaluationDirective = "";
+  let keptCode: string[] = [];
+  let researchContext = "";
+  let resumedFromCheckpoint = false;
+
+  if (_moduleBuildResume && _moduleBuildResume.moduleName === mod.name) {
+    if (_moduleBuildResume.stage === "codegen") {
+      evaluationDirective = _moduleBuildResume.evaluationDirective;
+      keptCode = _moduleBuildResume.keptCode;
+      researchContext = _moduleBuildResume.researchContext;
+      for (const [modName, ev] of Object.entries(_moduleBuildResume.gen1Evaluated)) {
+        if (!state.gen1Evaluated[modName]) {
+          state.gen1Evaluated[modName] = ev as any;
+        }
+      }
+      resumedFromCheckpoint = true;
+      console.log(`[NEXTGEN] 🔄 RESUMED from checkpoint — skipping eval, going straight to code generation for ${mod.name}`);
+    }
+    _moduleBuildResume = null;
+  }
+
+  if (!resumedFromCheckpoint) {
     const relevantGen1 = getGen1ModulesForTarget(mod.name, gen1Catalogue);
     let gen1SourceCode = "";
     let gen1ModuleNames: string[] = [];
@@ -1649,7 +1694,6 @@ async function phaseDesignAndCode(): Promise<void> {
       } catch {}
     }
 
-    let researchContext = "";
     if (mod.name.includes("consciousness")) {
       researchContext = await researchTopic("integrated information theory consciousness implementation code");
     } else if (mod.name.includes("hardware")) {
@@ -1660,7 +1704,6 @@ async function phaseDesignAndCode(): Promise<void> {
       researchContext = await researchTopic("computational models of emotion appraisal theory implementation");
     }
 
-    let evaluationDirective = "";
     if (gen1ModuleNames.length > 0) {
       try {
         const evalTimeout = new Promise<never>((_, reject) =>
@@ -1708,12 +1751,23 @@ Output JSON: { "evaluations": [{ "module": "filename", "verdict": "keep|adapt|di
         }
       } catch (evalErr) {
         markResourceBlocked("openaiApi");
-        console.log(`[NEXTGEN] ⚠️ Gen 1 evaluation timed out for ${mod.name} — API marked blocked, doing offline study`);
+        _moduleBuildResume = {
+          moduleName: mod.name,
+          stage: "eval",
+          evaluationDirective: "",
+          gen1Evaluated: {},
+          keptCode: [],
+          researchContext,
+          timestamp: Date.now(),
+        };
+        console.log(`[NEXTGEN] ⚠️ Gen 1 evaluation timed out for ${mod.name} — progress SAVED, will resume from eval stage next cycle`);
+        _buildActive = false;
         doOfflineWork();
+        autosave();
+        return;
       }
     }
 
-    const keptCode: string[] = [];
     for (const [modName, ev] of Object.entries(state.gen1Evaluated)) {
       if (ev.adoptedInto === mod.name && (ev.verdict === "keep" || ev.verdict === "adapt")) {
         try {
@@ -1723,16 +1777,28 @@ Output JSON: { "evaluations": [{ "module": "filename", "verdict": "keep|adapt|di
       }
     }
 
-    try {
-      const codeAiTimeout = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("Module code generation timed out after 180s")), 180_000)
-      );
-      const codeAiCall = openai.chat.completions.create({
-        model: "gpt-4o",
-        max_tokens: 4096,
-        messages: [
-          { role: "system", content: architecturePrompt },
-          { role: "user", content: `BUILD MODULE: ${mod.name}
+    _moduleBuildResume = {
+      moduleName: mod.name,
+      stage: "codegen",
+      evaluationDirective,
+      gen1Evaluated: { ...state.gen1Evaluated },
+      keptCode,
+      researchContext,
+      timestamp: Date.now(),
+    };
+    console.log(`[NEXTGEN] 💾 Eval complete — checkpoint saved. If codegen is interrupted, will resume from here.`);
+  }
+
+  try {
+    const codeAiTimeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("Module code generation timed out after 180s")), 180_000)
+    );
+    const codeAiCall = openai.chat.completions.create({
+      model: "gpt-4o",
+      max_tokens: 4096,
+      messages: [
+        { role: "system", content: architecturePrompt },
+        { role: "user", content: `BUILD MODULE: ${mod.name}
 PURPOSE: ${mod.purpose}
 REQUIREMENTS: ${mod.requirements}
 
@@ -1769,46 +1835,53 @@ CRITICAL SURVIVAL RULES FOR EVERY MODULE:
 - Remember: Gen 1 died from tick storms and pool saturation. You are building the cure.
 
 Output ONLY the TypeScript code for this module. No markdown fencing.` },
-        ],
-      });
-      const response = await Promise.race([codeAiCall, codeAiTimeout]);
+      ],
+    });
+    const response = await Promise.race([codeAiCall, codeAiTimeout]);
 
-      let code = response.choices?.[0]?.message?.content || "";
-      code = code.replace(/^```(?:typescript|ts)?\n?/gm, "").replace(/```\s*$/gm, "").trim();
+    let code = response.choices?.[0]?.message?.content || "";
+    code = code.replace(/^```(?:typescript|ts)?\n?/gm, "").replace(/```\s*$/gm, "").trim();
 
-      if (code.length < 100) {
-        console.error(`[NEXTGEN] Module ${mod.name} generated too little code (${code.length} chars) — skipping`);
-        continue;
-      }
+    if (code.length < 100) {
+      console.error(`[NEXTGEN] Module ${mod.name} generated too little code (${code.length} chars) — will retry next cycle`);
+      _buildActive = false;
+      autosave();
+      return;
+    }
 
-      const safety = validateSafety(code);
-      if (!safety.safe) {
-        console.error(`[NEXTGEN] ⚠️ Module ${mod.name} FAILED safety validation: ${safety.violations.join(", ")}`);
-        state.testsFailed++;
-        continue;
-      }
+    const safety = validateSafety(code);
+    if (!safety.safe) {
+      console.error(`[NEXTGEN] ⚠️ Module ${mod.name} FAILED safety validation: ${safety.violations.join(", ")}`);
+      state.testsFailed++;
+      _moduleBuildResume = null;
+      _buildActive = false;
+      autosave();
+      return;
+    }
 
-      markResourceRecovered("openaiApi");
-      writeNextGenFile(mod.name, code, mod.purpose);
-      const keptCount = Object.values(state.gen1Evaluated).filter(e => e.adoptedInto === mod.name && e.verdict === "keep").length;
-      const adaptedCount = Object.values(state.gen1Evaluated).filter(e => e.adoptedInto === mod.name && e.verdict === "adapt").length;
-      console.log(`[NEXTGEN] ✅ Module ${mod.name} — ${code.split("\n").length} lines | Safety: PASSED | Gen 1 incorporated: ${keptCount} kept, ${adaptedCount} adapted`);
+    markResourceRecovered("openaiApi");
+    writeNextGenFile(mod.name, code, mod.purpose);
+    _moduleBuildResume = null;
+    const keptCount = Object.values(state.gen1Evaluated).filter(e => e.adoptedInto === mod.name && e.verdict === "keep").length;
+    const adaptedCount = Object.values(state.gen1Evaluated).filter(e => e.adoptedInto === mod.name && e.verdict === "adapt").length;
+    console.log(`[NEXTGEN] ✅ Module ${mod.name} — ${code.split("\n").length} lines | Safety: PASSED | Gen 1 incorporated: ${keptCount} kept, ${adaptedCount} adapted`);
 
-    } catch (err: any) {
-      const msg = err?.message || "";
-      if (msg.includes("timed out")) {
-        markResourceBlocked("openaiApi");
-        console.log(`[NEXTGEN] ⏳ Build of ${mod.name} timed out — API marked blocked (cooldown: ${Math.round((resourceStatus.openaiApi.cooldownUntil! - Date.now()) / 1000)}s), switching to offline study`);
-        doOfflineWork();
-      } else if (msg.includes("timeout exceeded when trying to connect") || msg.includes("pool")) {
-        markResourceBlocked("dbPool");
-        console.log(`[NEXTGEN] ⏳ Build of ${mod.name} hit DB pool pressure — DB marked blocked, switching to offline study`);
-        doOfflineWork();
-      } else {
-        console.error(`[NEXTGEN] Failed to build ${mod.name}:`, err);
-      }
+  } catch (err: any) {
+    const msg = err?.message || "";
+    if (msg.includes("timed out")) {
+      markResourceBlocked("openaiApi");
+      console.log(`[NEXTGEN] ⏳ Build of ${mod.name} timed out at codegen stage — progress SAVED, will resume from codegen next cycle (eval work preserved)`);
+      doOfflineWork();
+    } else if (msg.includes("timeout exceeded when trying to connect") || msg.includes("pool")) {
+      markResourceBlocked("dbPool");
+      console.log(`[NEXTGEN] ⏳ Build of ${mod.name} hit DB pool pressure — progress SAVED, will resume next cycle`);
+      doOfflineWork();
+    } else {
+      console.error(`[NEXTGEN] Failed to build ${mod.name}:`, err);
+      _moduleBuildResume = null;
     }
   }
+  _buildActive = false;
 
   if (state.cycleCount % 3 === 0) {
     createCheckpoint(`Coding progress — cycle ${state.cycleCount}`);

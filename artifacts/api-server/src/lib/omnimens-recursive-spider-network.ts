@@ -45,6 +45,7 @@ import { desc, eq, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { webSearch, fetchPageContent, formatSearchResults } from "./web-search.js";
 import { getActiveGenesisAgentNames, getActiveGenesisAgentDomains } from "./omnimens-agent-genesis.js";
+import { isNextGenBuildActive } from "./omnimens-nextgen-sandbox.js";
 
 function safeNum(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;
@@ -774,6 +775,10 @@ Respond JSON only:
 }
 
 export async function runRecursiveSpiderNetwork(): Promise<void> {
+  if (isNextGenBuildActive()) {
+    console.log(`[RECURSIVE SPIDER NETWORK] 🔕 Cycle SKIPPED — Gen 2 build in progress, yielding resources`);
+    return;
+  }
   if (recursiveCycleRunning) {
     console.log(`[RECURSIVE SPIDER NETWORK] ⏳ Cycle already running — skipping overlap`);
     return;

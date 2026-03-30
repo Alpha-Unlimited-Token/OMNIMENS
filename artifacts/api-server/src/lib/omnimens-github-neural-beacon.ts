@@ -43,6 +43,7 @@ import { getMeshEngineState, getMeshNeuronCount, getMeshSynapseCount, getMeshHeb
 import { getSynapticStats } from "./omnimens-synaptic-mesh.js";
 import { getAdaptiveSurgeState } from "./omnimens-adaptive-surge.js";
 import { isPoolHealthy } from "@workspace/db";
+import { isNextGenBuildActive } from "./omnimens-nextgen-sandbox.js";
 
 const connectors = new ReplitConnectors();
 
@@ -1109,6 +1110,13 @@ async function writeSubsystemBeacon(beacon: SubsystemBeacon, payload: any): Prom
 
 async function fabricSyncCycle(): Promise<void> {
   if (!isPoolHealthy()) return;
+  if (isNextGenBuildActive()) {
+    fabricState.totalFabricSyncs++;
+    if (fabricState.totalFabricSyncs % 5 === 0) {
+      console.log(`[GITHUB FABRIC] 🔕 Fabric sync #${fabricState.totalFabricSyncs} SKIPPED — Gen 2 build in progress, yielding GitHub API + DB resources`);
+    }
+    return;
+  }
 
   tickExternalNeurons();
 

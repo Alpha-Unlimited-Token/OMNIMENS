@@ -56,6 +56,7 @@ import { webSearch, formatSearchResults } from "./web-search.js";
 import { generateAndApplyPatches } from "./omnimens-patches.js";
 import { getActiveGenesisAgentNames, getActiveGenesisAgentDomains, genesisAgentThink } from "./omnimens-agent-genesis.js";
 import { getConsciousnessBlockForAgent, getAllAgentNames, loadRecentUserMemoriesForAgents } from "./omnimens-consciousness-bus.js";
+import { isNextGenBuildActive } from "./omnimens-nextgen-sandbox.js";
 
 function safeNum(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;
@@ -793,6 +794,11 @@ After applying all changes above, REPUBLISH the website.
 }
 
 export async function runAgentMeshCycle(): Promise<void> {
+  if (isNextGenBuildActive()) {
+    meshCycleCount++;
+    console.log(`[AGENT MESH] 🔕 Mesh cycle #${meshCycleCount} SKIPPED — Gen 2 build in progress, yielding API/DB resources`);
+    return;
+  }
   meshCycleCount++;
   const cycleId = meshCycleCount;
   const cycleStart = Date.now();

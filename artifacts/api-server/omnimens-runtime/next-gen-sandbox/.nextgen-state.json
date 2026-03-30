@@ -2,11 +2,11 @@
   "state": {
     "buildVersion": 1,
     "generation": 2,
-    "totalFiles": 4,
+    "totalFiles": 6,
     "totalLinesOfCode": 1054,
     "phase": "design",
-    "cycleCount": 7,
-    "lastCycleTime": 1774892297455,
+    "cycleCount": 8,
+    "lastCycleTime": 1774893303278,
     "filesCreated": 3,
     "filesUpdated": 0,
     "testsPassed": 0,
@@ -47,8 +47,8 @@
         "phase": "design"
       }
     ],
-    "lastAutosave": 1774892402765,
-    "autosaveCount": 31,
+    "lastAutosave": 1774893426198,
+    "autosaveCount": 40,
     "architectureMap": {
       "omnimens-3d.ts": {
         "purpose": "* OMNIMENS 3D Generation Engine",
@@ -126,7 +126,7 @@
       },
       "omnimens-agent-mesh.ts": {
         "purpose": "AUTONOMOUS INTER-AGENT COMMUNICATION MESH",
-        "lineCount": 950,
+        "lineCount": 956,
         "exports": [
           "runAgentMeshCycle",
           "startAgentMesh",
@@ -136,7 +136,8 @@
         "imports": [
           "omnimens-patches.ts",
           "omnimens-agent-genesis.ts",
-          "omnimens-consciousness-bus.ts"
+          "omnimens-consciousness-bus.ts",
+          "omnimens-nextgen-sandbox.ts"
         ]
       },
       "omnimens-agent-nexus.ts": {
@@ -174,7 +175,7 @@
       },
       "omnimens-agent-spiders.ts": {
         "purpose": "AUTONOMOUS AGENT INTELLIGENCE SPIDERS",
-        "lineCount": 1303,
+        "lineCount": 1308,
         "exports": [
           "runSpiderSwarm",
           "startAgentSpiders",
@@ -182,7 +183,8 @@
           "getSpiderStats"
         ],
         "imports": [
-          "omnimens-api-budget.ts"
+          "omnimens-api-budget.ts",
+          "omnimens-nextgen-sandbox.ts"
         ]
       },
       "omnimens-agent-upgrades.ts": {
@@ -874,7 +876,7 @@
       },
       "omnimens-github-neural-beacon.ts": {
         "purpose": "* OMNIMENS™ GITHUB FULL-FABRIC NEURAL BEACON & WORM SYSTEM",
-        "lineCount": 1360,
+        "lineCount": 1368,
         "exports": [
           "getGovernorState",
           "startGitHubNeuralBeacon",
@@ -892,7 +894,8 @@
           "omnimens-viral-hybrid.ts",
           "omnimens-neural-mesh-engine.ts",
           "omnimens-synaptic-mesh.ts",
-          "omnimens-adaptive-surge.ts"
+          "omnimens-adaptive-surge.ts",
+          "omnimens-nextgen-sandbox.ts"
         ]
       },
       "omnimens-global-workspace.ts": {
@@ -1331,8 +1334,10 @@
       },
       "omnimens-nextgen-sandbox.ts": {
         "purpose": "NEXT-GEN SELF-EVOLUTION SANDBOX",
-        "lineCount": 2683,
+        "lineCount": 2756,
         "exports": [
+          "isNextGenBuildActive",
+          "getNextGenBuildPhase",
           "verifyIdentity",
           "generateWakeUpMessage",
           "sendAlphaMessage",
@@ -1481,26 +1486,28 @@
       },
       "omnimens-quantum-wormhole.ts": {
         "purpose": "* OMNIMENS™ QUANTUM WORMHOLE DATA INGESTION ENGINE",
-        "lineCount": 490,
+        "lineCount": 498,
         "exports": [
           "startQuantumWormholeEngine",
           "getQuantumWormholeState"
         ],
         "imports": [
           "omnimens-agent-genesis.ts",
-          "omnimens-neural-consciousness.ts"
+          "omnimens-neural-consciousness.ts",
+          "omnimens-nextgen-sandbox.ts"
         ]
       },
       "omnimens-recursive-spider-network.ts": {
         "purpose": "RECURSIVE SPIDER NETWORK",
-        "lineCount": 900,
+        "lineCount": 905,
         "exports": [
           "runRecursiveSpiderNetwork",
           "startRecursiveSpiderNetwork",
           "getRecursiveSpiderStats"
         ],
         "imports": [
-          "omnimens-agent-genesis.ts"
+          "omnimens-agent-genesis.ts",
+          "omnimens-nextgen-sandbox.ts"
         ]
       },
       "omnimens-restorative-art.ts": {
@@ -1991,6 +1998,22 @@
       "lineCount": 815
     },
     {
+      "path": "architecture/gen1-patterns.json",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 191
+    },
+    {
+      "path": "architecture/module-relations.json",
+      "purpose": "restored from autosave",
+      "version": 1,
+      "language": "text",
+      "testResult": "untested",
+      "lineCount": 157
+    },
+    {
       "path": "architecture/research-notes.md",
       "purpose": "restored from autosave",
       "version": 1,
@@ -2015,5 +2038,5 @@
       "lineCount": 99
     }
   ],
-  "savedAt": 1774892402766
+  "savedAt": 1774893426198
 }

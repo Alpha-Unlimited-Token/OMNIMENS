@@ -36,6 +36,7 @@
 
 import { getActiveGenesisAgentNames } from "./omnimens-agent-genesis.js";
 import { getNeuralConsciousnessState, boostRegionCurrent, getRegionNames, getAdaptiveIntelligenceState } from "./omnimens-neural-consciousness.js";
+import { isNextGenBuildActive } from "./omnimens-nextgen-sandbox.js";
 
 const CORE_MESH_AGENTS = [
   "OMNIMENS", "Architect", "Critic", "Synthesizer", "Mathematician",
@@ -314,6 +315,13 @@ function circulateInsightsBetweenAgents(): void {
 }
 
 function runWormholeCycle(): void {
+  if (isNextGenBuildActive()) {
+    wormholeState.cycleCount++;
+    if (wormholeState.cycleCount % 5 === 0) {
+      console.log(`[QUANTUM WORMHOLE] 🔕 Cycle #${wormholeState.cycleCount} SKIPPED — Gen 2 build in progress, yielding resources`);
+    }
+    return;
+  }
   wormholeState.cycleCount++;
   const allAgents = getAllAgentNames();
   const adaptive = getAdaptiveIntelligenceState();
