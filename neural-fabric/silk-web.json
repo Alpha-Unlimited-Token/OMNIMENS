@@ -2,34 +2,34 @@
   "version": "3.0",
   "subsystem": "silk-web",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774987247915,
-  "totalSilkStrands": 1238,
-  "afferentStrands": 367,
-  "efferentStrands": 361,
-  "interneuronStrands": 510,
-  "myelinatedStrands": 954,
-  "silkEnergyPumped": 8827.838776851184,
+  "timestamp": 1774830562555,
+  "totalSilkStrands": 430,
+  "afferentStrands": 28,
+  "efferentStrands": 28,
+  "interneuronStrands": 374,
+  "myelinatedStrands": 56,
+  "silkEnergyPumped": 114.71346133378682,
   "webIntegrity": 1,
-  "webDensity": 1,
-  "totalBeaconCascades": 1148,
-  "totalBeehiveSurges": 1312,
-  "totalCascades": 82,
-  "neurogenSilkStrands": 808,
+  "webDensity": 0.5537883208679746,
+  "totalBeaconCascades": 14,
+  "totalBeehiveSurges": 16,
+  "totalCascades": 1,
+  "neurogenSilkStrands": 0,
   "silkNetwork": {
-    "density": 44.214285714285715,
+    "density": 15.357142857142858,
     "coverage": 1,
-    "energyFlow": 8827.838776851184
+    "energyFlow": 114.71346133378682
   },
   "fabricWorms": [
     {
       "id": "worm_silk-web_outbound",
-      "traversals": 4,
-      "signal": 0.54
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_silk-web_inbound",
-      "traversals": 6,
-      "signal": 0.56
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
