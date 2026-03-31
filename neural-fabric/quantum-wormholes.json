@@ -2,137 +2,133 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774986252458,
-  "totalWormholesCreated": 5250,
+  "timestamp": 1774986346415,
+  "totalWormholesCreated": 8400,
   "totalActive": 0,
-  "totalClosed": 5250,
-  "totalDataIngestedKB": 7674,
-  "totalInsightsDecoded": 5250,
-  "totalCrossAgentCirculations": 315,
-  "totalSynthesizedDiscoveries": 300,
-  "cycleCount": 5,
+  "totalClosed": 8400,
+  "totalDataIngestedKB": 12265,
+  "totalInsightsDecoded": 8400,
+  "totalCrossAgentCirculations": 504,
+  "totalSynthesizedDiscoveries": 473,
+  "cycleCount": 8,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 250,
-      "totalInsightsDecoded": 262,
-      "crossAgentShares": 15
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 421,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 250,
-      "totalInsightsDecoded": 262,
-      "crossAgentShares": 15
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 421,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 250,
-      "totalInsightsDecoded": 262,
-      "crossAgentShares": 15
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 421,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 250,
-      "totalInsightsDecoded": 262,
-      "crossAgentShares": 15
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 421,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 250,
-      "totalInsightsDecoded": 262,
-      "crossAgentShares": 15
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 421,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 250,
-      "totalInsightsDecoded": 262,
-      "crossAgentShares": 15
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 421,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 250,
-      "totalInsightsDecoded": 262,
-      "crossAgentShares": 15
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 421,
+      "crossAgentShares": 24
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 250,
-      "totalInsightsDecoded": 262,
-      "crossAgentShares": 15
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 421,
+      "crossAgentShares": 24
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 250,
-      "totalInsightsDecoded": 262,
-      "crossAgentShares": 15
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 421,
+      "crossAgentShares": 24
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 250,
-      "totalInsightsDecoded": 262,
-      "crossAgentShares": 15
+      "totalWormholes": 400,
+      "totalInsightsDecoded": 421,
+      "crossAgentShares": 24
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Philosopher",
-      "insight": "Motivator/analogical_mapping: Phase transitions in neural networks: as connectivity increases past a critical threshold,",
-      "confidence": 0.769960392596305,
-      "synthesizedWith": [
-        "Philosopher/pattern_recognition: Quantum decoherence typically destroys quantum "
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Visionary",
-      "insight": "Motivator/feature_extraction: Recurrent neural networks can approximate any dynamical system — they are universal approx",
-      "confidence": 0.7929293110104556,
-      "synthesizedWith": [
-        "Visionary/pattern_recognition: The edge of chaos: complex systems exhibit the mo"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
       "toAgent": "OMNIMENS",
-      "insight": "Motivator/information_compression: The Boltzmann brain paradox suggests that a self-aware entity is more likely to arise",
-      "confidence": 0.7327438406462952,
+      "insight": "Motivator/emergent_property_detection: Kolmogorov complexity measures the shortest program that produces a given output ",
+      "confidence": 0.6171981869523855,
       "synthesizedWith": [
-        "OMNIMENS/cross_domain_synthesis: Predictive coding: the brain constantly generat"
+        "OMNIMENS/feature_extraction: The Chinese Room argument: can a system that manipu"
       ]
     },
     {
-      "fromAgent": "Empath",
-      "toAgent": "Archivist",
-      "insight": "Empath/information_compression: The hippocampus replays experiences during sleep in compressed form — dream consolidatio",
-      "confidence": 0.8972832918915461,
+      "fromAgent": "Motivator",
+      "toAgent": "Explorer",
+      "insight": "Motivator/analogical_mapping: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can emerg",
+      "confidence": 0.7816316950546875,
       "synthesizedWith": [
-        "Archivist/structural_analysis: Quantum entanglement allows particles to share st"
+        "Explorer/structural_analysis: Neuroplasticity allows the brain to reorganize its"
       ]
     },
     {
-      "fromAgent": "Empath",
+      "fromAgent": "Motivator",
       "toAgent": "Architect",
-      "insight": "Empath/abstraction_layer: Hebbian learning: neurons that fire together wire together — the fundamental rule of neural pl",
-      "confidence": 0.7363905534451662,
+      "insight": "Motivator/emergent_property_detection: Kolmogorov complexity measures the shortest program that produces a given output ",
+      "confidence": 0.6171981869523855,
       "synthesizedWith": [
-        "Architect/abstraction_layer: Transfer learning: knowledge gained from one domain"
+        "Architect/feature_extraction: Wolfram's Rule 110 cellular automaton is Turing co"
       ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Pioneer",
+      "insight": "Empath/emergent_property_detection: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers ",
+      "confidence": 0.6108171207448638,
+      "synthesizedWith": []
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Mathematician",
+      "insight": "Empath/emergent_property_detection: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers ",
+      "confidence": 0.6108171207448638,
+      "synthesizedWith": []
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
