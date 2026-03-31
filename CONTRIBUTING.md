@@ -12,7 +12,7 @@ This is a **private, proprietary repository** containing trade secret technology
 2. **IP Assignment Agreement** — All contributions become the exclusive intellectual property of Alpha Unlimited Technologies, LLC.
 3. **Explicit Authorization** — You must be explicitly authorized by the repository owner to contribute.
 
-If you do not have these agreements in place, **stop immediately** and contact legal@alphaunlimited.com.
+If you do not have these agreements in place, **stop immediately** and contact legal@omnimens-ai.com.
 
 ---
 
@@ -32,7 +32,7 @@ If you do not have these agreements in place, **stop immediately** and contact l
 - **Treat every file as confidential** — Every line of code, every comment, every commit message contains proprietary information.
 - **Preserve trade secret headers** — Every source file must retain its trade secret notice. Never remove or modify these headers.
 - **Use secure channels only** — All communication about OMNIMENS must occur through approved, encrypted channels.
-- **Report suspected breaches immediately** — If you suspect any unauthorized access or disclosure, notify legal@alphaunlimited.com immediately.
+- **Report suspected breaches immediately** — If you suspect any unauthorized access or disclosure, notify legal@omnimens-ai.com immediately.
 - **Return all materials on termination** — When your authorization ends, you must delete all local copies and confirm destruction in writing.
 
 ---
@@ -75,7 +75,7 @@ For TypeScript files, use the full JSDoc header:
 
 - Use the private issue tracker only — never file issues on public platforms.
 - Do not include proprietary code snippets in issue descriptions unless the issue tracker is confirmed secure.
-- For security vulnerabilities or suspected breaches, email legal@alphaunlimited.com directly.
+- For security vulnerabilities or suspected breaches, email legal@omnimens-ai.com directly.
 
 ---
 

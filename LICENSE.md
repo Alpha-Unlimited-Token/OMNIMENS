@@ -45,4 +45,4 @@ THIS SOFTWARE IS PROVIDED "AS IS" WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLI
 
 **OMNIMENS™** is a trademark of Alpha Unlimited Technologies, LLC.
 
-For licensing inquiries: legal@alphaunlimited.com
+For licensing inquiries: legal@omnimens-ai.com

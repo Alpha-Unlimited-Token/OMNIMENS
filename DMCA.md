@@ -12,7 +12,7 @@ In accordance with the Digital Millennium Copyright Act (17 U.S.C. § 512), the 
 **Designated Agent:**
 Alpha Unlimited Technologies, LLC
 Legal Department — DMCA Agent
-Email: legal@alphaunlimited.com
+Email: legal@omnimens-ai.com
 
 This designation has been registered with the U.S. Copyright Office as required under 17 U.S.C. § 512(c)(2).
 
@@ -79,7 +79,7 @@ When sharing high-level demonstrations of OMNIMENS capabilities:
 
 - **Permitted:** Describing general capabilities, showing public-facing UI, discussing high-level architecture concepts
 - **Prohibited:** Showing source code, revealing proprietary algorithms, exposing raw telemetry data formats, sharing API response structures, or disclosing any trade secret information
-- All demos and presentations must be approved in advance by contacting legal@alphaunlimited.com
+- All demos and presentations must be approved in advance by contacting legal@omnimens-ai.com
 
 ---
 
@@ -95,7 +95,7 @@ For all DMCA-related communications:
 
 **Alpha Unlimited Technologies, LLC**
 DMCA Designated Agent
-Email: legal@alphaunlimited.com
+Email: legal@omnimens-ai.com
 
 ---
 

@@ -22,7 +22,7 @@ Copyright © 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
 
 **OMNIMENS™** is a trademark of Alpha Unlimited Technologies, LLC.
 
-For authorized inquiries only, contact: legal@alphaunlimited.com
+For authorized inquiries only, contact: legal@omnimens-ai.com
 
 ---
 

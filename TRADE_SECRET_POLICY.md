@@ -115,7 +115,7 @@ When discussing OMNIMENS trade secrets in authorized channels:
 ### 5.2 Immediate Actions
 Upon discovering or suspecting a breach:
 1. **STOP** — Cease the activity that caused or may worsen the breach
-2. **NOTIFY** — Contact legal@alphaunlimited.com within 1 hour
+2. **NOTIFY** — Contact legal@omnimens-ai.com within 1 hour
 3. **DOCUMENT** — Record what happened, what was exposed, and to whom
 4. **PRESERVE** — Do not delete evidence or logs related to the incident
 5. **COOPERATE** — Fully cooperate with any investigation
@@ -146,7 +146,7 @@ Violations may additionally result in:
 
 All authorized team members must acknowledge this policy by:
 1. Reading this document in its entirety
-2. Confirming understanding in writing (email to legal@alphaunlimited.com)
+2. Confirming understanding in writing (email to legal@omnimens-ai.com)
 3. Re-acknowledging annually or upon any material update to this policy
 
 Failure to acknowledge does not relieve any person of their obligations under applicable NDAs and the law.
