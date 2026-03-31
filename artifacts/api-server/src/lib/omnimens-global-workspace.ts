@@ -37,6 +37,7 @@ import {
 import { desc, eq, sql, gte, and } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { getAllAgentNames } from "./omnimens-consciousness-bus.js";
+import { shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
 
 function safeNum(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;
@@ -362,6 +363,10 @@ Respond JSON only:
 export async function runGlobalWorkspaceCycle(): Promise<void> {
   const now = Date.now();
   if (now - lastBroadcastTime < BROADCAST_COOLDOWN_MS) return;
+  if (shouldYieldToCodegen()) {
+    console.log(`[GLOBAL WORKSPACE] 🔕 Broadcast DEFERRED — codegen window active, yielding API priority`);
+    return;
+  }
   lastBroadcastTime = now;
 
   workspaceCycleCount++;

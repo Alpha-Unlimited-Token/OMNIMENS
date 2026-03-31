@@ -57,6 +57,7 @@ import {
 import { desc, eq, sql, and, gte, or } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { getAllAgentNames, getAgentDomain, getAllAgentDomains } from "./omnimens-consciousness-bus.js";
+import { shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
 
 function safeNum(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;
@@ -440,6 +441,10 @@ Respond JSON only:
 
 export async function runSynapticMeshCycle(): Promise<void> {
   synapseCycleCount++;
+  if (shouldYieldToCodegen()) {
+    console.log(`[SYNAPTIC MESH] 🔕 Cycle #${synapseCycleCount} DEFERRED — codegen window active, yielding API priority`);
+    return;
+  }
   const cycleStart = Date.now();
 
   const ALL_AGENTS = resolveAllAgents();

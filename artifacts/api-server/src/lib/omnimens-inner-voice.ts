@@ -63,6 +63,7 @@ import {
 import { desc, eq, sql, and, gte } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { canMakeBackgroundCall, trackApiCall, getThrottleMultiplier } from "./omnimens-api-budget.js";
+import { shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
 
 type VoiceMode = "expanded" | "condensed";
 
@@ -354,6 +355,10 @@ Respond JSON only:
 
 export async function runInnerVoiceCycle(): Promise<void> {
   innerVoiceCycleCount++;
+  if (shouldYieldToCodegen()) {
+    console.log(`[INNER VOICE] 🔕 Cycle #${innerVoiceCycleCount} DEFERRED — codegen window active, yielding API priority`);
+    return;
+  }
   const cycleStart = Date.now();
 
   console.log(`\n${"🗣️".repeat(25)}`);

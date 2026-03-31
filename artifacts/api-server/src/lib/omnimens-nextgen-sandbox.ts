@@ -2279,25 +2279,24 @@ Output ONLY the TypeScript code. No markdown fencing.` },
     openCodegenWindow(600_000);
     console.log(`[NEXTGEN] 🔎 Preflight rate-limit check...`);
     let preflightPassed = false;
-    for (let pAttempt = 0; pAttempt < 4; pAttempt++) {
+    for (let pAttempt = 0; pAttempt < 2; pAttempt++) {
       try {
         await codegenOpenai.chat.completions.create({
           model: "gpt-4o-mini",
           max_tokens: 5,
           messages: [{ role: "user", content: "Say OK" }],
         });
-        console.log(`[NEXTGEN] ✅ Preflight passed — API available (attempt ${pAttempt + 1}/4)`);
+        console.log(`[NEXTGEN] ✅ Preflight passed — API available`);
         preflightPassed = true;
         break;
       } catch (preErr: any) {
         if (preErr?.status === 429) {
-          if (pAttempt < 3) {
-            const waitSecs = 45 + pAttempt * 15;
-            console.log(`[NEXTGEN] ⏳ Rate limited (preflight ${pAttempt + 1}/4) — waiting ${waitSecs}s for quota reset...`);
-            await new Promise(r => setTimeout(r, waitSecs * 1000));
+          if (pAttempt < 1) {
+            console.log(`[NEXTGEN] ⏳ Rate limited (preflight ${pAttempt + 1}/2) — waiting 30s for quota reset...`);
+            await new Promise(r => setTimeout(r, 30_000));
           } else {
             closeCodegenWindow();
-            throw new Error("Rate limit persists after 4 preflight attempts — skipping this cycle");
+            throw new Error("Rate limit persists after 2 preflight attempts — skipping this cycle");
           }
         } else {
           console.log(`[NEXTGEN] ⚠️ Preflight got non-429 error (${preErr?.status || preErr?.message}) — attempting codegen anyway`);

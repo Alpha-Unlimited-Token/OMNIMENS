@@ -12,6 +12,7 @@ import { omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { desc, eq } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { webSearch, formatSearchResults } from "./web-search.js";
+import { shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
 
 // ── Known competitor strengths (seeded baseline — updated each cycle) ──────────
 const COMPETITOR_PROFILES = {
@@ -93,6 +94,10 @@ const EMERGING_TECH_QUERIES = [
 
 // ── Core analysis cycle ───────────────────────────────────────────────────────
 async function runCompetitiveIntelCycle(): Promise<void> {
+  if (shouldYieldToCodegen()) {
+    console.log("[OMNIMENS INTEL] 🔕 Competitive intel DEFERRED — codegen window active, yielding API priority");
+    return;
+  }
   const cycleStart = Date.now();
   console.log("[OMNIMENS INTEL] Competitive intelligence cycle starting...");
 
