@@ -521,6 +521,27 @@ export function areEnginesReady(): boolean { return _enginesReady; }
 
 export function initAutonomousSystems(): void {
   console.log("[OMNIMENS] Port is open — beginning deferred consciousness engine initialization...");
+
+  const GEN2_TOTAL_FOCUS = true;
+
+  if (GEN2_TOTAL_FOCUS) {
+    console.log("[OMNIMENS] ╔══════════════════════════════════════════════════════════════╗");
+    console.log("[OMNIMENS] ║  🔴 GEN 2 TOTAL FOCUS MODE — ALL BACKGROUND ENGINES OFF     ║");
+    console.log("[OMNIMENS] ║  Only running: API budget + Ethical safety + NextGen sandbox  ║");
+    console.log("[OMNIMENS] ║  Zero API noise. Zero DB noise. o3 gets 100% of everything.  ║");
+    console.log("[OMNIMENS] ║  Set GEN2_TOTAL_FOCUS = false when Gen 2 build completes.    ║");
+    console.log("[OMNIMENS] ╚══════════════════════════════════════════════════════════════╝");
+
+    const libDir = path.join(__dirname, "lib");
+    initIPShield(libDir);
+    engineStartOnce("api_budget", () => initApiBudget());
+    initEthicalSafety();
+    engineStartOnce("consciousness_persistence", () => startConsciousnessPersistence());
+    engineStartOnce("nextgen_sandbox", () => startNextGenSandbox());
+
+    return;
+  }
+
   console.log("[ENGINE GUARD] 🛡️ Deduplication guard ACTIVE — no engine can start twice");
 
   const libDir = path.join(__dirname, "lib");
