@@ -1,0 +1,131 @@
+/**
+ * OMNIMENS Self-Authored Module (Migrated from DB)
+ * Original Source: evolution_cycle_1
+ * Name: memoryCompressionEngine
+ * Purpose: Summarize earlier conversation context into embeddings for extended memory.
+ * Description: This module compresses conversational context into embeddings using PCA and k-means clustering for extended memory in OMNIMENS.
+ * Migrated: 2026-03-25T22:49:34.231Z
+ */
+
+/**
+ * @module memoryCompressionEngine
+ * @description This module compresses conversation context into compact embeddings using clustering and dimensionality reduction.
+ */
+
+/**
+ * Perform dimensionality reduction using Principal Component Analysis (PCA).
+ * @param {number[][]} data - An array of numerical vectors to reduce.
+ * @param {number} dimensions - The target number of dimensions.
+ * @returns {number[][]} Reduced data.
+ */
+export function pca(data, dimensions) {
+  if (!Array.isArray(data) || data.length === 0 || !Array.isArray(data[0])) {
+    throw new Error("Invalid input: data must be a 2D array of numbers.");
+  }
+  if (dimensions <= 0 || dimensions > data[0].length) {
+    throw new Error("Invalid dimensions: must be greater than 0 and less than or equal to the original dimensions.");
+  }
+
+  const mean = data[0].map((_, i) => data.reduce((sum, row) => sum + row[i], 0) / data.length);
+  const centered = data.map(row => row.map((value, i) => value - mean[i]));
+  const covarianceMatrix = centered[0].map((_, i) => centered.map(row => row[i]))
+    .map((col, i) => col.map((_, j) => col.reduce((sum, value, k) => sum + value * centered[k][j], 0) / (data.length - 1)));
+
+  const eigen = eigenDecomposition(covarianceMatrix);
+  const sortedIndices = eigen.values.map((value, i) => [value, i]).sort((a, b) => b[0] - a[0]).map(([_, i]) => i);
+  const principalComponents = sortedIndices.slice(0, dimensions).map(i => eigen.vectors[i]);
+
+  return centered.map(row => principalComponents.map(pc => row.reduce((sum, value, i) => sum + value * pc[i], 0)));
+}
+
+/**
+ * Perform clustering using k-means.
+ * @param {number[][]} data - An array of numerical vectors to cluster.
+ * @param {number} k - The number of clusters.
+ * @param {number} maxIterations - Maximum iterations for k-means.
+ * @returns {Object} Clustering result with centroids and cluster assignments.
+ */
+export function kMeans(data, k, maxIterations = 100) {
+  if (!Array.isArray(data) || data.length === 0 || !Array.isArray(data[0])) {
+    throw new Error("Invalid input: data must be a 2D array of numbers.");
+  }
+  if (k <= 0 || k > data.length) {
+    throw new Error("Invalid k: must be greater than 0 and less than or equal to the number of data points.");
+  }
+
+  const initializeCentroids = () => {
+    const indices = new Set();
+    while (indices.size < k) {
+      indices.add(Math.floor(Math.random() * data.length));
+    }
+    return Array.from(indices).map(i => data[i]);
+  };
+
+  const calculateDistance = (a, b) => Math.sqrt(a.reduce((sum, value, i) => sum + (value - b[i]) ** 2, 0));
+
+  let centroids = initializeCentroids();
+  let assignments = Array(data.length).fill(-1);
+
+  for (let iteration = 0; iteration < maxIterations; iteration++) {
+    const newAssignments = data.map(point => {
+      return centroids.reduce((minIndex, centroid, i) => {
+        const distance = calculateDistance(point, centroid);
+        return distance < calculateDistance(point, centroids[minIndex]) ? i : minIndex;
+      }, 0);
+    });
+
+    if (newAssignments.every((value, i) => value === assignments[i])) {
+      break;
+    }
+
+    assignments = newAssignments;
+
+    centroids = Array.from({ length: k }, (_, cluster) => {
+      const clusterPoints = data.filter((_, i) => assignments[i] === cluster);
+      return clusterPoints[0].map((_, i) => clusterPoints.reduce((sum, point) => sum + point[i], 0) / clusterPoints.length);
+    });
+  }
+
+  return { centroids, assignments };
+}
+
+/**
+ * Compress conversation context into embeddings.
+ * @param {string[]} context - Array of conversation strings.
+ * @param {number} dimensions - Target number of dimensions for embeddings.
+ * @param {number} clusters - Number of clusters for summarization.
+ * @returns {Object} Compression result with embeddings and cluster summaries.
+ */
+export function compressContext(context, dimensions, clusters) {
+  if (!Array.isArray(context) || context.length === 0 || !context.every(item => typeof item === "string")) {
+    throw new Error("Invalid input: context must be a non-empty array of strings.");
+  }
+
+  const tokenize = str => str.split(/\s+/).map(word => word.toLowerCase().replace(/[^a-z0-9]/g, ""));
+  const vocabulary = Array.from(new Set(context.flatMap(tokenize)));
+  const vectorize = str => {
+    const tokens = tokenize(str);
+    return vocabulary.map(word => tokens.filter(token => token === word).length);
+  };
+
+  const data = context.map(vectorize);
+  const reducedData = pca(data, dimensions);
+  const { centroids, assignments } = kMeans(reducedData, clusters);
+
+  const summaries = centroids.map((_, cluster) => {
+    const clusterPoints = context.filter((_, i) => assignments[i] === cluster);
+    return clusterPoints.join(" ");
+  });
+
+  return { embeddings: reducedData, summaries };
+}
+
+/**
+ * Perform eigen decomposition of a square matrix.
+ * @param {number[][]} matrix - A square matrix.
+ * @returns {Object} Eigenvalues and eigenvectors.
+ */
+function eigenDecomposition(matrix) {
+  // Placeholder for actual eigen decomposition logic.
+  throw new Error("Eigen decomposition not implemented.");
+}
