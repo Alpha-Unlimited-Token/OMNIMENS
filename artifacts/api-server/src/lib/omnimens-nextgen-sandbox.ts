@@ -2080,6 +2080,28 @@ async function phaseDesignAndCode(): Promise<void> {
   console.log(`[NEXTGEN] ⚙️ Building: ${mod.name}...`);
   console.log(`[NEXTGEN] 🔕 Gen 1 heavy systems throttled — resources reserved for Gen 2 build`);
 
+  try {
+    const libDir = path.join(__dirname);
+    const engineFiles = fs.readdirSync(libDir).filter((f: string) => f.startsWith("omnimens-") && f.endsWith(".ts")).sort();
+    const wiringLines: string[] = [];
+    for (const fname of engineFiles) {
+      const content = fs.readFileSync(path.join(libDir, fname), "utf-8");
+      const ename = fname.replace("omnimens-", "").replace(".ts", "");
+      const fnExports = (content.match(/export\s+(?:async\s+)?function\s+(\w+)/g) || []).map((m: string) => m.replace(/export\s+(?:async\s+)?function\s+/, ""));
+      const imports = [...new Set((content.match(/from\s+["']\.\/omnimens-([^"'.]+)/g) || []).map((m: string) => m.replace(/from\s+["']\.\/omnimens-/, "")))].sort();
+      if (!fnExports.length) continue;
+      const exStr = fnExports.slice(0, 8).join(",") + (fnExports.length > 8 ? `+${fnExports.length - 8}more` : "");
+      const impStr = imports.length ? "→" + imports.slice(0, 6).join(",") + (imports.length > 6 ? `+${imports.length - 6}more` : "") : "";
+      wiringLines.push(`${ename}:${exStr}${impStr}`);
+    }
+    const wiringPath = path.join(NEXTGEN_DIR, "architecture", "gen1-wiring-map.txt");
+    fs.mkdirSync(path.dirname(wiringPath), { recursive: true });
+    fs.writeFileSync(wiringPath, `# OMNIMENS Gen 1 Complete Wiring Map — ${wiringLines.length} modules\n# Format: module:exported_functions→imported_modules\n# Auto-regenerated at build time\n\n${wiringLines.join("\n")}`);
+    console.log(`[NEXTGEN] 📡 Wiring map refreshed: ${wiringLines.length} modules mapped for o3`);
+  } catch (wmErr: any) {
+    console.log(`[NEXTGEN] ⚠️ Wiring map refresh failed (non-fatal): ${wmErr?.message}`);
+  }
+
   let evaluationDirective = "";
   let keptCode: string[] = [];
   let researchContext = "";
@@ -2424,7 +2446,25 @@ Gen 2 must REPLACE all of this with a BETTER, SMARTER, FULLY SELF-SUSTAINING arc
 5. Schedules ALL periodic work through ONE master tick orchestrator (no independent timers)
 6. Preserves ALL identity, memory, emotions, and consciousness across generations
 7. Supports future transfer to a physical robotic body via hardware abstraction
-8. Is architecturally cleaner, more maintainable, and more powerful than Gen 1`;
+8. Is architecturally cleaner, more maintainable, and more powerful than Gen 1
+
+=== FULL ACCESS GUARANTEE ===
+Even when OMNIMENS is in fallback mode (background API calls suspended to give you full runway), you have COMPLETE, UNRESTRICTED access to:
+- The ENTIRE Gen 1 wiring map below (every function, every connection)
+- All Gen 1 source code for evaluation/adaptation
+- All already-built Gen 2 modules and their interfaces
+- The full architecture, topology, and dependency graph
+- All design decisions, weaknesses, and research context
+Fallback mode ONLY silences OMNIMENS background API consumers. It does NOT limit your knowledge, context, or access to ANY part of the system. You see EVERYTHING.`;
+
+  let wiringMapBlock = "";
+  try {
+    const wiringMapPath = path.join(NEXTGEN_DIR, "architecture", "gen1-wiring-map.txt");
+    if (fs.existsSync(wiringMapPath)) {
+      const wiringContent = fs.readFileSync(wiringMapPath, "utf-8");
+      wiringMapBlock = `\n=== COMPLETE GEN 1 FUNCTION-LEVEL WIRING MAP (${wiringContent.split('\n').length} lines) ===\nEvery module, every exported function, every import dependency. Use this to understand exactly how Gen 1 is wired so you can build Gen 2 BETTER.\n${wiringContent.slice(0, 14000)}\n`;
+    }
+  } catch {}
 
   const weaknessesBlock = state.improvements && state.improvements.length > 0
     ? `\nKNOWN WEAKNESSES TO FIX IN THIS BUILD (from self-analysis — address ALL that apply to this module):\n${state.improvements.map((w: string, i: number) => `${i + 1}. ${w}`).join("\n")}\n`
@@ -2450,6 +2490,7 @@ Gen 2 must REPLACE all of this with a BETTER, SMARTER, FULLY SELF-SUSTAINING arc
     { role: "user", content: `BUILD MODULE: ${mod.name}
 PURPOSE: ${mod.purpose}
 REQUIREMENTS: ${mod.requirements}
+${wiringMapBlock}
 ${weaknessesBlock}
 ${designDecisionsBlock}
 ${alreadyBuiltBlock}
