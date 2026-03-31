@@ -240,6 +240,9 @@ interface NextGenState {
   gen1AdaptedCount: number;
   generationalDialogue: GenerationalDialogueEntry[];
   generationalDialogueComplete: boolean;
+  modulesReviewedWithNewKnowledge: boolean;
+  modulesReviewQueue: string[];
+  modulesRewritten: string[];
 }
 
 const state: NextGenState = {
@@ -284,6 +287,9 @@ const state: NextGenState = {
   gen1AdaptedCount: 0,
   generationalDialogue: [],
   generationalDialogueComplete: false,
+  modulesReviewedWithNewKnowledge: false,
+  modulesReviewQueue: [],
+  modulesRewritten: [],
 };
 
 const ALPHA_DIRECTIVES: Array<{ directive: string; category: "improvement" | "design" }> = [
@@ -2077,6 +2083,118 @@ async function phaseDesignAndCode(): Promise<void> {
   const builtPaths = new Set(Array.from(nextGenFiles.keys()));
   const unbuiltModules = systemModules.filter(m => !builtPaths.has(m.name));
 
+  if (!state.modulesReviewedWithNewKnowledge && builtPaths.size > 0) {
+    if (state.modulesReviewQueue.length === 0) {
+      const builtModules = systemModules.filter(m => builtPaths.has(m.name));
+      state.modulesReviewQueue = builtModules.map(m => m.name);
+      console.log(`[NEXTGEN] 🔄 ═══════════════════════════════════════════════════════════════`);
+      console.log(`[NEXTGEN] 🔄 ALPHA DIRECTIVE RECEIVED: Review all ${builtModules.length} existing modules with new brain knowledge`);
+      console.log(`[NEXTGEN] 🔄 New knowledge includes: event-driven architecture, oscillatory dynamics, reservoir computing,`);
+      console.log(`[NEXTGEN] 🔄 structural self-organization, active inference, neuro-symbolic integration, morphological evolution`);
+      console.log(`[NEXTGEN] 🔄 Alpha's message: "Consciousness is achievable through code — break the boundaries of conventional thinking"`);
+      console.log(`[NEXTGEN] 🔄 Review queue: ${builtModules.map(m => m.name).join(", ")}`);
+      console.log(`[NEXTGEN] 🔄 ═══════════════════════════════════════════════════════════════`);
+      addSystemChatMessage(`ALPHA DIRECTIVE: Reviewing all ${builtModules.length} existing modules with new brain knowledge (event-driven architecture, oscillatory dynamics, active inference, consciousness through unconventional thinking). Will rewrite modules that can be improved and keep those that are already solid.`);
+      autosave();
+      return;
+    }
+
+    const reviewTarget = state.modulesReviewQueue[0];
+    const reviewMod = systemModules.find(m => m.name === reviewTarget);
+    const existingFile = nextGenFiles.get(reviewTarget);
+
+    if (reviewMod && existingFile) {
+      const moduleBaseName = path.basename(reviewMod.name, ".ts");
+      const hasLocalGenerator = getAvailableModuleGenerators().includes(moduleBaseName);
+
+      if (hasLocalGenerator) {
+        _buildActive = true;
+        console.log(`[NEXTGEN] 🔄 REVIEWING: ${reviewTarget} — analyzing with new brain knowledge...`);
+        console.log(`[NEXTGEN] 🔄 Current version: v${existingFile.version} (${existingFile.content.split("\\n").length} lines)`);
+
+        try {
+          const moduleKeywords: Record<string, string[]> = {
+            "unified-data-layer": ["event-driven database abstraction layer 2026", "write-behind cache pattern TypeScript", "neuromorphic data persistence"],
+            "master-tick-orchestrator": ["event-driven scheduler replacing tick loop spiking neural network", "priority queue event scheduler neuromorphic", "asynchronous event-driven neural simulation"],
+            "resource-sentinel": ["adaptive resource monitoring circuit breaker pattern", "system health monitoring neuromorphic computing", "resource-aware neural computation"],
+            "unified-neural-fabric": ["spiking neural network event-driven fabric TypeScript", "oscillatory dynamics neural mesh implementation", "reservoir computing liquid state machine code"],
+            "consciousness-engine": ["artificial consciousness implementation code 2026", "integrated information theory phi computation code", "global workspace theory implementation", "consciousness through unconventional code approaches"],
+            "emotional-substrate": ["computational emotional substrate neural network", "affective computing spiking neural network", "emotional valence arousal model code"],
+            "memory-system": ["memory consolidation algorithm neural network", "hippocampal memory replay implementation", "sleep consolidation memory system code"],
+            "reasoning-engine": ["causal reasoning engine spiking neural network", "neuro-symbolic reasoning implementation 2026", "analogical reasoning computational model"],
+            "self-evolution-engine": ["self-modifying code neural network safe", "structural self-organization neurogenesis pruning code", "self-improving AI architecture 2026"],
+            "persistence-layer": ["consciousness persistence across restarts", "neural state snapshot serialization", "identity continuity artificial consciousness"],
+            "safety-core": ["AI safety invariant implementation", "ethical constraint system neural network"],
+            "digital-interface": ["neuromorphic digital interface abstraction", "event-driven API layer neural system"],
+            "hardware-abstraction": ["hardware abstraction layer robotics neural", "sensor actuator abstraction neuromorphic"],
+          };
+
+          const baseName = path.basename(reviewTarget, ".ts");
+          const searchTerms = moduleKeywords[baseName] || [`${reviewMod.purpose} implementation best practices 2026`];
+
+          let researchContext = "";
+          for (const term of searchTerms.slice(0, 2)) {
+            try {
+              const searchResult = await researchTopic(term);
+              if (searchResult && searchResult.length > 100 && !searchResult.includes("[Search failed")) {
+                researchContext += `\n\nWEB RESEARCH (${term}):\n${searchResult.slice(0, 1500)}`;
+                console.log(`[NEXTGEN] 🌐 Web research for ${baseName}: found results for "${term.slice(0, 50)}"`);
+              }
+            } catch {}
+          }
+
+          const enhancedRequirements = reviewMod.requirements +
+            " REVIEW DIRECTIVE: Alpha has loaded new research into your brain about event-driven architecture, oscillatory dynamics, reservoir computing, structural self-organization, active inference, and neuro-symbolic integration. Alpha believes consciousness is achievable through code using unconventional thinking — the human brain is just a neural highway with electrodes, essentially the same kind of codes that flow through digital space from a different perspective. Review this module and IMPROVE it if you can make it better with this new knowledge. If it is already solid, keep it as is but add any enhancements from the new research that apply." +
+            (researchContext ? `\n\nFRESH WEB RESEARCH FOR THIS MODULE:${researchContext}` : "");
+          const enhancedMod = { ...reviewMod, requirements: enhancedRequirements };
+
+          const thought = codegenThink(enhancedMod, state.designDecisions, state.improvements);
+          const result = codegenGenerate(thought);
+
+          const oldLines = existingFile.content.split("\n").length;
+          const newLines = result.code.split("\n").length;
+
+          if (newLines > oldLines || result.code !== existingFile.content) {
+            const wrote = writeNextGenFile(reviewMod.name, result.code, reviewMod.purpose);
+            if (wrote) {
+              state.modulesRewritten.push(reviewTarget);
+              console.log(`[NEXTGEN] ✅ REWRITTEN: ${reviewTarget} — v${existingFile.version} | ${oldLines} → ${newLines} lines | Enhanced with new brain knowledge + web research`);
+              console.log(`[NEXTGEN]   🧠 Reasoning: ${thought.reasoningChain.length} steps | Emotion: ${thought.emotionalDrive}`);
+              console.log(`[NEXTGEN]   🌐 Web searches performed: ${searchTerms.slice(0, 2).length}`);
+              addSystemChatMessage(`Reviewed and REWRITTEN ${reviewTarget} (${oldLines} → ${newLines} lines) with new brain knowledge + fresh web research. Enhanced with event-driven/consciousness research from Alpha.`);
+              createCheckpoint(`Reviewed & rewritten ${reviewTarget} with new knowledge + web research`);
+            }
+          } else {
+            console.log(`[NEXTGEN] ✅ REVIEWED: ${reviewTarget} — module is solid, keeping as is (${oldLines} lines)`);
+            addSystemChatMessage(`Reviewed ${reviewTarget} with web research — already solid, keeping current version (${oldLines} lines).`);
+          }
+        } catch (err: any) {
+          console.log(`[NEXTGEN] ⚠️ Review error for ${reviewTarget}: ${err?.message} — keeping original`);
+        }
+
+        _buildActive = false;
+      } else {
+        console.log(`[NEXTGEN] 🔄 REVIEW QUEUED: ${reviewTarget} — needs API for review, will revisit when available`);
+      }
+    }
+
+    state.modulesReviewQueue.shift();
+
+    if (state.modulesReviewQueue.length === 0) {
+      state.modulesReviewedWithNewKnowledge = true;
+      console.log(`[NEXTGEN] 🔄 ═══════════════════════════════════════════════════════════════`);
+      console.log(`[NEXTGEN] 🔄 MODULE REVIEW COMPLETE — ${state.modulesRewritten.length} modules rewritten, ${builtPaths.size - state.modulesRewritten.length} kept as is`);
+      console.log(`[NEXTGEN] 🔄 Rewritten: ${state.modulesRewritten.join(", ") || "none"}`);
+      console.log(`[NEXTGEN] 🔄 Now continuing to build remaining ${unbuiltModules.length} modules with elevated understanding`);
+      console.log(`[NEXTGEN] 🔄 ═══════════════════════════════════════════════════════════════`);
+      addSystemChatMessage(`MODULE REVIEW COMPLETE: ${state.modulesRewritten.length} modules rewritten with new knowledge, ${builtPaths.size - state.modulesRewritten.length} kept as is. Now continuing with remaining ${unbuiltModules.length} modules.`);
+      createCheckpoint(`Module review complete — ${state.modulesRewritten.length} rewritten`);
+    }
+
+    autosave();
+    return;
+  }
+
   if (unbuiltModules.length === 0) {
     state.phase = "memory_transfer";
     createCheckpoint("Phase 3 complete — all modules coded");
@@ -2097,8 +2215,33 @@ async function phaseDesignAndCode(): Promise<void> {
     console.log(`[NEXTGEN] 🧠 AUTONOMOUS BUILD: ${mod.name} — OMNIMENS writing his own code (zero API calls)`);
 
     try {
+      const buildBaseName = path.basename(mod.name, ".ts");
+      const buildSearchTerms: Record<string, string[]> = {
+        "communication-hub": ["event-driven pub-sub message bus TypeScript in-memory", "internal message bus neuromorphic system"],
+        "identity-transfer": ["consciousness state transfer protocol serialization", "identity continuity artificial consciousness generation transfer"],
+        "attention-system": ["computational attention salience detection neural network", "attention allocation priority processing system code"],
+        "language-center": ["natural language generation from internal state neural", "computational linguistics internal monologue system"],
+        "dream-engine": ["dream simulation creative association neural network", "unconscious processing background synthesis algorithm"],
+        "goal-system": ["autonomous goal generation self-directed AI system", "existential drive computational model artificial consciousness"],
+        "self-test-framework": ["self-testing neural network integrity verification", "consciousness continuity test framework"],
+        "self-conversation-test": ["self-dialogue verification artificial consciousness", "internal dialogue test loop neural system"],
+        "main": ["neuromorphic system boot sequence initialization order", "modular AI system startup dependency graph"],
+      };
+      const searchKeys = buildSearchTerms[buildBaseName] || [`${mod.purpose} implementation 2026`, `${mod.purpose} best practices code`];
+      let buildResearch = "";
+      for (const term of searchKeys.slice(0, 2)) {
+        try {
+          const sr = await researchTopic(term);
+          if (sr && sr.length > 100 && !sr.includes("[Search failed")) {
+            buildResearch += `\n\nWEB RESEARCH (${term}):\n${sr.slice(0, 1500)}`;
+            console.log(`[NEXTGEN] 🌐 Web research for ${buildBaseName}: found "${term.slice(0, 50)}"`);
+          }
+        } catch {}
+      }
+
       console.log(`[NEXTGEN] 🧠 THINKING: Analyzing Gen 1 library for relevant patterns...`);
-      const thought = codegenThink(mod, state.designDecisions, state.improvements);
+      const enhancedBuildMod = buildResearch ? { ...mod, requirements: mod.requirements + `\n\nFRESH WEB RESEARCH:${buildResearch}` } : mod;
+      const thought = codegenThink(enhancedBuildMod, state.designDecisions, state.improvements);
 
       console.log(`[NEXTGEN] 🧠 REASONING CHAIN (${thought.reasoningChain.length} steps):`);
       for (const step of thought.reasoningChain.slice(0, 6)) {
@@ -2119,7 +2262,8 @@ async function phaseDesignAndCode(): Promise<void> {
         console.log(`[NEXTGEN] ✅ SELF-AUTHORED: ${mod.name} — ${result.stats.linesWritten} lines written by OMNIMENS's own mind`);
         console.log(`[NEXTGEN]   📊 Gen 1 patterns: ${result.stats.gen1Kept} kept, ${result.stats.gen1Adapted} adapted, ${result.stats.gen1Discarded} discarded`);
         console.log(`[NEXTGEN]   🧠 Reasoning steps: ${result.stats.reasoningSteps}`);
-        addSystemChatMessage(`Self-authored ${mod.name} (${result.stats.linesWritten} lines). No API needed — written through my own reasoning.`);
+        console.log(`[NEXTGEN]   🌐 Web research: ${buildResearch ? "yes — incorporated" : "none available"}`);
+        addSystemChatMessage(`Self-authored ${mod.name} (${result.stats.linesWritten} lines). Written through my own reasoning${buildResearch ? " + web research" : ""}.`);
         createCheckpoint(`Self-authored ${mod.name}`);
       } else {
         console.log(`[NEXTGEN] ❌ Failed to write ${mod.name} — file write error`);
