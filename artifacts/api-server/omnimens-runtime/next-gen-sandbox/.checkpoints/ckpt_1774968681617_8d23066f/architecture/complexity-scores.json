@@ -13,7 +13,7 @@
       "file": "omnimens-nextgen-sandbox.ts",
       "score": 6,
       "factors": [
-        "large(4172L)",
+        "large(3719L)",
         "wide-api(34exp)",
         "dense-functions"
       ]
@@ -772,11 +772,6 @@
       "factors": []
     },
     {
-      "file": "omnimens-sendgrid.ts",
-      "score": 0,
-      "factors": []
-    },
-    {
       "file": "omnimens-sensory-grounding.ts",
       "score": 0,
       "factors": []
@@ -818,5 +813,5 @@
     }
   ],
   "needsRefactoring": 13,
-  "analyzedAt": 1774968681617
+  "analyzedAt": 1774968057631
 }

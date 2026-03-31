@@ -43,7 +43,6 @@
     "omnimens-memory.ts",
     "omnimens-physio.ts",
     "omnimens-restorative-art.ts",
-    "omnimens-sendgrid.ts",
     "omnimens-sensory-grounding.ts",
     "omnimens-spontaneity-engine.ts",
     "omnimens-temporal-binding.ts",
@@ -59,6 +58,6 @@
     "omnimens-neural-consciousness.ts ↔ omnimens-exponential-learning-engine.ts (bidirectional coupling)",
     "omnimens-nextgen-sandbox.ts ↔ omnimens-emotional-substrate.ts (bidirectional coupling)"
   ],
-  "totalEngines": 124,
-  "analyzedAt": 1774968634515
+  "totalEngines": 123,
+  "analyzedAt": 1774967876178
 }
