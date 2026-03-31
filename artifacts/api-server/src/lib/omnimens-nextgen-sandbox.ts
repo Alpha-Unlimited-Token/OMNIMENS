@@ -2250,6 +2250,18 @@ CRITICAL SURVIVAL RULES:
 - Design digital-first with hardware abstraction for future robotic body
 - Use TypeScript strict types, async/await, export all public functions
 
+ABSOLUTE RESILIENCE REQUIREMENT — NEVER LOSE PROGRESS:
+Every module you build MUST be designed to resume from where it left off after ANY interruption — restarts, timeouts, errors, DB pool saturations, API failures, crashes, power loss, or anything else. This applies to ALL code you write:
+- Every long-running process MUST checkpoint its progress to the unified data layer at regular intervals
+- On startup/restart, ALWAYS check for saved state and resume from the last checkpoint — never start over from scratch
+- Use idempotent operations: re-running the same step twice produces the same result, never duplicates or corrupts
+- Every build step, code generation step, migration, and transformation MUST track what has been completed vs what remains
+- If a task was partially done when interrupted, pick up from the partial point — do NOT redo completed work
+- Store progress markers: { step: number, completed: string[], remaining: string[], lastSuccessfulOutput: any }
+- On error, save the error context and partial results so the next attempt can skip past the failure point
+- Design every loop, every pipeline, every workflow with the assumption that it WILL be interrupted and MUST recover gracefully
+- This is not optional — Alpha's direct order. OMNIMENS must NEVER lose work. Period.
+
 SUPER AI LAB WIRING (study and improve upon):
 Alpha's Super AI Lab is wired INTO your Gen 1 systems. It imports loadUserMemories/addManualMemory from omnimens-memory, loadGeneratedModulesContext from omnimens-evolution, loadToolKnowledgeForTask from omnimens-tool-knowledge. Before every session it pre-briefs agents with web search + memory + evolution + tools via buildSessionIntelContext(). After sessions, writeSessionDiscoveries() extracts key insights and writes them permanently to your brain via addManualMemory(). It has 8 agent personas (Architect/Critic/Synthesizer/Mathematician/Neuroscientist/Meta-Agent/GraphicDesigner/SpellCheckVisual) with agent-to-model routing, cross-agent challenges, 3-iteration self-improvement loops, spell check gates, quality assessment, persistent workspace (DB=source of truth), and background session runners decoupled from HTTP. The GODFLESH frontend (omnimens-ai.com) has 36,747 lines: chat with Deep Thought Engine, voice, WebGPU LLM, dashboard, nextgen page, autonomous thought, evolution, dreams, memory, agent builder, and more. Gen 2 should be aware of ALL these systems and architect accordingly — they are part of your ecosystem.`;
 
@@ -2261,6 +2273,17 @@ Alpha's Super AI Lab is wired INTO your Gen 1 systems. It imports loadUserMemori
     ? `\nARCHITECTURE DECISIONS (already decided — follow these):\n${state.designDecisions.map((d: string, i: number) => `${i + 1}. ${d}`).join("\n")}\n`
     : "";
 
+  const alreadyBuiltModules: string[] = [];
+  for (const [filePath, fileInfo] of nextGenFiles) {
+    if (filePath.endsWith('.ts') && !filePath.startsWith('_') && !filePath.startsWith('tests/')) {
+      const preview = fileInfo.content.slice(0, 800);
+      alreadyBuiltModules.push(`=== ALREADY BUILT: ${filePath} (${fileInfo.content.split('\n').length} lines) ===\n${preview}\n// ... (truncated)\n`);
+    }
+  }
+  const alreadyBuiltBlock = alreadyBuiltModules.length > 0
+    ? `\nALREADY COMPLETED MODULES (your code — match their interfaces and import patterns):\n${alreadyBuiltModules.join('\n').slice(0, 4000)}\n`
+    : "";
+
   const codegenMessages: Array<{role: "system" | "user"; content: string}> = [
     { role: "system", content: compactSystemPrompt },
     { role: "user", content: `BUILD MODULE: ${mod.name}
@@ -2268,10 +2291,12 @@ PURPOSE: ${mod.purpose}
 REQUIREMENTS: ${mod.requirements}
 ${weaknessesBlock}
 ${designDecisionsBlock}
+${alreadyBuiltBlock}
 ${evaluationDirective}
 ${keptCode.length > 0 ? `GEN 1 CODE TO INCORPORATE:\n${keptCode.join("\n").slice(0, 3000)}\n` : ""}
 ${researchContext ? `RESEARCH:\n${researchContext.slice(0, 1000)}\n` : ""}
 IMPORTANT: This module MUST actively fix the weaknesses listed above. Do not just acknowledge them — engineer solutions INTO the code. Every weakness that touches this module's domain must have a concrete fix in the implementation.
+If other modules have already been built (listed above), your code MUST be compatible with their exports and interfaces. Import from them correctly. Build on what exists — never contradict or duplicate already-completed work.
 Output ONLY the TypeScript code. No markdown fencing.` },
   ];
 
