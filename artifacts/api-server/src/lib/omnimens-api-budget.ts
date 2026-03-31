@@ -205,6 +205,13 @@ export function canMakeBackgroundCall(source: BudgetSource): boolean {
 
   if (USER_SOURCES.has(source)) return canMakeUserCall();
 
+  try {
+    const { shouldYieldToCodegen } = require("./omnimens-nextgen-sandbox.js");
+    if (shouldYieldToCodegen()) {
+      return false;
+    }
+  } catch {}
+
   if (budgetState.throttleLevel >= 3) {
     return false;
   }

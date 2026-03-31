@@ -22,6 +22,7 @@ import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications, omnimensKnowledgeNodes } from "@workspace/db";
 import { desc, eq, sql, gt } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
 
 interface CreativeHypothesis {
   id: number;
@@ -223,6 +224,10 @@ function enterDreamState(): void {
 }
 
 async function evaluateTopHypotheses(): Promise<void> {
+  if (shouldYieldToCodegen()) {
+    console.log(`[CREATIVE ENGINE] 🔕 Hypothesis evaluation DEFERRED — codegen window active, yielding API priority`);
+    return;
+  }
   const unevaluated = hypotheses.filter(h => !h.evaluated).sort((a, b) => b.potentialValue - a.potentialValue).slice(0, 3);
   if (unevaluated.length === 0) return;
 

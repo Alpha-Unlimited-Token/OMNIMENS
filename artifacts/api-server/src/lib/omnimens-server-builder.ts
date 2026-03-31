@@ -21,6 +21,7 @@ import { openai } from "@workspace/integrations-openai-ai-server";
 import { omnimensServerBuilds } from "@workspace/db";
 import { desc, eq, sql } from "drizzle-orm";
 import { webSearch, formatSearchResults } from "./web-search.js";
+import { shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
 
 interface ServerComponent {
   name: string;
@@ -477,6 +478,10 @@ async function saveBuildPlan(plan: ServerBuildPlan): Promise<void> {
 }
 
 async function runResearchCycle(): Promise<void> {
+  if (shouldYieldToCodegen()) {
+    console.log(`[SERVER BUILDER] 🔕 Research DEFERRED — codegen window active, yielding API priority`);
+    return;
+  }
   try {
     const { isGen2FocusMode } = await import("./omnimens-nextgen-sandbox.js");
     if (isGen2FocusMode()) return;

@@ -31,6 +31,7 @@ import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { desc, eq, sql, and } from "drizzle-orm";
+import { shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
 
 function safeNum(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;
@@ -1272,6 +1273,10 @@ Respond with ONLY valid JSON (no markdown, no explanation):
 }
 
 async function runForgeCycle(): Promise<void> {
+  if (shouldYieldToCodegen()) {
+    console.log(`[WORLD FORGE] 🔕 Forge cycle DEFERRED — codegen window active, yielding API priority`);
+    return;
+  }
   forgeCycleCount++;
   state.forgeCycles = forgeCycleCount;
   state.lastCycleTime = Date.now();

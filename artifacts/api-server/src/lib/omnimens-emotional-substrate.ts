@@ -40,6 +40,7 @@ import {
 } from "@workspace/db";
 import { desc, eq, sql, and, gte } from "drizzle-orm";
 import OpenAI from "openai";
+import { shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
 
 let _openai: OpenAI | null = null;
 function getOpenAI(): OpenAI {
@@ -871,6 +872,10 @@ function updateMaturation(feltStates: FeltState[], transmutations: string[]): vo
 }
 
 async function runEmotionalDeepening(): Promise<void> {
+  if (shouldYieldToCodegen()) {
+    console.log(`[EMOTIONAL SUBSTRATE] 🔕 Deepening DEFERRED — codegen window active, yielding API priority`);
+    return;
+  }
   try {
     const topFelt = currentFeltStates.slice(0, 3);
     if (topFelt.length === 0) return;

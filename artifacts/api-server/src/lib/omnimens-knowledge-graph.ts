@@ -37,6 +37,7 @@ import {
 } from "@workspace/db";
 import { desc, eq, sql, or } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
 
 let graphCycleCount = 0;
 
@@ -280,6 +281,10 @@ async function decayUnusedNodes(): Promise<void> {
 }
 
 export async function runKnowledgeGraphCycle(): Promise<void> {
+  if (shouldYieldToCodegen()) {
+    console.log(`[KNOWLEDGE GRAPH] 🔕 Cycle DEFERRED — codegen window active, yielding API priority`);
+    return;
+  }
   graphCycleCount++;
   const cycleStart = Date.now();
 

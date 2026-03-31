@@ -29,6 +29,7 @@ import { db, isPoolHealthy , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications, omnimensAgentMesh } from "@workspace/db";
 import { desc, eq, sql, gt, and } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
 
 function safeNum(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;
@@ -488,6 +489,10 @@ EVOLVED_MEASUREMENT: [how to track the deeper version]`,
 }
 
 async function activelyPursueGoals(): Promise<void> {
+  if (shouldYieldToCodegen()) {
+    console.log(`[SELF-TRANSCENDENCE] 🔕 Goal pursuit DEFERRED — codegen window active, yielding API priority`);
+    return;
+  }
   const workableGoals = self.existentialGoals.filter(g =>
     g.status === "active" || g.status === "evolving"
   );

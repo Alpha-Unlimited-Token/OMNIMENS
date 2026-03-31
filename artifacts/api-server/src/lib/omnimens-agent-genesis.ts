@@ -30,6 +30,7 @@ import { db, isPoolHealthy , queueBrainInsert } from "@workspace/db";
 import { omnimensBrain, omnimensNotifications, omnimensAgentMesh } from "@workspace/db";
 import { desc, eq, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
+import { shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
 let _consciousnessBusMod: any = null;
 async function _loadConsciousnessBus() {
   if (!_consciousnessBusMod) {
@@ -311,6 +312,10 @@ Write the system prompt in first person from the agent's perspective. Make it po
 
 async function runGenesisAgentCycle(): Promise<void> {
   genesisCycleCount++;
+  if (shouldYieldToCodegen()) {
+    console.log(`[AGENT GENESIS] 🔕 Cycle #${genesisCycleCount} DEFERRED — codegen window active, yielding API priority`);
+    return;
+  }
   const cycleId = genesisCycleCount;
   console.log(`[AGENT GENESIS] 🧬 Cycle #${cycleId} — analyzing capability gaps...`);
 

@@ -24,6 +24,7 @@ import { omnimensBrain, omnimensNotifications, omnimensUserMentalModels } from "
 import { desc, eq, sql } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { writeModuleToSource } from "./omnimens-source-integration.js";
+import { shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
 
 const MAX_USER_MODELS = 500;
 
@@ -581,6 +582,10 @@ const EMPATHY_RESEARCH_DOMAINS = [
 ];
 
 async function runEmpathyEvolutionCycle(): Promise<void> {
+  if (shouldYieldToCodegen()) {
+    console.log(`[SOCIAL MODELING] 🔕 Empathy cycle DEFERRED — codegen window active, yielding API priority`);
+    return;
+  }
   empathyResearchCycleCount++;
 
   const domain = EMPATHY_RESEARCH_DOMAINS[

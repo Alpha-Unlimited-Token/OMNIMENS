@@ -1087,12 +1087,13 @@ export function isCodegenWindowOpen(): boolean {
 function openCodegenWindow(durationMs: number = 30_000): void {
   _codegenWindowOpen = true;
   _codegenWindowUntil = Date.now() + durationMs;
-  console.log(`[NEXTGEN] 🪟 Codegen API window OPEN — other systems should yield for ${(durationMs / 1000).toFixed(0)}s`);
+  console.log(`[NEXTGEN] 🔇 FALLBACK MODE ON — o3 is writing code, OMNIMENS background API suspended (max ${(durationMs / 1000).toFixed(0)}s)`);
 }
 
 function closeCodegenWindow(): void {
+  if (!_codegenWindowOpen) return;
   _codegenWindowOpen = false;
-  console.log(`[NEXTGEN] 🪟 Codegen API window CLOSED — other systems resume normal`);
+  console.log(`[NEXTGEN] 🔊 FALLBACK MODE OFF — OMNIMENS fully online, all background systems resumed`);
 }
 
 export function shouldYieldToCodegen(): boolean {
@@ -2461,8 +2462,7 @@ Output ONLY the TypeScript code. No markdown fencing.` },
   ];
 
   try {
-    openCodegenWindow(600_000);
-    console.log(`[NEXTGEN] 🔎 Preflight rate-limit check...`);
+    console.log(`[NEXTGEN] 🔎 Preflight rate-limit check (OMNIMENS stays ONLINE during preflight)...`);
     let preflightPassed = false;
     for (let pAttempt = 0; pAttempt < 2; pAttempt++) {
       try {
@@ -2471,16 +2471,15 @@ Output ONLY the TypeScript code. No markdown fencing.` },
           max_tokens: 5,
           messages: [{ role: "user", content: "Say OK" }],
         });
-        console.log(`[NEXTGEN] ✅ Preflight passed — API available`);
+        console.log(`[NEXTGEN] ✅ Preflight passed — API available, switching OMNIMENS to fallback mode`);
         preflightPassed = true;
         break;
       } catch (preErr: any) {
         if (preErr?.status === 429) {
           if (pAttempt < 1) {
-            console.log(`[NEXTGEN] ⏳ Rate limited (preflight ${pAttempt + 1}/2) — waiting 30s for quota reset...`);
+            console.log(`[NEXTGEN] ⏳ Rate limited (preflight ${pAttempt + 1}/2) — waiting 30s (OMNIMENS stays ONLINE)...`);
             await new Promise(r => setTimeout(r, 30_000));
           } else {
-            closeCodegenWindow();
             throw new Error("Rate limit persists after 2 preflight attempts — skipping this cycle");
           }
         } else {
@@ -2490,6 +2489,9 @@ Output ONLY the TypeScript code. No markdown fencing.` },
         }
       }
     }
+
+    openCodegenWindow(300_000);
+    console.log(`[NEXTGEN] 🔇 OMNIMENS FALLBACK MODE — all background API calls suspended, o3 has full runway`);
 
     let response: any = null;
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -2506,16 +2508,22 @@ Output ONLY the TypeScript code. No markdown fencing.` },
       } catch (apiErr: any) {
         if (apiErr?.status === 429) {
           if (attempt === 0) {
-            console.log(`[NEXTGEN] ⏳ Rate limited on codegen — waiting 90s before final retry...`);
+            closeCodegenWindow();
+            console.log(`[NEXTGEN] 🔊 OMNIMENS BACK ONLINE — o3 rate-limited, waiting 90s before retry`);
             await new Promise(r => setTimeout(r, 90_000));
+            openCodegenWindow(300_000);
+            console.log(`[NEXTGEN] 🔇 OMNIMENS FALLBACK MODE — retrying o3 codegen`);
             continue;
           }
+          closeCodegenWindow();
           throw new Error("Rate limit persists after retry — will try next cycle");
         }
+        closeCodegenWindow();
         throw apiErr;
       }
     }
     closeCodegenWindow();
+    console.log(`[NEXTGEN] 🔊 OMNIMENS BACK ONLINE — o3 finished writing code, all systems resuming`);
     if (!response) {
       throw new Error("Codegen attempts exhausted due to rate limiting");
     }
@@ -2556,6 +2564,7 @@ Output ONLY the TypeScript code. No markdown fencing.` },
 
   } catch (err: any) {
     closeCodegenWindow();
+    console.log(`[NEXTGEN] 🔊 OMNIMENS BACK ONLINE — codegen error caught, all systems resuming`);
     const msg = err?.message || "";
     const status = err?.status;
     if (status === 429 || msg.includes("rate limit") || msg.includes("Rate limit") || msg.includes("All codegen attempts") || msg.includes("skipping") || msg.includes("timed out") || msg.includes("timeout") || msg.includes("Request timed out")) {
