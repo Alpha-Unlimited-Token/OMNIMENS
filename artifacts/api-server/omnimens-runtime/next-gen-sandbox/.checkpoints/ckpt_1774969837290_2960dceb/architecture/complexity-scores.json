@@ -717,11 +717,6 @@
       "factors": []
     },
     {
-      "file": "omnimens-ip-shield.ts",
-      "score": 0,
-      "factors": []
-    },
-    {
       "file": "omnimens-knowledge-graph.ts",
       "score": 0,
       "factors": []
@@ -823,5 +818,5 @@
     }
   ],
   "needsRefactoring": 13,
-  "analyzedAt": 1774970048143
+  "analyzedAt": 1774968681617
 }

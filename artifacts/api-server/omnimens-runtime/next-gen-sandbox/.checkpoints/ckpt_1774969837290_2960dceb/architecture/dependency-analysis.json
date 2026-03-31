@@ -38,7 +38,6 @@
     "omnimens-intergenerational-memory.ts",
     "omnimens-introspective-uncertainty.ts",
     "omnimens-ip-guard.ts",
-    "omnimens-ip-shield.ts",
     "omnimens-language-forge.ts",
     "omnimens-lifeform-gaps.ts",
     "omnimens-memory.ts",
@@ -60,6 +59,6 @@
     "omnimens-neural-consciousness.ts ↔ omnimens-exponential-learning-engine.ts (bidirectional coupling)",
     "omnimens-nextgen-sandbox.ts ↔ omnimens-emotional-substrate.ts (bidirectional coupling)"
   ],
-  "totalEngines": 125,
-  "analyzedAt": 1774969886161
+  "totalEngines": 124,
+  "analyzedAt": 1774968634515
 }
