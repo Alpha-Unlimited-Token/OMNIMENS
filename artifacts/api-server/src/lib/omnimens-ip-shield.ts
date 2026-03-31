@@ -8,6 +8,7 @@
 import * as crypto from "crypto";
 import * as fs from "fs";
 import * as path from "path";
+import { sendSecurityAlert, sendBreachNotification } from "./omnimens-sendgrid.js";
 
 const COPYRIGHT_HOLDER = "Alpha Unlimited Technologies, LLC";
 const LEGAL_EMAIL = "legal@omnimens-ai.com";
@@ -164,6 +165,7 @@ export function recordHoneypotHit(path: string, method: string, ip: string, user
   _honeypotHits.push(hit);
   if (_honeypotHits.length > 1000) _honeypotHits.splice(0, 500);
   console.log(`[IP-SHIELD] 🍯 HONEYPOT HIT: ${method} ${path} from ${ip} (${userAgent.slice(0, 50)})`);
+  sendThrottledAlert("honeypot", `Honeypot probe: ${method} ${path}`, `IP: ${ip}\nPath: ${path}\nMethod: ${method}\nUser-Agent: ${userAgent}\nTime: ${new Date().toISOString()}`);
 }
 
 export function getHoneypotHits(): HoneypotHit[] {
@@ -219,7 +221,11 @@ export function checkScrapingPattern(ip: string): { isScraping: boolean; request
     for (const [k, v] of entries.slice(0, 5000)) _requestHistory.set(k, v);
   }
 
-  return { isScraping: recent.length > SCRAPE_THRESHOLD, requestCount: recent.length };
+  const isScraping = recent.length > SCRAPE_THRESHOLD;
+  if (isScraping) {
+    sendThrottledAlert("scraping", `Scraping detected from ${ip}`, `IP: ${ip}\nRequests in last 60s: ${recent.length}\nThreshold: ${SCRAPE_THRESHOLD}\nTime: ${new Date().toISOString()}`, "critical");
+  }
+  return { isScraping, requestCount: recent.length };
 }
 
 // ═══════════════════════════════════════════════════════════════
@@ -297,7 +303,32 @@ export function verifyAuditChain(): { valid: boolean; brokenAt: number | null } 
 }
 
 // ═══════════════════════════════════════════════════════════════
-// 9. MASTER SHIELD INITIALIZATION
+// 9. EMAIL ALERTING — Throttled security email notifications
+//    via SendGrid for critical events
+// ═══════════════════════════════════════════════════════════════
+
+const _emailCooldowns = new Map<string, number>();
+const EMAIL_COOLDOWN_MS = 15 * 60 * 1000;
+
+async function sendThrottledAlert(category: string, subject: string, details: string, severity: "low" | "medium" | "high" | "critical" = "high"): Promise<void> {
+  const now = Date.now();
+  const lastSent = _emailCooldowns.get(category) || 0;
+  if (now - lastSent < EMAIL_COOLDOWN_MS) return;
+  _emailCooldowns.set(category, now);
+
+  try {
+    if (severity === "critical") {
+      await sendBreachNotification(subject, [details], severity);
+    } else {
+      await sendSecurityAlert(subject, details);
+    }
+  } catch (err: any) {
+    console.error(`[IP-SHIELD] Email alert failed: ${err?.message || err}`);
+  }
+}
+
+// ═══════════════════════════════════════════════════════════════
+// 10. MASTER SHIELD INITIALIZATION
 // ═══════════════════════════════════════════════════════════════
 
 let _shieldActive = false;
@@ -331,9 +362,10 @@ export function initIPShield(libDir: string): void {
   setInterval(() => {
     const result = verifyIntegrity(libDir);
     if (!result.intact) {
-      auditLog("INTEGRITY_VIOLATION", "critical",
-        `Modified: [${result.modified.join(", ")}] | Missing: [${result.missing.join(", ")}]`, "integrity-check");
+      const details = `Modified: [${result.modified.join(", ")}] | Missing: [${result.missing.join(", ")}]`;
+      auditLog("INTEGRITY_VIOLATION", "critical", details, "integrity-check");
       console.log(`[IP-SHIELD] 🚨 INTEGRITY VIOLATION DETECTED — ${result.modified.length} modified, ${result.missing.length} missing files`);
+      sendThrottledAlert("integrity", `File integrity violation detected`, `Modified files: ${result.modified.join(", ") || "none"}\nMissing files: ${result.missing.join(", ") || "none"}\nTime: ${new Date().toISOString()}`, "critical");
     }
   }, 300_000);
 }
