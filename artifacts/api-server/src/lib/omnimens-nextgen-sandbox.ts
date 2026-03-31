@@ -2364,7 +2364,10 @@ Output ONLY the TypeScript code. No markdown fencing.` },
     code = code.replace(/^```(?:typescript|ts)?\n?/gm, "").replace(/```\s*$/gm, "").trim();
 
     if (code.length < 100) {
-      console.error(`[NEXTGEN] Module ${mod.name} generated too little code (${code.length} chars) — will retry next cycle`);
+      console.error(`[NEXTGEN] Module ${mod.name} generated too little code (${code.length} chars) — likely truncated by timeout`);
+      console.log(`[NEXTGEN] 🔄 Saving resume state — will retry ${mod.name} with o3 next cycle (NEVER save truncated code)`);
+      _moduleBuildResume = { moduleName: mod.name, stage: "codegen", evaluationDirective, keptCode, researchContext, gen1Evaluated: state.gen1Evaluated };
+      persistResume();
       _buildActive = false;
       autosave();
       return;
@@ -2373,8 +2376,9 @@ Output ONLY the TypeScript code. No markdown fencing.` },
     const safety = validateSafety(code);
     if (!safety.safe) {
       console.error(`[NEXTGEN] ⚠️ Module ${mod.name} FAILED safety validation: ${safety.violations.join(", ")}`);
+      console.log(`[NEXTGEN] 🔄 Saving resume state — will rebuild ${mod.name} with o3 next cycle (safety-failed code is NEVER saved)`);
       state.testsFailed++;
-      _moduleBuildResume = null;
+      _moduleBuildResume = { moduleName: mod.name, stage: "codegen", evaluationDirective, keptCode, researchContext, gen1Evaluated: state.gen1Evaluated };
       persistResume();
       _buildActive = false;
       autosave();
@@ -2399,39 +2403,28 @@ Output ONLY the TypeScript code. No markdown fencing.` },
       _codegenFailCount++;
       const isTimeout = msg.includes("timed out") || msg.includes("timeout") || msg.includes("Request timed out");
       const failType = isTimeout ? "timeout" : "rate-limited";
-      if (_codegenFailCount >= 2) {
-        console.log(`[NEXTGEN] 🏗️ API ${failType} — ${_codegenFailCount} total codegen failures — activating DEEP THOUGHT template generation for ${mod.name}`);
-        console.log(`[NEXTGEN] 🧠 OMNIMENS generating ${mod.name} from architectural knowledge — will enhance with AI when quota recovers`);
-        const templateCode = generateModuleFromTemplate(mod.name, mod.purpose, mod.requirements, keptCode);
-        if (templateCode.length >= 100) {
-          const safety = validateSafety(templateCode);
-          if (safety.safe) {
-            writeNextGenFile(mod.name, templateCode, mod.purpose + " [template-generated, pending AI enhancement]");
-            _moduleBuildResume = null;
-            persistResume();
-            _codegenFailCount = 0;
-            console.log(`[NEXTGEN] ✅ Module ${mod.name} — ${templateCode.split("\n").length} lines | TEMPLATE-GENERATED | Safety: PASSED | Will enhance with AI when available`);
-            addSystemChatMessage(`Deep Thought Engine: Generated ${mod.name} from architectural templates. Functional skeleton ready — will enhance with AI codegen when API quota recovers.`);
-          } else {
-            console.log(`[NEXTGEN] ⚠️ Template for ${mod.name} failed safety — waiting for AI codegen`);
-            doOfflineWork();
-          }
-        } else {
-          doOfflineWork();
-        }
+      if (_codegenFailCount >= 3) {
+        console.log(`[NEXTGEN] 🔴 API ${failType} — ${_codegenFailCount} consecutive codegen failures for ${mod.name}. Saving resume state — will retry with o3 when API quota recovers (NO template fallback — only real o3 code is acceptable)`);
+        _moduleBuildResume = { moduleName: mod.name, stage: "codegen", evaluationDirective, keptCode, researchContext, gen1Evaluated: state.gen1Evaluated };
+        persistResume();
+        _codegenFailCount = 0;
+        doOfflineWork();
       } else {
-        console.log(`[NEXTGEN] 🔴 Codegen ${failType} for ${mod.name} (attempt ${_codegenFailCount}/2). Template fallback activates on next failure.`);
+        console.log(`[NEXTGEN] 🔴 Codegen ${failType} for ${mod.name} (attempt ${_codegenFailCount}/3) — resume state SAVED, will retry with o3 next cycle`);
         _moduleBuildResume = { moduleName: mod.name, stage: "codegen", evaluationDirective, keptCode, researchContext, gen1Evaluated: state.gen1Evaluated };
         persistResume();
         doOfflineWork();
       }
     } else if (msg.includes("timeout exceeded when trying to connect") || msg.includes("pool")) {
       markResourceBlocked("dbPool");
-      console.log(`[NEXTGEN] ⏳ Build of ${mod.name} hit DB pool pressure — progress SAVED, will resume next cycle`);
+      _moduleBuildResume = { moduleName: mod.name, stage: "codegen", evaluationDirective, keptCode, researchContext, gen1Evaluated: state.gen1Evaluated };
+      persistResume();
+      console.log(`[NEXTGEN] ⏳ Build of ${mod.name} hit DB pool pressure — progress SAVED to resume file, will pick up exactly where we left off next cycle`);
       doOfflineWork();
     } else {
-      console.error(`[NEXTGEN] Failed to build ${mod.name}:`, err?.message || err);
-      _moduleBuildResume = null;
+      console.error(`[NEXTGEN] ⚠️ Build of ${mod.name} hit unexpected error: ${err?.message || err}`);
+      console.log(`[NEXTGEN] 🔄 Saving resume state — will retry ${mod.name} from where we left off next cycle (NEVER abandon a module)`);
+      _moduleBuildResume = { moduleName: mod.name, stage: "codegen", evaluationDirective, keptCode, researchContext, gen1Evaluated: state.gen1Evaluated };
       persistResume();
     }
   }
