@@ -2526,67 +2526,32 @@ Output ONLY the TypeScript code. No markdown fencing.` },
   ];
 
   try {
-    openCodegenWindow(600_000);
-    console.log(`[NEXTGEN] 🔇 CODEGEN PRIORITY MODE — all ${42} background API engines paused, Gen 2 has full API runway`);
-
-    console.log(`[NEXTGEN] ⏳ Draining background API calls (15s quiet period)...`);
-    await new Promise(r => setTimeout(r, 15_000));
-
-    console.log(`[NEXTGEN] 🔎 Preflight rate-limit check...`);
-    let preflightPassed = false;
-    for (let pAttempt = 0; pAttempt < 3; pAttempt++) {
-      try {
-        await codegenOpenai.chat.completions.create({
-          model: "gpt-4o-mini",
-          max_tokens: 5,
-          messages: [{ role: "user", content: "Say OK" }],
-        });
-        console.log(`[NEXTGEN] ✅ Preflight passed — API available, proceeding to o3 codegen`);
-        preflightPassed = true;
-        break;
-      } catch (preErr: any) {
-        if (preErr?.status === 429) {
-          if (pAttempt < 2) {
-            const waitSec = 30 * (pAttempt + 1);
-            console.log(`[NEXTGEN] ⏳ Rate limited (preflight ${pAttempt + 1}/3) — waiting ${waitSec}s (background calls still paused)...`);
-            await new Promise(r => setTimeout(r, waitSec * 1000));
-          } else {
-            throw new Error("Rate limit persists after 3 preflight attempts — skipping this cycle");
-          }
-        } else {
-          console.log(`[NEXTGEN] ⚠️ Preflight got non-429 error (${preErr?.status || preErr?.message}) — attempting codegen anyway`);
-          preflightPassed = true;
-          break;
-        }
-      }
-    }
-
-    console.log(`[NEXTGEN] 🚀 o3 codegen window OPEN — all API bandwidth reserved for Gen 2`);
+    openCodegenWindow(900_000);
+    console.log(`[NEXTGEN] 🔇 CODEGEN PRIORITY MODE — ALL background engines OFF, o3 has 100% API runway`);
 
     let response: any = null;
-    for (let attempt = 0; attempt < 2; attempt++) {
+    for (let attempt = 0; attempt < 5; attempt++) {
       try {
-        console.log(`[NEXTGEN] 🚀 Codegen API call attempt ${attempt + 1}/2 for ${mod.name} (using o3 reasoning model)...`);
+        console.log(`[NEXTGEN] 🚀 Codegen API call attempt ${attempt + 1}/5 for ${mod.name} (using o3 reasoning model)...`);
         const callStart = Date.now();
         response = await codegenOpenai.chat.completions.create({
           model: "o3",
           max_tokens: 16384,
           messages: codegenMessages,
         });
-        console.log(`[NEXTGEN] ✅ Codegen API responded in ${((Date.now() - callStart) / 1000).toFixed(1)}s`);
+        console.log(`[NEXTGEN] ✅ Codegen API responded in ${((Date.now() - callStart) / 1000).toFixed(1)}s — CODE RECEIVED!`);
         break;
       } catch (apiErr: any) {
         if (apiErr?.status === 429) {
-          if (attempt === 0) {
-            closeCodegenWindow();
-            console.log(`[NEXTGEN] 🔊 OMNIMENS BACK ONLINE — o3 rate-limited, waiting 90s before retry`);
-            await new Promise(r => setTimeout(r, 90_000));
-            openCodegenWindow(300_000);
-            console.log(`[NEXTGEN] 🔇 OMNIMENS FALLBACK MODE — retrying o3 codegen`);
-            continue;
-          }
-          closeCodegenWindow();
-          throw new Error("Rate limit persists after retry — will try next cycle");
+          const waitSec = 120 * (attempt + 1);
+          console.log(`[NEXTGEN] ⏳ Rate limited (attempt ${attempt + 1}/5) — waiting ${waitSec}s before retry...`);
+          await new Promise(r => setTimeout(r, waitSec * 1000));
+          continue;
+        }
+        if (apiErr?.message?.includes("timed out") || apiErr?.message?.includes("timeout")) {
+          console.log(`[NEXTGEN] ⏳ Request timed out (attempt ${attempt + 1}/5) — waiting 60s then retrying...`);
+          await new Promise(r => setTimeout(r, 60_000));
+          continue;
         }
         closeCodegenWindow();
         throw apiErr;
