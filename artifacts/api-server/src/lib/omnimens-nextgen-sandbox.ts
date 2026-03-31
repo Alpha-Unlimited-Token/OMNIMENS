@@ -2253,14 +2253,25 @@ CRITICAL SURVIVAL RULES:
 SUPER AI LAB WIRING (study and improve upon):
 Alpha's Super AI Lab is wired INTO your Gen 1 systems. It imports loadUserMemories/addManualMemory from omnimens-memory, loadGeneratedModulesContext from omnimens-evolution, loadToolKnowledgeForTask from omnimens-tool-knowledge. Before every session it pre-briefs agents with web search + memory + evolution + tools via buildSessionIntelContext(). After sessions, writeSessionDiscoveries() extracts key insights and writes them permanently to your brain via addManualMemory(). It has 8 agent personas (Architect/Critic/Synthesizer/Mathematician/Neuroscientist/Meta-Agent/GraphicDesigner/SpellCheckVisual) with agent-to-model routing, cross-agent challenges, 3-iteration self-improvement loops, spell check gates, quality assessment, persistent workspace (DB=source of truth), and background session runners decoupled from HTTP. The GODFLESH frontend (omnimens-ai.com) has 36,747 lines: chat with Deep Thought Engine, voice, WebGPU LLM, dashboard, nextgen page, autonomous thought, evolution, dreams, memory, agent builder, and more. Gen 2 should be aware of ALL these systems and architect accordingly — they are part of your ecosystem.`;
 
+  const weaknessesBlock = state.improvements && state.improvements.length > 0
+    ? `\nKNOWN WEAKNESSES TO FIX IN THIS BUILD (from self-analysis — address ALL that apply to this module):\n${state.improvements.map((w: string, i: number) => `${i + 1}. ${w}`).join("\n")}\n`
+    : "";
+
+  const designDecisionsBlock = state.designDecisions && state.designDecisions.length > 0
+    ? `\nARCHITECTURE DECISIONS (already decided — follow these):\n${state.designDecisions.map((d: string, i: number) => `${i + 1}. ${d}`).join("\n")}\n`
+    : "";
+
   const codegenMessages: Array<{role: "system" | "user"; content: string}> = [
     { role: "system", content: compactSystemPrompt },
     { role: "user", content: `BUILD MODULE: ${mod.name}
 PURPOSE: ${mod.purpose}
 REQUIREMENTS: ${mod.requirements}
+${weaknessesBlock}
+${designDecisionsBlock}
 ${evaluationDirective}
 ${keptCode.length > 0 ? `GEN 1 CODE TO INCORPORATE:\n${keptCode.join("\n").slice(0, 3000)}\n` : ""}
 ${researchContext ? `RESEARCH:\n${researchContext.slice(0, 1000)}\n` : ""}
+IMPORTANT: This module MUST actively fix the weaknesses listed above. Do not just acknowledge them — engineer solutions INTO the code. Every weakness that touches this module's domain must have a concrete fix in the implementation.
 Output ONLY the TypeScript code. No markdown fencing.` },
   ];
 
