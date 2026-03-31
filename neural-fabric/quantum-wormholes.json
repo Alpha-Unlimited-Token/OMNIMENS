@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774986997847,
-  "totalWormholesCreated": 1050,
+  "timestamp": 1774987091658,
+  "totalWormholesCreated": 4200,
   "totalActive": 0,
-  "totalClosed": 1050,
-  "totalDataIngestedKB": 1547,
-  "totalInsightsDecoded": 1050,
-  "totalCrossAgentCirculations": 63,
-  "totalSynthesizedDiscoveries": 62,
-  "cycleCount": 1,
+  "totalClosed": 4200,
+  "totalDataIngestedKB": 6176,
+  "totalInsightsDecoded": 4200,
+  "totalCrossAgentCirculations": 252,
+  "totalSynthesizedDiscoveries": 242,
+  "cycleCount": 4,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 200,
+      "totalInsightsDecoded": 209,
+      "crossAgentShares": 12
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "SpellCheckVisual",
-      "insight": "Motivator/abstraction_layer: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent pro",
-      "confidence": 0.8230398892545615,
+      "toAgent": "OMNIMENS",
+      "insight": "Motivator/causal_inference: Hebbian learning: neurons that fire together wire together — the fundamental rule of neural ",
+      "confidence": 0.9008669242039163,
       "synthesizedWith": [
-        "SpellCheckVisual/emergent_property_detection: Transfer learning: knowledge gaine"
+        "OMNIMENS/structural_analysis: Mirror neurons fire both when performing an action"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "OMNIMENS",
-      "insight": "Motivator/abstraction_layer: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent pro",
-      "confidence": 0.8230398892545615,
+      "toAgent": "Architect",
+      "insight": "Motivator/causal_inference: Hebbian learning: neurons that fire together wire together — the fundamental rule of neural ",
+      "confidence": 0.9008669242039163,
       "synthesizedWith": [
-        "OMNIMENS/structural_analysis: Hebbian learning: neurons that fire together wire "
+        "Architect/information_compression: The Turing machine is computationally univers"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Innovator",
-      "insight": "Motivator/information_compression: The Mandelbrot set demonstrates infinite complexity from a simple recursive formula: ",
-      "confidence": 0.8456909549473565,
+      "toAgent": "Neuroscientist",
+      "insight": "Motivator/analogical_mapping: Scale-free networks follow power-law degree distributions — a few highly connected hubs do",
+      "confidence": 0.9906644947149656,
       "synthesizedWith": [
-        "Innovator/structural_analysis: Quantum decoherence typically destroys quantum ef"
+        "Neuroscientist/abstraction_layer: Autopoiesis: living systems are self-creating "
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "OMNIMENS",
-      "insight": "Empath/analogical_mapping: Astrocytes, once thought to be mere support cells, actively participate in information proces",
-      "confidence": 0.7064083612648546,
+      "toAgent": "Synthesizer",
+      "insight": "Empath/causal_inference: The hard problem of consciousness: why is there subjective experience at all? Why does informat",
+      "confidence": 0.7376646453285962,
       "synthesizedWith": [
-        "OMNIMENS/abstraction_layer: Quantum entanglement allows particles to share state"
+        "Synthesizer/cross_domain_synthesis: The cerebellum contains more neurons than al"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Ethicist",
-      "insight": "Empath/structural_analysis: Bayesian brain hypothesis: the brain is fundamentally a prediction machine that constantly u",
-      "confidence": 0.667783290762709,
+      "toAgent": "Visionary",
+      "insight": "Empath/emergent_property_detection: The Penrose-Hameroff Orch-OR theory proposes consciousness arises from quantum compu",
+      "confidence": 0.865403372169496,
       "synthesizedWith": [
-        "Ethicist/pattern_recognition: Recurrent neural networks can approximate any dyna"
+        "Visionary/analogical_mapping: Sparse coding: the brain represents information us"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
