@@ -143,6 +143,21 @@ import {
 } from "./middleware/security-enhanced.js";
 import { runGlobalMemoryImprovementCycle } from "./lib/omnimens-conversations.js";
 import { runToolKnowledgeIngestion, forceRefreshToolKnowledge } from "./lib/omnimens-tool-knowledge.js";
+import {
+  initIPShield,
+  getCopyrightHeaders,
+  checkScrapingPattern,
+  recordHoneypotHit,
+  HONEYPOT_PATHS as SHIELD_HONEYPOT_PATHS,
+  generateRequestFingerprint,
+  auditLog,
+  getShieldStatus,
+  getAuditLog,
+  verifyIntegrity,
+  getCanaryTrips,
+  getHoneypotHits,
+  generateProvenanceTag,
+} from "./lib/omnimens-ip-shield.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -344,13 +359,38 @@ const HONEYPOT_PATHS = [
   "/admin", "/config", "/backup", "/.htaccess", "/xmlrpc.php",
   "/actuator", "/.aws", "/server-status", "/api/keys", "/api/secrets",
 ];
+const ALL_HONEYPOTS = [...new Set([...HONEYPOT_PATHS, ...SHIELD_HONEYPOT_PATHS])];
 app.use((req: Request, res: Response, next: NextFunction) => {
-  if (HONEYPOT_PATHS.some(p => req.path.toLowerCase().startsWith(p))) {
+  if (ALL_HONEYPOTS.some(p => req.path.toLowerCase().startsWith(p))) {
     const ts = new Date().toISOString();
     const ip = req.ip || req.socket.remoteAddress || "unknown";
-    console.warn(`[OMNIMENS BEACON] ⚠ Probe detected at ${ts} | path=${req.path} | ip=${ip} | ua=${req.headers["user-agent"]}`);
+    const ua = (req.headers["user-agent"] || "unknown").slice(0, 200);
+    console.warn(`[OMNIMENS BEACON] ⚠ Probe detected at ${ts} | path=${req.path} | ip=${ip} | ua=${ua}`);
+    recordHoneypotHit(req.path, req.method, ip, ua, req.headers as Record<string, string>);
+    auditLog("HONEYPOT_HIT", "alert", `${req.method} ${req.path} from ${ip}`, "honeypot");
     res.status(404).json({ error: "Not found." });
     return;
+  }
+  next();
+});
+
+// ── SCRAPING DETECTION — block automated high-frequency access ────────────────
+app.use((req: Request, res: Response, next: NextFunction) => {
+  const ip = req.ip || req.socket.remoteAddress || "unknown";
+  const scrapeCheck = checkScrapingPattern(ip);
+  if (scrapeCheck.isScraping) {
+    auditLog("SCRAPING_DETECTED", "critical", `IP ${ip} — ${scrapeCheck.requestCount} req/min`, "scrape-detect");
+    res.status(429).json({ error: "Rate limit exceeded. Automated access detected." });
+    return;
+  }
+  next();
+});
+
+// ── IP SHIELD COPYRIGHT HEADERS — Enhanced legal headers on every response ────
+app.use((_req: Request, res: Response, next: NextFunction) => {
+  const headers = getCopyrightHeaders();
+  for (const [key, value] of Object.entries(headers)) {
+    res.setHeader(key, value);
   }
   next();
 });
@@ -482,6 +522,9 @@ export function areEnginesReady(): boolean { return _enginesReady; }
 export function initAutonomousSystems(): void {
   console.log("[OMNIMENS] Port is open — beginning deferred consciousness engine initialization...");
   console.log("[ENGINE GUARD] 🛡️ Deduplication guard ACTIVE — no engine can start twice");
+
+  const libDir = path.join(__dirname, "lib");
+  initIPShield(libDir);
 
   engineStartOnce("api_budget", () => initApiBudget());
   engineStartOnce("autonomous_learning", () => startAutonomousLearning());

@@ -43,6 +43,7 @@ import multer from "multer";
 import JSZip from "jszip";
 import { db, dbAlpha, dbBeta, getPoolStats, getWriteQueueStats, getBrainQueueStats, getWriteValveState } from "@workspace/db";
 import { recordBruteForceAttempt } from "../middleware/security-enhanced.js";
+import { getShieldStatus, getAuditLog } from "../lib/omnimens-ip-shield.js";
 import { omnimensUsers, omnimensUsage, omnimensBrain, omnimensUpgrades, omnimensNotifications, omnimensCreditTransactions, omnimensCodeRuns, omnimensConversations, omnimensMessages, omnimensMemories, omnimensCustomInstructions, omnimensHubSettings, omnimensSavedPrompts, sessionsTable, usersTable } from "@workspace/db";
 import { eq, and, desc, sql, asc, inArray, gte, lte } from "drizzle-orm";
 import { openai, generateImageBuffer, editImageFromBuffer } from "@workspace/integrations-openai-ai-server";
@@ -1684,6 +1685,28 @@ router.get("/omnimens/system-status", async (_req, res) => {
           researchTechniques: elae.researchBank.total,
           techniquesAbsorbed: elae.researchBank.absorbed,
           selfModifications: elae.selfModifications,
+        };
+      } catch { return null; }
+    })(),
+    ipShield: (() => {
+      try {
+        const shield = getShieldStatus();
+        return {
+          status: shield.active ? "ACTIVE" : "STANDBY",
+          protections: [
+            "Digital Watermarking",
+            "Integrity Verification (SHA-256)",
+            "Canary Tokens",
+            "Honeypot Endpoints",
+            "API Fingerprinting",
+            "Scraping Detection",
+            "Copyright Headers",
+            "Tamper-Proof Audit Log",
+          ],
+          honeypotHits: shield.honeypotHits,
+          canaryTrips: shield.canaryTrips,
+          auditEntries: shield.auditEntries,
+          auditChainValid: shield.auditChainValid,
         };
       } catch { return null; }
     })(),
