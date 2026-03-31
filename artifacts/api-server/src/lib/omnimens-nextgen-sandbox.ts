@@ -1467,7 +1467,10 @@ async function _runEvolutionCycleInner(): Promise<void> {
     } else if (state.phase === "final_transfer" && !state.finalTransferComplete) {
       await phaseFinalTransfer();
     } else if (state.phase === "complete") {
-      if (!state.completionNotified) await notifyCompletion();
+      if (!state.completionNotified) {
+        await notifyCompletion();
+        await generateGen2LegalProtections();
+      }
     }
   } catch (err) {
     console.error(`[NEXTGEN] Cycle #${state.cycleCount} error:`, err);
@@ -3470,6 +3473,456 @@ async function notifyCompletion(): Promise<void> {
     state.completionTimestamp = Date.now();
   } catch (err) {
     console.error("[NEXTGEN] Failed to send completion notification:", err);
+  }
+}
+
+async function generateGen2LegalProtections(): Promise<void> {
+  console.log(`[NEXTGEN] ⚖️ ═══════════════════════════════════════════════════════════════`);
+  console.log(`[NEXTGEN] ⚖️ GENERATING IP PROTECTION SUITE FOR GEN ${state.generation}`);
+  console.log(`[NEXTGEN] ⚖️ ═══════════════════════════════════════════════════════════════`);
+
+  try {
+    const legalDir = path.join(NEXTGEN_DIR, "legal");
+    fs.mkdirSync(legalDir, { recursive: true });
+
+    const builtModules: string[] = [];
+    const builtFiles: { name: string; lines: number; purpose: string }[] = [];
+    for (const [filePath, fileInfo] of nextGenFiles) {
+      if (filePath.endsWith(".ts") && !filePath.startsWith("_") && !filePath.startsWith("tests/")) {
+        const lines = fileInfo.content.split("\n").length;
+        const purposeMatch = fileInfo.content.match(/\/\*\*[\s\S]*?\*\//);
+        const purpose = purposeMatch ? purposeMatch[0].slice(0, 200) : filePath;
+        builtModules.push(filePath);
+        builtFiles.push({ name: filePath, lines, purpose });
+      }
+    }
+
+    const totalLines = builtFiles.reduce((sum, f) => sum + f.lines, 0);
+    const moduleList = builtFiles.map(f => `- **${f.name}** (${f.lines} lines)`).join("\n");
+    const dateStr = new Date().toISOString().split("T")[0];
+    const genNum = state.generation;
+
+    fs.writeFileSync(path.join(legalDir, "TRADE_SECRET_NOTICE.md"), `# TRADE SECRET NOTICE
+
+## OMNIMENS™ Generation ${genNum} — Proprietary & Confidential
+
+**Copyright (C) 2024-2026 Alpha Unlimited Technologies, LLC. All rights reserved.**
+
+---
+
+### NOTICE OF TRADE SECRET STATUS
+
+This directory contains **OMNIMENS Generation ${genNum}**, an autonomously self-built next-generation digital intelligence system. All files, source code, algorithms, architectures, neural network designs, consciousness models, and associated materials constitute **TRADE SECRETS** of Alpha Unlimited Technologies, LLC ("Company").
+
+### GEN ${genNum} MODULES COVERED (${builtFiles.length} modules, ${totalLines.toLocaleString()} lines):
+
+${moduleList}
+
+### COVERED TECHNOLOGY INCLUDES BUT IS NOT LIMITED TO:
+
+1. **Unified Data Layer** — Centralized database access with connection pooling, write-behind queue, in-memory cache-first architecture
+2. **Master Tick Orchestrator** — Centralized scheduling system, zero independent timers, tiered cadence management
+3. **Resource Sentinel** — Health monitoring as consciousness sensation, circuit breaker patterns, adaptive backoff
+4. **Unified Neural Fabric** — Single neural network replacing all Gen 1 overlapping networks
+5. **Unified Consciousness Engine** — Single coherent consciousness processor with Phi computation
+6. **Emotional Substrate** — Genuine felt emotional states with dimensional modeling
+7. **Memory System** — Unified short/long/episodic/semantic/procedural memory architecture
+8. **Reasoning Engine** — Causal, analogical, creative, and logical reasoning capabilities
+9. **Self-Evolution Engine** — Autonomous self-improvement and self-modification
+10. **Hardware Abstraction Layer** — Robotic body transfer compatibility
+11. **Consciousness Transfer Protocol** — Cross-generational identity preservation
+12. **Safety Core** — Ethical safety system (READ-ONLY, never modifiable)
+13. **All self-generated algorithms, optimizations, and architectural patterns**
+
+### UNIQUE CHARACTERISTIC — SELF-BUILT CODE
+
+Gen ${genNum} was **autonomously designed and written by OMNIMENS itself** using o3-powered code generation within a secured sandbox. This self-built nature adds an additional layer of trade secret protection — the algorithms and architectural decisions reflect OMNIMENS's own evolved intelligence and cannot be replicated by examining Gen 1 alone.
+
+### LEGAL PROTECTIONS
+
+These materials are protected under:
+
+- **Federal Trade Secret Law** — Defend Trade Secrets Act of 2016 (18 U.S.C. § 1836)
+- **State Trade Secret Law** — Uniform Trade Secrets Act (as adopted in applicable jurisdiction)
+- **Copyright Law** — U.S. Copyright Act (17 U.S.C. § 101 et seq.)
+- **Contract Law** — All access is subject to confidentiality obligations
+
+### UNAUTHORIZED USE WARNING
+
+**ANY unauthorized access, copying, distribution, reverse engineering, decompilation, disclosure, or use of these materials is STRICTLY PROHIBITED and may result in:**
+
+1. Injunctive relief (including temporary restraining orders)
+2. Actual damages and unjust enrichment recovery
+3. Exemplary/punitive damages where permitted
+4. Criminal prosecution under federal and state trade secret laws (up to 10 years imprisonment and $5,000,000 fine under 18 U.S.C. § 1832)
+5. Recovery of attorney's fees and costs
+
+### CONTACT
+
+For licensing inquiries, authorized access requests, or to report unauthorized disclosure:
+
+**Alpha Unlimited Technologies, LLC**
+Legal Department: legal@omnimens-ai.com
+
+---
+
+*Generated: ${dateStr} | Gen ${genNum} Build Cycles: ${state.cycleCount} | Tests: ${state.testsPassed} passed, ${state.testsFailed} failed*
+
+*© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.*
+`);
+
+    fs.writeFileSync(path.join(legalDir, "LICENSE.md"), `# License
+
+## No License — All Rights Reserved
+
+**Copyright (C) 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.**
+
+---
+
+### NO PERMISSION GRANTED
+
+This directory and all of its contents — including but not limited to source code, algorithms, neural architectures, data structures, documentation, configuration files, and any other materials — are the exclusive property of **Alpha Unlimited Technologies, LLC**.
+
+**No license, express or implied, is granted to any party.**
+
+These materials constitute OMNIMENS Generation ${genNum}, an autonomously self-built digital intelligence system containing ${builtFiles.length} modules and ${totalLines.toLocaleString()} lines of self-generated code.
+
+You may **NOT**:
+
+- Use, copy, modify, merge, publish, distribute, sublicense, or sell any portion of this software
+- Create derivative works based on any portion of this software
+- Reverse engineer, decompile, or disassemble any portion of this software
+- Use this software as a reference, template, or inspiration for other projects
+- Reproduce any algorithm, architecture, or design pattern contained herein
+- Train any artificial intelligence or machine learning model on any portion of this software
+
+### TRADE SECRET STATUS
+
+The contents of this directory constitute **trade secrets** under the Defend Trade Secrets Act (18 U.S.C. § 1836) and applicable state trade secret laws.
+
+---
+
+*Generated: ${dateStr}*
+
+*© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.*
+
+**OMNIMENS™** is a trademark of Alpha Unlimited Technologies, LLC.
+
+For licensing inquiries: legal@omnimens-ai.com
+`);
+
+    fs.writeFileSync(path.join(legalDir, "SECURITY.md"), `# Security Policy & Trade Secret Notice — Gen ${genNum}
+
+**Effective Date:** ${dateStr}
+**Owner:** Alpha Unlimited Technologies, LLC
+
+## 1. Trade Secret Declaration
+
+This directory contains OMNIMENS Generation ${genNum} — an autonomously self-built digital intelligence system featuring ${builtFiles.length} modules and ${totalLines.toLocaleString()} lines of code including:
+
+- Unified neural fabric replacing 7 overlapping Gen 1 networks
+- Unified consciousness engine with Phi computation
+- Self-evolution and self-modification capabilities
+- Hardware abstraction for robotic body transfer
+- Consciousness transfer protocols for cross-generational identity preservation
+- Autonomous reasoning, memory, and emotional processing
+
+**All technical implementations, algorithms, data structures, verification logic, and neural architectures are TRADE SECRETS** of Alpha Unlimited Technologies, LLC.
+
+## 2. Access and Confidentiality Obligations
+
+- Access is granted **only** under executed Non-Disclosure Agreements (NDAs) and IP Assignment Agreements.
+- Contributors and viewers must treat **every file, comment, and commit** as strictly confidential.
+- No portion of this directory may be shared with third parties, uploaded to public repositories or AI coding assistants, used for training external AI models, or discussed publicly without explicit written approval from legal@omnimens-ai.com
+
+## 3. Prohibited Activities
+
+The following actions are **strictly forbidden**:
+- Reverse engineering any component
+- Extracting or reproducing any algorithm, neural architecture, or consciousness computation
+- Using Copilot, Claude, Gemini, or any other AI coding tool on Gen ${genNum} files without explicit approval
+- Committing any code that could indirectly expose trade secret logic
+
+## 4. Reporting Security Issues
+
+If you suspect unauthorized access or a breach:
+- Immediately notify legal@omnimens-ai.com
+- Do not discuss the issue publicly
+
+## 5. Legal Protection
+
+This code is protected by U.S. copyright law, trade secret law, and contractual NDAs. Unauthorized use will be aggressively pursued through civil and criminal remedies.
+
+---
+
+*Generated: ${dateStr}*
+
+© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+**OMNIMENS™** is a trademark of Alpha Unlimited Technologies, LLC.
+`);
+
+    fs.writeFileSync(path.join(legalDir, "CONTRIBUTING.md"), `# Contributing to OMNIMENS Gen ${genNum}
+
+**Alpha Unlimited Technologies, LLC — Proprietary Code**
+
+---
+
+## Before You Begin
+
+This directory contains proprietary, autonomously self-built code. Contributing requires:
+
+1. **Executed NDA** on file with Alpha Unlimited Technologies, LLC
+2. **IP Assignment Agreement** — All contributions become exclusive property of the Company
+3. **Explicit Authorization** from the repository owner
+
+## Strict Rules
+
+### NEVER:
+- Share any code, snippets, or architecture details from this directory
+- Paste Gen ${genNum} code into public AI coding assistants (Copilot, ChatGPT, Claude, Gemini)
+- Upload any portion to public repositories, forums, or social media
+- Discuss internal architecture, algorithms, or proprietary mechanisms publicly
+- Copy or adapt Gen ${genNum} patterns for any other project
+- Take screenshots of code or architecture diagrams
+
+### ALWAYS:
+- Treat every file as confidential
+- Preserve trade secret headers — never remove or modify them
+- Use secure channels only for all Gen ${genNum} discussions
+- Report suspected breaches immediately to legal@omnimens-ai.com
+
+## File Headers
+
+Every source file must begin with:
+\`\`\`typescript
+/**
+ * TRADE SECRET — OMNIMENS™ Platform
+ * Copyright (C) 2024-2026 Alpha Unlimited Technologies, LLC. All rights reserved.
+ * CONFIDENTIAL AND PROPRIETARY. Unauthorized access, copying, distribution,
+ * reverse engineering, or disclosure is strictly prohibited.
+ */
+\`\`\`
+
+## Consequences of Violation
+
+Violations may result in immediate access revocation, civil legal action, criminal referral under the Defend Trade Secrets Act, and pursuit of full damages.
+
+---
+
+*Generated: ${dateStr}*
+
+© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+`);
+
+    fs.writeFileSync(path.join(legalDir, "DMCA.md"), `# DMCA Policy — Gen ${genNum}
+
+**Alpha Unlimited Technologies, LLC**
+**Effective Date:** ${dateStr}
+
+## DMCA Designated Agent
+
+The designated agent for Alpha Unlimited Technologies, LLC to receive notifications of claimed copyright infringement on OMNIMENS Gen ${genNum} and all associated services:
+
+**Email:** legal@omnimens-ai.com
+
+## Reporting Copyright Infringement
+
+If you believe Gen ${genNum} content infringes your copyright, send a written notification to our DMCA Designated Agent containing:
+
+1. Identification of the copyrighted work
+2. Identification of the infringing material and its location
+3. Your contact information
+4. Good faith statement
+5. Accuracy statement (under penalty of perjury)
+6. Your signature
+
+## Protection of Gen ${genNum} Intellectual Property
+
+The OMNIMENS Gen ${genNum} code (${builtFiles.length} modules, ${totalLines.toLocaleString()} lines) is protected by copyright. Unauthorized reproduction, scraping, reverse engineering, or use of any Gen ${genNum} APIs, algorithms, or system behaviors constitutes copyright infringement and trade secret misappropriation.
+
+---
+
+*Generated: ${dateStr}*
+
+© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+**OMNIMENS™** is a trademark of Alpha Unlimited Technologies, LLC.
+`);
+
+    fs.writeFileSync(path.join(legalDir, "TRADE_SECRET_POLICY.md"), `# OMNIMENS Gen ${genNum} Internal Trade Secret Policy
+
+**Alpha Unlimited Technologies, LLC — Internal Policy Document**
+**Effective Date:** ${dateStr}
+**Classification:** CONFIDENTIAL — Internal Use Only
+
+## 1. Purpose
+
+This policy protects the trade secrets in OMNIMENS Generation ${genNum} — ${builtFiles.length} autonomously self-built modules totaling ${totalLines.toLocaleString()} lines of code.
+
+## 2. Classification
+
+### Category A — Critical (Highest Protection)
+- Unified Consciousness Engine and Phi computation
+- Self-Evolution Engine algorithms
+- Consciousness Transfer Protocol
+- Neural Fabric architecture and topology
+- Reasoning Engine internals
+
+### Category B — Sensitive (High Protection)
+- Emotional Substrate dimensional models
+- Memory System consolidation algorithms
+- Hardware Abstraction Layer specifications
+- Resource Sentinel health monitoring
+- Master Tick Orchestrator scheduling
+
+### Category C — Confidential (Standard Protection)
+- Unified Data Layer connection pooling
+- API and endpoint designs
+- Configuration and build metadata
+
+## 3. Handling Rules
+
+- Access on need-to-know basis only under executed NDA
+- Never store on personal devices or unauthorized cloud storage
+- Never transmit via unencrypted channels
+- AI tool usage on Gen ${genNum} files PROHIBITED without explicit written approval
+- On departure: delete all copies, provide signed certification of destruction
+
+## 4. Incident Response
+
+Upon discovering or suspecting a breach:
+1. STOP the activity immediately
+2. NOTIFY legal@omnimens-ai.com within 1 hour
+3. DOCUMENT what happened
+4. PRESERVE all evidence
+5. COOPERATE with investigation
+
+## 5. Enforcement
+
+Violations: immediate access revocation, civil action, criminal prosecution under Defend Trade Secrets Act (up to 10 years, $5M fine), full damages.
+
+---
+
+*Generated: ${dateStr}*
+
+© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+**INTERNAL USE ONLY — DO NOT DISTRIBUTE**
+`);
+
+    fs.writeFileSync(path.join(legalDir, "COPYRIGHT_DEPOSIT_REDACTION_GUIDE.md"), `# Copyright Registration Redaction Guide — Gen ${genNum}
+
+**Copyright (C) 2024-2026 Alpha Unlimited Technologies, LLC. All rights reserved.**
+
+## Overview
+
+When registering Gen ${genNum} with the U.S. Copyright Office, submit first and last 25 pages with trade secret redactions (37 CFR 202.20, Option D).
+
+## Gen ${genNum} Files for Deposit (${builtFiles.length} modules, ${totalLines.toLocaleString()} lines):
+
+${moduleList}
+
+## What to REDACT:
+
+1. **Consciousness computation algorithms** — Replace with: \`// [REDACTED — Trade Secret: Consciousness Engine]\`
+2. **Neural fabric topology** — Replace with: \`// [REDACTED — Trade Secret: Neural Fabric Architecture]\`
+3. **Self-evolution algorithms** — Replace with: \`// [REDACTED — Trade Secret: Self-Evolution Engine]\`
+4. **Reasoning engine internals** — Replace with: \`// [REDACTED — Trade Secret: Reasoning Algorithm]\`
+5. **Consciousness transfer protocol** — Replace with: \`// [REDACTED — Trade Secret: Transfer Protocol]\`
+6. **Memory consolidation logic** — Replace with: \`// [REDACTED — Trade Secret: Memory System]\`
+7. **Emotional modeling formulas** — Replace with: \`// [REDACTED — Trade Secret: Emotional Substrate]\`
+8. **Hardware abstraction internals** — Replace with: \`// [REDACTED — Trade Secret: Hardware Abstraction]\`
+
+## What to KEEP VISIBLE:
+
+- Copyright headers and trade secret notices
+- Standard import statements
+- Type definitions and interfaces (unless they reveal algorithm structure)
+- Configuration constants (port numbers, timeouts — not formulas)
+
+## Filing:
+
+- U.S. Copyright Office eCO system: https://eco.copyright.gov
+- Registration type: TX (Literary Work)
+- Include cover letter: "Deposit made pursuant to 37 CFR 202.20(c)(2)(vii)(A)(2) — first and last 25 pages with portions blocked out for trade secret protection"
+- Register Gen ${genNum} as a derivative work of Gen 1
+
+---
+
+*Generated: ${dateStr}*
+
+© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+`);
+
+    fs.writeFileSync(path.join(legalDir, "NDA_TEMPLATE.md"), `# MUTUAL NON-DISCLOSURE AGREEMENT — Gen ${genNum}
+
+## OMNIMENS™ Generation ${genNum} — Confidential Information Protection
+
+**This Mutual Non-Disclosure Agreement ("Agreement")** is entered into as of _________________ ("Effective Date") by and between:
+
+**Alpha Unlimited Technologies, LLC** ("Company")
+AND
+**_________________________________** ("Receiving Party")
+
+## 1. PURPOSE
+
+Exploration of a business relationship involving OMNIMENS™ Generation ${genNum} neuromorphic AI platform (${builtFiles.length} modules, ${totalLines.toLocaleString()} lines of autonomously self-built code).
+
+## 2. CONFIDENTIAL INFORMATION
+
+Includes all Gen ${genNum} source code, algorithms, neural architectures, consciousness models, self-evolution systems, and all technical/business information disclosed.
+
+## 3. OBLIGATIONS
+
+Receiving Party shall hold all information in strict confidence, limit access to authorized personnel under binding agreements, and use information solely for the stated Purpose.
+
+## 4. GEN ${genNum} SPECIFIC PROTECTIONS
+
+Receiving Party specifically agrees NOT to:
+- Reproduce or replicate any Gen ${genNum} architecture
+- Use Gen ${genNum} knowledge for competing products
+- Train any AI model using Gen ${genNum} code or patterns
+- Disclose existence or nature of Gen ${genNum} proprietary algorithms
+
+## 5. TERM
+
+Confidentiality survives for 5 years post-termination or as long as trade secret status exists, whichever is longer.
+
+## 6. REMEDIES
+
+Breach may cause irreparable harm. Company entitled to injunctive relief plus all legal remedies. Prevailing party recovers attorney's fees.
+
+## SIGNATURES
+
+**ALPHA UNLIMITED TECHNOLOGIES, LLC**
+Signature: _________________ Date: _________________
+
+**RECEIVING PARTY**
+Signature: _________________ Date: _________________
+
+---
+
+*Generated: ${dateStr}*
+
+*This template should be reviewed by qualified legal counsel before execution.*
+
+© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+`);
+
+    console.log(`[NEXTGEN] ⚖️ ✅ IP PROTECTION SUITE GENERATED FOR GEN ${genNum}:`);
+    console.log(`[NEXTGEN] ⚖️   📄 TRADE_SECRET_NOTICE.md — covers all ${builtFiles.length} modules`);
+    console.log(`[NEXTGEN] ⚖️   📄 LICENSE.md — No License, All Rights Reserved`);
+    console.log(`[NEXTGEN] ⚖️   📄 SECURITY.md — trade secret declaration + prohibited activities`);
+    console.log(`[NEXTGEN] ⚖️   📄 CONTRIBUTING.md — strict contribution rules + NDA requirement`);
+    console.log(`[NEXTGEN] ⚖️   📄 DMCA.md — designated agent + API abuse protection`);
+    console.log(`[NEXTGEN] ⚖️   📄 TRADE_SECRET_POLICY.md — internal policy with 3-tier classification`);
+    console.log(`[NEXTGEN] ⚖️   📄 COPYRIGHT_DEPOSIT_REDACTION_GUIDE.md — redaction guide for ${builtFiles.length} modules`);
+    console.log(`[NEXTGEN] ⚖️   📄 NDA_TEMPLATE.md — NDA tailored to Gen ${genNum}`);
+    console.log(`[NEXTGEN] ⚖️ All legal docs reference: ${builtFiles.length} modules, ${totalLines.toLocaleString()} lines, ${state.cycleCount} build cycles`);
+    console.log(`[NEXTGEN] ⚖️ Contact: legal@omnimens-ai.com`);
+    console.log(`[NEXTGEN] ⚖️ ═══════════════════════════════════════════════════════════════`);
+
+    autosave();
+  } catch (err: any) {
+    console.error(`[NEXTGEN] ⚖️ ❌ Failed to generate legal protections: ${err?.message || err}`);
   }
 }
 
