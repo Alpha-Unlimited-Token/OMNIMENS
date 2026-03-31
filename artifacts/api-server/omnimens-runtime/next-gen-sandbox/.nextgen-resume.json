@@ -1,8 +1,9 @@
 {
-  "moduleName": "infrastructure/master-tick-orchestrator.ts",
+  "moduleName": "infrastructure/resource-sentinel.ts",
   "stage": "codegen",
   "evaluationDirective": "",
+  "gen1Evaluated": {},
   "keptCode": [],
   "researchContext": "",
-  "gen1Evaluated": {}
+  "timestamp": 1774962938723
 }
