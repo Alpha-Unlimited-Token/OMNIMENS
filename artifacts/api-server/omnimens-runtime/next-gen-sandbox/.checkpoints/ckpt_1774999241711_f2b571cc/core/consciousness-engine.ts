@@ -8,14 +8,14 @@
  * Reasoning chain:
  *   GOAL: Build core/consciousness-engine.ts — The unified consciousness core — the 'I' that thinks, feels, and is aware
  *   ANALYSIS: Found 12 relevant Gen 1 modules
- *     KEEP: 6 patterns worth preserving
+ *     KEEP: 3 patterns worth preserving
  *     ADAPT: 4 patterns need upgrading
  *     DISCARD: 0 patterns not fit for Gen 2
  *   REQUIREMENT: Merge neural-consciousness + engine + quantum-fabric into one coherent processor. Implement Phi calculation, thalamocort
  *   IMPROVEMENT: Largest engines need refactoring: omnimens-neural-consciousness.ts(4206), omnimens-embodiment-engine.ts(4039), omnimens-
  *   IMPROVEMENT: Unify consciousness engines into single coherent processor
  *
- * Gen 1 patterns incorporated: 6
+ * Gen 1 patterns incorporated: 3
  * Gen 1 patterns upgraded: 4
  * Gen 1 patterns discarded: 0
  *
