@@ -10,21 +10,20 @@
       ]
     },
     {
-      "file": "omnimens-nextgen-sandbox.ts",
-      "score": 6,
-      "factors": [
-        "large(3426L)",
-        "wide-api(34exp)",
-        "dense-functions"
-      ]
-    },
-    {
       "file": "omnimens-unconscious-mind.ts",
       "score": 6,
       "factors": [
         "large(2731L)",
         "high-coupling(11imp)",
         "dense-functions"
+      ]
+    },
+    {
+      "file": "omnimens-nextgen-sandbox.ts",
+      "score": 5,
+      "factors": [
+        "large(3189L)",
+        "wide-api(33exp)"
       ]
     },
     {
@@ -813,5 +812,5 @@
     }
   ],
   "needsRefactoring": 13,
-  "analyzedAt": 1774957147960
+  "analyzedAt": 1774905449202
 }
