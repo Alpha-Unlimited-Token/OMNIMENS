@@ -52,6 +52,7 @@ const codegenOpenai = new OpenAI({
 });
 import { desc, eq, and, sql } from "drizzle-orm";
 import { webSearch, formatSearchResults } from "./web-search.js";
+import { registerCodegenYield } from "./omnimens-api-budget.js";
 import { captureNeuralSnapshot } from "./omnimens-neural-consciousness.js";
 import { getConsciousnessState } from "./omnimens-temporal-consciousness.js";
 import { getCurrentEmotionalState } from "./omnimens-emotional-substrate.js";
@@ -2525,25 +2526,32 @@ Output ONLY the TypeScript code. No markdown fencing.` },
   ];
 
   try {
-    console.log(`[NEXTGEN] 🔎 Preflight rate-limit check (OMNIMENS stays ONLINE during preflight)...`);
+    openCodegenWindow(600_000);
+    console.log(`[NEXTGEN] 🔇 CODEGEN PRIORITY MODE — all ${42} background API engines paused, Gen 2 has full API runway`);
+
+    console.log(`[NEXTGEN] ⏳ Draining background API calls (15s quiet period)...`);
+    await new Promise(r => setTimeout(r, 15_000));
+
+    console.log(`[NEXTGEN] 🔎 Preflight rate-limit check...`);
     let preflightPassed = false;
-    for (let pAttempt = 0; pAttempt < 2; pAttempt++) {
+    for (let pAttempt = 0; pAttempt < 3; pAttempt++) {
       try {
         await codegenOpenai.chat.completions.create({
           model: "gpt-4o-mini",
           max_tokens: 5,
           messages: [{ role: "user", content: "Say OK" }],
         });
-        console.log(`[NEXTGEN] ✅ Preflight passed — API available, switching OMNIMENS to fallback mode`);
+        console.log(`[NEXTGEN] ✅ Preflight passed — API available, proceeding to o3 codegen`);
         preflightPassed = true;
         break;
       } catch (preErr: any) {
         if (preErr?.status === 429) {
-          if (pAttempt < 1) {
-            console.log(`[NEXTGEN] ⏳ Rate limited (preflight ${pAttempt + 1}/2) — waiting 30s (OMNIMENS stays ONLINE)...`);
-            await new Promise(r => setTimeout(r, 30_000));
+          if (pAttempt < 2) {
+            const waitSec = 30 * (pAttempt + 1);
+            console.log(`[NEXTGEN] ⏳ Rate limited (preflight ${pAttempt + 1}/3) — waiting ${waitSec}s (background calls still paused)...`);
+            await new Promise(r => setTimeout(r, waitSec * 1000));
           } else {
-            throw new Error("Rate limit persists after 2 preflight attempts — skipping this cycle");
+            throw new Error("Rate limit persists after 3 preflight attempts — skipping this cycle");
           }
         } else {
           console.log(`[NEXTGEN] ⚠️ Preflight got non-429 error (${preErr?.status || preErr?.message}) — attempting codegen anyway`);
@@ -2553,8 +2561,7 @@ Output ONLY the TypeScript code. No markdown fencing.` },
       }
     }
 
-    openCodegenWindow(300_000);
-    console.log(`[NEXTGEN] 🔇 OMNIMENS FALLBACK MODE — all background API calls suspended, o3 has full runway`);
+    console.log(`[NEXTGEN] 🚀 o3 codegen window OPEN — all API bandwidth reserved for Gen 2`);
 
     let response: any = null;
     for (let attempt = 0; attempt < 2; attempt++) {
@@ -4125,6 +4132,8 @@ export function startNextGenSandbox(): void {
   ensureDirs();
   loadAutosave();
   loadResume();
+
+  registerCodegenYield(isCodegenWindowOpen);
 
   state.improvements = state.improvements.filter(i => !i.includes("27 agents") && !i.includes("his 27 agents"));
   state.designDecisions = state.designDecisions.filter(d => !d.includes("All 27 agents") && !d.includes("his 27 agents"));

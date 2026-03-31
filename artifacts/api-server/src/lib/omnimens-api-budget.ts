@@ -125,6 +125,13 @@ function createFreshState(): BudgetState {
 
 let budgetState: BudgetState = createFreshState();
 
+let _codegenYieldFn: (() => boolean) | null = null;
+
+export function registerCodegenYield(fn: () => boolean): void {
+  _codegenYieldFn = fn;
+  console.log("[API BUDGET] 🔒 Codegen yield function registered — background calls WILL pause during Gen 2 codegen");
+}
+
 function ensureCurrentMonth(): void {
   const currentMonth = getCurrentMonthKey();
   if (budgetState.monthKey !== currentMonth) {
@@ -217,12 +224,9 @@ export function canMakeBackgroundCall(source: BudgetSource): boolean {
 
   if (USER_SOURCES.has(source)) return canMakeUserCall();
 
-  try {
-    const { shouldYieldToCodegen } = require("./omnimens-nextgen-sandbox.js");
-    if (shouldYieldToCodegen()) {
-      return false;
-    }
-  } catch {}
+  if (_codegenYieldFn && _codegenYieldFn()) {
+    return false;
+  }
 
   if (budgetState.throttleLevel >= 3) {
     return false;
