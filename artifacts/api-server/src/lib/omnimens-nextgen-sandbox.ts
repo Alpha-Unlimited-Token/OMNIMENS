@@ -610,6 +610,7 @@ function autosave(): void {
 
   try {
     const stateFile = path.join(SANDBOX_DIR, ".nextgen-state.json");
+    const fileContents: Record<string, string> = {};
     const saveData = {
       state,
       fileManifest: Array.from(nextGenFiles.entries()).map(([p, f]) => ({
@@ -620,8 +621,14 @@ function autosave(): void {
         testResult: f.testResult,
         lineCount: f.content.split("\n").length,
       })),
+      fileContents,
       savedAt: Date.now(),
     };
+    for (const [p, f] of nextGenFiles.entries()) {
+      if (!p.startsWith("_v2_archive") && !p.startsWith("gen1-library") && !p.endsWith(".json")) {
+        fileContents[p] = f.content;
+      }
+    }
     fs.writeFileSync(stateFile, JSON.stringify(saveData, null, 2));
   } catch {}
 }
@@ -635,6 +642,32 @@ function loadAutosave(): boolean {
     if (data.state) {
       Object.assign(state, data.state);
       state.completionNotified = false;
+    }
+
+    const savedContents: Record<string, string> = data.fileContents || {};
+    let restoredFromSaved = 0;
+
+    for (const [relPath, content] of Object.entries(savedContents)) {
+      if (!nextGenFiles.has(relPath) && content) {
+        const fullPath = path.join(SANDBOX_DIR, relPath);
+        const dir = path.dirname(fullPath);
+        if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+        fs.writeFileSync(fullPath, content, "utf-8");
+        nextGenFiles.set(relPath, {
+          path: relPath,
+          content,
+          language: relPath.endsWith(".ts") ? "typescript" : relPath.endsWith(".js") ? "javascript" : "text",
+          purpose: (data.fileManifest || []).find((m: any) => m.path === relPath)?.purpose || "restored from saved contents",
+          version: (data.fileManifest || []).find((m: any) => m.path === relPath)?.version || 1,
+          createdAt: data.savedAt || Date.now(),
+          updatedAt: Date.now(),
+          testedAt: null,
+          testResult: (data.fileManifest || []).find((m: any) => m.path === relPath)?.testResult || "untested",
+          checkpointId: null,
+          errors: [],
+        });
+        restoredFromSaved++;
+      }
     }
 
     function walkSandbox(dir: string, base: string) {
@@ -669,6 +702,9 @@ function loadAutosave(): boolean {
 
     walkSandbox(SANDBOX_DIR, SANDBOX_DIR);
     state.totalFiles = nextGenFiles.size;
+    if (restoredFromSaved > 0) {
+      console.log(`[NEXTGEN] 🔧 Recovered ${restoredFromSaved} files from saved contents (would have been lost without content backup)`);
+    }
     console.log(`[NEXTGEN] 💾 Autosave restored — ${nextGenFiles.size} files | Phase: ${state.phase} | Cycle: ${state.cycleCount}`);
     return true;
   } catch {
