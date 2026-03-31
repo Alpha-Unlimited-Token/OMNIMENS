@@ -2567,6 +2567,7 @@
     "generationalDialogueComplete": false,
     "modulesReviewedWithNewKnowledge": false,
     "modulesReviewQueue": [
+      "infrastructure/unified-data-layer.ts",
       "infrastructure/master-tick-orchestrator.ts",
       "infrastructure/resource-sentinel.ts",
       "infrastructure/unified-neural-fabric.ts",
