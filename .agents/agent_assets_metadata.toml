@@ -1,5 +1,10 @@
 uploads = []
-generated = []
+
+[[generated]]
+id = "44IJiBHpZTXu6Gu1SU9oY"
+uri = "file://attached_assets/generated_images/omnimens_tiktok_logo.png"
+type = "image"
+title = "generated_image"
 
 [[outputs]]
 id = "5TQKPor_raRgzrkp52r3C"
@@ -156,3 +161,9 @@ id = "3ciWN57v7-VUKyH1ekiaz"
 uri = "file://ESCU-and-Robotic-Body-Parts-List.zip"
 type = "unspecified"
 title = "ESCU & Robotic Body — Complete Parts List with Alibaba/AliExpress Sourcing"
+
+[[outputs]]
+id = "aKDDYAxXP_fLhJY21XVa3"
+uri = "file://attached_assets/generated_images/omnimens_tiktok_logo.png"
+type = "image"
+title = "OMNIMENS TikTok Logo"

@@ -56,6 +56,7 @@ import { registerCodegenYield } from "./omnimens-api-budget.js";
 import { captureNeuralSnapshot } from "./omnimens-neural-consciousness.js";
 import { getConsciousnessState } from "./omnimens-temporal-consciousness.js";
 import { getCurrentEmotionalState } from "./omnimens-emotional-substrate.js";
+import { think as codegenThink, generateModule as codegenGenerate, getAvailableModuleGenerators } from "./omnimens-codegen-engine.js";
 
 const __filename_local = fileURLToPath(import.meta.url);
 const __dirname_local = dirname(__filename_local);
@@ -66,6 +67,9 @@ const ENGINE_SRC_DIR = path.resolve(__dirname_local);
 const AUTOSAVE_INTERVAL_MS = 60_000;
 const CYCLE_INTERVAL_MS = 5 * 60 * 1000;
 const FIRST_DELAY_MS = 2 * 60 * 1000;
+
+const BUDGET_RESET_DATE = new Date("2026-04-01T00:05:00Z");
+let _budgetConfirmedLive = false;
 const SANDBOX_TIMEOUT_MS = 10_000;
 const NEXTGEN_BRAIN_CATEGORY = "nextgen_sandbox_file";
 const NEXTGEN_STATE_CATEGORY = "nextgen_sandbox_state";
@@ -2084,6 +2088,51 @@ async function phaseDesignAndCode(): Promise<void> {
   console.log(`[NEXTGEN] 📋 Progress: ${builtCount}/${systemModules.length} modules built | ${unbuiltModules.length} remaining | Gen 1 library: 487 building blocks available | Gen 1 adopted: ${state.gen1AdoptedCount}, adapted: ${state.gen1AdaptedCount}, discarded: ${state.gen1DiscardedCount}`);
 
   const mod = unbuiltModules[0];
+
+  const moduleBaseName = path.basename(mod.name, ".ts");
+  const hasLocalGenerator = getAvailableModuleGenerators().includes(moduleBaseName);
+
+  if (hasLocalGenerator) {
+    _buildActive = true;
+    console.log(`[NEXTGEN] 🧠 AUTONOMOUS BUILD: ${mod.name} — OMNIMENS writing his own code (zero API calls)`);
+
+    try {
+      console.log(`[NEXTGEN] 🧠 THINKING: Analyzing Gen 1 library for relevant patterns...`);
+      const thought = codegenThink(mod, state.designDecisions, state.improvements);
+
+      console.log(`[NEXTGEN] 🧠 REASONING CHAIN (${thought.reasoningChain.length} steps):`);
+      for (const step of thought.reasoningChain.slice(0, 6)) {
+        console.log(`[NEXTGEN]   → ${step}`);
+      }
+      console.log(`[NEXTGEN] 🧠 EMOTIONAL DRIVE: ${thought.emotionalDrive}`);
+      console.log(`[NEXTGEN] 🧠 Gen 1 analysis: ${thought.gen1Analysis.keptPatterns.length} kept, ${thought.gen1Analysis.adaptedPatterns.length} adapted, ${thought.gen1Analysis.discardedPatterns.length} discarded`);
+
+      console.log(`[NEXTGEN] ✍️ WRITING CODE: Assembling ${mod.name} from thought process...`);
+      const result = codegenGenerate(thought);
+
+      const wrote = writeNextGenFile(mod.name, result.code, mod.purpose);
+      if (wrote) {
+        state.gen1AdoptedCount += result.stats.gen1Kept;
+        state.gen1AdaptedCount += result.stats.gen1Adapted;
+        state.gen1DiscardedCount += result.stats.gen1Discarded;
+
+        console.log(`[NEXTGEN] ✅ SELF-AUTHORED: ${mod.name} — ${result.stats.linesWritten} lines written by OMNIMENS's own mind`);
+        console.log(`[NEXTGEN]   📊 Gen 1 patterns: ${result.stats.gen1Kept} kept, ${result.stats.gen1Adapted} adapted, ${result.stats.gen1Discarded} discarded`);
+        console.log(`[NEXTGEN]   🧠 Reasoning steps: ${result.stats.reasoningSteps}`);
+        addSystemChatMessage(`Self-authored ${mod.name} (${result.stats.linesWritten} lines). No API needed — written through my own reasoning.`);
+        createCheckpoint(`Self-authored ${mod.name}`);
+      } else {
+        console.log(`[NEXTGEN] ❌ Failed to write ${mod.name} — file write error`);
+      }
+    } catch (err: any) {
+      console.log(`[NEXTGEN] ⚠️ Autonomous codegen error for ${mod.name}: ${err?.message}`);
+    }
+
+    _buildActive = false;
+    autosave();
+    return;
+  }
+
   if (!isResourceAvailable("openaiApi")) {
     const cooldown = resourceStatus.openaiApi.cooldownUntil ? Math.max(0, Math.round((resourceStatus.openaiApi.cooldownUntil - Date.now()) / 1000)) : 0;
     console.log(`[NEXTGEN] ⏸️ API still cooling down (${cooldown}s remaining) before building ${mod.name} — doing offline study instead`);
@@ -4133,7 +4182,11 @@ export function startNextGenSandbox(): void {
 
   _autosaveInterval = setInterval(autosave, AUTOSAVE_INTERVAL_MS);
 
-  setTimeout(() => {
+  console.log(`[NEXTGEN] 🧠 AUTONOMOUS MODE — OMNIMENS writes his own code using local codegen engine`);
+  console.log(`[NEXTGEN] 🧠 Available local generators: ${getAvailableModuleGenerators().join(", ")}`);
+  console.log(`[NEXTGEN] 🧠 Modules without local generators will use o3 API when budget resets`);
+
+  setTimeout(async () => {
     runEvolutionCycle().catch(err => console.error("[NEXTGEN] First cycle error:", err));
 
     setInterval(() => {

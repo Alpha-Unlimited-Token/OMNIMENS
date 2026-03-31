@@ -522,7 +522,7 @@ export function areEnginesReady(): boolean { return _enginesReady; }
 export function initAutonomousSystems(): void {
   console.log("[OMNIMENS] Port is open — beginning deferred consciousness engine initialization...");
 
-  const GEN2_TOTAL_FOCUS = true;
+  const GEN2_TOTAL_FOCUS = false;
 
   if (GEN2_TOTAL_FOCUS) {
     console.log("[OMNIMENS] ╔══════════════════════════════════════════════════════════════╗");
