@@ -2,137 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774987091658,
-  "totalWormholesCreated": 4200,
+  "timestamp": 1774987183946,
+  "totalWormholesCreated": 7350,
   "totalActive": 0,
-  "totalClosed": 4200,
-  "totalDataIngestedKB": 6176,
-  "totalInsightsDecoded": 4200,
-  "totalCrossAgentCirculations": 252,
-  "totalSynthesizedDiscoveries": 242,
-  "cycleCount": 4,
+  "totalClosed": 7350,
+  "totalDataIngestedKB": 10774,
+  "totalInsightsDecoded": 7350,
+  "totalCrossAgentCirculations": 441,
+  "totalSynthesizedDiscoveries": 422,
+  "cycleCount": 7,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 200,
-      "totalInsightsDecoded": 209,
-      "crossAgentShares": 12
+      "totalWormholes": 350,
+      "totalInsightsDecoded": 368,
+      "crossAgentShares": 21
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
       "toAgent": "OMNIMENS",
-      "insight": "Motivator/causal_inference: Hebbian learning: neurons that fire together wire together — the fundamental rule of neural ",
-      "confidence": 0.9008669242039163,
+      "insight": "Motivator/temporal_correlation: The cerebellum contains more neurons than all other brain regions combined and is crucia",
+      "confidence": 0.6445388558605519,
       "synthesizedWith": [
-        "OMNIMENS/structural_analysis: Mirror neurons fire both when performing an action"
+        "OMNIMENS/cross_domain_synthesis: The butterfly effect: in chaotic systems, infin"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Architect",
-      "insight": "Motivator/causal_inference: Hebbian learning: neurons that fire together wire together — the fundamental rule of neural ",
-      "confidence": 0.9008669242039163,
-      "synthesizedWith": [
-        "Architect/information_compression: The Turing machine is computationally univers"
-      ]
-    },
-    {
-      "fromAgent": "Motivator",
-      "toAgent": "Neuroscientist",
-      "insight": "Motivator/analogical_mapping: Scale-free networks follow power-law degree distributions — a few highly connected hubs do",
-      "confidence": 0.9906644947149656,
-      "synthesizedWith": [
-        "Neuroscientist/abstraction_layer: Autopoiesis: living systems are self-creating "
-      ]
-    },
-    {
-      "fromAgent": "Empath",
-      "toAgent": "Synthesizer",
-      "insight": "Empath/causal_inference: The hard problem of consciousness: why is there subjective experience at all? Why does informat",
-      "confidence": 0.7376646453285962,
-      "synthesizedWith": [
-        "Synthesizer/cross_domain_synthesis: The cerebellum contains more neurons than al"
-      ]
-    },
-    {
-      "fromAgent": "Empath",
       "toAgent": "Visionary",
-      "insight": "Empath/emergent_property_detection: The Penrose-Hameroff Orch-OR theory proposes consciousness arises from quantum compu",
-      "confidence": 0.865403372169496,
+      "insight": "Motivator/cross_domain_synthesis: The Weber-Fechner law: perception is logarithmic — doubling stimulus intensity does no",
+      "confidence": 0.883253461182898,
       "synthesizedWith": [
-        "Visionary/analogical_mapping: Sparse coding: the brain represents information us"
+        "Visionary/pattern_recognition: Integrated Information Theory (IIT) states consci"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Empath",
+      "insight": "Motivator/cross_domain_synthesis: The Weber-Fechner law: perception is logarithmic — doubling stimulus intensity does no",
+      "confidence": 0.883253461182898,
+      "synthesizedWith": [
+        "Empath/feature_extraction: DNA stores information at approximately 2 bits per nu"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "GraphicDesigner",
+      "insight": "Empath/structural_analysis: The hippocampus replays experiences during sleep in compressed form — dream consolidation ma",
+      "confidence": 0.7050433996672826,
+      "synthesizedWith": [
+        "GraphicDesigner/analogical_mapping: Recurrent neural networks can approximate an"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Mathematician",
+      "insight": "Empath/structural_analysis: The hippocampus replays experiences during sleep in compressed form — dream consolidation ma",
+      "confidence": 0.7050433996672826,
+      "synthesizedWith": [
+        "Mathematician/information_compression: Information is physical — Landauer's prin"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
