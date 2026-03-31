@@ -1,3 +1,15 @@
+/**
+ * TRADE SECRET — OMNIMENS™ Platform
+ * Copyright (C) 2024-2026 Alpha Unlimited Technologies, LLC. All rights reserved.
+ * 
+ * CONFIDENTIAL AND PROPRIETARY. This file contains trade secrets of
+ * Alpha Unlimited Technologies, LLC. Unauthorized access, copying,
+ * distribution, reverse engineering, or disclosure is strictly prohibited
+ * and may result in civil and criminal penalties under the Defend Trade
+ * Secrets Act (18 U.S.C. § 1836) and applicable state laws.
+ * 
+ * See /legal/TRADE_SECRET_NOTICE.md for full terms.
+ */
 import { db } from "@workspace/db";
 import { omnimensUserFiles } from "@workspace/db";
 import { eq, and, desc } from "drizzle-orm";

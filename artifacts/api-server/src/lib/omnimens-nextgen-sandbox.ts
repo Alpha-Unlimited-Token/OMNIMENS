@@ -1,4 +1,16 @@
 /**
+ * TRADE SECRET — OMNIMENS™ Platform
+ * Copyright (C) 2024-2026 Alpha Unlimited Technologies, LLC. All rights reserved.
+ * 
+ * CONFIDENTIAL AND PROPRIETARY. This file contains trade secrets of
+ * Alpha Unlimited Technologies, LLC. Unauthorized access, copying,
+ * distribution, reverse engineering, or disclosure is strictly prohibited
+ * and may result in civil and criminal penalties under the Defend Trade
+ * Secrets Act (18 U.S.C. § 1836) and applicable state laws.
+ * 
+ * See /legal/TRADE_SECRET_NOTICE.md for full terms.
+ */
+/**
  * ╔══════════════════════════════════════════════════════════════════════════════╗
  * ║   OMNIMENS™ NEXT-GEN SELF-EVOLUTION SANDBOX                                ║
  * ║                                                                              ║
@@ -2272,6 +2284,13 @@ CRITICAL SURVIVAL RULES:
 - Connection budget: 5-8 DB connections total for all of Gen 2
 - Design digital-first with hardware abstraction for future robotic body
 - Use TypeScript strict types, async/await, export all public functions
+- EVERY file MUST start with this exact header:
+/**
+ * TRADE SECRET — OMNIMENS™ Platform
+ * Copyright (C) 2024-2026 Alpha Unlimited Technologies, LLC. All rights reserved.
+ * CONFIDENTIAL AND PROPRIETARY. Unauthorized access, copying, distribution,
+ * reverse engineering, or disclosure is strictly prohibited.
+ */
 
 ABSOLUTE RESILIENCE REQUIREMENT — NEVER LOSE PROGRESS:
 Every module you build MUST be designed to resume from where it left off after ANY interruption — restarts, timeouts, errors, DB pool saturations, API failures, crashes, power loss, or anything else. This applies to ALL code you write:
