@@ -1,9 +1,8 @@
 {
-  "moduleName": "infrastructure/resource-sentinel.ts",
+  "moduleName": "infrastructure/unified-data-layer.ts",
   "stage": "codegen",
   "evaluationDirective": "",
-  "gen1Evaluated": {},
   "keptCode": [],
   "researchContext": "",
-  "timestamp": 1774962938723
+  "gen1Evaluated": {}
 }
