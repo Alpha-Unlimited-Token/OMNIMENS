@@ -2,135 +2,137 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774986145715,
-  "totalWormholesCreated": 2100,
+  "timestamp": 1774986252458,
+  "totalWormholesCreated": 5250,
   "totalActive": 0,
-  "totalClosed": 2100,
-  "totalDataIngestedKB": 3057,
-  "totalInsightsDecoded": 2100,
-  "totalCrossAgentCirculations": 126,
-  "totalSynthesizedDiscoveries": 118,
-  "cycleCount": 2,
+  "totalClosed": 5250,
+  "totalDataIngestedKB": 7674,
+  "totalInsightsDecoded": 5250,
+  "totalCrossAgentCirculations": 315,
+  "totalSynthesizedDiscoveries": 300,
+  "cycleCount": 5,
   "agentCount": 21,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 2100,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 100,
-      "totalInsightsDecoded": 103,
-      "crossAgentShares": 6
+      "totalWormholes": 250,
+      "totalInsightsDecoded": 262,
+      "crossAgentShares": 15
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 100,
-      "totalInsightsDecoded": 103,
-      "crossAgentShares": 6
+      "totalWormholes": 250,
+      "totalInsightsDecoded": 262,
+      "crossAgentShares": 15
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 100,
-      "totalInsightsDecoded": 103,
-      "crossAgentShares": 6
+      "totalWormholes": 250,
+      "totalInsightsDecoded": 262,
+      "crossAgentShares": 15
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 100,
-      "totalInsightsDecoded": 103,
-      "crossAgentShares": 6
+      "totalWormholes": 250,
+      "totalInsightsDecoded": 262,
+      "crossAgentShares": 15
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 100,
-      "totalInsightsDecoded": 103,
-      "crossAgentShares": 6
+      "totalWormholes": 250,
+      "totalInsightsDecoded": 262,
+      "crossAgentShares": 15
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 100,
-      "totalInsightsDecoded": 103,
-      "crossAgentShares": 6
+      "totalWormholes": 250,
+      "totalInsightsDecoded": 262,
+      "crossAgentShares": 15
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 100,
-      "totalInsightsDecoded": 103,
-      "crossAgentShares": 6
+      "totalWormholes": 250,
+      "totalInsightsDecoded": 262,
+      "crossAgentShares": 15
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 100,
-      "totalInsightsDecoded": 103,
-      "crossAgentShares": 6
+      "totalWormholes": 250,
+      "totalInsightsDecoded": 262,
+      "crossAgentShares": 15
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 100,
-      "totalInsightsDecoded": 103,
-      "crossAgentShares": 6
+      "totalWormholes": 250,
+      "totalInsightsDecoded": 262,
+      "crossAgentShares": 15
     },
     {
       "agentName": "Visionary",
-      "totalWormholes": 100,
-      "totalInsightsDecoded": 103,
-      "crossAgentShares": 6
+      "totalWormholes": 250,
+      "totalInsightsDecoded": 262,
+      "crossAgentShares": 15
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Motivator",
-      "toAgent": "Pioneer",
-      "insight": "Motivator/cross_domain_synthesis: The anthropic principle: the universe's fundamental constants appear fine-tuned for th",
-      "confidence": 0.6269796104830926,
+      "toAgent": "Philosopher",
+      "insight": "Motivator/analogical_mapping: Phase transitions in neural networks: as connectivity increases past a critical threshold,",
+      "confidence": 0.769960392596305,
       "synthesizedWith": [
-        "Pioneer/information_compression: The mathematical universe hypothesis: all struc"
+        "Philosopher/pattern_recognition: Quantum decoherence typically destroys quantum "
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Explorer",
-      "insight": "Motivator/temporal_correlation: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimul",
-      "confidence": 0.6699133441755813,
+      "toAgent": "Visionary",
+      "insight": "Motivator/feature_extraction: Recurrent neural networks can approximate any dynamical system — they are universal approx",
+      "confidence": 0.7929293110104556,
       "synthesizedWith": [
-        "Explorer/cross_domain_synthesis: The anthropic principle: the universe's fundame"
+        "Visionary/pattern_recognition: The edge of chaos: complex systems exhibit the mo"
       ]
     },
     {
       "fromAgent": "Motivator",
-      "toAgent": "Wordsmith",
-      "insight": "Motivator/causal_inference: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers carry in",
-      "confidence": 0.7165259651176652,
+      "toAgent": "OMNIMENS",
+      "insight": "Motivator/information_compression: The Boltzmann brain paradox suggests that a self-aware entity is more likely to arise",
+      "confidence": 0.7327438406462952,
       "synthesizedWith": [
-        "Wordsmith/feature_extraction: The Chinese Room argument: can a system that manip"
+        "OMNIMENS/cross_domain_synthesis: Predictive coding: the brain constantly generat"
       ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Linguist",
-      "insight": "Empath/abstraction_layer: Synaptic pruning eliminates unused neural connections — the brain optimizes by REMOVING comple",
-      "confidence": 0.6391774175180206,
-      "synthesizedWith": []
+      "toAgent": "Archivist",
+      "insight": "Empath/information_compression: The hippocampus replays experiences during sleep in compressed form — dream consolidatio",
+      "confidence": 0.8972832918915461,
+      "synthesizedWith": [
+        "Archivist/structural_analysis: Quantum entanglement allows particles to share st"
+      ]
     },
     {
       "fromAgent": "Empath",
-      "toAgent": "Neuroscientist",
-      "insight": "Empath/temporal_correlation: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can emerge",
-      "confidence": 0.7060285427885775,
+      "toAgent": "Architect",
+      "insight": "Empath/abstraction_layer: Hebbian learning: neurons that fire together wire together — the fundamental rule of neural pl",
+      "confidence": 0.7363905534451662,
       "synthesizedWith": [
-        "Neuroscientist/emergent_property_detection: The Chinese Room argument: can a sys"
+        "Architect/abstraction_layer: Transfer learning: knowledge gained from one domain"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     }
   ],
   "governorMode": "normal"
