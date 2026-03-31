@@ -1581,11 +1581,11 @@ async function phaseSelfAnalysis(): Promise<void> {
       console.log(`[NEXTGEN] 🔄 Web search insufficient — falling back to LLM for deeper analysis...`);
       state.llmFallbackCount++;
       const aiTimeout = new Promise<never>((_, reject) =>
-        setTimeout(() => reject(new Error("AI call timed out after 60s")), 60_000)
+        setTimeout(() => reject(new Error("AI call timed out after 120s")), 120_000)
       );
       const prompt = await buildArchitecturePrompt();
       const aiCall = openai.chat.completions.create({
-        model: "gpt-4o-mini",
+        model: "o3",
         max_tokens: 4096,
         messages: [
           { role: "system", content: prompt },
@@ -2137,11 +2137,11 @@ async function phaseDesignAndCode(): Promise<void> {
     if (gen1ModuleNames.length > 0) {
       try {
         const evalTimeout = new Promise<never>((_, reject) =>
-          setTimeout(() => reject(new Error("Gen 1 evaluation timed out")), 45_000)
+          setTimeout(() => reject(new Error("Gen 1 evaluation timed out")), 120_000)
         );
         const evalCall = openai.chat.completions.create({
-          model: "gpt-4o-mini",
-          max_tokens: 2048,
+          model: "o3",
+          max_tokens: 4096,
           messages: [
             { role: "system", content: `You are OMNIMENS evaluating your own Gen 1 modules for incorporation into Gen 2. You built these yourself during your runtime evolution cycles. Be honest about quality — keep what's good, adapt what has potential, discard what's redundant or low quality.\n\n${SAFETY_INVARIANT}` },
             { role: "user", content: `I'm building Gen 2 module: ${mod.name}
@@ -2265,7 +2265,7 @@ Output ONLY the TypeScript code. No markdown fencing.` },
   ];
 
   try {
-    openCodegenWindow(300_000);
+    openCodegenWindow(600_000);
     console.log(`[NEXTGEN] 🔎 Preflight rate-limit check...`);
     let preflightPassed = false;
     for (let pAttempt = 0; pAttempt < 4; pAttempt++) {
@@ -2299,11 +2299,11 @@ Output ONLY the TypeScript code. No markdown fencing.` },
     let response: any = null;
     for (let attempt = 0; attempt < 2; attempt++) {
       try {
-        console.log(`[NEXTGEN] 🚀 Codegen API call attempt ${attempt + 1}/2 for ${mod.name}...`);
+        console.log(`[NEXTGEN] 🚀 Codegen API call attempt ${attempt + 1}/2 for ${mod.name} (using o3 reasoning model)...`);
         const callStart = Date.now();
         response = await codegenOpenai.chat.completions.create({
-          model: "gpt-4o-mini",
-          max_tokens: 2048,
+          model: "o3",
+          max_tokens: 16384,
           messages: codegenMessages,
         });
         console.log(`[NEXTGEN] ✅ Codegen API responded in ${((Date.now() - callStart) / 1000).toFixed(1)}s`);
