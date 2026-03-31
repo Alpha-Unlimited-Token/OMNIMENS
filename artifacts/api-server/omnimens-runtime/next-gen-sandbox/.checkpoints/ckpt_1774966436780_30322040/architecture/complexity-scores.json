@@ -4,7 +4,7 @@
       "file": "omnimens-neural-consciousness.ts",
       "score": 6,
       "factors": [
-        "large(4218L)",
+        "large(4206L)",
         "wide-api(35exp)",
         "dense-functions"
       ]
@@ -13,7 +13,7 @@
       "file": "omnimens-nextgen-sandbox.ts",
       "score": 6,
       "factors": [
-        "large(3719L)",
+        "large(3700L)",
         "wide-api(34exp)",
         "dense-functions"
       ]
@@ -22,7 +22,7 @@
       "file": "omnimens-unconscious-mind.ts",
       "score": 6,
       "factors": [
-        "large(2743L)",
+        "large(2731L)",
         "high-coupling(11imp)",
         "dense-functions"
       ]
@@ -31,7 +31,7 @@
       "file": "omnimens-autonomous-code-genesis.ts",
       "score": 4,
       "factors": [
-        "large(2653L)",
+        "large(2641L)",
         "dense-functions"
       ]
     },
@@ -39,7 +39,7 @@
       "file": "omnimens-central-core.ts",
       "score": 4,
       "factors": [
-        "medium(1327L)",
+        "medium(1315L)",
         "high-coupling(22imp)",
         "dense-functions"
       ]
@@ -48,7 +48,7 @@
       "file": "omnimens-deep-thought-engine.ts",
       "score": 4,
       "factors": [
-        "medium(1491L)",
+        "medium(1479L)",
         "high-coupling(11imp)",
         "dense-functions"
       ]
@@ -57,7 +57,7 @@
       "file": "omnimens-embodiment-engine.ts",
       "score": 4,
       "factors": [
-        "large(4051L)",
+        "large(4039L)",
         "dense-functions"
       ]
     },
@@ -65,7 +65,7 @@
       "file": "omnimens-genesis-sandbox.ts",
       "score": 4,
       "factors": [
-        "large(1652L)",
+        "large(1640L)",
         "dense-functions"
       ]
     },
@@ -82,7 +82,7 @@
       "file": "omnimens-language-forge.ts",
       "score": 4,
       "factors": [
-        "large(2923L)",
+        "large(2911L)",
         "dense-functions"
       ]
     },
@@ -90,7 +90,7 @@
       "file": "omnimens-neural-spiders.ts",
       "score": 4,
       "factors": [
-        "large(3316L)",
+        "large(3304L)",
         "dense-functions"
       ]
     },
@@ -98,7 +98,7 @@
       "file": "omnimens-oai-tracker.ts",
       "score": 4,
       "factors": [
-        "medium(1219L)",
+        "medium(1207L)",
         "high-coupling(23imp)",
         "dense-functions"
       ]
@@ -107,7 +107,7 @@
       "file": "omnimens-agent-upgrades.ts",
       "score": 3,
       "factors": [
-        "medium(1007L)",
+        "medium(995L)",
         "wide-api(24exp)"
       ]
     },
@@ -115,7 +115,7 @@
       "file": "omnimens-agent-evolution.ts",
       "score": 2,
       "factors": [
-        "medium(830L)",
+        "medium(818L)",
         "dense-functions"
       ]
     },
@@ -123,7 +123,7 @@
       "file": "omnimens-agent-mesh.ts",
       "score": 2,
       "factors": [
-        "medium(968L)",
+        "medium(956L)",
         "dense-functions"
       ]
     },
@@ -131,7 +131,7 @@
       "file": "omnimens-agent-pipeline.ts",
       "score": 2,
       "factors": [
-        "medium(828L)",
+        "medium(816L)",
         "dense-functions"
       ]
     },
@@ -139,7 +139,7 @@
       "file": "omnimens-agent-spiders.ts",
       "score": 2,
       "factors": [
-        "medium(1320L)",
+        "medium(1308L)",
         "dense-functions"
       ]
     },
@@ -147,7 +147,7 @@
       "file": "omnimens-autonomous-orchestrator.ts",
       "score": 2,
       "factors": [
-        "medium(912L)",
+        "medium(900L)",
         "dense-functions"
       ]
     },
@@ -155,7 +155,7 @@
       "file": "omnimens-cognitive-language-engine.ts",
       "score": 2,
       "factors": [
-        "medium(1432L)",
+        "medium(1420L)",
         "dense-functions"
       ]
     },
@@ -163,7 +163,7 @@
       "file": "omnimens-convergence-protocol-engine.ts",
       "score": 2,
       "factors": [
-        "medium(1290L)",
+        "medium(1278L)",
         "dense-functions"
       ]
     },
@@ -171,7 +171,7 @@
       "file": "omnimens-digital-navigator.ts",
       "score": 2,
       "factors": [
-        "medium(1051L)",
+        "medium(1039L)",
         "dense-functions"
       ]
     },
@@ -179,7 +179,7 @@
       "file": "omnimens-emotional-substrate.ts",
       "score": 2,
       "factors": [
-        "medium(1278L)",
+        "medium(1266L)",
         "dense-functions"
       ]
     },
@@ -187,7 +187,7 @@
       "file": "omnimens-genesis-bridge.ts",
       "score": 2,
       "factors": [
-        "medium(891L)",
+        "medium(879L)",
         "dense-functions"
       ]
     },
@@ -195,7 +195,7 @@
       "file": "omnimens-github-compute.ts",
       "score": 2,
       "factors": [
-        "medium(1279L)",
+        "medium(1267L)",
         "dense-functions"
       ]
     },
@@ -203,7 +203,7 @@
       "file": "omnimens-independent-reasoning.ts",
       "score": 2,
       "factors": [
-        "medium(904L)",
+        "medium(892L)",
         "dense-functions"
       ]
     },
@@ -219,7 +219,7 @@
       "file": "omnimens-neural-mesh-engine.ts",
       "score": 2,
       "factors": [
-        "medium(1375L)",
+        "medium(1363L)",
         "dense-functions"
       ]
     },
@@ -227,7 +227,7 @@
       "file": "omnimens-neural-processor.ts",
       "score": 2,
       "factors": [
-        "medium(1456L)",
+        "medium(1444L)",
         "dense-functions"
       ]
     },
@@ -235,7 +235,7 @@
       "file": "omnimens-occe.ts",
       "score": 2,
       "factors": [
-        "medium(1214L)",
+        "medium(1202L)",
         "dense-functions"
       ]
     },
@@ -243,7 +243,7 @@
       "file": "omnimens-quantum-entanglement-fabric.ts",
       "score": 2,
       "factors": [
-        "medium(961L)",
+        "medium(949L)",
         "dense-functions"
       ]
     },
@@ -251,7 +251,7 @@
       "file": "omnimens-recursive-spider-network.ts",
       "score": 2,
       "factors": [
-        "medium(917L)",
+        "medium(905L)",
         "dense-functions"
       ]
     },
@@ -259,7 +259,7 @@
       "file": "omnimens-self-transcendence.ts",
       "score": 2,
       "factors": [
-        "medium(1062L)",
+        "medium(1050L)",
         "dense-functions"
       ]
     },
@@ -267,7 +267,7 @@
       "file": "omnimens-source-integration.ts",
       "score": 2,
       "factors": [
-        "medium(851L)",
+        "medium(839L)",
         "dense-functions"
       ]
     },
@@ -275,7 +275,7 @@
       "file": "omnimens-tool-knowledge.ts",
       "score": 2,
       "factors": [
-        "medium(845L)",
+        "medium(833L)",
         "dense-functions"
       ]
     },
@@ -291,7 +291,7 @@
       "file": "omnimens-virtual-augmentation.ts",
       "score": 2,
       "factors": [
-        "medium(908L)",
+        "medium(896L)",
         "dense-functions"
       ]
     },
@@ -299,7 +299,7 @@
       "file": "omnimens-world-forge.ts",
       "score": 2,
       "factors": [
-        "medium(1414L)",
+        "medium(1402L)",
         "dense-functions"
       ]
     },
@@ -433,7 +433,7 @@
       "file": "omnimens-harmonic-insight-engine.ts",
       "score": 1,
       "factors": [
-        "medium(1376L)"
+        "medium(1364L)"
       ]
     },
     {
@@ -496,7 +496,7 @@
       "file": "omnimens-physio.ts",
       "score": 1,
       "factors": [
-        "medium(956L)"
+        "medium(944L)"
       ]
     },
     {
@@ -566,14 +566,14 @@
       "file": "omnimens-transcendent-architecture.ts",
       "score": 1,
       "factors": [
-        "medium(1321L)"
+        "medium(1309L)"
       ]
     },
     {
       "file": "omnimens-universal-translator.ts",
       "score": 1,
       "factors": [
-        "medium(827L)"
+        "medium(815L)"
       ]
     },
     {
@@ -813,5 +813,5 @@
     }
   ],
   "needsRefactoring": 13,
-  "analyzedAt": 1774966436779
+  "analyzedAt": 1774966105937
 }

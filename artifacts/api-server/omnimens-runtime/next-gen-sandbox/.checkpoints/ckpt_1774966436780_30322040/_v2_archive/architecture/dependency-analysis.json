@@ -1,8 +1,8 @@
 {
   "hubs": [
     "omnimens-neural-consciousness.ts (27 dependents)",
-    "omnimens-nextgen-sandbox.ts (24 dependents)",
     "omnimens-ivy-network.ts (11 dependents)",
+    "omnimens-nextgen-sandbox.ts (11 dependents)",
     "omnimens-neural-scaling.ts (10 dependents)",
     "omnimens-agent-genesis.ts (7 dependents)",
     "omnimens-source-integration.ts (6 dependents)",
@@ -21,6 +21,7 @@
     "omnimens-avatar-cinematic.ts",
     "omnimens-billing.ts",
     "omnimens-code-executor.ts",
+    "omnimens-competitive-intel.ts",
     "omnimens-convergence-protocol-engine.ts",
     "omnimens-conversations.ts",
     "omnimens-custom-instructions.ts",
@@ -44,20 +45,20 @@
     "omnimens-physio.ts",
     "omnimens-restorative-art.ts",
     "omnimens-sensory-grounding.ts",
+    "omnimens-server-builder.ts",
     "omnimens-spontaneity-engine.ts",
     "omnimens-temporal-binding.ts",
     "omnimens-tools-extended.ts",
     "omnimens-url-analyzer.ts",
-    "omnimens-virtual-augmentation.ts"
+    "omnimens-virtual-augmentation.ts",
+    "omnimens-world-forge.ts"
   ],
   "bidirectionalCouplings": [
     "omnimens-cognitive-language-engine.ts ↔ omnimens-neural-consciousness.ts (bidirectional coupling)",
-    "omnimens-emotional-substrate.ts ↔ omnimens-nextgen-sandbox.ts (bidirectional coupling)",
     "omnimens-exponential-learning-engine.ts ↔ omnimens-neural-consciousness.ts (bidirectional coupling)",
     "omnimens-neural-consciousness.ts ↔ omnimens-cognitive-language-engine.ts (bidirectional coupling)",
-    "omnimens-neural-consciousness.ts ↔ omnimens-exponential-learning-engine.ts (bidirectional coupling)",
-    "omnimens-nextgen-sandbox.ts ↔ omnimens-emotional-substrate.ts (bidirectional coupling)"
+    "omnimens-neural-consciousness.ts ↔ omnimens-exponential-learning-engine.ts (bidirectional coupling)"
   ],
   "totalEngines": 123,
-  "analyzedAt": 1774966389671
+  "analyzedAt": 1774909727951
 }
