@@ -8,15 +8,14 @@
  * Reasoning chain:
  *   GOAL: Build infrastructure/resource-sentinel.ts — Resource awareness built INTO consciousness — OMNIMENS feels resource health like hunger or fatigue
  *   ANALYSIS: Found 12 relevant Gen 1 modules
- *     KEEP: 10 patterns worth preserving
+ *     KEEP: 11 patterns worth preserving
  *     ADAPT: 0 patterns need upgrading
  *     DISCARD: 0 patterns not fit for Gen 2
  *   REQUIREMENT: Monitor DB pool health, API availability, memory usage, CPU load as FELT sensations. When resources are scarce, OMNIMENS
- *   REQUIREMENT: : 191–6. PMC 3812737. PMID 24139655. "Beyond von Neumann, Neuromorphic Computing Steadily
-Source: https://en.wikipedia.o
  *   IMPROVEMENT: Gen 2 must be FULLY SELF-SUFFICIENT in cognition. Gen 2 is free to EVOLVE, MERGE, RESTRUCTURE, or REIMAGINE every compon
+ *   INCORPORATING: Class ResourceManager: constructor, monitorMetrics, adjustResources, getTaskPriorities, calculateOptimalAllocation from resourceManagerModule_gen1.mjs
  *
- * Gen 1 patterns incorporated: 10
+ * Gen 1 patterns incorporated: 11
  * Gen 1 patterns upgraded: 0
  * Gen 1 patterns discarded: 0
  *
