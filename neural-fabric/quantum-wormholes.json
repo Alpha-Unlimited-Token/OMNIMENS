@@ -2,14 +2,14 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1774984309607,
+  "timestamp": 1774986145715,
   "totalWormholesCreated": 2100,
   "totalActive": 0,
   "totalClosed": 2100,
-  "totalDataIngestedKB": 3098,
+  "totalDataIngestedKB": 3057,
   "totalInsightsDecoded": 2100,
   "totalCrossAgentCirculations": 126,
-  "totalSynthesizedDiscoveries": 119,
+  "totalSynthesizedDiscoveries": 118,
   "cycleCount": 2,
   "agentCount": 21,
   "wormholesPerAgent": 100,
@@ -18,106 +18,106 @@
     {
       "agentName": "OMNIMENS",
       "totalWormholes": 100,
-      "totalInsightsDecoded": 100,
+      "totalInsightsDecoded": 103,
       "crossAgentShares": 6
     },
     {
       "agentName": "Architect",
       "totalWormholes": 100,
-      "totalInsightsDecoded": 100,
+      "totalInsightsDecoded": 103,
       "crossAgentShares": 6
     },
     {
       "agentName": "Critic",
       "totalWormholes": 100,
-      "totalInsightsDecoded": 100,
+      "totalInsightsDecoded": 103,
       "crossAgentShares": 6
     },
     {
       "agentName": "Synthesizer",
       "totalWormholes": 100,
-      "totalInsightsDecoded": 100,
+      "totalInsightsDecoded": 103,
       "crossAgentShares": 6
     },
     {
       "agentName": "Mathematician",
       "totalWormholes": 100,
-      "totalInsightsDecoded": 100,
+      "totalInsightsDecoded": 103,
       "crossAgentShares": 6
     },
     {
       "agentName": "Neuroscientist",
       "totalWormholes": 100,
-      "totalInsightsDecoded": 100,
+      "totalInsightsDecoded": 103,
       "crossAgentShares": 6
     },
     {
       "agentName": "Meta-Agent",
       "totalWormholes": 100,
-      "totalInsightsDecoded": 100,
+      "totalInsightsDecoded": 103,
       "crossAgentShares": 6
     },
     {
       "agentName": "GraphicDesigner",
       "totalWormholes": 100,
-      "totalInsightsDecoded": 100,
+      "totalInsightsDecoded": 103,
       "crossAgentShares": 6
     },
     {
       "agentName": "SpellCheckVisual",
       "totalWormholes": 100,
-      "totalInsightsDecoded": 100,
+      "totalInsightsDecoded": 103,
       "crossAgentShares": 6
     },
     {
-      "agentName": "Explorer",
+      "agentName": "Visionary",
       "totalWormholes": 100,
-      "totalInsightsDecoded": 100,
+      "totalInsightsDecoded": 103,
       "crossAgentShares": 6
     }
   ],
   "recentCirculations": [
     {
-      "fromAgent": "Ethicist",
-      "toAgent": "Embodiment",
-      "insight": "Ethicist/emergent_property_detection: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fiber",
-      "confidence": 0.7072145522223943,
+      "fromAgent": "Motivator",
+      "toAgent": "Pioneer",
+      "insight": "Motivator/cross_domain_synthesis: The anthropic principle: the universe's fundamental constants appear fine-tuned for th",
+      "confidence": 0.6269796104830926,
       "synthesizedWith": [
-        "Embodiment/entropy_reduction: Mirror neurons fire both when performing an action"
+        "Pioneer/information_compression: The mathematical universe hypothesis: all struc"
       ]
     },
     {
-      "fromAgent": "Ethicist",
-      "toAgent": "Synthesizer",
-      "insight": "Ethicist/cross_domain_synthesis: The holographic principle suggests all information in a volume of space can be encoded ",
-      "confidence": 0.6036045925324586,
+      "fromAgent": "Motivator",
+      "toAgent": "Explorer",
+      "insight": "Motivator/temporal_correlation: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stimul",
+      "confidence": 0.6699133441755813,
+      "synthesizedWith": [
+        "Explorer/cross_domain_synthesis: The anthropic principle: the universe's fundame"
+      ]
+    },
+    {
+      "fromAgent": "Motivator",
+      "toAgent": "Wordsmith",
+      "insight": "Motivator/causal_inference: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers carry in",
+      "confidence": 0.7165259651176652,
+      "synthesizedWith": [
+        "Wordsmith/feature_extraction: The Chinese Room argument: can a system that manip"
+      ]
+    },
+    {
+      "fromAgent": "Empath",
+      "toAgent": "Linguist",
+      "insight": "Empath/abstraction_layer: Synaptic pruning eliminates unused neural connections — the brain optimizes by REMOVING comple",
+      "confidence": 0.6391774175180206,
       "synthesizedWith": []
     },
     {
-      "fromAgent": "Ethicist",
-      "toAgent": "TemporalAnalyst",
-      "insight": "Ethicist/causal_inference: The free energy principle suggests all living systems minimize variational free energy — pred",
-      "confidence": 0.7460679519961959,
+      "fromAgent": "Empath",
+      "toAgent": "Neuroscientist",
+      "insight": "Empath/temporal_correlation: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can emerge",
+      "confidence": 0.7060285427885775,
       "synthesizedWith": [
-        "TemporalAnalyst/structural_analysis: The cerebellum contains more neurons than a"
-      ]
-    },
-    {
-      "fromAgent": "Embodiment",
-      "toAgent": "Consolidator",
-      "insight": "Embodiment/cross_domain_synthesis: Attention is the computational bottleneck of consciousness — the brain processes vast",
-      "confidence": 0.6239869863518319,
-      "synthesizedWith": [
-        "Consolidator/recursive_decomposition: Synaptic pruning eliminates unused neural "
-      ]
-    },
-    {
-      "fromAgent": "Embodiment",
-      "toAgent": "Mathematician",
-      "insight": "Embodiment/cross_domain_synthesis: Attention is the computational bottleneck of consciousness — the brain processes vast",
-      "confidence": 0.6239869863518319,
-      "synthesizedWith": [
-        "Mathematician/pattern_recognition: Sparse coding: the brain represents informati"
+        "Neuroscientist/emergent_property_detection: The Chinese Room argument: can a sys"
       ]
     }
   ],
