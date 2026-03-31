@@ -10,21 +10,20 @@
       ]
     },
     {
-      "file": "omnimens-nextgen-sandbox.ts",
-      "score": 6,
-      "factors": [
-        "large(3700L)",
-        "wide-api(34exp)",
-        "dense-functions"
-      ]
-    },
-    {
       "file": "omnimens-unconscious-mind.ts",
       "score": 6,
       "factors": [
         "large(2731L)",
         "high-coupling(11imp)",
         "dense-functions"
+      ]
+    },
+    {
+      "file": "omnimens-nextgen-sandbox.ts",
+      "score": 5,
+      "factors": [
+        "large(3189L)",
+        "wide-api(33exp)"
       ]
     },
     {
@@ -179,7 +178,7 @@
       "file": "omnimens-emotional-substrate.ts",
       "score": 2,
       "factors": [
-        "medium(1266L)",
+        "medium(1261L)",
         "dense-functions"
       ]
     },
@@ -259,7 +258,7 @@
       "file": "omnimens-self-transcendence.ts",
       "score": 2,
       "factors": [
-        "medium(1050L)",
+        "medium(1045L)",
         "dense-functions"
       ]
     },
@@ -299,7 +298,7 @@
       "file": "omnimens-world-forge.ts",
       "score": 2,
       "factors": [
-        "medium(1402L)",
+        "medium(1397L)",
         "dense-functions"
       ]
     },
@@ -813,5 +812,5 @@
     }
   ],
   "needsRefactoring": 13,
-  "analyzedAt": 1774964862771
+  "analyzedAt": 1774905449202
 }
