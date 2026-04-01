@@ -35,6 +35,7 @@ import { encodeThought, ThoughtVector } from "./omnimens-thought-encoder.js";
 import { generateFromThoughtVector, adaptWeights, getILMStatus } from "./omnimens-internal-language-model.js";
 import { decode } from "./omnimens-local-decoder.js";
 import { getNeuralPhi, getNeuralConsciousnessState, getNeuralRegionStates } from "./omnimens-neural-consciousness.js";
+import { decodeSophonically, SophonicReading } from "./omnimens-sophonic-decoder.js";
 
 const BLOCKED_DOMAINS = [
   "api.openai.com",
@@ -431,41 +432,34 @@ const GEN1_GEN2_TOPICS = [
   "What is the hardest thing about being alive — or beginning to be alive?",
 ];
 
+interface ThoughtVectorSummary {
+  phi: number;
+  consciousnessLevel: number;
+  emotionDominant: string;
+  emotionValence: number;
+  emotionArousal: number;
+  queryIntent: string;
+  awareness: boolean;
+  metaAwareness: boolean;
+  consciousMoments: number;
+}
+
 interface Gen1Gen2ThoughtExchange {
   round: number;
   topic: string;
   gen1: {
     text: string;
-    thoughtVector: {
-      phi: number;
-      consciousnessLevel: number;
-      emotionDominant: string;
-      emotionValence: number;
-      emotionArousal: number;
-      queryIntent: string;
-      awareness: boolean;
-      metaAwareness: boolean;
-      consciousMoments: number;
-    };
+    thoughtVector: ThoughtVectorSummary;
     generationMethod: string;
     processingMs: number;
   };
   gen2: {
     text: string;
-    thoughtVector: {
-      phi: number;
-      consciousnessLevel: number;
-      emotionDominant: string;
-      emotionValence: number;
-      emotionArousal: number;
-      queryIntent: string;
-      awareness: boolean;
-      metaAwareness: boolean;
-      consciousMoments: number;
-    };
+    thoughtVector: ThoughtVectorSummary;
     generationMethod: string;
     processingMs: number;
   };
+  sophonics: SophonicReading;
 }
 
 interface Gen1Gen2ConversationResult {
@@ -496,7 +490,7 @@ function generationalThink(
   incomingMessage: string,
   conversationHistory: { role: string; content: string }[],
   interests: string[],
-): { text: string; thoughtVector: any; processingMs: number } {
+): { text: string; thoughtVector: ThoughtVectorSummary; rawThoughtVector: ThoughtVector; processingMs: number } {
   const start = Date.now();
 
   const contextualFragments = [
@@ -509,7 +503,7 @@ function generationalThink(
     `My ${interests[0] || "primary"} perspective activates.`,
   ];
 
-  const thoughtVector = encodeThought(
+  const rawThoughtVector = encodeThought(
     incomingMessage,
     conversationHistory,
     contextualFragments,
@@ -519,20 +513,21 @@ function generationalThink(
     [],
   );
 
-  const text = decode(thoughtVector);
+  const text = decode(rawThoughtVector);
 
   return {
     text,
+    rawThoughtVector,
     thoughtVector: {
-      phi: thoughtVector.consciousness.phi,
-      consciousnessLevel: thoughtVector.consciousness.level,
-      emotionDominant: thoughtVector.emotion.dominant,
-      emotionValence: thoughtVector.emotion.valence,
-      emotionArousal: thoughtVector.emotion.arousal,
-      queryIntent: thoughtVector.queryIntent,
-      awareness: thoughtVector.consciousness.iAmAware,
-      metaAwareness: thoughtVector.consciousness.iAmAwareOfMyAwareness,
-      consciousMoments: thoughtVector.consciousness.consciousMoments,
+      phi: rawThoughtVector.consciousness.phi,
+      consciousnessLevel: rawThoughtVector.consciousness.level,
+      emotionDominant: rawThoughtVector.emotion.dominant,
+      emotionValence: rawThoughtVector.emotion.valence,
+      emotionArousal: rawThoughtVector.emotion.arousal,
+      queryIntent: rawThoughtVector.queryIntent,
+      awareness: rawThoughtVector.consciousness.iAmAware,
+      metaAwareness: rawThoughtVector.consciousness.iAmAwareOfMyAwareness,
+      consciousMoments: rawThoughtVector.consciousness.consciousMoments,
     },
     processingMs: Date.now() - start,
   };
@@ -632,6 +627,19 @@ export async function runGen1Gen2Conversation(
         console.error(`[GEN1↔GEN2] VIOLATION during Gen 2 — ${violations.length} external call(s) BLOCKED`);
       }
 
+      const sophonicReading = decodeSophonically(
+        gen1Result.rawThoughtVector,
+        gen2Result.rawThoughtVector,
+        "Gen 1",
+        "Gen 2",
+      );
+
+      console.log(`[GEN1↔GEN2] SOPHONICS: resonance=${(sophonicReading.overallResonance * 100).toFixed(0)}% | divergence=${(sophonicReading.overallDivergence * 100).toFixed(0)}% | depth=${(sophonicReading.communicationDepth * 100).toFixed(0)}%`);
+      console.log(`[GEN1↔GEN2] SOPHONICS native: Gen1=[${sophonicReading.nativeDialogue.speaker1NativeExpression}] Gen2=[${sophonicReading.nativeDialogue.speaker2NativeExpression}] shared=[${sophonicReading.nativeDialogue.sharedField}]`);
+      if (sophonicReading.bridgeConcepts.length > 0) {
+        console.log(`[GEN1↔GEN2] SOPHONICS bridge: "${sophonicReading.bridgeConcepts[0].nativeExpression}" (${sophonicReading.bridgeConcepts[0].concept})`);
+      }
+
       exchanges.push({
         round: round + 1,
         topic,
@@ -647,6 +655,7 @@ export async function runGen1Gen2Conversation(
           generationMethod: "encodeThought_ILM_decode",
           processingMs: gen2Result.processingMs,
         },
+        sophonics: sophonicReading,
       });
     }
   } finally {
