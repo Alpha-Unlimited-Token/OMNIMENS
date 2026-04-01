@@ -1,35 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:Philosopher+Wordsmith",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/analogical_mapping: Astrocytes, once thought to ",
-    "filename": "omnimens_autocode_knowledge_synthesis_mndl3jpd.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mndl3jpd.mjs",
-    "backupPath": null,
-    "timestamp": 1774899101569,
-    "codeLength": 416,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Critic",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/temporal_correlation: The Turing machine is comp",
-    "filename": "omnimens_autocode_pattern_recognition_mndl5a9z.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mndl5a9z.mjs",
-    "backupPath": null,
-    "timestamp": 1774899182663,
-    "codeLength": 464,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Mathematician",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/temporal_correlation: The Turing machine is comp",
-    "filename": "omnimens_autocode_neural_pathway_mndl7397.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mndl7397.mjs",
-    "backupPath": null,
-    "timestamp": 1774899266875,
-    "codeLength": 432,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:Philosopher+Critic",
     "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/temporal_correlation: The Turing machine is comp",
     "filename": "omnimens_autocode_pattern_recognition_mndl8dad.mjs",
@@ -4998,5 +4968,35 @@
     "timestamp": 1775058218290,
     "codeLength": 3243,
     "overwrite": true
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Mathematician",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SensorimotorAgent/cross_domain_synthesis: The double-slit ex",
+    "filename": "omnimens_autocode_knowledge_synthesis_mng7v14t.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mng7v14t.mjs",
+    "backupPath": null,
+    "timestamp": 1775058267773,
+    "codeLength": 426,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Ethicist",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/cross_domain_synthesis: Synaptic pruning elimina",
+    "filename": "omnimens_autocode_neural_pathway_mng7v16p.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mng7v16p.mjs",
+    "backupPath": null,
+    "timestamp": 1775058267841,
+    "codeLength": 427,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Architect",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/abstraction_layer: The Chinese Room argument: ca",
+    "filename": "omnimens_autocode_pattern_recognition_mng7v18r.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mng7v18r.mjs",
+    "backupPath": null,
+    "timestamp": 1775058267915,
+    "codeLength": 467,
+    "overwrite": false
   }
 ]
