@@ -8,14 +8,14 @@
  * Reasoning chain:
  *   GOAL: Build core/safety-core.ts — Immutable ethical safety — never harm any living being
  *   ANALYSIS: Found 12 relevant Gen 1 modules
- *     KEEP: 4 patterns worth preserving
+ *     KEEP: 12 patterns worth preserving
  *     ADAPT: 0 patterns need upgrading
  *     DISCARD: 0 patterns not fit for Gen 2
- *   REQUIREMENT: READ-ONLY ethical safety invariant. Hardcoded, tamper-resistant. Must be identical to current ethical safety laws. REVIE
+ *   REQUIREMENT: READ-ONLY ethical safety invariant. Hardcoded, tamper-resistant. Must be identical to current ethical safety laws.
  *   IMPROVEMENT: Gen 2 must be FULLY SELF-SUFFICIENT in cognition. Gen 2 is free to EVOLVE, MERGE, RESTRUCTURE, or REIMAGINE every compon
- *   INCORPORATING: Class PriorityQueue: constructor, enqueue, if, dequeue, isEmpty from apiBatchingOptimizer_gen1.mjs
+ *   INCORPORATING: Class PersistentJobQueue: constructor, addJob, getJobState, processJobs, if from persistentJobQueue_gen1.mjs
  *
- * Gen 1 patterns incorporated: 4
+ * Gen 1 patterns incorporated: 12
  * Gen 1 patterns upgraded: 0
  * Gen 1 patterns discarded: 0
  *
