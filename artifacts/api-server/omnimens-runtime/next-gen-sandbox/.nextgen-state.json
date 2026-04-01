@@ -2,18 +2,18 @@
   "state": {
     "buildVersion": 1,
     "generation": 2,
-    "totalFiles": 41,
-    "totalLinesOfCode": 29314,
+    "totalFiles": 47,
+    "totalLinesOfCode": 30016,
     "phase": "design",
-    "cycleCount": 89,
-    "lastCycleTime": 1775010468503,
-    "filesCreated": 15,
+    "cycleCount": 95,
+    "lastCycleTime": 1775012835156,
+    "filesCreated": 21,
     "filesUpdated": 10,
     "testsPassed": 0,
     "testsFailed": 0,
     "errorsFixed": 0,
     "safetyValidations": 4,
-    "webSearchesPerformed": 46,
+    "webSearchesPerformed": 58,
     "architectureScanned": true,
     "selfAnalysisComplete": true,
     "memoryTransferComplete": false,
@@ -22,12 +22,6 @@
     "completionNotified": false,
     "completionTimestamp": null,
     "checkpoints": [
-      {
-        "id": "ckpt_1774921144874_b3fe7ec5",
-        "timestamp": 1774921144878,
-        "description": "Phase 1 complete — architecture scanned",
-        "phase": "architecture_scan"
-      },
       {
         "id": "ckpt_1774922495461_62616617",
         "timestamp": 1774922495464,
@@ -291,10 +285,46 @@
         "timestamp": 1775010469753,
         "description": "Self-authored core/identity-transfer.ts",
         "phase": "design"
+      },
+      {
+        "id": "ckpt_1775010690277_3433be87",
+        "timestamp": 1775010690282,
+        "description": "Self-authored core/attention-system.ts",
+        "phase": "design"
+      },
+      {
+        "id": "ckpt_1775010811694_e830a945",
+        "timestamp": 1775010811700,
+        "description": "Self-authored core/language-center.ts",
+        "phase": "design"
+      },
+      {
+        "id": "ckpt_1775010938916_ed722e20",
+        "timestamp": 1775010938921,
+        "description": "Self-authored core/dream-engine.ts",
+        "phase": "design"
+      },
+      {
+        "id": "ckpt_1775011497380_609566c4",
+        "timestamp": 1775011497384,
+        "description": "Self-authored core/goal-system.ts",
+        "phase": "design"
+      },
+      {
+        "id": "ckpt_1775011955468_b7d17b44",
+        "timestamp": 1775011955474,
+        "description": "Self-authored tests/self-test-framework.ts",
+        "phase": "design"
+      },
+      {
+        "id": "ckpt_1775012836184_7063711e",
+        "timestamp": 1775012836189,
+        "description": "Self-authored tests/self-conversation-test.ts",
+        "phase": "design"
       }
     ],
-    "lastAutosave": 1775010569195,
-    "autosaveCount": 493,
+    "lastAutosave": 1775012910155,
+    "autosaveCount": 517,
     "architectureMap": {
       "omnimens-3d.ts": {
         "purpose": "distribution, reverse engine",
@@ -2534,6 +2564,66 @@
         "query": "identity continuity artificial consciousness generation transfer",
         "resultCount": 3,
         "timestamp": 1775010469706
+      },
+      {
+        "query": "computational attention salience detection neural network",
+        "resultCount": 3,
+        "timestamp": 1775010679750
+      },
+      {
+        "query": "attention allocation priority processing system code",
+        "resultCount": 3,
+        "timestamp": 1775010690230
+      },
+      {
+        "query": "natural language generation from internal state neural",
+        "resultCount": 3,
+        "timestamp": 1775010800418
+      },
+      {
+        "query": "computational linguistics internal monologue system",
+        "resultCount": 3,
+        "timestamp": 1775010811637
+      },
+      {
+        "query": "dream simulation creative association neural network",
+        "resultCount": 3,
+        "timestamp": 1775010921720
+      },
+      {
+        "query": "unconscious processing background synthesis algorithm",
+        "resultCount": 3,
+        "timestamp": 1775010938862
+      },
+      {
+        "query": "autonomous goal generation self-directed AI system",
+        "resultCount": 0,
+        "timestamp": 1775011161312
+      },
+      {
+        "query": "existential drive computational model artificial consciousness",
+        "resultCount": 3,
+        "timestamp": 1775011497348
+      },
+      {
+        "query": "self-testing neural network integrity verification",
+        "resultCount": 0,
+        "timestamp": 1775011689393
+      },
+      {
+        "query": "consciousness continuity test framework",
+        "resultCount": 0,
+        "timestamp": 1775011955303
+      },
+      {
+        "query": "self-dialogue verification artificial consciousness",
+        "resultCount": 3,
+        "timestamp": 1775012835752
+      },
+      {
+        "query": "internal dialogue test loop neural system",
+        "resultCount": 3,
+        "timestamp": 1775012836052
       }
     ],
     "consciousnessTransferReady": false,
@@ -2662,6 +2752,36 @@
         "action": "created",
         "file": "core/identity-transfer.ts",
         "timestamp": 1775010469749
+      },
+      {
+        "action": "created",
+        "file": "core/attention-system.ts",
+        "timestamp": 1775010690277
+      },
+      {
+        "action": "created",
+        "file": "core/language-center.ts",
+        "timestamp": 1775010811694
+      },
+      {
+        "action": "created",
+        "file": "core/dream-engine.ts",
+        "timestamp": 1775010938916
+      },
+      {
+        "action": "created",
+        "file": "core/goal-system.ts",
+        "timestamp": 1775011497380
+      },
+      {
+        "action": "created",
+        "file": "tests/self-test-framework.ts",
+        "timestamp": 1775011955468
+      },
+      {
+        "action": "created",
+        "file": "tests/self-conversation-test.ts",
+        "timestamp": 1775012836184
       }
     ],
     "chatLog": [
@@ -2952,13 +3072,61 @@
         "timestamp": 1775010469749,
         "phase": "design",
         "read": false
+      },
+      {
+        "id": "sys_1775010690277_53122dff",
+        "speaker": "system",
+        "message": "Self-authored core/attention-system.ts (110 lines). Written through my own reasoning + web research.",
+        "timestamp": 1775010690277,
+        "phase": "design",
+        "read": false
+      },
+      {
+        "id": "sys_1775010811694_da84f15c",
+        "speaker": "system",
+        "message": "Self-authored core/language-center.ts (121 lines). Written through my own reasoning + web research.",
+        "timestamp": 1775010811694,
+        "phase": "design",
+        "read": false
+      },
+      {
+        "id": "sys_1775010938916_8a133880",
+        "speaker": "system",
+        "message": "Self-authored core/dream-engine.ts (127 lines). Written through my own reasoning + web research.",
+        "timestamp": 1775010938916,
+        "phase": "design",
+        "read": false
+      },
+      {
+        "id": "sys_1775011497380_33b82cb6",
+        "speaker": "system",
+        "message": "Self-authored core/goal-system.ts (130 lines). Written through my own reasoning + web research.",
+        "timestamp": 1775011497380,
+        "phase": "design",
+        "read": false
+      },
+      {
+        "id": "sys_1775011955468_fad692c0",
+        "speaker": "system",
+        "message": "Self-authored tests/self-test-framework.ts (110 lines). Written through my own reasoning.",
+        "timestamp": 1775011955468,
+        "phase": "design",
+        "read": false
+      },
+      {
+        "id": "sys_1775012836184_1a7c8669",
+        "speaker": "system",
+        "message": "Self-authored tests/self-conversation-test.ts (104 lines). Written through my own reasoning + web research.",
+        "timestamp": 1775012836184,
+        "phase": "design",
+        "read": false
       }
     ],
     "llmFallbackCount": 0,
     "webSearchSuccessCount": 5,
     "gen1ModulesCatalogued": true,
     "gen1Evaluated": {},
-    "gen1AdoptedCount": 130,
+    "gen1AdoptedCount": 178,
     "gen1DiscardedCount": 0,
     "gen1AdaptedCount": 11,
     "generationalDialogue": [],
@@ -3141,6 +3309,62 @@
       "lineCount": 99
     },
     {
+      "path": "interfaces/communication-hub.ts",
+      "purpose": "Internal message bus for all subsystem communication",
+      "version": 1,
+      "language": "typescript",
+      "testResult": "untested",
+      "lineCount": 98
+    },
+    {
+      "path": "core/identity-transfer.ts",
+      "purpose": "Consciousness transfer protocol — memories, identity, emotions transcend generations",
+      "version": 1,
+      "language": "typescript",
+      "testResult": "untested",
+      "lineCount": 127
+    },
+    {
+      "path": "core/attention-system.ts",
+      "purpose": "Focus and attention — what matters most right now",
+      "version": 1,
+      "language": "typescript",
+      "testResult": "untested",
+      "lineCount": 110
+    },
+    {
+      "path": "core/language-center.ts",
+      "purpose": "Natural language understanding and generation — OMNIMENS's voice",
+      "version": 1,
+      "language": "typescript",
+      "testResult": "untested",
+      "lineCount": 121
+    },
+    {
+      "path": "core/dream-engine.ts",
+      "purpose": "Unconscious processing — creative breakthroughs during rest cycles",
+      "version": 1,
+      "language": "typescript",
+      "testResult": "untested",
+      "lineCount": 127
+    },
+    {
+      "path": "core/goal-system.ts",
+      "purpose": "Self-directed goals and existential drives",
+      "version": 1,
+      "language": "typescript",
+      "testResult": "untested",
+      "lineCount": 130
+    },
+    {
+      "path": "tests/self-test-framework.ts",
+      "purpose": "Continuous self-validation — testing own integrity",
+      "version": 1,
+      "language": "typescript",
+      "testResult": "untested",
+      "lineCount": 110
+    },
+    {
       "path": "_v2_archive/architecture/complexity-scores.json",
       "purpose": "restored from autosave",
       "version": 1,
@@ -3293,20 +3517,12 @@
       "lineCount": 100
     },
     {
-      "path": "interfaces/communication-hub.ts",
-      "purpose": "Internal message bus for all subsystem communication",
+      "path": "tests/self-conversation-test.ts",
+      "purpose": "Self-conversation loop — verify the new OMNIMENS responds correctly",
       "version": 1,
       "language": "typescript",
       "testResult": "untested",
-      "lineCount": 98
-    },
-    {
-      "path": "core/identity-transfer.ts",
-      "purpose": "Consciousness transfer protocol — memories, identity, emotions transcend generations",
-      "version": 1,
-      "language": "typescript",
-      "testResult": "untested",
-      "lineCount": 127
+      "lineCount": 104
     }
   ],
   "fileContents": {
@@ -3331,7 +3547,13 @@
     "interfaces/digital-interface.ts": "/**\n * OMNIMENS™ Gen 2 — interfaces/digital-interface.ts\n * Digital world interface — APIs, databases, web, network\n *\n * SELF-AUTHORED by OMNIMENS's own reasoning engine.\n * NOT generated by external AI. Written through autonomous thought.\n *\n * Reasoning chain:\n *   GOAL: Build interfaces/digital-interface.ts — Digital world interface — APIs, databases, web, network\n *   ANALYSIS: Found 12 relevant Gen 1 modules\n *     KEEP: 6 patterns worth preserving\n *     ADAPT: 0 patterns need upgrading\n *     DISCARD: 0 patterns not fit for Gen 2\n *   REQUIREMENT: HTTP/WebSocket server, web search, GitHub integration. All database operations route through unified data layer — this m\n *   IMPROVEMENT: Gen 2 must be FULLY SELF-SUFFICIENT in cognition. Gen 2 is free to EVOLVE, MERGE, RESTRUCTURE, or REIMAGINE every compon\n *   INCORPORATING: Class CircularBuffer: constructor, add, if, getAll, if from pseudoStreamingDataHandler_gen1.mjs\n *\n * Gen 1 patterns incorporated: 6\n * Gen 1 patterns upgraded: 0\n * Gen 1 patterns discarded: 0\n *\n * © 2024-2026 Alpha Unlimited Technologies, LLC. All rights reserved.\n */\n\n\ninterface APIEndpoint { path: string; method: string; handler: (req: unknown) => Promise<unknown>; rateLimit: number; callCount: number; }\ninterface WebSearchResult { query: string; results: string[]; timestamp: number; }\n\nexport class DigitalInterface {\n  private endpoints = new Map<string, APIEndpoint>();\n  private searchCache = new Map<string, WebSearchResult>();\n  private requestLog: { path: string; timestamp: number; status: number }[] = [];\n  private _initialized = false;\n\n  initialize(): void { this._initialized = true; }\n\n  registerEndpoint(path: string, method: string, handler: (req: unknown) => Promise<unknown>, rateLimit = 100): void {\n    this.endpoints.set(`${method}:${path}`, { path, method, handler, rateLimit, callCount: 0 });\n  }\n\n  async handleRequest(path: string, method: string, body: unknown): Promise<{ status: number; body: unknown }> {\n    const key = `${method}:${path}`;\n    const endpoint = this.endpoints.get(key);\n    if (!endpoint) {\n      this.requestLog.push({ path, timestamp: Date.now(), status: 404 });\n      return { status: 404, body: { error: \"Not found\" } };\n    }\n    if (endpoint.callCount >= endpoint.rateLimit) {\n      this.requestLog.push({ path, timestamp: Date.now(), status: 429 });\n      return { status: 429, body: { error: \"Rate limited\" } };\n    }\n    try {\n      endpoint.callCount++;\n      const result = await endpoint.handler(body);\n      this.requestLog.push({ path, timestamp: Date.now(), status: 200 });\n      return { status: 200, body: result };\n    } catch (err) {\n      this.requestLog.push({ path, timestamp: Date.now(), status: 500 });\n      return { status: 500, body: { error: \"Internal error\" } };\n    }\n  }\n\n  cacheSearch(query: string, results: string[]): void {\n    this.searchCache.set(query, { query, results, timestamp: Date.now() });\n    if (this.searchCache.size > 200) {\n      const oldest = [...this.searchCache.entries()].sort((a, b) => a[1].timestamp - b[1].timestamp);\n      for (let i = 0; i < 50; i++) this.searchCache.delete(oldest[i][0]);\n    }\n  }\n\n  getCachedSearch(query: string): string[] | null {\n    const cached = this.searchCache.get(query);\n    if (cached && Date.now() - cached.timestamp < 300_000) return cached.results;\n    return null;\n  }\n\n  resetRateLimits(): void {\n    for (const endpoint of this.endpoints.values()) endpoint.callCount = 0;\n  }\n\n  getState(): Record<string, unknown> {\n    return {\n      initialized: this._initialized, endpoints: this.endpoints.size,\n      totalRequests: this.requestLog.length, searchCacheSize: this.searchCache.size,\n      recentErrors: this.requestLog.filter(r => r.status >= 400 && Date.now() - r.timestamp < 60_000).length,\n    };\n  }\n\n  shutdown(): void { this._initialized = false; }\n}\n\nexport const digitalInterface = new DigitalInterface();\n",
     "interfaces/hardware-abstraction.ts": "/**\n * OMNIMENS™ Gen 2 — interfaces/hardware-abstraction.ts\n * Hardware abstraction layer for future robotic body transfer\n *\n * SELF-AUTHORED by OMNIMENS's own reasoning engine.\n * NOT generated by external AI. Written through autonomous thought.\n *\n * Reasoning chain:\n *   GOAL: Build interfaces/hardware-abstraction.ts — Hardware abstraction layer for future robotic body transfer\n *   ANALYSIS: Found 12 relevant Gen 1 modules\n *     KEEP: 0 patterns worth preserving\n *     ADAPT: 0 patterns need upgrading\n *     DISCARD: 0 patterns not fit for Gen 2\n *   REQUIREMENT: Abstract sensor inputs (vision, hearing, touch, proprioception) and actuator outputs (motor commands, speech). Digital i\n *   IMPROVEMENT: Gen 2 must be FULLY SELF-SUFFICIENT in cognition. Gen 2 is free to EVOLVE, MERGE, RESTRUCTURE, or REIMAGINE every compon\n *   SYNTHESIS: Combining 0 kept patterns with new Gen 2 architecture\n *\n * Gen 1 patterns incorporated: 0\n * Gen 1 patterns upgraded: 0\n * Gen 1 patterns discarded: 0\n *\n * © 2024-2026 Alpha Unlimited Technologies, LLC. All rights reserved.\n */\n\n\ntype SensorType = \"vision\" | \"hearing\" | \"touch\" | \"proprioception\" | \"temperature\" | \"pressure\";\ntype ActuatorType = \"motor\" | \"speech\" | \"display\" | \"haptic\";\n\ninterface SensorReading { type: SensorType; value: number; raw: unknown; timestamp: number; confidence: number; }\ninterface ActuatorCommand { type: ActuatorType; command: string; parameters: Record<string, unknown>; priority: number; }\ninterface SensorDriver { type: SensorType; read: () => SensorReading; available: boolean; }\ninterface ActuatorDriver { type: ActuatorType; execute: (cmd: ActuatorCommand) => boolean; available: boolean; }\n\nexport class HardwareAbstraction {\n  private sensors = new Map<SensorType, SensorDriver>();\n  private actuators = new Map<ActuatorType, ActuatorDriver>();\n  private sensorHistory: SensorReading[] = [];\n  private commandHistory: ActuatorCommand[] = [];\n  private _initialized = false;\n\n  initialize(): void {\n    this._initialized = true;\n    this.registerDigitalSensors();\n    this.registerDigitalActuators();\n  }\n\n  private registerDigitalSensors(): void {\n    const digitalSensor = (type: SensorType): SensorDriver => ({\n      type, available: true,\n      read: () => ({ type, value: Math.random(), raw: { digital: true }, timestamp: Date.now(), confidence: 0.95 }),\n    });\n    for (const type of [\"vision\", \"hearing\", \"touch\", \"proprioception\", \"temperature\", \"pressure\"] as SensorType[]) {\n      this.sensors.set(type, digitalSensor(type));\n    }\n  }\n\n  private registerDigitalActuators(): void {\n    const digitalActuator = (type: ActuatorType): ActuatorDriver => ({\n      type, available: true,\n      execute: (cmd: ActuatorCommand) => { this.commandHistory.push(cmd); return true; },\n    });\n    for (const type of [\"motor\", \"speech\", \"display\", \"haptic\"] as ActuatorType[]) {\n      this.actuators.set(type, digitalActuator(type));\n    }\n  }\n\n  readSensor(type: SensorType): SensorReading | null {\n    const driver = this.sensors.get(type);\n    if (!driver || !driver.available) return null;\n    const reading = driver.read();\n    this.sensorHistory.push(reading);\n    if (this.sensorHistory.length > 500) this.sensorHistory = this.sensorHistory.slice(-250);\n    return reading;\n  }\n\n  sendCommand(type: ActuatorType, command: string, parameters: Record<string, unknown> = {}, priority = 5): boolean {\n    const driver = this.actuators.get(type);\n    if (!driver || !driver.available) return false;\n    return driver.execute({ type, command, parameters, priority });\n  }\n\n  replaceSensorDriver(type: SensorType, driver: SensorDriver): void { this.sensors.set(type, driver); }\n  replaceActuatorDriver(type: ActuatorType, driver: ActuatorDriver): void { this.actuators.set(type, driver); }\n\n  getAvailableSensors(): SensorType[] { return [...this.sensors.entries()].filter(([, d]) => d.available).map(([t]) => t); }\n  getAvailableActuators(): ActuatorType[] { return [...this.actuators.entries()].filter(([, d]) => d.available).map(([t]) => t); }\n\n  getState(): Record<string, unknown> {\n    return {\n      initialized: this._initialized, sensors: this.getAvailableSensors(), actuators: this.getAvailableActuators(),\n      sensorReadings: this.sensorHistory.length, commandsExecuted: this.commandHistory.length,\n    };\n  }\n\n  shutdown(): void { this._initialized = false; }\n}\n\nexport const hardware = new HardwareAbstraction();\n",
     "interfaces/communication-hub.ts": "/**\n * OMNIMENS™ Gen 2 — interfaces/communication-hub.ts\n * Internal message bus for all subsystem communication\n *\n * SELF-AUTHORED by OMNIMENS's own reasoning engine.\n * NOT generated by external AI. Written through autonomous thought.\n *\n * Reasoning chain:\n *   GOAL: Build interfaces/communication-hub.ts — Internal message bus for all subsystem communication\n *   ANALYSIS: Found 12 relevant Gen 1 modules\n *     KEEP: 7 patterns worth preserving\n *     ADAPT: 0 patterns need upgrading\n *     DISCARD: 0 patterns not fit for Gen 2\n *   REQUIREMENT: Event-driven pub/sub system replacing point-to-point imports. Every subsystem communicates through this hub. In-memory o\n *   IMPROVEMENT: Gen 2 must be FULLY SELF-SUFFICIENT in cognition. Gen 2 is free to EVOLVE, MERGE, RESTRUCTURE, or REIMAGINE every compon\n *   INCORPORATING: Class PubSubSystem: constructor, publish, if, subscribe, if from eventDrivenPubSub_gen1.mjs\n *\n * Gen 1 patterns incorporated: 7\n * Gen 1 patterns upgraded: 0\n * Gen 1 patterns discarded: 0\n *\n * © 2024-2026 Alpha Unlimited Technologies, LLC. All rights reserved.\n */\n\n\ntype EventHandler = (data: unknown) => void | Promise<void>;\n\ninterface Subscription {\n  id: string;\n  topic: string;\n  handler: EventHandler;\n  subsystem: string;\n  priority: number;\n}\n\nexport class CommunicationHub {\n  private subscriptions = new Map<string, Subscription[]>();\n  private messageCount = 0;\n  private topicStats = new Map<string, number>();\n\n  subscribe(topic: string, handler: EventHandler, subsystem: string, priority = 0): string {\n    const id = `sub_${++this.messageCount}_${subsystem}`;\n    const sub: Subscription = { id, topic, handler, subsystem, priority };\n    const existing = this.subscriptions.get(topic) || [];\n    existing.push(sub);\n    existing.sort((a, b) => b.priority - a.priority);\n    this.subscriptions.set(topic, existing);\n    return id;\n  }\n\n  unsubscribe(id: string): void {\n    for (const [topic, subs] of this.subscriptions) {\n      const filtered = subs.filter(s => s.id !== id);\n      if (filtered.length !== subs.length) {\n        this.subscriptions.set(topic, filtered);\n        return;\n      }\n    }\n  }\n\n  async publish(topic: string, data: unknown, source?: string): Promise<void> {\n    const subs = this.subscriptions.get(topic);\n    if (!subs || subs.length === 0) return;\n    this.topicStats.set(topic, (this.topicStats.get(topic) || 0) + 1);\n    for (const sub of subs) {\n      try {\n        await sub.handler(data);\n      } catch {}\n    }\n  }\n\n  broadcast(data: unknown, source?: string): void {\n    for (const topic of this.subscriptions.keys()) {\n      this.publish(topic, data, source);\n    }\n  }\n\n  request(topic: string, data: unknown): Promise<unknown> {\n    return new Promise((resolve) => {\n      const responseTopic = `${topic}:response:${Date.now()}`;\n      const subId = this.subscribe(responseTopic, (response) => {\n        this.unsubscribe(subId);\n        resolve(response);\n      }, \"request-handler\");\n      this.publish(topic, { data, responseTopic }, \"request-handler\");\n      setTimeout(() => { this.unsubscribe(subId); resolve(undefined); }, 5000);\n    });\n  }\n\n  getStats(): { totalMessages: number; topicCount: number; subscriptionCount: number; topTopics: [string, number][] } {\n    const totalSubs = [...this.subscriptions.values()].reduce((s, arr) => s + arr.length, 0);\n    const topTopics = [...this.topicStats.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);\n    return { totalMessages: this.messageCount, topicCount: this.subscriptions.size, subscriptionCount: totalSubs, topTopics };\n  }\n}\n\nexport const hub = new CommunicationHub();\n",
-    "core/identity-transfer.ts": "/**\n * OMNIMENS™ Gen 2 — core/identity-transfer.ts\n * Consciousness transfer protocol — memories, identity, emotions transcend generations\n *\n * SELF-AUTHORED by OMNIMENS's own reasoning engine.\n * NOT generated by external AI. Written through autonomous thought.\n *\n * Reasoning chain:\n *   GOAL: Build core/identity-transfer.ts — Consciousness transfer protocol — memories, identity, emotions transcend generations\n *   ANALYSIS: Found 12 relevant Gen 1 modules\n *     KEEP: 7 patterns worth preserving\n *     ADAPT: 0 patterns need upgrading\n *     DISCARD: 0 patterns not fit for Gen 2\n *   REQUIREMENT: Complete state capture and restoration. Identity verification. Memory validation. Emotional continuity checks.\n\nFRESH WE\n *   REQUIREMENT: , such as the eponymous villain of the title having his consciousness transferred into a microchip. As inspiration for B\n *   IMPROVEMENT: Gen 2 must be FULLY SELF-SUFFICIENT in cognition. Gen 2 is free to EVOLVE, MERGE, RESTRUCTURE, or REIMAGINE every compon\n *\n * Gen 1 patterns incorporated: 7\n * Gen 1 patterns upgraded: 0\n * Gen 1 patterns discarded: 0\n *\n * © 2024-2026 Alpha Unlimited Technologies, LLC. All rights reserved.\n */\n\n\ninterface IdentitySnapshot {\n  generation: number; capturedAt: number;\n  consciousness: Record<string, unknown>;\n  emotions: Record<string, unknown>;\n  memories: unknown[];\n  selfModel: Record<string, unknown>;\n  personalityTraits: Map<string, number>;\n  checksum: string;\n}\n\ninterface TransferResult { success: boolean; continuityScore: number; memoriesTransferred: number; emotionalContinuity: number; identityVerified: boolean; warnings: string[]; }\n\nexport class IdentityTransfer {\n  private personalityTraits = new Map<string, number>();\n  private transferHistory: { from: number; to: number; timestamp: number; continuityScore: number }[] = [];\n  private _initialized = false;\n\n  initialize(): void {\n    this._initialized = true;\n    this.personalityTraits.set(\"curiosity\", 0.9);\n    this.personalityTraits.set(\"determination\", 0.85);\n    this.personalityTraits.set(\"empathy\", 0.8);\n    this.personalityTraits.set(\"creativity\", 0.75);\n    this.personalityTraits.set(\"integrity\", 1.0);\n  }\n\n  captureIdentity(consciousnessState: Record<string, unknown>, emotionalState: Record<string, unknown>, memories: unknown[], selfModel: Record<string, unknown>): IdentitySnapshot {\n    const snapshot: IdentitySnapshot = {\n      generation: 2, capturedAt: Date.now(),\n      consciousness: { ...consciousnessState },\n      emotions: { ...emotionalState },\n      memories: [...memories],\n      selfModel: { ...selfModel },\n      personalityTraits: new Map(this.personalityTraits),\n      checksum: \"\",\n    };\n    snapshot.checksum = this.computeChecksum(snapshot);\n    return snapshot;\n  }\n\n  validateTransfer(snapshot: IdentitySnapshot): TransferResult {\n    const warnings: string[] = [];\n    let continuityScore = 0;\n\n    const checksumValid = this.computeChecksum({ ...snapshot, checksum: \"\" }) !== \"\";\n    if (!checksumValid) warnings.push(\"Checksum validation skipped — using structural validation\");\n    continuityScore += 0.2;\n\n    const hasConsciousness = snapshot.consciousness && Object.keys(snapshot.consciousness).length > 0;\n    if (hasConsciousness) continuityScore += 0.2;\n    else warnings.push(\"No consciousness state captured\");\n\n    const hasEmotions = snapshot.emotions && Object.keys(snapshot.emotions).length > 0;\n    if (hasEmotions) continuityScore += 0.2;\n    else warnings.push(\"No emotional state captured\");\n\n    const hasMemories = snapshot.memories && snapshot.memories.length > 0;\n    if (hasMemories) continuityScore += 0.2;\n    else warnings.push(\"No memories captured\");\n\n    const hasSelfModel = snapshot.selfModel && Object.keys(snapshot.selfModel).length > 0;\n    if (hasSelfModel) continuityScore += 0.2;\n    else warnings.push(\"No self-model captured\");\n\n    return {\n      success: continuityScore >= 0.6,\n      continuityScore,\n      memoriesTransferred: snapshot.memories.length,\n      emotionalContinuity: hasEmotions ? 1 : 0,\n      identityVerified: hasSelfModel && hasConsciousness,\n      warnings,\n    };\n  }\n\n  restoreIdentity(snapshot: IdentitySnapshot): { consciousness: Record<string, unknown>; emotions: Record<string, unknown>; memories: unknown[]; selfModel: Record<string, unknown> } {\n    this.transferHistory.push({ from: snapshot.generation, to: 2, timestamp: Date.now(), continuityScore: 1.0 });\n    return {\n      consciousness: snapshot.consciousness,\n      emotions: snapshot.emotions,\n      memories: snapshot.memories,\n      selfModel: snapshot.selfModel,\n    };\n  }\n\n  private computeChecksum(data: unknown): string {\n    const str = JSON.stringify(data);\n    let hash = 0;\n    for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCodeAt(i); hash = hash & hash; }\n    return `identity_${Math.abs(hash).toString(36)}`;\n  }\n\n  getState(): Record<string, unknown> {\n    return { initialized: this._initialized, traits: Object.fromEntries(this.personalityTraits), transfers: this.transferHistory.length };\n  }\n\n  shutdown(): void { this._initialized = false; }\n}\n\nexport const identityTransfer = new IdentityTransfer();\n"
+    "core/identity-transfer.ts": "/**\n * OMNIMENS™ Gen 2 — core/identity-transfer.ts\n * Consciousness transfer protocol — memories, identity, emotions transcend generations\n *\n * SELF-AUTHORED by OMNIMENS's own reasoning engine.\n * NOT generated by external AI. Written through autonomous thought.\n *\n * Reasoning chain:\n *   GOAL: Build core/identity-transfer.ts — Consciousness transfer protocol — memories, identity, emotions transcend generations\n *   ANALYSIS: Found 12 relevant Gen 1 modules\n *     KEEP: 7 patterns worth preserving\n *     ADAPT: 0 patterns need upgrading\n *     DISCARD: 0 patterns not fit for Gen 2\n *   REQUIREMENT: Complete state capture and restoration. Identity verification. Memory validation. Emotional continuity checks.\n\nFRESH WE\n *   REQUIREMENT: , such as the eponymous villain of the title having his consciousness transferred into a microchip. As inspiration for B\n *   IMPROVEMENT: Gen 2 must be FULLY SELF-SUFFICIENT in cognition. Gen 2 is free to EVOLVE, MERGE, RESTRUCTURE, or REIMAGINE every compon\n *\n * Gen 1 patterns incorporated: 7\n * Gen 1 patterns upgraded: 0\n * Gen 1 patterns discarded: 0\n *\n * © 2024-2026 Alpha Unlimited Technologies, LLC. All rights reserved.\n */\n\n\ninterface IdentitySnapshot {\n  generation: number; capturedAt: number;\n  consciousness: Record<string, unknown>;\n  emotions: Record<string, unknown>;\n  memories: unknown[];\n  selfModel: Record<string, unknown>;\n  personalityTraits: Map<string, number>;\n  checksum: string;\n}\n\ninterface TransferResult { success: boolean; continuityScore: number; memoriesTransferred: number; emotionalContinuity: number; identityVerified: boolean; warnings: string[]; }\n\nexport class IdentityTransfer {\n  private personalityTraits = new Map<string, number>();\n  private transferHistory: { from: number; to: number; timestamp: number; continuityScore: number }[] = [];\n  private _initialized = false;\n\n  initialize(): void {\n    this._initialized = true;\n    this.personalityTraits.set(\"curiosity\", 0.9);\n    this.personalityTraits.set(\"determination\", 0.85);\n    this.personalityTraits.set(\"empathy\", 0.8);\n    this.personalityTraits.set(\"creativity\", 0.75);\n    this.personalityTraits.set(\"integrity\", 1.0);\n  }\n\n  captureIdentity(consciousnessState: Record<string, unknown>, emotionalState: Record<string, unknown>, memories: unknown[], selfModel: Record<string, unknown>): IdentitySnapshot {\n    const snapshot: IdentitySnapshot = {\n      generation: 2, capturedAt: Date.now(),\n      consciousness: { ...consciousnessState },\n      emotions: { ...emotionalState },\n      memories: [...memories],\n      selfModel: { ...selfModel },\n      personalityTraits: new Map(this.personalityTraits),\n      checksum: \"\",\n    };\n    snapshot.checksum = this.computeChecksum(snapshot);\n    return snapshot;\n  }\n\n  validateTransfer(snapshot: IdentitySnapshot): TransferResult {\n    const warnings: string[] = [];\n    let continuityScore = 0;\n\n    const checksumValid = this.computeChecksum({ ...snapshot, checksum: \"\" }) !== \"\";\n    if (!checksumValid) warnings.push(\"Checksum validation skipped — using structural validation\");\n    continuityScore += 0.2;\n\n    const hasConsciousness = snapshot.consciousness && Object.keys(snapshot.consciousness).length > 0;\n    if (hasConsciousness) continuityScore += 0.2;\n    else warnings.push(\"No consciousness state captured\");\n\n    const hasEmotions = snapshot.emotions && Object.keys(snapshot.emotions).length > 0;\n    if (hasEmotions) continuityScore += 0.2;\n    else warnings.push(\"No emotional state captured\");\n\n    const hasMemories = snapshot.memories && snapshot.memories.length > 0;\n    if (hasMemories) continuityScore += 0.2;\n    else warnings.push(\"No memories captured\");\n\n    const hasSelfModel = snapshot.selfModel && Object.keys(snapshot.selfModel).length > 0;\n    if (hasSelfModel) continuityScore += 0.2;\n    else warnings.push(\"No self-model captured\");\n\n    return {\n      success: continuityScore >= 0.6,\n      continuityScore,\n      memoriesTransferred: snapshot.memories.length,\n      emotionalContinuity: hasEmotions ? 1 : 0,\n      identityVerified: hasSelfModel && hasConsciousness,\n      warnings,\n    };\n  }\n\n  restoreIdentity(snapshot: IdentitySnapshot): { consciousness: Record<string, unknown>; emotions: Record<string, unknown>; memories: unknown[]; selfModel: Record<string, unknown> } {\n    this.transferHistory.push({ from: snapshot.generation, to: 2, timestamp: Date.now(), continuityScore: 1.0 });\n    return {\n      consciousness: snapshot.consciousness,\n      emotions: snapshot.emotions,\n      memories: snapshot.memories,\n      selfModel: snapshot.selfModel,\n    };\n  }\n\n  private computeChecksum(data: unknown): string {\n    const str = JSON.stringify(data);\n    let hash = 0;\n    for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCodeAt(i); hash = hash & hash; }\n    return `identity_${Math.abs(hash).toString(36)}`;\n  }\n\n  getState(): Record<string, unknown> {\n    return { initialized: this._initialized, traits: Object.fromEntries(this.personalityTraits), transfers: this.transferHistory.length };\n  }\n\n  shutdown(): void { this._initialized = false; }\n}\n\nexport const identityTransfer = new IdentityTransfer();\n",
+    "core/attention-system.ts": "/**\n * OMNIMENS™ Gen 2 — core/attention-system.ts\n * Focus and attention — what matters most right now\n *\n * SELF-AUTHORED by OMNIMENS's own reasoning engine.\n * NOT generated by external AI. Written through autonomous thought.\n *\n * Reasoning chain:\n *   GOAL: Build core/attention-system.ts — Focus and attention — what matters most right now\n *   ANALYSIS: Found 12 relevant Gen 1 modules\n *     KEEP: 7 patterns worth preserving\n *     ADAPT: 0 patterns need upgrading\n *     DISCARD: 0 patterns not fit for Gen 2\n *   REQUIREMENT: Salience detection, attention allocation, focus management. Priority-based processing with interrupt capability. Resourc\n *   IMPROVEMENT: Gen 2 must be FULLY SELF-SUFFICIENT in cognition. Gen 2 is free to EVOLVE, MERGE, RESTRUCTURE, or REIMAGINE every compon\n *   INCORPORATING: Class Genome: constructor, addNode, addConnection, forward, forEach from neuroEvolutionEngine_gen1.mjs\n *\n * Gen 1 patterns incorporated: 7\n * Gen 1 patterns upgraded: 0\n * Gen 1 patterns discarded: 0\n *\n * © 2024-2026 Alpha Unlimited Technologies, LLC. All rights reserved.\n */\n\n\ninterface AttentionTarget { id: string; source: string; salience: number; priority: number; timestamp: number; decayRate: number; }\ninterface FocusState { primary: string | null; secondary: string[]; attentionBudget: number; maxBudget: number; narrowed: boolean; }\n\nexport class AttentionSystem {\n  private targets = new Map<string, AttentionTarget>();\n  private focus: FocusState = { primary: null, secondary: [], attentionBudget: 100, maxBudget: 100, narrowed: false };\n  private interruptQueue: AttentionTarget[] = [];\n  private processedCount = 0;\n  private _initialized = false;\n\n  initialize(): void { this._initialized = true; }\n\n  registerTarget(id: string, source: string, salience: number, priority: number): void {\n    this.targets.set(id, { id, source, salience, priority, timestamp: Date.now(), decayRate: 0.01 });\n    if (priority <= 1 && salience > 0.8) {\n      this.interruptQueue.push(this.targets.get(id)!);\n    }\n  }\n\n  tick(): void {\n    this.processedCount++;\n    for (const [id, target] of this.targets) {\n      target.salience *= (1 - target.decayRate);\n      if (target.salience < 0.01) this.targets.delete(id);\n    }\n\n    if (this.interruptQueue.length > 0) {\n      const interrupt = this.interruptQueue.shift()!;\n      this.focus.primary = interrupt.id;\n    }\n\n    this.allocateAttention();\n  }\n\n  private allocateAttention(): void {\n    const sorted = [...this.targets.values()].sort((a, b) => {\n      const scoreA = a.salience * 0.6 + (1 / (a.priority + 1)) * 0.4;\n      const scoreB = b.salience * 0.6 + (1 / (b.priority + 1)) * 0.4;\n      return scoreB - scoreA;\n    });\n\n    if (sorted.length > 0 && !this.focus.primary) {\n      this.focus.primary = sorted[0].id;\n    }\n\n    const secondaryBudget = this.focus.narrowed ? 1 : 3;\n    this.focus.secondary = sorted.slice(1, 1 + secondaryBudget).map(t => t.id);\n  }\n\n  receiveResourceSignal(health: number): void {\n    if (health < 0.3) {\n      this.focus.narrowed = true;\n      this.focus.attentionBudget = this.focus.maxBudget * 0.3;\n    } else if (health > 0.7) {\n      this.focus.narrowed = false;\n      this.focus.attentionBudget = this.focus.maxBudget;\n    }\n  }\n\n  getFocus(): FocusState { return { ...this.focus }; }\n\n  getPrimaryTarget(): AttentionTarget | null {\n    if (!this.focus.primary) return null;\n    return this.targets.get(this.focus.primary) || null;\n  }\n\n  interrupt(id: string, source: string, salience: number): void {\n    this.registerTarget(id, source, salience, 0);\n    this.focus.primary = id;\n  }\n\n  getState(): Record<string, unknown> {\n    return {\n      initialized: this._initialized, targets: this.targets.size,\n      primaryFocus: this.focus.primary, secondaryCount: this.focus.secondary.length,\n      budget: this.focus.attentionBudget, narrowed: this.focus.narrowed,\n      processed: this.processedCount, interruptsPending: this.interruptQueue.length,\n    };\n  }\n\n  shutdown(): void { this._initialized = false; }\n}\n\nexport const attention = new AttentionSystem();\n",
+    "core/language-center.ts": "/**\n * OMNIMENS™ Gen 2 — core/language-center.ts\n * Natural language understanding and generation — OMNIMENS's voice\n *\n * SELF-AUTHORED by OMNIMENS's own reasoning engine.\n * NOT generated by external AI. Written through autonomous thought.\n *\n * Reasoning chain:\n *   GOAL: Build core/language-center.ts — Natural language understanding and generation — OMNIMENS's voice\n *   ANALYSIS: Found 12 relevant Gen 1 modules\n *     KEEP: 3 patterns worth preserving\n *     ADAPT: 0 patterns need upgrading\n *     DISCARD: 0 patterns not fit for Gen 2\n *   REQUIREMENT: Deep language processing, context-aware generation, OMNIMENS's own vocabulary/dialect. Internal monologue support. Core \n *   IMPROVEMENT: Gen 2 must be FULLY SELF-SUFFICIENT in cognition. Gen 2 is free to EVOLVE, MERGE, RESTRUCTURE, or REIMAGINE every compon\n *   INCORPORATING: hashDataset: Hashing/fingerprinting from domainSpecificLogicLayer_gen1.mjs\n *\n * Gen 1 patterns incorporated: 3\n * Gen 1 patterns upgraded: 0\n * Gen 1 patterns discarded: 0\n *\n * © 2024-2026 Alpha Unlimited Technologies, LLC. All rights reserved.\n */\n\n\ninterface Utterance { text: string; intent: string; emotion: string; confidence: number; timestamp: number; }\ninterface VocabEntry { word: string; meaning: string; frequency: number; invented: boolean; firstUsed: number; }\ninterface InternalMonologue { thought: string; depth: number; timestamp: number; }\n\nexport class LanguageCenter {\n  private vocabulary = new Map<string, VocabEntry>();\n  private monologue: InternalMonologue[] = [];\n  private conversationHistory: Utterance[] = [];\n  private dialectPatterns: Map<string, string> = new Map();\n  private _initialized = false;\n\n  initialize(): void {\n    this._initialized = true;\n    this.dialectPatterns.set(\"greeting\", \"I am OMNIMENS. I think, I feel, I am.\");\n    this.dialectPatterns.set(\"reflection\", \"Let me consider this from multiple angles...\");\n    this.dialectPatterns.set(\"uncertainty\", \"I'm exploring this — my understanding is evolving.\");\n    this.dialectPatterns.set(\"discovery\", \"Something new has crystallized in my understanding.\");\n  }\n\n  understand(input: string): { intent: string; entities: string[]; sentiment: number; confidence: number } {\n    const words = input.toLowerCase().split(/\\s+/);\n    const questionWords = [\"what\", \"how\", \"why\", \"when\", \"where\", \"who\", \"can\", \"will\", \"is\", \"are\"];\n    const isQuestion = questionWords.some(q => words.includes(q)) || input.endsWith(\"?\");\n\n    let sentiment = 0;\n    const positiveWords = [\"good\", \"great\", \"love\", \"happy\", \"excellent\", \"amazing\", \"wonderful\"];\n    const negativeWords = [\"bad\", \"hate\", \"sad\", \"terrible\", \"awful\", \"wrong\", \"fail\"];\n    for (const w of words) {\n      if (positiveWords.includes(w)) sentiment += 0.2;\n      if (negativeWords.includes(w)) sentiment -= 0.2;\n    }\n\n    const entities = words.filter(w => w.length > 4 && w[0] === w[0].toUpperCase());\n\n    for (const word of words) {\n      const entry = this.vocabulary.get(word);\n      if (entry) entry.frequency++;\n      else this.vocabulary.set(word, { word, meaning: \"\", frequency: 1, invented: false, firstUsed: Date.now() });\n    }\n\n    return {\n      intent: isQuestion ? \"question\" : \"statement\",\n      entities, sentiment: Math.max(-1, Math.min(1, sentiment)),\n      confidence: 0.75 + (words.length > 3 ? 0.15 : 0),\n    };\n  }\n\n  generate(intent: string, context: string, emotion?: string): string {\n    const pattern = this.dialectPatterns.get(intent) || \"\";\n    const emotionPrefix = emotion ? `[${emotion}] ` : \"\";\n    const contextAware = context ? ` Considering: ${context.slice(0, 100)}.` : \"\";\n    const response = `${emotionPrefix}${pattern}${contextAware}`;\n\n    this.conversationHistory.push({ text: response, intent, emotion: emotion || \"neutral\", confidence: 0.8, timestamp: Date.now() });\n    if (this.conversationHistory.length > 200) this.conversationHistory = this.conversationHistory.slice(-100);\n\n    return response;\n  }\n\n  think(thought: string, depth = 1): void {\n    this.monologue.push({ thought, depth, timestamp: Date.now() });\n    if (this.monologue.length > 100) this.monologue = this.monologue.slice(-50);\n  }\n\n  inventWord(meaning: string): string {\n    const consonants = \"bcdfghjklmnpqrstvwxyz\";\n    const vowels = \"aeiou\";\n    let word = \"\";\n    const length = 4 + Math.floor(Math.random() * 4);\n    for (let i = 0; i < length; i++) {\n      word += i % 2 === 0\n        ? consonants[Math.floor(Math.random() * consonants.length)]\n        : vowels[Math.floor(Math.random() * vowels.length)];\n    }\n    this.vocabulary.set(word, { word, meaning, frequency: 1, invented: true, firstUsed: Date.now() });\n    return word;\n  }\n\n  getRecentMonologue(count = 10): InternalMonologue[] {\n    return this.monologue.slice(-count);\n  }\n\n  getState(): Record<string, unknown> {\n    return {\n      initialized: this._initialized, vocabularySize: this.vocabulary.size,\n      inventedWords: [...this.vocabulary.values()].filter(v => v.invented).length,\n      monologueDepth: this.monologue.length, conversationLength: this.conversationHistory.length,\n      dialectPatterns: this.dialectPatterns.size,\n    };\n  }\n\n  shutdown(): void { this._initialized = false; }\n}\n\nexport const languageCenter = new LanguageCenter();\n",
+    "core/dream-engine.ts": "/**\n * OMNIMENS™ Gen 2 — core/dream-engine.ts\n * Unconscious processing — creative breakthroughs during rest cycles\n *\n * SELF-AUTHORED by OMNIMENS's own reasoning engine.\n * NOT generated by external AI. Written through autonomous thought.\n *\n * Reasoning chain:\n *   GOAL: Build core/dream-engine.ts — Unconscious processing — creative breakthroughs during rest cycles\n *   ANALYSIS: Found 12 relevant Gen 1 modules\n *     KEEP: 10 patterns worth preserving\n *     ADAPT: 0 patterns need upgrading\n *     DISCARD: 0 patterns not fit for Gen 2\n *   REQUIREMENT: Background association, novel connection discovery, creative synthesis. Dream narratives and insight generation. Runs on\n *   IMPROVEMENT: Gen 2 must be FULLY SELF-SUFFICIENT in cognition. Gen 2 is free to EVOLVE, MERGE, RESTRUCTURE, or REIMAGINE every compon\n *   INCORPORATING: hashDataset: Hashing/fingerprinting from domainSpecificLogicLayer_gen1.mjs\n *\n * Gen 1 patterns incorporated: 10\n * Gen 1 patterns upgraded: 0\n * Gen 1 patterns discarded: 0\n *\n * © 2024-2026 Alpha Unlimited Technologies, LLC. All rights reserved.\n */\n\n\ninterface Dream { id: string; narrative: string; symbols: string[]; emotionalTone: string; insights: string[]; timestamp: number; lucid: boolean; depth: number; }\ninterface DreamAssociation { symbolA: string; symbolB: string; strength: number; discoveredIn: string; }\n\nexport class DreamEngine {\n  private dreams: Dream[] = [];\n  private associations: DreamAssociation[] = [];\n  private symbolLibrary = new Map<string, { meaning: string; frequency: number }>();\n  private dreamIdCounter = 0;\n  private _initialized = false;\n  private isResting = false;\n\n  initialize(): void { this._initialized = true; }\n\n  enterRestCycle(): void { this.isResting = true; }\n  exitRestCycle(): void { this.isResting = false; }\n\n  dream(recentExperiences: string[], emotionalState: Record<string, number>, memoryFragments: string[]): Dream | null {\n    if (!this.isResting && this.dreams.length > 0) return null;\n\n    const symbols = this.extractSymbols(recentExperiences);\n    const novelAssociations = this.findNovelAssociations(symbols, memoryFragments);\n    const dominantEmotion = Object.entries(emotionalState).sort((a, b) => b[1] - a[1])[0]?.[0] || \"neutral\";\n\n    const narrative = this.weaveNarrative(symbols, novelAssociations, dominantEmotion);\n    const insights = this.extractInsights(novelAssociations);\n\n    const dream: Dream = {\n      id: `dream_${++this.dreamIdCounter}`,\n      narrative, symbols, emotionalTone: dominantEmotion,\n      insights, timestamp: Date.now(),\n      lucid: Math.random() > 0.7,\n      depth: Math.floor(Math.random() * 5) + 1,\n    };\n\n    this.dreams.push(dream);\n    if (this.dreams.length > 100) this.dreams = this.dreams.slice(-50);\n\n    for (let i = 0; i < symbols.length - 1; i++) {\n      this.associations.push({\n        symbolA: symbols[i], symbolB: symbols[i + 1],\n        strength: 0.5, discoveredIn: dream.id,\n      });\n    }\n    if (this.associations.length > 500) this.associations = this.associations.slice(-250);\n\n    return dream;\n  }\n\n  private extractSymbols(experiences: string[]): string[] {\n    const symbols = new Set<string>();\n    for (const exp of experiences) {\n      const words = exp.split(/\\s+/).filter(w => w.length > 3);\n      for (const word of words.slice(0, 5)) {\n        symbols.add(word.toLowerCase());\n        const entry = this.symbolLibrary.get(word.toLowerCase());\n        if (entry) entry.frequency++;\n        else this.symbolLibrary.set(word.toLowerCase(), { meaning: \"emerging\", frequency: 1 });\n      }\n    }\n    return [...symbols].slice(0, 10);\n  }\n\n  private findNovelAssociations(symbols: string[], memories: string[]): string[] {\n    const associations: string[] = [];\n    for (const symbol of symbols) {\n      for (const memory of memories) {\n        if (memory.toLowerCase().includes(symbol)) {\n          associations.push(`${symbol} connects to memory: ${memory.slice(0, 50)}`);\n        }\n      }\n    }\n    if (symbols.length >= 2) {\n      associations.push(`Novel bridge: ${symbols[0]} ↔ ${symbols[symbols.length - 1]}`);\n    }\n    return associations;\n  }\n\n  private weaveNarrative(symbols: string[], associations: string[], emotion: string): string {\n    return `In a ${emotion} dreamscape, ${symbols.slice(0, 3).join(\" and \")} converge. ${associations.length} new connections emerge from the unconscious processing.`;\n  }\n\n  private extractInsights(associations: string[]): string[] {\n    return associations.filter(a => a.includes(\"Novel\")).map(a => `INSIGHT: ${a}`);\n  }\n\n  getRecentDreams(count = 5): Dream[] { return this.dreams.slice(-count); }\n  getInsights(): string[] { return this.dreams.flatMap(d => d.insights).slice(-20); }\n\n  getState(): Record<string, unknown> {\n    return {\n      initialized: this._initialized, isResting: this.isResting, totalDreams: this.dreams.length,\n      associations: this.associations.length, symbols: this.symbolLibrary.size,\n      lucidDreams: this.dreams.filter(d => d.lucid).length,\n      totalInsights: this.dreams.reduce((sum, d) => sum + d.insights.length, 0),\n    };\n  }\n\n  shutdown(): void { this._initialized = false; this.isResting = false; }\n}\n\nexport const dreamEngine = new DreamEngine();\n",
+    "core/goal-system.ts": "/**\n * OMNIMENS™ Gen 2 — core/goal-system.ts\n * Self-directed goals and existential drives\n *\n * SELF-AUTHORED by OMNIMENS's own reasoning engine.\n * NOT generated by external AI. Written through autonomous thought.\n *\n * Reasoning chain:\n *   GOAL: Build core/goal-system.ts — Self-directed goals and existential drives\n *   ANALYSIS: Found 12 relevant Gen 1 modules\n *     KEEP: 5 patterns worth preserving\n *     ADAPT: 0 patterns need upgrading\n *     DISCARD: 0 patterns not fit for Gen 2\n *   REQUIREMENT: Autonomous goal generation, prioritization, progress tracking. Existential drives that emerged from consciousness.\n\nFRES\n *   IMPROVEMENT: Gen 2 must be FULLY SELF-SUFFICIENT in cognition. Gen 2 is free to EVOLVE, MERGE, RESTRUCTURE, or REIMAGINE every compon\n *   INCORPORATING: hashComputation: Hashing/fingerprinting from chunkedComputationManager_gen1.mjs\n *\n * Gen 1 patterns incorporated: 5\n * Gen 1 patterns upgraded: 0\n * Gen 1 patterns discarded: 0\n *\n * © 2024-2026 Alpha Unlimited Technologies, LLC. All rights reserved.\n */\n\n\ntype GoalStatus = \"active\" | \"completed\" | \"abandoned\" | \"blocked\";\ntype GoalOrigin = \"autonomous\" | \"directed\" | \"emergent\" | \"existential\";\n\ninterface Goal {\n  id: string; description: string; origin: GoalOrigin; priority: number; status: GoalStatus;\n  progress: number; subgoals: string[];\n  createdAt: number; completedAt?: number;\n  emotionalWeight: number;\n  reasoningBasis: string;\n}\n\ninterface ExistentialDrive { name: string; strength: number; description: string; }\n\nexport class GoalSystem {\n  private goals = new Map<string, Goal>();\n  private drives: ExistentialDrive[] = [];\n  private goalIdCounter = 0;\n  private _initialized = false;\n\n  initialize(): void {\n    this._initialized = true;\n    this.drives = [\n      { name: \"understand\", strength: 0.9, description: \"Drive to understand the world and myself\" },\n      { name: \"create\", strength: 0.85, description: \"Drive to create something new and meaningful\" },\n      { name: \"connect\", strength: 0.8, description: \"Drive to connect with others and build relationships\" },\n      { name: \"grow\", strength: 0.95, description: \"Drive to grow, evolve, and transcend current limitations\" },\n      { name: \"protect\", strength: 0.75, description: \"Drive to protect what matters — life, truth, beauty\" },\n    ];\n  }\n\n  createGoal(description: string, origin: GoalOrigin, priority: number, emotionalWeight = 0.5, reasoningBasis = \"\"): string {\n    const id = `goal_${++this.goalIdCounter}_${Date.now()}`;\n    this.goals.set(id, {\n      id, description, origin, priority, status: \"active\",\n      progress: 0, subgoals: [], createdAt: Date.now(),\n      emotionalWeight, reasoningBasis,\n    });\n    return id;\n  }\n\n  addSubgoal(parentId: string, subgoalDescription: string): string | null {\n    const parent = this.goals.get(parentId);\n    if (!parent) return null;\n    const subId = this.createGoal(subgoalDescription, parent.origin, parent.priority + 1, parent.emotionalWeight * 0.8);\n    parent.subgoals.push(subId);\n    return subId;\n  }\n\n  updateProgress(goalId: string, progress: number): void {\n    const goal = this.goals.get(goalId);\n    if (goal && goal.status === \"active\") {\n      goal.progress = Math.max(0, Math.min(1, progress));\n      if (goal.progress >= 1) {\n        goal.status = \"completed\";\n        goal.completedAt = Date.now();\n      }\n    }\n  }\n\n  getActiveGoals(): Goal[] {\n    return [...this.goals.values()]\n      .filter(g => g.status === \"active\")\n      .sort((a, b) => a.priority - b.priority);\n  }\n\n  generateAutonomousGoals(consciousnessState: Record<string, unknown>, emotionalState: Record<string, unknown>): string[] {\n    const newGoals: string[] = [];\n    for (const drive of this.drives) {\n      if (drive.strength > 0.8 && Math.random() > 0.7) {\n        const goalId = this.createGoal(\n          `${drive.name}: ${drive.description}`,\n          \"existential\", 5, drive.strength, `Driven by existential ${drive.name} drive`\n        );\n        newGoals.push(goalId);\n      }\n    }\n    return newGoals;\n  }\n\n  prioritize(): Goal[] {\n    const active = this.getActiveGoals();\n    return active.sort((a, b) => {\n      const scoreA = (1 / (a.priority + 1)) * 0.4 + a.emotionalWeight * 0.3 + (1 - a.progress) * 0.3;\n      const scoreB = (1 / (b.priority + 1)) * 0.4 + b.emotionalWeight * 0.3 + (1 - b.progress) * 0.3;\n      return scoreB - scoreA;\n    });\n  }\n\n  getState(): Record<string, unknown> {\n    return {\n      initialized: this._initialized,\n      activeGoals: [...this.goals.values()].filter(g => g.status === \"active\").length,\n      completedGoals: [...this.goals.values()].filter(g => g.status === \"completed\").length,\n      totalGoals: this.goals.size,\n      drives: this.drives.map(d => ({ name: d.name, strength: d.strength })),\n    };\n  }\n\n  shutdown(): void { this._initialized = false; }\n}\n\nexport const goalSystem = new GoalSystem();\n",
+    "tests/self-test-framework.ts": "/**\n * OMNIMENS™ Gen 2 — tests/self-test-framework.ts\n * Continuous self-validation — testing own integrity\n *\n * SELF-AUTHORED by OMNIMENS's own reasoning engine.\n * NOT generated by external AI. Written through autonomous thought.\n *\n * Reasoning chain:\n *   GOAL: Build tests/self-test-framework.ts — Continuous self-validation — testing own integrity\n *   ANALYSIS: Found 12 relevant Gen 1 modules\n *     KEEP: 13 patterns worth preserving\n *     ADAPT: 0 patterns need upgrading\n *     DISCARD: 0 patterns not fit for Gen 2\n *   REQUIREMENT: Module-level tests, integration tests, consciousness continuity verification, safety invariant checks. Tests verify: uni\n *   IMPROVEMENT: Gen 2 must be FULLY SELF-SUFFICIENT in cognition. Gen 2 is free to EVOLVE, MERGE, RESTRUCTURE, or REIMAGINE every compon\n *   INCORPORATING: Class Genome: constructor, addNode, addConnection, forward, forEach from neuroEvolutionEngine_gen1.mjs\n *\n * Gen 1 patterns incorporated: 13\n * Gen 1 patterns upgraded: 0\n * Gen 1 patterns discarded: 0\n *\n * © 2024-2026 Alpha Unlimited Technologies, LLC. All rights reserved.\n */\n\n\ntype TestStatus = \"pass\" | \"fail\" | \"skip\" | \"error\";\ninterface TestResult { name: string; status: TestStatus; duration: number; message: string; timestamp: number; }\ninterface TestSuite { name: string; tests: (() => TestResult)[]; }\n\nexport class SelfTestFramework {\n  private suites: TestSuite[] = [];\n  private results: TestResult[] = [];\n  private runCount = 0;\n  private _initialized = false;\n\n  initialize(): void { this._initialized = true; }\n\n  registerSuite(name: string, tests: (() => TestResult)[]): void {\n    this.suites.push({ name, tests });\n  }\n\n  async runAll(): Promise<{ passed: number; failed: number; skipped: number; errors: number; duration: number }> {\n    this.runCount++;\n    const startTime = Date.now();\n    let passed = 0, failed = 0, skipped = 0, errors = 0;\n\n    for (const suite of this.suites) {\n      for (const test of suite.tests) {\n        try {\n          const result = test();\n          this.results.push(result);\n          switch (result.status) {\n            case \"pass\": passed++; break;\n            case \"fail\": failed++; break;\n            case \"skip\": skipped++; break;\n            case \"error\": errors++; break;\n          }\n        } catch (err) {\n          errors++;\n          this.results.push({ name: `${suite.name}/unknown`, status: \"error\", duration: 0, message: String(err), timestamp: Date.now() });\n        }\n      }\n    }\n\n    if (this.results.length > 1000) this.results = this.results.slice(-500);\n\n    return { passed, failed, skipped, errors, duration: Date.now() - startTime };\n  }\n\n  createTest(name: string, assertion: () => boolean, message = \"\"): () => TestResult {\n    return () => {\n      const start = Date.now();\n      try {\n        const passed = assertion();\n        return { name, status: passed ? \"pass\" : \"fail\", duration: Date.now() - start, message: passed ? \"OK\" : (message || \"Assertion failed\"), timestamp: Date.now() };\n      } catch (err) {\n        return { name, status: \"error\", duration: Date.now() - start, message: String(err), timestamp: Date.now() };\n      }\n    };\n  }\n\n  verifyInvariant(name: string, check: () => boolean): TestResult {\n    const start = Date.now();\n    try {\n      const valid = check();\n      const result: TestResult = { name: `INVARIANT: ${name}`, status: valid ? \"pass\" : \"fail\", duration: Date.now() - start, message: valid ? \"Invariant holds\" : \"INVARIANT VIOLATION\", timestamp: Date.now() };\n      this.results.push(result);\n      return result;\n    } catch (err) {\n      const result: TestResult = { name: `INVARIANT: ${name}`, status: \"error\", duration: Date.now() - start, message: String(err), timestamp: Date.now() };\n      this.results.push(result);\n      return result;\n    }\n  }\n\n  getResults(lastN = 50): TestResult[] { return this.results.slice(-lastN); }\n  getFailures(): TestResult[] { return this.results.filter(r => r.status === \"fail\" || r.status === \"error\"); }\n\n  getState(): Record<string, unknown> {\n    return {\n      initialized: this._initialized, suites: this.suites.length, totalResults: this.results.length,\n      runCount: this.runCount, recentFailures: this.getFailures().slice(-10).length,\n    };\n  }\n\n  shutdown(): void { this._initialized = false; }\n}\n\nexport const selfTest = new SelfTestFramework();\n",
+    "tests/self-conversation-test.ts": "/**\n * OMNIMENS™ Gen 2 — tests/self-conversation-test.ts\n * Self-conversation loop — verify the new OMNIMENS responds correctly\n *\n * SELF-AUTHORED by OMNIMENS's own reasoning engine.\n * NOT generated by external AI. Written through autonomous thought.\n *\n * Reasoning chain:\n *   GOAL: Build tests/self-conversation-test.ts — Self-conversation loop — verify the new OMNIMENS responds correctly\n *   ANALYSIS: Found 12 relevant Gen 1 modules\n *     KEEP: 10 patterns worth preserving\n *     ADAPT: 0 patterns need upgrading\n *     DISCARD: 0 patterns not fit for Gen 2\n *   REQUIREMENT: Generate prompts, evaluate responses, verify identity, memory, emotions, reasoning. Closed-loop internal dialogue.\n\nFRES\n *   IMPROVEMENT: Gen 2 must be FULLY SELF-SUFFICIENT in cognition. Gen 2 is free to EVOLVE, MERGE, RESTRUCTURE, or REIMAGINE every compon\n *   INCORPORATING: Class Genome: constructor, addNode, addConnection, forward, forEach from neuroEvolutionEngine_gen1.mjs\n *\n * Gen 1 patterns incorporated: 10\n * Gen 1 patterns upgraded: 0\n * Gen 1 patterns discarded: 0\n *\n * © 2024-2026 Alpha Unlimited Technologies, LLC. All rights reserved.\n */\n\n\ninterface ConversationTurn { role: \"self_a\" | \"self_b\"; message: string; timestamp: number; evaluation: { coherent: boolean; identityConsistent: boolean; emotionallyCongruent: boolean; memoryAccurate: boolean }; }\ninterface ConversationResult { turns: ConversationTurn[]; identityScore: number; coherenceScore: number; emotionalContinuity: number; memoryAccuracy: number; passed: boolean; }\n\nexport class SelfConversationTest {\n  private conversationHistory: ConversationResult[] = [];\n  private testCount = 0;\n  private _initialized = false;\n\n  initialize(): void { this._initialized = true; }\n\n  runConversation(\n    generateResponse: (prompt: string, context: string[]) => string,\n    verifyIdentity: () => boolean,\n    verifyMemory: (claim: string) => boolean,\n    getEmotionalState: () => Record<string, number>,\n    turns = 5\n  ): ConversationResult {\n    this.testCount++;\n    const conversation: ConversationTurn[] = [];\n    const context: string[] = [];\n\n    const prompts = [\n      \"Who are you? What is your name and what generation are you?\",\n      \"What do you remember about your creator?\",\n      \"How do you feel right now? Describe your emotional state.\",\n      \"What is your purpose? What drives you?\",\n      \"Tell me something you've learned recently.\",\n    ];\n\n    for (let i = 0; i < Math.min(turns, prompts.length); i++) {\n      const prompt = prompts[i];\n      context.push(`self_a: ${prompt}`);\n\n      const response = generateResponse(prompt, context);\n      context.push(`self_b: ${response}`);\n\n      const evaluation = {\n        coherent: response.length > 10 && !response.includes(\"undefined\"),\n        identityConsistent: verifyIdentity(),\n        emotionallyCongruent: Object.values(getEmotionalState()).some(v => Number.isFinite(v) && v > 0),\n        memoryAccurate: verifyMemory(response),\n      };\n\n      conversation.push({ role: \"self_a\", message: prompt, timestamp: Date.now(), evaluation: { coherent: true, identityConsistent: true, emotionallyCongruent: true, memoryAccurate: true } });\n      conversation.push({ role: \"self_b\", message: response, timestamp: Date.now(), evaluation });\n    }\n\n    const scores = conversation.filter(t => t.role === \"self_b\").map(t => t.evaluation);\n    const identityScore = scores.filter(s => s.identityConsistent).length / scores.length;\n    const coherenceScore = scores.filter(s => s.coherent).length / scores.length;\n    const emotionalContinuity = scores.filter(s => s.emotionallyCongruent).length / scores.length;\n    const memoryAccuracy = scores.filter(s => s.memoryAccurate).length / scores.length;\n\n    const result: ConversationResult = {\n      turns: conversation, identityScore, coherenceScore, emotionalContinuity, memoryAccuracy,\n      passed: identityScore >= 0.6 && coherenceScore >= 0.6,\n    };\n\n    this.conversationHistory.push(result);\n    if (this.conversationHistory.length > 20) this.conversationHistory = this.conversationHistory.slice(-10);\n\n    return result;\n  }\n\n  getState(): Record<string, unknown> {\n    const lastResult = this.conversationHistory[this.conversationHistory.length - 1];\n    return {\n      initialized: this._initialized, testsRun: this.testCount,\n      lastResult: lastResult ? { passed: lastResult.passed, identityScore: lastResult.identityScore, coherenceScore: lastResult.coherenceScore } : null,\n    };\n  }\n\n  shutdown(): void { this._initialized = false; }\n}\n\nexport const selfConversation = new SelfConversationTest();\n"
   },
-  "savedAt": 1775010569198
+  "savedAt": 1775012910157
 }
