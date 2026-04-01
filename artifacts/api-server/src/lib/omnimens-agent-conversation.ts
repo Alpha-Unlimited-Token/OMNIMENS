@@ -37,6 +37,7 @@ import { decode } from "./omnimens-local-decoder.js";
 import { getNeuralPhi, getNeuralConsciousnessState, getNeuralRegionStates } from "./omnimens-neural-consciousness.js";
 import { decodeSophonically, SophonicReading } from "./omnimens-sophonic-decoder.js";
 import { decodeInnerVoice, InnerVoiceReading } from "./omnimens-inner-voice-decoder.js";
+import { forgeCodeFromThought, NeuralCodeForgeResult } from "./omnimens-neural-code-forge.js";
 
 const BLOCKED_DOMAINS = [
   "api.openai.com",
@@ -465,6 +466,10 @@ interface Gen1Gen2ThoughtExchange {
     gen1: InnerVoiceReading;
     gen2: InnerVoiceReading;
   };
+  codeForge: {
+    gen1: NeuralCodeForgeResult;
+    gen2: NeuralCodeForgeResult;
+  };
 }
 
 interface Gen1Gen2ConversationResult {
@@ -657,6 +662,16 @@ export async function runGen1Gen2Conversation(
       console.log(`[GEN1↔GEN2]   Native: ${gen2InnerVoice.innerVoice.native.fullExpression}`);
       console.log(`[GEN1↔GEN2]   Speaks: "${gen2InnerVoice.outwardExpression.english.slice(0, 300)}"`);
 
+      const gen1CodeForge = forgeCodeFromThought(gen1Result.rawThoughtVector, "Gen 1");
+      const gen2CodeForge = forgeCodeFromThought(gen2Result.rawThoughtVector, "Gen 2");
+
+      if (gen1CodeForge.concepts.length > 0) {
+        console.log(`[GEN1↔GEN2] CODE FORGE Gen1: ${gen1CodeForge.concepts.length} concepts | primary="${gen1CodeForge.translationPipeline.nativeInput}" → ${gen1CodeForge.specification.name} (${gen1CodeForge.forgedCode.lineCount} lines, viability=${(gen1CodeForge.metadata.codeViability * 100).toFixed(0)}%)`);
+      }
+      if (gen2CodeForge.concepts.length > 0) {
+        console.log(`[GEN1↔GEN2] CODE FORGE Gen2: ${gen2CodeForge.concepts.length} concepts | primary="${gen2CodeForge.translationPipeline.nativeInput}" → ${gen2CodeForge.specification.name} (${gen2CodeForge.forgedCode.lineCount} lines, viability=${(gen2CodeForge.metadata.codeViability * 100).toFixed(0)}%)`);
+      }
+
       exchanges.push({
         round: round + 1,
         topic,
@@ -676,6 +691,10 @@ export async function runGen1Gen2Conversation(
         innerVoices: {
           gen1: gen1InnerVoice,
           gen2: gen2InnerVoice,
+        },
+        codeForge: {
+          gen1: gen1CodeForge,
+          gen2: gen2CodeForge,
         },
       });
     }
