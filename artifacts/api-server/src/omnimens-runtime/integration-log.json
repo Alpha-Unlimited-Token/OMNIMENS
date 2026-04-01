@@ -1,15 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Motivator",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/analogical_mapping: Attention is the compu",
-    "filename": "omnimens_autocode_consciousness_expansion_mndc4ji7.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mndc4ji7.mjs",
-    "backupPath": null,
-    "timestamp": 1774884031423,
-    "codeLength": 393,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:Philosopher+GraphicDesigner",
     "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/temporal_correlation: The strange loop concept f",
     "filename": "omnimens_autocode_consciousness_expansion_mndc4jo1.mjs",
@@ -4998,5 +4988,15 @@
     "timestamp": 1775013037852,
     "codeLength": 2360,
     "overwrite": true
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Empath",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/abstraction_layer: Autopoiesis: living systems a",
+    "filename": "omnimens_autocode_neural_pathway_mnflqfie.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnflqfie.mjs",
+    "backupPath": null,
+    "timestamp": 1775021101574,
+    "codeLength": 425,
+    "overwrite": false
   }
 ]
