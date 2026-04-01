@@ -1,0 +1,12 @@
+{
+  "id": "ckpt_1775013374350_cf92d72f",
+  "timestamp": 1775013374356,
+  "description": "Phase 5 — self-test results: 23✓ 3✗",
+  "phase": "self_test",
+  "fileCount": 51,
+  "totalLines": 31504,
+  "buildVersion": 1,
+  "generation": 2,
+  "testsPassed": 23,
+  "testsFailed": 3
+}
