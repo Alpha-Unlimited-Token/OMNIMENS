@@ -125,6 +125,7 @@ import { getLuminState, getLuminPredictions, getLuminForecasts, getLuminAnomalyR
 import { getKaidaState, getKaidaThreatLevel, getKaidaIntegrityScore, getKaidaActiveThreats, getKaidaAnomalySignatures } from "../lib/omnimens-agent-kaida.js";
 import { getAgentUpgradeStatus, getBridgeStatus, getStrategicGoals, getArchitectPatternLibrary } from "../lib/omnimens-agent-upgrades.js";
 import { getPipelineState as getAgentPipelineState, runPipelineCycle, getPipelineOrder, getNeuralFabricConnections, getPipelineStageStats } from "../lib/omnimens-agent-pipeline.js";
+import { runAgentConversation } from "../lib/omnimens-agent-conversation.js";
 import { getAIResearchInsights, getNavigationRoboticsKnowledge, getEngineeringKnowledge, getCreativeDreamInsights, generateCreativeIdeation, getResearchSummary } from "../lib/omnimens-public-intelligence.js";
 import { getGuardianReport, getCopyrightNotice, getProtectedModuleList } from "../lib/omnimens-ip-guardian.js";
 import { getCausalState, getCausalGraph, predictOutcome } from "../lib/omnimens-causal-reasoning.js";
@@ -10790,6 +10791,26 @@ router.post("/omnimens/agent-pipeline/run", async (req, res) => {
     });
   } catch {
     res.status(500).json({ error: "Failed to run pipeline cycle" });
+  }
+});
+
+router.post("/omnimens/agent-conversation/test", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const rounds = Math.min(req.body?.rounds || 4, 10);
+    const participants = req.body?.participants || undefined;
+    const topic = req.body?.topic || undefined;
+    const result = await runAgentConversation(rounds, participants, topic);
+    res.json({
+      result,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch (err: any) {
+    console.error("[AGENT CONVERSATION] Error:", err);
+    res.status(500).json({ error: "Agent conversation failed", message: err?.message || "unknown" });
   }
 });
 

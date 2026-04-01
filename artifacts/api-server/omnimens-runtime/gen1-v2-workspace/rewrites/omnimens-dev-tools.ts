@@ -1,0 +1,248 @@
+/**
+ * TRADE SECRET — OMNIMENS™ Platform
+ * Copyright (C) 2024-2026 Alpha Unlimited Technologies, LLC.
+ * CONFIDENTIAL AND PROPRIETARY — See /legal/TRADE_SECRET_NOTICE.md
+ *
+ * OMNIMENS Developer Tools Orchestrator — v2.0 (UNIFIED RUNTIME)
+ */
+
+import { spawn } from "child_process";
+import path from "path";
+import { fileURLToPath } from "url";
+import {
+  spikeBus,
+  dbGateway,
+  apiManager,
+  engineRegistry,
+  cognitionBus,
+} from "./omnimens-unified-runtime.js";
+
+engineRegistry.registerEngine("dev-tools", "NORMAL", { dbQuota: 10 });
+
+/* ─────────────────────────── Shared Constants ────────────────────────────── */
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const PY_DIR = path.resolve(__dirname, "../python");
+const PYTHON = process.env.PYTHON_BIN || "python3";
+const LOG = (msg: string) => console.log(`[OMNIMENS-DEV-TOOLS] ${msg}`);
+
+/* ───────────────────────────── Python Bridge ─────────────────────────────── */
+export async function runPythonTool(
+  script: string,
+  payload: unknown,
+  timeoutMs = 60_000,
+): Promise<any> {
+  const input = typeof payload === "string" ? payload : JSON.stringify(payload);
+  const proc = spawn(PYTHON, [path.join(PY_DIR, script)]);
+  let stdout = "",
+    stderr = "";
+
+  return new Promise((resolve) => {
+    const timer = setTimeout(() => {
+      proc.kill("SIGKILL");
+      resolve({ success: false, error: `Tool timeout after ${timeoutMs}ms` });
+    }, timeoutMs);
+
+    proc.stdout.on("data", (d: Buffer) => (stdout += d));
+    proc.stderr.on("data", (d: Buffer) => (stderr += d));
+    proc.on("close", () => {
+      clearTimeout(timer);
+      try {
+        resolve(JSON.parse(stdout.trim()));
+      } catch {
+        resolve({
+          success: false,
+          error: stderr.slice(0, 800) || "No output from Python tool",
+        });
+      }
+    });
+    proc.on("error", (err) => {
+      clearTimeout(timer);
+      resolve({ success: false, error: err.message });
+    });
+    proc.stdin.write(input);
+    proc.stdin.end();
+  });
+}
+
+/* ───────────────────────── Generic Tool Wrapper ──────────────────────────── */
+type Spec = Record<string, any>;
+const TOOL_DEF: Record<
+  string,
+  { script: string; timeout: number; log: (s: Spec) => string }
+> = {
+  chart: {
+    script: "chart_generator.py",
+    timeout: 30_000,
+    log: (s) => `Generating ${s.type} chart: "${s.title}"`,
+  },
+  pdf: {
+    script: "pdf_processor.py",
+    timeout: 30_000,
+    log: (s) => `PDF action: ${s.action}`,
+  },
+  doc: {
+    script: "document_processor.py",
+    timeout: 30_000,
+    log: (s) => `Document action: ${s.action}`,
+  },
+  ocr: {
+    script: "ocr_engine.py",
+    timeout: 30_000,
+    log: () => `Running OCR`,
+  },
+  nlp: {
+    script: "nlp_analyzer.py",
+    timeout: 60_000,
+    log: (s) => `NLP ${s.action} on ${s.text?.length || 0} chars`,
+  },
+  media: {
+    script: "ffmpeg_tools.py",
+    timeout: 180_000,
+    log: (s) => `FFmpeg: ${s.action}`,
+  },
+  diagram: {
+    script: "diagram_generator.py",
+    timeout: 30_000,
+    log: (s) => `Generating diagram (${s.type || "network"})`,
+  },
+  ds: {
+    script: "data_science.py",
+    timeout: 60_000,
+    log: (s) => `Data science: ${s.action}`,
+  },
+  math: {
+    script: "math_engine.py",
+    timeout: 30_000,
+    log: (s) => `Math: ${s.action}`,
+  },
+  audio: {
+    script: "audio_analyzer.py",
+    timeout: 60_000,
+    log: (s) => `Audio analysis: ${s.action}`,
+  },
+  code: {
+    script: "code_runner.py",
+    timeout: (s) => (s.timeout || 15) * 1000 + 5000,
+    log: (s) => `Code runner: op=${s.op} lang=${s.lang}`,
+  },
+  web: {
+    script: "web_tools.py",
+    timeout: 30_000,
+    log: (s) => `Web ${s.op}: ${s.url}`,
+  },
+  git: {
+    script: "git_tools.py",
+    timeout: 90_000,
+    log: (s) => `Git ${s.op}: ${s.url || s.path}`,
+  },
+  system: {
+    script: "system_tools.py",
+    timeout: 30_000,
+    log: (s) => `System ${s.op}`,
+  },
+  file: {
+    script: "file_tools.py",
+    timeout: 30_000,
+    log: (s) => `File tool: ${s.op}`,
+  },
+};
+
+async function callTool(kind: keyof typeof TOOL_DEF, spec: Spec): Promise<any> {
+  const def = TOOL_DEF[kind];
+  const timeout =
+    typeof def.timeout === "function" ? def.timeout(spec) : def.timeout;
+  LOG(def.log(spec));
+  return runPythonTool(def.script, spec, timeout);
+}
+
+/* ──────────────────────── Exported Convenience APIs ──────────────────────── */
+export const generateChart = (s: Spec) => callTool("chart", s);
+export const processPDF = (s: Spec) => callTool("pdf", s);
+export const processDocument = (s: Spec) => callTool("doc", s);
+export const runOCR = (img: string) => callTool("ocr", img);
+export const analyzeText = (s: Spec) => callTool("nlp", s);
+export const processMedia = (s: Spec) => callTool("media", s);
+export const generateDiagram = (s: Spec) => callTool("diagram", s);
+export const runDataScience = (s: Spec) => callTool("ds", s);
+export const solveMath = (s: Spec) => callTool("math", s);
+export const analyzeAudio = (s: Spec) => callTool("audio", s);
+export const runCode = (s: Spec) => callTool("code", s);
+export const fetchWebUrl = (s: Spec) => callTool("web", s);
+export const runGitOp = (s: Spec) => callTool("git", s);
+export const getSystemInfo = (s: Spec) => callTool("system", s);
+export const runFileTool = (s: Spec) => callTool("file", s);
+
+/* ────────────────────────────── Health Check ─────────────────────────────── */
+async function healthCheck() {
+  const tools = await checkAllTools();
+  cognitionBus.shareInsight("dev-tools", { type: "health", data: tools });
+  spikeBus.scheduleSpike("dev-tools:health", {}, 600_000); // 10-minute interval
+}
+spikeBus.on("dev-tools:health", healthCheck);
+spikeBus.scheduleSpike("dev-tools:health", {}, 100);
+
+/* ───────────────────────── Tool Availability Scan ────────────────────────── */
+export async function checkAllTools(): Promise<Record<string, boolean>> {
+  const tests: Record<string, () => Promise<any>> = {
+    chart: () => generateChart({ type: "bar", title: "Test", data: { labels: ["A", "B"], datasets: [{ values: [1, 2] }] } }),
+    math: () => solveMath({ action: "simplify", expression: "x**2 + 2*x + 1" }),
+  };
+  const out: Record<string, boolean> = {};
+  await Promise.all(
+    Object.entries(tests).map(async ([k, fn]) => {
+      try {
+        out[k] = (await fn())?.success === true;
+      } catch {
+        out[k] = false;
+      }
+    }),
+  );
+  return out;
+}
+
+/* ───────────────────────── Intent Detector (NLU) ─────────────────────────── */
+const REGEX_MAP: Record<keyof ReturnType<typeof detectDevToolIntent>, RegExp> = {
+  chart: /\b(chart|graph|plot|visuali[sz]e|histogram|heatmap|scatter|pie chart|bar chart|line chart|donut)\b/,
+  pdf: /\b(pdf|portable document)\b/,
+  docx: /\b(docx|word document|\.docx)\b/,
+  excel: /\b(excel|xlsx|spreadsheet)\b/,
+  csv: /\b(csv|comma.?separated|dataframe)\b/,
+  ocr: /\b(ocr|text from image|optical.*char)\b/,
+  nlp: /\b(nlp|sentiment|entity extraction|pos tag|keyword)\b/,
+  ffmpeg: /\b(ffmpeg|video|audio|thumbnail|waveform|trim)\b/,
+  diagram: /\b(diagram|graphviz|flowchart|network graph)\b/,
+  datascience: /\b(cluster|regression|machine learning|pca|anomaly)\b/,
+  math: /\b(derivative|integral|solve|equation|polynomial|matrix)\b/,
+  audio: /\b(audio|spectrogram|beat|tempo|bpm|librosa)\b/,
+  code_run: /\b(run this code|execute|lint|format|pylint|black)\b/,
+  web_fetch: /\b(fetch|scrape|crawl|api request|http request|curl)\b/,
+  git: /\b(git|repository|clone|commit|blame|diff)\b/,
+  system: /\b(system info|cpu usage|memory usage|uptime)\b/,
+  file_tools: /\b(diff.*files|zip|archive|convert.*json|validate.*json|search.*files)\b/,
+};
+
+export function detectDevToolIntent(msg: string) {
+  const m = msg.toLowerCase();
+  return Object.fromEntries(
+    Object.entries(REGEX_MAP).map(([k, r]) => [k, r.test(m)]),
+  ) as ReturnType<typeof detectDevToolIntent>;
+}
+
+/* ───────────────────────── Cognition Hooks ───────────────────────────────── */
+cognitionBus.onInsight((src, insight) => {
+  if (src !== "dev-tools" && insight?.type === "discovery") {
+    LOG(`Learning from ${src} insight`);
+  }
+});
+spikeBus.on("attention:dev-tools", () => spikeBus.scheduleSpike("dev-tools:health", {}, 1_000));
+spikeBus.on("cognition:curiosity", () => {
+  LOG("Curiosity spike — re-checking tools");
+  spikeBus.scheduleSpike("dev-tools:health", {}, 0);
+});
+
+/* ──────────────────────────── Shutdown Hook ─────────────────────────────── */
+export function shutdown() {
+  engineRegistry.unregisterEngine("dev-tools");
+  LOG("Engine shutdown");
+}
