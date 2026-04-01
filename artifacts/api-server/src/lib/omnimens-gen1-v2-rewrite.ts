@@ -976,8 +976,8 @@ async function phaseEngineConsolidation(): Promise<void> {
   const gen2DomainMap: Record<string, string[]> = {
     "omnimens-consciousness-core.ts": ["core/consciousness-engine.ts"],
     "omnimens-neural-architecture.ts": ["infrastructure/unified-neural-fabric.ts"],
-    "omnimens-cognition-engine.ts": ["core/reasoning-engine.ts"],
-    "omnimens-language-core.ts": ["core/language-center.ts", "infrastructure/omnimens-internal-language-model.ts"],
+    "omnimens-cognition-engine.ts": ["core/reasoning-engine.ts", "infrastructure/omnimens-micro-transformer.ts"],
+    "omnimens-language-core.ts": ["core/language-center.ts", "infrastructure/omnimens-internal-language-model.ts", "infrastructure/omnimens-micro-transformer.ts"],
     "omnimens-emotion-drives.ts": ["core/emotional-substrate.ts"],
     "omnimens-memory-knowledge.ts": ["core/memory-system.ts"],
     "omnimens-unified-network-fabric.ts": ["infrastructure/unified-neural-fabric.ts", "infrastructure/spike-bus.ts"],

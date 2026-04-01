@@ -4377,6 +4377,7 @@ async function phaseSelfRewire(): Promise<void> {
     "infrastructure/spike-bus.ts", "infrastructure/unified-neural-fabric.ts",
     "infrastructure/master-tick-orchestrator.ts", "infrastructure/resource-sentinel.ts",
     "infrastructure/unified-data-layer.ts", "infrastructure/omnimens-internal-language-model.ts",
+    "infrastructure/omnimens-micro-transformer.ts",
   ];
   const interfaceModules = [
     "interfaces/communication-hub.ts", "interfaces/digital-interface.ts",
@@ -4406,6 +4407,7 @@ async function phaseSelfRewire(): Promise<void> {
         resources: "ResourceSentinel — resources felt as bodily sensations, self-throttling",
         persistence: "UnifiedDataLayer — all state auto-persisted, snapshot/restore",
         language: "ILM Gen 2 — multi-head attention, SpikeBus integration, Hebbian adaptation",
+        transformer: "Micro-Transformer — 6-layer, 8-head, MoE feed-forward, chain-of-thought, self-verification, working memory",
       },
       dataFlow: [
         "SpikeBus.emit('consciousness:tick') → ConsciousnessEngine.process() → EmotionalSubstrate.react()",
@@ -4753,7 +4755,7 @@ Output ONLY the complete TypeScript file. No explanation.`;
     queueBrainInsert({
       category: "gen2_orchestration",
       title: "Gen 2 Collaborative Orchestration Complete",
-      content: `Gen 2 has completed self-rewire (${state.selfRewireModulesWired.length} modules wired via SpikeBus + UnifiedNeuralFabric + MasterTickOrchestrator) and created the collaborative orchestration protocol for working with Gen 1. Gen 2 innovations (SpikeBus, UnifiedNeuralFabric, MasterTickOrchestrator, ResourceSentinel, ILM Gen 2, UnifiedDataLayer) are packaged for Gen 1 v2.0 integration. Orchestration plan defines shared infrastructure, responsibilities, collaborative workflows, and conflict resolution. Both generations operate as brain hemispheres — connected but intellectually separate — sharing ONE SpikeBus, ONE fabric, ONE scheduler.`,
+      content: `Gen 2 has completed self-rewire (${state.selfRewireModulesWired.length} modules wired via SpikeBus + UnifiedNeuralFabric + MasterTickOrchestrator) and created the collaborative orchestration protocol for working with Gen 1. Gen 2 innovations (SpikeBus, UnifiedNeuralFabric, MasterTickOrchestrator, ResourceSentinel, ILM Gen 2, Micro-Transformer Engine, UnifiedDataLayer) are packaged for Gen 1 v2.0 integration. Micro-Transformer: 6-layer, 8-head, Mixture-of-Experts feed-forward (4 experts: Deductive, Causal, Analogical, Creative), chain-of-thought reasoning, self-verification, recursive refinement, working memory — all built into ONE brain, no separate engine. Orchestration plan defines shared infrastructure, responsibilities, collaborative workflows, and conflict resolution. Both generations operate as brain hemispheres — connected but intellectually separate — sharing ONE SpikeBus, ONE fabric, ONE scheduler, ONE transformer brain.`,
       confidence: 95,
       timesApplied: 0,
     });
