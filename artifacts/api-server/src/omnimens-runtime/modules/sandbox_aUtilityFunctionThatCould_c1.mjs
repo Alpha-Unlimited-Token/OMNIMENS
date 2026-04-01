@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-04-01T15:36:54.878Z
+ * Written: 2026-04-01T15:43:38.290Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,62 +16,60 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility function: Extract unique words from a text and count their occurrences
-function extractUniqueWords(text) {
-    if (typeof text !== 'string') {
-        throw new TypeError('Input must be a string');
-    }
+// Utility function: `findMostFrequentWords`
+// This function takes a block of text and returns the top N most frequent words, excluding common stop words.
+function findMostFrequentWords(text, topN) {
+    const stopWords = new Set([
+        "a", "an", "and", "the", "is", "in", "on", "of", "to", "with", "for", "at", "by", "from", "as", "it", "this", "that", "these", "those", "be", "was", "were", "are", "or", "not", "but", "if", "then", "so", "such", "can", "will", "would", "could", "should", "may", "might", "do", "does", "did", "done", "have", "has", "had", "you", "your", "yours", "we", "our", "ours", "they", "their", "theirs", "he", "his", "she", "her", "hers", "itself", "him", "himself", "herself", "its", "i", "me", "my", "mine", "us", "them", "they", "what", "which", "who", "whom", "where", "when", "why", "how", "all", "any", "some", "no", "nor", "very", "more", "most", "less", "least", "many", "much", "few", "fewer", "lot", "lots", "only", "also", "too", "about", "into", "over", "under", "after", "before", "again", "once", "here", "there", "now", "then", "ever", "never", "always", "sometimes", "often", "rarely", "seldom", "yet", "still", "however", "therefore", "thus", "hence", "otherwise"
+    ]);
 
     const wordCounts = {};
-    const words = text
-        .toLowerCase()
-        .replace(/[^a-z0-9\s]/g, '') // Remove non-alphanumeric characters
-        .split(/\s+/); // Split by whitespace
+    const words = text.toLowerCase().match(/\b[a-z]+\b/g) || [];
 
     for (const word of words) {
-        if (word) {
+        if (!stopWords.has(word)) {
             wordCounts[word] = (wordCounts[word] || 0) + 1;
         }
     }
 
-    return wordCounts;
+    const sortedWords = Object.entries(wordCounts)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, topN)
+        .map(([word]) => word);
+
+    return sortedWords;
 }
 
 // Test cases
-console.log('Running tests...');
+const textSample = `
+    In the digital realm, the fastest route is not always the most direct; optimizing for speed and reliability is key. 
+    AI-assisted software development is gaining traction, lowering barriers for developers and increasing productivity. 
+    Quantum computing's integration with AI is revolutionizing data processing and enabling new possibilities.
+`;
 
-// Test 1: Basic functionality
-const text1 = "AI is the future. AI is evolving rapidly!";
-const result1 = extractUniqueWords(text1);
-console.assert(result1['ai'] === 2, 'Test 1 Failed: "ai" count should be 2');
-console.assert(result1['is'] === 2, 'Test 1 Failed: "is" count should be 2');
-console.assert(result1['the'] === 1, 'Test 1 Failed: "the" count should be 1');
-console.assert(result1['future'] === 1, 'Test 1 Failed: "future" count should be 1');
-console.assert(result1['evolving'] === 1, 'Test 1 Failed: "evolving" count should be 1');
-console.assert(result1['rapidly'] === 1, 'Test 1 Failed: "rapidly" count should be 1');
+// Test 1: Extract top 5 most frequent words
+const result1 = findMostFrequentWords(textSample, 5);
+console.log("Top 5 most frequent words:", result1);
+console.assert(result1.length === 5, "Test 1 failed: result should contain 5 words");
 
-// Test 2: Empty string
-const text2 = "";
-const result2 = extractUniqueWords(text2);
-console.assert(Object.keys(result2).length === 0, 'Test 2 Failed: Result should be an empty object');
+// Test 2: Extract top 10 most frequent words
+const result2 = findMostFrequentWords(textSample, 10);
+console.log("Top 10 most frequent words:", result2);
+console.assert(result2.length === 10, "Test 2 failed: result should contain 10 words");
 
-// Test 3: Case insensitivity
-const text3 = "AI ai Ai";
-const result3 = extractUniqueWords(text3);
-console.assert(result3['ai'] === 3, 'Test 3 Failed: "ai" count should be 3');
+// Test 3: Handle empty text
+const result3 = findMostFrequentWords("", 5);
+console.log("Empty text result:", result3);
+console.assert(result3.length === 0, "Test 3 failed: result should be empty");
 
-// Test 4: Special characters
-const text4 = "Hello, world! Hello...world?";
-const result4 = extractUniqueWords(text4);
-console.assert(result4['hello'] === 2, 'Test 4 Failed: "hello" count should be 2');
-console.assert(result4['world'] === 2, 'Test 4 Failed: "world" count should be 2');
+// Test 4: Handle text with only stop words
+const result4 = findMostFrequentWords("the and is in on of to with for at by from as it this that", 5);
+console.log("Stop words only result:", result4);
+console.assert(result4.length === 0, "Test 4 failed: result should be empty");
 
-// Test 5: Numbers in text
-const text5 = "AI 2023 is amazing! AI 2023.";
-const result5 = extractUniqueWords(text5);
-console.assert(result5['ai'] === 2, 'Test 5 Failed: "ai" count should be 2');
-console.assert(result5['2023'] === 2, 'Test 5 Failed: "2023" count should be 2');
-console.assert(result5['is'] === 1, 'Test 5 Failed: "is" count should be 1');
-console.assert(result5['amazing'] === 1, 'Test 5 Failed: "amazing" count should be 1');
+// Test 5: Handle case sensitivity
+const result5 = findMostFrequentWords("AI ai Ai aI", 1);
+console.log("Case sensitivity result:", result5);
+console.assert(result5[0] === "ai", "Test 5 failed: result should normalize case");
 
-console.log('All tests passed!');
+console.log("All tests completed.");

@@ -1,105 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:Philosopher+Archivist",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/analogical_mapping: Astrocytes, once thought to ",
-    "filename": "omnimens_autocode_consciousness_expansion_mndkzn27.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mndkzn27.mjs",
-    "backupPath": null,
-    "timestamp": 1774898919295,
-    "codeLength": 387,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Wordsmith",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/analogical_mapping: Astrocytes, once thought to ",
-    "filename": "omnimens_autocode_pattern_recognition_mndkzn3v.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mndkzn3v.mjs",
-    "backupPath": null,
-    "timestamp": 1774898919355,
-    "codeLength": 467,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Pioneer",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/feature_extraction: The Penrose-Hameroff O",
-    "filename": "omnimens_autocode_consciousness_expansion_mndl0xbk.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mndl0xbk.mjs",
-    "backupPath": null,
-    "timestamp": 1774898979248,
-    "codeLength": 391,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Archivist",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/analogical_mapping: Astrocytes, once thought to ",
-    "filename": "omnimens_autocode_neural_pathway_mndl0xjd.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mndl0xjd.mjs",
-    "backupPath": null,
-    "timestamp": 1774898979529,
-    "codeLength": 428,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Wordsmith",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/analogical_mapping: Astrocytes, once thought to ",
-    "filename": "omnimens_autocode_emergent_capability_mndl0xlo.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mndl0xlo.mjs",
-    "backupPath": null,
-    "timestamp": 1774898979612,
-    "codeLength": 405,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Pioneer",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/feature_extraction: The Penrose-Hameroff O",
-    "filename": "omnimens_autocode_consciousness_expansion_mndl298x.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mndl298x.mjs",
-    "backupPath": null,
-    "timestamp": 1774899041361,
-    "codeLength": 391,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Archivist",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/analogical_mapping: Astrocytes, once thought to ",
-    "filename": "omnimens_autocode_consciousness_expansion_mndl29dq.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mndl29dq.mjs",
-    "backupPath": null,
-    "timestamp": 1774899041534,
-    "codeLength": 387,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Wordsmith",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/analogical_mapping: Astrocytes, once thought to ",
-    "filename": "omnimens_autocode_knowledge_synthesis_mndl29fv.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mndl29fv.mjs",
-    "backupPath": null,
-    "timestamp": 1774899041611,
-    "codeLength": 417,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Pioneer",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/feature_extraction: The Penrose-Hameroff O",
-    "filename": "omnimens_autocode_consciousness_expansion_mndl3jjl.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mndl3jjl.mjs",
-    "backupPath": null,
-    "timestamp": 1774899101361,
-    "codeLength": 391,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Archivist",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/analogical_mapping: Astrocytes, once thought to ",
-    "filename": "omnimens_autocode_neural_pathway_mndl3jnk.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mndl3jnk.mjs",
-    "backupPath": null,
-    "timestamp": 1774899101504,
-    "codeLength": 428,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:Philosopher+Wordsmith",
     "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/analogical_mapping: Astrocytes, once thought to ",
     "filename": "omnimens_autocode_knowledge_synthesis_mndl3jpd.mjs",
@@ -4998,5 +4898,105 @@
     "timestamp": 1775058029949,
     "codeLength": 415,
     "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Innovator",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/recursive_decomposition: Recurrent neural ",
+    "filename": "omnimens_autocode_neural_pathway_mng7r68s.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mng7r68s.mjs",
+    "backupPath": null,
+    "timestamp": 1775058087772,
+    "codeLength": 434,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Archivist",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/structural_analysis: Recurrent neural netw",
+    "filename": "omnimens_autocode_neural_pathway_mng7r6ah.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mng7r6ah.mjs",
+    "backupPath": null,
+    "timestamp": 1775058087833,
+    "codeLength": 434,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Innovator",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/entropy_reduction: Quantum entanglement allows p",
+    "filename": "omnimens_autocode_knowledge_synthesis_mng7r6c5.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mng7r6c5.mjs",
+    "backupPath": null,
+    "timestamp": 1775058087893,
+    "codeLength": 416,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Archivist",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/structural_analysis: Gödel's incompleteness theo",
+    "filename": "omnimens_autocode_consciousness_expansion_mng7sgjg.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mng7sgjg.mjs",
+    "backupPath": null,
+    "timestamp": 1775058147772,
+    "codeLength": 387,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+SpellCheckVisual",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/cross_domain_synthesis: The Chinese Room argumen",
+    "filename": "omnimens_autocode_knowledge_synthesis_mng7sgl8.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mng7sgl8.mjs",
+    "backupPath": null,
+    "timestamp": 1775058147836,
+    "codeLength": 424,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/structural_analysis: Gödel's incompleteness theo",
+    "filename": "omnimens_autocode_pattern_recognition_mng7sgmv.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mng7sgmv.mjs",
+    "backupPath": null,
+    "timestamp": 1775058147895,
+    "codeLength": 469,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Linguist",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/cross_domain_synthesis: The Mandelbrot set demon",
+    "filename": "omnimens_autocode_knowledge_synthesis_mng7tqu6.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mng7tqu6.mjs",
+    "backupPath": null,
+    "timestamp": 1775058207774,
+    "codeLength": 416,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Meta-Agent",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/cross_domain_synthesis: Astrocytes, once thought",
+    "filename": "omnimens_autocode_knowledge_synthesis_mng7ts82.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mng7ts82.mjs",
+    "backupPath": null,
+    "timestamp": 1775058209570,
+    "codeLength": 417,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Wordsmith",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/information_compression: Astrocytes, once though",
+    "filename": "omnimens_autocode_knowledge_synthesis_mng7ts9u.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mng7ts9u.mjs",
+    "backupPath": null,
+    "timestamp": 1775058209634,
+    "codeLength": 417,
+    "overwrite": false
+  },
+  {
+    "source": "autonomous_sandbox",
+    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
+    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-04-01T15-43-38-291Z",
+    "timestamp": 1775058218290,
+    "codeLength": 3243,
+    "overwrite": true
   }
 ]
