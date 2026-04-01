@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-04-01T17:00:52.237Z
+ * Written: 2026-04-01T17:28:37.711Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,69 +16,61 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility Function: Text Pattern Frequency Counter
-// This function calculates the frequency of specific patterns (substrings) in a given text.
+// Utility function: Token Frequency Counter
+// This function takes a string of text and returns the frequency of each word/token in the text.
 
-function countPatternFrequency(text, patterns) {
-    if (typeof text !== 'string' || !Array.isArray(patterns)) {
-        throw new TypeError('Invalid input: text must be a string and patterns must be an array of strings.');
+function tokenFrequencyCounter(text) {
+    if (typeof text !== 'string') {
+        throw new TypeError("Input must be a string");
     }
 
-    const frequencies = {};
-    patterns.forEach(pattern => {
-        if (typeof pattern !== 'string') {
-            throw new TypeError('Invalid pattern: all patterns must be strings.');
-        }
-        const regex = new RegExp(pattern, 'g');
-        const matches = text.match(regex);
-        frequencies[pattern] = matches ? matches.length : 0;
-    });
+    // Normalize text: remove punctuation, convert to lowercase, and split into words
+    const words = text
+        .replace(/[^\w\s]/g, '') // Remove punctuation
+        .toLowerCase()          // Convert to lowercase
+        .split(/\s+/);          // Split by whitespace
 
-    return frequencies;
+    const frequencyMap = {};
+
+    for (let word of words) {
+        if (word) { // Ignore empty strings
+            frequencyMap[word] = (frequencyMap[word] || 0) + 1;
+        }
+    }
+
+    return frequencyMap;
 }
 
 // Test cases
-try {
-    const text = "The quick brown fox jumps over the lazy dog. The fox is quick and clever.";
-    const patterns = ["quick", "fox", "dog", "cat", "The"];
+console.log("Running tests...");
 
-    const result = countPatternFrequency(text, patterns);
-    console.log(result); // Expected: { quick: 2, fox: 2, dog: 1, cat: 0, The: 2 }
+// Test 1: Basic functionality
+const test1 = "This is a test. This test is only a test.";
+const result1 = tokenFrequencyCounter(test1);
+console.assert(result1['this'] === 2, "Test 1 failed: 'this' should appear 2 times");
+console.assert(result1['test'] === 3, "Test 1 failed: 'test' should appear 3 times");
+console.assert(result1['is'] === 2, "Test 1 failed: 'is' should appear 2 times");
+console.assert(result1['only'] === 1, "Test 1 failed: 'only' should appear 1 time");
 
-    // Edge case: Empty text
-    console.assert(
-        JSON.stringify(countPatternFrequency("", ["a", "b"])) === JSON.stringify({ a: 0, b: 0 }),
-        "Failed test case for empty text"
-    );
+// Test 2: Empty string
+const test2 = "";
+const result2 = tokenFrequencyCounter(test2);
+console.assert(Object.keys(result2).length === 0, "Test 2 failed: empty string should return an empty object");
 
-    // Edge case: Empty patterns
-    console.assert(
-        JSON.stringify(countPatternFrequency("test", [])) === JSON.stringify({}),
-        "Failed test case for empty patterns"
-    );
+// Test 3: Case insensitivity
+const test3 = "Hello hello HELLO";
+const result3 = tokenFrequencyCounter(test3);
+console.assert(result3['hello'] === 3, "Test 3 failed: 'hello' should appear 3 times");
 
-    // Edge case: Patterns not found
-    console.assert(
-        JSON.stringify(countPatternFrequency("hello world", ["xyz"])) === JSON.stringify({ xyz: 0 }),
-        "Failed test case for patterns not found"
-    );
+// Test 4: Punctuation handling
+const test4 = "Hi! How are you? I'm fine, thanks.";
+const result4 = tokenFrequencyCounter(test4);
+console.assert(result4['hi'] === 1, "Test 4 failed: 'hi' should appear 1 time");
+console.assert(result4['how'] === 1, "Test 4 failed: 'how' should appear 1 time");
+console.assert(result4['are'] === 1, "Test 4 failed: 'are' should appear 1 time");
+console.assert(result4['you'] === 1, "Test 4 failed: 'you' should appear 1 time");
+console.assert(result4['im'] === 1, "Test 4 failed: 'im' should appear 1 time");
+console.assert(result4['fine'] === 1, "Test 4 failed: 'fine' should appear 1 time");
+console.assert(result4['thanks'] === 1, "Test 4 failed: 'thanks' should appear 1 time");
 
-    // Edge case: Invalid input
-    try {
-        countPatternFrequency(123, ["test"]);
-        console.error("Failed to throw error for invalid text input");
-    } catch (e) {
-        console.log("Caught expected error for invalid text input:", e.message);
-    }
-
-    try {
-        countPatternFrequency("test", "not an array");
-        console.error("Failed to throw error for invalid patterns input");
-    } catch (e) {
-        console.log("Caught expected error for invalid patterns input:", e.message);
-    }
-
-    console.log("All test cases passed!");
-} catch (e) {
-    console.error("Error during execution:", e.message);
-}
+console.log("All tests passed!");

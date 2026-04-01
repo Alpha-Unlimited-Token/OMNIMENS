@@ -1,0 +1,77 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
+ * Written: 2026-04-01T17:22:41.408Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Utility function: Text Pattern Frequency Analyzer
+// This function analyzes a given text and returns the frequency of specified patterns or words.
+
+function analyzePatternFrequency(text, patterns) {
+    if (typeof text !== 'string' || !Array.isArray(patterns)) {
+        throw new TypeError('Invalid input: text must be a string and patterns must be an array.');
+    }
+    
+    const frequencies = {};
+    patterns.forEach(pattern => {
+        if (typeof pattern !== 'string') {
+            throw new TypeError('Invalid pattern: each pattern must be a string.');
+        }
+        const regex = new RegExp(pattern, 'gi');
+        const matches = text.match(regex);
+        frequencies[pattern] = matches ? matches.length : 0;
+    });
+    return frequencies;
+}
+
+// Test cases
+console.log("Running tests...");
+
+// Test 1: Basic functionality
+const text1 = "Artificial intelligence is advancing rapidly. Intelligence is key to AI.";
+const patterns1 = ["intelligence", "AI", "key"];
+console.assert(JSON.stringify(analyzePatternFrequency(text1, patterns1)) === JSON.stringify({ intelligence: 2, AI: 1, key: 1 }), "Test 1 Failed");
+
+// Test 2: Case insensitivity
+const text2 = "Machine learning and deep learning are subsets of AI. Learning is powerful.";
+const patterns2 = ["learning", "ai", "machine"];
+console.assert(JSON.stringify(analyzePatternFrequency(text2, patterns2)) === JSON.stringify({ learning: 3, ai: 1, machine: 1 }), "Test 2 Failed");
+
+// Test 3: No matches
+const text3 = "This text has no relevant patterns.";
+const patterns3 = ["pattern", "AI", "intelligence"];
+console.assert(JSON.stringify(analyzePatternFrequency(text3, patterns3)) === JSON.stringify({ pattern: 0, AI: 0, intelligence: 0 }), "Test 3 Failed");
+
+// Test 4: Empty text
+const text4 = "";
+const patterns4 = ["test", "empty"];
+console.assert(JSON.stringify(analyzePatternFrequency(text4, patterns4)) === JSON.stringify({ test: 0, empty: 0 }), "Test 4 Failed");
+
+// Test 5: Invalid inputs
+try {
+    analyzePatternFrequency(123, ["test"]);
+    console.error("Test 5 Failed: Did not throw error for invalid text input.");
+} catch (e) {
+    console.log("Test 5 Passed: Error thrown for invalid text input.");
+}
+
+try {
+    analyzePatternFrequency("valid text", "not an array");
+    console.error("Test 5 Failed: Did not throw error for invalid patterns input.");
+} catch (e) {
+    console.log("Test 5 Passed: Error thrown for invalid patterns input.");
+}
+
+console.log("All tests completed.");
