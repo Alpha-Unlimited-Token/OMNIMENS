@@ -19,17 +19,9 @@
 
 // CIEM: ultra-light causal graph runner (pure computation)
 
-// Basic types
-
-
- fn};
-
-// One causal micro-world = list of nodes + initial state
-
-
 // Run one simulation tick
 function step(cmw) {
-  const next= { ...cmw.state };
+  const next = { ...cmw.state };
   for (const n of cmw.nodes) {
     next[n.key] = n.fn(cmw.state);
   }
@@ -40,9 +32,9 @@ function step(cmw) {
 export function simulate(
   cmw,
   ticks,
-  stopCond => boolean = () => false
+  stopCond = () => false
 ) {
-  const history= [cmw.state];
+  const history = [cmw.state];
   let current = cmw.state;
   for (let t = 0; t < ticks; t++) {
     current = step({ ...cmw, state: current });
@@ -60,7 +52,7 @@ export function counterFactual(
   ticks = 10
 ) {
   const original = simulate(cmw, ticks);
-  const mutated= { ...cmw, state: { ...cmw.state, [varKey]: newVal } };
+  const mutated = { ...cmw, state: { ...cmw.state, [varKey]: newVal } };
   const alt = simulate(mutated, ticks);
   return { original, alt };
 }

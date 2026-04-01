@@ -17,15 +17,13 @@
  */
 
 // Causal Imagination Fabric – minimal SCM + do() operator
- parents; fn: (p, e) => number };
 
-
-const topological = (scm): Node[] => {
-  const order= [];
+const topological = (scm) => {
+  const order = [];
   const visited = new Set();
   const visit = (n) => {
     if (visited.has(n.id)) return;
-    n.parents.forEach(pid => visit(scm.nodes.find(x => x.id === pid)!));
+    n.parents.forEach(pid => visit(scm.nodes.find(x => x.id === pid)));
     visited.add(n.id); order.push(n);
   };
   scm.nodes.forEach(visit); return order;
@@ -43,10 +41,10 @@ export function abduct(scm, evidence) {
 }
 
 // Intervention & prediction
-export function predict(scm, eps, intervene> = {}) {
+export function predict(scm, eps, intervene = {}) {
   const out = {};
   topological(scm).forEach(n => {
-    if (n.id in intervene) { out[n.id] = intervene[n.id]!; return; }
+    if (n.id in intervene) { out[n.id] = intervene[n.id]; return; }
     const pVals = n.parents.map(p => out[p]);
     out[n.id] = n.fn(pVals, eps[n.id]);
   });

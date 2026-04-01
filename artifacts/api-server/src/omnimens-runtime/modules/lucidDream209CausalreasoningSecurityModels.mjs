@@ -18,17 +18,13 @@
 
 // Causal Imagination Core – 24 lines, no I/O, pure computation
 
-
- to; weight};
- updater: (n, s) => number };
-
 // Apply one propagation step
 function propagate(graph, state) {
-  const next= { ...state };
+  const next = { ...state };
   for (const { from, to, weight } of graph.edges) {
     next[to] += weight * state[from];
   }
-  for (const n in next) next[n] = graph.updater(n, next); // local nonlinearities
+  for (const n in next) next[n] = graph.updater(n, next);
   return next;
 }
 
@@ -39,7 +35,7 @@ export function imagine(
   intervention,
   steps = 3
 ) {
-  let s= { ...initial, ...intervention }; // apply counterfactual
+  let s = { ...initial, ...intervention };
   for (let i = 0; i < steps; i++) s = propagate(graph, s);
   return s;
 }
