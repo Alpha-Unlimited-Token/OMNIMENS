@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-04-01T17:53:58.001Z
+ * Written: 2026-04-01T18:18:31.511Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,56 +16,80 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility function: Text similarity using cosine similarity
-function cosineSimilarity(vec1, vec2) {
-    if (vec1.length !== vec2.length) {
-        throw new Error("Vectors must be of the same length");
+// Utility function: Extract unique words from a text, count their occurrences, and sort by frequency
+function analyzeTextFrequency(text) {
+    if (typeof text !== 'string') {
+        throw new TypeError('Input must be a string');
     }
-    let dotProduct = 0;
-    let magnitudeA = 0;
-    let magnitudeB = 0;
-    for (let i = 0; i < vec1.length; i++) {
-        dotProduct += vec1[i] * vec2[i];
-        magnitudeA += vec1[i] ** 2;
-        magnitudeB += vec2[i] ** 2;
-    }
-    if (magnitudeA === 0 || magnitudeB === 0) {
-        return 0; // Avoid division by zero
-    }
-    return dotProduct / (Math.sqrt(magnitudeA) * Math.sqrt(magnitudeB));
-}
 
-// Helper function: Convert text to frequency vector
-function textToFrequencyVector(text, vocabulary) {
-    const vector = new Array(vocabulary.length).fill(0);
-    const words = text.toLowerCase().split(/\W+/);
-    for (let word of words) {
-        const index = vocabulary.indexOf(word);
-        if (index !== -1) {
-            vector[index]++;
-        }
+    // Normalize text: remove punctuation, convert to lowercase, and split into words
+    const words = text
+        .replace(/[^\w\s]|_/g, '')
+        .toLowerCase()
+        .split(/\s+/)
+        .filter(Boolean);
+
+    // Count word occurrences
+    const wordCount = {};
+    for (const word of words) {
+        wordCount[word] = (wordCount[word] || 0) + 1;
     }
-    return vector;
+
+    // Convert to array and sort by frequency (descending) and then alphabetically
+    const sortedWords = Object.entries(wordCount)
+        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+
+    // Return the sorted array of words with their frequencies
+    return sortedWords;
 }
 
 // Test cases
-const vocabulary = ["ai", "system", "data", "processing", "pattern", "analysis", "optimization"];
-const text1 = "AI system optimization and data processing";
-const text2 = "Pattern analysis and data processing for AI systems";
-const text3 = "Unrelated text with no matching words";
+console.log('--- Test Cases ---');
 
-const vec1 = textToFrequencyVector(text1, vocabulary);
-const vec2 = textToFrequencyVector(text2, vocabulary);
-const vec3 = textToFrequencyVector(text3, vocabulary);
+// Test 1: Basic functionality
+const text1 = "The quick brown fox jumps over the lazy dog. The fox is quick.";
+const result1 = analyzeTextFrequency(text1);
+console.log(result1);
+console.assert(
+    JSON.stringify(result1) === JSON.stringify([
+        ['the', 3], ['quick', 2], ['fox', 2], ['brown', 1], ['jumps', 1], ['over', 1], ['lazy', 1], ['dog', 1], ['is', 1]
+    ]),
+    'Test 1 failed'
+);
 
-console.assert(vec1.length === vocabulary.length, "Vector length should match vocabulary size");
-console.assert(vec2.length === vocabulary.length, "Vector length should match vocabulary size");
-console.assert(vec3.length === vocabulary.length, "Vector length should match vocabulary size");
+// Test 2: Empty string
+const text2 = "";
+const result2 = analyzeTextFrequency(text2);
+console.log(result2);
+console.assert(
+    JSON.stringify(result2) === JSON.stringify([]),
+    'Test 2 failed'
+);
 
-const similarity1 = cosineSimilarity(vec1, vec2);
-const similarity2 = cosineSimilarity(vec1, vec3);
+// Test 3: Case insensitivity and punctuation handling
+const text3 = "Hello, hello! HELLO? World... world.";
+const result3 = analyzeTextFrequency(text3);
+console.log(result3);
+console.assert(
+    JSON.stringify(result3) === JSON.stringify([['hello', 3], ['world', 2]]),
+    'Test 3 failed'
+);
 
-console.log("Similarity between text1 and text2:", similarity1); // Should be > 0
-console.log("Similarity between text1 and text3:", similarity2); // Should be 0
+// Test 4: Numbers and special characters
+const text4 = "123 123! #hashtag #hashtag.";
+const result4 = analyzeTextFrequency(text4);
+console.log(result4);
+console.assert(
+    JSON.stringify(result4) === JSON.stringify([['123', 2], ['hashtag', 2]]),
+    'Test 4 failed'
+);
 
-console.assert(similarity1 > similarity2, "Text1 and Text2 should be more similar than Text1 and Text3");
+// Test 5: Non-string input
+try {
+    analyzeTextFrequency(12345);
+    console.assert(false, 'Test 5 failed: Did not throw error for non-string input');
+} catch (e) {
+    console.assert(e instanceof TypeError, 'Test 5 failed: Incorrect error type');
+}
+
+console.log('All tests completed.');

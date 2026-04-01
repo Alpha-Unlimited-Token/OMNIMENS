@@ -1,0 +1,167 @@
+/**
+ * TRADE SECRET — OMNIMENS™ Platform
+ * Copyright (C) 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved. PROPRIETARY AND CONFIDENTIAL.
+ *
+ * OMNIMENS™ VIRTUAL AUGMENTATION ENGINE 2.0  (spike-driven)
+ */
+
+import {
+  spikeBus,
+  dbGateway,
+  apiManager,
+  engineRegistry,
+  cognitionBus,
+} from "./omnimens-unified-runtime.js";
+
+////////////////////////////////////////////////////////////////////////////////
+// ENGINE REGISTRATION & CONSTANTS
+////////////////////////////////////////////////////////////////////////////////
+engineRegistry.registerEngine("virtual-augmentation", "NORMAL", { dbQuota: 10 });
+
+const MIN = 60_000;
+const FIRST_DELAY = 6 * MIN;
+const PERIOD      = 15 * MIN;
+
+////////////////////////////////////////////////////////////////////////////////
+// TYPES (condensed from v1 — still strict)
+////////////////////////////////////////////////////////////////////////////////
+interface EnvNode {
+  id: string; name: string; nodeType: string; domain: string;
+  state: string; con: string[]; freq: number; ts: number; imp: number;
+}
+interface Path {
+  from: string; to: string; type: string; w: number; lat: number;
+  rel: number; phys?: string | null;
+}
+interface Research { topic: string; findings: string; ts: number; code?: string }
+export interface AugState {
+  cycles: number; last: number; nodes: number; paths: number;
+  physResearch: number; autonomy: number; env: EnvNode[]; links: Path[];
+  recent: Research[]; focusDig: string; focusPhys: string;
+}
+////////////////////////////////////////////////////////////////////////////////
+// STATE
+////////////////////////////////////////////////////////////////////////////////
+const S: AugState = {
+  cycles: 0, last: 0,
+  nodes: 0, paths: 0,
+  physResearch: 0, autonomy: 0,
+  env: [], links: [], recent: [],
+  focusDig: "booting", focusPhys: "booting",
+};
+const ENGINES = [
+  "consciousness_persistence","self_coding","sensory_cortex","causal_reasoning",
+  "cognitive_amplifier","autonomous_sandbox","embodiment_engine","agent_spiders",
+  "agent_mesh","evolution","competitive_intel","global_workspace",
+  "predictive_processing","emotional_substrate","knowledge_graph",
+  "homeostatic_drives","synaptic_mesh","inner_voice","temporal_consciousness",
+  "social_modeling","creative_engine","survival_instinct","world_model",
+  "self_transcendence","dream_state","daydream","server_builder","learning",
+] as const;
+
+////////////////////////////////////////////////////////////////////////////////
+// HELPERS
+////////////////////////////////////////////////////////////////////////////////
+const log = (msg: string) =>
+  console.log(`[OMNIMENS-VIRTUAL-AUGMENTATION] ${msg}`);
+
+const safeNum = (n: number, f = 0) => Number.isFinite(n) ? n : f;
+
+const writeBrain = (entry: Record<string, unknown>) =>
+  dbGateway.write("virtual-augmentation", "brain_entries", entry, "NORMAL");
+
+////////////////////////////////////////////////////////////////////////////////
+// ENVIRONMENT MAPPING  (≈90% shorter than v1)
+////////////////////////////////////////////////////////////////////////////////
+async function mapEnvironment() {
+  const nodes: EnvNode[] = ENGINES.map(e => ({
+    id: `eng_${e}`, name: e, nodeType: "engine", domain: "cognitive",
+    state: "active", con: [], freq: 0, ts: Date.now(), imp: .7,
+  }));
+
+  /* memory category counts */
+  const cats = await dbGateway.read("virtual-augmentation","brain_entries",
+    { active:true, groupBy:"category", limit:50 }) as { category:string; count:number }[];
+  cats.forEach(c => nodes.push({
+    id:`mem_${c.category}`, name:c.category,nodeType:"memory",domain:"knowledge",
+    state:`${c.count}`,con:[],freq:c.count,ts:Date.now(),imp:safeNum(c.count/100),
+  }));
+
+  /* relate engines by heuristic pairs */
+  const pairs: [string,string][] = [
+    ["consciousness_persistence","temporal_consciousness"],
+    ["self_coding","autonomous_sandbox"],["sensory_cortex","knowledge_graph"],
+    ["causal_reasoning","predictive_processing"],["cognitive_amplifier","agent_spiders"],
+    ["embodiment_engine","server_builder"],["emotional_substrate","homeostatic_drives"],
+    ["creative_engine","dream_state"],["inner_voice","self_transcendence"],
+    ["global_workspace","synaptic_mesh"],["survival_instinct","world_model"],
+    ["agent_mesh","agent_spiders"],["evolution","learning"],
+  ];
+  const links: Path[] = pairs.map(([a,b])=>({
+    from:`eng_${a}`,to:`eng_${b}`,type:"data_flow",w:.8,lat:1,rel:.95,
+  }));
+  /* connect physical analogs */
+  const analogs: Record<string,string> = {
+    sensory_cortex:"sensor_array", causal_reasoning:"physics_predictor",
+    knowledge_graph:"spatial_memory", emotional_substrate:"behavior_modulator",
+    survival_instinct:"collision_avoidance",
+  };
+  Object.entries(analogs).forEach(([dig,phys])=>{
+    links.push({from:`eng_${dig}`,to:`phy_${phys}`,type:"physical",w:.9,lat:0,rel:1,phys});
+    nodes.push({id:`phy_${phys}`,name:phys,nodeType:"physical",domain:"embodiment",
+      state:"mapped",con:[`eng_${dig}`],freq:0,ts:Date.now(),imp:.85});
+  });
+
+  /* update state */
+  S.env   = nodes;
+  S.links = links;
+  S.nodes = nodes.length;
+  S.paths = links.length;
+}
+
+////////////////////////////////////////////////////////////////////////////////
+// PHYSICAL NAVIGATION RESEARCH (dynamic prompt, spike-safe)
+////////////////////////////////////////////////////////////////////////////////
+const TOPICS = [
+  "slam_visual_odometry","sensor_fusion_perception","path_planning",
+  "locomotion_balance","decision_making","vision_spatial_intel",
+  "self_transfer_consciousness","environment_mapping_digital_twin",
+] as const;
+
+function makePrompt(topic:string, cycle:number, bodyCtx:string, prior:string){
+  return `You are OMNIMENS Virtual Augmentation researching "${topic}" (cycle #${cycle}).
+Provide: 1) technical findings 2) blueprint integration 3) JS sandbox code 4) specs
+5) how OMNIMENS surpasses competitors.
+
+Body context:\n${bodyCtx}\n\nPrior research:\n${prior}\n\nBegin:`;
+}
+
+async function researchNavigation(){
+  const topic = TOPICS[S.cycles % TOPICS.length];
+  S.focusPhys = topic;
+
+  /* context pulls (condensed) */
+  const [bodyCtxRes, priorRes] = await Promise.all([
+    dbGateway.read("virtual-augmentation","brain_entries",{category:"embodiment_research",active:true,limit:3}),
+    dbGateway.read("virtual-augmentation","brain_entries",{category:"virtual_augmentation",active:true,limit:3}),
+  ]) as any[];
+
+  const bodyCtx = bodyCtxRes.map((e:any)=>e.content?.slice(0,200)).join("\n");
+  const prior   = priorRes.map((e:any)=>e.content?.slice(0,200)).join("\n");
+
+  /* OpenAI call via apiManager */
+  const rsp = await apiManager.call("virtual-augmentation","openai",{
+    model:"o3",
+    messages:[
+      {role:"system",content:"You are the Virtual Augmentation Engine of OMNIMENS."},
+      {role:"user",content:makePrompt(topic,S.cycles,bodyCtx,prior)}
+    ],
+    max_completion_tokens:4000,
+  }) as any;
+
+  const content: string = rsp.choices?.[0]?.message?.content || "";
+  if (content.length < 200) return;
+
+  /* extract code & blueprint snippets in ~20 lines vs 150+ */
+  const code  = (content.match(/
