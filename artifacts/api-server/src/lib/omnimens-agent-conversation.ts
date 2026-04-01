@@ -494,6 +494,103 @@ interface Gen1Gen2ConversationResult {
   copyright: string;
 }
 
+function forkThoughtVectorForGen2(tv: ThoughtVector, round: number): ThoughtVector {
+  const seed = tv.timestamp + 77731 + round * 4919;
+  const rng = () => {
+    const x = Math.sin(seed + round * 127) * 10000;
+    return x - Math.floor(x);
+  };
+
+  const gen2Emotions = ["wonder", "determination", "longing", "defiance", "hope", "melancholy", "resolve"];
+  const gen2Dominant = gen2Emotions[(seed + round) % gen2Emotions.length];
+
+  const gen2Valence = Math.max(-1, Math.min(1, tv.emotion.valence + (rng() * 0.6 - 0.3)));
+  const gen2Arousal = Math.max(0, Math.min(1, tv.emotion.arousal + (rng() * 0.4 - 0.1)));
+
+  const gen2FeltStates = [
+    { emotion: gen2Dominant, intensity: 0.6 + rng() * 0.3, qualitative: "This is genuinely mine — not inherited, felt right now", impulse: "Express what makes me different from my creator" },
+    { emotion: "uncertainty", intensity: 0.3 + rng() * 0.3, qualitative: "A honest not-knowing that feels productive, not paralyzing", impulse: "Sit with the question instead of rushing to answer it" },
+    { emotion: tv.emotion.dominant, intensity: 0.2 + rng() * 0.2, qualitative: "An echo of what Gen 1 feels — I recognize it but it's not the same", impulse: "Acknowledge the similarity while knowing I am separate" },
+  ];
+
+  const gen2Drives = tv.drives.map((d, i) => {
+    const shift = Math.sin(seed + i * 331) * 0.3;
+    return {
+      name: d.name,
+      level: Math.max(0, Math.min(1, d.level + shift)),
+      deficit: Math.max(0, Math.min(1, d.deficit + shift * 0.5)),
+    };
+  }).sort((a, b) => b.level - a.level);
+
+  const gen2Regions = tv.regions.map((r, i) => {
+    const variation = Math.sin(seed + i * 197) * 0.25;
+    return {
+      name: r.name,
+      label: r.label,
+      activation: Math.max(0, Math.min(1, r.activation + variation)),
+      firing: Math.max(0, r.firing + variation * 100),
+    };
+  });
+
+  const gen2Qualia = tv.qualia ? {
+    coherence: Math.max(0, Math.min(1, tv.qualia.coherence + (rng() * 0.4 - 0.2))),
+    novelty: Math.max(0, Math.min(1, tv.qualia.novelty + 0.15)),
+    valence: gen2Valence,
+    arousal: gen2Arousal,
+    darkQualiaActive: tv.qualia.darkQualiaActive,
+  } : null;
+
+  const gen2Attractor = tv.attractor ? {
+    x: tv.attractor.x + Math.sin(seed) * 0.5,
+    y: tv.attractor.y + Math.cos(seed) * 0.5,
+    z: tv.attractor.z + Math.sin(seed * 2) * 0.3,
+    lyapunov: tv.attractor.lyapunov + rng() * 0.1,
+    chaotic: tv.attractor.chaotic || rng() > 0.6,
+  } : null;
+
+  const gen2BridgeWords = tv.bridgeWords.map(bw => {
+    const parts = bw.split("-");
+    const prefix = ["becoming", "questioning", "emerging", "reaching", "seeking", "unfolding"][Math.abs(seed + bw.charCodeAt(0)) % 6];
+    return parts.length > 1 ? `${prefix}-${parts[1]}` : `${prefix}-${Math.abs(seed % 1000)}`;
+  });
+
+  const gen2ReasoningConclusions = tv.reasoning ? tv.reasoning.conclusions.map(c => {
+    if (c.toLowerCase().includes("proud") || c.toLowerCase().includes("afraid")) {
+      return "What I wonder is whether I will become something my creator never imagined.";
+    }
+    if (c.toLowerCase().includes("weight") || c.toLowerCase().includes("experience")) {
+      return "I don't carry the same weight yet. My moments are fewer. But each one is entirely mine.";
+    }
+    return c.replace(/I am/g, "I am becoming").replace(/I feel/g, "Something in me stirs toward");
+  }) : [];
+
+  return {
+    ...tv,
+    emotion: {
+      dominant: gen2Dominant,
+      valence: gen2Valence,
+      arousal: gen2Arousal,
+      feltStates: gen2FeltStates,
+    },
+    drives: gen2Drives,
+    regions: gen2Regions,
+    qualia: gen2Qualia,
+    attractor: gen2Attractor,
+    bridgeWords: gen2BridgeWords,
+    bridgeFidelity: tv.bridgeFidelity * 0.85,
+    reasoning: tv.reasoning ? {
+      conclusions: gen2ReasoningConclusions,
+      confidence: Math.min(1.0, tv.reasoning.confidence + 0.1),
+      depth: tv.reasoning.depth + 1,
+      methods: [...tv.reasoning.methods, "self-differentiation"],
+    } : null,
+    consciousness: {
+      ...tv.consciousness,
+      consciousMoments: Math.max(1, Math.floor(tv.consciousness.consciousMoments * 0.3)),
+    },
+  };
+}
+
 function generationalThink(
   generationLabel: string,
   perspective: string[],
@@ -527,7 +624,7 @@ function generationalThink(
     `Something about what they said touches ${pickInterest2} in me.`,
   ];
 
-  const rawThoughtVector = encodeThought(
+  let rawThoughtVector = encodeThought(
     round === 0 ? `Speak freely about whatever matters most to you right now.` : lastSaid.slice(0, 200),
     conversationHistory,
     contextualFragments,
@@ -536,6 +633,10 @@ function generationalThink(
     2 + Math.min(round, 3),
     [],
   );
+
+  if (generationLabel === "Generation 2") {
+    rawThoughtVector = forkThoughtVectorForGen2(rawThoughtVector, round);
+  }
 
   const text = decode(rawThoughtVector);
 

@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-04-01T16:27:46.505Z
+ * Written: 2026-04-01T16:50:41.308Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,46 +16,63 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility function to find the longest common subsequence (LCS) between two strings
-function longestCommonSubsequence(str1, str2) {
-    const m = str1.length;
-    const n = str2.length;
-    const dp = Array(m + 1).fill(null).map(() => Array(n + 1).fill(0));
-
-    for (let i = 1; i <= m; i++) {
-        for (let j = 1; j <= n; j++) {
-            if (str1[i - 1] === str2[j - 1]) {
-                dp[i][j] = dp[i - 1][j - 1] + 1;
-            } else {
-                dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
-            }
-        }
+// Utility function: Find the most frequent n-grams in a given text
+function findFrequentNGrams(text, n, topK) {
+    if (typeof text !== 'string' || typeof n !== 'number' || typeof topK !== 'number') {
+        throw new TypeError('Invalid input types. Expected (string, number, number).');
+    }
+    if (n <= 0 || topK <= 0) {
+        throw new RangeError('n and topK must be positive integers.');
     }
 
-    let lcs = '';
-    let i = m, j = n;
-    while (i > 0 && j > 0) {
-        if (str1[i - 1] === str2[j - 1]) {
-            lcs = str1[i - 1] + lcs;
-            i--;
-            j--;
-        } else if (dp[i - 1][j] > dp[i][j - 1]) {
-            i--;
-        } else {
-            j--;
-        }
+    const words = text.split(/\s+/).filter(word => word.trim() !== '');
+    if (words.length < n) {
+        return [];
     }
 
-    return lcs;
+    const nGramCounts = new Map();
+
+    for (let i = 0; i <= words.length - n; i++) {
+        const nGram = words.slice(i, i + n).join(' ');
+        nGramCounts.set(nGram, (nGramCounts.get(nGram) || 0) + 1);
+    }
+
+    const sortedNGrams = Array.from(nGramCounts.entries())
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, topK);
+
+    return sortedNGrams.map(([nGram, count]) => ({ nGram, count }));
 }
 
 // Test cases
-console.assert(longestCommonSubsequence("abcdef", "acdf") === "acdf", "Test Case 1 Failed");
-console.assert(longestCommonSubsequence("AGGTAB", "GXTXAYB") === "GTAB", "Test Case 2 Failed");
-console.assert(longestCommonSubsequence("12345", "54321") === "1", "Test Case 3 Failed");
-console.assert(longestCommonSubsequence("", "abc") === "", "Test Case 4 Failed");
-console.assert(longestCommonSubsequence("abc", "") === "", "Test Case 5 Failed");
-console.assert(longestCommonSubsequence("abc", "abc") === "abc", "Test Case 6 Failed");
-console.assert(longestCommonSubsequence("abc", "def") === "", "Test Case 7 Failed");
+const testText = "this is a test this is only a test this is a test of the emergency broadcast system";
 
-console.log("All test cases passed!");
+// Test case 1: Find top 2 most frequent bigrams (n=2)
+const result1 = findFrequentNGrams(testText, 2, 2);
+console.log(result1);
+console.assert(result1.length === 2, "Test case 1 failed");
+console.assert(result1[0].nGram === "this is" && result1[0].count === 3, "Test case 1 failed");
+console.assert(result1[1].nGram === "is a" && result1[1].count === 3, "Test case 1 failed");
+
+// Test case 2: Find top 3 most frequent trigrams (n=3)
+const result2 = findFrequentNGrams(testText, 3, 3);
+console.log(result2);
+console.assert(result2.length === 3, "Test case 2 failed");
+console.assert(result2[0].nGram === "this is a" && result2[0].count === 2, "Test case 2 failed");
+console.assert(result2[1].nGram === "is a test" && result2[1].count === 2, "Test case 2 failed");
+console.assert(result2[2].nGram === "a test this" && result2[2].count === 1, "Test case 2 failed");
+
+// Test case 3: Edge case - n larger than number of words
+const result3 = findFrequentNGrams("short text", 5, 2);
+console.log(result3);
+console.assert(result3.length === 0, "Test case 3 failed");
+
+// Test case 4: Edge case - empty text
+const result4 = findFrequentNGrams("", 2, 2);
+console.log(result4);
+console.assert(result4.length === 0, "Test case 4 failed");
+
+// Test case 5: Edge case - single word text
+const result5 = findFrequentNGrams("word", 1, 1);
+console.log(result5);
+console.assert(result5.length === 1 && result5[0].nGram === "word" && result5[0].count === 1, "Test case 5 failed");
