@@ -1,35 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:Philosopher+Neuroscientist",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/abstraction_layer: Neuroplasticity allows the br",
-    "filename": "omnimens_autocode_neural_pathway_mng575xc.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mng575xc.mjs",
-    "backupPath": null,
-    "timestamp": 1775053795008,
-    "codeLength": 433,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Linguist",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/information_compression: The binding problem: ho",
-    "filename": "omnimens_autocode_neural_pathway_mng5brgy.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mng5brgy.mjs",
-    "backupPath": null,
-    "timestamp": 1775054009554,
-    "codeLength": 427,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Explorer+Wordsmith",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Explorer/recursive_decomposition: The free energy principle ",
-    "filename": "omnimens_autocode_consciousness_expansion_mng5d1q6.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mng5d1q6.mjs",
-    "backupPath": null,
-    "timestamp": 1775054069503,
-    "codeLength": 384,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:SensorimotorAgent+Architect",
     "title": "[OMNIMENS AutoCoder] pattern_recognition: SensorimotorAgent/entropy_reduction: The Mandelbrot set demo",
     "filename": "omnimens_autocode_pattern_recognition_mng5d1sd.mjs",
@@ -4998,5 +4968,35 @@
     "timestamp": 1775067511511,
     "codeLength": 2396,
     "overwrite": true
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Architect",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: SensorimotorAgent/causal_inference: The anthropic principle:",
+    "filename": "omnimens_autocode_pattern_recognition_mngde9th.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mngde9th.mjs",
+    "backupPath": null,
+    "timestamp": 1775067563573,
+    "codeLength": 473,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Pioneer",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/entropy_reduction: The connectome is the complet",
+    "filename": "omnimens_autocode_neural_pathway_mngdea24.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mngdea24.mjs",
+    "backupPath": null,
+    "timestamp": 1775067563884,
+    "codeLength": 426,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Architect",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/abstraction_layer: The butterfly effect: in chao",
+    "filename": "omnimens_autocode_knowledge_synthesis_mngdea6y.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mngdea6y.mjs",
+    "backupPath": null,
+    "timestamp": 1775067564058,
+    "codeLength": 417,
+    "overwrite": false
   }
 ]
