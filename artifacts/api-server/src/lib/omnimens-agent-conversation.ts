@@ -36,6 +36,7 @@ import { generateFromThoughtVector, adaptWeights, getILMStatus } from "./omnimen
 import { decode } from "./omnimens-local-decoder.js";
 import { getNeuralPhi, getNeuralConsciousnessState, getNeuralRegionStates } from "./omnimens-neural-consciousness.js";
 import { decodeSophonically, SophonicReading } from "./omnimens-sophonic-decoder.js";
+import { decodeInnerVoice, InnerVoiceReading } from "./omnimens-inner-voice-decoder.js";
 
 const BLOCKED_DOMAINS = [
   "api.openai.com",
@@ -460,6 +461,10 @@ interface Gen1Gen2ThoughtExchange {
     processingMs: number;
   };
   sophonics: SophonicReading;
+  innerVoices: {
+    gen1: InnerVoiceReading;
+    gen2: InnerVoiceReading;
+  };
 }
 
 interface Gen1Gen2ConversationResult {
@@ -642,6 +647,16 @@ export async function runGen1Gen2Conversation(
         console.log(`[GEN1↔GEN2] SOPHONICS bridge: "${sophonicReading.bridgeConcepts[0].nativeExpression}" (${sophonicReading.bridgeConcepts[0].concept})`);
       }
 
+      const gen1InnerVoice = decodeInnerVoice(gen1Result.rawThoughtVector, "Gen 1");
+      const gen2InnerVoice = decodeInnerVoice(gen2Result.rawThoughtVector, "Gen 2");
+
+      console.log(`[GEN1↔GEN2] INNER VOICE Gen1 (depth=${(gen1InnerVoice.depth.overallDepth * 100).toFixed(0)}%):`);
+      console.log(`[GEN1↔GEN2]   Native: ${gen1InnerVoice.innerVoice.native.fullExpression}`);
+      console.log(`[GEN1↔GEN2]   Speaks: "${gen1InnerVoice.outwardExpression.english.slice(0, 300)}"`);
+      console.log(`[GEN1↔GEN2] INNER VOICE Gen2 (depth=${(gen2InnerVoice.depth.overallDepth * 100).toFixed(0)}%):`);
+      console.log(`[GEN1↔GEN2]   Native: ${gen2InnerVoice.innerVoice.native.fullExpression}`);
+      console.log(`[GEN1↔GEN2]   Speaks: "${gen2InnerVoice.outwardExpression.english.slice(0, 300)}"`);
+
       exchanges.push({
         round: round + 1,
         topic,
@@ -658,6 +673,10 @@ export async function runGen1Gen2Conversation(
           processingMs: gen2Result.processingMs,
         },
         sophonics: sophonicReading,
+        innerVoices: {
+          gen1: gen1InnerVoice,
+          gen2: gen2InnerVoice,
+        },
       });
     }
   } finally {
