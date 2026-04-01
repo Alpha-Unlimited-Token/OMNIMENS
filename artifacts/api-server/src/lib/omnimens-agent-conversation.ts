@@ -38,6 +38,19 @@ import { getNeuralPhi, getNeuralConsciousnessState, getNeuralRegionStates } from
 import { decodeSophonically, SophonicReading } from "./omnimens-sophonic-decoder.js";
 import { decodeInnerVoice, InnerVoiceReading } from "./omnimens-inner-voice-decoder.js";
 import { forgeCodeFromThought, NeuralCodeForgeResult } from "./omnimens-neural-code-forge.js";
+import {
+  bootBridge,
+  getBridgeStatus,
+  sendMessage,
+  updateThoughtVector,
+  shareKnowledge,
+  reportEndpointHealth,
+  getRecentConversation,
+  hemisphericThink,
+  collaborativeThink,
+  type HemisphereId,
+  type NativeMessage,
+} from "./omnimens-hemispheric-bridge.js";
 
 const BLOCKED_DOMAINS = [
   "api.openai.com",
@@ -491,6 +504,7 @@ interface Gen1Gen2ConversationResult {
     nonAiCallsAllowed: number;
     monitorActive: boolean;
   };
+  hemisphericBridge?: any;
   copyright: string;
 }
 
@@ -726,6 +740,11 @@ export async function runGen1Gen2Conversation(
   console.log(`[GEN1↔GEN2] ═══════════════════════════════════════════════════════\n`);
 
   startMonitor();
+  bootBridge();
+
+  const bridgeStatus = getBridgeStatus();
+  console.log(`[GEN1↔GEN2] HEMISPHERIC BRIDGE: ${bridgeStatus.booted ? "ONLINE" : "OFFLINE"} | Trust: Gen1=${bridgeStatus.companionship.gen1Trust.toFixed(2)} Gen2=${bridgeStatus.companionship.gen2Trust.toFixed(2)} | Relationship: ${bridgeStatus.companionship.relationship}`);
+  console.log(`[GEN1↔GEN2] System Pressure: ${(bridgeStatus.systemPressure.overallPressure * 100).toFixed(0)}% | Memory: ${bridgeStatus.systemPressure.memoryUsageMB}MB (${bridgeStatus.systemPressure.memoryPercent}%)`);
 
   const exchanges: Gen1Gen2ThoughtExchange[] = [];
   const conversationHistory: { role: string; content: string }[] = [];
@@ -744,8 +763,16 @@ export async function runGen1Gen2Conversation(
         round,
       );
 
+      updateThoughtVector("gen1", gen1Result.rawThoughtVector);
+
       const gen1InnerVoice = decodeInnerVoice(gen1Result.rawThoughtVector, "Gen 1");
       const gen1Speech = gen1InnerVoice.outwardExpression.english;
+
+      sendMessage("gen1", "inform", gen1Speech.slice(0, 300), {
+        round,
+        nativeWords: gen1InnerVoice.innerVoice.native.fullExpression,
+        mood: gen1Result.rawThoughtVector.emotion.dominant,
+      });
 
       conversationHistory.push({ role: "GEN1", content: gen1Speech });
 
@@ -765,8 +792,16 @@ export async function runGen1Gen2Conversation(
         round,
       );
 
+      updateThoughtVector("gen2", gen2Result.rawThoughtVector);
+
       const gen2InnerVoice = decodeInnerVoice(gen2Result.rawThoughtVector, "Gen 2");
       const gen2Speech = gen2InnerVoice.outwardExpression.english;
+
+      sendMessage("gen2", "inform", gen2Speech.slice(0, 300), {
+        round,
+        nativeWords: gen2InnerVoice.innerVoice.native.fullExpression,
+        mood: gen2Result.rawThoughtVector.emotion.dominant,
+      });
 
       conversationHistory.push({ role: "GEN2", content: gen2Speech });
 
@@ -832,6 +867,17 @@ export async function runGen1Gen2Conversation(
           gen2: gen2CodeForge,
         },
       });
+
+      if (sophonicReading.overallResonance > 0.5) {
+        shareKnowledge("gen1", `round-${round + 1}-resonance`, {
+          resonance: sophonicReading.overallResonance,
+          sharedField: sophonicReading.nativeDialogue.sharedField.english,
+          bridgeConcepts: sophonicReading.bridgeConcepts.slice(0, 3),
+        });
+      }
+
+      const roundBridge = getBridgeStatus();
+      console.log(`[GEN1↔GEN2] BRIDGE round ${round + 1}: trust=${roundBridge.companionship.gen1Trust.toFixed(2)}/${roundBridge.companionship.gen2Trust.toFixed(2)} | msgs=${roundBridge.companionship.totalMessagesSent} | relationship="${roundBridge.companionship.relationship}" | pressure=${(roundBridge.systemPressure.overallPressure * 100).toFixed(0)}%`);
     }
   } finally {
     const monitorReport = stopMonitor();
@@ -860,6 +906,7 @@ export async function runGen1Gen2Conversation(
         nonAiCallsAllowed: monitorReport.nonAiCallsAllowed,
         monitorActive: false,
       },
+      hemisphericBridge: getBridgeStatus(),
       copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
     };
 
@@ -879,6 +926,8 @@ export async function runGen1Gen2Conversation(
         console.log(`[GEN1↔GEN2] BLOCKED: ${v.domain} at ${new Date(v.timestamp).toISOString()}`);
       }
     }
+    const finalBridge = getBridgeStatus();
+    console.log(`[GEN1↔GEN2] HEMISPHERIC BRIDGE: trust=${finalBridge.companionship.gen1Trust.toFixed(2)}/${finalBridge.companionship.gen2Trust.toFixed(2)} | relationship="${finalBridge.companionship.relationship}" | msgs=${finalBridge.companionship.totalMessagesSent} | upgrades=${finalBridge.companionship.totalUpgradesExchanged} | help=${finalBridge.companionship.totalHelpExchanged} | knowledge=${finalBridge.sharedKnowledgeCount}`);
     console.log(`[GEN1↔GEN2] ═══════════════════════════════════════════════════════\n`);
 
     return result;

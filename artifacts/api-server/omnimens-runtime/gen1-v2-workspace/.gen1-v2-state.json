@@ -3,14 +3,14 @@
     "buildVersion": "2.0",
     "generation": 1,
     "phase": "event_driven_rewrite",
-    "cycleCount": 74,
-    "lastCycleTime": 1775064760018,
+    "cycleCount": 76,
+    "lastCycleTime": 1775065264599,
     "engineFilesTotal": 127,
     "engineFilesAudited": 127,
-    "engineFilesRewritten": 55,
+    "engineFilesRewritten": 57,
     "engineFilesHotSwapped": 0,
     "timersFound": 236,
-    "timersConsolidated": 91,
+    "timersConsolidated": 93,
     "dbCallsFound": 288,
     "dbCallsOptimized": 0,
     "apiCallsFound": 102,
@@ -696,6 +696,30 @@
         "apiCallsFixed": 0,
         "identityPreserved": false,
         "rewrittenAt": 1775064831354
+      },
+      {
+        "originalFile": "omnimens-survival-instinct.ts",
+        "rewrittenFile": "rewrites/omnimens-survival-instinct.ts",
+        "category": "event_driven_rewrite",
+        "linesOriginal": 300,
+        "linesRewritten": 393,
+        "timersRemoved": 1,
+        "dbCallsOptimized": 0,
+        "apiCallsFixed": 0,
+        "identityPreserved": false,
+        "rewrittenAt": 1775065122152
+      },
+      {
+        "originalFile": "omnimens-synaptic-mesh.ts",
+        "rewrittenFile": "rewrites/omnimens-synaptic-mesh.ts",
+        "category": "event_driven_rewrite",
+        "linesOriginal": 616,
+        "linesRewritten": 143,
+        "timersRemoved": 1,
+        "dbCallsOptimized": 0,
+        "apiCallsFixed": 0,
+        "identityPreserved": false,
+        "rewrittenAt": 1775065337591
       }
     ],
     "auditFindings": {
@@ -6022,13 +6046,15 @@
       "omnimens-sensory-cortex.ts",
       "omnimens-server-builder.ts",
       "omnimens-social-modeling.ts",
-      "omnimens-source-integration.ts"
+      "omnimens-source-integration.ts",
+      "omnimens-survival-instinct.ts",
+      "omnimens-synaptic-mesh.ts"
     ],
     "hotSwappedFiles": [],
     "startedAt": 1775044041970,
     "completedAt": null,
-    "lastAutosave": 1775064831355,
-    "autosaveCount": 176,
+    "lastAutosave": 1775065337593,
+    "autosaveCount": 181,
     "recentActivity": [
       {
         "action": "audited",
@@ -6944,6 +6970,16 @@
         "action": "event_driven_rewrite",
         "file": "omnimens-source-integration.ts",
         "timestamp": 1775064831354
+      },
+      {
+        "action": "event_driven_rewrite",
+        "file": "omnimens-survival-instinct.ts",
+        "timestamp": 1775065122152
+      },
+      {
+        "action": "event_driven_rewrite",
+        "file": "omnimens-synaptic-mesh.ts",
+        "timestamp": 1775065337591
       }
     ]
   }

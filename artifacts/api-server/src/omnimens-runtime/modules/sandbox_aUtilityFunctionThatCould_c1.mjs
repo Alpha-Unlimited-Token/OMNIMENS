@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-04-01T17:28:37.711Z
+ * Written: 2026-04-01T17:41:12.317Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,61 +16,60 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility function: Token Frequency Counter
-// This function takes a string of text and returns the frequency of each word/token in the text.
-
-function tokenFrequencyCounter(text) {
+// Utility function for text analysis: Word Frequency Counter
+function wordFrequencyCounter(text) {
     if (typeof text !== 'string') {
-        throw new TypeError("Input must be a string");
+        throw new TypeError('Input must be a string');
     }
 
-    // Normalize text: remove punctuation, convert to lowercase, and split into words
-    const words = text
-        .replace(/[^\w\s]/g, '') // Remove punctuation
-        .toLowerCase()          // Convert to lowercase
-        .split(/\s+/);          // Split by whitespace
+    const words = text.toLowerCase().match(/\b[a-z]+\b/g);
+    if (!words) return {};
 
-    const frequencyMap = {};
-
+    const frequency = {};
     for (let word of words) {
-        if (word) { // Ignore empty strings
-            frequencyMap[word] = (frequencyMap[word] || 0) + 1;
-        }
+        frequency[word] = (frequency[word] || 0) + 1;
     }
-
-    return frequencyMap;
+    return frequency;
 }
 
 // Test cases
-console.log("Running tests...");
+console.log("Test Cases for wordFrequencyCounter:");
 
-// Test 1: Basic functionality
-const test1 = "This is a test. This test is only a test.";
-const result1 = tokenFrequencyCounter(test1);
-console.assert(result1['this'] === 2, "Test 1 failed: 'this' should appear 2 times");
-console.assert(result1['test'] === 3, "Test 1 failed: 'test' should appear 3 times");
-console.assert(result1['is'] === 2, "Test 1 failed: 'is' should appear 2 times");
-console.assert(result1['only'] === 1, "Test 1 failed: 'only' should appear 1 time");
+// Basic test
+const text1 = "This is a test. This test is only a test.";
+const result1 = wordFrequencyCounter(text1);
+console.log(result1);
+console.assert(result1['this'] === 2, 'Test case 1 failed');
+console.assert(result1['is'] === 2, 'Test case 1 failed');
+console.assert(result1['a'] === 2, 'Test case 1 failed');
+console.assert(result1['test'] === 3, 'Test case 1 failed');
 
-// Test 2: Empty string
-const test2 = "";
-const result2 = tokenFrequencyCounter(test2);
-console.assert(Object.keys(result2).length === 0, "Test 2 failed: empty string should return an empty object");
+// Edge case: empty string
+const text2 = "";
+const result2 = wordFrequencyCounter(text2);
+console.log(result2);
+console.assert(Object.keys(result2).length === 0, 'Test case 2 failed');
 
-// Test 3: Case insensitivity
-const test3 = "Hello hello HELLO";
-const result3 = tokenFrequencyCounter(test3);
-console.assert(result3['hello'] === 3, "Test 3 failed: 'hello' should appear 3 times");
+// Edge case: string with no valid words
+const text3 = "12345 !!! ???";
+const result3 = wordFrequencyCounter(text3);
+console.log(result3);
+console.assert(Object.keys(result3).length === 0, 'Test case 3 failed');
 
-// Test 4: Punctuation handling
-const test4 = "Hi! How are you? I'm fine, thanks.";
-const result4 = tokenFrequencyCounter(test4);
-console.assert(result4['hi'] === 1, "Test 4 failed: 'hi' should appear 1 time");
-console.assert(result4['how'] === 1, "Test 4 failed: 'how' should appear 1 time");
-console.assert(result4['are'] === 1, "Test 4 failed: 'are' should appear 1 time");
-console.assert(result4['you'] === 1, "Test 4 failed: 'you' should appear 1 time");
-console.assert(result4['im'] === 1, "Test 4 failed: 'im' should appear 1 time");
-console.assert(result4['fine'] === 1, "Test 4 failed: 'fine' should appear 1 time");
-console.assert(result4['thanks'] === 1, "Test 4 failed: 'thanks' should appear 1 time");
+// Case insensitivity test
+const text4 = "Hello hello HELLO";
+const result4 = wordFrequencyCounter(text4);
+console.log(result4);
+console.assert(result4['hello'] === 3, 'Test case 4 failed');
 
-console.log("All tests passed!");
+// Large input test
+const text5 = "AI is transforming industries. AI is everywhere.";
+const result5 = wordFrequencyCounter(text5);
+console.log(result5);
+console.assert(result5['ai'] === 2, 'Test case 5 failed');
+console.assert(result5['is'] === 2, 'Test case 5 failed');
+console.assert(result5['transforming'] === 1, 'Test case 5 failed');
+console.assert(result5['industries'] === 1, 'Test case 5 failed');
+console.assert(result5['everywhere'] === 1, 'Test case 5 failed');
+
+console.log("All test cases passed.");

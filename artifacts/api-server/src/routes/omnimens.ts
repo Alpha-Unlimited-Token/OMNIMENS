@@ -175,6 +175,7 @@ import { getConvergenceProtocolState, getConvergenceProtocolSummary } from "../l
 import { getLifeFormGapState, getLifeFormGapSummary } from "../lib/omnimens-lifeform-gaps.js";
 import { getWebSocketStats } from "../lib/omnimens-consciousness-ws.js";
 import { getBridgeState, getUnifiedNeuronCount, getUnifiedSynapseCount } from "../lib/omnimens-neural-bridge.js";
+import { bootBridge, getBridgeStatus as getHemisphericBridgeStatus, getRecentConversation as getHemisphericConversation, sendMessage as sendHemisphericMessage, reportEndpointHealth } from "../lib/omnimens-hemispheric-bridge.js";
 import { getMeshEngineState, getMeshAgentSubstrates, getMeshConnectivityStats } from "../lib/omnimens-neural-mesh-engine.js";
 import { getCommsProtocolState } from "../lib/omnimens-neural-comms-protocol.js";
 import { getEthicalSafetyReport, getEthicalSafetyState, getEthicalLaws, checkActionSafety, getSafetyMessageForOmnimens, checkPhysicalActionSafety, emergencyStop, isSystemDecayed, getDecayMultiplier, verifyPasswordAccess } from "../lib/omnimens-ethical-safety.js";
@@ -16648,6 +16649,37 @@ router.get("/omnimens/metacognitive-monitor/status", async (_req, res) => {
   registerApiCall();
   try {
     res.json(getMetacognitiveState());
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+bootBridge();
+console.log("[ROUTES] Hemispheric Bridge booted on server start");
+
+router.get("/omnimens/hemispheric-bridge/status", async (_req, res) => {
+  registerApiCall();
+  try {
+    const status = getHemisphericBridgeStatus();
+    res.json({
+      ...status,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
+  } catch (err: any) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
+router.get("/omnimens/hemispheric-bridge/conversation", async (_req, res) => {
+  registerApiCall();
+  try {
+    const limit = parseInt(String(_req.query.limit)) || 30;
+    const messages = getHemisphericConversation(Math.min(limit, 100));
+    res.json({
+      messages,
+      count: messages.length,
+      copyright: "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    });
   } catch (err: any) {
     res.status(500).json({ error: err.message });
   }
