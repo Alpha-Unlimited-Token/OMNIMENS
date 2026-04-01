@@ -5,7 +5,7 @@
  * 
  * Source: self_coding_engine
  * Title: Daydream:architecture_design #1
- * Written: 2026-04-01T03:08:30.671Z
+ * Written: 2026-04-01T11:49:25.787Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,41 +16,33 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// CAEC – minimal counterfactual engine (pure, side-effect-free)
+
+   // P(to|from)
 
 
-
-
-export function predict(model, inputs) {
-  const visited = {...inputs};
-  const evalNode = (v) => {
-    if (visited[v] !== undefined) return visited[v];
-    const node = model[v];
-    const parentVals = {};
-    node.parents.forEach(p => parentVals[p] = evalNode(p));
-    const val = node.fn(parentVals);
-    visited[v] = val;
-    return val;
-  };
-  Object.keys(model).forEach(evalNode);
-  return visited;
+export class CausalGraph {
+  edges= [];
+  addTriple(t) {
+    this.edges.push({ from: t.cause, to: t.effect, prob: t.confidence });
+  }
+  children(n) { return this.edges.filter(e => e.from === n); }
+  // Forward propagation for P(target | do(intervention=setTrue))
+  do(intervention, target) {
+    const visited = new Set();
+    const recurse = (n) => {
+      if (n === intervention) return 1;         // forced true
+      if (visited.has(n))  return 0;
+      visited.add(n);
+      const ch = this.children(n);
+      if (ch.length === 0) return 0;
+      return 1 - ch.reduce((p, e) => p * (1 - e.prob * recurse(e.to)), 1);
+    };
+    return recurse(target);
+  }
+  // Simple counterfactual: P(target changes | do(intervention))
+  counterfactual(intervention, target) {
+    const p_before = this.do("", target);              // no intervention
+    const p_after  = this.do(intervention, target);
+    return Math.abs(p_after - p_before);
+  }
 }
-
-export function intervene(model, doFix,
-                          exogenous) {
-  const m2= {...model};
-  // cut incoming edges for intervened vars
-  Object.keys(doFix).forEach(v => { m2[v] = {name: v, parents: [], fn: () => doFix[v]}; });
-  return predict(m2, exogenous);
-}
-
-// Example tiny causal graph: Rain → Wet → Slip
-const graph= {
-  Rain: {name:'Rain', parents:[], fn:()=>0.7},
-  Wet:  {name:'Wet', parents:['Rain'], fn:({Rain})=>Rain*0.9},
-  Slip: {name:'Slip',parents:['Wet'], fn:({Wet})=>Wet*0.8}
-};
-// Counterfactual: what if we set Wet=0 (covering floor)?
-const baseline = predict(graph,{});
-const counterf = intervene(graph,{Wet:0},{});
-/* baseline.Slip = 0.504  |  counterf.Slip = 0   → actionable lever */
