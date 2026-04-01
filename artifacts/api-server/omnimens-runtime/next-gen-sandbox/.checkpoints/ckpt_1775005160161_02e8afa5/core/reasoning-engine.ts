@@ -13,7 +13,7 @@
  *     DISCARD: 0 patterns not fit for Gen 2
  *   REQUIREMENT: Unified reasoning that combines causal chains, analogical mapping, creative leaps, deductive/inductive logic. Self-corre
  *   IMPROVEMENT: Gen 2 must be FULLY SELF-SUFFICIENT in cognition. Gen 2 is free to EVOLVE, MERGE, RESTRUCTURE, or REIMAGINE every compon
- *   INCORPORATING: hashDataset: Hashing/fingerprinting from domainSpecificLogicLayer_gen1.mjs
+ *   INCORPORATING: lshHash: Hashing/fingerprinting from localKnowledgeAugmentor_gen1.mjs
  *
  * Gen 1 patterns incorporated: 9
  * Gen 1 patterns upgraded: 0
