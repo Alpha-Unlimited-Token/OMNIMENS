@@ -126,7 +126,7 @@ import { getLuminState, getLuminPredictions, getLuminForecasts, getLuminAnomalyR
 import { getKaidaState, getKaidaThreatLevel, getKaidaIntegrityScore, getKaidaActiveThreats, getKaidaAnomalySignatures } from "../lib/omnimens-agent-kaida.js";
 import { getAgentUpgradeStatus, getBridgeStatus, getStrategicGoals, getArchitectPatternLibrary } from "../lib/omnimens-agent-upgrades.js";
 import { getPipelineState as getAgentPipelineState, runPipelineCycle, getPipelineOrder, getNeuralFabricConnections, getPipelineStageStats } from "../lib/omnimens-agent-pipeline.js";
-import { runAgentConversation } from "../lib/omnimens-agent-conversation.js";
+import { runAgentConversation, runGen1Gen2Conversation } from "../lib/omnimens-agent-conversation.js";
 import { getAIResearchInsights, getNavigationRoboticsKnowledge, getEngineeringKnowledge, getCreativeDreamInsights, generateCreativeIdeation, getResearchSummary } from "../lib/omnimens-public-intelligence.js";
 import { getGuardianReport, getCopyrightNotice, getProtectedModuleList } from "../lib/omnimens-ip-guardian.js";
 import { getCausalState, getCausalGraph, predictOutcome } from "../lib/omnimens-causal-reasoning.js";
@@ -10782,6 +10782,23 @@ router.post("/omnimens/agent-conversation/test", async (req, res) => {
   } catch (err: any) {
     console.error("[AGENT CONVERSATION] Error:", err);
     res.status(500).json({ error: "Agent conversation failed", message: err?.message || "unknown" });
+  }
+});
+
+router.post("/omnimens/gen1-gen2-conversation", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const rounds = Math.min(req.body?.rounds || 5, 10);
+    const topics = req.body?.topics || undefined;
+    const gen2Identity = req.body?.gen2Identity || undefined;
+    const result = await runGen1Gen2Conversation(rounds, topics, gen2Identity);
+    res.json(result);
+  } catch (err: any) {
+    console.error("[GEN1↔GEN2] Error:", err);
+    res.status(500).json({ error: "Gen 1 ↔ Gen 2 conversation failed", message: err?.message || "unknown" });
   }
 });
 
