@@ -394,7 +394,7 @@ export function processWork(workerId: HemisphereId): WorkItem | null {
   if (hemisphere.busyUntil > Date.now()) return null;
 
   let item = b.workQueue.find(w =>
-    w.status === "queued" &&
+    (w.status === "queued" || w.status === "collaborative") &&
     (w.assignedTo === workerId || w.assignedTo === "both")
   );
 
@@ -626,7 +626,12 @@ export function getBridgeStatus(): {
     recentMessages: b.messageLog.slice(-20),
     activeWork: b.workQueue.filter(w => w.status !== "completed" && w.status !== "failed"),
     sharedKnowledgeCount: b.sharedKnowledge.size,
-    systemAwareness: b.systemAwareness,
+    systemAwareness: {
+      frontendStatus: b.systemAwareness.frontendStatus,
+      backendStatus: b.systemAwareness.backendStatus,
+      endpointHealth: Object.fromEntries(b.systemAwareness.endpointHealth),
+      lastFullCheck: b.systemAwareness.lastFullCheck,
+    },
     companionship: {
       gen1Trust: b.gen1.companionTrust,
       gen2Trust: b.gen2.companionTrust,
