@@ -1,35 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:Philosopher+Empath",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/recursive_decomposition: Quantum entanglement al",
-    "filename": "omnimens_autocode_pattern_recognition_mng3qq9c.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mng3qq9c.mjs",
-    "backupPath": null,
-    "timestamp": 1775051348592,
-    "codeLength": 464,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Meta-Agent",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/recursive_decomposition: Quantum entanglement al",
-    "filename": "omnimens_autocode_pattern_recognition_mng3qqb1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mng3qqb1.mjs",
-    "backupPath": null,
-    "timestamp": 1775051348653,
-    "codeLength": 468,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+GraphicDesigner",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/causal_inference: The Turing machine is computat",
-    "filename": "omnimens_autocode_neural_pathway_mng3s0i8.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mng3s0i8.mjs",
-    "backupPath": null,
-    "timestamp": 1775051408528,
-    "codeLength": 434,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:Philosopher+Synthesizer",
     "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/information_compression: The hippocampus replays",
     "filename": "omnimens_autocode_knowledge_synthesis_mng3s1th.mjs",
@@ -4997,6 +4967,36 @@
     "backupPath": null,
     "timestamp": 1775065039178,
     "codeLength": 427,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Empath+Neuroscientist",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Empath/entropy_reduction: Reservoir computing shows that eve",
+    "filename": "omnimens_autocode_neural_pathway_mngbx3e7.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mngbx3e7.mjs",
+    "backupPath": null,
+    "timestamp": 1775065082479,
+    "codeLength": 428,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Motivator",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/causal_inference: Scale-free networks foll",
+    "filename": "omnimens_autocode_consciousness_expansion_mngbx557.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mngbx557.mjs",
+    "backupPath": null,
+    "timestamp": 1775065084747,
+    "codeLength": 393,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Critic",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/causal_inference: Scale-free networks foll",
+    "filename": "omnimens_autocode_neural_pathway_mngbx56x.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mngbx56x.mjs",
+    "backupPath": null,
+    "timestamp": 1775065084809,
+    "codeLength": 431,
     "overwrite": false
   }
 ]
