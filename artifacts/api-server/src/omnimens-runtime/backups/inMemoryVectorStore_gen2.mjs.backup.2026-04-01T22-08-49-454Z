@@ -1,0 +1,137 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-04-01T22:02:13.439Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Complete ES module code here
+
+import { createHash } from 'crypto';
+
+/**
+ * Generate a hash-based unique identifier for vectors.
+ * This ensures efficient indexing and fast retrieval.
+ * @param {Array<number>} vector - The input vector.
+ * @returns {string} - A unique hash for the vector.
+ */
+export function generateVectorHash(vector) {
+  const hash = createHash('sha256');
+  hash.update(vector.join(','));
+  return hash.digest('hex');
+}
+
+/**
+ * Calculate the Euclidean distance between two vectors.
+ * @param {Array<number>} vectorA - First vector.
+ * @param {Array<number>} vectorB - Second vector.
+ * @returns {number} - The Euclidean distance.
+ */
+export function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same dimensions');
+  }
+  return Math.sqrt(
+    vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0)
+  );
+}
+
+/**
+ * Build a k-d tree for efficient nearest-neighbor search.
+ * @param {Array<Array<number>>} points - Array of vectors.
+ * @param {number} depth - Current depth in the tree.
+ * @returns {object} - Root node of the k-d tree.
+ */
+export function buildKDTree(points, depth = 0) {
+  if (points.length === 0) return null;
+
+  const k = points[0].length;
+  const axis = depth % k;
+
+  points.sort((a, b) => a[axis] - b[axis]);
+  const median = Math.floor(points.length / 2);
+
+  return {
+    point: points[median],
+    left: buildKDTree(points.slice(0, median), depth + 1),
+    right: buildKDTree(points.slice(median + 1), depth + 1)
+  };
+}
+
+/**
+ * Perform nearest-neighbor search on a k-d tree.
+ * @param {object} tree - Root node of the k-d tree.
+ * @param {Array<number>} target - Target vector.
+ * @param {number} depth - Current depth in the tree.
+ * @returns {object} - Closest point and its distance.
+ */
+export function nearestNeighborSearch(tree, target, depth = 0) {
+  if (!tree) return { point: null, distance: Infinity };
+
+  const k = target.length;
+  const axis = depth % k;
+
+  const nextBranch = target[axis] < tree.point[axis] ? tree.left : tree.right;
+  const otherBranch = target[axis] < tree.point[axis] ? tree.right : tree.left;
+
+  const best = nearestNeighborSearch(nextBranch, target, depth + 1);
+  const currentDistance = euclideanDistance(tree.point, target);
+
+  if (currentDistance < best.distance) {
+    best.point = tree.point;
+    best.distance = currentDistance;
+  }
+
+  if (Math.abs(target[axis] - tree.point[axis]) < best.distance) {
+    const alternative = nearestNeighborSearch(otherBranch, target, depth + 1);
+    if (alternative.distance < best.distance) {
+      best.point = alternative.point;
+      best.distance = alternative.distance;
+    }
+  }
+
+  return best;
+}
+
+/**
+ * Index vectors in memory for fast similarity search.
+ * @param {Array<Array<number>>} vectors - Array of vectors to index.
+ * @returns {object} - Indexed k-d tree.
+ */
+export function indexVectors(vectors) {
+  return buildKDTree(vectors);
+}
+
+/**
+ * Search for the closest vector in the indexed k-d tree.
+ * @param {object} index - Indexed k-d tree.
+ * @param {Array<number>} queryVector - Vector to search for.
+ * @returns {object} - Closest vector and its distance.
+ */
+export function searchClosestVector(index, queryVector) {
+  return nearestNeighborSearch(index, queryVector);
+}
+
+/**
+ * Calculate cosine similarity between two vectors.
+ * @param {Array<number>} vectorA - First vector.
+ * @param {Array<number>} vectorB - Second vector.
+ * @returns {number} - Cosine similarity.
+ */
+export function cosineSimilarity(vectorA, vectorB) {
+  const dotProduct = vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val * val, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val * val, 0));
+  return dotProduct / (magnitudeA * magnitudeB);
+}

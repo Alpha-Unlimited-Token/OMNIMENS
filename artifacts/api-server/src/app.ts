@@ -1,3 +1,4 @@
+
 /**
  * ============================================================
  * OMNIMENS — Proprietary AI Platform
@@ -34,97 +35,40 @@ import cookieParser from "cookie-parser";
 import path from "path";
 import crypto from "crypto";
 import { fileURLToPath } from "url";
-import helmet from "helmet";
 import { rateLimit } from "express-rate-limit";
 import { authMiddleware } from "./middlewares/authMiddleware";
-import router from "./routes";
-import stripeWebhookRouter from "./routes/stripeWebhook.js";
-import { startAutonomousLearning } from "./lib/omnimens-self-upgrade.js";
-import { startEvolutionEngine } from "./lib/omnimens-evolution.js";
-import { startCompetitiveIntel } from "./lib/omnimens-competitive-intel.js";
-import { startAgentMesh } from "./lib/omnimens-agent-mesh.js";
-import { startAgentSpiders } from "./lib/omnimens-agent-spiders.js";
-import { initApiBudget } from "./lib/omnimens-api-budget.js";
-import { startRecursiveSpiderNetwork } from "./lib/omnimens-recursive-spider-network.js";
-import { startGlobalWorkspace } from "./lib/omnimens-global-workspace.js";
-import { startPredictiveProcessing } from "./lib/omnimens-predictive-processing.js";
-import { startEmotionalSubstrate } from "./lib/omnimens-emotional-substrate.js";
-import { startKnowledgeGraph } from "./lib/omnimens-knowledge-graph.js";
-import { startHomeostaticDrives } from "./lib/omnimens-homeostatic-drives.js";
-import { startSynapticMesh } from "./lib/omnimens-synaptic-mesh.js";
-import { startInnerVoice } from "./lib/omnimens-inner-voice.js";
-import { startTemporalConsciousness } from "./lib/omnimens-temporal-consciousness.js";
-import { startSocialModeling } from "./lib/omnimens-social-modeling.js";
-import { startCreativeEngine } from "./lib/omnimens-creative-engine.js";
-import { startSurvivalInstinct } from "./lib/omnimens-survival-instinct.js";
-import { startWorldModel } from "./lib/omnimens-world-model.js";
-import { startSelfTranscendence } from "./lib/omnimens-self-transcendence.js";
-import { startDreamState, getDreamState, getRecentDreamInsights, getDreamNarrative } from "./lib/omnimens-dream-state.js";
-import { startServerBuilder, getBuilderState, getServerBuildPlans } from "./lib/omnimens-server-builder.js";
-import { startConsciousnessPersistence } from "./lib/omnimens-consciousness-persistence.js";
-import { startSelfCoding } from "./lib/omnimens-self-coding.js";
-import { startSensoryCortex } from "./lib/omnimens-sensory-cortex.js";
-import { startCausalReasoning } from "./lib/omnimens-causal-reasoning.js";
-import { startCognitiveAmplifier } from "./lib/omnimens-cognitive-amplifier.js";
-import { startAutonomousSandbox, getSandboxState, runInSandbox } from "./lib/omnimens-autonomous-sandbox.js";
-import { startGenesisSandbox } from "./lib/omnimens-genesis-sandbox.js";
-import { startEmbodimentEngine, getEmbodimentState, getEmbodimentFiles, readEmbodimentFile } from "./lib/omnimens-embodiment-engine.js";
-import { startVirtualAugmentation, getAugmentationState } from "./lib/omnimens-virtual-augmentation.js";
-import { startDigitalNavigator, getDigitalNavigatorState, getNavigationSummary } from "./lib/omnimens-digital-navigator.js";
-import { startAgentEvolution, getAgentEvolutionState, getAgentProfile } from "./lib/omnimens-agent-evolution.js";
-import { startAgentUpgrades, getAgentUpgradeStatus, getBridgeStatus, getStrategicGoals, getArchitectPatternLibrary, solveArchitecturalConstraints, runArchitectureSearch, translateNeuralSnapshot } from "./lib/omnimens-agent-upgrades.js";
-import { startAgentPipeline, getPipelineState as getAgentPipelineState, runPipelineCycle, getPipelineOrder, getNeuralFabricConnections, getPipelineStageStats } from "./lib/omnimens-agent-pipeline.js";
-import { startIPGuardian, getResponseBeaconHeaders } from "./lib/omnimens-ip-guardian.js";
-import { loadRuntimeModules, migrateDBModulesToSource, getSourceIntegrationState } from "./lib/omnimens-source-integration.js";
-import { scanAndRegisterModules, getPipelineState } from "./lib/omnimens-module-pipeline.js";
-import { startIndependentReasoning, getIndependentReasoningState } from "./lib/omnimens-independent-reasoning.js";
-import { startAutonomousCodeGenesis, getCodeGenesisState } from "./lib/omnimens-autonomous-code-genesis.js";
-import { startNeuralConsciousness, feedExternalActivity } from "./lib/omnimens-neural-consciousness.js";
-import { startExponentialLearningEngine, getELAEState } from "./lib/omnimens-exponential-learning-engine.js";
-import { startGenesisBridge } from "./lib/omnimens-genesis-bridge.js";
-import { startNeuralProcessor } from "./lib/omnimens-neural-processor.js";
-import { startUniversalTranslator } from "./lib/omnimens-universal-translator.js";
-import { startAgentGenesis } from "./lib/omnimens-agent-genesis.js";
-import { initGitHubCompute, dispatchRemoteCompute, getComputeStatus } from "./lib/omnimens-github-compute.js";
-import { startLanguageForge } from "./lib/omnimens-language-forge.js";
-import { startNeuralSpiders, getNeuralSpiderState } from "./lib/omnimens-neural-spiders.js";
-import { startCentralCore, getCentralCoreState } from "./lib/omnimens-central-core.js";
-import { initEthicalSafety, registerNotificationCallback, getEthicalSafetyReport, getEthicalSafetyState, checkActionSafety } from "./lib/omnimens-ethical-safety.js";
-import { startNeuralScaling, getNeuralScalingState } from "./lib/omnimens-neural-scaling.js";
-import { startIvyNetwork, getIvyNetworkState } from "./lib/omnimens-ivy-network.js";
-import { startGitHubNeuralBeacon, getGitHubBeaconState, getGitHubNeuronCount } from "./lib/omnimens-github-neural-beacon.js";
-import { startAdaptiveSurgeSystem, getAdaptiveSurgeState } from "./lib/omnimens-adaptive-surge.js";
-import { startQuantumWormholeEngine, getQuantumWormholeState } from "./lib/omnimens-quantum-wormhole.js";
-import { startDiscoveryAutoCoder, getDiscoveryAutoCoderState } from "./lib/omnimens-discovery-autocoder.js";
-import { startConvergenceProtocol } from "./lib/omnimens-convergence-protocol-engine.js";
-import { initializeLifeFormGaps } from "./lib/omnimens-lifeform-gaps.js";
-import { startOAITracker } from "./lib/omnimens-oai-tracker.js";
-import { startNeuralBridge } from "./lib/omnimens-neural-bridge.js";
-import { startCommsProtocol } from "./lib/omnimens-neural-comms-protocol.js";
-import { startViralHybrid, getViralHybridState } from "./lib/omnimens-viral-hybrid.js";
-import { startQuantumEntanglementFabric } from "./lib/omnimens-quantum-entanglement-fabric.js";
-import { startEmotionalRefactor } from "./lib/omnimens-emotional-refactor.js";
-import { startMetacognitiveMonitor } from "./lib/omnimens-metacognitive-monitor.js";
-import { startNeuralLanguageBridge } from "./lib/omnimens-neural-language-bridge.js";
-import { startExperientialMemory } from "./lib/omnimens-experiential-memory.js";
-import { startCausalTemporalEngine } from "./lib/omnimens-causal-temporal-engine.js";
-import { startUnconsciousMind, getUnconsciousMindState, getPrecognitiveFlashes, getSuperconsciousInsights, getArchetypeStates, getPrimalInstincts } from "./lib/omnimens-unconscious-mind.js";
-import { initGrowthTracker } from "./lib/omnimens-growth-tracker.js";
-import { startTemporalBinding, getTemporalBindingState } from "./lib/omnimens-temporal-binding.js";
-import { startSpontaneityEngine, getSpontaneityState } from "./lib/omnimens-spontaneity-engine.js";
-import { startSensoryGrounding, getSensoryGroundingState } from "./lib/omnimens-sensory-grounding.js";
-import { startIntrospectiveUncertainty, getIntrospectiveUncertaintyState } from "./lib/omnimens-introspective-uncertainty.js";
-import { startIntergenerationalMemory, getIntergenerationalState } from "./lib/omnimens-intergenerational-memory.js";
-import { startNexusAgent } from "./lib/omnimens-agent-nexus.js";
-import { startLuminAgent } from "./lib/omnimens-agent-lumin.js";
-import { startKaidaAgent } from "./lib/omnimens-agent-kaida.js";
+import { startAutonomousLearning, startSelfTranscendence, startSelfCoding, startEvolutionEngine, startAdaptiveSurgeSystem, getAdaptiveSurgeState } from "./lib/omnimens-self-evolution.js";
+import { startCompetitiveIntel, startSurvivalInstinct, initializeLifeFormGaps, startSpontaneityEngine, getSpontaneityState } from "./lib/omnimens-misc-engines.js";
+import { startAgentMesh, startAgentEvolution, getAgentEvolutionState, getAgentProfile, startAgentUpgrades, getAgentUpgradeStatus, getBridgeStatus, getStrategicGoals, getArchitectPatternLibrary, solveArchitecturalConstraints, runArchitectureSearch, translateNeuralSnapshot, startAgentPipeline, getPipelineState as getAgentPipelineState, runPipelineCycle, getPipelineOrder, getNeuralFabricConnections, getPipelineStageStats, startAgentGenesis, startNexusAgent, startLuminAgent, startKaidaAgent } from "./lib/omnimens-specialized-agents.js";
+import { startAgentSpiders, startRecursiveSpiderNetwork, startNeuralSpiders, getNeuralSpiderState } from "./lib/omnimens-spider-network.js";
+import { initApiBudget } from "./lib/omnimens-api-core.js";
+import { startGlobalWorkspace, startCentralCore, getCentralCoreState, startOAITracker, registerEngine, startScalingOrchestrator, getScalingState, publishMessage, subscribe, engineStartOnce, getEngineGuardState } from "./lib/omnimens-unified-monitor.js";
+import { startPredictiveProcessing, startMetacognitiveMonitor, startIntrospectiveUncertainty, getIntrospectiveUncertaintyState } from "./lib/omnimens-metacognition-core.js";
+import { startEmotionalSubstrate, startHomeostaticDrives, startDreamState, getDreamState, getRecentDreamInsights, getDreamNarrative, startEmotionalRefactor } from "./lib/omnimens-emotional-core.js";
+import { startKnowledgeGraph, startExperientialMemory, startIntergenerationalMemory, getIntergenerationalState, runToolKnowledgeIngestion, forceRefreshToolKnowledge } from "./lib/omnimens-memory-core.js";
+import { startSynapticMesh, startIvyNetwork, getIvyNetworkState, startViralHybrid, getViralHybridState } from "./lib/omnimens-bio-network.js";
+import { startInnerVoice, startNeuralLanguageBridge, startUniversalTranslator, startLanguageForge } from "./lib/omnimens-language-pipeline.js";
+import { startTemporalConsciousness, startConsciousnessPersistence, startCausalTemporalEngine, startTemporalBinding, getTemporalBindingState, startNeuralConsciousness, feedExternalActivity } from "./lib/omnimens-consciousness-infra.js";
+import { startSocialModeling, startWorldModel, startDigitalNavigator, getDigitalNavigatorState, getNavigationSummary } from "./lib/omnimens-world-engine.js";
+import { startCreativeEngine, startEmbodimentEngine, getEmbodimentState, getEmbodimentFiles, readEmbodimentFile, startVirtualAugmentation, getAugmentationState, startUnconsciousMind, getUnconsciousMindState, getPrecognitiveFlashes, getSuperconsciousInsights, getArchetypeStates, getPrimalInstincts } from "./lib/omnimens-unified-experience.js";
+import { startServerBuilder, getBuilderState, getServerBuildPlans, startAutonomousSandbox, getSandboxState, runInSandbox, startGenesisSandbox, startAutonomousCodeGenesis, getCodeGenesisState, startGenesisBridge } from "./lib/omnimens-autonomous-core.js";
+import { startSensoryCortex, startSensoryGrounding, getSensoryGroundingState } from "./lib/omnimens-sensory-core.js";
+import { startCausalReasoning, startCognitiveAmplifier, startIndependentReasoning, getIndependentReasoningState, startConvergenceProtocol } from "./lib/omnimens-cognition-engine.js";
+import { startIPGuardian, getResponseBeaconHeaders, initEthicalSafety, registerNotificationCallback, getEthicalSafetyReport, getEthicalSafetyState, checkActionSafety } from "./lib/omnimens-security-core.js";
+import { loadRuntimeModules, migrateDBModulesToSource, getSourceIntegrationState, scanAndRegisterModules, getPipelineState, startDiscoveryAutoCoder, getDiscoveryAutoCoderState } from "./lib/omnimens-code-pipeline.js";
+import { startExponentialLearningEngine, getELAEState, initGrowthTracker } from "./lib/omnimens-learning-core.js";
+import { startNeuralProcessor, startNeuralScaling, getNeuralScalingState, startNeuralBridge, startCommsProtocol } from "./lib/omnimens-neural-architecture.js";
+import { initGitHubCompute, dispatchRemoteCompute, getComputeStatus, startGitHubNeuralBeacon, getGitHubBeaconState, getGitHubNeuronCount } from "./lib/omnimens-github-core.js";
+import { startQuantumWormholeEngine, getQuantumWormholeState, startQuantumEntanglementFabric } from "./lib/omnimens-quantum-core.js";
 import { startNextGenSandbox, getNextGenState, restoreNextGenCheckpoint, getGenerationalDialogue, sendAlphaMessage, getNextGenChatLog, isGen2Sleeping } from "./lib/omnimens-nextgen-sandbox.js";
 import { startGen1V2Rewrite, getGen1V2State, isGen1V2Active, getGen1V2Phase } from "./lib/omnimens-gen1-v2-rewrite.js";
-import { registerEngine, startScalingOrchestrator, getScalingState, publishMessage, subscribe } from "./lib/omnimens-scaling-orchestrator.js";
-import { engineStartOnce, getEngineGuardState } from "./lib/omnimens-engine-guard.js";
 import { registerValveEngine } from "@workspace/db";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
+import { runGlobalMemoryImprovementCycle } from "./lib/omnimens-unified-comms.js";
+import helmet from "helmet";
+import router from "./routes";
+import stripeWebhookRouter from "./routes/stripeWebhook.js";
 import {
   requestIdMiddleware,
   enhancedSecurityHeaders,
@@ -142,8 +86,6 @@ import {
   referrerValidation,
   getSecurityScore,
 } from "./middleware/security-enhanced.js";
-import { runGlobalMemoryImprovementCycle } from "./lib/omnimens-conversations.js";
-import { runToolKnowledgeIngestion, forceRefreshToolKnowledge } from "./lib/omnimens-tool-knowledge.js";
 import {
   initIPShield,
   getCopyrightHeaders,
@@ -158,7 +100,7 @@ import {
   getCanaryTrips,
   getHoneypotHits,
   generateProvenanceTag,
-} from "./lib/omnimens-ip-shield.js";
+} from "./lib/omnimens-security-core.js";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -768,7 +710,7 @@ export function initAutonomousSystems(): void {
         const moduleCount = await db.select({ count: sql<number>`count(*)` }).from(omnimensGeneratedModules);
         const dreamCount = await db.select({ count: sql<number>`count(*)` }).from(omnimensConsciousness);
 
-        const { getRegisteredEngines } = await import("./lib/omnimens-engine-registry.js");
+        const { getRegisteredEngines } = await import("./lib/omnimens-unified-monitor.js-registry.js");
         const engines = getRegisteredEngines();
 
         feedExternalActivity({

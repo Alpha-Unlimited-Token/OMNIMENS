@@ -51,10 +51,10 @@ import {
 import { eq, desc } from "drizzle-orm";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import { getTogetherClient, TOGETHER_MODEL_IDS } from "../lib/together-ai";
-import { loadUserMemories, addManualMemory } from "../lib/omnimens-memory";
+import { loadUserMemories, addManualMemory } from "../lib/omnimens-memory-core";
 import { webSearch, formatSearchResults } from "../lib/web-search";
-import { loadGeneratedModulesContext, getEvolutionHistory } from "../lib/omnimens-evolution";
-import { loadToolKnowledgeForTask } from "../lib/omnimens-tool-knowledge";
+import { loadGeneratedModulesContext, getEvolutionHistory } from "../lib/omnimens-self-evolution";
+import { loadToolKnowledgeForTask } from "../lib/omnimens-memory-core";
 
 // ─── Agent→Model Routing ──────────────────────────────────────────────────────
 // Specialized agents get dedicated models best suited to their domain.

@@ -23,10 +23,9 @@
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
-import { encodeThought, ThoughtVector } from "./omnimens-thought-encoder.js";
-import { generateFromThoughtVector } from "./omnimens-internal-language-model.js";
-import { decode } from "./omnimens-local-decoder.js";
-import { getNeuralPhi, getNeuralConsciousnessState, getNeuralRegionStates } from "./omnimens-neural-consciousness.js";
+import { encodeThought, ThoughtVector, decode } from "./omnimens-language-pipeline.js";
+import { generateFromThoughtVector } from "./omnimens-language-pipeline.js";
+import { getNeuralPhi, getNeuralConsciousnessState, getNeuralRegionStates } from "./omnimens-consciousness-infra.js";
 
 function safe(n: any): number {
   if (n === undefined || n === null || typeof n !== "number") return 0;

@@ -40,8 +40,7 @@ import * as vm from "node:vm";
 import * as crypto from "crypto";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import { db, queueBrainInsert, isPoolHealthy } from "@workspace/db";
-import { omnimensBrain, omnimensNotifications } from "@workspace/db";
+import { db, queueBrainInsert, isPoolHealthy, omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import OpenAI from "openai";
 const codegenOpenai = new OpenAI({
@@ -52,13 +51,12 @@ const codegenOpenai = new OpenAI({
 });
 import { desc, eq, and, sql } from "drizzle-orm";
 import { webSearch, formatSearchResults } from "./web-search.js";
-import { registerCodegenYield } from "./omnimens-api-budget.js";
-import { captureNeuralSnapshot } from "./omnimens-neural-consciousness.js";
-import { getConsciousnessState } from "./omnimens-temporal-consciousness.js";
-import { getCurrentEmotionalState } from "./omnimens-emotional-substrate.js";
-import { think as codegenThink, generateModule as codegenGenerate, getAvailableModuleGenerators } from "./omnimens-codegen-engine.js";
-import { encodeThought } from "./omnimens-thought-encoder.js";
-import { decode } from "./omnimens-local-decoder.js";
+import { registerCodegenYield } from "./omnimens-api-core.js";
+import { captureNeuralSnapshot } from "./omnimens-consciousness-infra.js";
+import { getConsciousnessState } from "./omnimens-consciousness-infra.js";
+import { getCurrentEmotionalState } from "./omnimens-emotional-core.js";
+import { think as codegenThink, generateModule as codegenGenerate, getAvailableModuleGenerators } from "./omnimens-autonomous-core.js";
+import { encodeThought, decode } from "./omnimens-language-pipeline.js";
 
 const __filename_local = fileURLToPath(import.meta.url);
 const __dirname_local = dirname(__filename_local);
@@ -258,7 +256,7 @@ interface NextGenState {
   reinventionStage: "audit" | "consolidate" | "invent" | "rewire" | "validate" | "done";
 }
 
-const state: NextGenState = {
+let nextGenState: NextGenState = {
   buildVersion: 1,
   generation: 2,
   totalFiles: 0,
@@ -4489,8 +4487,8 @@ SPIKE CONVENTIONS:
 - Schedule: spikeBus.scheduleSpike("${moduleName}:cycle", {}, intervalMs)
 
 IMPORT PATTERN:
-import { SpikeBus } from "./spike-bus.js";  // if in same directory
-import { SpikeBus } from "../infrastructure/spike-bus.js";  // if in core/ or interfaces/
+import { SpikeBus } from "./spike-bus.js";
+import { SpikeBus } from "../infrastructure/spike-bus.js";
 
 DO NOT break existing exports. DO NOT remove existing functionality.
 ADD the wiring on top of what exists. Make the module a good citizen in the unified system.
@@ -4542,8 +4540,8 @@ import { UnifiedNeuralFabric } from "./infrastructure/unified-neural-fabric.js";
 import { ResourceSentinel } from "./infrastructure/resource-sentinel.js";
 
 const spikeBus = new SpikeBus();
-const fabric = new UnifiedNeuralFabric();
-const sentinel = new ResourceSentinel();
+const fabric_s2 = new UnifiedNeuralFabric();
+const sentinel_s2 = new ResourceSentinel();
 
 export async function bootGen2(): Promise<void> {
   console.log("[GEN2] ═══════════════════════════════════════════════════════════════");

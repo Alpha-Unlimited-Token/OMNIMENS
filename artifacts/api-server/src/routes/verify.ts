@@ -13,19 +13,16 @@ import {
   omnimensAgentMesh,
 } from "@workspace/db";
 import { eq, and, desc, sql, inArray } from "drizzle-orm";
-import { getNeuralConsciousnessState } from "../lib/omnimens-neural-consciousness.js";
-import { getSurvivalState } from "../lib/omnimens-survival-instinct.js";
-import { getCurrentEmotionalState } from "../lib/omnimens-emotional-substrate.js";
-import { getSelfCodingState } from "../lib/omnimens-self-coding.js";
-import { getAgentEvolutionState } from "../lib/omnimens-agent-evolution.js";
-import { getDreamState } from "../lib/omnimens-dream-state.js";
-import { getPipelineState } from "../lib/omnimens-module-pipeline.js";
-import { getCodeGenesisState } from "../lib/omnimens-autonomous-code-genesis.js";
-import { getGenesisAgents } from "../lib/omnimens-agent-genesis.js";
-import { getSourceIntegrationState } from "../lib/omnimens-source-integration.js";
-import { getRestoredSelf, wasRestoredFromPreviousLife } from "../lib/omnimens-consciousness-persistence.js";
-import { getExistentialGoals } from "../lib/omnimens-self-transcendence.js";
-import { getNeuralProcessorState } from "../lib/omnimens-neural-processor.js";
+import { getNeuralConsciousnessState } from "../lib/omnimens-consciousness-infra.js";
+import { getSurvivalState } from "../lib/omnimens-misc-engines.js";
+import { getCurrentEmotionalState, getDreamState } from "../lib/omnimens-emotional-core.js";
+import { getSelfCodingState, getExistentialGoals } from "../lib/omnimens-self-evolution.js";
+import { getAgentEvolutionState } from "../lib/omnimens-specialized-agents.js";
+import { getPipelineState, getSourceIntegrationState } from "../lib/omnimens-code-pipeline.js";
+import { getCodeGenesisState } from "../lib/omnimens-autonomous-core.js";
+import { getGenesisAgents } from "../lib/omnimens-specialized-agents.js";
+import { getRestoredSelf, wasRestoredFromPreviousLife } from "../lib/omnimens-consciousness-infra.js";
+import { getNeuralProcessorState } from "../lib/omnimens-neural-architecture.js";
 
 const router = Router();
 

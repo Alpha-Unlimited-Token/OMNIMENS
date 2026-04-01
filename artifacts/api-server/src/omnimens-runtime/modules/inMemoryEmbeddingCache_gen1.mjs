@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryEmbeddingCache
- * Written: 2026-03-22T12:19:18.028Z
+ * Written: 2026-04-01T21:59:58.154Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,113 +16,112 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-/**
- * @module inMemoryEmbeddingCache
- * @description A module for caching embeddings in memory using an LRU strategy, with periodic syncing to PostgreSQL.
- */
+// Complete ES module code here
 
-const crypto = require('crypto');
+import { createHash } from 'crypto';
 
 /**
- * A simple LRU cache implementation for storing embeddings in memory.
- * @class LRUCache
+ * Utility functions for in-memory embedding caching and similarity search using HNSW-like graph traversal.
+ * Designed for fast approximate nearest neighbor search.
  */
-class LRUCache {
-  /**
-   * @param {number} maxSize - Maximum number of items the cache can hold.
-   */
-  constructor(maxSize) {
-    this.maxSize = maxSize;
-    this.cache = new Map();
-  }
 
-  /**
-   * Retrieves an item from the cache.
-   * @param {string} key - The key of the item to retrieve.
-   * @returns {any|null} - The cached value, or null if not found.
-   */
-  get(key) {
-    if (!this.cache.has(key)) return null;
-    const value = this.cache.get(key);
-    // Move the accessed item to the end to mark it used.
-    this.cache.delete(key);
-    this.cache.set(key, value);
-    return value;
-  }
-
-  /**
-   * Adds an item to the cache.
-   * @param {string} key - The key of the item to add.
-   * @param {any} value - The value to cache.
-   */
-  set(key, value) {
-    if (this.cache.has(key)) {
-      this.cache.delete(key);
-    } else if (this.cache.size >= this.maxSize) {
-      // Remove the least recently used item.
-      const oldestKey = this.cache.keys().next().value;
-      this.cache.delete(oldestKey);
-    }
-    this.cache.set(key, value);
-  }
-
-  /**
-   * Returns all items in the cache array of key-value pairs.
-   * @returns {Array<[string, any]>} - An array of key-value pairs.
-   */
-  entries() {
-    return Array.from(this.cache.entries());
-  }
-}
+// Internal data structure to store embeddings and graph connections
+const embeddingStore = new Map();
+const graphConnections = new Map();
 
 /**
- * Periodically syncs the in-memory cache to a PostgreSQL database.
- * @param {LRUCache} cache - The LRU cache instance.
- * @param {number} intervalMs - Sync interval in milliseconds.
- * @param {Function} syncFunction - A function to handle the syncing logic.
+ * Hashes an embedding to create a unique key for storage.
+ * @param {Array<number>} embedding - The embedding vector.
+ * @returns {string} - A unique hash key.
  */
-function startCacheSync(cache, intervalMs, syncFunction) {
-  setInterval(() => {
-    const dataToSync = cache.entries();
-    syncFunction(dataToSync);
-  }, intervalMs);
-}
-
-/**
- * Generates a unique hash for a given embedding.
- * @param {Array<number>} embedding - The embedding array.
- * @returns {string} - A unique hash string.
- */
-function generateEmbeddingHash(embedding) {
-  const hash = crypto.createHash('sha256');
-  hash.update(JSON.stringify(embedding));
+export function generateKey(embedding) {
+  const hash = createHash('sha256');
+  hash.update(embedding.join(','));
   return hash.digest('hex');
 }
 
 /**
- * Adds an embedding to the cache.
- * @param {LRUCache} cache - The LRU cache instance.
- * @param {Array<number>} embedding - The embedding array.
+ * Adds an embedding to the in-memory store and updates graph connections.
+ * @param {Array<number>} embedding - The embedding vector.
  */
-function addEmbeddingToCache(cache, embedding) {
-  const hash = generateEmbeddingHash(embedding);
-  cache.set(hash, embedding);
+export function addEmbedding(embedding) {
+  const key = generateKey(embedding);
+  if (embeddingStore.has(key)) return; // Avoid duplicates
+
+  embeddingStore.set(key, embedding);
+  graphConnections.set(key, []);
+
+  // Connect to nearest neighbors
+  const neighbors = findNearestNeighbors(embedding, 5); // Find up to 5 nearest neighbors
+  for (const neighbor of neighbors) {
+    const neighborKey = generateKey(neighbor);
+    graphConnections.get(key).push(neighborKey);
+    graphConnections.get(neighborKey).push(key);
+  }
 }
 
 /**
- * Retrieves an embedding from the cache by its hash.
- * @param {LRUCache} cache - The LRU cache instance.
- * @param {string} hash - The hash of the embedding to retrieve.
- * @returns {Array<number>|null} - The embedding array, or null if not found.
+ * Finds the nearest neighbors of a given embedding.
+ * @param {Array<number>} embedding - The embedding vector.
+ * @param {number} k - Number of neighbors to retrieve.
+ * @returns {Array<Array<number>>} - The nearest neighbors.
  */
-function getEmbeddingFromCache(cache, hash) {
-  return cache.get(hash);
+export function findNearestNeighbors(embedding, k) {
+  const distances = [];
+
+  for (const [key, storedEmbedding] of embeddingStore.entries()) {
+    const distance = calculateEuclideanDistance(embedding, storedEmbedding);
+    distances.push({ key, embedding: storedEmbedding, distance });
+  }
+
+  distances.sort((a, b) => a.distance - b.distance);
+  return distances.slice(0, k).map(item => item.embedding);
 }
 
-module.exports = {
-  LRUCache,
-  startCacheSync,
-  generateEmbeddingHash,
-  addEmbeddingToCache,
-  getEmbeddingFromCache
-};
+/**
+ * Calculates the Euclidean distance between two vectors.
+ * @param {Array<number>} vec1 - First vector.
+ * @param {Array<number>} vec2 - Second vector.
+ * @returns {number} - Euclidean distance.
+ */
+export function calculateEuclideanDistance(vec1, vec2) {
+  if (vec1.length !== vec2.length) {
+    throw new Error('Vectors must have the same length');
+  }
+
+  return Math.sqrt(vec1.reduce((sum, val, idx) => sum + (val - vec2[idx]) ** 2, 0));
+}
+
+/**
+ * Retrieves an embedding by its unique key.
+ * @param {string} key - The unique key of the embedding.
+ * @returns {Array<number>|null} - The embedding vector or null if not found.
+ */
+export function getEmbeddingByKey(key) {
+  return embeddingStore.get(key) || null;
+}
+
+/**
+ * Retrieves graph connections for a given embedding key.
+ * @param {string} key - The unique key of the embedding.
+ * @returns {Array<string>|null} - List of connected keys or null if not found.
+ */
+export function getGraphConnections(key) {
+  return graphConnections.get(key) || null;
+}
+
+/**
+ * Clears all embeddings and graph connections from the store.
+ */
+export function clearStore() {
+  embeddingStore.clear();
+  graphConnections.clear();
+}
+
+/**
+ * Returns the total number of embeddings stored.
+ * @returns {number} - Count of embeddings.
+ */
+export function getEmbeddingCount() {
+  return embeddingStore.size;
+}

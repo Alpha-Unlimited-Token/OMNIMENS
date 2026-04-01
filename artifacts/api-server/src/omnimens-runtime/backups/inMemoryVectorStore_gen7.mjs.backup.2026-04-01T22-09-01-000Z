@@ -1,0 +1,169 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-04-01T22:02:40.042Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// inMemoryVectorStore.mjs
+
+import { createHash } from 'crypto';
+
+/**
+ * Computes the Euclidean distance between two vectors.
+ * @param {number[]} vec1 - First vector.
+ * @param {number[]} vec2 - Second vector.
+ * @returns {number} - Euclidean distance.
+ */
+export function euclideanDistance(vec1, vec2) {
+  if (vec1.length !== vec2.length) {
+    throw new Error('Vectors must have the same dimensions.');
+  }
+  return Math.sqrt(vec1.reduce((sum, val, idx) => sum + (val - vec2[idx]) ** 2, 0));
+}
+
+/**
+ * Builds a KD-tree for efficient nearest neighbor search.
+ * @param {Array<{ point, id}>} points - Array of points with embeddings and unique IDs.
+ * @param {number} depth - Current depth of the tree (default: 0).
+ * @returns {object} - Root node of the KD-tree.
+ */
+export function buildKDTree(points, depth = 0) {
+  if (points.length === 0) return null;
+
+  const k = points[0].point.length;
+  const axis = depth % k;
+
+  points.sort((a, b) => a.point[axis] - b.point[axis]);
+  const median = Math.floor(points.length / 2);
+
+  return {
+    point: points[median].point,
+    id: points[median].id,
+    left: buildKDTree(points.slice(0, median), depth + 1),
+    right: buildKDTree(points.slice(median + 1), depth + 1)
+  };
+}
+
+/**
+ * Searches the KD-tree for the nearest neighbor to a target point.
+ * @param {object} node - Root node of the KD-tree.
+ * @param {number[]} target - Target point to search for.
+ * @param {number} depth - Current depth in the tree (default: 0).
+ * @param {object} best - Current best match ({ point, id, distance }).
+ * @returns {object} - Nearest neighbor ({ point, id, distance }).
+ */
+export function nearestNeighborSearch(node, target, depth = 0, best = { point, id, distance}) {
+  if (!node) return best;
+
+  const k = target.length;
+  const axis = depth % k;
+
+  const distance = euclideanDistance(node.point, target);
+  if (distance < best.distance) {
+    best = { point: node.point, id: node.id, distance };
+  }
+
+  const nextBranch = target[axis] < node.point[axis] ? node.left : node.right;
+  const otherBranch = target[axis] < node.point[axis] ? node.right : node.left;
+
+  best = nearestNeighborSearch(nextBranch, target, depth + 1, best);
+
+  if (Math.abs(target[axis] - node.point[axis]) < best.distance) {
+    best = nearestNeighborSearch(otherBranch, target, depth + 1, best);
+  }
+
+  return best;
+}
+
+/**
+ * Generates a unique ID for a given vector.
+ * @param {number[]} vector - Input vector.
+ * @returns {string} - Unique ID (hash).
+ */
+export function generateVectorId(vector) {
+  const hash = createHash('sha256');
+  hash.update(vector.join(','));
+  return hash.digest('hex');
+}
+
+/**
+ * Inserts a new vector into the KD-tree.
+ * @param {object} tree - Current KD-tree root.
+ * @param {number[]} vector - Vector to insert.
+ * @param {string} id - Unique ID for the vector.
+ * @param {number} depth - Current depth in the tree (default: 0).
+ * @returns {object} - Updated KD-tree.
+ */
+export function insertIntoKDTree(tree, vector, id, depth = 0) {
+  if (!tree) {
+    return { point: vector, id, left, right};
+  }
+
+  const k = vector.length;
+  const axis = depth % k;
+
+  if (vector[axis] < tree.point[axis]) {
+    tree.left = insertIntoKDTree(tree.left, vector, id, depth + 1);
+  } else {
+    tree.right = insertIntoKDTree(tree.right, vector, id, depth + 1);
+  }
+
+  return tree;
+}
+
+/**
+ * Finds the k-nearest neighbors to a target point.
+ * @param {object} tree - Root node of the KD-tree.
+ * @param {number[]} target - Target point.
+ * @param {number} k - Number of neighbors to find.
+ * @returns {Array<{ point, id, distance}>} - List of k-nearest neighbors.
+ */
+export function kNearestNeighbors(tree, target, k) {
+  const neighbors = [];
+
+  function search(node, depth = 0) {
+    if (!node) return;
+
+    const distance = euclideanDistance(node.point, target);
+    if (neighbors.length < k || distance < neighbors[neighbors.length - 1].distance) {
+      neighbors.push({ point: node.point, id: node.id, distance });
+      neighbors.sort((a, b) => a.distance - b.distance);
+      if (neighbors.length > k) neighbors.pop();
+    }
+
+    const axis = depth % target.length;
+    const nextBranch = target[axis] < node.point[axis] ? node.left : node.right;
+    const otherBranch = target[axis] < node.point[axis] ? node.right : node.left;
+
+    search(nextBranch, depth + 1);
+
+    if (Math.abs(target[axis] - node.point[axis]) < neighbors[neighbors.length - 1].distance) {
+      search(otherBranch, depth + 1);
+    }
+  }
+
+  search(tree);
+  return neighbors;
+}
+
+/**
+ * Utility function to create a KD-tree from a list of vectors.
+ * @param {number[][]} vectors - List of vectors.
+ * @returns {object} - Root of the KD-tree.
+ */
+export function createKDTreeFromVectors(vectors) {
+  const points = vectors.map(vector => ({ point: vector, id: generateVectorId(vector) }));
+  return buildKDTree(points);
+}

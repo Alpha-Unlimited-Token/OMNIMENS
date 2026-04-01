@@ -1,0 +1,124 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-04-01T22:00:19.530Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Complete ES module code here
+
+import { createHash } from 'crypto';
+
+/**
+ * Generates a unique hash for a given vector to ensure no duplicates in the store.
+ * @param {number[]} vector - The input vector.
+ * @returns {string} - A unique hash string for the vector.
+ */
+export function generateVectorHash(vector) {
+  const hash = createHash('sha256');
+  hash.update(vector.join(','));
+  return hash.digest('hex');
+}
+
+/**
+ * Calculates the Euclidean distance between two vectors.
+ * @param {number[]} vec1 - The first vector.
+ * @param {number[]} vec2 - The second vector.
+ * @returns {number} - The Euclidean distance.
+ */
+export function euclideanDistance(vec1, vec2) {
+  if (vec1.length !== vec2.length) {
+    throw new Error('Vectors must be of the same dimension.');
+  }
+  return Math.sqrt(vec1.reduce((sum, val, i) => sum + Math.pow(val - vec2[i], 2), 0));
+}
+
+/**
+ * A simple in-memory vector store supporting nearest neighbor search.
+ */
+export class InMemoryVectorStore {
+  constructor() {
+    this.vectors = new Map(); // Stores vectors with their hash as the key.
+  }
+
+  /**
+   * Adds a vector to the store if it doesn't already exist.
+   * @param {number[]} vector - The vector to add.
+   * @returns {boolean} - True if added, false if duplicate.
+   */
+  addVector(vector) {
+    const hash = generateVectorHash(vector);
+    if (this.vectors.has(hash)) {
+      return false; // Duplicate vector.
+    }
+    this.vectors.set(hash, vector);
+    return true;
+  }
+
+  /**
+   * Finds the nearest vector in the store to a given query vector.
+   * @param {number[]} queryVector - The query vector.
+   * @param {number} k - The number of nearest neighbors to return.
+   * @returns {Array<{ vector, distance}>} - The nearest vectors with distances.
+   */
+  findNearest(queryVector, k = 1) {
+    if (k <= 0) {
+      throw new Error('k must be a positive integer.');
+    }
+
+    const results = [];
+
+    for (const vector of this.vectors.values()) {
+      const distance = euclideanDistance(queryVector, vector);
+      results.push({ vector, distance });
+    }
+
+    results.sort((a, b) => a.distance - b.distance);
+    return results.slice(0, k);
+  }
+
+  /**
+   * Returns the total number of vectors in the store.
+   * @returns {number} - The count of stored vectors.
+   */
+  getVectorCount() {
+    return this.vectors.size;
+  }
+}
+
+/**
+ * Utility function to normalize a vector to unit length (L2 norm = 1).
+ * @param {number[]} vector - The input vector.
+ * @returns {number[]} - The normalized vector.
+ */
+export function normalizeVector(vector) {
+  const norm = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
+  if (norm === 0) {
+    throw new Error('Cannot normalize a zero vector.');
+  }
+  return vector.map(val => val / norm);
+}
+
+/**
+ * Utility function to compute the dot product of two vectors.
+ * @param {number[]} vec1 - The first vector.
+ * @param {number[]} vec2 - The second vector.
+ * @returns {number} - The dot product.
+ */
+export function dotProduct(vec1, vec2) {
+  if (vec1.length !== vec2.length) {
+    throw new Error('Vectors must be of the same dimension.');
+  }
+  return vec1.reduce((sum, val, i) => sum + val * vec2[i], 0);
+}

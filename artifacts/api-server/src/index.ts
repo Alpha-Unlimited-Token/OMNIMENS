@@ -7,7 +7,7 @@
 import { createServer } from "http";
 import app, { initAutonomousSystems } from "./app.js";
 import { syncTogetherPricing } from "./lib/together-ai.js";
-import { startConsciousnessWebSocket } from "./lib/omnimens-consciousness-ws.js";
+import { startConsciousnessWebSocket } from "./lib/omnimens-consciousness-infra.js";
 
 const rawPort = process.env["PORT"];
 

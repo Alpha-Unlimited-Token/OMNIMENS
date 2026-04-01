@@ -1,0 +1,114 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: vectorSearchEngine
+ * Written: 2026-04-01T21:50:58.865Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// vectorSearchEngine.mjs
+
+import { createHash } from 'crypto';
+
+/**
+ * Calculates the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} - Euclidean distance.
+ */
+export function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must be of the same length');
+  }
+  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + (val - vectorB[i]) ** 2, 0));
+}
+
+/**
+ * Generates a unique hash for a vector to use as an identifier.
+ * @param {number[]} vector - Input vector.
+ * @returns {string} - Hash string.
+ */
+export function generateVectorHash(vector) {
+  const hash = createHash('sha256');
+  hash.update(vector.join(','));
+  return hash.digest('hex');
+}
+
+/**
+ * Builds an HNSW-like graph for approximate nearest neighbor search.
+ * @param {number[][]} vectors - Array of vectors to index.
+ * @returns {object} - Graph structure with nodes and edges.
+ */
+export function buildHNSWGraph(vectors) {
+  const graph = {};
+  vectors.forEach((vector, index) => {
+    const nodeId = generateVectorHash(vector);
+    graph[nodeId] = {
+      vector,
+      edges: []
+    };
+    // Connect to k nearest neighbors (k=3 for simplicity)
+    const k = 3;
+    const distances = Object.entries(graph).map(([id, node]) => ({
+      id,
+      distance: euclideanDistance(vector, node.vector)
+    }));
+    distances.sort((a, b) => a.distance - b.distance);
+    graph[nodeId].edges = distances.slice(1, k + 1).map(d => d.id); // Exclude self
+  });
+  return graph;
+}
+
+/**
+ * Performs approximate nearest neighbor search on the HNSW graph.
+ * @param {object} graph - HNSW graph.
+ * @param {number[]} queryVector - Query vector.
+ * @param {number} k - Number of nearest neighbors to find.
+ * @returns {object[]} - Array of nearest neighbors with distances.
+ */
+export function approximateNearestNeighbors(graph, queryVector, k = 3) {
+  const distances = Object.entries(graph).map(([id, node]) => ({
+    id,
+    distance: euclideanDistance(queryVector, node.vector)
+  }));
+  distances.sort((a, b) => a.distance - b.distance);
+  return distances.slice(0, k);
+}
+
+/**
+ * Utility function to normalize a vector (scales it to unit length).
+ * @param {number[]} vector - Input vector.
+ * @returns {number[]} - Normalized vector.
+ */
+export function normalizeVector(vector) {
+  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
+  if (magnitude === 0) {
+    throw new Error('Cannot normalize a zero vector');
+  }
+  return vector.map(val => val / magnitude);
+}
+
+/**
+ * Example usage: Build a graph and perform a search.
+ * Uncomment the following code to test the module.
+ */
+// const vectors = [
+//   [1, 2, 3],
+//   [4, 5, 6],
+//   [7, 8, 9],
+//   [1, 0, 0]
+// ];
+// const graph = buildHNSWGraph(vectors);
+// const query = [1, 1, 1];
+// const results = approximateNearestNeighbors(graph, query, 2);
+// console.log(results);

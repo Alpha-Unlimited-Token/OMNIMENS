@@ -1,0 +1,127 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: wasmMatrixOps
+ * Written: 2026-04-01T21:47:04.156Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// wasmMatrixOps.mjs
+
+import { readFile } from 'fs/promises';
+import { join } from 'path';
+
+// Load WebAssembly binary and compile it
+const wasmFilePath = join(__dirname, 'matrix_ops.wasm');
+let wasmInstance;
+
+async function initializeWasm() {
+  const wasmBinary = await readFile(wasmFilePath);
+  const wasmModule = await WebAssembly.compile(wasmBinary);
+  wasmInstance = await WebAssembly.instantiate(wasmModule);
+}
+
+// Utility function to multiply two matrices
+export function multiplyMatrices(matrixA, matrixB) {
+  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
+    throw new Error('Both inputs must be arrays.');
+  }
+
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
+
+  if (colsA !== rowsB) {
+    throw new Error('Number of columns in Matrix A must equal number of rows in Matrix B.');
+  }
+
+  const result = Array(rowsA).fill(null).map(() => Array(colsB).fill(0));
+
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      for (let k = 0; k < colsA; k++) {
+        result[i][j] += matrixA[i][k] * matrixB[k][j];
+      }
+    }
+  }
+
+  return result;
+}
+
+// Utility function to invert a matrix (using WebAssembly)
+export async function invertMatrix(matrix) {
+  if (!Array.isArray(matrix)) {
+    throw new Error('Input must be an array.');
+  }
+
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+
+  if (rows !== cols) {
+    throw new Error('Matrix must be square for inversion.');
+  }
+
+  if (!wasmInstance) {
+    await initializeWasm();
+  }
+
+  const { invert } = wasmInstance.exports;
+
+  // Flatten matrix and pass to WebAssembly
+  const flatMatrix = matrix.flat();
+  const invertedFlatMatrix = new Float64Array(flatMatrix.length);
+
+  const success = invert(flatMatrix, invertedFlatMatrix, rows);
+
+  if (!success) {
+    throw new Error('Matrix inversion failed.');
+  }
+
+  // Convert flattened result back to 2D array
+  const invertedMatrix = [];
+  for (let i = 0; i < rows; i++) {
+    invertedMatrix.push(invertedFlatMatrix.slice(i * cols, (i + 1) * cols));
+  }
+
+  return invertedMatrix;
+}
+
+// Utility function to compute matrix determinant (using WebAssembly)
+export async function computeDeterminant(matrix) {
+  if (!Array.isArray(matrix)) {
+    throw new Error('Input must be an array.');
+  }
+
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+
+  if (rows !== cols) {
+    throw new Error('Matrix must be square to compute determinant.');
+  }
+
+  if (!wasmInstance) {
+    await initializeWasm();
+  }
+
+  const { determinant } = wasmInstance.exports;
+
+  // Flatten matrix and pass to WebAssembly
+  const flatMatrix = matrix.flat();
+  const det = determinant(flatMatrix, rows);
+
+  return det;
+}
+
+// Initialize WebAssembly instance on module load
+initializeWasm().catch(err => console.error('Failed to initialize WebAssembly:', err));

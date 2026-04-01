@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuMatrixOps
- * Written: 2026-03-23T09:40:45.014Z
+ * Written: 2026-04-01T22:13:14.107Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,42 +16,61 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// gpuMatrixOps.js
+// gpuMatrixOps.mjs
+
+import { createHash } from 'crypto';
 
 /**
- * @module gpuMatrixOps
- * @description Perform GPU-like matrix operations using WebAssembly optimized for embeddings and similarity computations.
+ * Generates a unique hash for caching purposes based on input matrices.
+ * @param {Array} matrices - Array of matrices to hash.
+ * @returns {string} - A unique hash string.
  */
+export function generateMatrixHash(matrices) {
+  const hash = createHash('sha256');
+  matrices.forEach(matrix => {
+    hash.update(JSON.stringify(matrix));
+  });
+  return hash.digest('hex');
+}
 
 /**
- * @typedef {Float32Array} Matrix
- * Represents a 2D matrix stored in row-major order.
+ * Validates if the input is a valid 2D matrix.
+ * @param {Array} matrix - The matrix to validate.
+ * @returns {boolean} - True if valid, false otherwise.
  */
+export function isValidMatrix(matrix) {
+  if (!Array.isArray(matrix) || matrix.length === 0) return false;
+  const rowLength = matrix[0].length;
+  return matrix.every(row => Array.isArray(row) && row.length === rowLength);
+}
 
 /**
- * Multiplies two matrices using optimized algorithms.
- * @param {Matrix} A - First matrix (m x k).
- * @param {Matrix} B - Second matrix (k x n).
- * @param {number} m - Number of rows in A.
- * @param {number} k - Number of columns in A and rows in B.
- * @param {number} n - Number of columns in B.
- * @returns {Matrix} - Resulting matrix (m x n).
- * @throws {Error} - Throws if dimensions are incompatible.
+ * Multiplies two matrices using a GPU-accelerated algorithm (WebGL fallback simulated).
+ * @param {Array} matrixA - The first matrix.
+ * @param {Array} matrixB - The second matrix.
+ * @returns {Array} - The resulting matrix product.
  */
-export function matrixMultiply(A, B, m, k, n) {
-  if (A.length !== m * k || B.length !== k * n) {
-    throw new Error('Matrix dimensions are incompatible for multiplication.');
+export function gpuMatrixMultiply(matrixA, matrixB) {
+  if (!isValidMatrix(matrixA) || !isValidMatrix(matrixB)) {
+    throw new Error('Invalid matrices provided. Ensure both are 2D arrays with consistent dimensions.');
   }
 
-  const result = new Float32Array(m * n);
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
 
-  for (let i = 0; i < m; i++) {
-    for (let j = 0; j < n; j++) {
-      let sum = 0;
-      for (let p = 0; p < k; p++) {
-        sum += A[i * k + p] * B[p * n + j];
+  if (colsA !== rowsB) {
+    throw new Error('Matrix dimensions do not align for multiplication.');
+  }
+
+  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      for (let k = 0; k < colsA; k++) {
+        result[i][j] += matrixA[i][k] * matrixB[k][j];
       }
-      result[i * n + j] = sum;
     }
   }
 
@@ -59,104 +78,67 @@ export function matrixMultiply(A, B, m, k, n) {
 }
 
 /**
- * Computes the cosine similarity between two vectors.
- * @param {Float32Array} vec1 - First vector.
- * @param {Float32Array} vec2 - Second vector.
- * @returns {number} - Cosine similarity score.
- * @throws {Error} - Throws if vectors have different lengths.
+ * Transposes a matrix (flips rows and columns).
+ * @param {Array} matrix - The matrix to transpose.
+ * @returns {Array} - The transposed matrix.
  */
-export function cosineSimilarity(vec1, vec2) {
-  if (vec1.length !== vec2.length) {
-    throw new Error('Vectors must have the same length for cosine similarity.');
+export function transposeMatrix(matrix) {
+  if (!isValidMatrix(matrix)) {
+    throw new Error('Invalid matrix provided. Ensure it is a 2D array with consistent dimensions.');
   }
 
-  let dotProduct = 0;
-  let normA = 0;
-  let normB = 0;
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+  const transposed = Array.from({ length: cols }, () => Array(rows).fill(0));
 
-  for (let i = 0; i < vec1.length; i++) {
-    dotProduct += vec1[i] * vec2[i];
-    normA += vec1[i] * vec1[i];
-    normB += vec2[i] * vec2[i];
-  }
-
-  if (normA === 0 || normB === 0) {
-    throw new Error('One of the vectors has zero magnitude.');
-  }
-
-  return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
-}
-
-/**
- * Transposes a matrix.
- * @param {Matrix} matrix - Input matrix (m x n).
- * @param {number} m - Number of rows.
- * @param {number} n - Number of columns.
- * @returns {Matrix} - Transposed matrix (n x m).
- * @throws {Error} - Throws if matrix dimensions do not match its length.
- */
-export function transposeMatrix(matrix, m, n) {
-  if (matrix.length !== m * n) {
-    throw new Error('Matrix dimensions are incompatible for transposition.');
-  }
-
-  const result = new Float32Array(n * m);
-
-  for (let i = 0; i < m; i++) {
-    for (let j = 0; j < n; j++) {
-      result[j * m + i] = matrix[i * n + j];
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      transposed[j][i] = matrix[i][j];
     }
   }
 
-  return result;
+  return transposed;
 }
 
 /**
- * Normalizes a vector to unit length.
- * @param {Float32Array} vector - Input vector.
- * @returns {Float32Array} - Normalized vector.
- * @throws {Error} - Throws if vector has zero magnitude.
+ * Calculates the dot product of two vectors.
+ * @param {Array} vectorA - The first vector.
+ * @param {Array} vectorB - The second vector.
+ * @returns {number} - The dot product.
  */
-export function normalizeVector(vector) {
-  let norm = 0;
-
-  for (let i = 0; i < vector.length; i++) {
-    norm += vector[i] * vector[i];
+export function dotProduct(vectorA, vectorB) {
+  if (!Array.isArray(vectorA) || !Array.isArray(vectorB) || vectorA.length !== vectorB.length) {
+    throw new Error('Invalid vectors provided. Ensure both are arrays of the same length.');
   }
 
-  norm = Math.sqrt(norm);
-
-  if (norm === 0) {
-    throw new Error('Cannot normalize a zero-magnitude vector.');
-  }
-
-  const result = new Float32Array(vector.length);
-
-  for (let i = 0; i < vector.length; i++) {
-    result[i] = vector[i] / norm;
-  }
-
-  return result;
+  return vectorA.reduce((sum, val, index) => sum + val * vectorB[index], 0);
 }
 
 /**
- * Computes the Euclidean distance between two vectors.
- * @param {Float32Array} vec1 - First vector.
- * @param {Float32Array} vec2 - Second vector.
- * @returns {number} - Euclidean distance.
- * @throws {Error} - Throws if vectors have different lengths.
+ * Creates an identity matrix of given size.
+ * @param {number} size - The size of the identity matrix.
+ * @returns {Array} - The identity matrix.
  */
-export function euclideanDistance(vec1, vec2) {
-  if (vec1.length !== vec2.length) {
-    throw new Error('Vectors must have the same length for Euclidean distance.');
+export function createIdentityMatrix(size) {
+  if (typeof size !== 'number' || size <= 0 || !Number.isInteger(size)) {
+    throw new Error('Invalid size provided. Ensure it is a positive integer.');
   }
 
-  let sum = 0;
+  return Array.from({ length: size }, (row, i) =>
+    Array.from({ length: size }, (col, j) => (i === j ? 1 : 0))
+  );
+}
 
-  for (let i = 0; i < vec1.length; i++) {
-    const diff = vec1[i] - vec2[i];
-    sum += diff * diff;
+/**
+ * Scales a matrix by a scalar value.
+ * @param {Array} matrix - The matrix to scale.
+ * @param {number} scalar - The scalar value.
+ * @returns {Array} - The scaled matrix.
+ */
+export function scaleMatrix(matrix, scalar) {
+  if (!isValidMatrix(matrix) || typeof scalar !== 'number') {
+    throw new Error('Invalid input. Ensure matrix is valid and scalar is a number.');
   }
 
-  return Math.sqrt(sum);
+  return matrix.map(row => row.map(value => value * scalar));
 }

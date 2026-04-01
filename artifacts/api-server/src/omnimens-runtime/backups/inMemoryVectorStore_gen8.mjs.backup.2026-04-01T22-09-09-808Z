@@ -1,0 +1,112 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-04-01T22:02:34.535Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// inMemoryVectorStore.mjs
+
+import { createHash } from 'crypto';
+
+/**
+ * Stores high-dimensional embeddings in memory and provides efficient nearest neighbor search.
+ */
+
+// Internal storage for embeddings
+const embeddingStore = new Map();
+
+/**
+ * Hashes a vector to create a unique identifier.
+ * @param {number[]} vector - The embedding vector.
+ * @returns {string} - A unique hash for the vector.
+ */
+export function generateVectorHash(vector) {
+  const hash = createHash('sha256');
+  hash.update(vector.join(','));
+  return hash.digest('hex');
+}
+
+/**
+ * Adds an embedding to the store.
+ * @param {string} id - A unique identifier for the embedding.
+ * @param {number[]} vector - The embedding vector.
+ */
+export function addEmbedding(id, vector) {
+  if (!Array.isArray(vector) || vector.some(isNaN)) {
+    throw new Error('Embedding must be a numeric array.');
+  }
+  embeddingStore.set(id, vector);
+}
+
+/**
+ * Calculates the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number} - The Euclidean distance.
+ */
+export function calculateDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same dimensionality.');
+  }
+  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
+}
+
+/**
+ * Finds the nearest neighbors to a given vector.
+ * @param {number[]} queryVector - The vector to search for.
+ * @param {number} k - The number of nearest neighbors to return.
+ * @returns {Array<{id, distance}>} - The nearest neighbors.
+ */
+export function findNearestNeighbors(queryVector, k = 1) {
+  if (!Array.isArray(queryVector) || queryVector.some(isNaN)) {
+    throw new Error('Query vector must be a numeric array.');
+  }
+  if (k <= 0) {
+    throw new Error('k must be a positive integer.');
+  }
+
+  const distances = [];
+
+  for (const [id, vector] of embeddingStore.entries()) {
+    const distance = calculateDistance(queryVector, vector);
+    distances.push({ id, distance });
+  }
+
+  distances.sort((a, b) => a.distance - b.distance);
+  return distances.slice(0, k);
+}
+
+/**
+ * Removes an embedding from the store.
+ * @param {string} id - The unique identifier of the embedding to remove.
+ */
+export function removeEmbedding(id) {
+  embeddingStore.delete(id);
+}
+
+/**
+ * Clears all embeddings from the store.
+ */
+export function clearStore() {
+  embeddingStore.clear();
+}
+
+/**
+ * Gets the total number of embeddings in the store.
+ * @returns {number} - The number of embeddings.
+ */
+export function getEmbeddingCount() {
+  return embeddingStore.size;
+}

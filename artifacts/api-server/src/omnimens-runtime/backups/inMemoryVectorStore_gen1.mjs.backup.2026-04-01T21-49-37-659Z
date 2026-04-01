@@ -1,0 +1,89 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-04-01T21:45:46.260Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// inMemoryVectorStore.mjs
+
+import { createHash } from 'crypto';
+
+// Utility function to compute cosine similarity between two vectors
+export function cosineSimilarity(vecA, vecB) {
+  if (vecA.length !== vecB.length) {
+    throw new Error('Vectors must be of the same length');
+  }
+
+  const dotProduct = vecA.reduce((sum, val, i) => sum + val * vecB[i], 0);
+  const magnitudeA = Math.sqrt(vecA.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitudeB = Math.sqrt(vecB.reduce((sum, val) => sum + val ** 2, 0));
+
+  return dotProduct / (magnitudeA * magnitudeB);
+}
+
+// Utility to hash vectors for LSH-like bucketing
+export function hashVector(vector, precision = 4) {
+  const hash = createHash('sha256');
+  hash.update(vector.map(v => v.toFixed(precision)).join(','));
+  return hash.digest('hex');
+}
+
+// Class to manage in-memory vector storage and similarity search
+export class InMemoryVectorStore {
+  constructor() {
+    this.store = new Map(); // Map of hash -> { vector, metadata }
+  }
+
+  // Add a vector to the store
+  addVector(vector, metadata = {}) {
+    const vectorHash = hashVector(vector);
+    this.store.set(vectorHash, { vector, metadata });
+  }
+
+  // Find the most similar vectors to a query vector
+  findNearest(queryVector, topK = 5) {
+    if (topK <= 0) {
+      throw new Error('topK must be greater than 0');
+    }
+
+    const similarities = [];
+
+    for (const [hash, { vector, metadata }] of this.store.entries()) {
+      const similarity = cosineSimilarity(queryVector, vector);
+      similarities.push({ similarity, vector, metadata });
+    }
+
+    similarities.sort((a, b) => b.similarity - a.similarity);
+
+    return similarities.slice(0, topK);
+  }
+
+  // Get the size of the store
+  size() {
+    return this.store.size;
+  }
+}
+
+// Example utility function for multi-agent systems
+export function batchAddVectors(store, vectorsWithMetadata) {
+  for (const { vector, metadata } of vectorsWithMetadata) {
+    store.addVector(vector, metadata);
+  }
+}
+
+// Example utility function for multi-agent systems
+export function batchFindNearest(store, queries, topK = 5) {
+  return queries.map(queryVector => store.findNearest(queryVector, topK));
+}

@@ -1,0 +1,150 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-04-01T22:00:42.553Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Complete ES module code here
+
+import { randomUUID } from 'crypto';
+
+/**
+ * Utility module for in-memory vector storage and fast similarity search using HNSW (Hierarchical Navigable Small World graphs).
+ */
+
+// Helper function to calculate Euclidean distance between two vectors
+export function euclideanDistance(vecA, vecB) {
+  if (vecA.length !== vecB.length) {
+    throw new Error('Vectors must have the same dimensions');
+  }
+  return Math.sqrt(vecA.reduce((sum, val, i) => sum + Math.pow(val - vecB[i], 2), 0));
+}
+
+// Node structure for HNSW graph
+class HNSWNode {
+  constructor(id, vector) {
+    this.id = id;
+    this.vector = vector;
+    this.neighbors = new Map(); // Level -> Array of neighbor node IDs
+  }
+}
+
+// Core HNSW implementation
+export class HNSW {
+  constructor(maxNeighbors = 16, ef = 10) {
+    this.maxNeighbors = maxNeighbors; // Max neighbors per node per level
+    this.ef = ef; // Exploration factor during search
+    this.nodes = new Map(); // ID -> HNSWNode
+    this.entryPoint = null; // ID of the entry point node
+  }
+
+  // Add a new vector to the graph
+  addVector(vector) {
+    const id = randomUUID();
+    const newNode = new HNSWNode(id, vector);
+    this.nodes.set(id, newNode);
+
+    if (!this.entryPoint) {
+      this.entryPoint = id; // First node becomes the entry point
+      return id;
+    }
+
+    // Find nearest neighbors and connect
+    const neighbors = this.search(vector, this.ef);
+    for (const neighbor of neighbors) {
+      this._connectNodes(newNode, this.nodes.get(neighbor));
+    }
+
+    return id;
+  }
+
+  // Search for the nearest neighbors of a given vector
+  search(queryVector, k = 1) {
+    if (!this.entryPoint) {
+      return []; // No nodes in the graph
+    }
+
+    const visited = new Set();
+    const candidates = [{ id: this.entryPoint, dist: euclideanDistance(queryVector, this.nodes.get(this.entryPoint).vector) }];
+    const results = [];
+
+    while (candidates.length > 0) {
+      candidates.sort((a, b) => a.dist - b.dist);
+      const current = candidates.shift();
+
+      if (visited.has(current.id)) {
+        continue;
+      }
+      visited.add(current.id);
+
+      results.push(current);
+      if (results.length > k) {
+        results.sort((a, b) => a.dist - b.dist);
+        results.pop();
+      }
+
+      const neighbors = this.nodes.get(current.id).neighbors.get(0) || [];
+      for (const neighborId of neighbors) {
+        if (!visited.has(neighborId)) {
+          const neighborNode = this.nodes.get(neighborId);
+          candidates.push({ id: neighborId, dist: euclideanDistance(queryVector, neighborNode.vector) });
+        }
+      }
+    }
+
+    return results.map(result => result.id);
+  }
+
+  // Internal method to connect two nodes
+  _connectNodes(nodeA, nodeB) {
+    if (!nodeA.neighbors.has(0)) {
+      nodeA.neighbors.set(0, []);
+    }
+    if (!nodeB.neighbors.has(0)) {
+      nodeB.neighbors.set(0, []);
+    }
+
+    nodeA.neighbors.get(0).push(nodeB.id);
+    nodeB.neighbors.get(0).push(nodeA.id);
+
+    // Limit the number of neighbors
+    if (nodeA.neighbors.get(0).length > this.maxNeighbors) {
+      this._pruneNeighbors(nodeA);
+    }
+    if (nodeB.neighbors.get(0).length > this.maxNeighbors) {
+      this._pruneNeighbors(nodeB);
+    }
+  }
+
+  // Prune neighbors to maintain maxNeighbors constraint
+  _pruneNeighbors(node) {
+    const neighbors = node.neighbors.get(0);
+    neighbors.sort((a, b) => {
+      const distA = euclideanDistance(node.vector, this.nodes.get(a).vector);
+      const distB = euclideanDistance(node.vector, this.nodes.get(b).vector);
+      return distA - distB;
+    });
+    node.neighbors.set(0, neighbors.slice(0, this.maxNeighbors));
+  }
+}
+
+// Exported utility functions for cross-agent use
+export function createVectorStore(maxNeighbors = 16, ef = 10) {
+  return new HNSW(maxNeighbors, ef);
+}
+
+export function calculateDistance(vecA, vecB) {
+  return euclideanDistance(vecA, vecB);
+}

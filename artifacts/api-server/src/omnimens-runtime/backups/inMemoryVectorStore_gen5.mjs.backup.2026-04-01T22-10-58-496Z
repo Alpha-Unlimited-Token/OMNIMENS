@@ -1,0 +1,156 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-04-01T22:00:19.256Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Complete ES module code here
+
+import { createHash } from 'crypto';
+
+/**
+ * Utility function to compute Euclidean distance between two vectors.
+ * @param {number[]} vec1 - First vector.
+ * @param {number[]} vec2 - Second vector.
+ * @returns {number} - Euclidean distance.
+ */
+export function euclideanDistance(vec1, vec2) {
+  if (vec1.length !== vec2.length) {
+    throw new Error('Vectors must have the same dimensions');
+  }
+  return Math.sqrt(vec1.reduce((sum, val, i) => sum + (val - vec2[i]) ** 2, 0));
+}
+
+/**
+ * Utility function to normalize a vector.
+ * @param {number[]} vector - Input vector.
+ * @returns {number[]} - Normalized vector.
+ */
+export function normalizeVector(vector) {
+  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
+  if (magnitude === 0) {
+    throw new Error('Cannot normalize a zero vector');
+  }
+  return vector.map(val => val / magnitude);
+}
+
+/**
+ * Node class for the binary tree structure.
+ */
+class TreeNode {
+  constructor(vector, id) {
+    this.vector = vector;
+    this.id = id;
+    this.left = null;
+    this.right = null;
+  }
+}
+
+/**
+ * InMemoryVectorStore class for storing and retrieving vectors efficiently.
+ */
+export class InMemoryVectorStore {
+  constructor() {
+    this.root = null;
+    this.size = 0;
+  }
+
+  /**
+   * Inserts a vector into the binary tree.
+   * @param {number[]} vector - The vector to insert.
+   * @param {string} id - Unique identifier for the vector.
+   */
+  insert(vector, id) {
+    const normalizedVector = normalizeVector(vector);
+    const newNode = new TreeNode(normalizedVector, id);
+
+    if (!this.root) {
+      this.root = newNode;
+    } else {
+      this._insertNode(this.root, newNode);
+    }
+
+    this.size++;
+  }
+
+  _insertNode(currentNode, newNode) {
+    const distanceToLeft = euclideanDistance(newNode.vector, currentNode.vector);
+
+    if (distanceToLeft < 0) {
+      if (!currentNode.left) {
+        currentNode.left = newNode;
+      } else {
+        this._insertNode(currentNode.left, newNode);
+      }
+    } else {
+      if (!currentNode.right) {
+        currentNode.right = newNode;
+      } else {
+        this._insertNode(currentNode.right, newNode);
+      }
+    }
+  }
+
+  /**
+   * Finds the nearest neighbor to a given vector.
+   * @param {number[]} queryVector - The query vector.
+   * @returns {{ id, distance}} - Nearest neighbor's ID and distance.
+   */
+  findNearest(queryVector) {
+    if (!this.root) {
+      throw new Error('Vector store is empty');
+    }
+
+    const normalizedQuery = normalizeVector(queryVector);
+    return this._findNearest(this.root, normalizedQuery, { id, distance});
+  }
+
+  _findNearest(currentNode, queryVector, bestMatch) {
+    if (!currentNode) {
+      return bestMatch;
+    }
+
+    const distance = euclideanDistance(queryVector, currentNode.vector);
+    if (distance < bestMatch.distance) {
+      bestMatch = { id: currentNode.id, distance };
+    }
+
+    const distanceToLeft = euclideanDistance(queryVector, currentNode.vector);
+    if (distanceToLeft < 0) {
+      return this._findNearest(currentNode.left, queryVector, bestMatch);
+    } else {
+      return this._findNearest(currentNode.right, queryVector, bestMatch);
+    }
+  }
+
+  /**
+   * Returns the total number of vectors in the store.
+   * @returns {number} - Total number of vectors.
+   */
+  getSize() {
+    return this.size;
+  }
+}
+
+/**
+ * Utility function to generate a unique hash ID for a vector.
+ * @param {number[]} vector - Input vector.
+ * @returns {string} - Unique hash ID.
+ */
+export function generateVectorId(vector) {
+  const hash = createHash('sha256');
+  hash.update(vector.join(','));
+  return hash.digest('hex');
+}

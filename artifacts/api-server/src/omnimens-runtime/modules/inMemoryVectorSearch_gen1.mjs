@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorSearch
- * Written: 2026-03-23T05:32:07.443Z
+ * Written: 2026-04-01T22:02:18.036Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,127 +16,145 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-/**
- * @module inMemoryVectorSearch
- * @description Provides fast in-memory vector search for semantic embeddings using HNSW (Hierarchical Navigable Small World) graph.
- * This module is designed for approximate nearest neighbor search with high performance and scalability.
- */
+// inMemoryVectorSearch.mjs
+
+import { createHash } from 'crypto';
 
 /**
- * Represents a node in the HNSW graph.
- * @class
+ * Computes the Euclidean distance between two vectors.
+ * @param {number[]} vec1 - First vector.
+ * @param {number[]} vec2 - Second vector.
+ * @returns {number} - Euclidean distance.
  */
-class HNSWNode {
-  /**
-   * @param {number[]} vector - The embedding vector of the node.
-   * @param {number} id - Unique identifier for the node.
-   */
-  constructor(vector, id) {
-    this.vector = vector;
-    this.id = id;
-    this.neighbors = []; // Array of neighboring nodes
+export function euclideanDistance(vec1, vec2) {
+  if (vec1.length !== vec2.length) {
+    throw new Error('Vectors must have the same dimensions.');
   }
+  return Math.sqrt(vec1.reduce((sum, val, idx) => sum + Math.pow(val - vec2[idx], 2), 0));
 }
 
 /**
- * Calculates the Euclidean distance between two vectors.
- * @param {number[]} vectorA - First vector.
- * @param {number[]} vectorB - Second vector.
- * @returns {number} - The Euclidean distance.
+ * Generates a unique hash for a vector to use as an identifier.
+ * @param {number[]} vector - The input vector.
+ * @returns {string} - A unique hash for the vector.
  */
-function euclideanDistance(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error("Vectors must have the same dimensions.");
-  }
-  return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + (val - vectorB[idx]) ** 2, 0));
+export function vectorHash(vector) {
+  const hash = createHash('sha256');
+  hash.update(vector.join(','));
+  return hash.digest('hex');
 }
 
 /**
- * HNSW graph for approximate nearest neighbor search.
- * @class
+ * Class representing an in-memory HNSW-based vector search index.
  */
-class HNSWGraph {
-  /**
-   * @param {number} maxNeighbors - Maximum number of neighbors per node.
-   */
-  constructor(maxNeighbors = 10) {
-    this.nodes = []; // Array of all nodes in the graph
-    this.maxNeighbors = maxNeighbors;
+export class HNSWIndex {
+  constructor() {
+    this.nodes = new Map(); // Map of nodeId -> { vector, edges }
+    this.levels = new Map(); // Map of level -> Set(nodeId)
+    this.maxLevel = 0;
   }
 
   /**
-   * Adds a new vector to the graph.
-   * @param {number[]} vector - The embedding vector to add.
-   * @returns {number} - The ID of the newly added vector.
+   * Adds a vector to the index.
+   * @param {number[]} vector - The vector to add.
    */
   addVector(vector) {
-    const id = this.nodes.length;
-    const newNode = new HNSWNode(vector, id);
-
-    // Connect the new node to its nearest neighbors
-    if (this.nodes.length > 0) {
-      const neighbors = this._findNearestNeighbors(vector, this.maxNeighbors);
-      newNode.neighbors = neighbors;
-      for (const neighbor of neighbors) {
-        neighbor.neighbors.push(newNode);
-        if (neighbor.neighbors.length > this.maxNeighbors) {
-          neighbor.neighbors.sort((a, b) => euclideanDistance(neighbor.vector, a.vector) - euclideanDistance(neighbor.vector, b.vector));
-          neighbor.neighbors.pop();
-        }
-      }
+    const id = vectorHash(vector);
+    if (this.nodes.has(id)) {
+      throw new Error('Vector already exists in the index.');
     }
 
-    this.nodes.push(newNode);
-    return id;
+    const level = this._randomLevel();
+    this.maxLevel = Math.max(this.maxLevel, level);
+
+    this.nodes.set(id, { vector, edges: new Map() });
+    if (!this.levels.has(level)) {
+      this.levels.set(level, new Set());
+    }
+    this.levels.get(level).add(id);
+
+    this._connectNeighbors(id, level);
   }
 
   /**
-   * Searches for the nearest neighbors to a given vector.
+   * Searches for the k nearest neighbors of a query vector.
    * @param {number[]} queryVector - The query vector.
-   * @param {number} k - Number of nearest neighbors to return.
-   * @returns {Array<{id, distance}>} - List of nearest neighbors with their IDs and distances.
+   * @param {number} k - The number of neighbors to retrieve.
+   * @returns {Array<{ id, distance}>} - Array of nearest neighbors.
    */
-  search(queryVector, k = 1) {
-    if (this.nodes.length === 0) {
-      return [];
+  search(queryVector, k) {
+    if (k <= 0) {
+      throw new Error('k must be a positive integer.');
     }
 
-    const visited = new Set();
-    const candidates = [this.nodes[0]]; // Start from the first node
-    const results = [];
+    let currentLevel = this.maxLevel;
+    let candidates = Array.from(this.levels.get(currentLevel) || []).map(id => ({
+      id,
+      distance: euclideanDistance(queryVector, this.nodes.get(id).vector)
+    }));
 
-    while (candidates.length > 0) {
-      const current = candidates.pop();
-      if (visited.has(current.id)) {
-        continue;
-      }
-      visited.add(current.id);
+    while (currentLevel >= 0) {
+      candidates.sort((a, b) => a.distance - b.distance);
+      candidates = candidates.slice(0, k);
 
-      const distance = euclideanDistance(queryVector, current.vector);
-      results.push({ id: current.id, distance });
-
-      for (const neighbor of current.neighbors) {
-        if (!visited.has(neighbor.id)) {
-          candidates.push(neighbor);
+      const nextCandidates = new Map();
+      for (const { id } of candidates) {
+        for (const neighborId of this.nodes.get(id).edges.keys()) {
+          if (!nextCandidates.has(neighborId)) {
+            const distance = euclideanDistance(queryVector, this.nodes.get(neighborId).vector);
+            nextCandidates.set(neighborId, { id: neighborId, distance });
+          }
         }
       }
+      candidates = Array.from(nextCandidates.values());
+      currentLevel--;
     }
 
-    results.sort((a, b) => a.distance - b.distance);
-    return results.slice(0, k);
+    return candidates.sort((a, b) => a.distance - b.distance).slice(0, k);
   }
 
   /**
-   * Finds the nearest neighbors for a given vector.
-   * @* @param {number[]} vector - The query vector.
-   * @param {number} k - Number of neighbors to find.
-   * @returns {HNSWNode[]} - List of nearest neighbor nodes.
+   * Randomly generates a level for a new vector.
+   * @returns {number} - The generated level.
    */
-  _findNearestNeighbors(vector, k) {
-    const distances = this.nodes.map(node => ({ node, distance: euclideanDistance(vector, node.vector) }));
-    distances.sort((a, b) => a.distance - b.distance);
-    return distances.slice(0, k).map(entry => entry.node);
+  _randomLevel() {
+    let level = 0;
+    while (Math.random() < 0.5) {
+      level++;
+    }
+    return level;
+  }
+
+  /**
+   * Connects a new vector to its nearest neighbors in the given level.
+   * @param {string} id - The ID of the new vector.
+   * @param {number} level - The level to connect neighbors in.
+   */
+  _connectNeighbors(id, level) {
+    if (!this.levels.has(level)) return;
+
+    const neighbors = Array.from(this.levels.get(level)).map(neighborId => ({
+      id: neighborId,
+      distance: euclideanDistance(this.nodes.get(id).vector, this.nodes.get(neighborId).vector)
+    }));
+
+    neighbors.sort((a, b) => a.distance - b.distance);
+    const topNeighbors = neighbors.slice(0, 5); // Limit connections to 5 nearest neighbors.
+
+    for (const neighbor of topNeighbors) {
+      this.nodes.get(id).edges.set(neighbor.id, neighbor.distance);
+      this.nodes.get(neighbor.id).edges.set(id, neighbor.distance);
+    }
   }
 }
 
-export { HNSWGraph, euclideanDistance };
+/**
+ * Utility function for bulk indexing vectors.
+ * @param {HNSWIndex} index - The HNSW index instance.
+ * @param {number[][]} vectors - Array of vectors to add.
+ */
+export function bulkAddVectors(index, vectors) {
+  for (const vector of vectors) {
+    index.addVector(vector);
+  }
+}

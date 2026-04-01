@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuAcceleratedMatrixOps
- * Written: 2026-03-23T23:48:37.373Z
+ * Written: 2026-04-01T21:59:50.433Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,42 +16,47 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-/**
- * @module gpuAcceleratedMatrixOps
- * @description Provides GPU-accelerated matrix operations for deep learning tasks using WebAssembly-like computation simulation.
- */
+// gpuAcceleratedMatrixOps.mjs
+import { randomUUID } from 'crypto';
 
 /**
- * Performs matrix multiplication using a simulated GPU-accelerated algorithm.
- * This implementation uses pure computation and parallelization simulation.
- *
- * @param {number[][]} matrixA - The first matrix (m x n).
- * @param {number[][]} matrixB - The second matrix (n x p).
- * @returns {number[][]} The resulting matrix (m x p) after multiplication.
- * @throws {Error} If the matrices cannot be multiplied due to dimension mismatch.
+ * Generates a 2D matrix with specified dimensions, filled with random values.
+ * @param {number} rows - Number of rows in the matrix.
+ * @param {number} cols - Number of columns in the matrix.
+ * @returns {Float32Array[]} - A 2D array representing the matrix.
  */
-export function matrixMultiply(matrixA, matrixB) {
-  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
-    throw new Error("Both inputs must be 2D arrays.");
+export function generateRandomMatrix(rows, cols) {
+  if (rows <= 0 || cols <= 0) {
+    throw new Error('Rows and columns must be positive integers.');
   }
+  return Array.from({ length: rows }, () => new Float32Array(cols).map(() => Math.random()));
+}
 
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
+/**
+ * Performs matrix multiplication on two 2D matrices.
+ * @param {Float32Array[]} matA - The first matrix.
+ * @param {Float32Array[]} matB - The second matrix.
+ * @returns {Float32Array[]} - The resulting matrix after multiplication.
+ */
+export function multiplyMatrices(matA, matB) {
+  const rowsA = matA.length;
+  const colsA = matA[0].length;
+  const rowsB = matB.length;
+  const colsB = matB[0].length;
 
   if (colsA !== rowsB) {
-    throw new Error("Matrix dimensions do not allow multiplication. Columns of A must match rows of B.");
+    throw new Error('Matrix dimensions do not align for multiplication.');
   }
 
-  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+  const result = Array.from({ length: rowsA }, () => new Float32Array(colsB));
 
-  // Simulate parallel computation by iterating over rows and columns
   for (let i = 0; i < rowsA; i++) {
     for (let j = 0; j < colsB; j++) {
+      let sum = 0;
       for (let k = 0; k < colsA; k++) {
-        result[i][j] += matrixA[i][k] * matrixB[k][j];
+        sum += matA[i][k] * matB[k][j];
       }
+      result[i][j] = sum;
     }
   }
 
@@ -59,20 +64,40 @@ export function matrixMultiply(matrixA, matrixB) {
 }
 
 /**
- * Transposes a given matrix.
- *
- * @param {number[][]} matrix - The input matrix (m x n).
- * @returns {number[][]} The transposed matrix (n x m).
- * @throws {Error} If the input is not a 2D array.
+ * Normalizes a 2D matrix by scaling its values to a range of [0, 1].
+ * @param {Float32Array[]} matrix - The input matrix.
+ * @returns {Float32Array[]} - The normalized matrix.
  */
-export function transposeMatrix(matrix) {
-  if (!Array.isArray(matrix)) {
-    throw new Error("Input must be a 2D array.");
+export function normalizeMatrix(matrix) {
+  const flatMatrix = matrix.flat();
+  const max = Math.max(...flatMatrix);
+  const min = Math.min(...flatMatrix);
+
+  if (max === min) {
+    throw new Error('Cannot normalize a matrix with all identical values.');
   }
 
+  return matrix.map(row => row.map(value => (value - min) / (max - min)));
+}
+
+/**
+ * Generates a unique identifier for a computation session.
+ * @returns {string} - A UUID string.
+ */
+export function generateSessionId() {
+  return randomUUID();
+}
+
+/**
+ * Transposes a 2D matrix (flips rows and columns).
+ * @param {Float32Array[]} matrix - The input matrix.
+ * @returns {Float32Array[]} - The transposed matrix.
+ */
+export function transposeMatrix(matrix) {
   const rows = matrix.length;
   const cols = matrix[0].length;
-  const transposed = Array.from({ length: cols }, () => Array(rows).fill(0));
+
+  const transposed = Array.from({ length: cols }, () => new Float32Array(rows));
 
   for (let i = 0; i < rows; i++) {
     for (let j = 0; j < cols; j++) {
@@ -84,56 +109,24 @@ export function transposeMatrix(matrix) {
 }
 
 /**
- * Computes the Hadamard product (element-wise multiplication) of two matrices.
- *
- * @param {number[][]} matrixA - The first matrix (m x n).
- * @param {number[][]} matrixB - The second matrix (m x n).
- * @returns {number[][]} The resulting matrix (m x n) after element-wise multiplication.
- * @throws {Error} If the matrices do not have the same dimensions.
+ * Applies an activation function element-wise to a matrix.
+ * @param {Float32Array[]} matrix - The input matrix.
+ * @param {Function} activationFunction - The activation function to apply.
+ * @returns {Float32Array[]} - The matrix after applying the activation function.
  */
-export function hadamardProduct(matrixA, matrixB) {
-  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
-    throw new Error("Both inputs must be 2D arrays.");
+export function applyActivationFunction(matrix, activationFunction) {
+  if (typeof activationFunction !== 'function') {
+    throw new Error('Activation function must be a valid function.');
   }
 
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
-
-  if (rowsA !== rowsB || colsA !== colsB) {
-    throw new Error("Matrices must have the same dimensions for Hadamard product.");
-  }
-
-  const result = Array.from({ length: rowsA }, () => Array(colsA).fill(0));
-
-  for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsA; j++) {
-      result[i][j] = matrixA[i][j] * matrixB[i][j];
-    }
-  }
-
-  return result;
+  return matrix.map(row => row.map(value => activationFunction(value)));
 }
 
 /**
- * Generates a random matrix with specified dimensions and value range.
- *
- * @param {number} rows - The number of rows in the matrix.
- * @param {number} cols - The number of columns in the matrix.
- * @param {number} [min=0] - The minimum value for random elements.
- * @param {number} [max=1] - The maximum value for random elements.
- * @returns {number[][]} The generated random matrix.
- * @throws {Error} If rows or columns are not positive integers.
+ * Example activation function: ReLU (Rectified Linear Unit).
+ * @param {number} x - Input value.
+ * @returns {number} - Output value after applying ReLU.
  */
-export function generateRandomMatrix(rows, cols, min = 0, max = 1) {
-  if (!Number.isInteger(rows) || !Number.isInteger(cols) || rows <= 0 || cols <= 0) {
-    throw new Error("Rows and columns must be positive integers.");
-  }
-
-  const result = Array.from({ length: rows }, () =>
-    Array.from({ length: cols }, () => Math.random() * (max - min) + min)
-  );
-
-  return result;
+export function relu(x) {
+  return Math.max(0, x);
 }

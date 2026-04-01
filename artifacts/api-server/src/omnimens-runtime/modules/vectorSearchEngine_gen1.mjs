@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: vectorSearchEngine
- * Written: 2026-03-22T04:30:51.670Z
+ * Written: 2026-04-01T22:10:41.134Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,189 +16,90 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-/**
- * @module vectorSearchEngine
- * @description Implements Hierarchical Navigable Small World (HNSW) graphs for approximate nearest neighbor search.
- * This module enables efficient similarity searches for high-dimensional vectors.
- */
+// vectorSearchEngine.mjs
 
-/**
- * @typedef {Object} Node
- * @property {number} id - Unique identifier for the node.
- * @property {Array<number>} vector - The high-dimensional vector representing the node.
- * @property {Map<number, Set<number>>} neighbors - A map of layer to neighbors' IDs.
- */
+import { createHash } from 'crypto';
 
-/**
- * @typedef {Object} HNSWGraph
- * @property {Map<number, Node>} nodes - A map of node IDs to Node objects.
- * @property {number} maxLayer - The highest layer in the graph.
- * @property {number} entryPoint - The ID of the entry point node.
- */
-
-/**
- * @function euclideanDistance
- * @description Calculates the Euclidean distance between two vectors.
- * @param {Array<number>} vectorA - The first vector.
- * @param {Array<number>} vectorB - The second vector.
- * @returns {number} The Euclidean distance between the vectors.
- */
+// Utility: Compute Euclidean distance between two vectors
 export function euclideanDistance(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
-    throw new Error("Vectors must have the same dimensions.");
+    throw new Error('Vectors must have the same dimensions');
   }
-  return Math.sqrt(vectorA.reduce((sum, a, i) => sum + (a - vectorB[i]) ** 2, 0));
+  return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0));
 }
 
-/**
- * @function createNode
- * @description Creates a new node for the HNSW graph.
- * @param {number} id - The unique identifier for the node.
- * @param {Array<number>} vector - The high-dimensional vector representing the node.
- * @returns {Node} A new node object.
- */
-export function createNode(id, vector) {
-  return {
-    id,
-    vector,
-    neighbors: new Map()
-  };
+// Utility: Generate a stable hash for a vector (used for node keys in the graph)
+export function hashVector(vector) {
+  const hash = createHash('sha256');
+  hash.update(vector.join(','));
+  return hash.digest('hex');
 }
 
-/**
- * @function createHNSWGraph
- * @description Initializes an empty HNSW graph.
- * @returns {HNSWGraph} A new HNSW graph object.
- */
-export function createHNSWGraph() {
-  return {
-    nodes: new Map(),
-    maxLayer: 0,
-    entryPoint
-  };
+// HNSW Graph Node Constructor
+class HNSWNode {
+  constructor(vector, id) {
+    this.vector = vector;
+    this.id = id;
+    this.neighbors = []; // Array of {node, distance}
+  }
 }
 
-/**
- * @function addNode
- * @description Adds a node to the HNSW graph and updates the graph structure.
- * @param {HNSWGraph} graph - The HNSW graph.
- * @param {Node} node - The node to add.
- * @param {number} maxNeighbors - Maximum number of neighbors per node per layer.
- */
-export function addNode(graph, node, maxNeighbors) {
-  if (graph.nodes.size === 0) {
-    graph.entryPoint = node.id;
-    graph.nodes.set(node.id, node);
-    return;
+// HNSW Graph Implementation
+export class HNSWGraph {
+  constructor(maxNeighbors = 10) {
+    this.nodes = new Map(); // Map of id -> HNSWNode
+    this.maxNeighbors = maxNeighbors;
   }
 
-  let currentNodeId = graph.entryPoint;
-  let currentLayer = graph.maxLayer;
+  // Add a vector to the graph
+  addVector(vector) {
+    const id = hashVector(vector);
+    if (this.nodes.has(id)) {
+      throw new Error('Vector already exists in the graph');
+    }
+    const newNode = new HNSWNode(vector, id);
 
-  while (currentLayer >= 0) {
-    const currentNode = graph.nodes.get(currentNodeId);
-    const candidates = Array.from(currentNode.neighbors.get(currentLayer) || []);
-    let closestNodeId = currentNodeId;
-    let closestDistance = euclideanDistance(node.vector, currentNode.vector);
+    // Connect to existing nodes
+    for (const node of this.nodes.values()) {
+      const distance = euclideanDistance(vector, node.vector);
+      node.neighbors.push({ node: newNode, distance });
+      newNode.neighbors.push({ node, distance });
 
-    for (const candidateId of candidates) {
-      const candidateNode = graph.nodes.get(candidateId);
-      const distance = euclideanDistance(node.vector, candidateNode.vector);
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestNodeId = candidateId;
-      }
+      // Maintain max neighbors by distance
+      node.neighbors.sort((a, b) => a.distance - b.distance);
+      newNode.neighbors.sort((a, b) => a.distance - b.distance);
+      if (node.neighbors.length > this.maxNeighbors) node.neighbors.pop();
+      if (newNode.neighbors.length > this.maxNeighbors) newNode.neighbors.pop();
     }
 
-    if (closestNodeId === currentNodeId) {
-      currentLayer--;
-    } else {
-      currentNodeId = closestNodeId;
+    this.nodes.set(id, newNode);
+  }
+
+  // Search for nearest neighbors to a given vector
+  search(vector, k = 1) {
+    const visited = new Set();
+    const results = [];
+
+    for (const node of this.nodes.values()) {
+      const distance = euclideanDistance(vector, node.vector);
+      results.push({ node, distance });
     }
-  }
 
-  connectNode(graph, node, currentNodeId, maxNeighbors);
-  graph.nodes.set(node.id, node);
-}
-
-/**
- * @function connectNode
- * @description Connects a new node to its neighbors in the graph.
- * @param {HNSWGraph} graph - The HNSW graph.
- * @param {Node} node - The new node to connect.
- * @param {number} neighborId - The ID of the initial neighbor.
- * @param {number} maxNeighbors - Maximum number of neighbors per node per layer.
- */
-function connectNode(graph, node, neighborId, maxNeighbors) {
-  const neighborNode = graph.nodes.get(neighborId);
-  if (!neighborNode) return;
-
-  const layer = 0; // Simplified single-layer implementation for now.
-  if (!node.neighbors.has(layer)) {
-    node.neighbors.set(layer, new Set());
-  }
-  if (!neighborNode.neighbors.has(layer)) {
-    neighborNode.neighbors.set(layer, new Set());
-  }
-
-  node.neighbors.get(layer).add(neighborId);
-  neighborNode.neighbors.get(layer).add(node.id);
-
-  trimNeighbors(node, layer, maxNeighbors);
-  trimNeighbors(neighborNode, layer, maxNeighbors);
-}
-
-/**
- * @function trimNeighbors
- * @description Ensures the number of neighbors for a node does not exceed the maximum.
- * @param {Node} node - The node whose neighbors will be trimmed.
- * @param {number} layer - The layer to trim neighbors in.
- * @param {number} maxNeighbors - Maximum number of neighbors allowed.
- */
-function trimNeighbors(node, layer, maxNeighbors) {
-  const neighbors = Array.from(node.neighbors.get(layer));
-  if (neighbors.length > maxNeighbors) {
-    neighbors.sort((a, b) => a - b); // Sort by ID for deterministic trimming.
-    node.neighbors.set(layer, new Set(neighbors.slice(0, maxNeighbors)));
-  }
-}
-
-/**
- * @function search
- * @description Searches for the nearest neighbors of a query vector in the HNSW graph.
- * @param {HNSWGraph} graph - The HNSW graph.
- * @param {Array<number>} queryVector - The vector to search for.
- * @param {number} k - The number of nearest neighbors to retrieve.
- * @returns {Array<{id, distance}>} The k nearest neighbors and their distances.
- */
-export function search(graph, queryVector, k) {
-  if (!graph.entryPoint) {
-    return [];
-  }
-
-  const visited = new Set();
-  const candidates = [{ id: graph.entryPoint, distance}];
-  const results = [];
-
-  while (candidates.length > 0) {
-    const candidate = candidates.pop();
-    if (visited.has(candidate.id)) continue;
-    visited.add(candidate.id);
-
-    const candidateNode = graph.nodes.get(candidate.id);
-    const distance = euclideanDistance(queryVector, candidateNode.vector);
-
-    results.push({ id: candidate.id, distance });
+    // Sort results by distance and return top-k
     results.sort((a, b) => a.distance - b.distance);
-    if (results.length > k) results.pop();
-
-    const neighbors = Array.from(candidateNode.neighbors.get(0) || []);
-    for (const neighborId of neighbors) {
-      if (!visited.has(neighborId)) {
-        candidates.push({ id: neighborId, distance });
-      }
-    }
+    return results.slice(0, k).map(result => ({ id: result.node.id, distance: result.distance }));
   }
+}
 
-  return results.slice(0, k);
+// Example Usage
+export function exampleUsage() {
+  const graph = new HNSWGraph();
+
+  // Add vectors
+  graph.addVector([1, 2, 3]);
+  graph.addVector([4, 5, 6]);
+  graph.addVector([7, 8, 9]);
+
+  // Search nearest neighbors
+  return graph.search([5, 5, 5], 2);
 }

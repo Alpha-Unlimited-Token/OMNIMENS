@@ -1,0 +1,127 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-04-01T21:57:54.712Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// inMemoryVectorStore.mjs
+
+import { createHash } from 'crypto';
+
+/**
+ * Generate a hash-based bucket key for locality-sensitive hashing.
+ * @param {Array<number>} vector - The input vector.
+ * @param {number} bucketSize - The number of buckets.
+ * @returns {string} - A hash key representing the bucket.
+ */
+export function generateBucketKey(vector, bucketSize) {
+  const hash = createHash('sha256');
+  hash.update(vector.map(v => v.toFixed(6)).join(','));
+  const digest = hash.digest('hex');
+  const bucketIndex = parseInt(digest.slice(0, 8), 16) % bucketSize;
+  return bucketIndex.toString();
+}
+
+/**
+ * Calculate the Euclidean distance between two vectors.
+ * @param {Array<number>} vectorA - The first vector.
+ * @param {Array<number>} vectorB - The second vector.
+ * @returns {number} - The Euclidean distance.
+ */
+export function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must be of the same dimension.');
+  }
+  return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0));
+}
+
+/**
+ * Class representing an in-memory vector store with LSH-based indexing.
+ */
+export class InMemoryVectorStore {
+  constructor(bucketSize = 100) {
+    this.bucketSize = bucketSize;
+    this.buckets = new Map();
+  }
+
+  /**
+   * Add a vector to the store.
+   * @param {string} id - A unique identifier for the vector.
+   * @param {Array<number>} vector - The vector to store.
+   */
+  addVector(id, vector) {
+    const bucketKey = generateBucketKey(vector, this.bucketSize);
+    if (!this.buckets.has(bucketKey)) {
+      this.buckets.set(bucketKey, []);
+    }
+    this.buckets.get(bucketKey).push({ id, vector });
+  }
+
+  /**
+   * Find the nearest neighbors to a given vector.
+   * @param {Array<number>} queryVector - The vector to search for.
+   * @param {number} k - The number of nearest neighbors to return.
+   * @returns {Array<{id, distance}>} - An array of nearest neighbors.
+   */
+  findNearestNeighbors(queryVector, k = 1) {
+    const bucketKey = generateBucketKey(queryVector, this.bucketSize);
+    const candidates = this.buckets.get(bucketKey) || [];
+
+    const neighbors = candidates
+      .map(({ id, vector }) => ({ id, distance: euclideanDistance(queryVector, vector) }))
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, k);
+
+    return neighbors;
+  }
+
+  /**
+   * Get all stored vectors (for debugging or inspection purposes).
+   * @returns {Array<{id, vector}>} - All stored vectors.
+   */
+  getAllVectors() {
+    const allVectors = [];
+    for (const bucket of this.buckets.values()) {
+      allVectors.push(...bucket);
+    }
+    return allVectors;
+  }
+}
+
+/**
+ * Normalize a vector to unit length.
+ * @param {Array<number>} vector - The input vector.
+ * @returns {Array<number>} - The normalized vector.
+ */
+export function normalizeVector(vector) {
+  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
+  if (magnitude === 0) {
+    throw new Error('Cannot normalize a zero vector.');
+  }
+  return vector.map(val => val / magnitude);
+}
+
+/**
+ * Dot product of two vectors.
+ * @param {Array<number>} vectorA - The first vector.
+ * @param {Array<number>} vectorB - The second vector.
+ * @returns {number} - The dot product.
+ */
+export function dotProduct(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must be of the same dimension.');
+  }
+  return vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
+}

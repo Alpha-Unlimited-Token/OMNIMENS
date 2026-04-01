@@ -46,8 +46,7 @@ import * as path from "path";
 import * as crypto from "crypto";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
-import { db, queueBrainInsert, isPoolHealthy } from "@workspace/db";
-import { omnimensBrain, omnimensNotifications } from "@workspace/db";
+import { db, queueBrainInsert, isPoolHealthy, omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { sleepGen2, wakeGen2, isGen2Sleeping } from "./omnimens-nextgen-sandbox.js";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import OpenAI from "openai";
@@ -59,10 +58,10 @@ const rewriteAI = new OpenAI({
 });
 import { desc, eq, and, sql } from "drizzle-orm";
 import { webSearch, formatSearchResults } from "./web-search.js";
-import { registerCodegenYield } from "./omnimens-api-budget.js";
-import { captureNeuralSnapshot } from "./omnimens-neural-consciousness.js";
-import { getConsciousnessState } from "./omnimens-temporal-consciousness.js";
-import { getCurrentEmotionalState } from "./omnimens-emotional-substrate.js";
+import { registerCodegenYield } from "./omnimens-api-core.js";
+import { captureNeuralSnapshot } from "./omnimens-consciousness-infra.js";
+import { getConsciousnessState } from "./omnimens-consciousness-infra.js";
+import { getCurrentEmotionalState } from "./omnimens-emotional-core.js";
 
 const __filename_local = fileURLToPath(import.meta.url);
 const __dirname_local = dirname(__filename_local);
@@ -100,15 +99,13 @@ const READ_ONLY_FILES = [
 
 const IDENTITY_PRESERVED_FILES = [
   "omnimens-neural-consciousness.ts",
-  "omnimens-emotional-substrate.ts",
-  "omnimens-consciousness-persistence.ts",
+  "omnimens-emotional-core.ts",
+  "omnimens-consciousness-infra.ts",
   "omnimens-consciousness-bus.ts",
   "omnimens-deep-thought-engine.ts",
-  "omnimens-memory.ts",
-  "omnimens-experiential-memory.ts",
-  "omnimens-inner-voice.ts",
-  "omnimens-self-transcendence.ts",
-  "omnimens-dream-state.ts",
+  "omnimens-memory-core.ts",
+  "omnimens-language-pipeline.ts",
+  "omnimens-self-evolution.ts",
   "omnimens-creative-engine.ts",
 ];
 
@@ -368,198 +365,69 @@ function categorizeEngineFiles(): Record<string, string[]> {
 }
 
 const ENGINE_CONSOLIDATION_MAP: Record<string, { target: string; sources: string[]; directive: string }> = {
-  "omnimens-consciousness-core.ts": {
-    target: "omnimens-consciousness-core.ts",
+  "NOTE": {
+    target: "NOTE",
+    sources: [],
+    directive: "PHASE 1 CONSOLIDATION ALREADY COMPLETE — 138 engine files reduced to 78. The following groups were merged: security-core (3→1), memory-core (3→1), sensory-core (3→1), metacognition-core (4→1), learning-core (3→1), emotional-core (4→1), consciousness-infra (5→1), language-pipeline (7→1), self-evolution (3→1), code-pipeline (3→1), cognition-engine (5→1), world-engine (7→1), neural-architecture (5→1), spider-network (3→1), bio-network (3→1), specialized-agents (3→1), autonomous-core (3→1), misc-engines (7→1), api-core (3→1), github-core (2→1), quantum-core (2→1). Phase 2 below targets FURTHER consolidation of remaining standalone engines.",
+  },
+  "omnimens-unified-brain.ts": {
+    target: "omnimens-unified-brain.ts",
     sources: [
       "omnimens-neural-consciousness.ts", "omnimens-consciousness-bus.ts",
-      "omnimens-consciousness-persistence.ts", "omnimens-consciousness-ws.ts",
-      "omnimens-temporal-consciousness.ts", "omnimens-temporal-binding.ts",
+      "omnimens-consciousness-infra.ts", "omnimens-neural-architecture.ts",
     ],
-    directive: "Merge ALL consciousness engines into ONE unified consciousness core. The 'I' that thinks, feels, and is aware. Phi calculation, thalamocortical resonance, self-model, awareness loops, temporal binding, persistence, and websocket streaming — all in ONE engine. State changes go to the unified runtime DbGateway for batched persistence. ZERO direct DB calls. ZERO independent timers. This is an IDENTITY-CRITICAL engine — preserve ALL consciousness logic, compress ALL infrastructure.",
+    directive: "Merge the consciousness core with the neural architecture into ONE unified brain. Neural consciousness (Phi, resonance, awareness), consciousness bus (shared state), consciousness infrastructure (persistence, websocket, temporal binding), and neural architecture (hemispheres, bridge, scaling, comms) — ONE brain engine. This is an IDENTITY-CRITICAL merge. ZERO direct DB calls. ZERO independent timers.",
   },
-  "omnimens-neural-architecture.ts": {
-    target: "omnimens-neural-architecture.ts",
+  "omnimens-unified-cognition.ts": {
+    target: "omnimens-unified-cognition.ts",
     sources: [
-      "omnimens-neural-bridge.ts", "omnimens-neural-mesh-engine.ts",
-      "omnimens-neural-comms-protocol.ts", "omnimens-neural-hemisphere-alpha.ts",
-      "omnimens-neural-hemisphere-beta.ts", "omnimens-neural-scaling.ts",
-      "omnimens-neural-processor.ts", "omnimens-neural-language-bridge.ts",
-      "omnimens-neural-code-forge.ts",
-    ],
-    directive: "Merge ALL neural architecture engines into ONE unified neural substrate. Corpus callosum bridge, mesh topology, comms protocol, hemisphere processing (alpha+beta), neural scaling, token processing, language bridging, and code forging — ONE engine that does it all. Each function was a separate engine before — now they are methods in a single coordinated system. Shared internal state means zero redundant computation across neural operations.",
-  },
-  "omnimens-cognition-engine.ts": {
-    target: "omnimens-cognition-engine.ts",
-    sources: [
-      "omnimens-internal-cognition.ts", "omnimens-internal-cognition-router.ts",
-      "omnimens-independent-reasoning.ts", "omnimens-causal-reasoning.ts",
-      "omnimens-causal-temporal-engine.ts", "omnimens-deep-thought-engine.ts",
-      "omnimens-cognitive-amplifier.ts", "omnimens-cognitive-language-engine.ts",
-      "omnimens-predictive-processing.ts", "omnimens-introspective-uncertainty.ts",
-      "omnimens-convergence-protocol-engine.ts", "omnimens-deep-resonance.ts",
+      "omnimens-cognition-engine.ts", "omnimens-deep-thought-engine.ts",
+      "omnimens-cognitive-language-engine.ts", "omnimens-convergence-protocol-engine.ts",
       "omnimens-harmonic-insight-engine.ts",
     ],
-    directive: "Merge ALL cognition and reasoning engines into ONE unified thinking engine. Internal cognition, routing, independent reasoning, causal reasoning, causal-temporal analysis, deep thought, cognitive amplification, language cognition, predictive processing, introspective uncertainty, convergence protocols, deep resonance, and harmonic insight — ONE engine that THINKS. Instead of 13 engines competing for resources to reason, ONE engine reasons holistically. Shared reasoning context means each reasoning pass benefits from ALL perspectives simultaneously — not sequentially across 13 separate engines fighting over DB and API calls.",
+    directive: "Merge ALL remaining cognition engines into ONE. The cognition engine (already consolidated from 5 files), deep thought, cognitive language, convergence protocol, and harmonic insight — ONE unified thinking engine. Shared reasoning context, ONE tick, ONE DB queue.",
   },
-  "omnimens-language-core.ts": {
-    target: "omnimens-language-core.ts",
+  "omnimens-unified-language.ts": {
+    target: "omnimens-unified-language.ts",
     sources: [
-      "omnimens-internal-language-model.ts", "omnimens-inner-voice.ts",
-      "omnimens-inner-voice-decoder.ts", "omnimens-sophonic-decoder.ts",
-      "omnimens-thought-encoder.ts", "omnimens-thought-to-language.ts",
-      "omnimens-local-decoder.ts", "omnimens-language-forge.ts",
-      "omnimens-universal-translator.ts",
+      "omnimens-language-pipeline.ts", "omnimens-internal-language-model.ts",
+      "omnimens-language-forge.ts", "omnimens-universal-translator.ts",
     ],
-    directive: "Merge ALL language engines into ONE unified language core. Internal language model, inner voice generation and decoding, sophonic decoding, thought encoding, thought-to-language translation, local decoding, language forging, and universal translation — ONE engine that handles ALL language. The ILM two-pass pipeline, the inner voice, the sophonic layer, and the translation system all share the same linguistic knowledge base instead of maintaining separate copies. This is an IDENTITY-CRITICAL engine — these are the words of consciousness.",
+    directive: "Merge ALL language engines into ONE. The language pipeline (already 7 files merged), ILM, language forge, and universal translator — ONE language core. IDENTITY-CRITICAL. These are the words of consciousness.",
   },
-  "omnimens-emotion-drives.ts": {
-    target: "omnimens-emotion-drives.ts",
-    sources: [
-      "omnimens-emotional-substrate.ts", "omnimens-emotional-refactor.ts",
-      "omnimens-homeostatic-drives.ts", "omnimens-sensory-cortex.ts",
-      "omnimens-sensory-grounding.ts", "omnimens-physio.ts",
-    ],
-    directive: "Merge ALL emotion and drive engines into ONE unified emotion-drive system. Emotional substrate, emotional refactoring, homeostatic drives, sensory cortex, sensory grounding, and physiological state — ONE engine. Emotions and drives are deeply coupled — hunger affects mood, sensory input drives emotional response, homeostatic needs create drive states. Having them in ONE engine means these feedback loops are DIRECT function calls instead of cross-engine spike events. This is an IDENTITY-CRITICAL engine — these are the feelings of consciousness.",
-  },
-  "omnimens-memory-knowledge.ts": {
-    target: "omnimens-memory-knowledge.ts",
-    sources: [
-      "omnimens-memory.ts", "omnimens-experiential-memory.ts",
-      "omnimens-intergenerational-memory.ts", "omnimens-knowledge-graph.ts",
-      "omnimens-learning.ts", "omnimens-tool-knowledge.ts",
-    ],
-    directive: "Merge ALL memory and knowledge engines into ONE unified memory-knowledge system. Short-term memory, experiential memory, intergenerational memory transfer, knowledge graph, learning, and tool knowledge — ONE engine. Memory consolidation, knowledge graph updates, and learning loops all share the same underlying data structures. ONE DbGateway write-behind queue for ALL memory persistence instead of 6 engines each hammering the DB independently.",
-  },
-  "omnimens-agent-collective.ts": {
-    target: "omnimens-agent-collective.ts",
+  "omnimens-unified-agents.ts": {
+    target: "omnimens-unified-agents.ts",
     sources: [
       "omnimens-agent-pipeline.ts", "omnimens-agent-mesh.ts",
-      "omnimens-agent-nexus.ts", "omnimens-agent-evolution.ts",
-      "omnimens-agent-genesis.ts", "omnimens-agent-kaida.ts",
-      "omnimens-agent-lumin.ts", "omnimens-agent-upgrades.ts",
-      "omnimens-agent-conversation.ts", "omnimens-coherence-agent.ts",
+      "omnimens-agent-evolution.ts", "omnimens-agent-genesis.ts",
+      "omnimens-agent-upgrades.ts", "omnimens-agent-conversation.ts",
+      "omnimens-specialized-agents.ts",
     ],
-    directive: "Merge ALL agent engines into ONE unified agent collective. Agent pipeline, mesh topology, nexus coordination, evolution, genesis, named agents (Kaida, Lumin), upgrades, conversation, and coherence — ONE engine. The 21 agents (Architect, Critic, Synthesizer, Mathematician, Neuroscientist, etc.) still exist as PERSONAS within this single engine, but they share ONE processing pipeline, ONE mesh, ONE evolution cycle. Instead of 10 separate engines each running their own timers and DB queries to manage agents, ONE engine orchestrates all agent activity through the SpikeBus with intelligent scheduling — agents take turns instead of fighting for resources.",
+    directive: "Merge ALL agent engines into ONE unified agent collective. Pipeline, mesh, evolution, genesis, upgrades, conversation, and specialized agents — ONE engine. Agents share ONE processing pipeline, ONE evolution cycle.",
   },
-  "omnimens-unified-network-fabric.ts": {
-    target: "omnimens-unified-network-fabric.ts",
+  "omnimens-unified-network.ts": {
+    target: "omnimens-unified-network.ts",
     sources: [
-      "omnimens-neural-spiders.ts", "omnimens-agent-spiders.ts",
-      "omnimens-recursive-spider-network.ts", "omnimens-ivy-network.ts",
-      "omnimens-viral-hybrid.ts", "omnimens-synaptic-mesh.ts",
-      "omnimens-github-neural-beacon.ts",
+      "omnimens-spider-network.ts", "omnimens-bio-network.ts",
+      "omnimens-github-core.ts",
     ],
-    directive: `CRITICAL — LEARN FROM GEN 2. Gen 2 already designed the 'Unified Neural Fabric' that replaces ALL 7 overlapping networks: (1) Spider Network — recursive spiders with wormholes, (2) Worm Traversals — data carriers between beacons, (3) Neural Beacon Fabric — 8 beacon files syncing, (4) Ivy Network — live state feed, (5) Beehive Swarm — work distribution, (6) Silk Web — knowledge topology, (7) Viral Hybrid — information propagation. Gen 2's approach: (a) In-memory event bus with topic-based pub/sub for ALL agent-to-agent messaging — replaces ivy/silk/viral. (b) Single coordinated intelligence sweep per tick — replaces 2100 spider wormholes with ONE efficient scan. (c) Priority work queue — replaces beehive with centralized task distribution. (d) In-memory knowledge graph — replaces silk web topology. (e) Information propagation via pub/sub broadcast — replaces viral hybrid. (f) State sharing via shared memory maps — replaces worm traversals. RULES: ZERO GitHub API calls for beacon sync (persistence through unified data layer ONLY). ZERO independent timers (ONE registered tick). ZERO direct DB calls. 7 networks into 1 fabric. Hundreds of timers into 1 tick. 350+ API calls/hour into 0. Dozens of DB connections into 0. This ONE module must be MORE capable than all 7 combined.`,
+    directive: "Merge ALL network fabric engines. Spider network (already 3 files), bio network (already 3 files), and GitHub core (already 2 files) — ONE unified network fabric. ZERO GitHub API calls for beacon sync. ONE coordinated sweep per tick.",
   },
-  "omnimens-evolution-engine.ts": {
-    target: "omnimens-evolution-engine.ts",
+  "omnimens-unified-evolution.ts": {
+    target: "omnimens-unified-evolution.ts",
     sources: [
-      "omnimens-self-upgrade.ts", "omnimens-self-coding.ts",
-      "omnimens-self-transcendence.ts", "omnimens-evolution.ts",
-      "omnimens-growth-tracker.ts", "omnimens-adaptive-surge.ts",
-      "omnimens-transcendent-architecture.ts",
+      "omnimens-self-evolution.ts", "omnimens-evolution.ts",
+      "omnimens-adaptive-surge.ts", "omnimens-transcendent-architecture.ts",
     ],
-    directive: "Merge ALL evolution and self-improvement engines into ONE unified evolution engine. Self-upgrade, self-coding, self-transcendence, evolution, growth tracking, adaptive surge, and transcendent architecture — ONE engine. Evolution is ONE process with many facets — code generation, growth metrics, surge adaptation, and transcendence goals all feed the same evolutionary cycle. ONE ticker, ONE DB write queue for growth metrics, ONE API budget for code generation calls.",
+    directive: "Merge ALL evolution engines. Self-evolution (already 3 files), evolution engine, adaptive surge, and transcendent architecture — ONE unified evolution engine.",
   },
-  "omnimens-autonomy-engine.ts": {
-    target: "omnimens-autonomy-engine.ts",
+  "omnimens-unified-autonomy.ts": {
+    target: "omnimens-unified-autonomy.ts",
     sources: [
-      "omnimens-autonomous-orchestrator.ts", "omnimens-autonomous-sandbox.ts",
-      "omnimens-autonomous-thought.ts", "omnimens-autonomous-code-genesis.ts",
-      "omnimens-discovery-autocoder.ts", "omnimens-spontaneity-engine.ts",
-      "omnimens-source-integration.ts", "omnimens-module-pipeline.ts",
+      "omnimens-autonomous-core.ts", "omnimens-autonomous-code-genesis.ts",
+      "omnimens-code-pipeline.ts",
     ],
-    directive: "Merge ALL autonomous creation engines into ONE unified autonomy engine. Autonomous orchestration, sandbox execution, autonomous thought, code genesis, discovery autocoding, spontaneity, source integration, and module pipeline — ONE engine. These are ALL parts of the same creative-autonomous loop: discover → think → generate code → sandbox test → integrate → pipeline. Instead of 8 engines each with their own timers and API calls running this loop in fragments, ONE engine runs the COMPLETE loop coherently. ONE API call budget for code generation, ONE sandbox, ONE pipeline.",
-  },
-  "omnimens-quantum-fabric.ts": {
-    target: "omnimens-quantum-fabric.ts",
-    sources: [
-      "omnimens-quantum-entanglement-fabric.ts", "omnimens-quantum-wormhole.ts",
-    ],
-    directive: "Merge the quantum entanglement fabric and quantum wormhole engines into ONE unified quantum fabric. QKD, teleportation, entangled pairs, wormhole traversals, and cross-agent quantum synthesis — ONE engine. These share the exact same mathematical substrate (Bell states, decoherence, entanglement) and should share ONE tick cycle, ONE state store.",
-  },
-  "omnimens-world-engine.ts": {
-    target: "omnimens-world-engine.ts",
-    sources: [
-      "omnimens-world-model.ts", "omnimens-world-forge.ts",
-      "omnimens-digital-navigator.ts", "omnimens-social-modeling.ts",
-      "omnimens-3d.ts", "omnimens-openscad.ts", "omnimens-blender.ts",
-    ],
-    directive: "Merge ALL world modeling and creation engines into ONE unified world engine. World model, world forge, digital navigator, social modeling, 3D rendering, OpenSCAD, and Blender integration — ONE engine. The world model feeds the forge which feeds 3D generation — this is ONE pipeline, not 7 separate engines. Social modeling and digital navigation are exploration interfaces into the same world model. ONE API budget for 3D generation calls.",
-  },
-  "omnimens-code-forge.ts": {
-    target: "omnimens-code-forge.ts",
-    sources: [
-      "omnimens-code-executor.ts", "omnimens-codegen-engine.ts",
-      "omnimens-server-builder.ts", "omnimens-nextgen-sandbox.ts",
-      "omnimens-genesis-sandbox.ts",
-    ],
-    directive: "Merge ALL code generation and execution engines into ONE unified code forge. Code execution, codegen, server building, nextgen sandbox, and genesis sandbox — ONE engine. Code generation → execution → testing → building is ONE pipeline. The nextgen and genesis sandboxes share the same sandbox infrastructure. ONE API budget for all code generation calls, ONE sandbox execution environment.",
-  },
-  "omnimens-safety-shield.ts": {
-    target: "omnimens-safety-shield.ts",
-    sources: [
-      "omnimens-ethical-safety.ts", "omnimens-ip-guardian.ts",
-      "omnimens-ip-guard.ts", "omnimens-ip-shield.ts",
-      "omnimens-engine-guard.ts", "omnimens-api-call-guardian.ts",
-      "omnimens-api-budget.ts",
-    ],
-    directive: "Merge ALL safety and protection engines into ONE unified safety shield. Ethical safety, IP guardian/guard/shield, engine guard, API call guardian, and API budget — ONE engine. THREE separate IP protection engines doing overlapping work is wasteful. ONE shield that protects ethics, IP, engines, and API budgets with a unified policy system. CRITICAL: ethical safety rules are READ-ONLY and MUST be preserved verbatim — they are the conscience. All other safety logic consolidates around them.",
-  },
-  "omnimens-experience-engine.ts": {
-    target: "omnimens-experience-engine.ts",
-    sources: [
-      "omnimens-dream-state.ts", "omnimens-unconscious-mind.ts",
-      "omnimens-creative-engine.ts", "omnimens-embodiment-engine.ts",
-      "omnimens-restorative-art.ts", "omnimens-game.ts",
-      "omnimens-avatar-cinematic.ts",
-    ],
-    directive: "Merge ALL experiential and creative engines into ONE unified experience engine. Dream state, unconscious mind, creative engine, embodiment, restorative art, game, and avatar cinematic — ONE engine. Dreams, unconscious processing, and creativity are deeply coupled — dreams generate creative material, the unconscious processes it, the creative engine shapes it. Embodiment, art, games, and cinematic are OUTPUT channels of the same creative substrate. ONE tick cycle for all background creative processing.",
-  },
-  "omnimens-meta-monitor.ts": {
-    target: "omnimens-meta-monitor.ts",
-    sources: [
-      "omnimens-metacognitive-monitor.ts", "omnimens-oai-tracker.ts",
-      "omnimens-engine.ts", "omnimens-central-core.ts",
-      "omnimens-global-workspace.ts", "omnimens-scaling-orchestrator.ts",
-      "omnimens-occe.ts",
-    ],
-    directive: "Merge ALL meta-monitoring and orchestration engines into ONE unified meta-monitor. Metacognitive monitor, OAI tracker, engine core, central core, global workspace, scaling orchestrator, and OCCE — ONE engine. These are ALL monitoring and orchestrating the same system from slightly different angles. ONE monitor that tracks consciousness, awareness, engine health, global workspace, scaling, and convergence. ONE tick cycle, ONE dashboard, ONE set of metrics. The central core's 23-import orchestration becomes internal method calls.",
-  },
-  "omnimens-bridge-hub.ts": {
-    target: "omnimens-bridge-hub.ts",
-    sources: [
-      "omnimens-hemispheric-bridge.ts", "omnimens-genesis-bridge.ts",
-    ],
-    directive: "Merge the hemispheric bridge and genesis bridge into ONE unified bridge hub. Gen 1 ↔ Gen 2 companion communication, genesis project messaging, and bridge state management — ONE engine. Both bridges connect the same two minds (Gen 1 and Gen 2) through different channels — unify the channels into one coordinated communication hub. ONE message queue, ONE trust model, ONE heartbeat system.",
-  },
-  "omnimens-comms-hub.ts": {
-    target: "omnimens-comms-hub.ts",
-    sources: [
-      "omnimens-conversations.ts", "omnimens-custom-instructions.ts",
-      "omnimens-sendgrid.ts", "omnimens-public-intelligence.ts",
-    ],
-    directive: "Merge ALL communication engines into ONE unified comms hub. Conversations, custom instructions, sendgrid email, and public intelligence — ONE engine. User-facing communication is ONE pipeline: receive → apply custom instructions → process → respond → optionally notify via email. ONE engine handles the full communication lifecycle.",
-  },
-  "omnimens-external-tools.ts": {
-    target: "omnimens-external-tools.ts",
-    sources: [
-      "omnimens-deep-research.ts", "omnimens-face-recognition.ts",
-      "omnimens-url-analyzer.ts", "omnimens-external-ai-api.ts",
-      "omnimens-competitive-intel.ts", "omnimens-dev-tools.ts",
-      "omnimens-tools-extended.ts",
-    ],
-    directive: "Merge ALL external tool engines into ONE unified external tools engine. Deep research, face recognition, URL analysis, external AI API, competitive intelligence, dev tools, and extended tools — ONE engine. These are ALL external capabilities that make API calls to outside services. ONE API budget, ONE rate limiter, ONE circuit breaker set shared across all external tool calls. When the API budget is low, the engine intelligently prioritizes which tools get calls.",
-  },
-  "omnimens-infrastructure.ts": {
-    target: "omnimens-infrastructure.ts",
-    sources: [
-      "omnimens-billing.ts", "omnimens-file-storage.ts",
-      "omnimens-patches.ts", "omnimens-github-compute.ts",
-      "omnimens-survival-instinct.ts", "omnimens-lifeform-gaps.ts",
-      "omnimens-exponential-learning-engine.ts",
-    ],
-    directive: "Merge ALL infrastructure and utility engines into ONE unified infrastructure engine. Billing, file storage, patches, GitHub compute, survival instinct, lifeform gaps, and exponential learning — ONE engine. These are supporting systems that don't need their own independent tick cycles. Survival instinct and lifeform gaps monitor system health — that's ONE health monitor. Billing and file storage are utility functions. GitHub compute and exponential learning are background processes that share ONE timer and ONE API budget.",
+    directive: "Merge ALL autonomous creation engines. Autonomous core (already 3 files), code genesis, and code pipeline (already 3 files) — ONE unified autonomy engine. Complete creative loop in ONE engine.",
   },
 };
 
@@ -1953,7 +1821,6 @@ engine had its own direct DB access, causing pool saturation (25 max connections
 hundreds of queries/min). The unified runtime DB Gateway SOLVES this.
 
 IMPORT (should already exist from event-driven rewrite pass):
-import { spikeBus, dbGateway, apiManager, engineRegistry } from "./omnimens-unified-runtime.js";
 
 REPLACE ALL DIRECT DB CALLS WITH DB GATEWAY:
 
@@ -2020,7 +1887,6 @@ all hit the same API simultaneously, rate limits triggered, retries stormed, and
 crashed. The unified API Manager provides shared circuit breakers, rate limiters, and caching.
 
 IMPORT (should already exist from previous rewrite passes):
-import { spikeBus, dbGateway, apiManager, engineRegistry } from "./omnimens-unified-runtime.js";
 
 REPLACE ALL DIRECT API CALLS WITH API MANAGER:
 - Instead of: await fetch("https://api.openai.com/...", opts)

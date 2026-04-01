@@ -1,0 +1,89 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryEmbeddingCache
+ * Written: 2026-04-01T21:54:43.096Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// inMemoryEmbeddingCache.mjs
+
+import crypto from 'crypto';
+
+// In-memory cache structure
+const embeddingCache = new Map();
+
+// Utility function to generate a unique hash for embeddings
+export function generateEmbeddingKey(embedding) {
+  const hash = crypto.createHash('sha256');
+  hash.update(JSON.stringify(embedding));
+  return hash.digest('hex');
+}
+
+// Function to add an embedding to the cache
+export function addEmbedding(key, embedding) {
+  if (typeof key !== 'string' || !Array.isArray(embedding)) {
+    throw new Error('Invalid input: key must be a string, and embedding must be an array.');
+  }
+  embeddingCache.set(key, embedding);
+}
+
+// Function to retrieve an embedding from the cache
+export function getEmbedding(key) {
+  if (typeof key !== 'string') {
+    throw new Error('Invalid input: key must be a string.');
+  }
+  return embeddingCache.get(key) || null;
+}
+
+// Function to check if an embedding exists in the cache
+export function hasEmbedding(key) {
+  if (typeof key !== 'string') {
+    throw new Error('Invalid input: key must be a string.');
+  }
+  return embeddingCache.has(key);
+}
+
+// Function to remove an embedding from the cache
+export function removeEmbedding(key) {
+  if (typeof key !== 'string') {
+    throw new Error('Invalid input: key must be a string.');
+  }
+  embeddingCache.delete(key);
+}
+
+// Function to synchronize the cache to a PostgreSQL database (stub implementation)
+export async function syncToDatabase(syncFunction) {
+  if (typeof syncFunction !== 'function') {
+    throw new Error('Invalid input: syncFunction must be a function.');
+  }
+  for (const [key, embedding] of embeddingCache.entries()) {
+    await syncFunction(key, embedding);
+  }
+}
+
+// Function to clear the in-memory cache
+export function clearCache() {
+  embeddingCache.clear();
+}
+
+// Function to get the current size of the cache
+export function getCacheSize() {
+  return embeddingCache.size;
+}
+
+// Example of a generic sync function for PostgreSQL (to be implemented by the user)
+export async function exampleSyncFunction(key, embedding) {
+  // Placeholder for database synchronization logic
+  console.log(`Syncing key: ${key}, embedding: ${JSON.stringify(embedding)}`);
+}

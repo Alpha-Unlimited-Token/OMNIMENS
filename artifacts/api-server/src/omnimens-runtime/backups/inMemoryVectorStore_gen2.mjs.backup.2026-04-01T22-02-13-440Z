@@ -1,0 +1,132 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-04-01T21:57:36.443Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// inMemoryVectorStore.mjs
+
+import { performance } from 'perf_hooks';
+
+/**
+ * Calculate the Euclidean distance between two vectors.
+ * @param {number[]} vec1 - First vector.
+ * @param {number[]} vec2 - Second vector.
+ * @returns {number} - Euclidean distance.
+ */
+export function euclideanDistance(vec1, vec2) {
+  if (vec1.length !== vec2.length) {
+    throw new Error('Vectors must have the same dimensions.');
+  }
+  return Math.sqrt(vec1.reduce((sum, val, idx) => sum + Math.pow(val - vec2[idx], 2), 0));
+}
+
+/**
+ * Build a Hierarchical Navigable Small World (HNSW) graph for approximate nearest neighbor search.
+ * @param {number[][]} vectors - Array of vectors to index.
+ * @returns {Object} - HNSW graph structure.
+ */
+export function buildHNSWGraph(vectors) {
+  const graph = new Map();
+
+  vectors.forEach((vector, index) => {
+    graph.set(index, []);
+    vectors.forEach((otherVector, otherIndex) => {
+      if (index !== otherIndex) {
+        const distance = euclideanDistance(vector, otherVector);
+        graph.get(index).push({ neighbor: otherIndex, distance });
+      }
+    });
+    graph.get(index).sort((a, b) => a.distance - b.distance); // Sort neighbors by distance
+  });
+
+  return graph;
+}
+
+/**
+ * Perform approximate nearest neighbor search using the HNSW graph.
+ * @param {Object} graph - HNSW graph.
+ * @param {number[][]} vectors - Original vectors.
+ * @param {number[]} queryVector - Query vector.
+ * @param {number} k - Number of nearest neighbors to retrieve.
+ * @returns {Object[]} - Array of nearest neighbors and distances.
+ */
+export function approximateNearestNeighbors(graph, vectors, queryVector, k) {
+  if (k <= 0) {
+    throw new Error('k must be a positive integer.');
+  }
+
+  const visited = new Set();
+  const candidates = [];
+  const results = [];
+
+  // Start with a random node
+  const startNode = Math.floor(Math.random() * vectors.length);
+  candidates.push({ node: startNode, distance: euclideanDistance(vectors[startNode], queryVector) });
+
+  while (candidates.length > 0 && results.length < k) {
+    candidates.sort((a, b) => a.distance - b.distance);
+    const current = candidates.shift();
+
+    if (visited.has(current.node)) {
+      continue;
+    }
+
+    visited.add(current.node);
+    results.push(current);
+
+    const neighbors = graph.get(current.node);
+    for (const neighbor of neighbors) {
+      if (!visited.has(neighbor.neighbor)) {
+        const distance = euclideanDistance(vectors[neighbor.neighbor], queryVector);
+        candidates.push({ node: neighbor.neighbor, distance });
+      }
+    }
+  }
+
+  return results.slice(0, k);
+}
+
+/**
+ * Utility function to validate input vectors.
+ * @param {number[][]} vectors - Array of vectors.
+ */
+export function validateVectors(vectors) {
+  if (!Array.isArray(vectors) || vectors.length === 0) {
+    throw new Error('Input must be a non-empty array of vectors.');
+  }
+  const dimension = vectors[0].length;
+  if (!vectors.every(vec => Array.isArray(vec) && vec.length === dimension)) {
+    throw new Error('All vectors must have the same dimensions.');
+  }
+}
+
+/**
+ * Main entry point to create and query an in-memory vector store.
+ * @param {number[][]} vectors - Array of vectors to index.
+ * @param {number[]} queryVector - Query vector.
+ * @param {number} k - Number of nearest neighbors to retrieve.
+ * @returns {Object[]} - Array of nearest neighbors and distances.
+ */
+export function searchInMemoryVectorStore(vectors, queryVector, k) {
+  validateVectors(vectors);
+  const graph = buildHNSWGraph(vectors);
+  return approximateNearestNeighbors(graph, vectors, queryVector, k);
+}
+
+// Example usage (uncomment to test):
+// const vectors = [[1, 2], [3, 4], [5, 6], [7, 8]];
+// const query = [4, 5];
+// console.log(searchInMemoryVectorStore(vectors, query, 2));

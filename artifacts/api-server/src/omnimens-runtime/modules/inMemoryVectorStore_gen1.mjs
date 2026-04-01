@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-03-23T21:06:22.737Z
+ * Written: 2026-04-01T21:49:37.656Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,99 +16,80 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-/**
- * @module inMemoryVectorStore
- * @description Provides fast semantic search and context retention using in-memory embeddings.
- */
+// inMemoryVectorStore.mjs
 
-/**
- * @typedef {Object} VectorStore
- * @property {Array<number[]>} vectors - Array of stored vectors.
- * @property {Array<string>} metadata - Metadata associated with each vector.
- */
+import { createHash } from 'crypto';
 
-/**
- * @typedef {Object} SearchResult
- * @property {string} metadata - Metadata of the closest vector.
- * @property {number} similarity - Cosine similarity score.
- */
-
-/**
- * Computes the cosine similarity between two vectors.
- * @param {number[]} vectorA - First vector.
- * @param {number[]} vectorB - Second vector.
- * @returns {number} Cosine similarity score.
- */
-function cosineSimilarity(vectorA, vectorB) {
-  const dotProduct = vectorA.reduce((sum, value, index) => sum + value * vectorB[index], 0);
-  const magnitudeA = Math.sqrt(vectorA.reduce((sum, value) => sum + value ** 2, 0));
-  const magnitudeB = Math.sqrt(vectorB.reduce((sum, value) => sum + value ** 2, 0));
-  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
-}
-
-/**
- * Creates a new in-memory vector store.
- * @returns {VectorStore} A new vector store object.
- */
-function createVectorStore() {
-  return {
-    vectors: [],
-    metadata: []
-  };
-}
-
-/**
- * Adds a vector and its associated metadata to the store.
- * @param {VectorStore} store - The vector store.
- * @param {number[]} vector - The vector to add.
- * @param {string} metadata - Metadata associated with the vector.
- */
-function addVector(store, vector, metadata) {
-  if (!Array.isArray(vector) || typeof metadata !== 'string') {
-    throw new Error('Invalid input: vector must be an array and metadata must be a string.');
-  }
-  store.vectors.push(vector);
-  store.metadata.push(metadata);
-}
-
-/**
- * Searches for the closest vector in the store using cosine similarity.
- * @param {VectorStore} store - The vector store.
- * @param {number[]} queryVector - The query vector.
- * @returns {SearchResult|null} The closest vector's metadata and similarity score, or null if the store is empty.
- */
-function searchVector(store, queryVector) {
-  if (!Array.isArray(queryVector)) {
-    throw new Error('Invalid input: queryVector must be an array.');
-  }
-  if (store.vectors.length === 0) {
-    return null;
+// Utility function to calculate cosine similarity between two vectors
+export function cosineSimilarity(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same dimensionality');
   }
 
-  let bestMatch = null;
-  let highestSimilarity = -Infinity;
+  const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a ** 2, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b ** 2, 0));
 
-  for (let i = 0; i < store.vectors.length; i++) {
-    const similarity = cosineSimilarity(queryVector, store.vectors[i]);
-    if (similarity > highestSimilarity) {
-      highestSimilarity = similarity;
-      bestMatch = store.metadata[i];
+  return dotProduct / (magnitudeA * magnitudeB);
+}
+
+// Hash function to generate unique keys for vectors
+function hashVector(vector) {
+  return createHash('sha256').update(vector.join(',')).digest('hex');
+}
+
+// In-memory vector store class
+export class InMemoryVectorStore {
+  constructor() {
+    this.store = new Map();
+  }
+
+  // Add a vector to the store with an optional identifier
+  addVector(vector, id = null) {
+    if (!Array.isArray(vector) || vector.some(isNaN)) {
+      throw new Error('Vector must be an array of numbers');
     }
+
+    const key = id || hashVector(vector);
+    this.store.set(key, vector);
+    return key;
   }
 
-  return {
-    metadata: bestMatch,
-    similarity: highestSimilarity
-  };
+  // Retrieve a vector by its identifier
+  getVector(id) {
+    return this.store.get(id) || null;
+  }
+
+  // Find the nearest neighbors to a given query vector
+  findNearestNeighbors(queryVector, k = 1) {
+    if (!Array.isArray(queryVector) || queryVector.some(isNaN)) {
+      throw new Error('Query vector must be an array of numbers');
+    }
+
+    const similarities = [];
+
+    for (const [id, vector] of this.store.entries()) {
+      const similarity = cosineSimilarity(queryVector, vector);
+      similarities.push({ id, similarity });
+    }
+
+    similarities.sort((a, b) => b.similarity - a.similarity);
+    return similarities.slice(0, k);
+  }
+
+  // Remove a vector by its identifier
+  removeVector(id) {
+    return this.store.delete(id);
+  }
+
+  // Clear the entire vector store
+  clearStore() {
+    this.store.clear();
+  }
 }
 
-/**
- * Clears all vectors and metadata from the store.
- * @param {VectorStore} store - The vector store.
- */
-function clearStore(store) {
-  store.vectors.length = 0;
-  store.metadata.length = 0;
+// Example utility function to normalize a vector
+export function normalizeVector(vector) {
+  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
+  return vector.map(val => val / magnitude);
 }
-
-export { createVectorStore, addVector, searchVector, clearStore };

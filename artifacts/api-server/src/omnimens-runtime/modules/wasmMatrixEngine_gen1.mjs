@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: wasmMatrixEngine
- * Written: 2026-03-24T22:22:05.849Z
+ * Written: 2026-04-01T21:57:17.676Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -17,102 +17,75 @@
  */
 
 // wasmMatrixEngine.mjs
+import { instantiate } from 'webassembly';
 
-import { readFileSync } from 'fs';
-import { join } from 'path';
+const wasmSource = `
+(module
+  (memory $mem 1)
+  (export "memory" (memory $mem))
+  (func $multiplyMatrices (param $rows i32) (param $cols i32) (param $common i32) (param $aOffset i32) (param $bOffset i32) (param $resultOffset i32)
+    (local $i i32) (local $j i32) (local $k i32) (local $sum f32)
+    (local.set $i (i32.const 0))
+    (loop $outer
+      (local.set $j (i32.const 0))
+      (loop $inner
+        (local.set $sum (f32.const 0))
+        (local.set $k (i32.const 0))
+        (loop $multiply
+          (local.set $sum (f32.add (local.get $sum) (f32.mul
+            (f32.load (i32.add (local.get $aOffset) (i32.mul (local.get $i) (local.get $common)) (local.get $k)))
+            (f32.load (i32.add (local.get $bOffset) (i32.mul (local.get $k) (local.get $cols)) (local.get $j)))))))
+          (local.set $k (i32.add (local.get $k) (i32.const 1)))
+          (br_if $multiply (i32.lt_s (local.get $k) (local.get $common))))
+        (f32.store (i32.add (local.get $resultOffset) (i32.mul (local.get $i) (local.get $cols)) (local.get $j)) (local.get $sum))
+        (local.set $j (i32.add (local.get $j) (i32.const 1)))
+        (br_if $inner (i32.lt_s (local.get $j) (local.get $cols))))
+      (local.set $i (i32.add (local.get $i) (i32.const 1)))
+      (br_if $outer (i32.lt_s (local.get $i) (local.get $rows))))))
+  (export "multiplyMatrices" (func $multiplyMatrices))
+)`;
 
-// Utility function to load and compile WebAssembly module
-export async function loadWasmModule(filePath) {
-  const wasmBuffer = readFileSync(filePath);
-  const wasmModule = await WebAssembly.compile(wasmBuffer);
-  const wasmInstance = await WebAssembly.instantiate(wasmModule);
-  return wasmInstance.exports;
+let wasmInstance;
+
+async function initializeWasm() {
+  const wasmModule = await WebAssembly.compile(new TextEncoder().encode(wasmSource));
+  wasmInstance = await WebAssembly.instantiate(wasmModule);
 }
 
-// Function to perform matrix multiplication using WebAssembly
-export async function wasmMatrixMultiply(wasmFilePath, matrixA, matrixB) {
-  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
-    throw new Error('Both inputs must be 2D arrays.');
+function multiplyMatrices(rows, cols, common, matrixA, matrixB) {
+  if (!wasmInstance) {
+    throw new Error("WASM module not initialized. Call initializeWasm() first.");
   }
 
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
+  const memory = new Float32Array(wasmInstance.exports.memory.buffer);
+  const aOffset = 0;
+  const bOffset = rows * common;
+  const resultOffset = rows * common + common * cols;
 
-  if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions do not align for multiplication.');
-  }
+  // Copy matrices into WASM memory
+  matrixA.flat().forEach((val, index) => memory[aOffset + index] = val);
+  matrixB.flat().forEach((val, index) => memory[bOffset + index] = val);
 
-  const wasmExports = await loadWasmModule(wasmFilePath);
+  wasmInstance.exports.multiplyMatrices(rows, cols, common, aOffset, bOffset, resultOffset);
 
-  const flatMatrixA = matrixA.flat();
-  const flatMatrixB = matrixB.flat();
-
-  const resultPointer = wasmExports.matrixMultiply(
-    flatMatrixA,
-    rowsA,
-    colsA,
-    flatMatrixB,
-    rowsB,
-    colsB
-  );
-
-  const resultArray = new Float32Array(
-    wasmExports.memory.buffer,
-    resultPointer,
-    rowsA * colsB
-  );
-
-  const resultMatrix = [];
-  for (let i = 0; i < rowsA; i++) {
-    resultMatrix.push(resultArray.slice(i * colsB, (i + 1) * colsB));
-  }
-
-  return resultMatrix;
-}
-
-// Generic utility for validating matrix dimensions
-export function validateMatrix(matrix) {
-  if (!Array.isArray(matrix) || matrix.length === 0) {
-    throw new Error('Matrix must be a non-empty 2D array.');
-  }
-  const rowLength = matrix[0].length;
-  for (const row of matrix) {
-    if (!Array.isArray(row) || row.length !== rowLength) {
-      throw new Error('All rows in the matrix must have the same length.');
-    }
-  }
-}
-
-// Example utility for creating a random matrix
-export function generateRandomMatrix(rows, cols, min = 0, max = 1) {
-  if (rows <= 0 || cols <= 0) {
-    throw new Error('Rows and columns must be positive integers.');
-  }
-  const matrix = [];
+  // Retrieve result matrix
+  const result = [];
   for (let i = 0; i < rows; i++) {
-    const row = [];
-    for (let j = 0; j < cols; j++) {
-      row.push(Math.random() * (max - min) + min);
-    }
-    matrix.push(row);
+    result.push(memory.slice(resultOffset + i * cols, resultOffset + (i + 1) * cols));
   }
-  return matrix;
+
+  return result;
 }
 
-// Example utility for matrix transposition
-export function transposeMatrix(matrix) {
-  validateMatrix(matrix);
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-  const transposed = [];
-  for (let i = 0; i < cols; i++) {
-    const row = [];
-    for (let j = 0; j < rows; j++) {
-      row.push(matrix[j][i]);
-    }
-    transposed.push(row);
-  }
-  return transposed;
+export async function initialize() {
+  await initializeWasm();
 }
+
+export function matrixMultiply(rows, cols, common, matrixA, matrixB) {
+  return multiplyMatrices(rows, cols, common, matrixA, matrixB);
+}
+
+export const wasmMatrixEngine = {
+  initialize,
+  matrixMultiply
+};
