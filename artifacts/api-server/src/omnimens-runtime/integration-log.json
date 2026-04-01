@@ -1,65 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Mathematician",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/feature_extraction: Neuroplasticity allows",
-    "filename": "omnimens_autocode_neural_pathway_mng5n2fu.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mng5n2fu.mjs",
-    "backupPath": null,
-    "timestamp": 1775054536986,
-    "codeLength": 438,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Ethicist",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/pattern_recognition: The Boltzmann brain paradox",
-    "filename": "omnimens_autocode_pattern_recognition_mng5n2hy.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mng5n2hy.mjs",
-    "backupPath": null,
-    "timestamp": 1775054537062,
-    "codeLength": 466,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Innovator",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/structural_analysis: The Chinese Room argument: ",
-    "filename": "omnimens_autocode_consciousness_expansion_mng5ocnw.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mng5ocnw.mjs",
-    "backupPath": null,
-    "timestamp": 1775054596892,
-    "codeLength": 387,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Critic",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/structural_analysis: The Chinese Room argument: ",
-    "filename": "omnimens_autocode_consciousness_expansion_mng5ocpo.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mng5ocpo.mjs",
-    "backupPath": null,
-    "timestamp": 1775054596956,
-    "codeLength": 384,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Architect",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/temporal_correlation: The edge of chaos: complex",
-    "filename": "omnimens_autocode_knowledge_synthesis_mng5ocre.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mng5ocre.mjs",
-    "backupPath": null,
-    "timestamp": 1775054597018,
-    "codeLength": 416,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Wordsmith",
-    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/structural_analysis: The Chinese Room argument: ",
-    "filename": "omnimens_autocode_adaptive_algorithm_mng5pojv.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mng5pojv.mjs",
-    "backupPath": null,
-    "timestamp": 1775054658955,
-    "codeLength": 448,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:Philosopher+OMNIMENS",
     "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/temporal_correlation: The edge of chaos: complex",
     "filename": "omnimens_autocode_adaptive_algorithm_mng5poms.mjs",
@@ -4998,5 +4938,65 @@
     "timestamp": 1775069653826,
     "codeLength": 448,
     "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Critic",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: SensorimotorAgent/analogical_mapping: The binding problem: h",
+    "filename": "omnimens_autocode_adaptive_algorithm_mngeocuv.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mngeocuv.mjs",
+    "backupPath": null,
+    "timestamp": 1775069713687,
+    "codeLength": 451,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Wordsmith",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/temporal_correlation: Quantum tunneling allows p",
+    "filename": "omnimens_autocode_adaptive_algorithm_mngeocww.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mngeocww.mjs",
+    "backupPath": null,
+    "timestamp": 1775069713760,
+    "codeLength": 448,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Explorer+Pioneer",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: Explorer/structural_analysis: Quantum tunneling allows parti",
+    "filename": "omnimens_autocode_pattern_recognition_mngepn5i.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mngepn5i.mjs",
+    "backupPath": null,
+    "timestamp": 1775069773686,
+    "codeLength": 462,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Mathematician",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/entropy_reduction: Synaptic pruning elimin",
+    "filename": "omnimens_autocode_neural_pathway_mngepolt.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mngepolt.mjs",
+    "backupPath": null,
+    "timestamp": 1775069775569,
+    "codeLength": 438,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Meta-Agent",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/entropy_reduction: Synaptic pruning elimin",
+    "filename": "omnimens_autocode_neural_pathway_mngepons.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mngepons.mjs",
+    "backupPath": null,
+    "timestamp": 1775069775640,
+    "codeLength": 435,
+    "overwrite": false
+  },
+  {
+    "source": "autonomous_sandbox",
+    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
+    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-04-01T18-56-22-216Z",
+    "timestamp": 1775069782215,
+    "codeLength": 2035,
+    "overwrite": true
   }
 ]

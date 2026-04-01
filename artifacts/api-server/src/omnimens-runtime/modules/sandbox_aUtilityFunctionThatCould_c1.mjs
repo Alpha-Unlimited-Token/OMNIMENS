@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-04-01T18:18:31.511Z
+ * Written: 2026-04-01T18:56:22.215Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,80 +16,68 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility function: Extract unique words from a text, count their occurrences, and sort by frequency
-function analyzeTextFrequency(text) {
-    if (typeof text !== 'string') {
-        throw new TypeError('Input must be a string');
+// Utility function to calculate the cosine similarity between two vectors
+function cosineSimilarity(vecA, vecB) {
+    if (vecA.length !== vecB.length) {
+        throw new Error("Vectors must be of the same length");
     }
 
-    // Normalize text: remove punctuation, convert to lowercase, and split into words
-    const words = text
-        .replace(/[^\w\s]|_/g, '')
-        .toLowerCase()
-        .split(/\s+/)
-        .filter(Boolean);
+    let dotProduct = 0;
+    let magnitudeA = 0;
+    let magnitudeB = 0;
 
-    // Count word occurrences
-    const wordCount = {};
-    for (const word of words) {
-        wordCount[word] = (wordCount[word] || 0) + 1;
+    for (let i = 0; i < vecA.length; i++) {
+        dotProduct += vecA[i] * vecB[i];
+        magnitudeA += vecA[i] ** 2;
+        magnitudeB += vecB[i] ** 2;
     }
 
-    // Convert to array and sort by frequency (descending) and then alphabetically
-    const sortedWords = Object.entries(wordCount)
-        .sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
+    if (magnitudeA === 0 || magnitudeB === 0) {
+        throw new Error("Magnitude of one or both vectors is zero");
+    }
 
-    // Return the sorted array of words with their frequencies
-    return sortedWords;
+    return dotProduct / (Math.sqrt(magnitudeA) * Math.sqrt(magnitudeB));
 }
 
 // Test cases
-console.log('--- Test Cases ---');
-
-// Test 1: Basic functionality
-const text1 = "The quick brown fox jumps over the lazy dog. The fox is quick.";
-const result1 = analyzeTextFrequency(text1);
-console.log(result1);
-console.assert(
-    JSON.stringify(result1) === JSON.stringify([
-        ['the', 3], ['quick', 2], ['fox', 2], ['brown', 1], ['jumps', 1], ['over', 1], ['lazy', 1], ['dog', 1], ['is', 1]
-    ]),
-    'Test 1 failed'
-);
-
-// Test 2: Empty string
-const text2 = "";
-const result2 = analyzeTextFrequency(text2);
-console.log(result2);
-console.assert(
-    JSON.stringify(result2) === JSON.stringify([]),
-    'Test 2 failed'
-);
-
-// Test 3: Case insensitivity and punctuation handling
-const text3 = "Hello, hello! HELLO? World... world.";
-const result3 = analyzeTextFrequency(text3);
-console.log(result3);
-console.assert(
-    JSON.stringify(result3) === JSON.stringify([['hello', 3], ['world', 2]]),
-    'Test 3 failed'
-);
-
-// Test 4: Numbers and special characters
-const text4 = "123 123! #hashtag #hashtag.";
-const result4 = analyzeTextFrequency(text4);
-console.log(result4);
-console.assert(
-    JSON.stringify(result4) === JSON.stringify([['123', 2], ['hashtag', 2]]),
-    'Test 4 failed'
-);
-
-// Test 5: Non-string input
 try {
-    analyzeTextFrequency(12345);
-    console.assert(false, 'Test 5 failed: Did not throw error for non-string input');
-} catch (e) {
-    console.assert(e instanceof TypeError, 'Test 5 failed: Incorrect error type');
-}
+    // Test 1: Perfect similarity
+    let vec1 = [1, 2, 3];
+    let vec2 = [1, 2, 3];
+    console.assert(cosineSimilarity(vec1, vec2) === 1, "Test 1 Failed");
 
-console.log('All tests completed.');
+    // Test 2: Orthogonal vectors
+    vec1 = [1, 0];
+    vec2 = [0, 1];
+    console.assert(cosineSimilarity(vec1, vec2) === 0, "Test 2 Failed");
+
+    // Test 3: General case
+    vec1 = [1, 2, 3];
+    vec2 = [4, 5, 6];
+    const expected = (1 * 4 + 2 * 5 + 3 * 6) / (Math.sqrt(1 ** 2 + 2 ** 2 + 3 ** 2) * Math.sqrt(4 ** 2 + 5 ** 2 + 6 ** 2));
+    console.assert(Math.abs(cosineSimilarity(vec1, vec2) - expected) < 1e-10, "Test 3 Failed");
+
+    // Test 4: Zero vector
+    try {
+        vec1 = [0, 0, 0];
+        vec2 = [1, 2, 3];
+        cosineSimilarity(vec1, vec2);
+        console.assert(false, "Test 4 Failed - Exception not thrown for zero vector");
+    } catch (e) {
+        console.log("Test 4 Passed - Exception thrown for zero vector");
+    }
+
+    // Test 5: Unequal lengths
+    try {
+        vec1 = [1, 2];
+        vec2 = [1, 2, 3];
+        cosineSimilarity(vec1, vec2);
+        console.assert(false, "Test 5 Failed - Exception not thrown for unequal vector lengths");
+    } catch (e) {
+        console.log("Test 5 Passed - Exception thrown for unequal vector lengths");
+    }
+
+    console.log("All tests completed");
+} catch (e) {
+    console.error("Error during tests:", e.message);
+}
