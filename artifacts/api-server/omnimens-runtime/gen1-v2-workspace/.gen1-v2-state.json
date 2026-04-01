@@ -2,7 +2,7 @@
   "state": {
     "buildVersion": "2.0",
     "generation": 1,
-    "phase": "engine_consolidation",
+    "phase": "complete",
     "cycleCount": 0,
     "lastCycleTime": 1775076239775,
     "engineFilesTotal": 29,
@@ -6469,7 +6469,7 @@
     ],
     "consolidationComplete": false,
     "startedAt": 1775044041970,
-    "completedAt": null,
+    "completedAt": 1775084308864,
     "lastAutosave": 1775076711882,
     "autosaveCount": 244,
     "recentActivity": [
@@ -7473,6 +7473,7 @@
         "file": "omnimens-code-forge.ts",
         "timestamp": 1775076711880
       }
-    ]
+    ],
+    "reason": "Superseded by fresh Gen 1 evolution restart in NextGen sandbox"
   }
 }

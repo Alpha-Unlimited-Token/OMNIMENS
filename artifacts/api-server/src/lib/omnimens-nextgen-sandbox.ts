@@ -1554,13 +1554,16 @@ async function _runEvolutionCycleInner(): Promise<void> {
   const workType = chooseWorkForResources();
   const statusLine = getResourceStatusSummary();
 
-  if (workType === "local_only") {
+  const localPhases = ["architecture_scan"];
+  const isLocalPhase = localPhases.includes(state.phase);
+
+  if (workType === "local_only" && !isLocalPhase) {
     console.log(`[NEXTGEN] ⏸️ Resources: ${statusLine} — switching to offline study (no DB or API available)`);
     doOfflineWork();
     return;
   }
 
-  if (workType === "db_only") {
+  if (workType === "db_only" && !isLocalPhase) {
     console.log(`[NEXTGEN] 📊 Resources: ${statusLine} — API cooling down, doing DB-safe work + offline study`);
     doOfflineWork();
     return;

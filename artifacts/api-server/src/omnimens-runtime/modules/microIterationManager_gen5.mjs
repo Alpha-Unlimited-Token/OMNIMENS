@@ -78,9 +78,10 @@ export function exampleTaskFunction(state) {
  * @param {Object} state - The current state of the task.
  * @returns {Promise<void>} - Resolves when checkpoint handling is complete.
  */
+let _microCkpt5 = 0;
 export async function exampleCheckpointCallback(state) {
-  console.log('Checkpoint reached:', state);
-  // Simulate async checkpoint handling (e.g., saving state to a database).
+  _microCkpt5++;
+  if (_microCkpt5 % 1000 === 0) console.log('Checkpoint reached:', _microCkpt5);
   return new Promise(resolve => setTimeout(resolve, 10));
 }
 

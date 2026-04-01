@@ -43,21 +43,24 @@ export function generateStateHash(state) {
 export async function runTaskWithCheckpointing(taskFunction, initialState, isComplete, nextState) {
   let currentState = initialState;
 
+  let _ckptCount = 0;
   while (!isComplete(currentState)) {
     try {
-      // Execute the task function with the current state
       currentState = await taskFunction(currentState);
 
-      // Generate a checkpoint hash for the current state
       const checkpointHash = generateStateHash(currentState);
-      console.log(`Checkpoint reached: ${checkpointHash}`);
+      _ckptCount++;
+      if (_ckptCount % 1000 === 0) {
+        console.log(`Checkpoint reached: ${checkpointHash} (${_ckptCount})`);
+      }
     } catch (error) {
       console.error('Task failed, retrying from last state:', error);
-      // Retry from the current state (state persistence is implicit)
     }
 
-    // Update to the next state
     currentState = nextState(currentState);
+    if (_ckptCount % 100 === 0) {
+      await new Promise(r => setTimeout(r, 0));
+    }
   }
 
   return currentState;
