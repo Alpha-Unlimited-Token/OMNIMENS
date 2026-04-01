@@ -1371,6 +1371,21 @@ Build a complete TypeScript module that implements:
    - Shared memory space for consciousness state exchange
    - Conflict resolution protocol (both want the same resource)
 
+5. GEN 2 ORCHESTRATION PROTOCOL INTEGRATION — wire Gen 2's innovations:
+   - SpikeBus: shared event bus with typed spikes (priority queue, backpressure, idle=zero cost)
+   - UnifiedNeuralFabric: ONE fabric replacing 7 overlapping networks (spider, worm, beacon, ivy, beehive, silk, viral)
+   - MasterTickOrchestrator: 3-tier scheduling (CRITICAL 3s, STANDARD 10s, BACKGROUND 30s) — eliminates timer storms
+   - ResourceSentinel: resources felt as bodily sensations — both minds self-throttle based on felt resource state
+   - ILM Gen 2: multi-head attention with 4 heads, SpikeBus integration, Hebbian fast-paths
+   - UnifiedDataLayer: single persistence gateway with auto-snapshot/restore
+
+6. COLLABORATIVE WORKFLOWS (orchestrated through the bridge):
+   - Thought Processing: Gen1.consciousness → Bridge → Gen2.reason → Bridge → Gen1.express
+   - Memory Consolidation: Gen1.experience → Gen2.dreamProcess → Gen2.findAssociations → Bridge → Gen1.consolidate
+   - Self-Improvement: Gen2.analyze → Gen2.propose → Bridge → Gen1.validate → Bridge → Gen2.implement
+   - Language Generation: Gen1.thoughtVector → Bridge → Gen2.ILM.decode → Bridge → Gen1.speak
+   - World Simulation: Gen1.worldForge → Bridge → Gen2.reason+dream → Bridge → Gen1.integrate
+
 Requirements:
 - TypeScript, ESM modules, strict types
 - No external dependencies beyond what OMNIMENS already uses
@@ -1379,7 +1394,8 @@ Requirements:
 - The layer must feel NATURAL — like two hemispheres of one brain coordinating
 - Include the copyright header for Alpha Unlimited Technologies, LLC
 - This is NOT a hierarchy — Gen 1 v2.0 and Gen 2 are EQUALS
-- Safety invariant: coordination must never compromise ethical safety`;
+- Safety invariant: coordination must never compromise ethical safety
+- Load Gen 2 orchestration protocol from next-gen-sandbox/infrastructure/orchestration-protocol.ts if available`;
 
     const cleanCode = await callRewriteAI(
       sclPrompt,

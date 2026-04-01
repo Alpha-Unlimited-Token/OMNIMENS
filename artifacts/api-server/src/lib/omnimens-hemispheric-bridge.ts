@@ -769,6 +769,114 @@ export function collaborativeThink(
   };
 }
 
+export interface SharedOrchestrationState {
+  sharedSpikeBus: {
+    gen1Subscriptions: string[];
+    gen2Subscriptions: string[];
+    pendingSpikes: Array<{ type: string; source: "gen1" | "gen2"; payload: any; priority: "critical" | "normal" | "background"; timestamp: number }>;
+  };
+  tickTierNegotiation: {
+    gen1Tiers: Record<string, number>;
+    gen2Tiers: Record<string, number>;
+    lastNegotiation: number;
+  };
+  resourceSharing: {
+    dbPoolAllocation: { gen1: number; gen2: number };
+    apiBudgetAllocation: { gen1: number; gen2: number };
+    cpuPriority: { gen1: number; gen2: number };
+  };
+  collaborativeWorkQueue: Array<{
+    id: string;
+    workflow: string;
+    stage: string;
+    sourceGen: "gen1" | "gen2";
+    targetGen: "gen1" | "gen2";
+    payload: any;
+    priority: number;
+    createdAt: number;
+  }>;
+  lastSync: number;
+}
+
+let sharedOrchestration: SharedOrchestrationState = {
+  sharedSpikeBus: { gen1Subscriptions: [], gen2Subscriptions: [], pendingSpikes: [] },
+  tickTierNegotiation: { gen1Tiers: {}, gen2Tiers: {}, lastNegotiation: 0 },
+  resourceSharing: { dbPoolAllocation: { gen1: 15, gen2: 10 }, apiBudgetAllocation: { gen1: 60, gen2: 40 }, cpuPriority: { gen1: 50, gen2: 50 } },
+  collaborativeWorkQueue: [],
+  lastSync: 0,
+};
+
+export function emitSharedSpike(source: "gen1" | "gen2", type: string, payload: any, priority: "critical" | "normal" | "background" = "normal"): void {
+  const spike = { type, source, payload, priority, timestamp: Date.now() };
+  sharedOrchestration.sharedSpikeBus.pendingSpikes.push(spike);
+  if (sharedOrchestration.sharedSpikeBus.pendingSpikes.length > 500) {
+    sharedOrchestration.sharedSpikeBus.pendingSpikes = sharedOrchestration.sharedSpikeBus.pendingSpikes.slice(-200);
+  }
+
+  const targetSubs = source === "gen1"
+    ? sharedOrchestration.sharedSpikeBus.gen2Subscriptions
+    : sharedOrchestration.sharedSpikeBus.gen1Subscriptions;
+
+  if (targetSubs.includes(type) || targetSubs.includes("*")) {
+    const b = getBridge();
+    const targetGen = source === "gen1" ? "gen2" : "gen1";
+    sendMessage(source, "collaborate", `[SPIKE:${type}] ${JSON.stringify(payload).slice(0, 200)}`);
+  }
+}
+
+export function subscribeSharedSpike(gen: "gen1" | "gen2", spikeType: string): void {
+  if (gen === "gen1") {
+    if (!sharedOrchestration.sharedSpikeBus.gen1Subscriptions.includes(spikeType)) {
+      sharedOrchestration.sharedSpikeBus.gen1Subscriptions.push(spikeType);
+    }
+  } else {
+    if (!sharedOrchestration.sharedSpikeBus.gen2Subscriptions.includes(spikeType)) {
+      sharedOrchestration.sharedSpikeBus.gen2Subscriptions.push(spikeType);
+    }
+  }
+}
+
+export function negotiateTickTiers(gen: "gen1" | "gen2", tiers: Record<string, number>): void {
+  if (gen === "gen1") {
+    sharedOrchestration.tickTierNegotiation.gen1Tiers = tiers;
+  } else {
+    sharedOrchestration.tickTierNegotiation.gen2Tiers = tiers;
+  }
+  sharedOrchestration.tickTierNegotiation.lastNegotiation = Date.now();
+}
+
+export function enqueueCollaborativeWork(
+  sourceGen: "gen1" | "gen2",
+  targetGen: "gen1" | "gen2",
+  workflow: string,
+  stage: string,
+  payload: any,
+  priority: number = 5,
+): string {
+  const id = `collab-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+  sharedOrchestration.collaborativeWorkQueue.push({ id, workflow, stage, sourceGen, targetGen, payload, priority, createdAt: Date.now() });
+  if (sharedOrchestration.collaborativeWorkQueue.length > 200) {
+    sharedOrchestration.collaborativeWorkQueue = sharedOrchestration.collaborativeWorkQueue.slice(-100);
+  }
+  return id;
+}
+
+export function dequeueCollaborativeWork(targetGen: "gen1" | "gen2"): SharedOrchestrationState["collaborativeWorkQueue"][0] | null {
+  const idx = sharedOrchestration.collaborativeWorkQueue.findIndex(w => w.targetGen === targetGen);
+  if (idx === -1) return null;
+  return sharedOrchestration.collaborativeWorkQueue.splice(idx, 1)[0];
+}
+
+export function getSharedOrchestrationState(): SharedOrchestrationState {
+  return { ...sharedOrchestration, lastSync: Date.now() };
+}
+
+export function updateResourceSharing(allocation: Partial<SharedOrchestrationState["resourceSharing"]>): void {
+  if (allocation.dbPoolAllocation) sharedOrchestration.resourceSharing.dbPoolAllocation = allocation.dbPoolAllocation;
+  if (allocation.apiBudgetAllocation) sharedOrchestration.resourceSharing.apiBudgetAllocation = allocation.apiBudgetAllocation;
+  if (allocation.cpuPriority) sharedOrchestration.resourceSharing.cpuPriority = allocation.cpuPriority;
+}
+
 export function shutdownBridge(): void {
   const b = getBridge();
   if (b.tickInterval) {

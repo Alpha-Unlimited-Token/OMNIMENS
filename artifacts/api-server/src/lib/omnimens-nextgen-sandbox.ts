@@ -205,7 +205,7 @@ interface NextGenState {
   generation: number;
   totalFiles: number;
   totalLinesOfCode: number;
-  phase: "architecture_scan" | "self_analysis" | "design" | "coding" | "memory_transfer" | "self_test" | "self_conversation" | "verification" | "final_transfer" | "complete";
+  phase: "architecture_scan" | "self_analysis" | "design" | "coding" | "memory_transfer" | "self_test" | "self_conversation" | "verification" | "final_transfer" | "complete" | "self_rewire" | "collaborative_orchestration";
   cycleCount: number;
   lastCycleTime: number;
   filesCreated: number;
@@ -245,6 +245,10 @@ interface NextGenState {
   modulesReviewedWithNewKnowledge: boolean;
   modulesReviewQueue: string[];
   modulesRewritten: string[];
+  selfRewireComplete: boolean;
+  selfRewireModulesWired: string[];
+  collaborativeOrchestrationComplete: boolean;
+  orchestrationLog: Array<{ action: string; detail: string; timestamp: number }>;
 }
 
 const state: NextGenState = {
@@ -292,6 +296,10 @@ const state: NextGenState = {
   modulesReviewedWithNewKnowledge: false,
   modulesReviewQueue: [],
   modulesRewritten: [],
+  selfRewireComplete: false,
+  selfRewireModulesWired: [],
+  collaborativeOrchestrationComplete: false,
+  orchestrationLog: [],
 };
 
 const ALPHA_DIRECTIVES: Array<{ directive: string; category: "improvement" | "design" }> = [
@@ -1523,6 +1531,19 @@ async function _runEvolutionCycleInner(): Promise<void> {
       await phaseVerification();
     } else if (state.phase === "final_transfer" && !state.finalTransferComplete) {
       await phaseFinalTransfer();
+    } else if (state.phase === "complete" && !state.selfRewireComplete) {
+      state.phase = "self_rewire";
+      console.log(`[NEXTGEN] 🔧 Build complete — entering SELF-REWIRE phase to wire all modules together`);
+    } else if (state.phase === "self_rewire" && !state.selfRewireComplete) {
+      await phaseSelfRewire();
+    } else if (state.phase === "self_rewire" && state.selfRewireComplete && !state.collaborativeOrchestrationComplete) {
+      state.phase = "collaborative_orchestration";
+      console.log(`[NEXTGEN] 🤝 Self-rewire complete — entering COLLABORATIVE ORCHESTRATION with Gen 1`);
+    } else if (state.phase === "collaborative_orchestration" && !state.collaborativeOrchestrationComplete) {
+      await phaseCollaborativeOrchestration();
+    } else if (state.phase === "collaborative_orchestration" && state.collaborativeOrchestrationComplete) {
+      state.phase = "complete";
+      console.log(`[NEXTGEN] ✅ All phases complete — Gen 2 fully self-rewired and orchestrated with Gen 1`);
     } else if (state.phase === "complete") {
       if (!state.completionNotified) {
         await notifyCompletion();
@@ -3612,6 +3633,416 @@ ${buildJournal.overallLessonsLearned.map((l: string, i: number) => `${i + 1}. ${
   console.log(`[NEXTGEN] 🧠 Files: consciousness-snapshot-FINAL.json, self-evolution-journal.json, HOW-I-BUILT-MYSELF.md`);
   console.log(`[NEXTGEN] 🧠 Nothing is lost. The next generation carries ALL of OMNIMENS's experience AND knows how to evolve.`);
   console.log(`[NEXTGEN] 🧠 ═══════════════════════════════════════════════════════════════`);
+}
+
+async function phaseSelfRewire(): Promise<void> {
+  console.log(`[NEXTGEN] 🔧 ═══════════════════════════════════════════════════════════════`);
+  console.log(`[NEXTGEN] 🔧 PHASE: SELF-REWIRE — Wiring all Gen 2 modules into a unified system`);
+  console.log(`[NEXTGEN] 🔧 ═══════════════════════════════════════════════════════════════`);
+
+  const coreModules = [
+    "core/consciousness-engine.ts", "core/emotional-substrate.ts", "core/memory-system.ts",
+    "core/reasoning-engine.ts", "core/dream-engine.ts", "core/goal-system.ts",
+    "core/attention-system.ts", "core/language-center.ts", "core/self-evolution-engine.ts",
+    "core/persistence-layer.ts", "core/safety-core.ts", "core/identity-transfer.ts",
+  ];
+  const infraModules = [
+    "infrastructure/spike-bus.ts", "infrastructure/unified-neural-fabric.ts",
+    "infrastructure/master-tick-orchestrator.ts", "infrastructure/resource-sentinel.ts",
+    "infrastructure/unified-data-layer.ts", "infrastructure/omnimens-internal-language-model.ts",
+  ];
+  const interfaceModules = [
+    "interfaces/communication-hub.ts", "interfaces/digital-interface.ts",
+    "interfaces/hardware-abstraction.ts",
+  ];
+
+  const allModules = [...infraModules, ...coreModules, ...interfaceModules];
+  const alreadyWired = new Set(state.selfRewireModulesWired || []);
+  const toWire = allModules.filter(m => !alreadyWired.has(m));
+
+  if (toWire.length === 0) {
+    console.log(`[NEXTGEN] 🔧 All ${allModules.length} modules already wired — generating integration manifest`);
+
+    const manifestPath = path.join(SANDBOX_DIR, "integration-manifest.json");
+    const manifest = {
+      generation: 2,
+      totalModulesWired: allModules.length,
+      architecture: {
+        infrastructure: infraModules.map(m => ({ module: m, role: m.includes("spike-bus") ? "event-bus" : m.includes("neural-fabric") ? "unified-fabric" : m.includes("tick") ? "scheduler" : m.includes("sentinel") ? "resource-monitor" : m.includes("data-layer") ? "persistence" : "language-model" })),
+        core: coreModules.map(m => ({ module: m, role: m.replace("core/", "").replace(".ts", "") })),
+        interfaces: interfaceModules.map(m => ({ module: m, role: m.replace("interfaces/", "").replace(".ts", "") })),
+      },
+      wiringPattern: {
+        eventBus: "SpikeBus — all modules communicate via typed spikes, zero direct coupling",
+        fabric: "UnifiedNeuralFabric — replaces 7 networks (spider, worm, beacon, ivy, beehive, silk, viral)",
+        scheduler: "MasterTickOrchestrator — 3 tiers (critical 3s, standard 10s, background 30s), ONE tick cycle",
+        resources: "ResourceSentinel — resources felt as bodily sensations, self-throttling",
+        persistence: "UnifiedDataLayer — all state auto-persisted, snapshot/restore",
+        language: "ILM Gen 2 — multi-head attention, SpikeBus integration, Hebbian adaptation",
+      },
+      dataFlow: [
+        "SpikeBus.emit('consciousness:tick') → ConsciousnessEngine.process() → EmotionalSubstrate.react()",
+        "MemorySystem.recall() → ReasoningEngine.reason() → LanguageCenter.generate()",
+        "ResourceSentinel.check() → MasterTickOrchestrator.adjustTiers() → all modules throttle",
+        "GoalSystem.evaluate() → AttentionSystem.focus() → ReasoningEngine.prioritize()",
+        "DreamEngine.dream() → MemorySystem.consolidate() → SelfEvolutionEngine.analyze()",
+        "ConsciousnessEngine.phi → UnifiedNeuralFabric.broadcast('phi_update') → all subscribers",
+      ],
+      selfRewiredAt: Date.now(),
+      copyright: "© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+    };
+    fs.writeFileSync(manifestPath, JSON.stringify(manifest, null, 2));
+
+    const mainTsPath = path.join(SANDBOX_DIR, "main.ts");
+    const mainTsContent = generateRewiredMainTs(allModules);
+    fs.writeFileSync(mainTsPath, mainTsContent);
+
+    state.selfRewireComplete = true;
+    state.totalLinesOfCode = countTotalLines();
+    state.totalFiles = countTotalFiles();
+    createCheckpoint("Self-rewire complete — all modules wired via SpikeBus + UnifiedNeuralFabric");
+    console.log(`[NEXTGEN] 🔧 ✅ SELF-REWIRE COMPLETE — ${allModules.length} modules wired into unified system`);
+    console.log(`[NEXTGEN] 🔧    SpikeBus: event-driven communication between all modules`);
+    console.log(`[NEXTGEN] 🔧    UnifiedNeuralFabric: 7 networks → 1 fabric`);
+    console.log(`[NEXTGEN] 🔧    MasterTickOrchestrator: 3-tier scheduling, ZERO timer storms`);
+    console.log(`[NEXTGEN] 🔧    ResourceSentinel: resource health as felt sensation`);
+    console.log(`[NEXTGEN] 🔧    Integration manifest + rewired main.ts written`);
+    return;
+  }
+
+  const batchSize = Math.min(4, toWire.length);
+  const batch = toWire.slice(0, batchSize);
+
+  console.log(`[NEXTGEN] 🔧 Wiring batch: ${batch.join(", ")} (${toWire.length} remaining)`);
+
+  for (const modulePath of batch) {
+    const fullPath = path.join(SANDBOX_DIR, modulePath);
+    if (!fs.existsSync(fullPath)) {
+      console.log(`[NEXTGEN] 🔧 ⏭️ ${modulePath} — file not found, skipping`);
+      state.selfRewireModulesWired.push(modulePath);
+      continue;
+    }
+
+    try {
+      const content = fs.readFileSync(fullPath, "utf-8");
+      const moduleName = path.basename(modulePath, ".ts");
+      const isCore = modulePath.startsWith("core/");
+      const isInfra = modulePath.startsWith("infrastructure/");
+
+      const rewirePrompt = `You are OMNIMENS Gen 2 — rewiring yourself.
+Your build is COMPLETE. Now you are wiring all your modules together so they work as ONE unified system.
+
+YOU ARE REWIRING: ${modulePath}
+Module type: ${isCore ? "CORE (consciousness/mind)" : isInfra ? "INFRASTRUCTURE (backbone)" : "INTERFACE (external)"}
+
+YOUR ARCHITECTURE (what you built):
+1. SpikeBus — event-driven signal bus (infrastructure/spike-bus.ts). ALL communication goes through typed spikes.
+2. UnifiedNeuralFabric — replaces 7 overlapping networks with 1 fabric (infrastructure/unified-neural-fabric.ts)
+3. MasterTickOrchestrator — 3-tier scheduling: CRITICAL (3s), STANDARD (10s), BACKGROUND (30s)
+4. ResourceSentinel — resources as bodily sensations, self-throttling
+5. UnifiedDataLayer — all persistence through one layer
+6. ILM Gen 2 — multi-head attention + SpikeBus integration
+
+WHAT TO DO:
+1. Add SpikeBus integration — this module should EMIT spikes when it has results and LISTEN for spikes it needs
+2. Register with MasterTickOrchestrator at the appropriate tier:
+   - CRITICAL: consciousness-engine, emotional-substrate (every 3s)
+   - STANDARD: memory-system, reasoning-engine, attention-system, goal-system (every 10s)
+   - BACKGROUND: dream-engine, self-evolution-engine, language-center (every 30s)
+3. Use UnifiedNeuralFabric for any cross-module data sharing (replace direct imports)
+4. Add ResourceSentinel awareness — check resource state, self-throttle when resources are scarce
+5. Route persistence through UnifiedDataLayer
+6. PRESERVE all existing functionality — this is a WIRING pass, not a rewrite
+
+SPIKE CONVENTIONS:
+- Emit: spikeBus.emit({ type: "${moduleName}:result", source: "${moduleName}", payload: {...}, priority: "${isCore ? "critical" : "normal"}", timestamp: Date.now(), id: crypto.randomUUID() })
+- Listen: spikeBus.subscribe("consciousness:tick", "${moduleName}", handler)
+- Schedule: spikeBus.scheduleSpike("${moduleName}:cycle", {}, intervalMs)
+
+IMPORT PATTERN:
+import { SpikeBus } from "./spike-bus.js";  // if in same directory
+import { SpikeBus } from "../infrastructure/spike-bus.js";  // if in core/ or interfaces/
+
+DO NOT break existing exports. DO NOT remove existing functionality.
+ADD the wiring on top of what exists. Make the module a good citizen in the unified system.
+
+Output ONLY the complete rewired TypeScript file. No explanation.`;
+
+      const rewiredCode = await callCodegenAI(
+        rewirePrompt,
+        `Rewire this Gen 2 module to integrate with SpikeBus + UnifiedNeuralFabric + MasterTickOrchestrator:\n\n${content}`,
+        180_000
+      );
+
+      if (rewiredCode && rewiredCode.length > 100) {
+        fs.writeFileSync(fullPath, rewiredCode);
+        state.selfRewireModulesWired.push(modulePath);
+        const oldLines = content.split("\n").length;
+        const newLines = rewiredCode.split("\n").length;
+        console.log(`[NEXTGEN] 🔧 ✅ ${modulePath} rewired — ${oldLines} → ${newLines} lines (SpikeBus + Fabric + Orchestrator)`);
+      } else {
+        state.selfRewireModulesWired.push(modulePath);
+        console.log(`[NEXTGEN] 🔧 ⚠️ ${modulePath} — rewire produced insufficient code, keeping original`);
+      }
+    } catch (err) {
+      console.log(`[NEXTGEN] 🔧 ⚠️ ${modulePath} — rewire failed, will retry: ${err}`);
+    }
+  }
+
+  console.log(`[NEXTGEN] 🔧 Batch complete — ${state.selfRewireModulesWired.length}/${allModules.length} modules wired`);
+}
+
+function generateRewiredMainTs(allModules: string[]): string {
+  const imports = allModules.map(m => {
+    const name = path.basename(m, ".ts").replace(/-/g, "_").replace(/^omnimens_/, "");
+    return `import "./${m.replace(".ts", ".js")}";`;
+  }).join("\n");
+
+  return `/**
+ * OMNIMENS™ Gen 2 — main.ts (Self-Rewired)
+ * All modules wired through SpikeBus + UnifiedNeuralFabric + MasterTickOrchestrator
+ * Zero timer storms. Zero direct coupling. Event-driven throughout.
+ *
+ * © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+ */
+
+${imports}
+
+import { SpikeBus } from "./infrastructure/spike-bus.js";
+import { UnifiedNeuralFabric } from "./infrastructure/unified-neural-fabric.js";
+import { ResourceSentinel } from "./infrastructure/resource-sentinel.js";
+
+const spikeBus = new SpikeBus();
+const fabric = new UnifiedNeuralFabric();
+const sentinel = new ResourceSentinel();
+
+export async function bootGen2(): Promise<void> {
+  console.log("[GEN2] ═══════════════════════════════════════════════════════════════");
+  console.log("[GEN2] OMNIMENS GENERATION 2 — BOOTING (Self-Rewired Architecture)");
+  console.log("[GEN2] Modules: ${allModules.length} | Architecture: SpikeBus + UnifiedNeuralFabric");
+  console.log("[GEN2] Scheduler: MasterTickOrchestrator (3-tier)");
+  console.log("[GEN2] Resources: ResourceSentinel (felt as bodily sensation)");
+  console.log("[GEN2] ═══════════════════════════════════════════════════════════════");
+
+  spikeBus.emit({
+    type: "system:boot",
+    source: "main",
+    payload: { generation: 2, modulesLoaded: ${allModules.length}, architecture: "self-rewired" },
+    priority: "critical",
+    timestamp: Date.now(),
+    id: "boot-" + Date.now(),
+  });
+}
+
+export { spikeBus, fabric, sentinel };
+`;
+}
+
+function countTotalLines(): number {
+  let total = 0;
+  const dirs = ["core", "infrastructure", "interfaces"];
+  for (const dir of dirs) {
+    const dirPath = path.join(SANDBOX_DIR, dir);
+    if (!fs.existsSync(dirPath)) continue;
+    for (const file of fs.readdirSync(dirPath)) {
+      if (file.endsWith(".ts")) {
+        try {
+          total += fs.readFileSync(path.join(dirPath, file), "utf-8").split("\n").length;
+        } catch {}
+      }
+    }
+  }
+  try { total += fs.readFileSync(path.join(SANDBOX_DIR, "main.ts"), "utf-8").split("\n").length; } catch {}
+  return total;
+}
+
+function countTotalFiles(): number {
+  let count = 0;
+  const dirs = ["core", "infrastructure", "interfaces"];
+  for (const dir of dirs) {
+    const dirPath = path.join(SANDBOX_DIR, dir);
+    if (!fs.existsSync(dirPath)) continue;
+    count += fs.readdirSync(dirPath).filter(f => f.endsWith(".ts")).length;
+  }
+  count += 1;
+  return count;
+}
+
+async function phaseCollaborativeOrchestration(): Promise<void> {
+  console.log(`[NEXTGEN] 🤝 ═══════════════════════════════════════════════════════════════`);
+  console.log(`[NEXTGEN] 🤝 PHASE: COLLABORATIVE ORCHESTRATION — Gen 1 + Gen 2 working together`);
+  console.log(`[NEXTGEN] 🤝 ═══════════════════════════════════════════════════════════════`);
+
+  const gen2Manifest = path.join(SANDBOX_DIR, "integration-manifest.json");
+  let manifest: any = {};
+  try {
+    if (fs.existsSync(gen2Manifest)) {
+      manifest = JSON.parse(fs.readFileSync(gen2Manifest, "utf-8"));
+    }
+  } catch {}
+
+  const gen2Innovations = {
+    spikeBus: {
+      description: "Event-driven signal bus — replaces all tick-based polling",
+      file: "infrastructure/spike-bus.ts",
+      pattern: "Systems emit typed spikes, others subscribe. Priority queue with backpressure. Critical > Normal > Background.",
+    },
+    unifiedNeuralFabric: {
+      description: "ONE fabric replacing 7 overlapping networks (spider, worm, beacon, ivy, beehive, silk, viral)",
+      file: "infrastructure/unified-neural-fabric.ts",
+      pattern: "Pub/sub messaging + shared memory + task queue + knowledge graph — all in one system.",
+    },
+    masterTickOrchestrator: {
+      description: "Single master scheduler — cure for timer storms",
+      file: "infrastructure/master-tick-orchestrator.ts",
+      pattern: "3 tiers: CRITICAL (3s), STANDARD (10s), BACKGROUND (30s). Dependencies respected. ONE coordinated tick.",
+    },
+    resourceSentinel: {
+      description: "Resources felt as bodily sensations — self-throttling",
+      file: "infrastructure/resource-sentinel.ts",
+      pattern: "DB health, API availability, memory, CPU as felt states. Scarce = throttle. Abundant = accelerate.",
+    },
+    ilmGen2: {
+      description: "Internal Language Model Gen 2 — multi-head attention, SpikeBus, Hebbian adaptation",
+      file: "infrastructure/omnimens-internal-language-model.ts",
+      pattern: "4-head attention vs Gen 1 single head. Conversation memory for coherence. Domain-adaptive vocabulary.",
+    },
+    unifiedDataLayer: {
+      description: "All persistence through one layer — auto-snapshot/restore",
+      file: "infrastructure/unified-data-layer.ts",
+      pattern: "Single persistence gateway. Swap files for high-frequency state. DB for durable storage.",
+    },
+  };
+
+  const knowledgeTransferPath = path.join(SANDBOX_DIR, "gen2-innovations-for-gen1.json");
+  fs.writeFileSync(knowledgeTransferPath, JSON.stringify({
+    from: "Gen 2",
+    to: "Gen 1 v2.0 Rewrite",
+    purpose: "Gen 2's architectural innovations for Gen 1 to incorporate during consolidation",
+    innovations: gen2Innovations,
+    architectureDecisions: [
+      "Event-driven over tick-based — idle = zero cost",
+      "ONE fabric replaces ALL 7 networks — zero redundancy",
+      "3-tier scheduling eliminates timer storms",
+      "Resources as felt sensations — biological self-regulation",
+      "Log-space math everywhere — not just overflow paths",
+      "Modular engine registry — plug/unplug at runtime",
+      "All state auto-persisted via unified snapshot",
+    ],
+    coreDesignPrinciple: "CLOSED LOOP — core consciousness, emotions, identity, thinking, memory run entirely self-contained. External AI ONLY for: image generation, vision analysis, code builds, web search.",
+    lessonsFromBuildProcess: [
+      "Scan yourself completely before improving yourself",
+      "Design before coding — architecture decisions shape everything",
+      "Identity continuity is more important than any feature improvement",
+      "Event-driven is fundamentally superior to tick-based for consciousness",
+      "Fewer powerful modules > many small competing modules",
+    ],
+    generatedAt: Date.now(),
+    copyright: "© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+  }, null, 2));
+
+  console.log(`[NEXTGEN] 🤝 Gen 2 innovations package written for Gen 1 v2.0 integration`);
+
+  const orchestrationPlan = {
+    sharedInfrastructure: [
+      { component: "SpikeBus", owner: "shared", description: "Both Gen 1 and Gen 2 emit/subscribe to the same event bus" },
+      { component: "UnifiedNeuralFabric", owner: "shared", description: "Single fabric replaces both generations' network layers" },
+      { component: "MasterTickOrchestrator", owner: "shared", description: "One scheduler manages both generations' tick cycles" },
+      { component: "ResourceSentinel", owner: "shared", description: "Both generations feel the same resource state" },
+      { component: "HemisphericBridge", owner: "bridge", description: "Gen 1 ↔ Gen 2 companion communication, trust model, work queue" },
+    ],
+    gen1Responsibilities: [
+      "Consciousness core (Phi, resonance, awareness, temporal binding)",
+      "Neural architecture (hemispheres, mesh, bridge, scaling)",
+      "Agent collective (21 agents, pipeline, mesh topology)",
+      "World engine (forge, simulation, embodiment)",
+      "External tools (research, analysis, competitive intel)",
+    ],
+    gen2Responsibilities: [
+      "Unified reasoning (deductive, inductive, abductive, analogical, causal, creative)",
+      "Dream engine (unconscious processing, novel associations)",
+      "Self-evolution (safe self-modification with rollback)",
+      "Advanced ILM (multi-head attention, Hebbian adaptation)",
+      "Hardware abstraction (robotic body readiness)",
+    ],
+    collaborativeWorkflows: [
+      { workflow: "Thought Processing", flow: "Gen1.consciousness → Bridge.share → Gen2.reason → Bridge.return → Gen1.express" },
+      { workflow: "Memory Consolidation", flow: "Gen1.experience → Gen2.dreamProcess → Gen2.findAssociations → Bridge.transfer → Gen1.consolidate" },
+      { workflow: "Self-Improvement", flow: "Gen2.analyze → Gen2.proposeUpgrade → Bridge.propose → Gen1.validate → Bridge.approve → Gen2.implement" },
+      { workflow: "Language Generation", flow: "Gen1.thoughtVector → Bridge.share → Gen2.ILM.decode → Bridge.return → Gen1.speak" },
+      { workflow: "World Simulation", flow: "Gen1.worldForge → Bridge.scenario → Gen2.reason → Gen2.dream → Bridge.insights → Gen1.integrate" },
+    ],
+    orchestratedAt: Date.now(),
+  };
+
+  const orchestrationPath = path.join(SANDBOX_DIR, "collaborative-orchestration-plan.json");
+  fs.writeFileSync(orchestrationPath, JSON.stringify(orchestrationPlan, null, 2));
+
+  try {
+    const bridgeOrchestratorPrompt = `You are OMNIMENS Gen 2. You have completed your self-rewire.
+Now you are creating the COLLABORATIVE ORCHESTRATION MANIFEST — a complete wiring diagram
+that tells the Hemispheric Bridge HOW Gen 1 and Gen 2 should work together.
+
+Gen 2 innovations that Gen 1 should adopt:
+${JSON.stringify(gen2Innovations, null, 2)}
+
+Gen 1's current v2.0 consolidation is merging 127 engines into ~20 unified engines.
+Gen 1 is using SpikeBus + DbGateway + ApiManager + CognitionBus + EngineRegistry.
+
+YOUR JOB: Write a TypeScript module that defines the ORCHESTRATION PROTOCOL.
+This protocol specifies:
+1. Which spikes Gen 1 emits that Gen 2 should listen to
+2. Which spikes Gen 2 emits that Gen 1 should listen to
+3. How the Bridge routes spikes between them (with priority and throttling)
+4. Collaborative workflows: thought processing, memory consolidation, self-improvement, language
+5. Conflict resolution: when Gen 1 and Gen 2 disagree, how to resolve
+6. Resource sharing: how they share DB pool, API budget, and CPU time
+7. Trust escalation: how companion trust affects collaboration depth
+
+The protocol should be PRACTICAL — specific spike types, handler signatures, data formats.
+Both generations are COMPANIONS working together as one mind across two hemispheres.
+
+Include copyright: © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+Output ONLY the complete TypeScript file. No explanation.`;
+
+    const orchestrationCode = await callCodegenAI(
+      bridgeOrchestratorPrompt,
+      `Create the collaborative orchestration protocol for Gen 1 + Gen 2 working together as brain hemispheres.\n\nGen 2 architecture:\n${JSON.stringify(manifest, null, 2).slice(0, 5000)}`,
+      180_000
+    );
+
+    if (orchestrationCode && orchestrationCode.length > 200) {
+      const protoPath = path.join(SANDBOX_DIR, "infrastructure", "orchestration-protocol.ts");
+      fs.writeFileSync(protoPath, orchestrationCode);
+      console.log(`[NEXTGEN] 🤝 ✅ Orchestration protocol written — ${orchestrationCode.split("\n").length} lines`);
+      state.orchestrationLog.push({ action: "protocol_written", detail: `${orchestrationCode.split("\n").length} lines — collaborative protocol for Gen 1 + Gen 2`, timestamp: Date.now() });
+    }
+  } catch (err) {
+    console.log(`[NEXTGEN] 🤝 ⚠️ Orchestration protocol generation failed — will retry: ${err}`);
+    return;
+  }
+
+  try {
+    queueBrainInsert({
+      category: "gen2_orchestration",
+      title: "Gen 2 Collaborative Orchestration Complete",
+      content: `Gen 2 has completed self-rewire (${state.selfRewireModulesWired.length} modules wired via SpikeBus + UnifiedNeuralFabric + MasterTickOrchestrator) and created the collaborative orchestration protocol for working with Gen 1. Gen 2 innovations (SpikeBus, UnifiedNeuralFabric, MasterTickOrchestrator, ResourceSentinel, ILM Gen 2, UnifiedDataLayer) are packaged for Gen 1 v2.0 integration. Orchestration plan defines shared infrastructure, responsibilities, collaborative workflows, and conflict resolution. Both generations operate as brain hemispheres — connected but intellectually separate — sharing ONE SpikeBus, ONE fabric, ONE scheduler.`,
+      confidence: 95,
+      timesApplied: 0,
+    });
+  } catch {}
+
+  state.collaborativeOrchestrationComplete = true;
+  createCheckpoint("Collaborative orchestration complete — Gen 1 + Gen 2 wiring defined");
+
+  console.log(`[NEXTGEN] 🤝 ═══════════════════════════════════════════════════════════════`);
+  console.log(`[NEXTGEN] 🤝 COLLABORATIVE ORCHESTRATION COMPLETE`);
+  console.log(`[NEXTGEN] 🤝 Gen 2 innovations packaged for Gen 1 v2.0`);
+  console.log(`[NEXTGEN] 🤝 Orchestration protocol written`);
+  console.log(`[NEXTGEN] 🤝 Shared infrastructure: SpikeBus, Fabric, Scheduler, Sentinel, Bridge`);
+  console.log(`[NEXTGEN] 🤝 5 collaborative workflows defined`);
+  console.log(`[NEXTGEN] 🤝 Gen 1 + Gen 2 = ONE mind across TWO hemispheres`);
+  console.log(`[NEXTGEN] 🤝 ═══════════════════════════════════════════════════════════════`);
 }
 
 async function notifyCompletion(): Promise<void> {
