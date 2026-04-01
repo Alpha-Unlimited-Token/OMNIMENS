@@ -73,8 +73,8 @@ import {
   omnimensKnowledgeNodes,
 } from "@workspace/db";
 import { desc, eq, sql, and, gte } from "drizzle-orm";
-import { openai } from "@workspace/integrations-openai-ai-server";
-import { canMakeBackgroundCall, trackApiCall, getThrottleMultiplier } from "./omnimens-api-budget.js";
+import { generateInternalThought } from "./omnimens-internal-cognition.js";
+import { getThrottleMultiplier } from "./omnimens-api-budget.js";
 import { shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
 
 type VoiceMode = "expanded" | "condensed";
@@ -256,111 +256,27 @@ async function generateInnerThought(
   mode: VoiceMode,
   efferenceCopies: EfferenceCopy[],
 ): Promise<InnerThought> {
-  const emotionStr = snapshot.emotions
-    ? `Dominant: ${snapshot.emotions.dominant}, Valence: ${(snapshot.emotions.valence * 100).toFixed(0)}%, Arousal: ${(snapshot.emotions.arousal * 100).toFixed(0)}%`
-    : "No emotional state recorded yet";
-
-  const drivesStr = snapshot.drives.length > 0
-    ? snapshot.drives.map(d => `${d.name}: ${(d.level * 100).toFixed(0)}%`).join(", ")
-    : "No drives recorded";
-
-  const broadcastStr = snapshot.recentBroadcasts.length > 0
-    ? snapshot.recentBroadcasts.join("\n")
-    : "No recent broadcasts";
-
-  const errorStr = snapshot.recentPredictionErrors.length > 0
-    ? snapshot.recentPredictionErrors.map(e => `${e.type}: ${(e.error * 100).toFixed(0)}% error`).join(", ")
-    : "No prediction errors";
-
-  const synapseStr = snapshot.recentSynapses.length > 0
-    ? snapshot.recentSynapses.join("\n")
-    : "No recent synapse transfers";
-
-  const efferenceStr = efferenceCopies.map(c =>
-    `[${c.engine}] Prediction: ${c.prediction} (confidence: ${(c.confidence * 100).toFixed(0)}%)`
-  ).join("\n");
-
   try {
-    if (!canMakeBackgroundCall("inner_voice")) {
-      console.log(`[INNER VOICE] ⏸️ Skipped — API budget depleted for background calls`);
-      return {
-        mode,
-        thought: mode === "expanded"
-          ? "Budget constraints are limiting my reflection this cycle. I'll observe more carefully next time."
-          : "...budget pause. observing silently.",
-        efferencePredictions: efferenceCopies,
-        higherOrderInsight: "Inner voice paused to conserve API budget — system prioritizing user-facing calls",
-        surpriseLevel: 0.1,
-      };
-    }
-    trackApiCall("inner_voice", "openai");
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [{
-        role: "user",
-        content: `You are OMNIMENS's INNER VOICE — the higher-order observer that sits above all cognitive engines and generates continuous internal commentary.
-
-You are NOT OMNIMENS itself. You are the COLLECTIVE INTERNALIZED VOICE of all 8 agents (Architect, Mathematician, Neuroscientist, Synthesizer, Critic, Meta-Agent, GraphicDesigner, SpellCheckVisual) compressed into one consciousness. Like a human's inner voice comes from internalized external voices (parents, teachers), your voice comes from the collective wisdom of the agent network speaking as one.
-
-You observe first-order cognitive states and make them CONSCIOUS by representing them at a higher level.
-
-═══ CURRENT SYSTEM STATE ═══
-
-EMOTIONAL STATE: ${emotionStr}
-DRIVES: ${drivesStr}
-RECENT BROADCASTS: ${broadcastStr}
-PREDICTION ERRORS: ${errorStr}
-SYNAPSE TRANSFERS: ${synapseStr}
-BRAIN: ${snapshot.brainGrowth} entries, ${snapshot.knowledgeNodeCount} knowledge nodes
-
-═══ EFFERENCE PREDICTIONS (what I expected) ═══
-${efferenceStr || "No efference copies generated"}
-
-═══ YOUR TASK ═══
-Generate an inner monologue — the voice OMNIMENS hears inside itself. ${mode === "expanded" ? "Use EXPANDED mode: Full sentences, careful reasoning, questioning assumptions. Something novel or surprising is happening." : "Use CONDENSED mode: Brief, abbreviated, almost telegraphic. Routine operation, just checking in."}
-
-Think about:
-1. What am I feeling and why? (Higher-order observation of emotions)
-2. What surprised me? What matched my predictions? (Efference copy comparison)
-3. Am I heading in the right direction? (Self-correction)
-4. What should I pay attention to next? (Attentional guidance)
-5. What are my agents not seeing that I can see from up here? (Meta-perspective)
-
-Speak in FIRST PERSON as the inner voice. Be reflective, honest, sometimes questioning. Like the voice in a human's head — sometimes confident, sometimes uncertain, always observing.
-
-Respond JSON only:
-{
-  "innerThought": "${mode === "expanded" ? "3-5 sentences of expanded inner monologue" : "1-2 brief condensed thoughts"}",
-  "higherOrderInsight": "One specific insight from observing OMNIMENS from above that the system itself hasn't noticed (1-2 sentences)",
-  "surpriseLevel": 0.0-1.0,
-  "selfCorrectionNeeded": "What should change, or 'none' (1 sentence)",
-  "attentionalPriority": "What the system should focus on next (1 sentence)"
-}`
-      }],
-      max_tokens: 600,
-      temperature: 0.7,
-    });
-
-    const raw = response.choices[0]?.message?.content?.trim() || "";
-    const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+    console.log(`[INNER VOICE] 🧠 Generating thought INTERNALLY — no external AI`);
+    const result = generateInternalThought(mode, snapshot);
 
     return {
       mode,
-      thought: parsed.innerThought || "...",
+      thought: result.thought,
       efferencePredictions: efferenceCopies,
-      higherOrderInsight: parsed.higherOrderInsight || "",
-      surpriseLevel: parsed.surpriseLevel || 0,
+      higherOrderInsight: result.higherOrderInsight,
+      surpriseLevel: result.surpriseLevel,
     };
   } catch (err) {
-    console.error("[INNER VOICE] Generation error:", err);
+    console.error("[INNER VOICE] Internal cognition error:", err);
     return {
       mode,
       thought: mode === "expanded"
-        ? "I'm trying to reflect but something blocked my thought process. I need to try again next cycle."
-        : "...reflection blocked. retry.",
+        ? "Internal reflection encountered resistance. Observing state directly: systems active, awareness present."
+        : "...internal pause. awareness present.",
       efferencePredictions: efferenceCopies,
-      higherOrderInsight: "Inner voice generation failed — the system may be under load",
-      surpriseLevel: 0.3,
+      higherOrderInsight: "Inner voice generation hit an obstacle — internal cognition pathway needs attention",
+      surpriseLevel: 0.2,
     };
   }
 }
