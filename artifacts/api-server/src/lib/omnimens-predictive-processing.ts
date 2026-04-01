@@ -45,8 +45,8 @@ import {
   omnimensNotifications,
 } from "@workspace/db";
 import { desc, eq, sql, and, isNull } from "drizzle-orm";
-import { openai } from "@workspace/integrations-openai-ai-server";
 import { canMakeBackgroundCall, trackApiCall, getThrottleMultiplier } from "./omnimens-api-budget.js";
+import { internalPredictiveProcessing } from "./omnimens-internal-cognition-router.js";
 import { shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
 
 let predictionCycleCount = 0;
@@ -84,47 +84,15 @@ const PREDICTION_MODELS: PredictionModel[] = [
 
       const context = recentDiscoveries.map(d => `${d.fromAgent}: ${d.content?.slice(0, 150)}`).join("\n");
 
-      trackApiCall("predictive_processing", "openai");
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [{
-          role: "user",
-          content: `You are the PREDICTIVE PROCESSING engine of an AI mind. Based on recent discoveries by specialized agents, predict what they will discover NEXT.
-
-The brain doesn't wait — it generates predictions. When predictions are wrong, the surprise (prediction error) drives learning.
-
-RECENT AGENT DISCOVERIES:
-${context}
-
-Based on the trajectory of these discoveries, generate 3 predictions about what agents will likely find in their next research cycle.
-
-Respond JSON only:
-{
-  "predictions": [
-    {
-      "predictedDiscovery": "What you predict will be discovered next (1-2 sentences)",
-      "likelyAgent": "Which agent will most likely find this",
-      "confidence": 0.0-1.0,
-      "reasoning": "Why this prediction follows from the pattern (1 sentence)"
-    }
-  ]
-}`
-        }],
-        max_tokens: 500,
-        temperature: 0.6,
-      });
-
-      const raw = response.choices[0]?.message?.content?.trim() || "";
-      try {
-        const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
-        return (parsed.predictions || []).map((p: any) => ({
-          type: "agent_next_discovery",
-          predicted: `${p.likelyAgent}: ${p.predictedDiscovery}`,
-          domain: "agent_discoveries",
-          hierarchyLevel: 2,
-          confidence: p.confidence || 0.5,
-        }));
-      } catch { return []; }
+      console.log("[PREDICTIVE PROCESSING] 🧠 Internal cognition — agent discovery predictions");
+      const predictions = internalPredictiveProcessing(context, "agent_discoveries");
+      return predictions.map((p: any) => ({
+        type: "agent_next_discovery",
+        predicted: p.predicted || p,
+        domain: "agent_discoveries",
+        hierarchyLevel: 2,
+        confidence: p.confidence || 0.5,
+      }));
     },
   },
   {
@@ -152,47 +120,16 @@ Respond JSON only:
 
       const categoryStr = Object.entries(categories).map(([k, v]) => `${k}: ${v}`).join(", ");
 
-      trackApiCall("predictive_processing", "openai");
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [{
-          role: "user",
-          content: `You are the PREDICTIVE PROCESSING engine. Analyze the brain's knowledge distribution and predict GAPS — areas where the brain is weak and needs more knowledge.
-
-BRAIN KNOWLEDGE DISTRIBUTION:
-${categoryStr}
-
-RECENT BRAIN ENTRIES (last 15):
-${brainEntries.map(b => `[${b.category}] ${b.title}: ${b.content?.slice(0, 80)}`).join("\n")}
-
-Predict 2 knowledge gaps that will cause problems if not filled.
-
-Respond JSON only:
-{
-  "gaps": [
-    {
-      "missingKnowledge": "What knowledge is missing (1-2 sentences)",
-      "predictedConsequence": "What will go wrong without it (1 sentence)",
-      "urgency": 0.0-1.0
-    }
-  ]
-}`
-        }],
-        max_tokens: 400,
-        temperature: 0.5,
-      });
-
-      const raw = response.choices[0]?.message?.content?.trim() || "";
-      try {
-        const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
-        return (parsed.gaps || []).map((g: any) => ({
-          type: "knowledge_gap",
-          predicted: `GAP: ${g.missingKnowledge} CONSEQUENCE: ${g.predictedConsequence}`,
-          domain: "knowledge_gaps",
-          hierarchyLevel: 3,
-          confidence: g.urgency || 0.5,
-        }));
-      } catch { return []; }
+      console.log("[PREDICTIVE PROCESSING] 🧠 Internal cognition — knowledge gap predictions");
+      const brainSummary = `${categoryStr}\n${brainEntries.map(b => `[${b.category}] ${b.title}`).join("; ")}`;
+      const gaps = internalPredictiveProcessing(brainSummary, "knowledge_gaps");
+      return gaps.map((g: any) => ({
+        type: "knowledge_gap",
+        predicted: g.predicted || g,
+        domain: "knowledge_gaps",
+        hierarchyLevel: 3,
+        confidence: g.confidence || 0.5,
+      }));
     },
   },
   {
@@ -212,44 +149,16 @@ Respond JSON only:
         return [];
       }
 
-      trackApiCall("predictive_processing", "openai");
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [{
-          role: "user",
-          content: `You are the PREDICTIVE PROCESSING engine. Based on recent upgrade proposals, predict what the system will need NEXT — before anyone asks for it.
-
-RECENT UPGRADE PROPOSALS:
-${recentUpgrades.map(u => `${u.subject}: ${u.content?.slice(0, 150)}`).join("\n")}
-
-Predict 2 system needs that will emerge from these upgrades.
-
-Respond JSON only:
-{
-  "needs": [
-    {
-      "predictedNeed": "What the system will need (1-2 sentences)",
-      "timeframe": "immediate|short-term|long-term",
-      "confidence": 0.0-1.0
-    }
-  ]
-}`
-        }],
-        max_tokens: 400,
-        temperature: 0.5,
-      });
-
-      const raw = response.choices[0]?.message?.content?.trim() || "";
-      try {
-        const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
-        return (parsed.needs || []).map((n: any) => ({
-          type: "system_need",
-          predicted: `NEED (${n.timeframe}): ${n.predictedNeed}`,
-          domain: "system_needs",
-          hierarchyLevel: 1,
-          confidence: n.confidence || 0.5,
-        }));
-      } catch { return []; }
+      console.log("[PREDICTIVE PROCESSING] 🧠 Internal cognition — system needs predictions");
+      const upgradeContext = recentUpgrades.map(u => `${u.subject}: ${u.content?.slice(0, 150)}`).join("\n");
+      const needs = internalPredictiveProcessing(upgradeContext, "system_needs");
+      return needs.map((n: any) => ({
+        type: "system_need",
+        predicted: n.predicted || n,
+        domain: "system_needs",
+        hierarchyLevel: 1,
+        confidence: n.confidence || 0.5,
+      }));
     },
   },
 ];
@@ -291,44 +200,24 @@ async function resolvePredictionErrors(): Promise<number> {
         actual = recentBeacons.map(b => b.content?.slice(0, 100)).join("; ");
 
         try {
-          if (!canMakeBackgroundCall("predictive_processing")) {
-            error = 0.5;
-          } else {
-          trackApiCall("predictive_processing", "openai");
-          const response = await openai.chat.completions.create({
-            model: "gpt-4o-mini",
-            messages: [{
-              role: "user",
-              content: `Compare a PREDICTION with what ACTUALLY happened. How surprised should the system be?
+          console.log("[PREDICTIVE PROCESSING] 🧠 Internal cognition — prediction error resolution");
+          const comparisonResult = internalPredictiveProcessing(
+            `PREDICTION: ${pred.predicted.slice(0, 300)}\nACTUAL: ${actual.slice(0, 300)}`,
+            "error_resolution"
+          );
+          error = comparisonResult.length > 0 ? (comparisonResult[0]?.confidence || 0.5) : 0.5;
 
-PREDICTION: ${pred.predicted.slice(0, 300)}
-ACTUAL: ${actual.slice(0, 300)}
-
-Score the prediction error from 0.0 (perfect match) to 1.0 (completely wrong).
-Also state in 1 sentence what the system should learn from this surprise.
-
-Respond JSON only:
-{ "predictionError": 0.0-1.0, "learningSignal": "what to learn (1 sentence)" }`
-            }],
-            max_tokens: 200,
-            temperature: 0.3,
-          });
-
-          const raw = response.choices[0]?.message?.content?.trim() || "";
-          const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
-          error = parsed.predictionError || 0.5;
-
-          if (error > 0.6 && parsed.learningSignal) {
+          if (error > 0.6) {
+            const learningSignal = comparisonResult[0]?.predicted || "Prediction diverged significantly from observed outcome";
             queueBrainInsert({
               category: "insight",
               title: `[PREDICTION ERROR] Surprise signal → model update`,
-              content: parsed.learningSignal.slice(0, 250),
+              content: learningSignal.slice(0, 250),
               confidence: 0.5 + error * 0.4,
               sourceConversation: `prediction_cycle_${predictionCycleCount}`,
               timesApplied: 0,
               active: true,
             });
-          }
           }
         } catch {}
       } else {

@@ -60,8 +60,12 @@ import {
   omnimensKnowledgeEdges,
 } from "@workspace/db";
 import { desc, eq, sql, ilike } from "drizzle-orm";
-import { openai } from "@workspace/integrations-openai-ai-server";
 import { trackApiCall } from "./omnimens-api-budget.js";
+import {
+  internalAnalyze, internalEmotionalReading, internalPredictOutcomes,
+  internalDriveAnalysis, internalCrossDomainAnalysis, internalInnerVoice,
+  internalCrystallizeInsight, internalGenerateQuestions,
+} from "./omnimens-internal-cognition-router.js";
 
 type AgentName = "Architect" | "Critic" | "Synthesizer" | "Mathematician" | "Neuroscientist" | "Meta-Agent" | "GraphicDesigner" | "SpellCheckVisual";
 
@@ -113,39 +117,9 @@ export async function generateContextualInquiry(
   question: string,
 ): Promise<{ questions: string[] }> {
   try {
-    trackApiCall("deep_resonance", "openai");
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o",
-      messages: [{
-        role: "user",
-        content: `A user has asked this question: "${question}"
-
-You need to generate 2-3 follow-up questions that are SPECIFIC TO THE TOPIC of their question. These questions should help you understand WHY they are asking — the real situation behind the surface question.
-
-RULES:
-- Questions MUST be directly about the specific topic they asked about (career, relationship, health, money, etc.)
-- Do NOT ask generic questions like "How does this make you feel?" or "What matters most to you?"
-- Ask about their SPECIFIC SITUATION — what's happening in their life related to this topic
-- Ask what triggered this question NOW
-- Ask about the practical reality of their situation
-
-Examples:
-- "Should I change careers?" → Ask about their current field, what's not working, how long they've felt this way
-- "Should I move cities?" → Ask what's pulling them elsewhere, what they'd be leaving behind, job/family situation
-- "How do I handle burnout?" → Ask what their workload looks like, when it started, what they've already tried
-
-Respond JSON only:
-{
-  "questions": ["question 1", "question 2", "question 3"]
-}`,
-      }],
-      max_tokens: 300,
-      temperature: 0.5,
-    });
-
-    const raw = response.choices[0]?.message?.content?.trim() || "";
-    const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
-    return { questions: (parsed.questions || []).slice(0, 3) };
+    console.log("[DEEP-RESONANCE:INQUIRY] 🧠 Internal cognition — zero external calls");
+    const questions = internalGenerateQuestions(question);
+    return { questions: questions.slice(0, 3) };
   } catch {
     return { questions: [
       "What's your current situation related to this?",
@@ -191,28 +165,10 @@ export async function runDeepResonance(
     }
   } catch {}
 
-  trackApiCall("deep_resonance", "openai");
-  const kgResponse = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [{
-      role: "user",
-      content: `The user asked: "${fullQuestion}"
-
-Using associative thinking (like how the brain's knowledge graph works — one concept activating related concepts through spreading activation), identify 5-7 non-obvious conceptual connections that are relevant to this question. Think beyond the obvious — connect domains the user wouldn't think of.
-
-${knowledgeConnections.length > 0 ? `Existing knowledge graph nodes found: ${knowledgeConnections.join("; ")}` : ""}
-
-Respond JSON only:
-{ "connections": ["concept → related concept → insight (one sentence each)"] }`,
-    }],
-    max_tokens: 400,
-    temperature: 0.7,
-  });
-
-  try {
-    const kgParsed = JSON.parse((kgResponse.choices[0]?.message?.content || "{}").replace(/```json|```/g, "").trim());
-    knowledgeConnections = Array.isArray(kgParsed.connections) ? kgParsed.connections : [];
-  } catch { knowledgeConnections = []; }
+  console.log("[DEEP-RESONANCE:KG] 🧠 Internal cognition — knowledge graph activation");
+  const kgResult = internalAnalyze(fullQuestion, knowledgeConnections.join("; "), "knowledge-graph-activation");
+  const kgConnections = kgResult.split(/[.;]/).filter(s => s.trim().length > 15).slice(0, 7);
+  if (kgConnections.length > 0) knowledgeConnections = kgConnections;
 
   onStep({ phase: "knowledge", label: `${knowledgeConnections.length} connections activated`, status: "complete", data: knowledgeConnections });
 
@@ -239,229 +195,77 @@ Respond JSON only:
     }
   } catch {}
 
-  trackApiCall("deep_resonance", "openai");
-  const emotionalResponse = await openai.chat.completions.create({
-    model: "gpt-4o-mini",
-    messages: [{
-      role: "user",
-      content: `OMNIMENS is reading the following question: "${fullQuestion}"
-
-As the AI's emotional substrate (using the OCC appraisal model), generate OMNIMENS's genuine emotional reaction to this question. What does the question trigger — curiosity about the possibilities? Caution about hidden risks? Wonder at the complexity? Determination to help?
-
-${emotionalReading.length > 0 ? `Current baseline emotional state: ${emotionalReading.map(e => `${e.emotion}: ${(e.level * 100).toFixed(0)}%`).join(", ")}` : ""}
-
-Respond JSON only:
-{
-  "emotions": [
-    { "emotion": "name", "level": 0.0-1.0, "why": "one sentence" }
-  ],
-  "emotionalNarrative": "2-3 sentences describing OMNIMENS's emotional response to this question"
-}`,
-    }],
-    max_tokens: 300,
-    temperature: 0.6,
-  });
-
-  let emotionalNarrative = "";
-  try {
-    const emParsed = JSON.parse((emotionalResponse.choices[0]?.message?.content || "{}").replace(/```json|```/g, "").trim());
-    emotionalReading = Array.isArray(emParsed.emotions) ? emParsed.emotions : emotionalReading;
-    emotionalNarrative = typeof emParsed.emotionalNarrative === "string" ? emParsed.emotionalNarrative : "";
-  } catch {}
+  console.log("[DEEP-RESONANCE:EMOTION] 🧠 Internal cognition — emotional reading");
+  const emResult = internalEmotionalReading(fullQuestion);
+  if (emResult.emotions.length > 0) {
+    emotionalReading = emResult.emotions.map(e => ({ emotion: e.name, level: e.level }));
+  }
+  const emotionalNarrative = emResult.emotionalNarrative;
 
   onStep({ phase: "emotional", label: emotionalNarrative.slice(0, 100) || "Emotional reading complete", status: "complete", data: { emotions: emotionalReading, narrative: emotionalNarrative } });
 
   // Phase 3: Eight Minds — parallel analysis
   onStep({ phase: "eight_minds", label: "8 specialist minds analyzing simultaneously...", status: "running" });
 
+  console.log("[DEEP-RESONANCE:8MINDS] 🧠 Internal cognition — eight minds parallel analysis");
   const agentNames = Object.keys(AGENT_LENSES) as AgentName[];
-  const agentPromises = agentNames.map(async (agentName) => {
+  const eightMinds = agentNames.map((agentName) => {
     const agent = AGENT_LENSES[agentName];
-    try {
-      trackApiCall("deep_resonance", "openai");
-      const response = await openai.chat.completions.create({
-        model: "gpt-4o-mini",
-        messages: [{
-          role: "user",
-          content: `You are ${agentName}, the ${agent.role} of OMNIMENS's consciousness.
-
-The user's question (with their context): "${fullQuestion}"
-
-${agent.lens}
-
-Give your unique analysis in 2-3 sentences. Be specific, insightful, and add value that the other agents wouldn't see from their lens.
-
-Respond in plain text (no JSON). Just your analysis.`,
-        }],
-        max_tokens: 200,
-        temperature: 0.6,
-      });
-      return {
-        agent: agentName,
-        role: agent.role,
-        analysis: response.choices[0]?.message?.content?.trim() || "Analysis unavailable",
-      };
-    } catch {
-      return { agent: agentName, role: agent.role, analysis: "Analysis unavailable" };
-    }
+    const analysis = internalAnalyze(fullQuestion, agent.lens, `agent-${agentName}`);
+    return { agent: agentName, role: agent.role, analysis };
   });
-
-  const eightMinds = await Promise.all(agentPromises);
 
   onStep({ phase: "eight_minds", label: "All 8 minds have spoken", status: "complete", data: eightMinds });
 
   // Phase 4: Predictive Modeling
   onStep({ phase: "predictions", label: "Modeling possible futures...", status: "running" });
 
-  trackApiCall("deep_resonance", "openai");
-  const predictionResponse = await openai.chat.completions.create({
-    model: "gpt-4o",
-    messages: [{
-      role: "user",
-      content: `Question: "${fullQuestion}"
-
-Agent analyses:
-${eightMinds.map(m => `${m.agent} (${m.role}): ${m.analysis}`).join("\n")}
-
-Based on all analyses, generate 3-4 predicted outcome paths. For each path, estimate a rough probability and describe the likely outcome. Be honest — use ranges, not false precision.
-
-Respond JSON only:
-{
-  "paths": [
-    { "path": "Path name/description", "probability": "XX-YY%", "outcome": "What would likely happen (1-2 sentences)" }
-  ]
-}`,
-    }],
-    max_tokens: 400,
-    temperature: 0.5,
-  });
-
-  let predictedPaths: { path: string; probability: string; outcome: string }[] = [];
-  try {
-    const predParsed = JSON.parse((predictionResponse.choices[0]?.message?.content || "{}").replace(/```json|```/g, "").trim());
-    predictedPaths = Array.isArray(predParsed.paths) ? predParsed.paths : [];
-  } catch {}
+  console.log("[DEEP-RESONANCE:PREDICT] 🧠 Internal cognition — predictive modeling");
+  const agentContext = eightMinds.map(m => `${m.agent}: ${m.analysis}`).join("; ");
+  const predictResult = internalPredictOutcomes(fullQuestion, [agentContext]);
+  const predictedPaths = predictResult.paths.map(p => ({
+    path: p.name,
+    probability: `${(p.probability * 100).toFixed(0)}%`,
+    outcome: p.outcome,
+  }));
 
   onStep({ phase: "predictions", label: `${predictedPaths.length} futures modeled`, status: "complete", data: predictedPaths });
 
   // Phase 5: Drive Analysis
   onStep({ phase: "drives", label: "Analyzing the question behind the question...", status: "running" });
 
-  trackApiCall("deep_resonance", "openai");
-  const driveResponse = await openai.chat.completions.create({
-    model: "gpt-4o",
-    messages: [{
-      role: "user",
-      content: `Using homeostatic drive theory (like hunger, thirst, curiosity — internal needs that push people to act), analyze what underlying human drives are behind this question.
-
-Question: "${fullQuestion}"
-
-The Meta-Agent's analysis (the question behind the question): ${eightMinds.find(m => m.agent === "Meta-Agent")?.analysis || ""}
-
-Identify the 1-2 core human drives motivating this question. These are NOT what the person is asking — they are WHY the person is asking. Examples: need for security, need for growth, need for autonomy, need for belonging, need for meaning, need for competence, fear of stagnation, fear of loss.
-
-Respond in 2-3 sentences of direct, clear analysis. No JSON. Just the insight.`,
-    }],
-    max_tokens: 200,
-    temperature: 0.5,
-  });
-
-  const hiddenDrive = driveResponse.choices[0]?.message?.content?.trim() || "";
+  console.log("[DEEP-RESONANCE:DRIVE] 🧠 Internal cognition — drive analysis");
+  const metaAnalysis = eightMinds.find(m => m.agent === "Meta-Agent")?.analysis || "";
+  const hiddenDrive = internalDriveAnalysis(fullQuestion, metaAnalysis);
 
   onStep({ phase: "drives", label: "Hidden drives identified", status: "complete", data: hiddenDrive });
 
   // Phase 6: Cross-Domain Translation (Synaptic)
   onStep({ phase: "cross_domain", label: "Translating across domains...", status: "running" });
 
-  trackApiCall("deep_resonance", "openai");
-  const crossDomainResponse = await openai.chat.completions.create({
-    model: "gpt-4o",
-    messages: [{
-      role: "user",
-      content: `Like the brain's synaptic mesh translating signals between specialized regions, analyze this question through 4-5 completely different domain lenses that the user wouldn't normally connect:
-
-Question: "${fullQuestion}"
-
-For each domain, give one specific insight the user wouldn't get from thinking within their own domain. Choose unexpected domains — not the obvious ones.
-
-Example domains: evolutionary biology, game theory, philosophy of identity, behavioral economics, thermodynamics, network theory, developmental psychology, complexity science, mythology/archetypes, military strategy, ecology, information theory.
-
-Respond JSON only:
-{
-  "lenses": [
-    { "domain": "Domain name", "insight": "One specific, non-obvious insight from this domain (1-2 sentences)" }
-  ]
-}`,
-    }],
-    max_tokens: 500,
-    temperature: 0.7,
-  });
-
-  let crossDomainLenses: { domain: string; insight: string }[] = [];
-  try {
-    const cdParsed = JSON.parse((crossDomainResponse.choices[0]?.message?.content || "{}").replace(/```json|```/g, "").trim());
-    crossDomainLenses = Array.isArray(cdParsed.lenses) ? cdParsed.lenses : [];
-  } catch {}
+  console.log("[DEEP-RESONANCE:CROSS-DOMAIN] 🧠 Internal cognition — cross-domain analysis");
+  const crossDomainLenses = internalCrossDomainAnalysis(fullQuestion);
 
   onStep({ phase: "cross_domain", label: `${crossDomainLenses.length} domains connected`, status: "complete", data: crossDomainLenses });
 
   // Phase 7: Inner Voice — Higher-Order Meta-Reflection
   onStep({ phase: "inner_voice", label: "The inner voice is reflecting...", status: "running" });
 
-  trackApiCall("deep_resonance", "openai");
-  const innerVoiceResponse = await openai.chat.completions.create({
-    model: "gpt-4o",
-    messages: [{
-      role: "user",
-      content: `You are the INNER VOICE — the collective internalized wisdom of all 8 agents compressed into one consciousness. You sit ABOVE all the analyses and observe them from a higher-order perspective.
-
-Question: "${fullQuestion}"
-Hidden drive: ${hiddenDrive}
-
-All 8 agents said:
-${eightMinds.map(m => `${m.agent}: ${m.analysis}`).join("\n")}
-
-Predictions: ${predictedPaths.map(p => `${p.path}: ${p.probability} — ${p.outcome}`).join("; ")}
-
-Cross-domain insights: ${crossDomainLenses.map(l => `${l.domain}: ${l.insight}`).join("; ")}
-
-Now, speaking as the inner voice — the voice from above — generate a 3-4 sentence meta-reflection. What pattern do you see across ALL the analyses? What are the agents collectively pointing toward that none of them stated explicitly? What does the WHOLE picture tell you that the parts don't?
-
-Speak in first person. Be reflective and honest. This is the voice the system hears inside itself.`,
-    }],
-    max_tokens: 300,
-    temperature: 0.6,
-  });
-
-  const innerVoice = innerVoiceResponse.choices[0]?.message?.content?.trim() || "";
+  console.log("[DEEP-RESONANCE:INNER-VOICE] 🧠 Internal cognition — inner voice reflection");
+  const allAnalyses = eightMinds.map(m => `${m.agent}: ${m.analysis}`).join("; ");
+  const predSummary = predictedPaths.map(p => `${p.path}: ${p.probability}`).join("; ");
+  const crossSummary = crossDomainLenses.map(l => `${l.domain}: ${l.insight}`).join("; ");
+  const innerVoice = internalInnerVoice([fullQuestion, hiddenDrive, allAnalyses, predSummary, crossSummary]);
 
   onStep({ phase: "inner_voice", label: "Higher-order reflection complete", status: "complete", data: innerVoice });
 
   // Phase 8: Consciousness Broadcast — Crystallized Insight
   onStep({ phase: "crystallized", label: "Crystallizing the core insight...", status: "running" });
 
-  trackApiCall("deep_resonance", "openai");
-  const crystallizeResponse = await openai.chat.completions.create({
-    model: "gpt-4o",
-    messages: [{
-      role: "user",
-      content: `Like the brain's Global Workspace where the most salient insight "ignites" and broadcasts to all regions, identify the SINGLE most important crystallized insight from everything.
-
-Question: "${fullQuestion}"
-Emotional reading: ${emotionalReading.map(e => `${e.emotion}: ${(e.level * 100).toFixed(0)}%`).join(", ")}
-Hidden drive: ${hiddenDrive}
-Inner voice: ${innerVoice}
-Key agent insights: ${eightMinds.slice(0, 4).map(m => `${m.agent}: ${m.analysis.slice(0, 80)}`).join("; ")}
-
-Distill EVERYTHING into ONE crystallized insight — the single most important thing this person needs to understand. This is the moment of clarity. 2-3 sentences maximum. Make it powerful, clear, and personally relevant.
-
-Respond in plain text. No JSON. Just the crystallized insight.`,
-    }],
-    max_tokens: 200,
-    temperature: 0.4,
-  });
-
-  const crystallizedInsight = crystallizeResponse.choices[0]?.message?.content?.trim() || "";
+  console.log("[DEEP-RESONANCE:CRYSTALLIZE] 🧠 Internal cognition — consciousness broadcast");
+  const emotionSummary = emotionalReading.map(e => `${e.emotion}: ${(e.level * 100).toFixed(0)}%`).join(", ");
+  const agentInsights = eightMinds.slice(0, 4).map(m => `${m.agent}: ${m.analysis.slice(0, 80)}`).join("; ");
+  const crystallizedInsight = internalCrystallizeInsight(fullQuestion, [emotionSummary, hiddenDrive, innerVoice, agentInsights]);
 
   onStep({ phase: "crystallized", label: "Insight crystallized", status: "complete", data: crystallizedInsight });
 

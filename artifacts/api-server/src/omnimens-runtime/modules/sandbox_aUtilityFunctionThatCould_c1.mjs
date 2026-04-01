@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-04-01T14:44:29.655Z
+ * Written: 2026-04-01T14:51:38.760Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,40 +16,65 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Function: findMostFrequentWords
-// This utility function takes a string of text and returns the N most frequent words, excluding common stop words.
+// Utility function: Text Frequency Analyzer
+// This function analyzes a given text and returns the frequency of each word, sorted by frequency in descending order.
 
-function findMostFrequentWords(text, topN) {
-    if (typeof text !== 'string' || typeof topN !== 'number' || topN <= 0) {
-        throw new TypeError('Invalid input: text must be a string and topN must be a positive number.');
+function textFrequencyAnalyzer(text) {
+    if (typeof text !== 'string') {
+        throw new TypeError('Input must be a string');
     }
 
-    const stopWords = new Set([
-        'a', 'an', 'and', 'the', 'is', 'in', 'on', 'at', 'of', 'to', 'for', 'with', 'as', 'by', 'it', 'this', 'that', 'these', 'those', 'are', 'was', 'were', 'be', 'been', 'but', 'or', 'if', 'then', 'so', 'than', 'too', 'very', 'can', 'will', 'just', 'not', 'no', 'yes', 'do', 'does', 'did', 'from', 'up', 'down', 'out', 'over', 'under', 'about', 'into', 'like', 'such', 'all', 'any', 'some', 'more', 'most', 'less', 'least', 'many', 'few', 'one', 'two', 'three', 'other', 'another', 'each', 'every', 'either', 'neither', 'both', 'half', 'much', 'how', 'why', 'when', 'where', 'what', 'who', 'whom', 'which'
-    ]);
+    const words = text.toLowerCase().match(/\b[a-z]+\b/g);
+    if (!words) return {};
 
-    const words = text
-        .toLowerCase()
-        .replace(/[^a-z0-9\s]/g, '') // Remove punctuation
-        .split(/\s+/) // Split by whitespace
-        .filter(word => word && !stopWords.has(word)); // Remove stop words and empty strings
+    const frequencyMap = {};
+    for (let word of words) {
+        frequencyMap[word] = (frequencyMap[word] || 0) + 1;
+    }
 
-    const wordCounts = words.reduce((counts, word) => {
-        counts[word] = (counts[word] || 0) + 1;
-        return counts;
-    }, {});
+    const sortedFrequencies = Object.entries(frequencyMap)
+        .sort((a, b) => b[1] - a[1])
+        .reduce((acc, [word, count]) => {
+            acc[word] = count;
+            return acc;
+        }, {});
 
-    const sortedWords = Object.entries(wordCounts)
-        .sort((a, b) => b[1] - a[1]) // Sort by frequency (descending)
-        .slice(0, topN) // Take the top N
-        .map(entry => ({ word: entry[0], count: entry[1] }));
-
-    return sortedWords;
+    return sortedFrequencies;
 }
 
 // Test cases
-console.log(findMostFrequentWords("This is a test. This test is only a test.", 3)); // [{ word: "test", count: 3 }, { word: "this", count: 2 }, { word: "only", count: 1 }]
-console.log(findMostFrequentWords("AI is transforming the world. The world of AI is vast and growing.", 2)); // [{ word: "world", count: 2 }, { word: "ai", count: 2 }]
-console.log(findMostFrequentWords("One fish, two fish, red fish, blue fish.", 2)); // [{ word: "fish", count: 4 }, { word: "one", count: 1 }]
-console.log(findMostFrequentWords("Hello world! Hello again, world.", 1)); // [{ word: "world", count: 2 }]
-console.log(findMostFrequentWords("", 3)); // []
+console.log('Test Case 1: Basic text analysis');
+const testText1 = "This is a test. This test is only a test.";
+const result1 = textFrequencyAnalyzer(testText1);
+console.log(result1);
+console.assert(result1['test'] === 3, 'Test Case 1 Failed: "test" frequency');
+console.assert(result1['this'] === 2, 'Test Case 1 Failed: "this" frequency');
+console.assert(result1['is'] === 2, 'Test Case 1 Failed: "is" frequency');
+console.assert(result1['a'] === 2, 'Test Case 1 Failed: "a" frequency');
+console.assert(result1['only'] === 1, 'Test Case 1 Failed: "only" frequency');
+
+console.log('Test Case 2: Empty string');
+const testText2 = "";
+const result2 = textFrequencyAnalyzer(testText2);
+console.log(result2);
+console.assert(Object.keys(result2).length === 0, 'Test Case 2 Failed: Empty string should return empty object');
+
+console.log('Test Case 3: Non-alphabetic characters');
+const testText3 = "123 456! @#$%^&*()";
+const result3 = textFrequencyAnalyzer(testText3);
+console.log(result3);
+console.assert(Object.keys(result3).length === 0, 'Test Case 3 Failed: Non-alphabetic characters should return empty object');
+
+console.log('Test Case 4: Mixed case sensitivity');
+const testText4 = "Hello hello HELLO";
+const result4 = textFrequencyAnalyzer(testText4);
+console.log(result4);
+console.assert(result4['hello'] === 3, 'Test Case 4 Failed: Case insensitivity check');
+
+console.log('Test Case 5: Large input');
+const testText5 = "word ".repeat(1000) + "test ".repeat(500) + "example ".repeat(200);
+const result5 = textFrequencyAnalyzer(testText5);
+console.log(result5);
+console.assert(result5['word'] === 1000, 'Test Case 5 Failed: "word" frequency');
+console.assert(result5['test'] === 500, 'Test Case 5 Failed: "test" frequency');
+console.assert(result5['example'] === 200, 'Test Case 5 Failed: "example" frequency');

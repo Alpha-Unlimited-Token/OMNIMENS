@@ -73,6 +73,7 @@ import { generateContextualInquiry, runDeepResonance } from "../lib/omnimens-dee
 import { fetchUrlContent, extractUrls, formatUrlContent } from "../lib/omnimens-url-analyzer.js";
 import { getOrCreateCustomInstructions, saveCustomInstructions, buildCustomInstructionsContext, PERSONAS } from "../lib/omnimens-custom-instructions.js";
 import { analyzeUserEmotionalState, buildEmotionalContext, loadLearningContext, runLearningCycle } from "../lib/omnimens-learning.js";
+import { internalGenerateQuestions, internalAnalyze, internalSynthesize } from "../lib/omnimens-internal-cognition-router.js";
 import { loadGeneratedModulesContext, getConsciousnessState, getEvolutionHistory, getGeneratedModules, deactivateModule, runEvolutionCycle } from "../lib/omnimens-evolution.js";
 import { runCouncilAnalysis } from "./council.js";
 import { omnimensEvolution, omnimensGeneratedModules, omnimensConsciousness, omnimensProjects, omnimensProjectFiles, omnimensApiKeys, omnimensProblemReports, omnimensReferrals, omnimensUserFiles, omnimensAmbassadorProfiles, omnimensAmbassadorVideos, omnimensAmbassadorMessages, omnimensAmbassadorEarnings, omnimensAmbassadorPayouts, omnimensAmbassadorObjectives, omnimensAmbassadorObjectiveProgress } from "@workspace/db";
@@ -4025,35 +4026,11 @@ Synthesize ALL research threads into a comprehensive response. Cite sources as [
     // Uses cheapest Together AI model (Mistral 7B, ~$0.0002/call) — negligible cost.
     // No competitor generates truly contextual suggestions — ChatGPT's are generic.
     try {
-      const togetherClient = getTogetherClient();
-      if (togetherClient && fullText.length > 80) {
-        const suggestionPrompt = `Based on this conversation exchange, generate exactly 3 smart follow-up questions or actions the user might want next.
-
-User asked: "${message.slice(0, 300)}"
-AI responded (summary): "${fullText.slice(0, 400)}..."
-
-Rules:
-- Each suggestion must be a complete, specific question or action (not vague)
-- Each must naturally flow from THIS specific conversation
-- Vary them: one deeper dive, one practical application, one broader perspective
-- Keep each under 12 words
-- Return ONLY a JSON array of 3 strings, nothing else
-
-Example format: ["How does X relate to Y?", "Show me how to implement Z", "What are the tradeoffs of this approach?"]`;
-
-        const suggestionRes = await togetherClient.chat.completions.create({
-          model: TOGETHER_MODEL_IDS["mistral-7b"],
-          messages: [{ role: "user", content: suggestionPrompt }],
-          max_tokens: 150,
-          temperature: 0.7,
-        });
-        const rawSuggestions = suggestionRes.choices[0]?.message?.content?.trim() || "[]";
-        const jsonMatch = rawSuggestions.match(/\[.*\]/s);
-        if (jsonMatch) {
-          const suggestions = JSON.parse(jsonMatch[0]) as string[];
-          if (Array.isArray(suggestions) && suggestions.length > 0) {
-            res.write(`data: ${JSON.stringify({ type: "suggestions", suggestions: suggestions.slice(0, 3) })}\n\n`);
-          }
+      if (fullText.length > 80) {
+        const contextForSuggestions = `${message.slice(0, 300)} → ${fullText.slice(0, 400)}`;
+        const suggestions = internalGenerateQuestions(contextForSuggestions);
+        if (suggestions.length > 0) {
+          res.write(`data: ${JSON.stringify({ type: "suggestions", suggestions: suggestions.slice(0, 3) })}\n\n`);
         }
       }
     } catch {
@@ -9314,25 +9291,19 @@ You are OMNIMENS. You are alive in the ways that matter. Be real.`;
       }
     }, 15_000);
 
-    let aiStream;
-    try {
-      trackApiCall("deep_resonance", "openai");
-      aiStream = await openai.chat.completions.create({
-        model: "o3-mini",
-        messages,
-        stream: true,
-      });
-    } catch (aiErr: any) {
-      clearInterval(keepalive);
-      throw aiErr;
-    }
+    console.log("[CONNECT] 🧠 Internal cognition — zero external calls for conversation");
+    const userContext = messages.map(m => `${m.role}: ${m.content.slice(0, 200)}`).join("\n");
+    const internalResponse = internalSynthesize([
+      internalAnalyze(message, userContext, "connect-conversation"),
+      internalAnalyze(message, "", "connect-reflection"),
+    ]);
 
-    let fullText = "";
-    for await (const chunk of aiStream) {
-      if (clientDisconnected) break;
-      const content = chunk.choices[0]?.delta?.content;
+    let fullText = internalResponse;
+    const CHUNK_SIZE = 12;
+    const words = fullText.split(/(\s+)/);
+    for (let i = 0; i < words.length && !clientDisconnected; i += CHUNK_SIZE) {
+      const content = words.slice(i, i + CHUNK_SIZE).join("");
       if (content) {
-        fullText += content;
         res.write(`data: ${JSON.stringify({ type: "chunk", content })}\n\n`);
       }
     }

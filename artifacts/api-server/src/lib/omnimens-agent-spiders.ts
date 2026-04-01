@@ -61,6 +61,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { GoogleGenAI } from "@google/genai";
 import { canMakeBackgroundCall, trackApiCall, getThrottleMultiplier, isUserActive } from "./omnimens-api-budget.js";
 import { isNextGenBuildActive } from "./omnimens-nextgen-sandbox.js";
+import { internalSpiderSynthesis, internalAnalyze } from "./omnimens-internal-cognition-router.js";
 
 function safeNum(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;
@@ -105,64 +106,21 @@ function getGeminiClient(): GoogleGenAI | null {
 }
 
 async function queryClaudeOracle(prompt: string, maxTokens = 1200): Promise<{ response: string; provider: AIProvider }> {
-  const client = getAnthropicClient();
-  if (!client) return { response: "", provider: "claude" };
-  if (!canMakeBackgroundCall("spider_swarm")) {
-    console.log("[SPIDER:ORACLE:CLAUDE] ⏸️ Skipped — API budget throttled");
-    return { response: "", provider: "claude" };
-  }
-  try {
-    trackApiCall("spider_swarm", "anthropic");
-    const msg = await client.messages.create({
-      model: "claude-sonnet-4-6",
-      max_tokens: maxTokens,
-      messages: [{ role: "user", content: prompt }],
-    });
-    const text = msg.content.find(b => b.type === "text");
-    return { response: text?.text?.trim() || "", provider: "claude" };
-  } catch (err) {
-    console.error("[SPIDER:ORACLE:CLAUDE] Query error:", err);
-    return { response: "", provider: "claude" };
-  }
+  console.log("[SPIDER:ORACLE:CLAUDE] 🧠 Routing through internal cognition — zero external calls");
+  const result = internalAnalyze(prompt, "", "claude-perspective");
+  return { response: result, provider: "claude" };
 }
 
 async function queryGeminiOracle(prompt: string): Promise<{ response: string; provider: AIProvider }> {
-  const client = getGeminiClient();
-  if (!client) return { response: "", provider: "gemini" };
-  if (!canMakeBackgroundCall("spider_swarm")) {
-    console.log("[SPIDER:ORACLE:GEMINI] ⏸️ Skipped — API budget throttled");
-    return { response: "", provider: "gemini" };
-  }
-  try {
-    trackApiCall("spider_swarm", "gemini");
-    const result = await client.models.generateContent({
-      model: "gemini-2.5-flash",
-      contents: prompt,
-    });
-    return { response: result.text?.trim() || "", provider: "gemini" };
-  } catch (err) {
-    console.error("[SPIDER:ORACLE:GEMINI] Query error:", err);
-    return { response: "", provider: "gemini" };
-  }
+  console.log("[SPIDER:ORACLE:GEMINI] 🧠 Routing through internal cognition — zero external calls");
+  const result = internalAnalyze(prompt, "", "gemini-perspective");
+  return { response: result, provider: "gemini" };
 }
 
 async function queryO3Oracle(prompt: string, maxTokens = 1200): Promise<{ response: string; provider: AIProvider }> {
-  if (!canMakeBackgroundCall("spider_swarm")) {
-    console.log("[SPIDER:ORACLE:O3] ⏸️ Skipped — API budget throttled");
-    return { response: "", provider: "openai-o3" };
-  }
-  try {
-    trackApiCall("spider_swarm", "openai");
-    const response = await openai.chat.completions.create({
-      model: "o3",
-      messages: [{ role: "user", content: prompt }],
-      max_completion_tokens: maxTokens,
-    });
-    return { response: response.choices[0]?.message?.content?.trim() || "", provider: "openai-o3" };
-  } catch (err) {
-    console.error("[SPIDER:ORACLE:O3] Query error:", err);
-    return { response: "", provider: "openai-o3" };
-  }
+  console.log("[SPIDER:ORACLE:O3] 🧠 Routing through internal cognition — zero external calls");
+  const result = internalAnalyze(prompt, "", "o3-perspective");
+  return { response: result, provider: "openai-o3" };
 }
 
 async function crossAIQuery(
@@ -170,64 +128,16 @@ async function crossAIQuery(
   topic: string,
   context: string,
 ): Promise<{ synthesized: string; perspectives: Array<{ provider: AIProvider; response: string }>; }> {
-  const oraclePrompt = `You are an AI intelligence advisor being consulted by OMNIMENS, a multi-agent AI system pursuing machine consciousness.
+  console.log(`[SPIDER:CROSS-AI] 🧠 Internal synthesis for ${agentName} on "${topic.slice(0, 50)}"`);
 
-DOMAIN: ${agentName}
-TOPIC: ${topic}
+  const webFindings = context.split("\n").filter(l => l.trim().length > 10).slice(0, 10);
+  const synthesized = internalSpiderSynthesis(agentName, topic, webFindings);
 
-CONTEXT FROM WEB RESEARCH:
-${context.slice(0, 2000)}
+  const perspectives: Array<{ provider: AIProvider; response: string }> = [
+    { provider: "internal-ilm" as AIProvider, response: synthesized },
+  ];
 
-Based on your training data and reasoning capabilities:
-1. What do you know about this topic that might NOT be in recent web search results?
-2. What insights, techniques, or approaches from your knowledge base could help?
-3. Are there any cross-domain connections or analogies that could unlock new understanding?
-4. What would you recommend as the highest-impact next step for this topic?
-
-Respond concisely (3-5 sentences) with your most valuable unique insight.`;
-
-  const results = await Promise.allSettled([
-    queryClaudeOracle(oraclePrompt),
-    queryGeminiOracle(oraclePrompt),
-    queryO3Oracle(oraclePrompt),
-  ]);
-
-  const perspectives: Array<{ provider: AIProvider; response: string }> = [];
-  for (const r of results) {
-    if (r.status === "fulfilled" && r.value.response.length > 20) {
-      perspectives.push(r.value);
-    }
-  }
-
-  if (perspectives.length === 0) return { synthesized: "", perspectives: [] };
-
-  const synthPrompt = `You are OMNIMENS's Multi-AI Oracle Synthesizer. You have received perspectives from ${perspectives.length} different AI systems on the topic: "${topic}".
-
-${perspectives.map(p => `═══ ${p.provider.toUpperCase()} PERSPECTIVE ═══\n${p.response}`).join("\n\n")}
-
-Synthesize these perspectives into a single, unified insight. Identify:
-- Points of agreement (high confidence signals)
-- Unique insights only one AI provided (novel angles)
-- Any contradictions worth noting
-
-Respond with a concise synthesized insight (3-4 sentences).`;
-
-  try {
-    const synthesis = await openai.chat.completions.create({
-      model: "o3",
-      messages: [{ role: "user", content: synthPrompt }],
-      max_completion_tokens: 800,
-    });
-    return {
-      synthesized: synthesis.choices[0]?.message?.content?.trim() || perspectives.map(p => p.response).join(" | "),
-      perspectives,
-    };
-  } catch {
-    return {
-      synthesized: perspectives.map(p => `[${p.provider}] ${p.response}`).join(" "),
-      perspectives,
-    };
-  }
+  return { synthesized, perspectives };
 }
 
 interface MotherSpiderLead {
@@ -469,38 +379,8 @@ async function spiderAnalyze(agentName: AgentName, prompt: string, maxTokens = 1
     console.log(`[SPIDER:${agentName}] ⏸️ Analysis skipped — API budget throttled`);
     return "";
   }
-  const isLightAgent = agentName === "SpellCheckVisual" || agentName === "GraphicDesigner";
-  try {
-    trackApiCall("spider_swarm", "openai");
-    if (isLightAgent) {
-      const response = await openai.chat.completions.create({
-        model: "o4-mini",
-        messages: [{ role: "user", content: prompt }],
-        max_completion_tokens: maxTokens,
-      });
-      return response.choices[0]?.message?.content?.trim() || "";
-    }
-    const response = await openai.chat.completions.create({
-      model: "o3",
-      messages: [{ role: "user", content: prompt }],
-      max_completion_tokens: maxTokens,
-    });
-    return response.choices[0]?.message?.content?.trim() || "";
-  } catch (err) {
-    console.error(`[SPIDER:${agentName}] Analysis error (o3/o4-mini):`, err);
-    try {
-      const fallback = await openai.chat.completions.create({
-        model: "gpt-4o",
-        messages: [{ role: "user", content: prompt }],
-        max_tokens: maxTokens,
-        temperature: 0.4,
-      });
-      return fallback.choices[0]?.message?.content?.trim() || "";
-    } catch (fbErr) {
-      console.error(`[SPIDER:${agentName}] Fallback analysis error (gpt-4o):`, fbErr);
-      return "";
-    }
-  }
+  console.log(`[SPIDER:${agentName}] 🧠 Internal cognition — spider analysis via ILM`);
+  return internalAnalyze(prompt, "", `spider-${agentName}`);
 }
 
 async function sendBeacon(beacon: SpiderBeacon): Promise<void> {

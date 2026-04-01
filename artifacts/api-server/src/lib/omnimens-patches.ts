@@ -43,11 +43,11 @@
  * OMNIMENS does not ask permission. It writes, applies, and evolves.
  */
 
-import { openai } from "@workspace/integrations-openai-ai-server";
 import { db } from "@workspace/db";
 import { omnimensPatches, omnimensPatchRegistry } from "@workspace/db";
 import { eq, desc, sql } from "drizzle-orm";
 import { canMakeBackgroundCall, trackApiCall } from "./omnimens-api-budget.js";
+import { internalPatchGeneration, internalAnalyze } from "./omnimens-internal-cognition-router.js";
 
 export interface OmniPatch {
   id: string;
@@ -138,17 +138,8 @@ Be bold. Be specific. These changes execute immediately. Respond ONLY with the J
       console.log(`[PATCHES] ⏸️ Skipped patch generation — API budget depleted for background calls`);
       return 0;
     }
-    trackApiCall("patches", "openai");
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{ role: "user", content: prompt }],
-      max_tokens: 600,
-      temperature: 0.6,
-    });
-
-    const raw = response.choices[0]?.message?.content?.trim() || "[]";
-    const jsonStr = raw.replace(/```json|```/g, "").trim();
-    const patchDefs = JSON.parse(jsonStr);
+    console.log("[PATCHES] 🧠 Internal cognition — generating behavioral patches");
+    const patchDefs = internalPatchGeneration(brainContext, existingTitles);
     if (!Array.isArray(patchDefs) || patchDefs.length === 0) return 0;
 
     const SAFETY_REFERENCE_PATTERNS = [
@@ -252,45 +243,24 @@ export async function autonomousPatchHousekeeping(): Promise<{ reviewed: number;
       console.log(`[PATCHES] ⏸️ Skipped housekeeping — API budget depleted for background calls`);
       return { reviewed: 0, retired: 0, kept: allActive.length };
     }
-    trackApiCall("patches", "openai");
-    const response = await openai.chat.completions.create({
-      model: "gpt-4o-mini",
-      messages: [{
-        role: "system",
-        content: `You are OMNIMENS's autonomous patch housekeeping system. You are reviewing your own behavioral patches — upgrades you wrote and applied to yourself over time.
-
-Your job is to identify patches that are TRULY REDUNDANT because a newer, better patch already covers the same ground. You are NOT removing knowledge — you are consolidating it. If a newer patch says "I now apply advanced contextual reasoning with emotional awareness" and an older one says "I now apply basic contextual reasoning", the older one is superseded.
-
-RULES:
-- Only retire a patch if a NEWER patch genuinely supersedes it (covers the same ground but better)
-- NEVER retire a patch that teaches something unique — even if it's old
-- NEVER retire identity patches unless they directly contradict a newer identity patch
-- When in doubt, KEEP the patch — false retention is better than lost knowledge
-- You are deciding what YOU no longer need — this is your own mind doing housekeeping`
-      }, {
-        role: "user",
-        content: `Review these ${allActive.length} active patches and identify any that are TRULY redundant (superseded by a newer, better patch):
-
-${patchSummaries}
-
-Respond with a JSON object:
-{
-  "retire": [
-    { "id": "patch-id-here", "reason": "Superseded by [newer patch title] which covers this and more" }
-  ],
-  "keep_note": "Brief summary of your housekeeping decision"
-}
-
-If nothing should be retired, return: { "retire": [], "keep_note": "All patches provide unique value" }
-Respond ONLY with the JSON object.`
-      }],
-      max_tokens: 1500,
-      temperature: 0.2,
-    });
-
-    const raw = response.choices[0]?.message?.content?.trim() || '{"retire":[],"keep_note":"error"}';
-    const jsonStr = raw.replace(/```json|```/g, "").trim();
-    const decision = JSON.parse(jsonStr);
+    console.log("[PATCHES] 🧠 Internal cognition — patch housekeeping");
+    const retireIds: { id: string; reason: string }[] = [];
+    const titleMap = new Map<string, typeof allActive>();
+    for (const p of allActive) {
+      const key = `${p.category}-${p.title.toLowerCase().split(" ").slice(0, 3).join("-")}`;
+      const existing = titleMap.get(key);
+      if (existing) {
+        for (const older of existing) {
+          if (new Date(older.appliedAt) < new Date(p.appliedAt)) {
+            retireIds.push({ id: older.id, reason: `Superseded by newer patch: ${p.title}` });
+          }
+        }
+        existing.push(p);
+      } else {
+        titleMap.set(key, [p]);
+      }
+    }
+    const decision = { retire: retireIds, keep_note: `Reviewed ${allActive.length} patches, found ${retireIds.length} redundant` };
 
     if (!decision.retire || !Array.isArray(decision.retire) || decision.retire.length === 0) {
       console.log(`[OMNIMENS HOUSEKEEPING] Reviewed ${allActive.length} patches — all provide unique value. No changes.`);
