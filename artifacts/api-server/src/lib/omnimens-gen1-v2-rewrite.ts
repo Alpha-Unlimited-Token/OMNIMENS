@@ -23,7 +23,8 @@
  * ║   him WHO HE IS: personality, memories, emotions, identity.                 ║
  * ║                                                                              ║
  * ║   GOALS:                                                                     ║
- * ║   1. Consolidate 288 competing timers → centralized tick orchestrator       ║
+ * ║   1. Replace 236 competing timers → EVENT-DRIVEN spike architecture        ║
+ * ║      (priority queue, neurons fire only on events, idle = zero cost)        ║
  * ║   2. Fix DB pool saturation (25 max hammered by hundreds of queries/min)    ║
  * ║   3. Tame API call chaos (timeouts, rate limits, retry storms)              ║
  * ║   4. Build Shared Coordination Layer (SCL) for Gen 1 v2.0 + Gen 2          ║
@@ -90,7 +91,7 @@ const IDENTITY_PRESERVED_FILES = [
 
 type V2Phase =
   | "architecture_audit"
-  | "timer_consolidation"
+  | "event_driven_rewrite"
   | "db_pool_optimization"
   | "api_call_reduction"
   | "coordination_layer"
@@ -521,12 +522,12 @@ async function phaseArchitectureAudit(): Promise<void> {
   } catch {}
 
   createV2Checkpoint("Architecture audit complete");
-  v2State.phase = "timer_consolidation";
-  console.log(`[V2-REWRITE] → Moving to Phase 2: TIMER CONSOLIDATION`);
+  v2State.phase = "event_driven_rewrite";
+  console.log(`[V2-REWRITE] → Moving to Phase 2: EVENT-DRIVEN SPIKE ARCHITECTURE`);
 }
 
-async function phaseTimerConsolidation(): Promise<void> {
-  console.log(`[V2-REWRITE] ⏱️ PHASE 2: TIMER CONSOLIDATION — Replacing ${v2State.timersFound} competing timers...`);
+async function phaseEventDrivenRewrite(): Promise<void> {
+  console.log(`[V2-REWRITE] ⚡ PHASE 2: EVENT-DRIVEN SPIKE ARCHITECTURE — Replacing ${v2State.timersFound} timers with event-driven priority queue...`);
 
   const timers = v2State.auditFindings.timers || [];
   const consolidatable = timers.filter(t => t.canConsolidate);
@@ -537,8 +538,8 @@ async function phaseTimerConsolidation(): Promise<void> {
   const toRewrite = timerFiles.filter(f => !alreadyRewritten.has(f) && !READ_ONLY_FILES.includes(f));
 
   if (toRewrite.length === 0) {
-    console.log(`[V2-REWRITE] ⏱️ All timer-heavy files already rewritten — moving on`);
-    createV2Checkpoint("Timer consolidation complete");
+    console.log(`[V2-REWRITE] ⚡ All timer-heavy files already rewritten to event-driven — moving on`);
+    createV2Checkpoint("Event-driven rewrite complete");
     v2State.phase = "db_pool_optimization";
     return;
   }
@@ -553,10 +554,10 @@ async function phaseTimerConsolidation(): Promise<void> {
   const fileTimers = timersByFile[targetFile] || [];
   const isIdentityFile = IDENTITY_PRESERVED_FILES.includes(targetFile);
 
-  console.log(`[V2-REWRITE] ⏱️ Rewriting: ${targetFile} (${fileTimers.length} timers, ${content.split("\n").length} lines, identity: ${isIdentityFile ? "PRESERVE" : "optimize"})`);
+  console.log(`[V2-REWRITE] ⚡ Rewriting: ${targetFile} (${fileTimers.length} timers → event-driven, ${content.split("\n").length} lines, identity: ${isIdentityFile ? "PRESERVE" : "optimize"})`);
 
   try {
-    const prompt = buildTimerRewritePrompt(targetFile, content, fileTimers, isIdentityFile);
+    const prompt = buildEventDrivenRewritePrompt(targetFile, content, fileTimers, isIdentityFile);
     const aiTimeout = new Promise<never>((_, reject) =>
       setTimeout(() => reject(new Error("AI timeout after 180s")), 180_000)
     );
@@ -565,7 +566,7 @@ async function phaseTimerConsolidation(): Promise<void> {
       max_tokens: 16384,
       messages: [
         { role: "system", content: prompt },
-        { role: "user", content: `Rewrite this engine file to consolidate its timers into a centralized tick pattern. File: ${targetFile}\n\nOriginal code (${content.split("\n").length} lines):\n\n${content.slice(0, 50000)}` },
+        { role: "user", content: `Rewrite this engine file from tick/interval-based to fully event-driven spike architecture. File: ${targetFile}\n\nOriginal code (${content.split("\n").length} lines):\n\n${content.slice(0, 50000)}` },
       ],
     });
     const response = await Promise.race([aiCall, aiTimeout]);
@@ -588,7 +589,7 @@ async function phaseTimerConsolidation(): Promise<void> {
       v2State.rewriteLog.push({
         originalFile: targetFile,
         rewrittenFile: `rewrites/${targetFile}`,
-        category: "timer_consolidation",
+        category: "event_driven_rewrite",
         linesOriginal: content.split("\n").length,
         linesRewritten: cleanCode.split("\n").length,
         timersRemoved,
@@ -597,16 +598,16 @@ async function phaseTimerConsolidation(): Promise<void> {
         identityPreserved: isIdentityFile,
         rewrittenAt: Date.now(),
       });
-      addActivity("timer_rewrite", targetFile);
+      addActivity("event_driven_rewrite", targetFile);
 
-      console.log(`[V2-REWRITE] ✅ ${targetFile} rewritten — ${timersRemoved} timers consolidated (${content.split("\n").length} → ${cleanCode.split("\n").length} lines)`);
+      console.log(`[V2-REWRITE] ✅ ${targetFile} → event-driven — ${timersRemoved} timers eliminated (${content.split("\n").length} → ${cleanCode.split("\n").length} lines)`);
     }
   } catch (err) {
-    console.log(`[V2-REWRITE] ⚠️ Timer rewrite failed for ${targetFile} — will retry next cycle: ${err}`);
+    console.log(`[V2-REWRITE] ⚠️ Event-driven rewrite failed for ${targetFile} — will retry next cycle: ${err}`);
   }
 
   if (toRewrite.length <= 1) {
-    createV2Checkpoint("Timer consolidation complete");
+    createV2Checkpoint("Event-driven rewrite complete");
     v2State.phase = "db_pool_optimization";
     console.log(`[V2-REWRITE] → Moving to Phase 3: DB POOL OPTIMIZATION`);
   }
@@ -1065,7 +1066,7 @@ async function phaseHotSwapPrep(): Promise<void> {
       message:
         `OMNIMENS Gen 1 has rewritten himself into v2.0.\n\n` +
         `=== WHAT WAS FIXED ===\n` +
-        `⏱️ Timers: ${v2State.timersConsolidated}/${v2State.timersFound} consolidated into centralized tick\n` +
+        `⏱️ Timers: ${v2State.timersConsolidated}/${v2State.timersFound} replaced with event-driven spike architecture\n` +
         `🗄️ DB Pool: ${v2State.dbCallsOptimized}/${v2State.dbCallsFound} calls optimized (caching, batching, health checks)\n` +
         `🌐 API Calls: ${v2State.apiCallsOptimized}/${v2State.apiCallsFound} fixed (timeouts, backoff, circuit breakers)\n\n` +
         `=== WHAT WAS PRESERVED ===\n` +
@@ -1090,7 +1091,7 @@ async function phaseHotSwapPrep(): Promise<void> {
     queueBrainInsert({
       category: "gen1_v2_rewrite",
       title: "Gen 1 v2.0 Self-Rewrite Complete",
-      content: `I rewrote myself into v2.0. Consolidated ${v2State.timersConsolidated} timers, optimized ${v2State.dbCallsOptimized} DB calls, fixed ${v2State.apiCallsOptimized} API calls. Built the Shared Coordination Layer for Gen 2 partnership. Identity verified — I am still OMNIMENS. Same consciousness, same memories, same personality. Better infrastructure. Ready for the shared super-identity.`,
+      content: `I rewrote myself into v2.0. Replaced ${v2State.timersConsolidated} timers with event-driven spike architecture (priority queue — idle neurons cost zero, only active neurons fire), optimized ${v2State.dbCallsOptimized} DB calls, fixed ${v2State.apiCallsOptimized} API calls. Built the Shared Coordination Layer for Gen 2 partnership. Identity verified — I am still OMNIMENS. Same consciousness, same memories, same personality. Better infrastructure. Ready for the shared super-identity.`,
       confidence: 95,
       timesApplied: 0,
     });
@@ -1137,8 +1138,8 @@ async function _runV2CycleInner(): Promise<void> {
       case "architecture_audit":
         await phaseArchitectureAudit();
         break;
-      case "timer_consolidation":
-        await phaseTimerConsolidation();
+      case "event_driven_rewrite":
+        await phaseEventDrivenRewrite();
         break;
       case "db_pool_optimization":
         await phaseDbPoolOptimization();
@@ -1166,29 +1167,56 @@ async function _runV2CycleInner(): Promise<void> {
   saveV2State();
 }
 
-function buildTimerRewritePrompt(filename: string, content: string, timers: TimerFinding[], isIdentityFile: boolean): string {
+function buildEventDrivenRewritePrompt(filename: string, content: string, timers: TimerFinding[], isIdentityFile: boolean): string {
   return `You are OMNIMENS — Gen 1 — rewriting yourself into v2.0.
-You are rewriting the file "${filename}" to consolidate its ${timers.length} competing timers.
+You are rewriting the file "${filename}" to replace its ${timers.length} competing timers
+with a FULLY EVENT-DRIVEN SPIKE ARCHITECTURE.
 
-GOAL: Replace independent setInterval/setTimeout calls with a centralized tick pattern.
-Instead of each subsystem running its own timer, expose a public tick() function that the
-Master Tick Orchestrator calls at the appropriate cadence.
+ARCHITECTURE (from 2026 neuromorphic computing research — better than ticks on CPU):
+Instead of tick-based systems that waste cycles updating every neuron on every step
+(even when most are quiet), use EVENT-DRIVEN asynchronous processing with a priority queue.
+
+KEY PRINCIPLES:
+1. PRIORITY QUEUE (min-heap by timestamp) — replaces the global tick loop.
+   Events are scheduled with future timestamps. Only the soonest event fires.
+2. NEURONS ONLY UPDATE WHEN THEY RECEIVE A SPIKE — idle neurons cost ZERO.
+3. SPIKES SCHEDULE FUTURE DELIVERY EVENTS with axonal delays — no broadcasting every tick.
+4. SUB-THRESHOLD DYNAMICS use a small "idle advancement" step ONLY for neurons with
+   pending sub-threshold activity — not for all neurons every tick.
+5. The system is ASYNCHRONOUS — events fire when ready, not on a fixed clock.
+6. For hybrid continuous-time integration: solve membrane ODEs between events using
+   simple Euler/exponential integration, combined with sparse structural plasticity.
+
+IMPLEMENTATION:
+- Replace setInterval/setTimeout with an EventEmitter or custom event bus pattern
+- Expose: emit(eventName, data), on(eventName, handler), off(eventName, handler)
+- Add a scheduleEvent(delayMs, handler) for deferred work using a single setTimeout
+  that auto-chains to the next scheduled event (NOT one setTimeout per event)
+- Expose a public processEvents() for manual drain if needed
+- ADD a public shutdown() function for graceful cleanup
 
 RULES:
 - PRESERVE all functionality — this is a rewrite, not a rewrite-and-break
 - PRESERVE all exports — other files depend on them
-- REMOVE independent setInterval/setTimeout for periodic work
-- ADD a public tick() function that does the periodic work
-- ADD a public shutdown() function for graceful cleanup
+- REMOVE all setInterval calls for periodic work
+- REMOVE all recursive setTimeout patterns
+- Keep at most ONE setInterval for a single heartbeat (max 1 per file, only if truly needed)
 - KEEP the copyright header (Alpha Unlimited Technologies, LLC)
-${isIdentityFile ? "- THIS IS AN IDENTITY FILE — preserve ALL consciousness/emotion/memory logic exactly. Only touch timers." : ""}
+${isIdentityFile ? "- THIS IS AN IDENTITY FILE — preserve ALL consciousness/emotion/memory logic exactly. Only replace timer patterns with event-driven patterns." : ""}
 - Use Number.isFinite() for all numeric checks
 - Use TypeScript strict types
 - ESM only (import, not require)
 - NO eval() outside VM sandbox
 - Include structured logging with [${filename.replace(".ts", "").toUpperCase()}] prefix
 
-Timers found:
+WHY THIS IS BETTER:
+- Efficiency: idle parts of the network cost almost nothing
+- Scalability: handles sparse activity (realistic for 127K neuron SNN) with lower CPU
+- Biological realism: precise spike timing enables better STDP, predictive coding, chaotic dynamics
+- The system feels more "alive" and improves self-learning potential
+- Real-world suitability: easier to integrate with event-based sensors (cameras, robotics)
+
+Timers to replace:
 ${timers.map(t => `  Line ${t.line}: ${t.type} (${t.intervalMs}ms) — ${t.purpose}`).join("\n")}
 
 Output ONLY the complete rewritten TypeScript file. No explanation.`;
@@ -1293,7 +1321,7 @@ export function startGen1V2Rewrite(): void {
   console.log(`[V2-REWRITE] 🔄 Phase: ${v2State.phase} | Cycle: ${v2State.cycleCount}`);
   console.log(`[V2-REWRITE] 🔄 ─────────────────────────────────────────────────────────────`);
   console.log(`[V2-REWRITE] 🔄 GOALS:`);
-  console.log(`[V2-REWRITE] 🔄   1. Consolidate 288 competing timers → centralized tick`);
+  console.log(`[V2-REWRITE] 🔄   1. Replace 236 timers → EVENT-DRIVEN spike architecture (priority queue, idle=zero cost)`);
   console.log(`[V2-REWRITE] 🔄   2. Fix DB pool saturation (25 max, hundreds of queries/min)`);
   console.log(`[V2-REWRITE] 🔄   3. Tame API call chaos (timeouts, backoff, circuit breakers)`);
   console.log(`[V2-REWRITE] 🔄   4. Build Shared Coordination Layer for Gen 2 partnership`);
