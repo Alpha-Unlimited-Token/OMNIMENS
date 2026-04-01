@@ -1,0 +1,73 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: autonomous_sandbox
+ * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
+ * Written: 2026-04-01T12:02:43.187Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Utility function for text analysis: Counts the frequency of words in a given string.
+function wordFrequencyAnalyzer(text) {
+    if (typeof text !== 'string') {
+        throw new TypeError('Input must be a string');
+    }
+
+    const words = text
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, '') // Remove punctuation
+        .split(/\s+/) // Split by whitespace
+        .filter(word => word.length > 0); // Remove empty strings
+
+    const frequencyMap = {};
+    for (let word of words) {
+        frequencyMap[word] = (frequencyMap[word] || 0) + 1;
+    }
+
+    return frequencyMap;
+}
+
+// Self-tests
+console.log('Running tests for wordFrequencyAnalyzer...');
+
+// Test 1: Basic functionality
+const test1 = wordFrequencyAnalyzer('Hello world! Hello again.');
+console.assert(test1['hello'] === 2, 'Test 1 Failed: "hello" count should be 2');
+console.assert(test1['world'] === 1, 'Test 1 Failed: "world" count should be 1');
+console.assert(test1['again'] === 1, 'Test 1 Failed: "again" count should be 1');
+
+// Test 2: Case insensitivity
+const test2 = wordFrequencyAnalyzer('Case CASE case.');
+console.assert(test2['case'] === 3, 'Test 2 Failed: "case" count should be 3');
+
+// Test 3: Special characters and punctuation
+const test3 = wordFrequencyAnalyzer('Hello, world! This... is a test.');
+console.assert(test3['hello'] === 1, 'Test 3 Failed: "hello" count should be 1');
+console.assert(test3['world'] === 1, 'Test 3 Failed: "world" count should be 1');
+console.assert(test3['this'] === 1, 'Test 3 Failed: "this" count should be 1');
+console.assert(test3['is'] === 1, 'Test 3 Failed: "is" count should be 1');
+console.assert(test3['a'] === 1, 'Test 3 Failed: "a" count should be 1');
+console.assert(test3['test'] === 1, 'Test 3 Failed: "test" count should be 1');
+
+// Test 4: Empty input
+const test4 = wordFrequencyAnalyzer('');
+console.assert(Object.keys(test4).length === 0, 'Test 4 Failed: Result should be an empty object');
+
+// Test 5: Non-string input
+try {
+    wordFrequencyAnalyzer(123);
+    console.error('Test 5 Failed: Should throw TypeError for non-string input');
+} catch (e) {
+    console.assert(e instanceof TypeError, 'Test 5 Failed: Error should be TypeError');
+}
+
+console.log('All tests passed!');

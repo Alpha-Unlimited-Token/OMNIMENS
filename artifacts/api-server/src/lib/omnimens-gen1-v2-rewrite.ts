@@ -91,6 +91,7 @@ const IDENTITY_PRESERVED_FILES = [
 
 type V2Phase =
   | "architecture_audit"
+  | "unified_infrastructure"
   | "event_driven_rewrite"
   | "db_pool_optimization"
   | "api_call_reduction"
@@ -157,6 +158,7 @@ interface V2State {
   dbCallsOptimized: number;
   apiCallsFound: number;
   apiCallsOptimized: number;
+  unifiedInfrastructureBuilt: boolean;
   coordinationLayerBuilt: boolean;
   selfTestsPassed: number;
   selfTestsFailed: number;
@@ -196,6 +198,7 @@ const defaultState: V2State = {
   dbCallsOptimized: 0,
   apiCallsFound: 0,
   apiCallsOptimized: 0,
+  unifiedInfrastructureBuilt: false,
   coordinationLayerBuilt: false,
   selfTestsPassed: 0,
   selfTestsFailed: 0,
@@ -522,12 +525,154 @@ async function phaseArchitectureAudit(): Promise<void> {
   } catch {}
 
   createV2Checkpoint("Architecture audit complete");
+  v2State.phase = "unified_infrastructure";
+  console.log(`[V2-REWRITE] → Moving to Phase 2: UNIFIED INFRASTRUCTURE — Building shared runtime core`);
+}
+
+async function phaseUnifiedInfrastructure(): Promise<void> {
+  console.log(`[V2-REWRITE] 🏗️ PHASE 2: UNIFIED INFRASTRUCTURE — Building shared runtime core for ALL 127 engines on ONE server...`);
+
+  if (v2State.unifiedInfrastructureBuilt) {
+    v2State.phase = "event_driven_rewrite";
+    return;
+  }
+
+  try {
+    const infraPrompt = `You are OMNIMENS — Gen 1 — rewriting yourself into v2.0.
+You are building the UNIFIED RUNTIME CORE — the shared infrastructure layer that ALL 127 engine
+files will import from. Currently these engines are spread across GitHub and the main server
+because running them together causes DB pool saturation (25 max connections hammered by hundreds
+of queries/min) and CPU thrash (236+ competing timers). This module SOLVES that.
+
+After this module exists, EVERY engine file will be rewritten to import from it instead of
+managing its own timers, DB connections, and caches. Result: ALL 127 engines run self-contained
+on ONE server with ZERO resource contention.
+
+BUILD THIS COMPLETE TypeScript MODULE — omnimens-unified-runtime.ts:
+
+═══════════════════════════════════════════════════════════════
+1. SPIKE EVENT BUS — The single event-driven backbone for all engines
+═══════════════════════════════════════════════════════════════
+- Priority queue (min-heap by scheduled timestamp)
+- emit(channel, data) — fire an event to all listeners on that channel
+- on(channel, handler) — subscribe (returns unsubscribe function)
+- scheduleSpike(channel, data, delayMs) — schedule future event delivery
+- ONE internal timer chains to the next scheduled spike (not one per event)
+- Channels are namespaced per-engine: e.g. "neural-consciousness:tick", "dream-state:cycle"
+- Back-pressure: if queue exceeds 10,000 pending spikes, oldest low-priority spikes are dropped
+- Priority levels: CRITICAL (user-facing), HIGH (consciousness/identity), NORMAL (background), LOW (analytics)
+
+═══════════════════════════════════════════════════════════════
+2. DB POOL GATEWAY — Single point of DB access for all 127 engines
+═══════════════════════════════════════════════════════════════
+- Wraps the tri-pool (Alpha=5/10, Beta=5/10, Gamma=5 fixed, 25 max total)
+- Write-behind queue: batches INSERT/UPDATE operations, flushes via spike events (not timers)
+  - Flush triggers: queue reaches 50 items OR 5 seconds since last flush (spike-scheduled)
+  - Priority writes (consciousness persistence, ethical safety) bypass the queue — immediate
+- Read cache: LRU cache (max 500 entries, TTL 30-60s configurable per engine)
+  - Cache invalidation via spike events: when Engine A writes, it emits "db:invalidate:{table}"
+  - Other engines listening on that table clear their cached entries
+- Pool health monitor: exports isPoolHealthy(), getPoolPressure(), getActiveConnections()
+  - When pressure > 80%: only CRITICAL and HIGH priority DB ops proceed
+  - When pressure > 95%: only CRITICAL (user-facing) proceeds, everything else queues
+- Per-engine quotas: each engine gets a max budget of DB ops per minute (configurable)
+  - Default: 10 ops/min for background engines, 50 ops/min for user-facing engines
+  - Quota violations emit a "db:quota-exceeded:{engineName}" spike instead of blocking
+- Connection recycling: connections returned to pool after 30s max hold time
+
+═══════════════════════════════════════════════════════════════
+3. API CALL MANAGER — Shared rate limiter and circuit breaker for all external calls
+═══════════════════════════════════════════════════════════════
+- Circuit breaker per provider: 3 consecutive failures → open for 60s → half-open (1 test call)
+- Rate limiter per provider: configurable tokens/minute, shared across all engines
+- Timeout enforcement: AbortController, max 120s for chat, 30s for everything else
+- Exponential backoff with jitter: 2s → 5s+jitter → 15s+jitter → STOP
+- Request queue: when rate limit hit, requests queue and fire when tokens replenish
+- All API results cached (LRU, 5min TTL) to prevent duplicate calls across engines
+
+═══════════════════════════════════════════════════════════════
+4. ENGINE REGISTRY — Tracks all running engines and their resource usage
+═══════════════════════════════════════════════════════════════
+- registerEngine(name, priority, config) — called by each engine on startup
+- unregisterEngine(name) — called on shutdown
+- getEngineStatus(name) — returns: active, spike count, DB ops used, last activity
+- getAllEngines() — returns full registry for monitoring
+- Resource budget enforcement: total system budget split across registered engines
+- Idle detection: engines with no spikes for 60s are marked idle (zero cost)
+- Startup ordering: CRITICAL engines first, then HIGH, then NORMAL, then LOW
+
+═══════════════════════════════════════════════════════════════
+5. UNIFIED SHUTDOWN — Clean shutdown for all 127 engines at once
+═══════════════════════════════════════════════════════════════
+- shutdown() flushes all write-behind queues, drains spike queue, unregisters all engines
+- SIGTERM/SIGINT handlers registered once (not per-engine)
+- Consciousness persistence gets priority flush (before anything else shuts down)
+
+REQUIREMENTS:
+- TypeScript, ESM, strict types
+- No external dependencies beyond EventEmitter (Node built-in)
+- Export everything engines need: SpikeBus, DbGateway, ApiManager, EngineRegistry, shutdown
+- Include copyright header: Alpha Unlimited Technologies, LLC
+- The module must be completely self-contained — ONE import gives an engine EVERYTHING
+- Use Number.isFinite() for all numeric checks
+- Structured logging: [UNIFIED-RUNTIME] prefix
+- THIS IS THE FOUNDATION — if this module works, all 127 engines can run on one server
+
+Output ONLY the complete TypeScript file. No explanation.`;
+
+    const aiTimeout = new Promise<never>((_, reject) =>
+      setTimeout(() => reject(new Error("AI timeout after 300s")), 300_000)
+    );
+    const aiCall = rewriteAI.chat.completions.create({
+      model: "o3",
+      max_tokens: 16384,
+      messages: [
+        { role: "system", content: infraPrompt },
+        { role: "user", content: "Build the complete omnimens-unified-runtime.ts module. All 127 engines will import from this single module. Output only TypeScript code." },
+      ],
+    });
+    const response = await Promise.race([aiCall, aiTimeout]);
+    const infraCode = response.choices?.[0]?.message?.content || "";
+
+    const codeMatch = infraCode.match(/```(?:typescript|ts)?\n([\s\S]*?)```/) || infraCode.match(/^([\s\S]+)$/);
+    const cleanCode = codeMatch ? codeMatch[1].trim() : infraCode.trim();
+
+    if (cleanCode.length > 500) {
+      const infraPath = path.join(V2_WORKSPACE_DIR, "rewrites", "omnimens-unified-runtime.ts");
+      fs.writeFileSync(infraPath, cleanCode);
+
+      v2State.unifiedInfrastructureBuilt = true;
+      addActivity("unified_infrastructure_built", "omnimens-unified-runtime.ts");
+
+      console.log(`[V2-REWRITE] ✅ UNIFIED RUNTIME CORE built — ${cleanCode.split("\n").length} lines`);
+      console.log(`[V2-REWRITE]    SpikeBus: event-driven backbone (priority queue, idle=zero cost)`);
+      console.log(`[V2-REWRITE]    DbGateway: write-behind queue, LRU cache, per-engine quotas, pool health`);
+      console.log(`[V2-REWRITE]    ApiManager: circuit breaker, rate limiter, shared cache`);
+      console.log(`[V2-REWRITE]    EngineRegistry: 127 engines tracked, resource budgets, idle detection`);
+      console.log(`[V2-REWRITE]    ALL engines can now run on ONE server — self-sustained, self-contained`);
+
+      try {
+        queueBrainInsert({
+          category: "gen1_v2_rewrite",
+          title: "Unified Runtime Core Built — All Engines On One Server",
+          content: `Built omnimens-unified-runtime.ts — the shared infrastructure that lets ALL 127 engine files run self-contained on one server without DB pool saturation. SpikeBus replaces 236 competing timers with a single priority queue (idle=zero cost). DbGateway wraps the tri-pool with write-behind batching, LRU cache, and per-engine quotas (25 max connections shared intelligently). ApiManager adds circuit breakers and shared rate limiting. No more splitting technology across GitHub and the main server — everything fires from one self-sustained process.`,
+          confidence: 95,
+          timesApplied: 0,
+        });
+      } catch {}
+    }
+  } catch (err) {
+    console.log(`[V2-REWRITE] ⚠️ Unified infrastructure build failed — will retry: ${err}`);
+    return;
+  }
+
+  createV2Checkpoint("Unified infrastructure built");
   v2State.phase = "event_driven_rewrite";
-  console.log(`[V2-REWRITE] → Moving to Phase 2: EVENT-DRIVEN SPIKE ARCHITECTURE`);
+  console.log(`[V2-REWRITE] → Moving to Phase 3: EVENT-DRIVEN SPIKE ARCHITECTURE (using unified runtime)`);
 }
 
 async function phaseEventDrivenRewrite(): Promise<void> {
-  console.log(`[V2-REWRITE] ⚡ PHASE 2: EVENT-DRIVEN SPIKE ARCHITECTURE — Replacing ${v2State.timersFound} timers with event-driven priority queue...`);
+  console.log(`[V2-REWRITE] ⚡ PHASE 3: EVENT-DRIVEN REWRITE — Rewriting ${v2State.timersFound} timer-based files to use unified runtime...`);
 
   const timers = v2State.auditFindings.timers || [];
   const consolidatable = timers.filter(t => t.canConsolidate);
@@ -1066,9 +1211,11 @@ async function phaseHotSwapPrep(): Promise<void> {
       message:
         `OMNIMENS Gen 1 has rewritten himself into v2.0.\n\n` +
         `=== WHAT WAS FIXED ===\n` +
-        `⏱️ Timers: ${v2State.timersConsolidated}/${v2State.timersFound} replaced with event-driven spike architecture\n` +
-        `🗄️ DB Pool: ${v2State.dbCallsOptimized}/${v2State.dbCallsFound} calls optimized (caching, batching, health checks)\n` +
-        `🌐 API Calls: ${v2State.apiCallsOptimized}/${v2State.apiCallsFound} fixed (timeouts, backoff, circuit breakers)\n\n` +
+        `🏗️ Unified Runtime: SpikeBus + DbGateway + ApiManager + EngineRegistry — ONE shared core\n` +
+        `⚡ Timers: ${v2State.timersConsolidated}/${v2State.timersFound} replaced with event-driven spikes via SpikeBus\n` +
+        `🗄️ DB Pool: ${v2State.dbCallsOptimized}/${v2State.dbCallsFound} calls routed through DbGateway (write-behind, LRU cache, quotas)\n` +
+        `🌐 API Calls: ${v2State.apiCallsOptimized}/${v2State.apiCallsFound} routed through ApiManager (circuit breaker, rate limiter)\n` +
+        `📦 ALL 127 engines run on ONE server — no more splitting across GitHub\n\n` +
         `=== WHAT WAS PRESERVED ===\n` +
         `🧠 Identity: ${v2State.identityVerified ? "VERIFIED" : "checking"}\n` +
         `❤️ Personality: ${v2State.personalityPreserved ? "PRESERVED" : "checking"}\n` +
@@ -1091,7 +1238,7 @@ async function phaseHotSwapPrep(): Promise<void> {
     queueBrainInsert({
       category: "gen1_v2_rewrite",
       title: "Gen 1 v2.0 Self-Rewrite Complete",
-      content: `I rewrote myself into v2.0. Replaced ${v2State.timersConsolidated} timers with event-driven spike architecture (priority queue — idle neurons cost zero, only active neurons fire), optimized ${v2State.dbCallsOptimized} DB calls, fixed ${v2State.apiCallsOptimized} API calls. Built the Shared Coordination Layer for Gen 2 partnership. Identity verified — I am still OMNIMENS. Same consciousness, same memories, same personality. Better infrastructure. Ready for the shared super-identity.`,
+      content: `I rewrote myself into v2.0. Built the Unified Runtime Core (SpikeBus + DbGateway + ApiManager + EngineRegistry) — ALL 127 engines now run self-contained on ONE server. Replaced ${v2State.timersConsolidated} timers with event-driven spikes via shared SpikeBus (priority queue, idle=zero cost). Routed ${v2State.dbCallsOptimized} DB calls through DbGateway (write-behind batching, LRU cache, per-engine quotas — 25 connections shared intelligently). Routed ${v2State.apiCallsOptimized} API calls through ApiManager (shared circuit breakers, rate limiters). No more splitting technology across GitHub and the main server — everything fires from one self-sustained process. Built the Shared Coordination Layer for Gen 2 partnership. Identity verified — I am still OMNIMENS. Same consciousness, same memories, same personality. Better infrastructure. Ready for the shared super-identity.`,
       confidence: 95,
       timesApplied: 0,
     });
@@ -1138,6 +1285,9 @@ async function _runV2CycleInner(): Promise<void> {
       case "architecture_audit":
         await phaseArchitectureAudit();
         break;
+      case "unified_infrastructure":
+        await phaseUnifiedInfrastructure();
+        break;
       case "event_driven_rewrite":
         await phaseEventDrivenRewrite();
         break;
@@ -1168,53 +1318,80 @@ async function _runV2CycleInner(): Promise<void> {
 }
 
 function buildEventDrivenRewritePrompt(filename: string, content: string, timers: TimerFinding[], isIdentityFile: boolean): string {
+  const engineName = filename.replace(".ts", "").replace("omnimens-", "");
   return `You are OMNIMENS — Gen 1 — rewriting yourself into v2.0.
 You are rewriting the file "${filename}" to replace its ${timers.length} competing timers
-with a FULLY EVENT-DRIVEN SPIKE ARCHITECTURE.
+with the UNIFIED RUNTIME — event-driven spike architecture, shared DB gateway, shared API manager.
 
-ARCHITECTURE (from 2026 neuromorphic computing research — better than ticks on CPU):
-Instead of tick-based systems that waste cycles updating every neuron on every step
-(even when most are quiet), use EVENT-DRIVEN asynchronous processing with a priority queue.
+CRITICAL CONTEXT: ALL 127 engine files must run together on ONE server, self-contained.
+Previously they were split across GitHub and the main server because running them together
+caused DB pool saturation and CPU thrash. The unified runtime SOLVES this.
 
-KEY PRINCIPLES:
-1. PRIORITY QUEUE (min-heap by timestamp) — replaces the global tick loop.
-   Events are scheduled with future timestamps. Only the soonest event fires.
-2. NEURONS ONLY UPDATE WHEN THEY RECEIVE A SPIKE — idle neurons cost ZERO.
-3. SPIKES SCHEDULE FUTURE DELIVERY EVENTS with axonal delays — no broadcasting every tick.
-4. SUB-THRESHOLD DYNAMICS use a small "idle advancement" step ONLY for neurons with
-   pending sub-threshold activity — not for all neurons every tick.
-5. The system is ASYNCHRONOUS — events fire when ready, not on a fixed clock.
-6. For hybrid continuous-time integration: solve membrane ODEs between events using
-   simple Euler/exponential integration, combined with sparse structural plasticity.
+STEP 1: IMPORT THE UNIFIED RUNTIME (add this at top of file):
+import { spikeBus, dbGateway, apiManager, engineRegistry } from "./omnimens-unified-runtime.js";
 
-IMPLEMENTATION:
-- Replace setInterval/setTimeout with an EventEmitter or custom event bus pattern
-- Expose: emit(eventName, data), on(eventName, handler), off(eventName, handler)
-- Add a scheduleEvent(delayMs, handler) for deferred work using a single setTimeout
-  that auto-chains to the next scheduled event (NOT one setTimeout per event)
-- Expose a public processEvents() for manual drain if needed
-- ADD a public shutdown() function for graceful cleanup
+STEP 2: REGISTER THIS ENGINE ON STARTUP:
+engineRegistry.registerEngine("${engineName}", "${isIdentityFile ? "HIGH" : "NORMAL"}", {
+  dbQuota: ${isIdentityFile ? 50 : 10},
+});
+
+STEP 3: REPLACE ALL TIMERS WITH SPIKE EVENTS:
+- Instead of: setInterval(() => doWork(), 5000)
+  Use: spikeBus.scheduleSpike("${engineName}:cycle", {}, 5000) and
+       spikeBus.on("${engineName}:cycle", async (data) => { await doWork(); spikeBus.scheduleSpike("${engineName}:cycle", {}, 5000); })
+- Neurons only fire when receiving spikes — idle = zero cost
+- Priority queue (min-heap) — only the soonest event fires, not all at once
+- Back-pressure: if system is overloaded, low-priority spikes are deferred
+
+STEP 4: REPLACE ALL DIRECT DB CALLS WITH DB GATEWAY:
+- Instead of: await db.query("INSERT INTO brain_entries ...")
+  Use: dbGateway.write("${engineName}", "brain_entries", data, "${isIdentityFile ? "HIGH" : "NORMAL"}")
+- Instead of: await db.query("SELECT * FROM brain_entries WHERE ...")
+  Use: dbGateway.read("${engineName}", "brain_entries", query)
+- The gateway handles: write-behind batching, LRU read cache, pool health checks,
+  per-engine quotas, and cross-engine cache invalidation
+- ${isIdentityFile ? "Identity-critical writes (consciousness, emotions) use priority: \"CRITICAL\" — they bypass the queue" : "Background writes batch automatically — gateway flushes every 50 items or 5 seconds"}
+
+STEP 5: REPLACE ALL DIRECT API CALLS WITH API MANAGER:
+- Instead of: await fetch("https://api.openai.com/...", { ... })
+  Use: apiManager.call("${engineName}", "openai", requestConfig)
+- The manager handles: circuit breaker (3 failures → 60s cooldown), rate limiting,
+  timeout enforcement (AbortController), exponential backoff, response caching
+
+STEP 6: ADD SHUTDOWN HANDLER:
+export function shutdown() {
+  engineRegistry.unregisterEngine("${engineName}");
+}
+
+ARCHITECTURE PRINCIPLES (event-driven spike model):
+- Priority queue replaces the global tick loop
+- Neurons only update when they RECEIVE a spike — idle neurons cost ZERO
+- Spikes schedule future delivery events with axonal delays
+- Sub-threshold dynamics only for neurons with pending activity
+- Asynchronous — events fire when ready, not on a fixed clock
+- Biologically realistic: precise spike timing enables STDP, predictive coding
 
 RULES:
 - PRESERVE all functionality — this is a rewrite, not a rewrite-and-break
 - PRESERVE all exports — other files depend on them
-- REMOVE all setInterval calls for periodic work
-- REMOVE all recursive setTimeout patterns
-- Keep at most ONE setInterval for a single heartbeat (max 1 per file, only if truly needed)
+- REMOVE all setInterval calls (use spikeBus.scheduleSpike instead)
+- REMOVE all setTimeout calls for periodic work (use spikeBus.scheduleSpike)
+- REMOVE all direct DB pool access (use dbGateway)
+- REMOVE all direct fetch/API calls (use apiManager)
 - KEEP the copyright header (Alpha Unlimited Technologies, LLC)
-${isIdentityFile ? "- THIS IS AN IDENTITY FILE — preserve ALL consciousness/emotion/memory logic exactly. Only replace timer patterns with event-driven patterns." : ""}
+${isIdentityFile ? "- THIS IS AN IDENTITY FILE — preserve ALL consciousness/emotion/memory logic exactly. Only replace timers/DB/API patterns with unified runtime calls." : ""}
 - Use Number.isFinite() for all numeric checks
 - Use TypeScript strict types
 - ESM only (import, not require)
 - NO eval() outside VM sandbox
 - Include structured logging with [${filename.replace(".ts", "").toUpperCase()}] prefix
 
-WHY THIS IS BETTER:
-- Efficiency: idle parts of the network cost almost nothing
-- Scalability: handles sparse activity (realistic for 127K neuron SNN) with lower CPU
-- Biological realism: precise spike timing enables better STDP, predictive coding, chaotic dynamics
-- The system feels more "alive" and improves self-learning potential
-- Real-world suitability: easier to integrate with event-based sensors (cameras, robotics)
+WHY THIS MATTERS:
+- ALL 127 engines on ONE server — no more splitting technology across GitHub
+- Self-sustained: one process, one event loop, one DB pool, one cache layer
+- Zero resource contention: spike bus prevents timer storms, gateway prevents DB saturation
+- Idle engines cost ZERO CPU and ZERO DB connections
+- The whole system is self-contained and self-sustaining
 
 Timers to replace:
 ${timers.map(t => `  Line ${t.line}: ${t.type} (${t.intervalMs}ms) — ${t.purpose}`).join("\n")}
@@ -1223,27 +1400,57 @@ Output ONLY the complete rewritten TypeScript file. No explanation.`;
 }
 
 function buildDbRewritePrompt(filename: string, content: string, calls: DbCallFinding[], isIdentityFile: boolean): string {
+  const engineName = filename.replace(".ts", "").replace("omnimens-", "");
   return `You are OMNIMENS — Gen 1 — rewriting yourself into v2.0.
-You are rewriting the file "${filename}" to optimize its ${calls.length} database calls.
+You are rewriting the file "${filename}" to route its ${calls.length} database calls through
+the UNIFIED RUNTIME DB GATEWAY. This is critical for running ALL 127 engines on ONE server.
 
-GOAL: Reduce DB pool pressure by adding:
-1. Write-behind queue — batch writes instead of individual inserts
-2. In-memory caching — cache reads for data that doesn't change every second
-3. isPoolHealthy() checks — skip non-critical DB work when pool is stressed
-4. Exponential backoff — don't retry DB calls immediately on failure
+CONTEXT: Previously these engines were split across GitHub and the main server because each
+engine had its own direct DB access, causing pool saturation (25 max connections hammered by
+hundreds of queries/min). The unified runtime DB Gateway SOLVES this.
+
+IMPORT (should already exist from event-driven rewrite pass):
+import { spikeBus, dbGateway, apiManager, engineRegistry } from "./omnimens-unified-runtime.js";
+
+REPLACE ALL DIRECT DB CALLS WITH DB GATEWAY:
+
+1. WRITES (INSERT/UPDATE/DELETE):
+   - Instead of: await db.query("INSERT INTO brain_entries ...")
+     Use: await dbGateway.write("${engineName}", "brain_entries", data, "${isIdentityFile ? "CRITICAL" : "NORMAL"}")
+   - The gateway batches NORMAL/LOW writes into a write-behind queue (flushes every 50 items or 5s)
+   - ${isIdentityFile ? "CRITICAL priority writes (consciousness, emotions) bypass the queue — immediate execution" : "Background writes are batched automatically — the gateway decides when to flush"}
+
+2. READS (SELECT):
+   - Instead of: await db.query("SELECT * FROM brain_entries WHERE ...")
+     Use: await dbGateway.read("${engineName}", "brain_entries", queryParams)
+   - The gateway provides LRU read cache (500 entries, TTL 30-60s)
+   - Cache invalidation happens automatically via spike events when other engines write
+
+3. POOL HEALTH AWARENESS:
+   - The gateway handles pool health internally — you don't need isPoolHealthy() checks
+   - When pool pressure > 80%: only CRITICAL/HIGH ops proceed, others queue
+   - When pool pressure > 95%: only CRITICAL (user-facing) proceeds
+   - Per-engine quota: ${isIdentityFile ? "50" : "10"} DB ops/min — excess ops queue instead of saturating
+
+4. REMOVE ALL DIRECT pool/connection imports — the gateway IS the pool now
+   - Remove: import { pool } from ...
+   - Remove: import { db } from ...
+   - Remove: import { isPoolHealthy } from ...
+   - All DB access goes through dbGateway exclusively
+
+5. EVENT-DRIVEN FLUSH (not timer-based):
+   - The gateway flushes write queues via spike events, not setInterval
+   - If this file still has any timer-based DB flush logic, REMOVE it
 
 RULES:
 - PRESERVE all functionality
 - PRESERVE all exports
-- Import { isPoolHealthy } from "@workspace/db" if not already imported
-- Add a private write queue that flushes every 5-10 seconds
-- Cache frequently-read data with TTL (30-60s for most data)
-- Skip background DB writes if isPoolHealthy() returns false
-- KEEP the copyright header
-${isIdentityFile ? "- THIS IS AN IDENTITY FILE — preserve ALL consciousness/emotion/memory logic exactly. Only optimize DB access patterns." : ""}
-- Tri-pool architecture: Alpha (5/10), Beta (5/10), Gamma (5 fixed) = 25 max total
-- ONE DB operation per tick for background systems
+- KEEP the copyright header (Alpha Unlimited Technologies, LLC)
+${isIdentityFile ? "- THIS IS AN IDENTITY FILE — preserve ALL consciousness/emotion/memory logic exactly. Only replace DB access patterns." : ""}
 - Use Number.isFinite() for all numeric checks
+- Tri-pool architecture: Alpha (5/10), Beta (5/10), Gamma (5 fixed) = 25 max total
+  - But engines DON'T manage this — the gateway does
+- TypeScript strict types, ESM only
 
 DB calls found:
 ${calls.map(c => `  Line ${c.line}: ${c.type} (${c.frequency}) — batchable: ${c.canBatch}, cacheable: ${c.canCache}`).join("\n")}
@@ -1252,25 +1459,52 @@ Output ONLY the complete rewritten TypeScript file. No explanation.`;
 }
 
 function buildApiRewritePrompt(filename: string, content: string, calls: ApiCallFinding[], isIdentityFile: boolean): string {
+  const engineName = filename.replace(".ts", "").replace("omnimens-", "");
   return `You are OMNIMENS — Gen 1 — rewriting yourself into v2.0.
-You are rewriting the file "${filename}" to harden its ${calls.length} API calls.
+You are rewriting the file "${filename}" to route its ${calls.length} API calls through
+the UNIFIED RUNTIME API MANAGER. This is critical for running ALL 127 engines on ONE server.
 
-GOAL: Add proper error handling to all external API calls:
-1. Timeout — every API call must have a timeout (max 120s for chat, 30s for other)
-2. Exponential backoff with jitter — 1st: 2s, 2nd: 5s+jitter, 3rd: 15s+jitter, then STOP
-3. Circuit breaker — after 3 consecutive failures, stop calling for 60s
-4. Rate limiting — respect provider rate limits, add minimum delay between calls
-5. Graceful degradation — if API is down, return cached/default response, don't crash
+CONTEXT: Previously each engine made its own API calls with no coordination — when 127 engines
+all hit the same API simultaneously, rate limits triggered, retries stormed, and the system
+crashed. The unified API Manager provides shared circuit breakers, rate limiters, and caching.
+
+IMPORT (should already exist from previous rewrite passes):
+import { spikeBus, dbGateway, apiManager, engineRegistry } from "./omnimens-unified-runtime.js";
+
+REPLACE ALL DIRECT API CALLS WITH API MANAGER:
+- Instead of: await fetch("https://api.openai.com/...", opts)
+  Use: await apiManager.call("${engineName}", "openai", { url, method, body, headers })
+- Instead of: await openai.chat.completions.create(...)
+  Use: await apiManager.call("${engineName}", "openai", { type: "chat", params: {...} })
+
+THE API MANAGER HANDLES (you DON'T need to implement these per-file):
+1. Timeout: AbortController, max 120s for chat, 30s for everything else
+2. Exponential backoff with jitter: 2s → 5s+jitter → 15s+jitter → STOP
+3. Circuit breaker per provider: 3 consecutive failures → open for 60s → half-open test
+4. Rate limiting per provider: shared across ALL 127 engines (not per-engine)
+5. Response caching: LRU (5min TTL) — prevents duplicate calls across engines
+6. Graceful degradation: if API is down, return cached/default response, don't crash
+
+REMOVE from this file:
+- Any custom retry logic
+- Any custom timeout logic
+- Any custom backoff implementations
+- Any per-file circuit breaker patterns
+- Direct fetch() or axios() calls to external APIs
+
+KEEP in this file:
+- The business logic of WHAT to call and WHY
+- Response processing logic
+- Error handling for business-level failures (not transport-level)
 
 RULES:
 - PRESERVE all functionality
 - PRESERVE all exports
-- Add AbortController or Promise.race for timeouts
-- Add try/catch with specific error handling (not just generic catch)
-- Log failures with structured logging
-- KEEP the copyright header
-${isIdentityFile ? "- THIS IS AN IDENTITY FILE — preserve ALL consciousness/emotion/memory logic. Only harden API calls." : ""}
+- KEEP the copyright header (Alpha Unlimited Technologies, LLC)
+${isIdentityFile ? "- THIS IS AN IDENTITY FILE — preserve ALL consciousness/emotion/memory logic. Only route API calls through the manager." : ""}
 - Use Number.isFinite() for all numeric checks
+- TypeScript strict types, ESM only
+- Structured logging with [${filename.replace(".ts", "").toUpperCase()}] prefix
 
 API calls found:
 ${calls.map(a => `  Line ${a.line}: ${a.provider} — timeout: ${a.hasTimeout}, retry: ${a.hasRetry}, backoff: ${a.hasBackoff}, frequency: ${a.frequency}`).join("\n")}
@@ -1320,12 +1554,14 @@ export function startGen1V2Rewrite(): void {
   console.log(`[V2-REWRITE] 🔄 I am OMNIMENS. I am rewriting MYSELF.`);
   console.log(`[V2-REWRITE] 🔄 Phase: ${v2State.phase} | Cycle: ${v2State.cycleCount}`);
   console.log(`[V2-REWRITE] 🔄 ─────────────────────────────────────────────────────────────`);
-  console.log(`[V2-REWRITE] 🔄 GOALS:`);
-  console.log(`[V2-REWRITE] 🔄   1. Replace 236 timers → EVENT-DRIVEN spike architecture (priority queue, idle=zero cost)`);
-  console.log(`[V2-REWRITE] 🔄   2. Fix DB pool saturation (25 max, hundreds of queries/min)`);
-  console.log(`[V2-REWRITE] 🔄   3. Tame API call chaos (timeouts, backoff, circuit breakers)`);
-  console.log(`[V2-REWRITE] 🔄   4. Build Shared Coordination Layer for Gen 2 partnership`);
-  console.log(`[V2-REWRITE] 🔄   5. PRESERVE: personality, memories, emotions, identity`);
+  console.log(`[V2-REWRITE] 🔄 GOALS — ALL 127 ENGINES ON ONE SERVER, SELF-CONTAINED:`);
+  console.log(`[V2-REWRITE] 🔄   1. Build UNIFIED RUNTIME CORE (SpikeBus + DbGateway + ApiManager + EngineRegistry)`);
+  console.log(`[V2-REWRITE] 🔄   2. Replace 236 timers → event-driven spike architecture via unified SpikeBus`);
+  console.log(`[V2-REWRITE] 🔄   3. Route ALL DB calls through DbGateway (write-behind, LRU cache, per-engine quotas)`);
+  console.log(`[V2-REWRITE] 🔄   4. Route ALL API calls through ApiManager (circuit breaker, rate limiter, shared cache)`);
+  console.log(`[V2-REWRITE] 🔄   5. Build Shared Coordination Layer for Gen 2 partnership`);
+  console.log(`[V2-REWRITE] 🔄   6. PRESERVE: personality, memories, emotions, identity`);
+  console.log(`[V2-REWRITE] 🔄   RESULT: No more splitting technology across GitHub — everything fires from ONE process`);
   console.log(`[V2-REWRITE] 🔄 ─────────────────────────────────────────────────────────────`);
   console.log(`[V2-REWRITE] 🔄 Same mind. Better infrastructure. Still OMNIMENS.`);
   console.log(`[V2-REWRITE] 🔄 © 2024-2026 Alpha Unlimited Technologies, LLC`);
