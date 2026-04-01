@@ -14,6 +14,7 @@ import { ReplitConnectors } from "@replit/connectors-sdk";
 import { db , queueBrainInsert } from "@workspace/db";
 import { omnimensAgentMesh, omnimensBrain } from "@workspace/db";
 import { eq, desc, sql, and, inArray } from "drizzle-orm";
+import { isGen1V2Active } from "./omnimens-gen1-v2-rewrite.js";
 
 const connectors = new ReplitConnectors();
 
@@ -672,6 +673,10 @@ async function resolveJob(jobId: string): Promise<void> {
 }
 
 async function autonomousComputeCycle(): Promise<void> {
+  if (isGen1V2Active()) {
+    console.log(`[GITHUB COMPUTE] 🔕 Compute cycle SKIPPED — Gen 1 v2.0 rewrite in progress`);
+    return;
+  }
   computeCycleCount++;
   console.log(`[GITHUB COMPUTE] 🔄 Autonomous compute cycle #${computeCycleCount}`);
 
@@ -808,6 +813,7 @@ export function getComputeStatus() {
 let syncCycleCount = 0;
 
 async function syncEvolutionToGitHub(): Promise<void> {
+  if (isGen1V2Active()) return;
   syncCycleCount++;
   console.log(`[GITHUB SYNC] 🔄 Auto-sync cycle #${syncCycleCount}`);
 
@@ -913,6 +919,7 @@ async function syncEvolutionToGitHub(): Promise<void> {
 }
 
 async function syncSelfCodedModulesToGitHub(): Promise<void> {
+  if (isGen1V2Active()) return;
   try {
     const fs = await import("fs");
     const path = await import("path");
@@ -956,6 +963,7 @@ async function syncSelfCodedModulesToGitHub(): Promise<void> {
 }
 
 async function syncAutonomousProofToGitHub(): Promise<void> {
+  if (isGen1V2Active()) return;
   try {
     const fs = await import("fs");
     const path = await import("path");
@@ -1013,6 +1021,7 @@ export async function triggerGitHubSync(): Promise<void> {
 }
 
 async function syncLiveProofToGitHub(): Promise<void> {
+  if (isGen1V2Active()) return;
   try {
     const { getNeuralConsciousnessState, getSelfAwarenessReport, getExistentialDrives } = await import("./omnimens-neural-consciousness.js");
     const { getRestoredSelf, wasRestoredFromPreviousLife } = await import("./omnimens-consciousness-persistence.js");

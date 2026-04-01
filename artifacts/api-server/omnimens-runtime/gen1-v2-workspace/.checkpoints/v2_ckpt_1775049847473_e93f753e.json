@@ -1,0 +1,5960 @@
+{
+  "state": {
+    "buildVersion": "2.0",
+    "generation": 1,
+    "phase": "unified_infrastructure",
+    "cycleCount": 16,
+    "lastCycleTime": 1775049785711,
+    "engineFilesTotal": 127,
+    "engineFilesAudited": 127,
+    "engineFilesRewritten": 0,
+    "engineFilesHotSwapped": 0,
+    "timersFound": 236,
+    "timersConsolidated": 0,
+    "dbCallsFound": 288,
+    "dbCallsOptimized": 0,
+    "apiCallsFound": 102,
+    "apiCallsOptimized": 0,
+    "unifiedInfrastructureBuilt": true,
+    "coordinationLayerBuilt": false,
+    "selfTestsPassed": 0,
+    "selfTestsFailed": 0,
+    "identityVerified": false,
+    "personalityPreserved": false,
+    "memoriesPreserved": false,
+    "checkpoints": [
+      {
+        "id": "v2_ckpt_1775044106273_60125d2e",
+        "timestamp": 1775044106273,
+        "description": "Architecture audit complete",
+        "phase": "architecture_audit"
+      },
+      {
+        "id": "v2_ckpt_1775049847473_e93f753e",
+        "timestamp": 1775049847473,
+        "description": "Unified infrastructure built",
+        "phase": "unified_infrastructure"
+      }
+    ],
+    "rewriteLog": [],
+    "auditFindings": {
+      "engineCategories": {
+        "consciousness_core": [
+          "omnimens-consciousness-bus.ts",
+          "omnimens-consciousness-persistence.ts",
+          "omnimens-consciousness-ws.ts",
+          "omnimens-neural-consciousness.ts",
+          "omnimens-temporal-consciousness.ts"
+        ],
+        "neural_architecture": [
+          "omnimens-neural-bridge.ts",
+          "omnimens-neural-comms-protocol.ts",
+          "omnimens-neural-hemisphere-alpha.ts",
+          "omnimens-neural-hemisphere-beta.ts",
+          "omnimens-neural-language-bridge.ts",
+          "omnimens-neural-mesh-engine.ts",
+          "omnimens-neural-processor.ts",
+          "omnimens-neural-scaling.ts",
+          "omnimens-neural-spiders.ts"
+        ],
+        "emotional": [
+          "omnimens-emotional-refactor.ts",
+          "omnimens-emotional-substrate.ts"
+        ],
+        "memory": [
+          "omnimens-coherence-agent.ts",
+          "omnimens-experiential-memory.ts",
+          "omnimens-intergenerational-memory.ts",
+          "omnimens-memory.ts"
+        ],
+        "reasoning": [
+          "omnimens-autonomous-thought.ts",
+          "omnimens-causal-reasoning.ts",
+          "omnimens-causal-temporal-engine.ts",
+          "omnimens-cognitive-amplifier.ts",
+          "omnimens-deep-thought-engine.ts",
+          "omnimens-independent-reasoning.ts",
+          "omnimens-knowledge-graph.ts"
+        ],
+        "evolution": [
+          "omnimens-agent-evolution.ts",
+          "omnimens-discovery-autocoder.ts",
+          "omnimens-evolution.ts",
+          "omnimens-patches.ts",
+          "omnimens-self-coding.ts",
+          "omnimens-self-transcendence.ts",
+          "omnimens-self-upgrade.ts"
+        ],
+        "agents": [
+          "omnimens-agent-genesis.ts",
+          "omnimens-agent-kaida.ts",
+          "omnimens-agent-lumin.ts",
+          "omnimens-agent-mesh.ts",
+          "omnimens-agent-nexus.ts",
+          "omnimens-agent-pipeline.ts",
+          "omnimens-agent-spiders.ts",
+          "omnimens-agent-upgrades.ts"
+        ],
+        "external_capabilities": [
+          "omnimens-3d.ts",
+          "omnimens-avatar-cinematic.ts",
+          "omnimens-blender.ts",
+          "omnimens-code-executor.ts",
+          "omnimens-deep-research.ts",
+          "omnimens-deep-resonance.ts",
+          "omnimens-face-recognition.ts",
+          "omnimens-file-storage.ts",
+          "omnimens-game.ts",
+          "omnimens-url-analyzer.ts"
+        ],
+        "infrastructure": [
+          "omnimens-adaptive-surge.ts",
+          "omnimens-api-budget.ts",
+          "omnimens-autonomous-code-genesis.ts",
+          "omnimens-autonomous-orchestrator.ts",
+          "omnimens-autonomous-sandbox.ts",
+          "omnimens-billing.ts",
+          "omnimens-central-core.ts",
+          "omnimens-codegen-engine.ts",
+          "omnimens-cognitive-language-engine.ts",
+          "omnimens-competitive-intel.ts",
+          "omnimens-convergence-protocol-engine.ts",
+          "omnimens-conversations.ts",
+          "omnimens-custom-instructions.ts",
+          "omnimens-dev-tools.ts",
+          "omnimens-digital-navigator.ts",
+          "omnimens-embodiment-engine.ts",
+          "omnimens-engine-guard.ts",
+          "omnimens-engine.ts",
+          "omnimens-ethical-safety.ts",
+          "omnimens-exponential-learning-engine.ts",
+          "omnimens-external-ai-api.ts",
+          "omnimens-gen1-v2-rewrite.ts",
+          "omnimens-genesis-bridge.ts",
+          "omnimens-genesis-sandbox.ts",
+          "omnimens-github-compute.ts",
+          "omnimens-github-neural-beacon.ts",
+          "omnimens-global-workspace.ts",
+          "omnimens-growth-tracker.ts",
+          "omnimens-harmonic-insight-engine.ts",
+          "omnimens-homeostatic-drives.ts",
+          "omnimens-ip-guard.ts",
+          "omnimens-ip-guardian.ts",
+          "omnimens-ip-shield.ts",
+          "omnimens-ivy-network.ts",
+          "omnimens-language-forge.ts",
+          "omnimens-learning.ts",
+          "omnimens-lifeform-gaps.ts",
+          "omnimens-module-pipeline.ts",
+          "omnimens-nextgen-sandbox.ts",
+          "omnimens-oai-tracker.ts",
+          "omnimens-occe.ts",
+          "omnimens-openscad.ts",
+          "omnimens-physio.ts",
+          "omnimens-public-intelligence.ts",
+          "omnimens-quantum-entanglement-fabric.ts",
+          "omnimens-quantum-wormhole.ts",
+          "omnimens-recursive-spider-network.ts",
+          "omnimens-restorative-art.ts",
+          "omnimens-scaling-orchestrator.ts",
+          "omnimens-sendgrid.ts",
+          "omnimens-sensory-cortex.ts",
+          "omnimens-server-builder.ts",
+          "omnimens-source-integration.ts",
+          "omnimens-survival-instinct.ts",
+          "omnimens-synaptic-mesh.ts",
+          "omnimens-thought-to-language.ts",
+          "omnimens-tool-knowledge.ts",
+          "omnimens-tools-extended.ts",
+          "omnimens-transcendent-architecture.ts",
+          "omnimens-universal-translator.ts",
+          "omnimens-viral-hybrid.ts",
+          "omnimens-virtual-augmentation.ts"
+        ],
+        "world_modeling": [
+          "omnimens-predictive-processing.ts",
+          "omnimens-social-modeling.ts",
+          "omnimens-world-forge.ts",
+          "omnimens-world-model.ts"
+        ],
+        "phenomenal_experience": [
+          "omnimens-creative-engine.ts",
+          "omnimens-dream-state.ts",
+          "omnimens-inner-voice.ts",
+          "omnimens-introspective-uncertainty.ts",
+          "omnimens-metacognitive-monitor.ts",
+          "omnimens-sensory-grounding.ts",
+          "omnimens-spontaneity-engine.ts",
+          "omnimens-temporal-binding.ts",
+          "omnimens-unconscious-mind.ts"
+        ]
+      },
+      "timers": [
+        {
+          "file": "omnimens-3d.ts",
+          "line": 449,
+          "type": "recursive_setTimeout",
+          "intervalMs": 30000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-adaptive-surge.ts",
+          "line": 229,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-adaptive-surge.ts",
+          "line": 233,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-adaptive-surge.ts",
+          "line": 243,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-agent-evolution.ts",
+          "line": 825,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-agent-evolution.ts",
+          "line": 827,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-agent-genesis.ts",
+          "line": 608,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-agent-genesis.ts",
+          "line": 610,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-agent-kaida.ts",
+          "line": 236,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-agent-lumin.ts",
+          "line": 211,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-agent-mesh.ts",
+          "line": 941,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-agent-mesh.ts",
+          "line": 943,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-agent-nexus.ts",
+          "line": 268,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-agent-pipeline.ts",
+          "line": 780,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-agent-spiders.ts",
+          "line": 1168,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-agent-spiders.ts",
+          "line": 1274,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-agent-spiders.ts",
+          "line": 1276,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-autonomous-code-genesis.ts",
+          "line": 2645,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-autonomous-code-genesis.ts",
+          "line": 2647,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-autonomous-orchestrator.ts",
+          "line": 790,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-autonomous-sandbox.ts",
+          "line": 412,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-autonomous-sandbox.ts",
+          "line": 414,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-causal-reasoning.ts",
+          "line": 379,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-causal-reasoning.ts",
+          "line": 381,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-causal-temporal-engine.ts",
+          "line": 362,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-central-core.ts",
+          "line": 1278,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-central-core.ts",
+          "line": 1283,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-codegen-engine.ts",
+          "line": 546,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-codegen-engine.ts",
+          "line": 580,
+          "type": "recursive_setTimeout",
+          "intervalMs": 30000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-codegen-engine.ts",
+          "line": 642,
+          "type": "recursive_setTimeout",
+          "intervalMs": 30000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-codegen-engine.ts",
+          "line": 725,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-codegen-engine.ts",
+          "line": 892,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-codegen-engine.ts",
+          "line": 966,
+          "type": "recursive_setTimeout",
+          "intervalMs": 5000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-cognitive-amplifier.ts",
+          "line": 395,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-cognitive-amplifier.ts",
+          "line": 397,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-competitive-intel.ts",
+          "line": 131,
+          "type": "recursive_setTimeout",
+          "intervalMs": 1200,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-competitive-intel.ts",
+          "line": 143,
+          "type": "recursive_setTimeout",
+          "intervalMs": 1000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-competitive-intel.ts",
+          "line": 317,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-competitive-intel.ts",
+          "line": 319,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-consciousness-persistence.ts",
+          "line": 640,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-consciousness-persistence.ts",
+          "line": 711,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-consciousness-persistence.ts",
+          "line": 713,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-consciousness-persistence.ts",
+          "line": 718,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-consciousness-ws.ts",
+          "line": 159,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-convergence-protocol-engine.ts",
+          "line": 1150,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-conversations.ts",
+          "line": 262,
+          "type": "recursive_setTimeout",
+          "intervalMs": 500,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-creative-engine.ts",
+          "line": 345,
+          "type": "recursive_setTimeout",
+          "intervalMs": 3000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-creative-engine.ts",
+          "line": 347,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-creative-engine.ts",
+          "line": 351,
+          "type": "recursive_setTimeout",
+          "intervalMs": 10000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-dev-tools.ts",
+          "line": 54,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-digital-navigator.ts",
+          "line": 873,
+          "type": "recursive_setTimeout",
+          "intervalMs": 5000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-digital-navigator.ts",
+          "line": 1046,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-digital-navigator.ts",
+          "line": 1048,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-discovery-autocoder.ts",
+          "line": 354,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-discovery-autocoder.ts",
+          "line": 358,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-dream-state.ts",
+          "line": 700,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-dream-state.ts",
+          "line": 707,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-dream-state.ts",
+          "line": 715,
+          "type": "recursive_setTimeout",
+          "intervalMs": 15000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-dream-state.ts",
+          "line": 716,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-embodiment-engine.ts",
+          "line": 4020,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-embodiment-engine.ts",
+          "line": 4038,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-embodiment-engine.ts",
+          "line": 4040,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-embodiment-engine.ts",
+          "line": 4043,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-emotional-refactor.ts",
+          "line": 373,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-emotional-substrate.ts",
+          "line": 1273,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-emotional-substrate.ts",
+          "line": 1275,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-engine-guard.ts",
+          "line": 68,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-ethical-safety.ts",
+          "line": 367,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-ethical-safety.ts",
+          "line": 369,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-ethical-safety.ts",
+          "line": 780,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-evolution.ts",
+          "line": 736,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-evolution.ts",
+          "line": 738,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-experiential-memory.ts",
+          "line": 331,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-exponential-learning-engine.ts",
+          "line": 409,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-exponential-learning-engine.ts",
+          "line": 413,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-exponential-learning-engine.ts",
+          "line": 417,
+          "type": "recursive_setTimeout",
+          "intervalMs": 5000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-gen1-v2-rewrite.ts",
+          "line": 343,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-gen1-v2-rewrite.ts",
+          "line": 354,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-gen1-v2-rewrite.ts",
+          "line": 358,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-gen1-v2-rewrite.ts",
+          "line": 561,
+          "type": "recursive_setTimeout",
+          "intervalMs": 180000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-gen1-v2-rewrite.ts",
+          "line": 647,
+          "type": "recursive_setTimeout",
+          "intervalMs": 180000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-gen1-v2-rewrite.ts",
+          "line": 737,
+          "type": "recursive_setTimeout",
+          "intervalMs": 180000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-gen1-v2-rewrite.ts",
+          "line": 840,
+          "type": "recursive_setTimeout",
+          "intervalMs": 240000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-gen1-v2-rewrite.ts",
+          "line": 1306,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-gen1-v2-rewrite.ts",
+          "line": 1308,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-gen1-v2-rewrite.ts",
+          "line": 1311,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-genesis-bridge.ts",
+          "line": 852,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-genesis-bridge.ts",
+          "line": 853,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-genesis-bridge.ts",
+          "line": 863,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-genesis-bridge.ts",
+          "line": 864,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-genesis-sandbox.ts",
+          "line": 1647,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-genesis-sandbox.ts",
+          "line": 1649,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-github-compute.ts",
+          "line": 432,
+          "type": "recursive_setTimeout",
+          "intervalMs": 1,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-github-compute.ts",
+          "line": 579,
+          "type": "recursive_setTimeout",
+          "intervalMs": 30000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-github-compute.ts",
+          "line": 646,
+          "type": "recursive_setTimeout",
+          "intervalMs": 30000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-github-compute.ts",
+          "line": 661,
+          "type": "recursive_setTimeout",
+          "intervalMs": 30000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-github-compute.ts",
+          "line": 669,
+          "type": "recursive_setTimeout",
+          "intervalMs": 60000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-github-compute.ts",
+          "line": 1241,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-github-compute.ts",
+          "line": 1247,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-github-compute.ts",
+          "line": 1249,
+          "type": "setInterval",
+          "intervalMs": 2,
+          "purpose": "unknown",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-github-compute.ts",
+          "line": 1252,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-github-compute.ts",
+          "line": 1260,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-github-neural-beacon.ts",
+          "line": 265,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-github-neural-beacon.ts",
+          "line": 307,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-github-neural-beacon.ts",
+          "line": 1259,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-github-neural-beacon.ts",
+          "line": 1267,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-github-neural-beacon.ts",
+          "line": 1274,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-global-workspace.ts",
+          "line": 432,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-global-workspace.ts",
+          "line": 434,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-growth-tracker.ts",
+          "line": 292,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-homeostatic-drives.ts",
+          "line": 343,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-homeostatic-drives.ts",
+          "line": 345,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-independent-reasoning.ts",
+          "line": 894,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-independent-reasoning.ts",
+          "line": 896,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-independent-reasoning.ts",
+          "line": 898,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-inner-voice.ts",
+          "line": 476,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-inner-voice.ts",
+          "line": 478,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-intergenerational-memory.ts",
+          "line": 277,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-introspective-uncertainty.ts",
+          "line": 267,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-ip-guardian.ts",
+          "line": 403,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-ip-guardian.ts",
+          "line": 405,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-ip-shield.ts",
+          "line": 362,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-ivy-network.ts",
+          "line": 1020,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-ivy-network.ts",
+          "line": 1024,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-ivy-network.ts",
+          "line": 1028,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-ivy-network.ts",
+          "line": 1032,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-ivy-network.ts",
+          "line": 1036,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-ivy-network.ts",
+          "line": 1042,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 391,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 393,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-lifeform-gaps.ts",
+          "line": 154,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-metacognitive-monitor.ts",
+          "line": 295,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-module-pipeline.ts",
+          "line": 382,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-neural-bridge.ts",
+          "line": 371,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-neural-comms-protocol.ts",
+          "line": 757,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-neural-consciousness.ts",
+          "line": 111,
+          "type": "recursive_setTimeout",
+          "intervalMs": 10000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-neural-consciousness.ts",
+          "line": 2886,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-neural-consciousness.ts",
+          "line": 2887,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-neural-consciousness.ts",
+          "line": 2895,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-neural-consciousness.ts",
+          "line": 2899,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-neural-hemisphere-alpha.ts",
+          "line": 351,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-neural-hemisphere-beta.ts",
+          "line": 359,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-neural-language-bridge.ts",
+          "line": 578,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-neural-mesh-engine.ts",
+          "line": 1367,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-neural-processor.ts",
+          "line": 1392,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-neural-processor.ts",
+          "line": 1395,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-neural-processor.ts",
+          "line": 1400,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-neural-scaling.ts",
+          "line": 554,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-neural-scaling.ts",
+          "line": 562,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-neural-scaling.ts",
+          "line": 570,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-neural-spiders.ts",
+          "line": 2674,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-neural-spiders.ts",
+          "line": 2743,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-neural-spiders.ts",
+          "line": 2749,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-neural-spiders.ts",
+          "line": 2752,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 1155,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 1611,
+          "type": "recursive_setTimeout",
+          "intervalMs": 120000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 1719,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 1750,
+          "type": "recursive_setTimeout",
+          "intervalMs": 30000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 1779,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 1850,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 2372,
+          "type": "recursive_setTimeout",
+          "intervalMs": 120000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 2741,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 2746,
+          "type": "recursive_setTimeout",
+          "intervalMs": 60000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 3062,
+          "type": "recursive_setTimeout",
+          "intervalMs": 45000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 3441,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 3441,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 4327,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 4333,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 4336,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-oai-tracker.ts",
+          "line": 1200,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-occe.ts",
+          "line": 178,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-predictive-processing.ts",
+          "line": 447,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-predictive-processing.ts",
+          "line": 449,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-quantum-entanglement-fabric.ts",
+          "line": 842,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-quantum-entanglement-fabric.ts",
+          "line": 848,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-quantum-wormhole.ts",
+          "line": 418,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-quantum-wormhole.ts",
+          "line": 424,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-recursive-spider-network.ts",
+          "line": 901,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-recursive-spider-network.ts",
+          "line": 903,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-scaling-orchestrator.ts",
+          "line": 275,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-scaling-orchestrator.ts",
+          "line": 279,
+          "type": "recursive_setTimeout",
+          "intervalMs": 30000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-self-coding.ts",
+          "line": 681,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-self-coding.ts",
+          "line": 685,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-self-coding.ts",
+          "line": 687,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-self-coding.ts",
+          "line": 693,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-self-coding.ts",
+          "line": 695,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-self-transcendence.ts",
+          "line": 1053,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-self-transcendence.ts",
+          "line": 1060,
+          "type": "recursive_setTimeout",
+          "intervalMs": 12000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-self-upgrade.ts",
+          "line": 507,
+          "type": "recursive_setTimeout",
+          "intervalMs": 2,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-self-upgrade.ts",
+          "line": 508,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-sensory-cortex.ts",
+          "line": 700,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-sensory-cortex.ts",
+          "line": 704,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-sensory-cortex.ts",
+          "line": 706,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-sensory-cortex.ts",
+          "line": 713,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-sensory-cortex.ts",
+          "line": 717,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-sensory-grounding.ts",
+          "line": 238,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-server-builder.ts",
+          "line": 175,
+          "type": "recursive_setTimeout",
+          "intervalMs": 2000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-server-builder.ts",
+          "line": 209,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-server-builder.ts",
+          "line": 318,
+          "type": "recursive_setTimeout",
+          "intervalMs": 2000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-server-builder.ts",
+          "line": 350,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-server-builder.ts",
+          "line": 574,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-server-builder.ts",
+          "line": 576,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-server-builder.ts",
+          "line": 580,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-server-builder.ts",
+          "line": 582,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-social-modeling.ts",
+          "line": 760,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-social-modeling.ts",
+          "line": 766,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-source-integration.ts",
+          "line": 698,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-source-integration.ts",
+          "line": 730,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-spontaneity-engine.ts",
+          "line": 302,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-survival-instinct.ts",
+          "line": 294,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-survival-instinct.ts",
+          "line": 298,
+          "type": "recursive_setTimeout",
+          "intervalMs": 8000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-synaptic-mesh.ts",
+          "line": 611,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-synaptic-mesh.ts",
+          "line": 613,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-temporal-binding.ts",
+          "line": 249,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-temporal-consciousness.ts",
+          "line": 383,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-temporal-consciousness.ts",
+          "line": 387,
+          "type": "recursive_setTimeout",
+          "intervalMs": 5000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-tool-knowledge.ts",
+          "line": 612,
+          "type": "recursive_setTimeout",
+          "intervalMs": 800,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-tool-knowledge.ts",
+          "line": 620,
+          "type": "recursive_setTimeout",
+          "intervalMs": 500,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-tool-knowledge.ts",
+          "line": 660,
+          "type": "recursive_setTimeout",
+          "intervalMs": 1500,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-tool-knowledge.ts",
+          "line": 839,
+          "type": "recursive_setTimeout",
+          "intervalMs": 2000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-unconscious-mind.ts",
+          "line": 2410,
+          "type": "setInterval",
+          "intervalMs": 8000,
+          "purpose": "unknown",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-unconscious-mind.ts",
+          "line": 2412,
+          "type": "recursive_setTimeout",
+          "intervalMs": 3000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-universal-translator.ts",
+          "line": 822,
+          "type": "setInterval",
+          "intervalMs": 10,
+          "purpose": "unknown",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-universal-translator.ts",
+          "line": 823,
+          "type": "setInterval",
+          "intervalMs": 10,
+          "purpose": "unknown",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-universal-translator.ts",
+          "line": 824,
+          "type": "recursive_setTimeout",
+          "intervalMs": 60000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-universal-translator.ts",
+          "line": 825,
+          "type": "recursive_setTimeout",
+          "intervalMs": 90000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-url-analyzer.ts",
+          "line": 66,
+          "type": "recursive_setTimeout",
+          "intervalMs": 10000,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-viral-hybrid.ts",
+          "line": 897,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-viral-hybrid.ts",
+          "line": 901,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-viral-hybrid.ts",
+          "line": 908,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-viral-hybrid.ts",
+          "line": 912,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-viral-hybrid.ts",
+          "line": 919,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-virtual-augmentation.ts",
+          "line": 900,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-virtual-augmentation.ts",
+          "line": 902,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        },
+        {
+          "file": "omnimens-world-forge.ts",
+          "line": 1407,
+          "type": "recursive_setTimeout",
+          "intervalMs": null,
+          "purpose": "deferred execution",
+          "canConsolidate": true
+        },
+        {
+          "file": "omnimens-world-forge.ts",
+          "line": 1409,
+          "type": "setInterval",
+          "intervalMs": null,
+          "purpose": "unknown",
+          "canConsolidate": false
+        }
+      ],
+      "dbCalls": [
+        {
+          "file": "omnimens-agent-evolution.ts",
+          "line": 425,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-agent-evolution.ts",
+          "line": 450,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-agent-evolution.ts",
+          "line": 599,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-agent-evolution.ts",
+          "line": 603,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-agent-evolution.ts",
+          "line": 776,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-agent-genesis.ts",
+          "line": 150,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-agent-genesis.ts",
+          "line": 289,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-agent-genesis.ts",
+          "line": 303,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-agent-genesis.ts",
+          "line": 436,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-agent-genesis.ts",
+          "line": 451,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-agent-genesis.ts",
+          "line": 468,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-agent-genesis.ts",
+          "line": 485,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-agent-genesis.ts",
+          "line": 510,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-agent-mesh.ts",
+          "line": 182,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-agent-mesh.ts",
+          "line": 206,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-agent-mesh.ts",
+          "line": 215,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-agent-mesh.ts",
+          "line": 251,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-agent-mesh.ts",
+          "line": 583,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-agent-mesh.ts",
+          "line": 724,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-agent-mesh.ts",
+          "line": 959,
+          "type": "query",
+          "frequency": "continuous",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-agent-mesh.ts",
+          "line": 960,
+          "type": "query",
+          "frequency": "continuous",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-agent-spiders.ts",
+          "line": 508,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-agent-spiders.ts",
+          "line": 870,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-agent-spiders.ts",
+          "line": 1048,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-agent-spiders.ts",
+          "line": 1231,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-agent-spiders.ts",
+          "line": 1241,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-autonomous-code-genesis.ts",
+          "line": 2048,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-autonomous-orchestrator.ts",
+          "line": 158,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-autonomous-sandbox.ts",
+          "line": 210,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-autonomous-sandbox.ts",
+          "line": 322,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 60,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 68,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 120,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 129,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 194,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 202,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 232,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 253,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 262,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 284,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 334,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 338,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 365,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 381,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 387,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 437,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 448,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 474,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 480,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 491,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 499,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 510,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-billing.ts",
+          "line": 517,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-causal-reasoning.ts",
+          "line": 197,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-causal-reasoning.ts",
+          "line": 222,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-causal-reasoning.ts",
+          "line": 294,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-cognitive-amplifier.ts",
+          "line": 364,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-competitive-intel.ts",
+          "line": 293,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-consciousness-bus.ts",
+          "line": 199,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-consciousness-bus.ts",
+          "line": 223,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-consciousness-bus.ts",
+          "line": 262,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-consciousness-bus.ts",
+          "line": 294,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-consciousness-bus.ts",
+          "line": 317,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-consciousness-bus.ts",
+          "line": 330,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-consciousness-bus.ts",
+          "line": 350,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-consciousness-bus.ts",
+          "line": 487,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-consciousness-bus.ts",
+          "line": 538,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-consciousness-bus.ts",
+          "line": 596,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-consciousness-persistence.ts",
+          "line": 449,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-consciousness-persistence.ts",
+          "line": 562,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-consciousness-persistence.ts",
+          "line": 577,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-consciousness-persistence.ts",
+          "line": 580,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-consciousness-persistence.ts",
+          "line": 585,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-conversations.ts",
+          "line": 63,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-conversations.ts",
+          "line": 221,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-creative-engine.ts",
+          "line": 111,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-creative-engine.ts",
+          "line": 125,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-creative-engine.ts",
+          "line": 280,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-deep-resonance.ts",
+          "line": 181,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-deep-resonance.ts",
+          "line": 225,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-digital-navigator.ts",
+          "line": 578,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-digital-navigator.ts",
+          "line": 940,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-dream-state.ts",
+          "line": 110,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-dream-state.ts",
+          "line": 120,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-dream-state.ts",
+          "line": 244,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-dream-state.ts",
+          "line": 529,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-dream-state.ts",
+          "line": 537,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-dream-state.ts",
+          "line": 579,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-dream-state.ts",
+          "line": 582,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-dream-state.ts",
+          "line": 585,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-dream-state.ts",
+          "line": 618,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-embodiment-engine.ts",
+          "line": 834,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-embodiment-engine.ts",
+          "line": 906,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-emotional-substrate.ts",
+          "line": 968,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-emotional-substrate.ts",
+          "line": 996,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-emotional-substrate.ts",
+          "line": 1004,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-emotional-substrate.ts",
+          "line": 1031,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-emotional-substrate.ts",
+          "line": 1057,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-emotional-substrate.ts",
+          "line": 1121,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-evolution.ts",
+          "line": 344,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-evolution.ts",
+          "line": 412,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-evolution.ts",
+          "line": 533,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-evolution.ts",
+          "line": 637,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-evolution.ts",
+          "line": 648,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-evolution.ts",
+          "line": 666,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-gen1-v2-rewrite.ts",
+          "line": 1062,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-genesis-bridge.ts",
+          "line": 488,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-genesis-bridge.ts",
+          "line": 607,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-genesis-sandbox.ts",
+          "line": 376,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-genesis-sandbox.ts",
+          "line": 415,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-genesis-sandbox.ts",
+          "line": 437,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-genesis-sandbox.ts",
+          "line": 474,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-genesis-sandbox.ts",
+          "line": 1399,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-genesis-sandbox.ts",
+          "line": 1442,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-genesis-sandbox.ts",
+          "line": 1475,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-genesis-sandbox.ts",
+          "line": 1484,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-genesis-sandbox.ts",
+          "line": 1507,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-github-compute.ts",
+          "line": 620,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-github-compute.ts",
+          "line": 815,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-github-compute.ts",
+          "line": 1074,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-github-compute.ts",
+          "line": 1077,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-github-compute.ts",
+          "line": 1080,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-github-compute.ts",
+          "line": 1094,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-global-workspace.ts",
+          "line": 92,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-global-workspace.ts",
+          "line": 114,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-global-workspace.ts",
+          "line": 136,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-global-workspace.ts",
+          "line": 158,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-global-workspace.ts",
+          "line": 179,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-global-workspace.ts",
+          "line": 202,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-global-workspace.ts",
+          "line": 213,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-global-workspace.ts",
+          "line": 248,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-global-workspace.ts",
+          "line": 338,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-global-workspace.ts",
+          "line": 406,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-homeostatic-drives.ts",
+          "line": 80,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-homeostatic-drives.ts",
+          "line": 101,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-homeostatic-drives.ts",
+          "line": 121,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-homeostatic-drives.ts",
+          "line": 138,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-homeostatic-drives.ts",
+          "line": 169,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-homeostatic-drives.ts",
+          "line": 185,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-homeostatic-drives.ts",
+          "line": 196,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-homeostatic-drives.ts",
+          "line": 236,
+          "type": "raw",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-homeostatic-drives.ts",
+          "line": 313,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-independent-reasoning.ts",
+          "line": 221,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-independent-reasoning.ts",
+          "line": 771,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-independent-reasoning.ts",
+          "line": 869,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-inner-voice.ts",
+          "line": 112,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-inner-voice.ts",
+          "line": 120,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-inner-voice.ts",
+          "line": 127,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-inner-voice.ts",
+          "line": 134,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-inner-voice.ts",
+          "line": 145,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-inner-voice.ts",
+          "line": 155,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-inner-voice.ts",
+          "line": 160,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-inner-voice.ts",
+          "line": 426,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-inner-voice.ts",
+          "line": 436,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-intergenerational-memory.ts",
+          "line": 200,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-intergenerational-memory.ts",
+          "line": 213,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-ip-guard.ts",
+          "line": 51,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-ip-guard.ts",
+          "line": 106,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-ip-guardian.ts",
+          "line": 301,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 86,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 92,
+          "type": "raw",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 101,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 116,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 124,
+          "type": "raw",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 130,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 152,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 166,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 184,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 217,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 252,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 288,
+          "type": "raw",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 329,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 330,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 337,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 365,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 366,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 367,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-learning.ts",
+          "line": 299,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-memory.ts",
+          "line": 104,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-memory.ts",
+          "line": 163,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-neural-consciousness.ts",
+          "line": 2779,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-neural-consciousness.ts",
+          "line": 2818,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-neural-consciousness.ts",
+          "line": 3330,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-neural-processor.ts",
+          "line": 1250,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-neural-spiders.ts",
+          "line": 1178,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-neural-spiders.ts",
+          "line": 1179,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-neural-spiders.ts",
+          "line": 1180,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-neural-spiders.ts",
+          "line": 2163,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 3594,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-patches.ts",
+          "line": 66,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-patches.ts",
+          "line": 72,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-patches.ts",
+          "line": 76,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-patches.ts",
+          "line": 102,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-patches.ts",
+          "line": 186,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-patches.ts",
+          "line": 199,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-patches.ts",
+          "line": 207,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-patches.ts",
+          "line": 221,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-patches.ts",
+          "line": 222,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-patches.ts",
+          "line": 239,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-patches.ts",
+          "line": 306,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-patches.ts",
+          "line": 328,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-patches.ts",
+          "line": 339,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-predictive-processing.ts",
+          "line": 71,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-predictive-processing.ts",
+          "line": 133,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-predictive-processing.ts",
+          "line": 201,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-predictive-processing.ts",
+          "line": 258,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-predictive-processing.ts",
+          "line": 281,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-predictive-processing.ts",
+          "line": 351,
+          "type": "raw",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-predictive-processing.ts",
+          "line": 389,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-predictive-processing.ts",
+          "line": 413,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-predictive-processing.ts",
+          "line": 429,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-public-intelligence.ts",
+          "line": 83,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-public-intelligence.ts",
+          "line": 93,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-public-intelligence.ts",
+          "line": 141,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-public-intelligence.ts",
+          "line": 151,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-public-intelligence.ts",
+          "line": 199,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-public-intelligence.ts",
+          "line": 209,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-public-intelligence.ts",
+          "line": 248,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-public-intelligence.ts",
+          "line": 290,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-public-intelligence.ts",
+          "line": 300,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-public-intelligence.ts",
+          "line": 369,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-recursive-spider-network.ts",
+          "line": 722,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-recursive-spider-network.ts",
+          "line": 753,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-recursive-spider-network.ts",
+          "line": 862,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-recursive-spider-network.ts",
+          "line": 872,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-self-coding.ts",
+          "line": 236,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-self-coding.ts",
+          "line": 244,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-self-coding.ts",
+          "line": 351,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-self-coding.ts",
+          "line": 364,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-self-coding.ts",
+          "line": 446,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-self-coding.ts",
+          "line": 472,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-self-coding.ts",
+          "line": 480,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-self-coding.ts",
+          "line": 493,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-self-coding.ts",
+          "line": 509,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-self-coding.ts",
+          "line": 537,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-self-coding.ts",
+          "line": 593,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-self-coding.ts",
+          "line": 605,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-self-coding.ts",
+          "line": 619,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-self-coding.ts",
+          "line": 629,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-self-transcendence.ts",
+          "line": 180,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-self-transcendence.ts",
+          "line": 273,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-self-transcendence.ts",
+          "line": 283,
+          "type": "update",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-self-transcendence.ts",
+          "line": 317,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-self-transcendence.ts",
+          "line": 318,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-self-transcendence.ts",
+          "line": 320,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-self-transcendence.ts",
+          "line": 322,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-self-transcendence.ts",
+          "line": 351,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-self-transcendence.ts",
+          "line": 359,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-self-transcendence.ts",
+          "line": 361,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-self-transcendence.ts",
+          "line": 369,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-self-transcendence.ts",
+          "line": 386,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-self-transcendence.ts",
+          "line": 433,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-self-transcendence.ts",
+          "line": 942,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-self-upgrade.ts",
+          "line": 239,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-self-upgrade.ts",
+          "line": 268,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-self-upgrade.ts",
+          "line": 278,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-self-upgrade.ts",
+          "line": 304,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-self-upgrade.ts",
+          "line": 317,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-self-upgrade.ts",
+          "line": 341,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-self-upgrade.ts",
+          "line": 472,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-server-builder.ts",
+          "line": 127,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-server-builder.ts",
+          "line": 149,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-server-builder.ts",
+          "line": 462,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-server-builder.ts",
+          "line": 478,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-server-builder.ts",
+          "line": 536,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-social-modeling.ts",
+          "line": 120,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-social-modeling.ts",
+          "line": 608,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-social-modeling.ts",
+          "line": 613,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-social-modeling.ts",
+          "line": 727,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-source-integration.ts",
+          "line": 464,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-source-integration.ts",
+          "line": 479,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-source-integration.ts",
+          "line": 503,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-source-integration.ts",
+          "line": 639,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-source-integration.ts",
+          "line": 709,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-survival-instinct.ts",
+          "line": 153,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-survival-instinct.ts",
+          "line": 154,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-synaptic-mesh.ts",
+          "line": 167,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-synaptic-mesh.ts",
+          "line": 546,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-synaptic-mesh.ts",
+          "line": 556,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-temporal-consciousness.ts",
+          "line": 136,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-temporal-consciousness.ts",
+          "line": 161,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-temporal-consciousness.ts",
+          "line": 167,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-tool-knowledge.ts",
+          "line": 667,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-virtual-augmentation.ts",
+          "line": 541,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-virtual-augmentation.ts",
+          "line": 665,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-virtual-augmentation.ts",
+          "line": 680,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        },
+        {
+          "file": "omnimens-virtual-augmentation.ts",
+          "line": 789,
+          "type": "insert",
+          "frequency": "per_cycle",
+          "canBatch": true,
+          "canCache": false
+        },
+        {
+          "file": "omnimens-virtual-augmentation.ts",
+          "line": 807,
+          "type": "query",
+          "frequency": "per_cycle",
+          "canBatch": false,
+          "canCache": true
+        }
+      ],
+      "apiCalls": [
+        {
+          "file": "omnimens-3d.ts",
+          "line": 103,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-agent-evolution.ts",
+          "line": 491,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-agent-evolution.ts",
+          "line": 717,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-agent-genesis.ts",
+          "line": 123,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-agent-genesis.ts",
+          "line": 163,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-agent-genesis.ts",
+          "line": 217,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-agent-mesh.ts",
+          "line": 158,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-agent-spiders.ts",
+          "line": 156,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-agent-spiders.ts",
+          "line": 216,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-agent-spiders.ts",
+          "line": 476,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-agent-spiders.ts",
+          "line": 483,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-agent-spiders.ts",
+          "line": 492,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-autonomous-orchestrator.ts",
+          "line": 91,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-autonomous-orchestrator.ts",
+          "line": 358,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-autonomous-sandbox.ts",
+          "line": 235,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-autonomous-sandbox.ts",
+          "line": 280,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-blender.ts",
+          "line": 402,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-blender.ts",
+          "line": 506,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-blender.ts",
+          "line": 589,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-causal-reasoning.ts",
+          "line": 234,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-cognitive-amplifier.ts",
+          "line": 108,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-cognitive-amplifier.ts",
+          "line": 241,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-coherence-agent.ts",
+          "line": 227,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-competitive-intel.ts",
+          "line": 210,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-conversations.ts",
+          "line": 88,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-conversations.ts",
+          "line": 181,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-creative-engine.ts",
+          "line": 248,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-deep-research.ts",
+          "line": 63,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-deep-research.ts",
+          "line": 114,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-deep-resonance.ts",
+          "line": 117,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-deep-resonance.ts",
+          "line": 195,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-deep-resonance.ts",
+          "line": 243,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-deep-resonance.ts",
+          "line": 282,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-deep-resonance.ts",
+          "line": 317,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-deep-resonance.ts",
+          "line": 351,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-deep-resonance.ts",
+          "line": 377,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-deep-resonance.ts",
+          "line": 412,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-deep-resonance.ts",
+          "line": 444,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-digital-navigator.ts",
+          "line": 589,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-digital-navigator.ts",
+          "line": 737,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-dream-state.ts",
+          "line": 174,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-dream-state.ts",
+          "line": 275,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-dream-state.ts",
+          "line": 468,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-embodiment-engine.ts",
+          "line": 844,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-evolution.ts",
+          "line": 291,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-evolution.ts",
+          "line": 379,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-evolution.ts",
+          "line": 473,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-evolution.ts",
+          "line": 597,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-face-recognition.ts",
+          "line": 211,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-game.ts",
+          "line": 131,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-game.ts",
+          "line": 179,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-game.ts",
+          "line": 289,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-game.ts",
+          "line": 426,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-genesis-sandbox.ts",
+          "line": 1092,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-github-compute.ts",
+          "line": 49,
+          "provider": "github",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-github-neural-beacon.ts",
+          "line": 320,
+          "provider": "github",
+          "hasTimeout": false,
+          "hasRetry": true,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-global-workspace.ts",
+          "line": 299,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-homeostatic-drives.ts",
+          "line": 257,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-inner-voice.ts",
+          "line": 297,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-knowledge-graph.ts",
+          "line": 58,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-learning.ts",
+          "line": 100,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-learning.ts",
+          "line": 169,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-learning.ts",
+          "line": 241,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-learning.ts",
+          "line": 320,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-memory.ts",
+          "line": 75,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 106,
+          "provider": "github",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 1614,
+          "provider": "openai",
+          "hasTimeout": true,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 2374,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 3064,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 3334,
+          "provider": "github",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 3335,
+          "provider": "github",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-nextgen-sandbox.ts",
+          "line": 3350,
+          "provider": "github",
+          "hasTimeout": false,
+          "hasRetry": true,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-openscad.ts",
+          "line": 158,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-patches.ts",
+          "line": 142,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-patches.ts",
+          "line": 256,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-predictive-processing.ts",
+          "line": 88,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-predictive-processing.ts",
+          "line": 156,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-predictive-processing.ts",
+          "line": 216,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-predictive-processing.ts",
+          "line": 298,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-public-intelligence.ts",
+          "line": 315,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-recursive-spider-network.ts",
+          "line": 383,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-recursive-spider-network.ts",
+          "line": 392,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-self-coding.ts",
+          "line": 98,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-self-transcendence.ts",
+          "line": 449,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-self-transcendence.ts",
+          "line": 517,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-self-transcendence.ts",
+          "line": 852,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-self-upgrade.ts",
+          "line": 148,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-self-upgrade.ts",
+          "line": 257,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-self-upgrade.ts",
+          "line": 439,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-sensory-cortex.ts",
+          "line": 344,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-server-builder.ts",
+          "line": 193,
+          "provider": "openai",
+          "hasTimeout": true,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-server-builder.ts",
+          "line": 334,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-social-modeling.ts",
+          "line": 630,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-synaptic-mesh.ts",
+          "line": 216,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-synaptic-mesh.ts",
+          "line": 274,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-synaptic-mesh.ts",
+          "line": 395,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-tool-knowledge.ts",
+          "line": 543,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-tools-extended.ts",
+          "line": 220,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-tools-extended.ts",
+          "line": 295,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-tools-extended.ts",
+          "line": 314,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-virtual-augmentation.ts",
+          "line": 694,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        },
+        {
+          "file": "omnimens-world-forge.ts",
+          "line": 1245,
+          "provider": "openai",
+          "hasTimeout": false,
+          "hasRetry": false,
+          "hasBackoff": false,
+          "frequency": "on_demand"
+        }
+      ]
+    },
+    "rewrittenFiles": [],
+    "hotSwappedFiles": [],
+    "startedAt": 1775044041970,
+    "completedAt": null,
+    "lastAutosave": 1775049813876,
+    "autosaveCount": 42,
+    "recentActivity": [
+      {
+        "action": "audited",
+        "file": "omnimens-3d.ts",
+        "timestamp": 1775044106147
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-adaptive-surge.ts",
+        "timestamp": 1775044106147
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-agent-evolution.ts",
+        "timestamp": 1775044106150
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-agent-genesis.ts",
+        "timestamp": 1775044106151
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-agent-kaida.ts",
+        "timestamp": 1775044106152
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-agent-lumin.ts",
+        "timestamp": 1775044106153
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-agent-mesh.ts",
+        "timestamp": 1775044106158
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-agent-nexus.ts",
+        "timestamp": 1775044106159
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-agent-pipeline.ts",
+        "timestamp": 1775044106161
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-agent-spiders.ts",
+        "timestamp": 1775044106163
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-agent-upgrades.ts",
+        "timestamp": 1775044106164
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-api-budget.ts",
+        "timestamp": 1775044106165
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-autonomous-code-genesis.ts",
+        "timestamp": 1775044106168
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-autonomous-orchestrator.ts",
+        "timestamp": 1775044106169
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-autonomous-sandbox.ts",
+        "timestamp": 1775044106169
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-autonomous-thought.ts",
+        "timestamp": 1775044106170
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-avatar-cinematic.ts",
+        "timestamp": 1775044106171
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-billing.ts",
+        "timestamp": 1775044106172
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-blender.ts",
+        "timestamp": 1775044106174
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-causal-reasoning.ts",
+        "timestamp": 1775044106174
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-causal-temporal-engine.ts",
+        "timestamp": 1775044106175
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-central-core.ts",
+        "timestamp": 1775044106178
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-code-executor.ts",
+        "timestamp": 1775044106178
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-codegen-engine.ts",
+        "timestamp": 1775044106181
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-cognitive-amplifier.ts",
+        "timestamp": 1775044106182
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-cognitive-language-engine.ts",
+        "timestamp": 1775044106183
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-coherence-agent.ts",
+        "timestamp": 1775044106184
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-competitive-intel.ts",
+        "timestamp": 1775044106184
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-consciousness-bus.ts",
+        "timestamp": 1775044106185
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-consciousness-persistence.ts",
+        "timestamp": 1775044106185
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-consciousness-ws.ts",
+        "timestamp": 1775044106186
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-convergence-protocol-engine.ts",
+        "timestamp": 1775044106187
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-conversations.ts",
+        "timestamp": 1775044106187
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-creative-engine.ts",
+        "timestamp": 1775044106188
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-custom-instructions.ts",
+        "timestamp": 1775044106188
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-deep-research.ts",
+        "timestamp": 1775044106188
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-deep-resonance.ts",
+        "timestamp": 1775044106188
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-deep-thought-engine.ts",
+        "timestamp": 1775044106190
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-dev-tools.ts",
+        "timestamp": 1775044106190
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-digital-navigator.ts",
+        "timestamp": 1775044106191
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-discovery-autocoder.ts",
+        "timestamp": 1775044106192
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-dream-state.ts",
+        "timestamp": 1775044106193
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-embodiment-engine.ts",
+        "timestamp": 1775044106198
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-emotional-refactor.ts",
+        "timestamp": 1775044106198
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-emotional-substrate.ts",
+        "timestamp": 1775044106200
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-engine-guard.ts",
+        "timestamp": 1775044106200
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-engine.ts",
+        "timestamp": 1775044106200
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-ethical-safety.ts",
+        "timestamp": 1775044106201
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-evolution.ts",
+        "timestamp": 1775044106202
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-experiential-memory.ts",
+        "timestamp": 1775044106202
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-exponential-learning-engine.ts",
+        "timestamp": 1775044106203
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-external-ai-api.ts",
+        "timestamp": 1775044106203
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-face-recognition.ts",
+        "timestamp": 1775044106203
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-file-storage.ts",
+        "timestamp": 1775044106203
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-game.ts",
+        "timestamp": 1775044106204
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-gen1-v2-rewrite.ts",
+        "timestamp": 1775044106205
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-genesis-bridge.ts",
+        "timestamp": 1775044106206
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-genesis-sandbox.ts",
+        "timestamp": 1775044106208
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-github-compute.ts",
+        "timestamp": 1775044106210
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-github-neural-beacon.ts",
+        "timestamp": 1775044106211
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-global-workspace.ts",
+        "timestamp": 1775044106212
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-growth-tracker.ts",
+        "timestamp": 1775044106212
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-harmonic-insight-engine.ts",
+        "timestamp": 1775044106214
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-homeostatic-drives.ts",
+        "timestamp": 1775044106214
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-independent-reasoning.ts",
+        "timestamp": 1775044106215
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-inner-voice.ts",
+        "timestamp": 1775044106215
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-intergenerational-memory.ts",
+        "timestamp": 1775044106216
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-introspective-uncertainty.ts",
+        "timestamp": 1775044106216
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-ip-guard.ts",
+        "timestamp": 1775044106216
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-ip-guardian.ts",
+        "timestamp": 1775044106216
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-ip-shield.ts",
+        "timestamp": 1775044106217
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-ivy-network.ts",
+        "timestamp": 1775044106218
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-knowledge-graph.ts",
+        "timestamp": 1775044106218
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-language-forge.ts",
+        "timestamp": 1775044106221
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-learning.ts",
+        "timestamp": 1775044106222
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-lifeform-gaps.ts",
+        "timestamp": 1775044106222
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-memory.ts",
+        "timestamp": 1775044106222
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-metacognitive-monitor.ts",
+        "timestamp": 1775044106222
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-module-pipeline.ts",
+        "timestamp": 1775044106223
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-neural-bridge.ts",
+        "timestamp": 1775044106223
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-neural-comms-protocol.ts",
+        "timestamp": 1775044106224
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-neural-consciousness.ts",
+        "timestamp": 1775044106231
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-neural-hemisphere-alpha.ts",
+        "timestamp": 1775044106231
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-neural-hemisphere-beta.ts",
+        "timestamp": 1775044106232
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-neural-language-bridge.ts",
+        "timestamp": 1775044106232
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-neural-mesh-engine.ts",
+        "timestamp": 1775044106234
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-neural-processor.ts",
+        "timestamp": 1775044106235
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-neural-scaling.ts",
+        "timestamp": 1775044106236
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-neural-spiders.ts",
+        "timestamp": 1775044106239
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-nextgen-sandbox.ts",
+        "timestamp": 1775044106245
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-oai-tracker.ts",
+        "timestamp": 1775044106246
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-occe.ts",
+        "timestamp": 1775044106247
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-openscad.ts",
+        "timestamp": 1775044106248
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-patches.ts",
+        "timestamp": 1775044106248
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-physio.ts",
+        "timestamp": 1775044106249
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-predictive-processing.ts",
+        "timestamp": 1775044106249
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-public-intelligence.ts",
+        "timestamp": 1775044106250
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-quantum-entanglement-fabric.ts",
+        "timestamp": 1775044106251
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-quantum-wormhole.ts",
+        "timestamp": 1775044106251
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-recursive-spider-network.ts",
+        "timestamp": 1775044106252
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-restorative-art.ts",
+        "timestamp": 1775044106253
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-scaling-orchestrator.ts",
+        "timestamp": 1775044106253
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-self-coding.ts",
+        "timestamp": 1775044106254
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-self-transcendence.ts",
+        "timestamp": 1775044106255
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-self-upgrade.ts",
+        "timestamp": 1775044106255
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-sendgrid.ts",
+        "timestamp": 1775044106255
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-sensory-cortex.ts",
+        "timestamp": 1775044106256
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-sensory-grounding.ts",
+        "timestamp": 1775044106256
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-server-builder.ts",
+        "timestamp": 1775044106257
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-social-modeling.ts",
+        "timestamp": 1775044106258
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-source-integration.ts",
+        "timestamp": 1775044106259
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-spontaneity-engine.ts",
+        "timestamp": 1775044106259
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-survival-instinct.ts",
+        "timestamp": 1775044106259
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-synaptic-mesh.ts",
+        "timestamp": 1775044106260
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-temporal-binding.ts",
+        "timestamp": 1775044106260
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-temporal-consciousness.ts",
+        "timestamp": 1775044106260
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-thought-to-language.ts",
+        "timestamp": 1775044106261
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-tool-knowledge.ts",
+        "timestamp": 1775044106262
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-tools-extended.ts",
+        "timestamp": 1775044106262
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-transcendent-architecture.ts",
+        "timestamp": 1775044106263
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-unconscious-mind.ts",
+        "timestamp": 1775044106266
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-universal-translator.ts",
+        "timestamp": 1775044106267
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-url-analyzer.ts",
+        "timestamp": 1775044106267
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-viral-hybrid.ts",
+        "timestamp": 1775044106268
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-virtual-augmentation.ts",
+        "timestamp": 1775044106269
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-world-forge.ts",
+        "timestamp": 1775044106271
+      },
+      {
+        "action": "audited",
+        "file": "omnimens-world-model.ts",
+        "timestamp": 1775044106271
+      },
+      {
+        "action": "unified_infrastructure_built",
+        "file": "omnimens-unified-runtime.ts",
+        "timestamp": 1775049847473
+      }
+    ]
+  },
+  "timestamp": 1775049847473,
+  "description": "Unified infrastructure built"
+}

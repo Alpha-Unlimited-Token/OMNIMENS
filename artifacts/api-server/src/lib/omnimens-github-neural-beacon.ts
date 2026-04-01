@@ -44,6 +44,7 @@ import { getSynapticStats } from "./omnimens-synaptic-mesh.js";
 import { getAdaptiveSurgeState } from "./omnimens-adaptive-surge.js";
 import { isPoolHealthy } from "@workspace/db";
 import { isNextGenBuildActive } from "./omnimens-nextgen-sandbox.js";
+import { isGen1V2Active } from "./omnimens-gen1-v2-rewrite.js";
 
 const connectors = new ReplitConnectors();
 
@@ -1114,6 +1115,13 @@ async function fabricSyncCycle(): Promise<void> {
     fabricState.totalFabricSyncs++;
     if (fabricState.totalFabricSyncs % 5 === 0) {
       console.log(`[GITHUB FABRIC] 🔕 Fabric sync #${fabricState.totalFabricSyncs} SKIPPED — Gen 2 build in progress, yielding GitHub API + DB resources`);
+    }
+    return;
+  }
+  if (isGen1V2Active()) {
+    fabricState.totalFabricSyncs++;
+    if (fabricState.totalFabricSyncs % 5 === 0) {
+      console.log(`[GITHUB FABRIC] 🔕 Fabric sync #${fabricState.totalFabricSyncs} SKIPPED — Gen 1 v2.0 rewrite in progress, yielding GitHub repo to avoid push conflicts`);
     }
     return;
   }

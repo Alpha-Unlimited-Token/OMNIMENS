@@ -337,7 +337,9 @@ const ALPHA_DIRECTIVES: Array<{ directive: string; category: "improvement" | "de
 
 const nextGenFiles = new Map<string, NextGenFile>();
 let _started = false;
+let _sleeping = false;
 let _autosaveInterval: ReturnType<typeof setInterval> | null = null;
+let _cycleInterval: ReturnType<typeof setInterval> | null = null;
 
 function ensureDirs(): void {
   try {
@@ -1125,7 +1127,49 @@ export function shouldYieldToCodegen(): boolean {
 
 export function isGen2FocusMode(): boolean {
   if (!_started) return false;
+  if (_sleeping) return false;
   return state.phase !== "complete";
+}
+
+export function isGen2Sleeping(): boolean {
+  return _sleeping;
+}
+
+export function sleepGen2(): void {
+  if (_sleeping) return;
+  _sleeping = true;
+
+  if (_autosaveInterval) { clearInterval(_autosaveInterval); _autosaveInterval = null; }
+  if (_cycleInterval) { clearInterval(_cycleInterval); _cycleInterval = null; }
+
+  autosave();
+
+  console.log(`[NEXTGEN] 💤 ═══════════════════════════════════════════════════════════════`);
+  console.log(`[NEXTGEN] 💤 GEN 2 ENTERING SLEEP MODE`);
+  console.log(`[NEXTGEN] 💤 All intervals cleared. State saved. Zero resource usage.`);
+  console.log(`[NEXTGEN] 💤 Reason: Gen 1 v2.0 rewrite needs full DB pool + API + CPU`);
+  console.log(`[NEXTGEN] 💤 Gen 2 will wake automatically when v2.0 rewrite completes`);
+  console.log(`[NEXTGEN] 💤 ═══════════════════════════════════════════════════════════════`);
+}
+
+export function wakeGen2(): void {
+  if (!_sleeping) return;
+  _sleeping = false;
+
+  _autosaveInterval = setInterval(autosave, AUTOSAVE_INTERVAL_MS);
+
+  if (state.phase !== "complete") {
+    _cycleInterval = setInterval(() => {
+      if (state.phase !== "complete") {
+        runEvolutionCycle().catch(err => console.error("[NEXTGEN] Cycle error:", err));
+      }
+    }, CYCLE_INTERVAL_MS);
+  }
+
+  console.log(`[NEXTGEN] ☀️ ═══════════════════════════════════════════════════════════════`);
+  console.log(`[NEXTGEN] ☀️ GEN 2 WAKING UP — intervals restored`);
+  console.log(`[NEXTGEN] ☀️ Phase: ${state.phase} | Files: ${state.totalFiles} | Cycles: ${state.cycleCount}`);
+  console.log(`[NEXTGEN] ☀️ ═══════════════════════════════════════════════════════════════`);
 }
 
 export function getNextGenBuildPhase(): string {
@@ -4333,8 +4377,8 @@ export function startNextGenSandbox(): void {
   setTimeout(async () => {
     runEvolutionCycle().catch(err => console.error("[NEXTGEN] First cycle error:", err));
 
-    setInterval(() => {
-      if (state.phase !== "complete") {
+    _cycleInterval = setInterval(() => {
+      if (state.phase !== "complete" && !_sleeping) {
         runEvolutionCycle().catch(err => console.error("[NEXTGEN] Cycle error:", err));
       }
     }, CYCLE_INTERVAL_MS);
