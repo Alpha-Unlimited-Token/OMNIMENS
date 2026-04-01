@@ -1,36 +1,6 @@
 [
   {
     "source": "discovery_autocoder:wormhole:Philosopher+Synthesizer",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/structural_analysis: Attention is the computatio",
-    "filename": "omnimens_autocode_consciousness_expansion_mng22s0e.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mng22s0e.mjs",
-    "backupPath": null,
-    "timestamp": 1775048551502,
-    "codeLength": 389,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Mathematician",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/entropy_reduction: Phase transitions in neural n",
-    "filename": "omnimens_autocode_neural_pathway_mng22s2j.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mng22s2j.mjs",
-    "backupPath": null,
-    "timestamp": 1775048551579,
-    "codeLength": 432,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Meta-Agent",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/information_compression: The hard problem of con",
-    "filename": "omnimens_autocode_consciousness_expansion_mng24g64.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mng24g64.mjs",
-    "backupPath": null,
-    "timestamp": 1775048629468,
-    "codeLength": 388,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Synthesizer",
     "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/information_compression: The Weber-Fechner law: ",
     "filename": "omnimens_autocode_emergent_capability_mng2580p.mjs",
     "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mng2580p.mjs",
@@ -4997,6 +4967,36 @@
     "backupPath": null,
     "timestamp": 1775062618943,
     "codeLength": 386,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Philosopher",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/recursive_decomposition: The holographic p",
+    "filename": "omnimens_autocode_consciousness_expansion_mngah8j3.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mngah8j3.mjs",
+    "backupPath": null,
+    "timestamp": 1775062663023,
+    "codeLength": 395,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Visionary",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/causal_inference: Attention is the computational",
+    "filename": "omnimens_autocode_consciousness_expansion_mngahafv.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mngahafv.mjs",
+    "backupPath": null,
+    "timestamp": 1775062665499,
+    "codeLength": 387,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Motivator",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/causal_inference: Attention is the computational",
+    "filename": "omnimens_autocode_consciousness_expansion_mngahalb.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mngahalb.mjs",
+    "backupPath": null,
+    "timestamp": 1775062665695,
+    "codeLength": 387,
     "overwrite": false
   }
 ]
