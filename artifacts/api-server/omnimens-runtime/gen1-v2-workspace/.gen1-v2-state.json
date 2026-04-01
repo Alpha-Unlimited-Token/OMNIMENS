@@ -3,14 +3,14 @@
     "buildVersion": "2.0",
     "generation": 1,
     "phase": "event_driven_rewrite",
-    "cycleCount": 59,
-    "lastCycleTime": 1775061196744,
+    "cycleCount": 62,
+    "lastCycleTime": 1775061957669,
     "engineFilesTotal": 127,
     "engineFilesAudited": 127,
-    "engineFilesRewritten": 41,
+    "engineFilesRewritten": 43,
     "engineFilesHotSwapped": 0,
     "timersFound": 236,
-    "timersConsolidated": 61,
+    "timersConsolidated": 71,
     "dbCallsFound": 288,
     "dbCallsOptimized": 0,
     "apiCallsFound": 102,
@@ -528,6 +528,30 @@
         "apiCallsFixed": 0,
         "identityPreserved": false,
         "rewrittenAt": 1775061233162
+      },
+      {
+        "originalFile": "omnimens-nextgen-sandbox.ts",
+        "rewrittenFile": "rewrites/omnimens-nextgen-sandbox.ts",
+        "category": "event_driven_rewrite",
+        "linesOriginal": 4379,
+        "linesRewritten": 243,
+        "timersRemoved": 9,
+        "dbCallsOptimized": 0,
+        "apiCallsFixed": 0,
+        "identityPreserved": false,
+        "rewrittenAt": 1775061451033
+      },
+      {
+        "originalFile": "omnimens-occe.ts",
+        "rewrittenFile": "rewrites/omnimens-occe.ts",
+        "category": "event_driven_rewrite",
+        "linesOriginal": 1214,
+        "linesRewritten": 299,
+        "timersRemoved": 1,
+        "dbCallsOptimized": 0,
+        "apiCallsFixed": 0,
+        "identityPreserved": false,
+        "rewrittenAt": 1775061801832
       }
     ],
     "auditFindings": {
@@ -5840,13 +5864,15 @@
       "omnimens-neural-consciousness.ts",
       "omnimens-neural-processor.ts",
       "omnimens-neural-scaling.ts",
-      "omnimens-neural-spiders.ts"
+      "omnimens-neural-spiders.ts",
+      "omnimens-nextgen-sandbox.ts",
+      "omnimens-occe.ts"
     ],
     "hotSwappedFiles": [],
     "startedAt": 1775044041970,
     "completedAt": null,
-    "lastAutosave": 1775061233164,
-    "autosaveCount": 145,
+    "lastAutosave": 1775061790006,
+    "autosaveCount": 149,
     "recentActivity": [
       {
         "action": "audited",
@@ -6692,6 +6718,16 @@
         "action": "event_driven_rewrite",
         "file": "omnimens-neural-spiders.ts",
         "timestamp": 1775061233162
+      },
+      {
+        "action": "event_driven_rewrite",
+        "file": "omnimens-nextgen-sandbox.ts",
+        "timestamp": 1775061451033
+      },
+      {
+        "action": "event_driven_rewrite",
+        "file": "omnimens-occe.ts",
+        "timestamp": 1775061801832
       }
     ]
   }

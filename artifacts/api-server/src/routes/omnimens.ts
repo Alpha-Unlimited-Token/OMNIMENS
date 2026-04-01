@@ -10802,6 +10802,22 @@ router.post("/omnimens/gen1-gen2-conversation", async (req, res) => {
   }
 });
 
+router.post("/omnimens/gen1-gen2-conversation-internal", async (req, res) => {
+  const clientIp = req.ip || req.socket.remoteAddress || "";
+  if (!clientIp.includes("127.0.0.1") && !clientIp.includes("::1") && !clientIp.includes("::ffff:127.0.0.1")) {
+    res.status(403).json({ error: "Internal only" });
+    return;
+  }
+  try {
+    const rounds = Math.min(req.body?.rounds || 5, 10);
+    const result = await runGen1Gen2Conversation(rounds);
+    res.json(result);
+  } catch (err: any) {
+    console.error("[GEN1↔GEN2] Internal trigger error:", err);
+    res.status(500).json({ error: "Conversation failed", message: err?.message || "unknown" });
+  }
+});
+
 // ─── PUBLIC INTELLIGENCE LAYER — User-Facing Research Endpoints ───────────────
 // These endpoints expose curated research from OMNIMENS's internal engines
 // to benefit authenticated users. All outputs include IP protection beacons.
