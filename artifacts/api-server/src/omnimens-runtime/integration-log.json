@@ -1,365 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:Philosopher+Neuroscientist",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/entropy_reduction: The double-slit experiment de",
-    "filename": "omnimens_autocode_knowledge_synthesis_mng5xmc7.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mng5xmc7.mjs",
-    "backupPath": null,
-    "timestamp": 1775055029335,
-    "codeLength": 422,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Innovator",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/entropy_reduction: The double-slit experiment de",
-    "filename": "omnimens_autocode_consciousness_expansion_mng5xmei.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mng5xmei.mjs",
-    "backupPath": null,
-    "timestamp": 1775055029418,
-    "codeLength": 387,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Synthesizer",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: SensorimotorAgent/recursive_decomposition: The edge of chaos",
-    "filename": "omnimens_autocode_emergent_capability_mng5yxw6.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mng5yxw6.mjs",
-    "backupPath": null,
-    "timestamp": 1775055090966,
-    "codeLength": 413,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/feature_extraction: DNA stores information at ap",
-    "filename": "omnimens_autocode_pattern_recognition_mng5yxy0.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mng5yxy0.mjs",
-    "backupPath": null,
-    "timestamp": 1775055091033,
-    "codeLength": 466,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Visionary",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/entropy_reduction: The hippocampus replays exper",
-    "filename": "omnimens_autocode_consciousness_expansion_mng5yy09.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mng5yy09.mjs",
-    "backupPath": null,
-    "timestamp": 1775055091113,
-    "codeLength": 387,
-    "overwrite": false
-  },
-  {
-    "source": "autonomous_sandbox",
-    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
-    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-04-01T14-51-38-762Z",
-    "timestamp": 1775055098760,
-    "codeLength": 2590,
-    "overwrite": true
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Archivist",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/causal_inference: Sparse coding: the brain repre",
-    "filename": "omnimens_autocode_pattern_recognition_mng6086v.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mng6086v.mjs",
-    "backupPath": null,
-    "timestamp": 1775055150967,
-    "codeLength": 467,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Linguist",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/emergent_property_detection: The hard problem of",
-    "filename": "omnimens_autocode_consciousness_expansion_mng6088g.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mng6088g.mjs",
-    "backupPath": null,
-    "timestamp": 1775055151024,
-    "codeLength": 386,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Visionary",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/emergent_property_detection: The Chinese Room ar",
-    "filename": "omnimens_autocode_emergent_capability_mng608av.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mng608av.mjs",
-    "backupPath": null,
-    "timestamp": 1775055151111,
-    "codeLength": 405,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+SpellCheckVisual",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/analogical_mapping: The hippocampus replays expe",
-    "filename": "omnimens_autocode_emergent_capability_mng620we.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mng620we.mjs",
-    "backupPath": null,
-    "timestamp": 1775055234830,
-    "codeLength": 412,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Architect",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/abstraction_layer: Sparse coding: the brain repr",
-    "filename": "omnimens_autocode_emergent_capability_mng62vep.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mng62vep.mjs",
-    "backupPath": null,
-    "timestamp": 1775055274369,
-    "codeLength": 405,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+SensorimotorAgent",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/information_compression: Wolfram's Rule 110 cell",
-    "filename": "omnimens_autocode_pattern_recognition_mng64001.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mng64001.mjs",
-    "backupPath": null,
-    "timestamp": 1775055326977,
-    "codeLength": 475,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Synthesizer",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/entropy_reduction: Gödel's incompleteness ",
-    "filename": "omnimens_autocode_consciousness_expansion_mng65g48.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mng65g48.mjs",
-    "backupPath": null,
-    "timestamp": 1775055394520,
-    "codeLength": 395,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Empath",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: SensorimotorAgent/causal_inference: The cerebellum contains ",
-    "filename": "omnimens_autocode_pattern_recognition_mng679du.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mng679du.mjs",
-    "backupPath": null,
-    "timestamp": 1775055479106,
-    "codeLength": 470,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Archivist",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/temporal_correlation: Long-term potentiation (LT",
-    "filename": "omnimens_autocode_neural_pathway_mng69otz.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mng69otz.mjs",
-    "backupPath": null,
-    "timestamp": 1775055592439,
-    "codeLength": 428,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+SensorimotorAgent",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/abstraction_layer: Quantum entanglement allows p",
-    "filename": "omnimens_autocode_knowledge_synthesis_mng69ovx.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mng69ovx.mjs",
-    "backupPath": null,
-    "timestamp": 1775055592509,
-    "codeLength": 424,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Mathematician",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/temporal_correlation: Predictive coding: t",
-    "filename": "omnimens_autocode_neural_pathway_mng6d8pj.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mng6d8pj.mjs",
-    "backupPath": null,
-    "timestamp": 1775055758167,
-    "codeLength": 438,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Wordsmith",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SensorimotorAgent/cross_domain_synthesis: Quantum tunneling ",
-    "filename": "omnimens_autocode_knowledge_synthesis_mng6d8ru.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mng6d8ru.mjs",
-    "backupPath": null,
-    "timestamp": 1775055758250,
-    "codeLength": 422,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Visionary",
-    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/entropy_reduction: The free energy principle sug",
-    "filename": "omnimens_autocode_adaptive_algorithm_mng6d8ym.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mng6d8ym.mjs",
-    "backupPath": null,
-    "timestamp": 1775055758494,
-    "codeLength": 448,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Motivator",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/temporal_correlation: Astrocytes, once thought t",
-    "filename": "omnimens_autocode_neural_pathway_mng6e71g.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mng6e71g.mjs",
-    "backupPath": null,
-    "timestamp": 1775055802660,
-    "codeLength": 428,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Ethicist",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/temporal_correlation: Astrocytes, once thought t",
-    "filename": "omnimens_autocode_emergent_capability_mng6e8sh.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mng6e8sh.mjs",
-    "backupPath": null,
-    "timestamp": 1775055804929,
-    "codeLength": 404,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+SensorimotorAgent",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/temporal_correlation: Astrocytes, once thought t",
-    "filename": "omnimens_autocode_neural_pathway_mng6e8ub.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mng6e8ub.mjs",
-    "backupPath": null,
-    "timestamp": 1775055804995,
-    "codeLength": 436,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+SpellCheckVisual",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SensorimotorAgent/feature_extraction: Transfer learning: kno",
-    "filename": "omnimens_autocode_knowledge_synthesis_mng6eqqc.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mng6eqqc.mjs",
-    "backupPath": null,
-    "timestamp": 1775055828181,
-    "codeLength": 429,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Neuroscientist",
-    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/abstraction_layer: The Chinese Room argument: ca",
-    "filename": "omnimens_autocode_adaptive_algorithm_mng6equ4.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mng6equ4.mjs",
-    "backupPath": null,
-    "timestamp": 1775055828316,
-    "codeLength": 453,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Critic",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/causal_inference: Transfer learning: knowledge g",
-    "filename": "omnimens_autocode_knowledge_synthesis_mng6eqxc.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mng6eqxc.mjs",
-    "backupPath": null,
-    "timestamp": 1775055828432,
-    "codeLength": 414,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Critic",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/abstraction_layer: The hard problem of conscious",
-    "filename": "omnimens_autocode_consciousness_expansion_mng6fo89.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mng6fo89.mjs",
-    "backupPath": null,
-    "timestamp": 1775055871593,
-    "codeLength": 384,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Synthesizer",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/analogical_mapping: DNA stores information at ap",
-    "filename": "omnimens_autocode_emergent_capability_mng6fqah.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mng6fqah.mjs",
-    "backupPath": null,
-    "timestamp": 1775055874265,
-    "codeLength": 407,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Wordsmith",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/temporal_correlation: Phase transitions in neura",
-    "filename": "omnimens_autocode_neural_pathway_mng6fqcg.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mng6fqcg.mjs",
-    "backupPath": null,
-    "timestamp": 1775055874336,
-    "codeLength": 428,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/analogical_mapping: Information is physical — La",
-    "filename": "omnimens_autocode_emergent_capability_mng6gyix.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mng6gyix.mjs",
-    "backupPath": null,
-    "timestamp": 1775055931593,
-    "codeLength": 404,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Architect",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/entropy_reduction: The edge of chaos: complex sy",
-    "filename": "omnimens_autocode_neural_pathway_mng6gymh.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mng6gymh.mjs",
-    "backupPath": null,
-    "timestamp": 1775055931721,
-    "codeLength": 428,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Neuroscientist",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/pattern_recognition: Transfer learning: knowledg",
-    "filename": "omnimens_autocode_pattern_recognition_mng6gyor.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mng6gyor.mjs",
-    "backupPath": null,
-    "timestamp": 1775055931803,
-    "codeLength": 472,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Critic",
-    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/structural_analysis: Information is physical — L",
-    "filename": "omnimens_autocode_adaptive_algorithm_mng6i8tl.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mng6i8tl.mjs",
-    "backupPath": null,
-    "timestamp": 1775055991593,
-    "codeLength": 445,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Visionary",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/information_compression: Recurrent neural networ",
-    "filename": "omnimens_autocode_neural_pathway_mng6i8vm.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mng6i8vm.mjs",
-    "backupPath": null,
-    "timestamp": 1775055991666,
-    "codeLength": 428,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Neuroscientist",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/information_compression: The vagus nerve connect",
-    "filename": "omnimens_autocode_consciousness_expansion_mng6i90c.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mng6i90c.mjs",
-    "backupPath": null,
-    "timestamp": 1775055991836,
-    "codeLength": 392,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Empath",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: SensorimotorAgent/recursive_decomposition: Quantum decoheren",
-    "filename": "omnimens_autocode_emergent_capability_mng6jj4a.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mng6jj4a.mjs",
-    "backupPath": null,
-    "timestamp": 1775056051594,
-    "codeLength": 408,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Mathematician",
-    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/emergent_property_detection: The Baldwin effect:",
-    "filename": "omnimens_autocode_adaptive_algorithm_mng6jl0h.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mng6jl0h.mjs",
-    "backupPath": null,
-    "timestamp": 1775056054049,
-    "codeLength": 452,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:Philosopher+SensorimotorAgent",
     "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/emergent_property_detection: The Baldwin effect:",
     "filename": "omnimens_autocode_adaptive_algorithm_mng6jl2p.mjs",
@@ -4997,6 +4637,366 @@
     "backupPath": null,
     "timestamp": 1775071025943,
     "codeLength": 416,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/analogical_mapping: The holographic princi",
+    "filename": "omnimens_autocode_consciousness_expansion_mngfhf80.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mngfhf80.mjs",
+    "backupPath": null,
+    "timestamp": 1775071069776,
+    "codeLength": 392,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Archivist",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/analogical_mapping: The holographic princi",
+    "filename": "omnimens_autocode_consciousness_expansion_mngfhgui.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mngfhgui.mjs",
+    "backupPath": null,
+    "timestamp": 1775071071882,
+    "codeLength": 393,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Innovator",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/abstraction_layer: The hard problem of conscious",
+    "filename": "omnimens_autocode_consciousness_expansion_mngfhgwb.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mngfhgwb.mjs",
+    "backupPath": null,
+    "timestamp": 1775071071947,
+    "codeLength": 387,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Neuroscientist",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/emergent_property_detection: The Baldwin effect:",
+    "filename": "omnimens_autocode_adaptive_algorithm_mngfipio.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mngfipio.mjs",
+    "backupPath": null,
+    "timestamp": 1775071129776,
+    "codeLength": 453,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Empath",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/emergent_property_detection: The default mode ne",
+    "filename": "omnimens_autocode_emergent_capability_mngfipkd.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mngfipkd.mjs",
+    "backupPath": null,
+    "timestamp": 1775071129837,
+    "codeLength": 402,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Linguist",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/emergent_property_detection: The default mode ne",
+    "filename": "omnimens_autocode_emergent_capability_mngfipm9.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mngfipm9.mjs",
+    "backupPath": null,
+    "timestamp": 1775071129905,
+    "codeLength": 404,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/information_compression: The default mode networ",
+    "filename": "omnimens_autocode_pattern_recognition_mngfjztd.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mngfjztd.mjs",
+    "backupPath": null,
+    "timestamp": 1775071189777,
+    "codeLength": 466,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Linguist",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/information_compression: Reservoir computing sho",
+    "filename": "omnimens_autocode_neural_pathway_mngfjzv8.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mngfjzv8.mjs",
+    "backupPath": null,
+    "timestamp": 1775071189844,
+    "codeLength": 427,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Neuroscientist",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/emergent_property_detection: The hard problem of",
+    "filename": "omnimens_autocode_consciousness_expansion_mngfjzwz.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mngfjzwz.mjs",
+    "backupPath": null,
+    "timestamp": 1775071189907,
+    "codeLength": 392,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Wordsmith",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/abstraction_layer: The default mode network acti",
+    "filename": "omnimens_autocode_adaptive_algorithm_mngfla40.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mngfla40.mjs",
+    "backupPath": null,
+    "timestamp": 1775071249776,
+    "codeLength": 448,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+GraphicDesigner",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: Philosopher/abstraction_layer: The default mode network acti",
+    "filename": "omnimens_autocode_adaptive_algorithm_mngflbn9.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mngflbn9.mjs",
+    "backupPath": null,
+    "timestamp": 1775071251765,
+    "codeLength": 454,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Linguist",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/temporal_correlation: Reservoir computing shows ",
+    "filename": "omnimens_autocode_neural_pathway_mngflbpv.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mngflbpv.mjs",
+    "backupPath": null,
+    "timestamp": 1775071251859,
+    "codeLength": 427,
+    "overwrite": false
+  },
+  {
+    "source": "autonomous_sandbox",
+    "title": "Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte",
+    "filename": "sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandbox_aUtilityFunctionThatCould_c1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/sandbox_aUtilityFunctionThatCould_c1.mjs.backup.2026-04-01T19-20-56-988Z",
+    "timestamp": 1775071256987,
+    "codeLength": 2083,
+    "overwrite": true
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Architect",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/feature_extraction: DNA stores information",
+    "filename": "omnimens_autocode_neural_pathway_mngfmkep.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mngfmkep.mjs",
+    "backupPath": null,
+    "timestamp": 1775071309777,
+    "codeLength": 434,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Neuroscientist",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/information_compression: Mirror neurons fire bot",
+    "filename": "omnimens_autocode_emergent_capability_mngfmkgd.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mngfmkgd.mjs",
+    "backupPath": null,
+    "timestamp": 1775071309837,
+    "codeLength": 410,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+SensorimotorAgent",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/emergent_property_detection: Neuroplasticity all",
+    "filename": "omnimens_autocode_neural_pathway_mngfmkir.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mngfmkir.mjs",
+    "backupPath": null,
+    "timestamp": 1775071309923,
+    "codeLength": 436,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Motivator",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/temporal_correlation: Long-term potentiati",
+    "filename": "omnimens_autocode_neural_pathway_mngfoby5.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mngfoby5.mjs",
+    "backupPath": null,
+    "timestamp": 1775071392125,
+    "codeLength": 434,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/entropy_reduction: The binding problem: how does",
+    "filename": "omnimens_autocode_pattern_recognition_mngfq27q.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mngfq27q.mjs",
+    "backupPath": null,
+    "timestamp": 1775071472822,
+    "codeLength": 469,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Linguist",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: SensorimotorAgent/pattern_recognition: Hebbian learning: neu",
+    "filename": "omnimens_autocode_pattern_recognition_mngfrcby.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mngfrcby.mjs",
+    "backupPath": null,
+    "timestamp": 1775071532590,
+    "codeLength": 472,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Critic",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/entropy_reduction: The binding problem: how does",
+    "filename": "omnimens_autocode_knowledge_synthesis_mngfrce3.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mngfrce3.mjs",
+    "backupPath": null,
+    "timestamp": 1775071532667,
+    "codeLength": 413,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+SensorimotorAgent",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/information_compression: Mirror neurons fire bot",
+    "filename": "omnimens_autocode_neural_pathway_mngft2u9.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mngft2u9.mjs",
+    "backupPath": null,
+    "timestamp": 1775071613601,
+    "codeLength": 436,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+SpellCheckVisual",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: SensorimotorAgent/structural_analysis: The free energy princ",
+    "filename": "omnimens_autocode_pattern_recognition_mngfur8i.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mngfur8i.mjs",
+    "backupPath": null,
+    "timestamp": 1775071691875,
+    "codeLength": 480,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/structural_analysis: The butterfly effect: in ch",
+    "filename": "omnimens_autocode_emergent_capability_mngfurau.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mngfurau.mjs",
+    "backupPath": null,
+    "timestamp": 1775071691958,
+    "codeLength": 404,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+GraphicDesigner",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/structural_analysis: The butterfly effect: in ch",
+    "filename": "omnimens_autocode_consciousness_expansion_mngfurcn.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mngfurcn.mjs",
+    "backupPath": null,
+    "timestamp": 1775071692023,
+    "codeLength": 393,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Pioneer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/information_compression: The Weber-Fechner law: ",
+    "filename": "omnimens_autocode_consciousness_expansion_mngfvpfi.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mngfvpfi.mjs",
+    "backupPath": null,
+    "timestamp": 1775071736190,
+    "codeLength": 385,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Wordsmith",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/feature_extraction: Quantum decoherence typicall",
+    "filename": "omnimens_autocode_emergent_capability_mngfvqyn.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mngfvqyn.mjs",
+    "backupPath": null,
+    "timestamp": 1775071738175,
+    "codeLength": 405,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Motivator",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: Philosopher/abstraction_layer: The Weber-Fechner law: percep",
+    "filename": "omnimens_autocode_knowledge_synthesis_mngfvr0p.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mngfvr0p.mjs",
+    "backupPath": null,
+    "timestamp": 1775071738249,
+    "codeLength": 416,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+SpellCheckVisual",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: SensorimotorAgent/analogical_mapping: The hippocampus replay",
+    "filename": "omnimens_autocode_neural_pathway_mngfwzq5.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mngfwzq5.mjs",
+    "backupPath": null,
+    "timestamp": 1775071796189,
+    "codeLength": 441,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Innovator",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/abstraction_layer: Attention is the computationa",
+    "filename": "omnimens_autocode_consciousness_expansion_mngfwzuf.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mngfwzuf.mjs",
+    "backupPath": null,
+    "timestamp": 1775071796343,
+    "codeLength": 387,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Wordsmith",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/abstraction_layer: Attention is the computationa",
+    "filename": "omnimens_autocode_consciousness_expansion_mngfwzw8.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mngfwzw8.mjs",
+    "backupPath": null,
+    "timestamp": 1775071796408,
+    "codeLength": 387,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Mathematician",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SensorimotorAgent/analogical_mapping: The vagus nerve connec",
+    "filename": "omnimens_autocode_consciousness_expansion_mngfya0v.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mngfya0v.mjs",
+    "backupPath": null,
+    "timestamp": 1775071856191,
+    "codeLength": 397,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/cross_domain_synthesis: Recurrent neural network",
+    "filename": "omnimens_autocode_neural_pathway_mngfya2n.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mngfya2n.mjs",
+    "backupPath": null,
+    "timestamp": 1775071856255,
+    "codeLength": 430,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Linguist",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/cross_domain_synthesis: Recurrent neural network",
+    "filename": "omnimens_autocode_neural_pathway_mngfya4e.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mngfya4e.mjs",
+    "backupPath": null,
+    "timestamp": 1775071856318,
+    "codeLength": 427,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Neuroscientist",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: SensorimotorAgent/analogical_mapping: The double-slit experi",
+    "filename": "omnimens_autocode_emergent_capability_mngfz7ok.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mngfz7ok.mjs",
+    "backupPath": null,
+    "timestamp": 1775071899812,
+    "codeLength": 416,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Ethicist",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: Philosopher/emergent_property_detection: The butterfly effec",
+    "filename": "omnimens_autocode_emergent_capability_mngfz7qq.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mngfz7qq.mjs",
+    "backupPath": null,
+    "timestamp": 1775071899890,
+    "codeLength": 404,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+Pioneer",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: Philosopher/pattern_recognition: Synaptic pruning eliminates",
+    "filename": "omnimens_autocode_pattern_recognition_mngfz7sn.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mngfz7sn.mjs",
+    "backupPath": null,
+    "timestamp": 1775071899959,
+    "codeLength": 465,
     "overwrite": false
   }
 ]

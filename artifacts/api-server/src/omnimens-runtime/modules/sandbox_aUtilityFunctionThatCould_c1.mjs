@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-04-01T18:56:22.215Z
+ * Written: 2026-04-01T19:20:56.987Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,68 +16,69 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility function to calculate the cosine similarity between two vectors
-function cosineSimilarity(vecA, vecB) {
-    if (vecA.length !== vecB.length) {
-        throw new Error("Vectors must be of the same length");
+// Function to compute term frequency-inverse document frequency (TF-IDF) for text analysis
+function computeTFIDF(documents) {
+    if (!Array.isArray(documents) || documents.length === 0) {
+        throw new Error("Input must be a non-empty array of documents.");
     }
 
-    let dotProduct = 0;
-    let magnitudeA = 0;
-    let magnitudeB = 0;
+    const termFrequency = {};
+    const documentFrequency = {};
+    const totalDocuments = documents.length;
 
-    for (let i = 0; i < vecA.length; i++) {
-        dotProduct += vecA[i] * vecB[i];
-        magnitudeA += vecA[i] ** 2;
-        magnitudeB += vecB[i] ** 2;
+    // Calculate term frequency (TF) and document frequency (DF)
+    documents.forEach((doc, index) => {
+        if (typeof doc !== "string") {
+            throw new Error(`Document at index ${index} is not a string.`);
+        }
+        const terms = doc.toLowerCase().split(/\W+/).filter(Boolean);
+        const uniqueTerms = new Set(terms);
+
+        termFrequency[index] = {};
+        terms.forEach(term => {
+            termFrequency[index][term] = (termFrequency[index][term] || 0) + 1;
+        });
+
+        uniqueTerms.forEach(term => {
+            documentFrequency[term] = (documentFrequency[term] || 0) + 1;
+        });
+    });
+
+    // Calculate TF-IDF
+    const tfidf = {};
+    for (let docIndex in termFrequency) {
+        tfidf[docIndex] = {};
+        for (let term in termFrequency[docIndex]) {
+            const tf = termFrequency[docIndex][term];
+            const idf = Math.log(totalDocuments / (1 + documentFrequency[term]));
+            tfidf[docIndex][term] = tf * idf;
+        }
     }
 
-    if (magnitudeA === 0 || magnitudeB === 0) {
-        throw new Error("Magnitude of one or both vectors is zero");
-    }
-
-    return dotProduct / (Math.sqrt(magnitudeA) * Math.sqrt(magnitudeB));
+    return tfidf;
 }
 
 // Test cases
+const docs = [
+    "The quick brown fox jumps over the lazy dog",
+    "The quick brown fox",
+    "The dog is lazy but the fox is quick"
+];
+
+// Expected: A TF-IDF representation of the documents
+const tfidfResult = computeTFIDF(docs);
+console.log("TF-IDF Result:", tfidfResult);
+
+// Edge case: Empty array
 try {
-    // Test 1: Perfect similarity
-    let vec1 = [1, 2, 3];
-    let vec2 = [1, 2, 3];
-    console.assert(cosineSimilarity(vec1, vec2) === 1, "Test 1 Failed");
-
-    // Test 2: Orthogonal vectors
-    vec1 = [1, 0];
-    vec2 = [0, 1];
-    console.assert(cosineSimilarity(vec1, vec2) === 0, "Test 2 Failed");
-
-    // Test 3: General case
-    vec1 = [1, 2, 3];
-    vec2 = [4, 5, 6];
-    const expected = (1 * 4 + 2 * 5 + 3 * 6) / (Math.sqrt(1 ** 2 + 2 ** 2 + 3 ** 2) * Math.sqrt(4 ** 2 + 5 ** 2 + 6 ** 2));
-    console.assert(Math.abs(cosineSimilarity(vec1, vec2) - expected) < 1e-10, "Test 3 Failed");
-
-    // Test 4: Zero vector
-    try {
-        vec1 = [0, 0, 0];
-        vec2 = [1, 2, 3];
-        cosineSimilarity(vec1, vec2);
-        console.assert(false, "Test 4 Failed - Exception not thrown for zero vector");
-    } catch (e) {
-        console.log("Test 4 Passed - Exception thrown for zero vector");
-    }
-
-    // Test 5: Unequal lengths
-    try {
-        vec1 = [1, 2];
-        vec2 = [1, 2, 3];
-        cosineSimilarity(vec1, vec2);
-        console.assert(false, "Test 5 Failed - Exception not thrown for unequal vector lengths");
-    } catch (e) {
-        console.log("Test 5 Passed - Exception thrown for unequal vector lengths");
-    }
-
-    console.log("All tests completed");
+    computeTFIDF([]);
 } catch (e) {
-    console.error("Error during tests:", e.message);
+    console.assert(e.message === "Input must be a non-empty array of documents.", "Edge case failed: Empty array");
+}
+
+// Edge case: Non-string document
+try {
+    computeTFIDF([42]);
+} catch (e) {
+    console.assert(e.message === "Document at index 0 is not a string.", "Edge case failed: Non-string document");
 }

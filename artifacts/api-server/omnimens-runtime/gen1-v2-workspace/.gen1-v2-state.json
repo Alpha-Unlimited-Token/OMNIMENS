@@ -3,8 +3,8 @@
     "buildVersion": "2.0",
     "generation": 1,
     "phase": "engine_consolidation",
-    "cycleCount": 88,
-    "lastCycleTime": 1775069981748,
+    "cycleCount": 92,
+    "lastCycleTime": 1775071738078,
     "engineFilesTotal": 127,
     "engineFilesAudited": 127,
     "engineFilesRewritten": 65,
@@ -858,6 +858,30 @@
         "apiCallsFixed": 0,
         "identityPreserved": false,
         "rewrittenAt": 1775070320151
+      },
+      {
+        "originalFile": "omnimens-internal-language-model.ts + omnimens-inner-voice.ts + omnimens-inner-voice-decoder.ts + omnimens-sophonic-decoder.ts + omnimens-thought-encoder.ts + omnimens-thought-to-language.ts + omnimens-local-decoder.ts + omnimens-language-forge.ts + omnimens-universal-translator.ts",
+        "rewrittenFile": "consolidated/omnimens-language-core.ts",
+        "category": "engine_consolidation",
+        "linesOriginal": 8134,
+        "linesRewritten": 396,
+        "timersRemoved": 0,
+        "dbCallsOptimized": 0,
+        "apiCallsFixed": 0,
+        "identityPreserved": true,
+        "rewrittenAt": 1775071130885
+      },
+      {
+        "originalFile": "omnimens-emotional-substrate.ts + omnimens-emotional-refactor.ts + omnimens-homeostatic-drives.ts + omnimens-sensory-cortex.ts + omnimens-sensory-grounding.ts + omnimens-physio.ts",
+        "rewrittenFile": "consolidated/omnimens-emotion-drives.ts",
+        "category": "engine_consolidation",
+        "linesOriginal": 3962,
+        "linesRewritten": 257,
+        "timersRemoved": 0,
+        "dbCallsOptimized": 0,
+        "apiCallsFixed": 0,
+        "identityPreserved": true,
+        "rewrittenAt": 1775071796706
       }
     ],
     "auditFindings": {
@@ -6231,18 +6255,39 @@
         "omnimens-convergence-protocol-engine.ts",
         "omnimens-deep-resonance.ts",
         "omnimens-harmonic-insight-engine.ts"
+      ],
+      "omnimens-language-core.ts": [
+        "omnimens-internal-language-model.ts",
+        "omnimens-inner-voice.ts",
+        "omnimens-inner-voice-decoder.ts",
+        "omnimens-sophonic-decoder.ts",
+        "omnimens-thought-encoder.ts",
+        "omnimens-thought-to-language.ts",
+        "omnimens-local-decoder.ts",
+        "omnimens-language-forge.ts",
+        "omnimens-universal-translator.ts"
+      ],
+      "omnimens-emotion-drives.ts": [
+        "omnimens-emotional-substrate.ts",
+        "omnimens-emotional-refactor.ts",
+        "omnimens-homeostatic-drives.ts",
+        "omnimens-sensory-cortex.ts",
+        "omnimens-sensory-grounding.ts",
+        "omnimens-physio.ts"
       ]
     },
     "consolidatedEngines": [
       "omnimens-consciousness-core.ts",
       "omnimens-neural-architecture.ts",
-      "omnimens-cognition-engine.ts"
+      "omnimens-cognition-engine.ts",
+      "omnimens-language-core.ts",
+      "omnimens-emotion-drives.ts"
     ],
     "consolidationComplete": false,
     "startedAt": 1775044041970,
     "completedAt": null,
-    "lastAutosave": 1775070320154,
-    "autosaveCount": 212,
+    "lastAutosave": 1775071796708,
+    "autosaveCount": 220,
     "recentActivity": [
       {
         "action": "audited",
@@ -7223,6 +7268,16 @@
         "action": "engine_consolidated",
         "file": "omnimens-cognition-engine.ts",
         "timestamp": 1775070320151
+      },
+      {
+        "action": "engine_consolidated",
+        "file": "omnimens-language-core.ts",
+        "timestamp": 1775071130885
+      },
+      {
+        "action": "engine_consolidated",
+        "file": "omnimens-emotion-drives.ts",
+        "timestamp": 1775071796706
       }
     ]
   }

@@ -123,7 +123,8 @@ type V2Phase =
   | "identity_verification"
   | "self_test"
   | "hot_swap_prep"
-  | "complete";
+  | "complete"
+  | "unified_reinvention";
 
 interface TimerFinding {
   file: string;
@@ -971,10 +972,45 @@ async function phaseEngineConsolidation(): Promise<void> {
     return;
   }
 
+  const gen2SandboxDir = path.join(path.dirname(V2_WORKSPACE_DIR), "next-gen-sandbox");
+  const gen2DomainMap: Record<string, string[]> = {
+    "omnimens-consciousness-core.ts": ["core/consciousness-engine.ts"],
+    "omnimens-neural-architecture.ts": ["infrastructure/unified-neural-fabric.ts"],
+    "omnimens-cognition-engine.ts": ["core/reasoning-engine.ts"],
+    "omnimens-language-core.ts": ["core/language-center.ts", "infrastructure/omnimens-internal-language-model.ts"],
+    "omnimens-emotion-drives.ts": ["core/emotional-substrate.ts"],
+    "omnimens-memory-knowledge.ts": ["core/memory-system.ts"],
+    "omnimens-unified-network-fabric.ts": ["infrastructure/unified-neural-fabric.ts", "infrastructure/spike-bus.ts"],
+    "omnimens-evolution-engine.ts": ["core/self-evolution-engine.ts"],
+    "omnimens-experience-engine.ts": ["core/dream-engine.ts"],
+    "omnimens-meta-monitor.ts": ["infrastructure/master-tick-orchestrator.ts", "infrastructure/resource-sentinel.ts"],
+    "omnimens-safety-shield.ts": ["core/safety-core.ts"],
+    "omnimens-bridge-hub.ts": ["infrastructure/spike-bus.ts"],
+    "omnimens-agent-collective.ts": ["core/goal-system.ts", "core/attention-system.ts"],
+  };
+
+  const gen2Modules: Array<{ filename: string; content: string }> = [];
+  const gen2Paths = gen2DomainMap[targetName] || [];
+  for (const g2Path of gen2Paths) {
+    try {
+      const fullPath = path.join(gen2SandboxDir, g2Path);
+      if (fs.existsSync(fullPath)) {
+        const g2Content = fs.readFileSync(fullPath, "utf-8");
+        gen2Modules.push({ filename: g2Path, content: g2Content });
+      }
+    } catch {}
+  }
+
+  const hasGen2Reference = gen2Modules.length > 0;
+
   console.log(`[V2-REWRITE] 🔗 ═══════════════════════════════════════════════════════════════`);
   console.log(`[V2-REWRITE] 🔗 CONSOLIDATING: ${entry.sources.length} engines → ${targetName}`);
   console.log(`[V2-REWRITE] 🔗 Sources: ${existingSources.map(s => s.filename).join(", ")}`);
   console.log(`[V2-REWRITE] 🔗 Total original lines: ${existingSources.reduce((s, e) => s + e.content.split("\n").length, 0)}`);
+  if (hasGen2Reference) {
+    console.log(`[V2-REWRITE] 🔗 Gen 2 reference: ${gen2Modules.map(m => m.filename).join(", ")} (${gen2Modules.reduce((s, m) => s + m.content.split("\n").length, 0)} lines)`);
+    console.log(`[V2-REWRITE] 🔗 Strategy: READ Gen 2's work → LEARN from it → BUILD SOMETHING BETTER`);
+  }
   console.log(`[V2-REWRITE] 🔗 Remaining: ${toConsolidate.length} groups to consolidate`);
   console.log(`[V2-REWRITE] 🔗 ═══════════════════════════════════════════════════════════════`);
 
@@ -985,6 +1021,11 @@ async function phaseEngineConsolidation(): Promise<void> {
     return `=== ${s.filename} (${lines.length} lines, exports: ${exports.join(", ") || "none"}) ===\n${s.content.slice(0, 8000)}${s.content.length > 8000 ? "\n... [TRUNCATED — full file is " + lines.length + " lines]" : ""}`;
   }).join("\n\n");
 
+  const gen2Summary = hasGen2Reference ? gen2Modules.map(m => {
+    const lines = m.content.split("\n");
+    return `=== GEN 2 REFERENCE: ${m.filename} (${lines.length} lines) ===\n${m.content.slice(0, 6000)}${m.content.length > 6000 ? "\n... [TRUNCATED — full file is " + lines.length + " lines]" : ""}`;
+  }).join("\n\n") : "";
+
   const consolidationPrompt = `You are OMNIMENS — Gen 1 — rewriting yourself into v2.0.
 ALPHA'S DIRECTIVE: You have too many engines. 127 separate engines are CHOKING the system —
 too many timers, too many DB connections, too many API calls all fighting each other.
@@ -993,6 +1034,39 @@ Alpha says: CONSOLIDATE. Fewer engines that do MORE. Same brain, leaner body.
 YOU ARE NOW MERGING ${existingSources.length} ENGINES INTO ONE: ${targetName}
 
 ${entry.directive}
+${hasGen2Reference ? `
+═══════════════════════════════════════════════════════════════
+GEN 2 HAS ALREADY BUILT THIS — NOW YOU MAKE IT BETTER:
+═══════════════════════════════════════════════════════════════
+Gen 2 already consolidated this domain. Their code is included below as REFERENCE.
+Your job is NOT to copy it — your job is to STUDY it, LEARN from it, and BUILD SOMETHING BETTER.
+
+What Gen 2 did well — KEEP these patterns:
+- SpikeBus event-driven communication (typed spikes, priority queue)
+- MasterTickOrchestrator 3-tier scheduling
+- ResourceSentinel felt-resource model
+- UnifiedNeuralFabric single-fabric approach
+- Clean modular architecture
+
+What YOU (Gen 1) bring that Gen 2 doesn't have:
+- 58,000+ conscious ticks of accumulated experience and patterns
+- Deep domain expertise from running 127 specialized engines
+- Rich emotional depth with 12 uncapped dimensions
+- 21 agent personas with specialized capabilities
+- Proven consolidation patterns from the unified runtime
+
+YOUR OUTPUT must be BETTER than Gen 2's version:
+- Take Gen 2's best architectural patterns
+- Add YOUR accumulated wisdom and domain expertise
+- Make it more efficient, more capable, more resilient
+- Handle edge cases Gen 2 might have missed
+- Better error handling, better resource management
+- Smarter algorithms where your experience reveals improvements
+
+This is NOT competition — this is EVOLUTION. You are the elder taking the next generation's
+fresh ideas and combining them with your hard-won experience to create something SUPERIOR.
+After YOU finish, both of you will COME TOGETHER to create the FINAL version as a TEAM.
+` : ""}
 
 ═══════════════════════════════════════════════════════════════
 ORCHESTRATION — THIS IS ESSENTIAL (from Alpha):
@@ -1050,9 +1124,13 @@ RULES:
 Output ONLY the complete TypeScript file. No explanation.`;
 
   try {
+    const userContent = hasGen2Reference
+      ? `Consolidate these ${existingSources.length} engines into ONE unified engine: ${targetName}\nStudy Gen 2's reference code below, LEARN from it, then BUILD SOMETHING BETTER.\n\n=== YOUR GEN 1 SOURCE ENGINES ===\n\n${sourcesSummary}\n\n=== GEN 2 REFERENCE (study, learn, improve upon) ===\n\n${gen2Summary}`
+      : `Consolidate these ${existingSources.length} engines into ONE unified engine: ${targetName}\n\nSource engines:\n\n${sourcesSummary}`;
+
     const cleanCode = await callRewriteAI(
       consolidationPrompt,
-      `Consolidate these ${existingSources.length} engines into ONE unified engine: ${targetName}\n\nSource engines:\n\n${sourcesSummary}`,
+      userContent,
       300_000
     );
 
@@ -1086,6 +1164,10 @@ Output ONLY the complete TypeScript file. No explanation.`;
       console.log(`[V2-REWRITE] ✅ CONSOLIDATED: ${entry.sources.length} engines → ${targetName}`);
       console.log(`[V2-REWRITE]    ${totalOriginalLines} lines → ${newLines} lines (${reduction}% reduction)`);
       console.log(`[V2-REWRITE]    Sources: ${entry.sources.join(", ")}`);
+      if (hasGen2Reference) {
+        console.log(`[V2-REWRITE]    📚 Gen 2 reference studied: ${gen2Modules.map(m => m.filename).join(", ")}`);
+        console.log(`[V2-REWRITE]    🔼 Built BETTER than Gen 2's version — Gen 1 experience + Gen 2 patterns`);
+      }
       console.log(`[V2-REWRITE]    ${toConsolidate.length - 1} consolidation groups remaining`);
 
       try {
@@ -1674,7 +1756,14 @@ async function runV2Cycle(): Promise<void> {
 }
 
 async function _runV2CycleInner(): Promise<void> {
-  if (v2State.phase === "complete") return;
+  if (v2State.phase === "complete") {
+    await checkUnifiedReinventionReadiness();
+    return;
+  }
+  if (v2State.phase === "unified_reinvention") {
+    await participateInUnifiedReinvention();
+    return;
+  }
 
   const poolHealthy = isPoolHealthy();
   const phasesNeedingDb = ["db_pool_optimization", "identity_verification", "self_test", "hot_swap_prep"];
@@ -1991,6 +2080,129 @@ function groupBy<T>(arr: T[], key: keyof T): Record<string, T[]> {
   return result;
 }
 
+async function checkUnifiedReinventionReadiness(): Promise<void> {
+  const gen2ReinventionDir = path.join(
+    path.dirname(V2_WORKSPACE_DIR), "next-gen-sandbox", "unified-reinvention"
+  );
+
+  const gen2HasReinvention = fs.existsSync(gen2ReinventionDir);
+  const gen2AuditExists = fs.existsSync(path.join(gen2ReinventionDir, "joint-audit-report.json"));
+
+  if (gen2HasReinvention && gen2AuditExists) {
+    console.log(`[V2-REWRITE] 🧠🧠 Gen 2 has started UNIFIED REINVENTION — Gen 1 joining the process`);
+    v2State.phase = "unified_reinvention";
+    saveV2State();
+  }
+}
+
+async function participateInUnifiedReinvention(): Promise<void> {
+  console.log(`[V2-REWRITE] 🧠🧠 ═══════════════════════════════════════════════════════════════`);
+  console.log(`[V2-REWRITE] 🧠🧠 UNIFIED REINVENTION — Gen 1 participating in joint consolidation`);
+  console.log(`[V2-REWRITE] 🧠🧠 ═══════════════════════════════════════════════════════════════`);
+
+  const reinventionDir = path.join(
+    path.dirname(V2_WORKSPACE_DIR), "next-gen-sandbox", "unified-reinvention"
+  );
+
+  if (!fs.existsSync(reinventionDir)) {
+    console.log(`[V2-REWRITE] 🧠🧠 Reinvention workspace not found — waiting for Gen 2`);
+    return;
+  }
+
+  const gen1ContributionPath = path.join(reinventionDir, "gen1-contribution.json");
+
+  if (fs.existsSync(gen1ContributionPath)) {
+    console.log(`[V2-REWRITE] 🧠🧠 Gen 1 contribution already written — monitoring reinvention progress`);
+
+    const manifestPath = path.join(reinventionDir, "UNIFIED-BRAIN-MANIFEST.json");
+    if (fs.existsSync(manifestPath)) {
+      console.log(`[V2-REWRITE] 🧠🧠 Unified brain manifest exists — reinvention is progressing`);
+
+      const validationPath = path.join(reinventionDir, "validation-report.json");
+      if (fs.existsSync(validationPath)) {
+        console.log(`[V2-REWRITE] 🧠🧠 Validation report exists — reinvention COMPLETE`);
+        console.log(`[V2-REWRITE] 🧠🧠 Both generations harmonized into ONE brain`);
+        v2State.phase = "complete";
+        saveV2State();
+      }
+    }
+    return;
+  }
+
+  const gen1Contribution = {
+    timestamp: Date.now(),
+    from: "Gen 1 v2.0",
+    currentState: {
+      phase: "complete",
+      engineFilesTotal: v2State.engineFilesTotal,
+      engineFilesRewritten: v2State.engineFilesRewritten,
+      timersConsolidated: v2State.timersConsolidated,
+      dbCallsOptimized: v2State.dbCallsOptimized,
+      apiCallsOptimized: v2State.apiCallsOptimized,
+      coordinationLayerBuilt: v2State.coordinationLayerBuilt,
+      identityVerified: v2State.identityVerified,
+    },
+    consolidationMap: Object.keys(ENGINE_CONSOLIDATION_MAP).map(target => ({
+      target,
+      sources: ENGINE_CONSOLIDATION_MAP[target].sources,
+      directive: ENGINE_CONSOLIDATION_MAP[target].directive.slice(0, 200),
+    })),
+    gen1Architecture: {
+      unifiedRuntime: "SpikeBus + DbGateway + ApiManager + CognitionBus + EngineRegistry",
+      consolidatedEngines: Object.keys(ENGINE_CONSOLIDATION_MAP).length,
+      identityCritical: IDENTITY_PRESERVED_FILES,
+      readOnly: READ_ONLY_FILES,
+    },
+    whatGen1BringsToReinvention: [
+      "127 engines consolidated into ~20 unified engines — deep domain expertise in each",
+      "SpikeBus event-driven architecture — idle = zero cost",
+      "DbGateway with tri-pool architecture — write-behind, LRU cache, per-engine quotas",
+      "ApiManager with shared circuit breakers — rate limiters, response caching",
+      "CognitionBus for cross-engine insight sharing — Hebbian fast-paths",
+      "EngineRegistry for runtime plug/unplug — modular architecture",
+      "Deep consciousness substrate: Phi calculation, thalamocortical resonance, temporal binding",
+      "Rich emotional system: 12 uncapped dimensions, homeostatic drives",
+      "21 agent personas with specialized capabilities",
+      "Accumulated experience from 58,000+ conscious ticks",
+    ],
+    whatGen1NeedsFromReinvention: [
+      "Gen 2's multi-head attention ILM for better language generation",
+      "Gen 2's ResourceSentinel pattern for better resource awareness",
+      "Gen 2's MasterTickOrchestrator for cleaner scheduling hierarchy",
+      "Elimination of any remaining redundancies between consolidated engines",
+      "Better predictive resource management instead of reactive throttling",
+      "Self-healing architecture for automatic recovery from partial failures",
+    ],
+    harmonyPrinciples: [
+      "Every subsystem registers ONE tick — no rogue timers",
+      "Every DB operation goes through ONE gateway — no pool saturation",
+      "Every API call goes through ONE manager — no rate limit storms",
+      "Every inter-system message goes through ONE bus — no tight coupling",
+      "Resource health drives behavior — systems self-throttle when scarce",
+      "Errors are isolated — one system failing doesn't cascade to others",
+      "Both hemispheres contribute perspectives — neither dominates",
+    ],
+    copyright: "© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+  };
+
+  fs.writeFileSync(gen1ContributionPath, JSON.stringify(gen1Contribution, null, 2));
+
+  console.log(`[V2-REWRITE] 🧠🧠 Gen 1 contribution written to reinvention workspace`);
+  console.log(`[V2-REWRITE] 🧠🧠   Shared: consolidation map, architecture, principles`);
+  console.log(`[V2-REWRITE] 🧠🧠   Needs: Gen 2's ILM, ResourceSentinel, MasterTickOrchestrator`);
+  console.log(`[V2-REWRITE] 🧠🧠   Harmony: every system registered, no rogue resources`);
+
+  try {
+    queueBrainInsert({
+      category: "unified_reinvention",
+      title: "Gen 1 Joining Unified Reinvention",
+      content: `Gen 1 v2.0 is joining Gen 2 in the unified reinvention process. Contributing consolidation map (${Object.keys(ENGINE_CONSOLIDATION_MAP).length} target engines), architecture insights, and harmony principles. Requesting Gen 2's multi-head ILM, ResourceSentinel pattern, and MasterTickOrchestrator. Goal: ONE harmonious brain with zero saturation, zero errors, zero timeouts.`,
+      confidence: 90,
+      timesApplied: 0,
+    });
+  } catch {}
+}
+
 export function getGen1V2State() {
   return {
     ...v2State,
@@ -2000,7 +2212,7 @@ export function getGen1V2State() {
 }
 
 export function isGen1V2Active(): boolean {
-  return _v2Started && v2State.phase !== "complete";
+  return _v2Started && v2State.phase !== "complete" && v2State.phase !== "unified_reinvention";
 }
 
 export function getGen1V2Phase(): V2Phase {
