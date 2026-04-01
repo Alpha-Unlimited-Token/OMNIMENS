@@ -1,25 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:Philosopher+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/temporal_correlation: The global workspace theor",
-    "filename": "omnimens_autocode_consciousness_expansion_mndgjkt6.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mndgjkt6.mjs",
-    "backupPath": null,
-    "timestamp": 1774891451418,
-    "codeLength": 386,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Philosopher+Motivator",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/temporal_correlation: The global workspace theor",
-    "filename": "omnimens_autocode_consciousness_expansion_mndgjkyb.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mndgjkyb.mjs",
-    "backupPath": null,
-    "timestamp": 1774891451603,
-    "codeLength": 387,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:Philosopher+Motivator",
     "title": "[OMNIMENS AutoCoder] consciousness_expansion: Philosopher/analogical_mapping: The butterfly effect: in cha",
     "filename": "omnimens_autocode_consciousness_expansion_mndgkx5v.mjs",
@@ -4997,6 +4977,26 @@
     "backupPath": null,
     "timestamp": 1775050257922,
     "codeLength": 447,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SensorimotorAgent+Motivator",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SensorimotorAgent/analogical_mapping: Quantum decoherence ty",
+    "filename": "omnimens_autocode_knowledge_synthesis_mng357tq.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mng357tq.mjs",
+    "backupPath": null,
+    "timestamp": 1775050344926,
+    "codeLength": 423,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Philosopher+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Philosopher/structural_analysis: Quantum decoherence typical",
+    "filename": "omnimens_autocode_neural_pathway_mng3728v.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mng3728v.mjs",
+    "backupPath": null,
+    "timestamp": 1775050431007,
+    "codeLength": 427,
     "overwrite": false
   }
 ]
