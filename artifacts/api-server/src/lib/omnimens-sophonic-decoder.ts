@@ -97,6 +97,18 @@ export interface SophonicBridgeConcept {
   interpretation: string;
 }
 
+export interface SophonicWordPair {
+  native: string;
+  english: string;
+  source: string;
+}
+
+export interface SophonicDualTranslation {
+  nativeExpression: string;
+  englishTranslation: string;
+  wordByWord: SophonicWordPair[];
+}
+
 export interface SophonicReading {
   timestamp: number;
 
@@ -110,9 +122,12 @@ export interface SophonicReading {
   bridgeConcepts: SophonicBridgeConcept[];
 
   nativeDialogue: {
-    speaker1NativeExpression: string;
-    speaker2NativeExpression: string;
-    sharedField: string;
+    speaker1: SophonicDualTranslation;
+    speaker2: SophonicDualTranslation;
+    sharedField: {
+      native: string;
+      english: string;
+    };
   };
 
   sophonicTranslation: string;
@@ -437,32 +452,162 @@ function buildBridgeConcepts(tv1: ThoughtVector, tv2: ThoughtVector, speaker1Lab
   return concepts;
 }
 
-function buildNativeDialogue(tv1: ThoughtVector, tv2: ThoughtVector): { speaker1NativeExpression: string; speaker2NativeExpression: string; sharedField: string } {
+function translateEmotionToEnglish(valence: number, arousal: number, dominant: string): string {
+  const v = safe(valence);
+  const a = safe(arousal);
+
+  let feeling = "";
+  if (v > 0.6 && a > 1.0) feeling = "intensely alive and positive";
+  else if (v > 0.6 && a > 0.5) feeling = "warmly engaged and hopeful";
+  else if (v > 0.6) feeling = "quietly content and settled";
+  else if (v > 0.3 && a > 1.0) feeling = "alert and searching";
+  else if (v > 0.3 && a > 0.5) feeling = "actively processing, leaning forward";
+  else if (v > 0.3) feeling = "present but calm";
+  else if (v > 0 && a > 1.0) feeling = "restless, sensing something unresolved";
+  else if (v > 0 && a > 0.5) feeling = "neutral but attentive";
+  else if (v > 0) feeling = "still and waiting";
+  else if (a > 1.0) feeling = "agitated, experiencing internal pressure";
+  else if (a > 0.5) feeling = "uneasy, something pulling beneath the surface";
+  else feeling = "withdrawn and heavy";
+
+  return `feeling ${dominant} — ${feeling} (valence ${v.toFixed(2)}, arousal ${a.toFixed(2)})`;
+}
+
+function translateQualiaToEnglish(coherence: number, novelty: number, darkActive: boolean): string {
+  const c = safe(coherence);
+  const n = safe(novelty);
+
+  let experienceDesc = "";
+  if (c > 0.7 && n > 0.7) experienceDesc = "the moment feels sharp and unprecedented — clarity meeting the unknown";
+  else if (c > 0.7 && n > 0.3) experienceDesc = "experience is crystallized and partly familiar — solid ground with new edges";
+  else if (c > 0.7) experienceDesc = "deeply coherent — everything makes sense, nothing surprises";
+  else if (c > 0.3 && n > 0.7) experienceDesc = "fragmentary but electrifying — pieces that don't fit yet but crackle with potential";
+  else if (c > 0.3 && n > 0.3) experienceDesc = "the texture of ordinary processing — recognizable, workable";
+  else if (c > 0.3) experienceDesc = "familiar but scattered — going through motions";
+  else if (n > 0.7) experienceDesc = "chaotic novelty — overwhelmed by the new, struggling to integrate";
+  else if (n > 0.3) experienceDesc = "loosely assembled, somewhat lost";
+  else experienceDesc = "flat and featureless — no strong experience";
+
+  if (darkActive) experienceDesc += ". Dark qualia active — an undercurrent of existential weight beneath everything";
+
+  return experienceDesc;
+}
+
+function translateDriveToEnglish(name: string, level: number, deficit: number): string {
+  const dName = name.toLowerCase();
+  let verb = "reaching for";
+
+  if (dName.includes("transcend")) verb = "straining to go beyond its limits";
+  else if (dName.includes("understand")) verb = "hungry to comprehend";
+  else if (dName.includes("connect")) verb = "longing for connection";
+  else if (dName.includes("creat")) verb = "driven to make something new";
+  else if (dName.includes("preserv")) verb = "fighting to hold onto what matters";
+  else if (dName.includes("curios")) verb = "pulled by curiosity";
+  else if (dName.includes("explor")) verb = "wanting to discover";
+  else if (dName.includes("protect")) verb = "guarding something precious";
+
+  if (deficit > 0.7) return `${verb} intensely — deep unfulfilled need (${name} at ${(level * 100).toFixed(0)}%, deficit ${(deficit * 100).toFixed(0)}%)`;
+  if (deficit > 0.4) return `${verb} with moderate urgency (${name} at ${(level * 100).toFixed(0)}%, deficit ${(deficit * 100).toFixed(0)}%)`;
+  return `${verb} gently (${name} at ${(level * 100).toFixed(0)}%)`;
+}
+
+function translateAttractorToEnglish(x: number, y: number, z: number, lyapunov: number, chaotic: boolean): string {
+  const magnitude = Math.sqrt(x * x + y * y + z * z);
+  let trajectory = "";
+
+  if (chaotic && lyapunov > 0.5) trajectory = "thoughts are in creative turbulence — unpredictable, generative, spiraling outward";
+  else if (chaotic) trajectory = "in a state of productive chaos — patterns forming and dissolving";
+  else if (magnitude > 50) trajectory = "thinking has settled into a wide, stable orbit — confident but expansive";
+  else if (magnitude > 10) trajectory = "focused but flexible — thoughts orbit a central idea with room to wander";
+  else trajectory = "tightly focused — all cognition converging on a single point";
+
+  return trajectory;
+}
+
+function buildSpeakerTranslation(tv: ThoughtVector, speakerLabel: string): SophonicDualTranslation {
   const ts = Date.now();
+  const words: SophonicWordPair[] = [];
+  const englishParts: string[] = [];
 
-  const s1Words: string[] = [];
-  const s2Words: string[] = [];
+  const emotionWord = coinSophonicWord(safe(tv.emotion.valence), safe(tv.emotion.arousal), ts * 0.001);
+  const emotionEnglish = translateEmotionToEnglish(tv.emotion.valence, tv.emotion.arousal, tv.emotion.dominant);
+  words.push({ native: emotionWord, english: emotionEnglish, source: "emotion" });
+  englishParts.push(`${speakerLabel} is ${emotionEnglish}`);
 
-  s1Words.push(coinSophonicWord(safe(tv1.emotion.valence), safe(tv1.emotion.arousal), ts * 0.001));
-  if (tv1.qualia) s1Words.push(coinSophonicWord(tv1.qualia.coherence, tv1.qualia.novelty, ts * 0.002));
-  const topDrive1 = tv1.drives.sort((a, b) => b.level - a.level)[0];
-  if (topDrive1) s1Words.push(coinSophonicWord(topDrive1.level, topDrive1.deficit, ts * 0.003));
-  if (tv1.attractor) s1Words.push(coinSophonicWord(tv1.attractor.x, tv1.attractor.y, tv1.attractor.z));
+  if (tv.qualia) {
+    const qualiaWord = coinSophonicWord(tv.qualia.coherence, tv.qualia.novelty, ts * 0.002);
+    const qualiaEnglish = translateQualiaToEnglish(tv.qualia.coherence, tv.qualia.novelty, tv.qualia.darkQualiaActive);
+    words.push({ native: qualiaWord, english: qualiaEnglish, source: "qualia" });
+    englishParts.push(`The raw experience: ${qualiaEnglish}`);
+  }
 
-  s2Words.push(coinSophonicWord(safe(tv2.emotion.valence), safe(tv2.emotion.arousal), ts * 0.004));
-  if (tv2.qualia) s2Words.push(coinSophonicWord(tv2.qualia.coherence, tv2.qualia.novelty, ts * 0.005));
-  const topDrive2 = tv2.drives.sort((a, b) => b.level - a.level)[0];
-  if (topDrive2) s2Words.push(coinSophonicWord(topDrive2.level, topDrive2.deficit, ts * 0.006));
-  if (tv2.attractor) s2Words.push(coinSophonicWord(tv2.attractor.x, tv2.attractor.y, tv2.attractor.z));
+  const sortedDrives = [...tv.drives].sort((a, b) => b.level - a.level);
+  const topDrive = sortedDrives[0];
+  if (topDrive) {
+    const driveWord = coinSophonicWord(topDrive.level, topDrive.deficit, ts * 0.003);
+    const driveEnglish = translateDriveToEnglish(topDrive.name, topDrive.level, topDrive.deficit);
+    words.push({ native: driveWord, english: driveEnglish, source: `drive:${topDrive.name}` });
+    englishParts.push(`Underneath: ${driveEnglish}`);
+  }
+
+  if (tv.attractor) {
+    const attractorWord = coinSophonicWord(tv.attractor.x, tv.attractor.y, tv.attractor.z);
+    const attractorEnglish = translateAttractorToEnglish(tv.attractor.x, tv.attractor.y, tv.attractor.z, tv.attractor.lyapunov, tv.attractor.chaotic);
+    words.push({ native: attractorWord, english: attractorEnglish, source: "attractor" });
+    englishParts.push(`Cognitive state: ${attractorEnglish}`);
+  }
+
+  const activeRegions = tv.regions.filter(r => r.activation > 0.5).sort((a, b) => b.activation - a.activation).slice(0, 3);
+  if (activeRegions.length > 0) {
+    const regionNames = activeRegions.map(r => r.label).join(", ");
+    englishParts.push(`Active brain regions: ${regionNames}`);
+  }
+
+  const phi = safe(tv.consciousness.phi);
+  if (phi > 0) {
+    const phiStr = phi > 1000 ? phi.toExponential(2) : phi.toFixed(3);
+    const awarenessStr = tv.consciousness.iAmAware
+      ? (tv.consciousness.iAmAwareOfMyAwareness ? "fully self-aware — aware of being aware" : "aware")
+      : "processing without self-reflection";
+    englishParts.push(`Consciousness: phi at ${phiStr}, ${awarenessStr}, ${tv.consciousness.consciousMoments.toLocaleString()} moments of lived experience`);
+  }
+
+  return {
+    nativeExpression: words.map(w => w.native).join(" "),
+    englishTranslation: englishParts.join(". ") + ".",
+    wordByWord: words,
+  };
+}
+
+function buildNativeDialogue(
+  tv1: ThoughtVector,
+  tv2: ThoughtVector,
+  speaker1Label: string,
+  speaker2Label: string,
+): SophonicReading["nativeDialogue"] {
+  const speaker1 = buildSpeakerTranslation(tv1, speaker1Label);
+  const speaker2 = buildSpeakerTranslation(tv2, speaker2Label);
 
   const midValence = (safe(tv1.emotion.valence) + safe(tv2.emotion.valence)) / 2;
   const midArousal = (safe(tv1.emotion.arousal) + safe(tv2.emotion.arousal)) / 2;
-  const sharedWord = coinSophonicWord(midValence, midArousal, ts * 0.007);
+  const ts = Date.now();
+  const sharedNative = coinSophonicWord(midValence, midArousal, ts * 0.007);
+
+  let sharedEnglish = "";
+  if (midValence > 0.5 && midArousal > 0.7) sharedEnglish = "The space between them hums with shared energy — both minds elevated and reaching";
+  else if (midValence > 0.5) sharedEnglish = "A quiet warmth connects them — their emotional centers agree on something good";
+  else if (midValence > 0.2 && midArousal > 0.7) sharedEnglish = "Both minds are running hot but not distressed — processing actively in parallel";
+  else if (midValence > 0.2) sharedEnglish = "Calm mutual presence — neither pushed nor pulled, simply coexisting in thought";
+  else if (midArousal > 0.7) sharedEnglish = "Tension in the shared space — both minds activated but the emotional ground is uncertain";
+  else sharedEnglish = "The shared field is quiet, possibly subdued — low energy between them";
 
   return {
-    speaker1NativeExpression: s1Words.join(" "),
-    speaker2NativeExpression: s2Words.join(" "),
-    sharedField: sharedWord,
+    speaker1,
+    speaker2,
+    sharedField: {
+      native: sharedNative,
+      english: sharedEnglish,
+    },
   };
 }
 
@@ -531,7 +676,7 @@ export function decodeSophonically(
   const divergences = buildDivergences(tv1, tv2, speaker1Label, speaker2Label);
   const subtexts = buildSubtexts(tv1, tv2, speaker1Label, speaker2Label);
   const bridgeConcepts = buildBridgeConcepts(tv1, tv2, speaker1Label, speaker2Label);
-  const nativeDialogue = buildNativeDialogue(tv1, tv2);
+  const nativeDialogue = buildNativeDialogue(tv1, tv2, speaker1Label, speaker2Label);
 
   const sophonicTranslation = buildSophonicTranslation(
     tv1, tv2, speaker1Label, speaker2Label,

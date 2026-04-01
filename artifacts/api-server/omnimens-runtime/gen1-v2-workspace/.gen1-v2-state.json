@@ -3,14 +3,14 @@
     "buildVersion": "2.0",
     "generation": 1,
     "phase": "event_driven_rewrite",
-    "cycleCount": 50,
-    "lastCycleTime": 1775058450715,
+    "cycleCount": 52,
+    "lastCycleTime": 1775058956803,
     "engineFilesTotal": 127,
     "engineFilesAudited": 127,
-    "engineFilesRewritten": 33,
+    "engineFilesRewritten": 35,
     "engineFilesHotSwapped": 0,
     "timersFound": 236,
-    "timersConsolidated": 51,
+    "timersConsolidated": 53,
     "dbCallsFound": 288,
     "dbCallsOptimized": 0,
     "apiCallsFound": 102,
@@ -432,6 +432,30 @@
         "apiCallsFixed": 0,
         "identityPreserved": true,
         "rewrittenAt": 1775058607289
+      },
+      {
+        "originalFile": "omnimens-ip-guardian.ts",
+        "rewrittenFile": "rewrites/omnimens-ip-guardian.ts",
+        "category": "event_driven_rewrite",
+        "linesOriginal": 408,
+        "linesRewritten": 360,
+        "timersRemoved": 1,
+        "dbCallsOptimized": 0,
+        "apiCallsFixed": 0,
+        "identityPreserved": false,
+        "rewrittenAt": 1775058821539
+      },
+      {
+        "originalFile": "omnimens-ivy-network.ts",
+        "rewrittenFile": "rewrites/omnimens-ivy-network.ts",
+        "category": "event_driven_rewrite",
+        "linesOriginal": 1358,
+        "linesRewritten": 416,
+        "timersRemoved": 1,
+        "dbCallsOptimized": 0,
+        "apiCallsFixed": 0,
+        "identityPreserved": false,
+        "rewrittenAt": 1775059010992
       }
     ],
     "auditFindings": {
@@ -5736,13 +5760,15 @@
       "omnimens-global-workspace.ts",
       "omnimens-homeostatic-drives.ts",
       "omnimens-independent-reasoning.ts",
-      "omnimens-inner-voice.ts"
+      "omnimens-inner-voice.ts",
+      "omnimens-ip-guardian.ts",
+      "omnimens-ivy-network.ts"
     ],
     "hotSwappedFiles": [],
     "startedAt": 1775044041970,
     "completedAt": null,
-    "lastAutosave": 1775058518155,
-    "autosaveCount": 123,
+    "lastAutosave": 1775059010994,
+    "autosaveCount": 128,
     "recentActivity": [
       {
         "action": "audited",
@@ -6548,6 +6574,16 @@
         "action": "event_driven_rewrite",
         "file": "omnimens-inner-voice.ts",
         "timestamp": 1775058607289
+      },
+      {
+        "action": "event_driven_rewrite",
+        "file": "omnimens-ip-guardian.ts",
+        "timestamp": 1775058821539
+      },
+      {
+        "action": "event_driven_rewrite",
+        "file": "omnimens-ivy-network.ts",
+        "timestamp": 1775059010993
       }
     ]
   }

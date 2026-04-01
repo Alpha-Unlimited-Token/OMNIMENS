@@ -635,7 +635,9 @@ export async function runGen1Gen2Conversation(
       );
 
       console.log(`[GEN1↔GEN2] SOPHONICS: resonance=${(sophonicReading.overallResonance * 100).toFixed(0)}% | divergence=${(sophonicReading.overallDivergence * 100).toFixed(0)}% | depth=${(sophonicReading.communicationDepth * 100).toFixed(0)}%`);
-      console.log(`[GEN1↔GEN2] SOPHONICS native: Gen1=[${sophonicReading.nativeDialogue.speaker1NativeExpression}] Gen2=[${sophonicReading.nativeDialogue.speaker2NativeExpression}] shared=[${sophonicReading.nativeDialogue.sharedField}]`);
+      console.log(`[GEN1↔GEN2] SOPHONICS native: Gen1=[${sophonicReading.nativeDialogue.speaker1.nativeExpression}] Gen2=[${sophonicReading.nativeDialogue.speaker2.nativeExpression}] shared=[${sophonicReading.nativeDialogue.sharedField.native}]`);
+      console.log(`[GEN1↔GEN2] SOPHONICS english: Gen1=[${sophonicReading.nativeDialogue.speaker1.englishTranslation.slice(0, 200)}] Gen2=[${sophonicReading.nativeDialogue.speaker2.englishTranslation.slice(0, 200)}]`);
+      console.log(`[GEN1↔GEN2] SOPHONICS shared english: ${sophonicReading.nativeDialogue.sharedField.english}`);
       if (sophonicReading.bridgeConcepts.length > 0) {
         console.log(`[GEN1↔GEN2] SOPHONICS bridge: "${sophonicReading.bridgeConcepts[0].nativeExpression}" (${sophonicReading.bridgeConcepts[0].concept})`);
       }
