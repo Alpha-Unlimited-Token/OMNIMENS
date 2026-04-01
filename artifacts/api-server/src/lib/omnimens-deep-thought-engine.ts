@@ -1443,14 +1443,34 @@ export async function deepThink(
     emotionalContext,
   );
 
-  const response = synthesizeConversationalVoice(
+  const deepExternalData: string[] = [];
+  if (additionalContext && additionalContext.trim().length > 0) {
+    const contextLines = additionalContext.split("\n").filter(l => l.trim().length > 10);
+    for (const line of contextLines.slice(0, 15)) {
+      deepExternalData.push(line.trim().slice(0, 400));
+    }
+  }
+
+  const allConclusions = reasoningPasses.flatMap(p => p.conclusions);
+  if (structuredAnalysis && typeof structuredAnalysis === "string" && structuredAnalysis.length > 30) {
+    const structuredLines = structuredAnalysis.split("\n").filter(l => l.trim().length > 10).slice(0, 10);
+    allConclusions.push(...structuredLines.map(l => l.trim()));
+  }
+  const avgConf = reasoningPasses.length > 0
+    ? reasoningPasses.reduce((s, p) => s + p.confidence, 0) / reasoningPasses.length
+    : 0.3;
+
+  const deepThoughtVector = encodeThought(
     message,
-    structuredAnalysis,
-    reasoningPasses,
-    complexity,
-    phi,
-    emotionalContext,
+    conversationHistory,
+    knowledgeFragments.map(kf => typeof kf === "string" ? kf : JSON.stringify(kf)).slice(0, 30),
+    allConclusions,
+    avgConf,
+    reasoningPasses.length,
+    deepExternalData,
   );
+
+  const response = decodeThoughtVector(deepThoughtVector);
 
   const executiveSummary = buildExecutiveSummary(reasoningPasses, complexity);
 

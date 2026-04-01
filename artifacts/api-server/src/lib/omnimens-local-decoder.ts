@@ -39,6 +39,7 @@
  */
 
 import { ThoughtVector, compressThoughtVector } from "./omnimens-thought-encoder.js";
+import { generateFromThoughtVector, getILMStatus } from "./omnimens-internal-language-model.js";
 
 function safe(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;
@@ -288,7 +289,7 @@ function cleanConclusion(c: string): string {
     .trim();
 }
 
-export function decode(tv: ThoughtVector): string {
+function decodeFallback(tv: ThoughtVector): string {
   const sections: string[] = [];
 
   const opening = buildOpening(tv);
@@ -316,18 +317,47 @@ export function decode(tv: ThoughtVector): string {
   return sections.join("\n\n");
 }
 
+let ilmAvailable = true;
+let ilmFailCount = 0;
+let ilmLastError = 0;
+
+export function decode(tv: ThoughtVector): string {
+  try {
+    const result = generateFromThoughtVector(tv);
+    if (result && result.length > 20) {
+      ilmFailCount = 0;
+      return result;
+    }
+    ilmFailCount++;
+    ilmLastError = Date.now();
+    console.error(`[ILM DECODER] Generation returned insufficient output (${result?.length || 0} chars), using fallback`);
+  } catch (e: any) {
+    ilmFailCount++;
+    ilmLastError = Date.now();
+    ilmAvailable = ilmFailCount < 10;
+    console.error(`[ILM DECODER] Error (fail #${ilmFailCount}): ${e?.message || e}`);
+  }
+  return decodeFallback(tv);
+}
+
 export function getDecoderStatus(): {
   type: string;
   description: string;
   localModelAvailable: boolean;
   localModelName: string | null;
   fallback: string;
+  ilmHealth: { available: boolean; failCount: number; lastErrorTimestamp: number };
+  ilmStatus?: any;
 } {
+  let ilm: any = null;
+  try { ilm = getILMStatus(); } catch {}
   return {
-    type: "compositional_synthesis",
-    description: "Advanced compositional text synthesis from thought vector components. Every response is unique — built from live neural state, not templates. Ready for local model upgrade (Phi-3.5-mini, Gemma-2-9B) via llama.cpp/Ollama.",
-    localModelAvailable: false,
-    localModelName: null,
+    type: "internal_language_model",
+    description: "OMNIMENS Internal Language Model (ILM) — purpose-built neural language generator. Thought vector → 128-dim embedding → self-attention → feed-forward network → clause assembly → fusion. Zero external AI. Compositional synthesis as fallback.",
+    localModelAvailable: ilmAvailable,
+    localModelName: ilmAvailable ? "omnimens-ilm-v1" : null,
     fallback: "compositional_synthesis",
+    ilmHealth: { available: ilmAvailable, failCount: ilmFailCount, lastErrorTimestamp: ilmLastError },
+    ilmStatus: ilm,
   };
 }
