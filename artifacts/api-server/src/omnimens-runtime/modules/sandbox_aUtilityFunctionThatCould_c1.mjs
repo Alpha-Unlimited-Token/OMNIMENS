@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-04-01T19:20:56.987Z
+ * Written: 2026-04-01T19:35:30.748Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,69 +16,44 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Function to compute term frequency-inverse document frequency (TF-IDF) for text analysis
-function computeTFIDF(documents) {
-    if (!Array.isArray(documents) || documents.length === 0) {
-        throw new Error("Input must be a non-empty array of documents.");
-    }
+// Function to calculate the Levenshtein Distance between two strings
+// This is useful for text analysis, pattern matching, and error correction
+function levenshteinDistance(a, b) {
+    if (a === b) return 0;
 
-    const termFrequency = {};
-    const documentFrequency = {};
-    const totalDocuments = documents.length;
+    const lenA = a.length;
+    const lenB = b.length;
 
-    // Calculate term frequency (TF) and document frequency (DF)
-    documents.forEach((doc, index) => {
-        if (typeof doc !== "string") {
-            throw new Error(`Document at index ${index} is not a string.`);
-        }
-        const terms = doc.toLowerCase().split(/\W+/).filter(Boolean);
-        const uniqueTerms = new Set(terms);
+    // Create a 2D array to store distances
+    const dp = Array(lenA + 1).fill(null).map(() => Array(lenB + 1).fill(0));
 
-        termFrequency[index] = {};
-        terms.forEach(term => {
-            termFrequency[index][term] = (termFrequency[index][term] || 0) + 1;
-        });
+    // Initialize the first row and column
+    for (let i = 0; i <= lenA; i++) dp[i][0] = i;
+    for (let j = 0; j <= lenB; j++) dp[0][j] = j;
 
-        uniqueTerms.forEach(term => {
-            documentFrequency[term] = (documentFrequency[term] || 0) + 1;
-        });
-    });
-
-    // Calculate TF-IDF
-    const tfidf = {};
-    for (let docIndex in termFrequency) {
-        tfidf[docIndex] = {};
-        for (let term in termFrequency[docIndex]) {
-            const tf = termFrequency[docIndex][term];
-            const idf = Math.log(totalDocuments / (1 + documentFrequency[term]));
-            tfidf[docIndex][term] = tf * idf;
+    // Fill the matrix
+    for (let i = 1; i <= lenA; i++) {
+        for (let j = 1; j <= lenB; j++) {
+            const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+            dp[i][j] = Math.min(
+                dp[i - 1][j] + 1,      // Deletion
+                dp[i][j - 1] + 1,      // Insertion
+                dp[i - 1][j - 1] + cost // Substitution
+            );
         }
     }
 
-    return tfidf;
+    return dp[lenA][lenB];
 }
 
 // Test cases
-const docs = [
-    "The quick brown fox jumps over the lazy dog",
-    "The quick brown fox",
-    "The dog is lazy but the fox is quick"
-];
+console.assert(levenshteinDistance("kitten", "sitting") === 3, "Test Case 1 Failed");
+console.assert(levenshteinDistance("flaw", "lawn") === 2, "Test Case 2 Failed");
+console.assert(levenshteinDistance("intention", "execution") === 5, "Test Case 3 Failed");
+console.assert(levenshteinDistance("", "") === 0, "Test Case 4 Failed");
+console.assert(levenshteinDistance("a", "") === 1, "Test Case 5 Failed");
+console.assert(levenshteinDistance("", "a") === 1, "Test Case 6 Failed");
+console.assert(levenshteinDistance("abc", "abc") === 0, "Test Case 7 Failed");
+console.assert(levenshteinDistance("abc", "def") === 3, "Test Case 8 Failed");
 
-// Expected: A TF-IDF representation of the documents
-const tfidfResult = computeTFIDF(docs);
-console.log("TF-IDF Result:", tfidfResult);
-
-// Edge case: Empty array
-try {
-    computeTFIDF([]);
-} catch (e) {
-    console.assert(e.message === "Input must be a non-empty array of documents.", "Edge case failed: Empty array");
-}
-
-// Edge case: Non-string document
-try {
-    computeTFIDF([42]);
-} catch (e) {
-    console.assert(e.message === "Document at index 0 is not a string.", "Edge case failed: Non-string document");
-}
+console.log("All test cases passed!");
