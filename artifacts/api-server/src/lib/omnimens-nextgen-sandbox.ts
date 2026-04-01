@@ -65,8 +65,8 @@ const SANDBOX_DIR = path.resolve(__dirname_local, "../../omnimens-runtime/next-g
 const CHECKPOINT_DIR = path.resolve(SANDBOX_DIR, ".checkpoints");
 const ENGINE_SRC_DIR = path.resolve(__dirname_local);
 const AUTOSAVE_INTERVAL_MS = 60_000;
-const CYCLE_INTERVAL_MS = 5 * 60 * 1000;
-const FIRST_DELAY_MS = 2 * 60 * 1000;
+const CYCLE_INTERVAL_MS = 2 * 60 * 1000;
+const FIRST_DELAY_MS = 45 * 1000;
 
 const BUDGET_RESET_DATE = new Date("2026-04-01T00:05:00Z");
 let _budgetConfirmedLive = false;
