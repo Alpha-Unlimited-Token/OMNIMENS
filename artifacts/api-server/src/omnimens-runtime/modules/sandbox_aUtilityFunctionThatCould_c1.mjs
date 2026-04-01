@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-04-01T02:27:11.198Z
+ * Written: 2026-04-01T03:10:37.852Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,62 +16,73 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Function to perform k-nearest neighbors (KNN) classification
-function knnClassifier(data, labels, queryPoint, k) {
-    if (!Array.isArray(data) || !Array.isArray(labels) || typeof k !== 'number' || k <= 0) {
-        throw new Error("Invalid input: data and labels must be arrays, and k must be a positive number.");
-    }
-    if (data.length !== labels.length) {
-        throw new Error("Data and labels arrays must have the same length.");
+// Utility function: Generate n-grams from a given text
+function generateNGrams(text, n) {
+    if (typeof text !== 'string' || typeof n !== 'number' || n < 1 || !Number.isInteger(n)) {
+        throw new TypeError('Invalid input: text must be a string and n must be a positive integer.');
     }
 
-    // Calculate Euclidean distance between queryPoint and each data point
-    const distances = data.map((point, index) => {
-        if (!Array.isArray(point) || point.length !== queryPoint.length) {
-            throw new Error("All data points and the query point must have the same dimensionality.");
-        }
-        const distance = Math.sqrt(point.reduce((sum, coord, i) => sum + Math.pow(coord - queryPoint[i], 2), 0));
-        return { distance, label: labels[index] };
-    });
+    const words = text.split(/\s+/).filter(word => word.trim().length > 0);
+    const nGrams = [];
 
-    // Sort by distance
-    distances.sort((a, b) => a.distance - b.distance);
-
-    // Get the k nearest neighbors
-    const kNearest = distances.slice(0, k);
-
-    // Count the occurrences of each label in the k nearest neighbors
-    const labelCounts = {};
-    kNearest.forEach(neighbor => {
-        labelCounts[neighbor.label] = (labelCounts[neighbor.label] || 0) + 1;
-    });
-
-    // Find the label with the highest count
-    let maxCount = 0;
-    let predictedLabel = null;
-    for (const label in labelCounts) {
-        if (labelCounts[label] > maxCount) {
-            maxCount = labelCounts[label];
-            predictedLabel = label;
-        }
+    for (let i = 0; i <= words.length - n; i++) {
+        nGrams.push(words.slice(i, i + n).join(' '));
     }
 
-    return predictedLabel;
+    return nGrams;
 }
 
 // Test cases
-const data = [
-    [1, 2],
-    [2, 3],
-    [3, 4],
-    [5, 6],
-    [6, 7]
-];
+console.log("Test Case 1: Basic bigrams");
+console.assert(
+    JSON.stringify(generateNGrams("Artificial intelligence is fascinating", 2)) === JSON.stringify(["Artificial intelligence", "intelligence is", "is fascinating"]),
+    "Test Case 1 Failed"
+);
 
-const labels = ['A', 'A', 'B', 'B', 'A'];
+console.log("Test Case 2: Trigrams");
+console.assert(
+    JSON.stringify(generateNGrams("Artificial intelligence is fascinating", 3)) === JSON.stringify(["Artificial intelligence is", "intelligence is fascinating"]),
+    "Test Case 2 Failed"
+);
 
-console.assert(knnClassifier(data, labels, [2, 2], 3) === 'A', "Test Case 1 Failed");
-console.assert(knnClassifier(data, labels, [4, 5], 3) === 'B', "Test Case 2 Failed");
-console.assert(knnClassifier(data, labels, [6, 6], 1) === 'A', "Test Case 3 Failed");
+console.log("Test Case 3: Single-word n-grams");
+console.assert(
+    JSON.stringify(generateNGrams("AI is evolving rapidly", 1)) === JSON.stringify(["AI", "is", "evolving", "rapidly"]),
+    "Test Case 3 Failed"
+);
 
-console.log("All test cases passed.");
+console.log("Test Case 4: Edge case - empty string");
+console.assert(
+    JSON.stringify(generateNGrams("", 2)) === JSON.stringify([]),
+    "Test Case 4 Failed"
+);
+
+console.log("Test Case 5: Edge case - n larger than number of words");
+console.assert(
+    JSON.stringify(generateNGrams("AI is evolving", 5)) === JSON.stringify([]),
+    "Test Case 5 Failed"
+);
+
+console.log("Test Case 6: Invalid inputs");
+try {
+    generateNGrams(123, 2);
+    console.error("Test Case 6 Failed: Did not throw error for non-string input");
+} catch (e) {
+    console.log("Test Case 6 Passed: Correctly threw error for non-string input");
+}
+
+try {
+    generateNGrams("AI is evolving", -1);
+    console.error("Test Case 6 Failed: Did not throw error for negative n");
+} catch (e) {
+    console.log("Test Case 6 Passed: Correctly threw error for negative n");
+}
+
+try {
+    generateNGrams("AI is evolving", 1.5);
+    console.error("Test Case 6 Failed: Did not throw error for non-integer n");
+} catch (e) {
+    console.log("Test Case 6 Passed: Correctly threw error for non-integer n");
+}
+
+console.log("All tests completed.");
