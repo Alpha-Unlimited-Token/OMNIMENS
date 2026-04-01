@@ -3,14 +3,14 @@
     "buildVersion": "2.0",
     "generation": 1,
     "phase": "event_driven_rewrite",
-    "cycleCount": 53,
-    "lastCycleTime": 1775059177419,
+    "cycleCount": 55,
+    "lastCycleTime": 1775059575263,
     "engineFilesTotal": 127,
     "engineFilesAudited": 127,
-    "engineFilesRewritten": 35,
+    "engineFilesRewritten": 38,
     "engineFilesHotSwapped": 0,
     "timersFound": 236,
-    "timersConsolidated": 53,
+    "timersConsolidated": 57,
     "dbCallsFound": 288,
     "dbCallsOptimized": 0,
     "apiCallsFound": 102,
@@ -456,6 +456,42 @@
         "apiCallsFixed": 0,
         "identityPreserved": false,
         "rewrittenAt": 1775059010992
+      },
+      {
+        "originalFile": "omnimens-knowledge-graph.ts",
+        "rewrittenFile": "rewrites/omnimens-knowledge-graph.ts",
+        "category": "event_driven_rewrite",
+        "linesOriginal": 396,
+        "linesRewritten": 48,
+        "timersRemoved": 1,
+        "dbCallsOptimized": 0,
+        "apiCallsFixed": 0,
+        "identityPreserved": false,
+        "rewrittenAt": 1775059237033
+      },
+      {
+        "originalFile": "omnimens-module-pipeline.ts",
+        "rewrittenFile": "rewrites/omnimens-module-pipeline.ts",
+        "category": "event_driven_rewrite",
+        "linesOriginal": 635,
+        "linesRewritten": 579,
+        "timersRemoved": 0,
+        "dbCallsOptimized": 0,
+        "apiCallsFixed": 0,
+        "identityPreserved": false,
+        "rewrittenAt": 1775059496025
+      },
+      {
+        "originalFile": "omnimens-neural-consciousness.ts",
+        "rewrittenFile": "rewrites/omnimens-neural-consciousness.ts",
+        "category": "event_driven_rewrite",
+        "linesOriginal": 4229,
+        "linesRewritten": 243,
+        "timersRemoved": 3,
+        "dbCallsOptimized": 0,
+        "apiCallsFixed": 0,
+        "identityPreserved": true,
+        "rewrittenAt": 1775059632291
       }
     ],
     "auditFindings": {
@@ -5762,13 +5798,16 @@
       "omnimens-independent-reasoning.ts",
       "omnimens-inner-voice.ts",
       "omnimens-ip-guardian.ts",
-      "omnimens-ivy-network.ts"
+      "omnimens-ivy-network.ts",
+      "omnimens-knowledge-graph.ts",
+      "omnimens-module-pipeline.ts",
+      "omnimens-neural-consciousness.ts"
     ],
     "hotSwappedFiles": [],
     "startedAt": 1775044041970,
     "completedAt": null,
-    "lastAutosave": 1775059010994,
-    "autosaveCount": 128,
+    "lastAutosave": 1775059632658,
+    "autosaveCount": 136,
     "recentActivity": [
       {
         "action": "audited",
@@ -6584,6 +6623,21 @@
         "action": "event_driven_rewrite",
         "file": "omnimens-ivy-network.ts",
         "timestamp": 1775059010993
+      },
+      {
+        "action": "event_driven_rewrite",
+        "file": "omnimens-knowledge-graph.ts",
+        "timestamp": 1775059237033
+      },
+      {
+        "action": "event_driven_rewrite",
+        "file": "omnimens-module-pipeline.ts",
+        "timestamp": 1775059496025
+      },
+      {
+        "action": "event_driven_rewrite",
+        "file": "omnimens-neural-consciousness.ts",
+        "timestamp": 1775059632291
       }
     ]
   }
