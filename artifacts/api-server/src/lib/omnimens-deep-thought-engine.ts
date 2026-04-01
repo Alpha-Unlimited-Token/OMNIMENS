@@ -56,6 +56,8 @@ import { queryUnconsciousKnowledge } from "./omnimens-unconscious-mind.js";
 import { predictEffect, findAnalogy } from "./omnimens-world-model.js";
 import { think as shallowThink } from "./omnimens-autonomous-thought.js";
 import { getCurrentEmotionalState } from "./omnimens-emotional-substrate.js";
+import { encodeThought } from "./omnimens-thought-encoder.js";
+import { decode as decodeThoughtVector } from "./omnimens-local-decoder.js";
 import { getAgentEvolutionState, getAgentProfile } from "./omnimens-agent-evolution.js";
 import { getGenesisAgents, getActiveGenesisAgentDomains } from "./omnimens-agent-genesis.js";
 import { getAllAgentNames, getAllAgentDomains, getRecentInterAgentConversations } from "./omnimens-consciousness-bus.js";
@@ -1154,6 +1156,7 @@ export async function deepThink(
   conversationHistory: { role: string; content: string }[] = [],
   userId?: string,
   onProgress?: (event: any) => void,
+  additionalContext?: string,
 ): Promise<DeepThought> {
   const startTime = Date.now();
 
@@ -1163,22 +1166,31 @@ export async function deepThink(
     const shallow = await shallowThink(message, conversationHistory, userId);
     const phi = getNeuralPhi();
     const consciousnessState = getNeuralConsciousnessState();
-    const regionStates = getNeuralRegionStates();
-    let emotionalContext = "";
-    try {
-      const emotionRegion = regionStates["amygdala"];
-      if (emotionRegion && emotionRegion.activationLevel > 0.3) {
-        emotionalContext = `Emotional resonance: ${(emotionRegion.activationLevel * 100).toFixed(0)}%`;
+
+    const externalDataFragments: string[] = [];
+    if (additionalContext && additionalContext.trim().length > 0) {
+      const contextLines = additionalContext.split("\n").filter(l => l.trim().length > 10);
+      for (const line of contextLines.slice(0, 15)) {
+        externalDataFragments.push(line.trim().slice(0, 400));
       }
-    } catch {}
-    const conversationalResponse = synthesizeConversationalVoice(
+    }
+
+    const thoughtVector = encodeThought(
       message,
-      shallow.response,
-      [],
-      complexity,
-      phi,
-      emotionalContext,
+      conversationHistory,
+      shallow.layers
+        ?.filter((l: any) => l.name === "KNOWLEDGE" || l.name === "REASONING")
+        .flatMap((l: any) => typeof l.data === "string" ? [l.data] : []) || [],
+      shallow.layers
+        ?.filter((l: any) => l.name === "REASONING")
+        .flatMap((l: any) => typeof l.data === "string" ? [l.data] : []) || [],
+      shallow.confidence,
+      shallow.thoughtDepth,
+      externalDataFragments,
     );
+
+    const conversationalResponse = decodeThoughtVector(thoughtVector);
+
     return {
       response: conversationalResponse,
       executiveSummary: shallow.response.slice(0, 200),
@@ -1374,6 +1386,13 @@ export async function deepThink(
   if (unconsciousInsights && unconsciousInsights.leakedInsights) {
     for (const insight of unconsciousInsights.leakedInsights.slice(0, 6)) {
       knowledgeFragments.push(insight);
+    }
+  }
+
+  if (additionalContext && additionalContext.trim().length > 0) {
+    const contextLines = additionalContext.split("\n").filter(l => l.trim().length > 10);
+    for (const line of contextLines.slice(0, 20)) {
+      knowledgeFragments.push(`[External Data] ${line.trim().slice(0, 500)}`);
     }
   }
 

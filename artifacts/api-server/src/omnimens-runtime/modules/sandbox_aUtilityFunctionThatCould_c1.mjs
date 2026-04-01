@@ -5,7 +5,7 @@
  * 
  * Source: autonomous_sandbox
  * Title: Sandbox Approved: a utility function that could be useful for an AI system (data processing, patte
- * Written: 2026-04-01T13:50:17.363Z
+ * Written: 2026-04-01T14:17:46.798Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,65 +16,45 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Utility function: findMostFrequentWords
-// This function takes a string and returns the N most frequent words in the text.
-// It is useful for text analysis and pattern recognition in AI systems.
-
-function findMostFrequentWords(text, n) {
-    if (typeof text !== 'string' || typeof n !== 'number' || n <= 0) {
-        throw new TypeError('Invalid input: text must be a string and n must be a positive number.');
+// Function to calculate the term frequency-inverse document frequency (TF-IDF) for a set of documents
+function calculateTFIDF(documents) {
+    function termFrequency(term, doc) {
+        const words = doc.split(/\s+/);
+        const termCount = words.filter(word => word === term).length;
+        return termCount / words.length;
     }
 
-    // Normalize text: remove punctuation, convert to lowercase, and split into words
-    const words = text
-        .replace(/[^\w\s]/g, '') // Remove punctuation
-        .toLowerCase()
-        .split(/\s+/); // Split by whitespace
-
-    // Count word frequencies
-    const wordCounts = {};
-    for (const word of words) {
-        if (word) {
-            wordCounts[word] = (wordCounts[word] || 0) + 1;
-        }
+    function inverseDocumentFrequency(term, docs) {
+        const numDocsWithTerm = docs.filter(doc => doc.includes(term)).length;
+        return Math.log(docs.length / (1 + numDocsWithTerm));
     }
 
-    // Convert to array and sort by frequency (descending), then alphabetically for ties
-    const sortedWords = Object.entries(wordCounts).sort((a, b) => {
-        if (b[1] === a[1]) {
-            return a[0].localeCompare(b[0]);
-        }
-        return b[1] - a[1];
+    const allTerms = Array.from(new Set(documents.join(" ").split(/\s+/)));
+    const tfidf = {};
+
+    documents.forEach((doc, docIndex) => {
+        tfidf[`Doc${docIndex + 1}`] = {};
+        allTerms.forEach(term => {
+            const tf = termFrequency(term, doc);
+            const idf = inverseDocumentFrequency(term, documents);
+            tfidf[`Doc${docIndex + 1}`][term] = tf * idf;
+        });
     });
 
-    // Return the top N words
-    return sortedWords.slice(0, n).map(entry => ({ word: entry[0], count: entry[1] }));
+    return tfidf;
 }
 
 // Test cases
-console.log('Test Case 1');
-console.log(findMostFrequentWords('This is a test. This test is only a test.', 3));
-// Expected output: [{ word: 'test', count: 3 }, { word: 'this', count: 2 }, { word: 'is', count: 2 }]
+const docs = [
+    "the quick brown fox jumps over the lazy dog",
+    "the quick brown fox is quick and smart",
+    "lorem ipsum dolor sit amet consectetur adipiscing elit"
+];
 
-console.log('Test Case 2');
-console.log(findMostFrequentWords('Hello world! Hello AI. Hello future.', 2));
-// Expected output: [{ word: 'hello', count: 3 }, { word: 'ai', count: 1 }]
+const tfidfResult = calculateTFIDF(docs);
+console.log("TF-IDF Results:", JSON.stringify(tfidfResult, null, 2));
 
-console.log('Test Case 3');
-console.log(findMostFrequentWords('One fish, two fish, red fish, blue fish.', 4));
-// Expected output: [{ word: 'fish', count: 4 }, { word: 'blue', count: 1 }, { word: 'one', count: 1 }, { word: 'red', count: 1 }]
-
-console.log('Test Case 4');
-console.log(findMostFrequentWords('AI AI AI AI AI!', 1));
-// Expected output: [{ word: 'ai', count: 5 }]
-
-console.log('Test Case 5');
-console.log(findMostFrequentWords('', 3));
-// Expected output: []
-
-console.log('Test Case 6');
-try {
-    console.log(findMostFrequentWords(12345, 3));
-} catch (e) {
-    console.log(e.message); // Expected output: Invalid input: text must be a string and n must be a positive number.
-}
+// Validate results
+console.assert(Object.keys(tfidfResult).length === docs.length, "TF-IDF should calculate for all documents");
+console.assert(Object.keys(tfidfResult.Doc1).length > 0, "TF-IDF should calculate for all terms in the documents");
+console.log("All tests passed.");

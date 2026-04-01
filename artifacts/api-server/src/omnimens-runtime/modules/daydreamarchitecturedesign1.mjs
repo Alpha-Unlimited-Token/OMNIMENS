@@ -5,7 +5,7 @@
  * 
  * Source: self_coding_engine
  * Title: Daydream:architecture_design #1
- * Written: 2026-04-01T11:49:25.787Z
+ * Written: 2026-04-01T14:15:45.221Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,33 +16,33 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
+// Quantum-Topological Causal Mapper – minimal prototype
 
-   // P(to|from)
 
 
-export class CausalGraph {
-  edges= [];
-  addTriple(t) {
-    this.edges.push({ from: t.cause, to: t.effect, prob: t.confidence });
+export function buildCausalTopology(stream, k = 3, life = 5) {
+  const simplices = new Map();   // key -> birth step
+  const invariants= [];
+  const distance = (a, b) =>
+    Math.sqrt(a.reduce((s, v, i) => s + (v - b[i]) ** 2, 0));
+
+  for (let t = 0; t < stream.length - k + 1; t++) {
+    // 1. create a k-simplex from consecutive vectors
+    const simplexVerts = stream.slice(t, t + k);
+    const id = simplexVerts.map(v => v.join(',')).join('|');
+    if (!simplices.has(id)) simplices.set(id, t);
+
+    // 2. prune old simplices and record persistent ones
+    for (const [key, birth] of [...simplices]) {
+      if (t - birth >= life) {
+        const verts = key.split('|').map(s => s.split(',').map(Number));
+        // simple β1 proxy: average pairwise distance < ε ⇒ loop detected
+        const pairs = verts.flatMap((v, i) => verts.slice(i + 1).map(u => distance(v, u)));
+        const avg = pairs.reduce((a, b) => a + b, 0) / pairs.length;
+        if (avg < 0.5) invariants.push({ order: 1, size: verts.length, lifespan: t - birth });
+        simplices.delete(key);
+      }
+    }
   }
-  children(n) { return this.edges.filter(e => e.from === n); }
-  // Forward propagation for P(target | do(intervention=setTrue))
-  do(intervention, target) {
-    const visited = new Set();
-    const recurse = (n) => {
-      if (n === intervention) return 1;         // forced true
-      if (visited.has(n))  return 0;
-      visited.add(n);
-      const ch = this.children(n);
-      if (ch.length === 0) return 0;
-      return 1 - ch.reduce((p, e) => p * (1 - e.prob * recurse(e.to)), 1);
-    };
-    return recurse(target);
-  }
-  // Simple counterfactual: P(target changes | do(intervention))
-  counterfactual(intervention, target) {
-    const p_before = this.do("", target);              // no intervention
-    const p_after  = this.do(intervention, target);
-    return Math.abs(p_after - p_before);
-  }
+  return invariants;
 }
