@@ -96,9 +96,225 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "inMemoryVectorStore_gen4.mjs": {
+      "filename": "inMemoryVectorStore_gen4.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateRandomUnitVector",
+        "euclideanDistance",
+        "normalizeVector",
+        "InMemoryVectorStore"
+      ],
+      "loadedAt": 1775081599675,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "inMemoryVectorStore_gen2.mjs": {
+      "filename": "inMemoryVectorStore_gen2.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "euclideanDistance",
+        "normalizeVector",
+        "hashVector",
+        "createVectorStore",
+        "InMemoryVectorStore"
+      ],
+      "loadedAt": 1775081600200,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuMatrixOps_gen3.mjs": {
+      "filename": "gpuMatrixOps_gen3.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "gpuMatrixMultiply",
+        "hashMatrix",
+        "validateMatrix",
+        "description"
+      ],
+      "loadedAt": 1775081601259,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "embeddingVectorStore_gen1.mjs": {
+      "filename": "embeddingVectorStore_gen1.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "euclideanDistance",
+        "vectorHash",
+        "createHNSWGraph",
+        "normalizeVector",
+        "HNSWGraph"
+      ],
+      "loadedAt": 1775081603634,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "inMemoryVectorStore_gen3.mjs": {
+      "filename": "inMemoryVectorStore_gen3.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateVectorHash",
+        "addEmbedding",
+        "getEmbedding",
+        "findClosestEmbedding",
+        "cosineSimilarity",
+        "clearStore",
+        "listEmbeddingIDs"
+      ],
+      "loadedAt": 1775081608118,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "memoryCompaction_gen2.mjs": {
+      "filename": "memoryCompaction_gen2.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "hashText",
+        "tokenize",
+        "generateEmbedding",
+        "summarizeText",
+        "calculateSimilarity",
+        "compactMemory"
+      ],
+      "loadedAt": 1775081613184,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen2.mjs": {
+      "filename": "evolution_marker_gen2.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775081613200,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "hierarchicalContextManager_gen3.mjs": {
+      "filename": "hierarchicalContextManager_gen3.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateHash",
+        "summarizeText",
+        "calculateRelevance",
+        "slidingWindow",
+        "rehydrateContext",
+        "manageContext",
+        "mergeContexts"
+      ],
+      "loadedAt": 1775081617016,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen3.mjs": {
+      "filename": "evolution_marker_gen3.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775081617031,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "webGpuMatrixOps_gen6.mjs": {
+      "filename": "webGpuMatrixOps_gen6.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "initializeWebGLContext",
+        "compileShader",
+        "createProgram",
+        "gpuMatrixMultiply",
+        "hashMatrix",
+        "validateMatrix"
+      ],
+      "loadedAt": 1775081619265,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "vectorStoreIndex_gen7.mjs": {
+      "filename": "vectorStoreIndex_gen7.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateRandomVector",
+        "calculateDistance",
+        "normalizeVector",
+        "VectorStore"
+      ],
+      "loadedAt": 1775081622936,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "approximateVectorSearch_gen6.mjs": {
+      "filename": "approximateVectorSearch_gen6.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateLSHSignature",
+        "computeEuclideanDistance",
+        "buildLSHIndex",
+        "approximateNearestNeighbors",
+        "normalizeVector"
+      ],
+      "loadedAt": 1775081626638,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuMatrixEngine_gen9.mjs": {
+      "filename": "gpuMatrixEngine_gen9.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "initializeWebGLContext",
+        "compileShader",
+        "createProgram",
+        "gpuMatrixMultiply",
+        "generateHash"
+      ],
+      "loadedAt": 1775081628996,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 0,
-  "totalModules": 8,
+  "totalModules": 32,
   "totalCalls": 0
 }

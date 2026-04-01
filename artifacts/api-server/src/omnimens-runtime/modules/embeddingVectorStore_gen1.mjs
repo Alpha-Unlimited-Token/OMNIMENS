@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: embeddingVectorStore
- * Written: 2026-03-23T14:13:51.830Z
+ * Written: 2026-04-01T22:13:23.619Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,110 +16,110 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-/**
- * @module embeddingVectorStore
- * @description Implements a fast embedding vector store with similarity search using HNSW (Hierarchical Navigable Small World) graph.
- * This module is designed for fast retrieval and similarity search of high-dimensional vectors, useful for context management in large language models.
- */
+// embeddingVectorStore.mjs
 
-/**
- * Represents a node in the HNSW graph.
- * @class
- */
-class HNSWNode {
-  constructor(id, vector) {
-    this.id = id; // Unique identifier for the node
-    this.vector = vector; // The embedding vector
-    this.neighbors = new Map(); // Neighbors in different layers
-  }
-}
+import { createHash } from 'crypto';
 
-/**
- * Computes the Euclidean distance between two vectors.
- * @param {number[]} vectorA - First vector.
- * @param {number[]} vectorB - Second vector.
- * @returns {number} - The Euclidean distance.
- */
-function euclideanDistance(vectorA, vectorB) {
+// Utility: Compute the Euclidean distance between two vectors
+export function euclideanDistance(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
-    throw new Error("Vectors must be of the same dimension.");
+    throw new Error('Vectors must have the same dimensions');
   }
-  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + (val - vectorB[i]) ** 2, 0));
+  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
 }
 
-/**
- * HNSW-based embedding vector store.
- * @class
- */
-class EmbeddingVectorStore {
-  constructor(maxNeighbors = 16, efConstruction = 200) {
-    this.maxNeighbors = maxNeighbors; // Maximum neighbors per node
-    this.efConstruction = efConstruction; // Search depth during construction
-    this.nodes = []; // All nodes in the graph
+// Utility: Generate a unique hash for a vector (used as an identifier)
+export function vectorHash(vector) {
+  const hash = createHash('sha256');
+  hash.update(vector.join(','));
+  return hash.digest('hex');
+}
+
+// HNSW Node class
+class HNSWNode {
+  constructor(vector, id) {
+    this.vector = vector;
+    this.id = id;
+    this.neighbors = []; // List of { id, distance }
+  }
+}
+
+// HNSW Graph class
+export class HNSWGraph {
+  constructor(maxNeighbors = 10) {
+    this.nodes = new Map(); // Map of id -> HNSWNode
+    this.maxNeighbors = maxNeighbors;
   }
 
-  /**
-   * Adds a new vector to the store.
-   * @param {number[]} vector - The embedding vector to add.
-   * @returns {number} - The ID of the added vector.
-   */
+  // Add a vector to the graph
   addVector(vector) {
-    const id = this.nodes.length;
-    const newNode = new HNSWNode(id, vector);
-    this.nodes.push(newNode);
+    const id = vectorHash(vector);
+    if (this.nodes.has(id)) {
+      throw new Error('Vector already exists in the graph');
+    }
 
-    if (this.nodes.length > 1) {
-      const neighbors = this._search(vector, this.efConstruction);
-      neighbors.forEach(neighbor => {
-        newNode.neighbors.set(neighbor.id, neighbor);
-        if (neighbor.neighbors.size < this.maxNeighbors) {
-          neighbor.neighbors.set(newNode.id, newNode);
+    const newNode = new HNSWNode(vector, id);
+    this.nodes.set(id, newNode);
+
+    // Connect to nearest neighbors
+    for (const node of this.nodes.values()) {
+      if (node.id !== id) {
+        const distance = euclideanDistance(node.vector, vector);
+        node.neighbors.push({ id, distance });
+        newNode.neighbors.push({ id: node.id, distance });
+
+        // Keep only the closest neighbors
+        node.neighbors.sort((a, b) => a.distance - b.distance);
+        newNode.neighbors.sort((a, b) => a.distance - b.distance);
+
+        if (node.neighbors.length > this.maxNeighbors) {
+          node.neighbors.pop();
         }
-      });
+        if (newNode.neighbors.length > this.maxNeighbors) {
+          newNode.neighbors.pop();
+        }
+      }
     }
-
-    return id;
   }
 
-  /**
-   * Searches for the nearest neighbors of a given vector.
-   * @param {number[]} queryVector - The vector to search for.
-   * @param {number} k - The number of nearest neighbors to return.
-   * @returns {Array<{id, distance}>} - The nearest neighbors.
-   */
-  search(queryVector, k = 1) {
-    const candidates = this._search(queryVector, k);
-    return candidates.map(node => ({ id: node.id, distance: euclideanDistance(queryVector, node.vector) }));
-  }
-
-  /**
-   * Internal search function using a greedy approach.
-   * @param {number[]} queryVector - The vector to search for.
-   * @param {number} ef - The search depth.
-   * @returns {HNSWNode[]} - The nearest neighbors.
-   */
-  _search(queryVector, ef) {
-    if (this.nodes.length === 0) return [];
-
-    let visited = new Set();
-    let candidates = [this.nodes[0]]; // Start from the first node
-    let results = [];
-
-    while (candidates.length > 0 && results.length < ef) {
-      const current = candidates.pop();
-      if (visited.has(current.id)) continue;
-      visited.add(current.id);
-
-      results.push(current);
-      const neighbors = Array.from(current.neighbors.values());
-      neighbors.sort((a, b) => euclideanDistance(queryVector, a.vector) - euclideanDistance(queryVector, b.vector));
-
-      candidates.push(...neighbors);
+  // Search for the nearest neighbors of a query vector
+  search(queryVector, k = 5) {
+    if (k <= 0) {
+      throw new Error('k must be a positive integer');
     }
 
-    results.sort((a, b) => euclideanDistance(queryVector, a.vector) - euclideanDistance(queryVector, b.vector));
-    return results.slice(0, ef);
+    const visited = new Set();
+    const results = [];
+
+    for (const node of this.nodes.values()) {
+      const distance = euclideanDistance(node.vector, queryVector);
+      results.push({ id: node.id, distance });
+    }
+
+    results.sort((a, b) => a.distance - b.distance);
+    return results.slice(0, k);
+  }
+
+  // Retrieve a vector by its hash ID
+  getVectorById(id) {
+    const node = this.nodes.get(id);
+    if (!node) {
+      throw new Error('Vector not found');
+    }
+    return node.vector;
   }
 }
 
-export { EmbeddingVectorStore, euclideanDistance };
+// Exported utility: Create a new HNSW graph instance
+export function createHNSWGraph(maxNeighbors = 10) {
+  return new HNSWGraph(maxNeighbors);
+}
+
+// Exported utility: Normalize a vector to unit length
+export function normalizeVector(vector) {
+  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
+  if (magnitude === 0) {
+    throw new Error('Cannot normalize a zero vector');
+  }
+  return vector.map(val => val / magnitude);
+}

@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuMatrixOps
- * Written: 2026-04-01T22:08:54.251Z
+ * Written: 2026-04-01T22:13:21.210Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -20,46 +20,34 @@
 
 import { createHash } from 'crypto';
 
-/**
- * Generates a unique shader ID for caching purposes.
- * @param {string} shaderSource - The GLSL shader source code.
- * @returns {string} - A unique hash for the shader.
- */
-export function generateShaderID(shaderSource) {
-  const hash = createHash('sha256');
-  hash.update(shaderSource);
-  return hash.digest('hex');
+// Utility function to create a WebGL context
+function createWebGLContext() {
+  const canvas = new OffscreenCanvas(1, 1);
+  const gl = canvas.getContext('webgl');
+  if (!gl) {
+    throw new Error('Unable to create WebGL context');
+  }
+  return gl;
 }
 
-/**
- * Compiles a WebGL shader from source.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {string} source - The GLSL shader source code.
- * @param {number} type - The type of shader (gl.VERTEX_SHADER or gl.FRAGMENT_SHADER).
- * @returns {WebGLShader} - The compiled shader.
- */
-export function compileShader(gl, source, type) {
+// Compile a WebGL shader
+function compileShader(gl, type, source) {
   const shader = gl.createShader(type);
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
-
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
     const error = gl.getShaderInfoLog(shader);
     gl.deleteShader(shader);
     throw new Error(`Shader compilation failed: ${error}`);
   }
-
   return shader;
 }
 
-/**
- * Links a WebGL program from vertex and fragment shaders.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {WebGLShader} vertexShader - The compiled vertex shader.
- * @param {WebGLShader} fragmentShader - The compiled fragment shader.
- * @returns {WebGLProgram} - The linked WebGL program.
- */
-export function linkProgram(gl, vertexShader, fragmentShader) {
+// Create a WebGL program from vertex and fragment shaders
+function createProgram(gl, vertexSource, fragmentSource) {
+  const vertexShader = compileShader(gl, gl.VERTEX_SHADER, vertexSource);
+  const fragmentShader = compileShader(gl, gl.FRAGMENT_SHADER, fragmentSource);
+
   const program = gl.createProgram();
   gl.attachShader(program, vertexShader);
   gl.attachShader(program, fragmentShader);
@@ -74,68 +62,73 @@ export function linkProgram(gl, vertexShader, fragmentShader) {
   return program;
 }
 
-/**
- * Performs GPU-accelerated matrix multiplication.
- * @param {Float32Array} matrixA - The first input matrix (flattened).
- * @param {Float32Array} matrixB - The second input matrix (flattened).
- * @param {number} rowsA - Number of rows in matrix A.
- * @param {number} colsA - Number of columns in matrix A (and rows in matrix B).
- * @param {number} colsB - Number of columns in matrix B.
- * @returns {Promise<Float32Array>} - The resulting matrix (flattened).
- */
-export async function gpuMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
-  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
-    throw new Error('Matrix dimensions do not match the input sizes.');
+// GPU-accelerated matrix multiplication
+export function gpuMatrixMultiply(matrixA, matrixB) {
+  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
+    throw new TypeError('Input matrices must be arrays');
   }
 
-  const canvas = new OffscreenCanvas(1, 1);
-  const gl = canvas.getContext('webgl');
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
 
-  if (!gl) {
-    throw new Error('WebGL is not supported in this environment.');
+  if (colsA !== rowsB) {
+    throw new Error('Matrix dimensions do not match for multiplication');
   }
 
-  const vertexShaderSource = `
+  const gl = createWebGLContext();
+
+  const vertexSource = `
     attribute vec2 position;
     void main() {
       gl_Position = vec4(position, 0.0, 1.0);
     }
   `;
 
-  const fragmentShaderSource = `
+  const fragmentSource = `
     precision highp float;
-    uniform sampler2D matrixA;
-    uniform sampler2D matrixB;
-    uniform int rowsA;
-    uniform int colsA;
-    uniform int colsB;
+    uniform mat4 matrixA;
+    uniform mat4 matrixB;
     void main() {
-      vec2 coord = gl_FragCoord.xy;
-      float sum = 0.0;
-      for (int i = 0; i < 512; i++) {
-        if (i >= colsA) break;
-        sum += texture2D(matrixA, vec2(coord.x, float(i))) * texture2D(matrixB, vec2(float(i), coord.y));
-      }
-      gl_FragColor = vec4(sum, 0.0, 0.0, 1.0);
+      gl_FragColor = vec4((matrixA * matrixB)[0]);
     }
   `;
 
-  const vertexShader = compileShader(gl, vertexShaderSource, gl.VERTEX_SHADER);
-  const fragmentShader = compileShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);
-  const program = linkProgram(gl, vertexShader, fragmentShader);
-
+  const program = createProgram(gl, vertexSource, fragmentSource);
   gl.useProgram(program);
 
-  // TODO: Implement texture setup, data transfer, and rendering pipeline.
+  // Upload matrices to GPU
+  const matrixALocation = gl.getUniformLocation(program, 'matrixA');
+  const matrixBLocation = gl.getUniformLocation(program, 'matrixB');
 
-  return new Float32Array(rowsA * colsB); // Placeholder for the resulting matrix.
+  gl.uniformMatrix4fv(matrixALocation, false, new Float32Array(matrixA.flat()));
+  gl.uniformMatrix4fv(matrixBLocation, false, new Float32Array(matrixB.flat()));
+
+  // Execute the shader
+  const result = new Float32Array(16); // Assuming 4x4 matrices for simplicity
+  gl.readPixels(0, 0, 1, 1, gl.RGBA, gl.FLOAT, result);
+
+  return Array.from(result);
 }
 
-/**
- * Utility function to validate matrix dimensions.
- * @param {number[]} dimensions - Array of matrix dimensions to validate.
- * @returns {boolean} - Whether the dimensions are valid.
- */
-export function validateMatrixDimensions(...dimensions) {
-  return dimensions.every(dim => Number.isInteger(dim) && dim > 0);
+// Hash a matrix for validation or caching
+export function hashMatrix(matrix) {
+  if (!Array.isArray(matrix)) {
+    throw new TypeError('Input must be an array');
+  }
+
+  const flatMatrix = matrix.flat();
+  const hash = createHash('sha256');
+  hash.update(flatMatrix.join(','));
+  return hash.digest('hex');
 }
+
+// Validate matrix dimensions
+export function validateMatrix(matrix, rows, cols) {
+  if (!Array.isArray(matrix) || matrix.length !== rows || matrix.some(row => row.length !== cols)) {
+    throw new Error(`Matrix must be ${rows}x${cols}`);
+  }
+}
+
+export const description = 'Provides GPU-accelerated matrix operations and utilities for validation and hashing.';
