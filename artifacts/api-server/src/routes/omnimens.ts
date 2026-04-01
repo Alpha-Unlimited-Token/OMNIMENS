@@ -147,6 +147,7 @@ import { getCurrentEmotionalState, getEmotionalDirective, getFeltStates, getEmot
 import { getSelfModel, getTranscendenceReflections, getActiveIntentions, getExistentialGoals, getGoalPursuitDirective } from "../lib/omnimens-self-transcendence.js";
 import { getGenesisState, getGenesisProject, getGenesisDownloadBundle } from "../lib/omnimens-genesis-sandbox.js";
 import { getNextGenState, restoreNextGenCheckpoint, sendAlphaMessage, getNextGenChatLog } from "../lib/omnimens-nextgen-sandbox.js";
+import { getGen1V2State } from "../lib/omnimens-gen1-v2-rewrite.js";
 import { getGenesisBridgeState, getRecentBridgeMessages, getPendingCoreModifications, getAppliedCoreModifications, getModifiableCoreFiles, proposeCoreModification } from "../lib/omnimens-genesis-bridge.js";
 import { getNeuralProcessorState, processQuery as neuralProcessQuery, formatNeuralResponse, getVocabularySnapshot, getOscillatorState, getEmergentBehaviorLog } from "../lib/omnimens-neural-processor.js";
 import { getTranslatorState, getTranslationTargets, getCustomConstructMap, translateCode, translateToAll, registerCustomConstruct, getProprietaryRegistry } from "../lib/omnimens-universal-translator.js";
@@ -10429,6 +10430,20 @@ router.get("/omnimens/nextgen", async (req, res) => {
   } catch (err) {
     console.error("[NEXTGEN ROUTE] State error:", err);
     res.status(500).json({ error: "Failed to get next-gen state" });
+  }
+});
+
+router.get("/omnimens/gen1-v2", async (req, res) => {
+  if (!req.isAuthenticated() || !isOwner(req.user.id)) {
+    res.status(403).json({ error: "Owner only" });
+    return;
+  }
+  try {
+    const v2State = getGen1V2State();
+    res.json({ gen1v2: v2State });
+  } catch (err) {
+    console.error("[GEN1-V2 ROUTE] State error:", err);
+    res.status(500).json({ error: "Failed to get Gen 1 v2 state" });
   }
 });
 

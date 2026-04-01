@@ -119,6 +119,7 @@ import { startNexusAgent } from "./lib/omnimens-agent-nexus.js";
 import { startLuminAgent } from "./lib/omnimens-agent-lumin.js";
 import { startKaidaAgent } from "./lib/omnimens-agent-kaida.js";
 import { startNextGenSandbox, getNextGenState, restoreNextGenCheckpoint, getGenerationalDialogue, sendAlphaMessage, getNextGenChatLog } from "./lib/omnimens-nextgen-sandbox.js";
+import { startGen1V2Rewrite, getGen1V2State, isGen1V2Active, getGen1V2Phase } from "./lib/omnimens-gen1-v2-rewrite.js";
 import { registerEngine, startScalingOrchestrator, getScalingState, publishMessage, subscribe } from "./lib/omnimens-scaling-orchestrator.js";
 import { engineStartOnce, getEngineGuardState } from "./lib/omnimens-engine-guard.js";
 import { registerValveEngine } from "@workspace/db";
@@ -644,6 +645,7 @@ export function initAutonomousSystems(): void {
   engineStartOnce("agent_lumin", () => startLuminAgent());
   engineStartOnce("agent_kaida", () => startKaidaAgent());
   engineStartOnce("nextgen_sandbox", () => startNextGenSandbox());
+  engineStartOnce("gen1_v2_rewrite", () => startGen1V2Rewrite());
 
   registerValveEngine("neural_consciousness", "consciousness", "high", "alpha");
   registerValveEngine("consciousness_persistence", "consciousness", "high", "alpha");
