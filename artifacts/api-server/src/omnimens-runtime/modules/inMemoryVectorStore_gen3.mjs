@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-04-01T22:13:28.104Z
+ * Written: 2026-04-01T22:16:20.762Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -21,106 +21,125 @@
 import { createHash } from 'crypto';
 
 /**
- * Generates a unique hash for a given embedding vector.
- * Useful for indexing and retrieval.
- * @param {Float64Array} vector - The embedding vector.
- * @returns {string} - A unique hash string.
+ * Utility function to calculate Euclidean distance between two vectors.
+ * @param {number[]} vec1 - First vector.
+ * @param {number[]} vec2 - Second vector.
+ * @returns {number} - Euclidean distance.
  */
-export function generateVectorHash(vector) {
+export function euclideanDistance(vec1, vec2) {
+  if (vec1.length !== vec2.length) {
+    throw new Error('Vectors must be of the same dimension.');
+  }
+  return Math.sqrt(vec1.reduce((sum, val, i) => sum + Math.pow(val - vec2[i], 2), 0));
+}
+
+/**
+ * Class representing an in-memory k-d tree for efficient nearest neighbor search.
+ */
+export class KDTree {
+  constructor(points = [], depth = 0) {
+    this.depth = depth;
+    this.axis = depth % (points[0]?.length || 1);
+
+    if (points.length === 0) {
+      this.point = null;
+      this.left = null;
+      this.right = null;
+    } else {
+      points.sort((a, b) => a[this.axis] - b[this.axis]);
+      const medianIndex = Math.floor(points.length / 2);
+
+      this.point = points[medianIndex];
+      this.left = new KDTree(points.slice(0, medianIndex), depth + 1);
+      this.right = new KDTree(points.slice(medianIndex + 1), depth + 1);
+    }
+  }
+
+  /**
+   * Find the nearest neighbor to a given vector.
+   * @param {number[]} target - Target vector.
+   * @returns {number[]} - Nearest neighbor vector.
+   */
+  nearestNeighbor(target) {
+    if (!this.point) {
+      return null;
+    }
+
+    let best = this.point;
+    let bestDist = euclideanDistance(target, this.point);
+
+    const nextBranch = target[this.axis] < this.point[this.axis] ? this.left : this.right;
+    const otherBranch = target[this.axis] < this.point[this.axis] ? this.right : this.left;
+
+    const candidate = nextBranch?.nearestNeighbor(target);
+    if (candidate) {
+      const candidateDist = euclideanDistance(target, candidate);
+      if (candidateDist < bestDist) {
+        best = candidate;
+        bestDist = candidateDist;
+      }
+    }
+
+    if (Math.abs(target[this.axis] - this.point[this.axis]) < bestDist) {
+      const candidate = otherBranch?.nearestNeighbor(target);
+      if (candidate) {
+        const candidateDist = euclideanDistance(target, candidate);
+        if (candidateDist < bestDist) {
+          best = candidate;
+          bestDist = candidateDist;
+        }
+      }
+    }
+
+    return best;
+  }
+}
+
+/**
+ * Utility function to hash a vector for efficient storage/retrieval.
+ * @param {number[]} vector - Input vector.
+ * @returns {string} - Hash of the vector.
+ */
+export function hashVector(vector) {
   const hash = createHash('sha256');
-  vector.forEach(val => hash.update(Buffer.from(Float64Array.of(val).buffer)));
+  hash.update(vector.join(','));
   return hash.digest('hex');
 }
 
 /**
- * Stores embeddings in shared memory for fast retrieval.
- * @type {Map<string, Float64Array>} - A memory-based key-value store.
+ * In-memory vector store for dynamic embedding storage and retrieval.
  */
-const inMemoryStore = new Map();
-
-/**
- * Adds an embedding vector to the in-memory store.
- * @param {string} id - Unique identifier for the embedding.
- * @param {Float64Array} vector - The embedding vector.
- */
-export function addEmbedding(id, vector) {
-  if (!(vector instanceof Float64Array)) {
-    throw new TypeError('Embedding must be a Float64Array');
-  }
-  inMemoryStore.set(id, vector);
-}
-
-/**
- * Retrieves an embedding vector by its unique identifier.
- * @param {string} id - Unique identifier for the embedding.
- * @returns {Float64Array | null} - The embedding vector, or null if not found.
- */
-export function getEmbedding(id) {
-  return inMemoryStore.get(id) || null;
-}
-
-/**
- * Finds the closest embedding in the store using cosine similarity.
- * @param {Float64Array} queryVector - The query embedding vector.
- * @returns {{ id, similarity} | null} - Closest embedding ID and similarity score, or null if store is empty.
- */
-export function findClosestEmbedding(queryVector) {
-  if (!(queryVector instanceof Float64Array)) {
-    throw new TypeError('Query vector must be a Float64Array');
+export class InMemoryVectorStore {
+  constructor() {
+    this.store = new Map();
+    this.tree = null;
   }
 
-  let closest = null;
-  let highestSimilarity = -Infinity;
+  /**
+   * Add a vector to the store.
+   * @param {number[]} vector - Vector to add.
+   */
+  addVector(vector) {
+    const hash = hashVector(vector);
+    this.store.set(hash, vector);
+    this.tree = new KDTree(Array.from(this.store.values()));
+  }
 
-  for (const [id, storedVector] of inMemoryStore.entries()) {
-    const similarity = cosineSimilarity(queryVector, storedVector);
-    if (similarity > highestSimilarity) {
-      highestSimilarity = similarity;
-      closest = { id, similarity };
+  /**
+   * Retrieve the nearest neighbor to a given vector.
+   * @param {number[]} vector - Target vector.
+   * @returns {number[]} - Nearest neighbor vector.
+   */
+  getNearestNeighbor(vector) {
+    if (!this.tree) {
+      throw new Error('Vector store is empty.');
     }
+    return this.tree.nearestNeighbor(vector);
   }
-
-  return closest;
 }
 
-/**
- * Computes cosine similarity between two embedding vectors.
- * @param {Float64Array} vectorA - First embedding vector.
- * @param {Float64Array} vectorB - Second embedding vector.
- * @returns {number} - Cosine similarity score.
- */
-export function cosineSimilarity(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must have the same length');
-  }
-
-  let dotProduct = 0;
-  let magnitudeA = 0;
-  let magnitudeB = 0;
-
-  for (let i = 0; i < vectorA.length; i++) {
-    dotProduct += vectorA[i] * vectorB[i];
-    magnitudeA += vectorA[i] ** 2;
-    magnitudeB += vectorB[i] ** 2;
-  }
-
-  magnitudeA = Math.sqrt(magnitudeA);
-  magnitudeB = Math.sqrt(magnitudeB);
-
-  return dotProduct / (magnitudeA * magnitudeB);
-}
-
-/**
- * Clears all embeddings from the in-memory store.
- */
-export function clearStore() {
-  inMemoryStore.clear();
-}
-
-/**
- * Retrieves all stored embedding IDs.
- * @returns {string[]} - Array of all embedding IDs.
- */
-export function listEmbeddingIDs() {
-  return Array.from(inMemoryStore.keys());
-}
+// Example usage:
+// const store = new InMemoryVectorStore();
+// store.addVector([1, 2, 3]);
+// store.addVector([4, 5, 6]);
+// console.log(store.getNearestNeighbor([2, 3, 4]));

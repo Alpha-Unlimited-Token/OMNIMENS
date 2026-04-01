@@ -1,0 +1,116 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-04-01T22:16:49.378Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Complete ES module code here
+
+import { createHash } from 'crypto';
+
+/**
+ * Utility module for in-memory storage and retrieval of vector embeddings using HNSW.
+ * Provides approximate nearest neighbor search capabilities.
+ */
+
+// Helper function to compute Euclidean distance between two vectors
+export function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same dimensionality.');
+  }
+  return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0));
+}
+
+// Generate a unique ID for a vector based on its content
+export function generateVectorId(vector) {
+  const hash = createHash('sha256');
+  hash.update(vector.join(','));
+  return hash.digest('hex');
+}
+
+// HNSW Node class representing a single point in the graph
+class HNSWNode {
+  constructor(id, vector) {
+    this.id = id;
+    this.vector = vector;
+    this.neighbors = new Map(); // Map of level -> array of neighbor IDs
+  }
+}
+
+// HNSW Graph class for managing nodes and performing approximate nearest neighbor search
+class HNSWGraph {
+  constructor(maxNeighbors = 16, efConstruction = 200) {
+    this.nodes = new Map(); // Map of vector ID -> HNSWNode
+    this.maxNeighbors = maxNeighbors; // Max neighbors per level
+    this.efConstruction = efConstruction; // Exploration factor during construction
+  }
+
+  addNode(vector) {
+    const id = generateVectorId(vector);
+    if (this.nodes.has(id)) {
+      throw new Error('Vector already exists in the graph.');
+    }
+    const newNode = new HNSWNode(id, vector);
+    this.nodes.set(id, newNode);
+    
+    if (this.nodes.size > 1) {
+      this._connectNode(newNode);
+    }
+    return id;
+  }
+
+  _connectNode(newNode) {
+    const candidates = Array.from(this.nodes.values());
+    const distances = candidates.map(node => ({
+      node,
+      distance: euclideanDistance(newNode.vector, node.vector)
+    }));
+
+    distances.sort((a, b) => a.distance - b.distance);
+    const neighbors = distances.slice(0, this.maxNeighbors).map(d => d.node);
+
+    for (const neighbor of neighbors) {
+      newNode.neighbors.set(0, [...(newNode.neighbors.get(0) || []), neighbor.id]);
+      neighbor.neighbors.set(0, [...(neighbor.neighbors.get(0) || []), newNode.id]);
+    }
+  }
+
+  search(vector, k = 1) {
+    if (this.nodes.size === 0) {
+      return [];
+    }
+
+    const candidates = Array.from(this.nodes.values());
+    const distances = candidates.map(node => ({
+      id: node.id,
+      distance: euclideanDistance(vector, node.vector)
+    }));
+
+    distances.sort((a, b) => a.distance - b.distance);
+    return distances.slice(0, k).map(d => ({ id: d.id, distance: d.distance }));
+  }
+}
+
+// Exported instance of the HNSWGraph
+export const inMemoryVectorStore = new HNSWGraph();
+
+// Exported utility functions for external use
+export function addVectorToStore(vector) {
+  return inMemoryVectorStore.addNode(vector);
+}
+
+export function searchNearestNeighbors(vector, k = 1) {
+  return inMemoryVectorStore.search(vector, k);
+}

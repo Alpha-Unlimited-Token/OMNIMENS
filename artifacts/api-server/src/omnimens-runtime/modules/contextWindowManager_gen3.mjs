@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: contextWindowManager
- * Written: 2026-04-01T22:00:30.290Z
+ * Written: 2026-04-01T22:21:43.447Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,109 +16,97 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
+/**
+ * TRANSLATION STATUS:
+ * Novel constructs: attention
+ * All constructs have translation mappings
+ * Compiled targets: javascript: OK (4 IR steps) | python: OK (4 IR steps) | c: OK (4 IR steps) | x86_64: OK (4 IR steps) | arm64: OK (4 IR steps) | avr: OK (4 IR steps)
+ * Translation map version: 22
+ */
 // contextWindowManager.mjs
 
-import crypto from 'crypto';
+import { createHash } from 'crypto';
 
 /**
- * Splits a long text into smaller chunks using a sliding window approach.
- * Dynamically adjusts overlap based on semantic importance.
+ * Generates a hash for a string to uniquely identify context segments.
+ * @param {string} input - The input string to hash.
+ * @returns {string} - A SHA-256 hash of the input string.
  */
-
-// Utility to calculate semantic importance using a simple hash-based heuristic
-function calculateSemanticImportance(text) {
-  const hash = crypto.createHash('sha256').update(text).digest('hex');
-  const numericValue = parseInt(hash.slice(0, 8), 16); // Use first 8 hex chars
-  return numericValue % 100; // Normalize importance to a scale of 0-99
+export function generateHash(input) {
+  const hash = createHash('sha256');
+  hash.update(input);
+  return hash.digest('hex');
 }
 
 /**
- * Splits text into overlapping chunks based on dynamic overlap adjustment.
- * @param {string} text - The full text to segment.
- * @param {number} chunkSize - The size of each chunk.
- * @param {number} baseOverlap - The minimum overlap between chunks.
- * @returns {Array<string>} - Array of segmented chunks.
+ * Extracts key phrases from text using a simple frequency-based attention mechanism.
+ * @param {string} text - The input text.
+ * @param {number} threshold - Minimum frequency for a word to be considered a key phrase.
+ * @returns {Array<string>} - Array of key phrases.
  */
-export function segmentTextWithDynamicOverlap(text, chunkSize = 200, baseOverlap = 50) {
-  if (chunkSize <= baseOverlap) {
-    throw new Error("chunkSize must be greater than baseOverlap");
+export function extractKeyPhrases(text, threshold = 2) {
+  const words = text.toLowerCase().match(/\b\w+\b/g) || [];
+  const frequencyMap = new Map();
+
+  for (const word of words) {
+    frequencyMap.set(word, (frequencyMap.get(word) || 0) + 1);
   }
 
-  const chunks = [];
-  let start = 0;
-
-  while (start < text.length) {
-    const end = Math.min(start + chunkSize, text.length);
-    const chunk = text.slice(start, end);
-
-    // Calculate semantic importance of the current chunk
-    const importance = calculateSemanticImportance(chunk);
-
-    // Adjust overlap dynamically (higher importance -> larger overlap)
-    const dynamicOverlap = Math.min(baseOverlap + Math.floor(importance / 10), chunkSize - 1);
-
-    chunks.push(chunk);
-
-    // Slide window forward
-    start += chunkSize - dynamicOverlap;
-  }
-
-  return chunks;
+  return Array.from(frequencyMap.entries())
+    .filter(([_, freq]) => freq >= threshold)
+    .map(([word]) => word);
 }
 
 /**
- * Merges overlapping chunks back into a single text, preserving context.
- * @param {Array<string>} chunks - Array of overlapping text chunks.
- * @returns {string} - Reconstructed text.
+ * Summarizes a text by extracting key phrases and limiting output length.
+ * @param {string} text - The input text to summarize.
+ * @param {number} maxLength - Maximum length of the summary.
+ * @returns {string} - A summarized version of the text.
  */
-export function reconstructTextFromChunks(chunks) {
-  let reconstructedText = "";
-
-  for (let i = 0; i < chunks.length; i++) {
-    const chunk = chunks[i];
-
-    // Avoid duplicate overlap by trimming already-reconstructed parts
-    if (i > 0) {
-      const overlapStart = reconstructedText.lastIndexOf(chunk.slice(0, 10));
-      reconstructedText += chunk.slice(overlapStart === -1 ? 0 : overlapStart + 10);
-    } else {
-      reconstructedText += chunk;
-    }
-  }
-
-  return reconstructedText;
+export function summarizeText(text, maxLength = 200) {
+  const keyPhrases = extractKeyPhrases(text);
+  const summary = keyPhrases.join(', ');
+  return summary.length > maxLength ? summary.slice(0, maxLength - 3) + '...' : summary;
 }
 
 /**
- * Utility function to calculate average semantic importance of a text.
- * @param {string} text - Input text.
- * @returns {number} - Average semantic importance.
+ * Manages context using a sliding window and hierarchical summarization.
+ * @param {Array<string>} conversation - Array of conversation segments.
+ * @param {number} windowSize - Number of segments to include in the sliding window.
+ * @returns {Array<{hash, summary}>} - Array of summarized context segments with hashes.
  */
-export function calculateAverageImportance(text) {
-  const chunks = segmentTextWithDynamicOverlap(text, 200, 50);
-  const importanceValues = chunks.map(calculateSemanticImportance);
-  const totalImportance = importanceValues.reduce((sum, val) => sum + val, 0);
-  return totalImportance / importanceValues.length;
+export function manageContextWindow(conversation, windowSize = 5) {
+  const contextSummaries = [];
+
+  for (let i = 0; i < conversation.length; i++) {
+    const windowStart = Math.max(0, i - windowSize + 1);
+    const windowEnd = i + 1;
+    const windowSegments = conversation.slice(windowStart, windowEnd);
+    const concatenatedWindow = windowSegments.join(' ');
+    const summary = summarizeText(concatenatedWindow);
+    const hash = generateHash(concatenatedWindow);
+
+    contextSummaries.push({ hash, summary });
+  }
+
+  return contextSummaries;
 }
 
 /**
- * Utility function to validate input text and parameters.
- * @param {string} text - Input text.
- * @param {number} chunkSize - Chunk size.
- * @param {number} overlap - Overlap size.
- * @returns {boolean} - Validation result.
+ * Utility to merge multiple context summaries into a hierarchical summary.
+ * @param {Array<string>} summaries - Array of summarized strings.
+ * @returns {string} - A single hierarchical summary.
  */
-export function validateParameters(text, chunkSize, overlap) {
-  if (typeof text !== 'string' || text.length === 0) {
-    return false;
-  }
-  if (typeof chunkSize !== 'number' || chunkSize <= 0) {
-    return false;
-  }
-  if (typeof overlap !== 'number' || overlap < 0 || overlap >= chunkSize) {
-    return false;
-  }
-  return true;
+export function mergeSummaries(summaries) {
+  const concatenatedSummaries = summaries.join(' ');
+  return summarizeText(concatenatedSummaries);
 }
 
-export const moduleDescription = "Handles long texts by segmenting them into smaller, overlapping chunks using dynamic overlap adjustment based on semantic importance.";
+/**
+ * Validates input data for conversation context.
+ * @param {Array<string>} conversation - Array of conversation segments.
+ * @returns {boolean} - True if valid, false otherwise.
+ */
+export function validateConversation(conversation) {
+  return Array.isArray(conversation) && conversation.every(segment => typeof segment === 'string');
+}

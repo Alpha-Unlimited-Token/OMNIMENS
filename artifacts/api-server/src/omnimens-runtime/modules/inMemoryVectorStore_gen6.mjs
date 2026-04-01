@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-04-01T22:00:19.813Z
+ * Written: 2026-04-01T22:16:40.519Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -20,88 +20,132 @@
 
 import { createHash } from 'crypto';
 
-// Utility: Calculate Euclidean distance between two vectors
-export function calculateEuclideanDistance(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must have the same dimensions');
-  }
-  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
-}
-
-// Utility: Normalize a vector to unit length
-export function normalizeVector(vector) {
-  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
-  if (magnitude === 0) {
-    throw new Error('Cannot normalize a zero vector');
-  }
-  return vector.map(val => val / magnitude);
-}
-
-// Core: In-memory vector store with approximate nearest neighbor search
-export function createInMemoryVectorStore(dimensions, maxCapacity = 1000) {
-  if (!Number.isInteger(dimensions) || dimensions <= 0) {
-    throw new Error('Dimensions must be a positive integer');
-  }
-  if (!Number.isInteger(maxCapacity) || maxCapacity <= 0) {
-    throw new Error('Max capacity must be a positive integer');
-  }
-
-  const vectors = new Map();
-  const ids = new Set();
-
-  // Add a vector to the store
-  function addVector(id, vector) {
-    if (ids.has(id)) {
-      throw new Error(`ID '${id}' already exists in the store`);
-    }
-    if (vector.length !== dimensions) {
-      throw new Error(`Vector must have ${dimensions} dimensions`);
-    }
-    if (vectors.size >= maxCapacity) {
-      throw new Error('Vector store is at maximum capacity');
-    }
-    vectors.set(id, normalizeVector(vector));
-    ids.add(id);
-  }
-
-  // Remove a vector by ID
-  function removeVector(id) {
-    if (!ids.has(id)) {
-      throw new Error(`ID '${id}' does not exist in the store`);
-    }
-    vectors.delete(id);
-    ids.delete(id);
-  }
-
-  // Find the nearest neighbors for a given query vector
-  function findNearestNeighbors(queryVector, k = 1) {
-    if (queryVector.length !== dimensions) {
-      throw new Error(`Query vector must have ${dimensions} dimensions`);
-    }
-    if (!Number.isInteger(k) || k <= 0) {
-      throw new Error('k must be a positive integer');
-    }
-    const normalizedQuery = normalizeVector(queryVector);
-    const distances = Array.from(vectors.entries()).map(([id, vector]) => ({
-      id,
-      distance: calculateEuclideanDistance(normalizedQuery, vector)
-    }));
-    distances.sort((a, b) => a.distance - b.distance);
-    return distances.slice(0, k);
-  }
-
-  return {
-    addVector,
-    removeVector,
-    findNearestNeighbors,
-    size: () => vectors.size,
-    capacity: () => maxCapacity
-  };
-}
-
-// Utility: Generate a unique hash-based ID for a vector
-export function generateVectorID(vector) {
+/**
+ * Generates a unique hash for a vector to ensure uniqueness in indexing.
+ * @param {number[]} vector - The input vector.
+ * @returns {string} - A unique hash string.
+ */
+export function generateVectorHash(vector) {
   const hash = createHash('sha256');
   hash.update(vector.join(','));
   return hash.digest('hex');
+}
+
+/**
+ * Calculates the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number} - The Euclidean distance.
+ */
+export function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same dimensions.');
+  }
+  return Math.sqrt(
+    vectorA.reduce((sum, value, index) => sum + Math.pow(value - vectorB[index], 2), 0)
+  );
+}
+
+/**
+ * KD-tree node structure.
+ * @typedef {Object} KDTreeNode
+ * @property {number[]} point - The vector stored at this node.
+ * @property {KDTreeNode|null} left - Left child node.
+ * @property {KDTreeNode|null} right - Right child node.
+ */
+
+/**
+ * Builds a KD-tree for efficient nearest neighbor search.
+ * @param {number[][]} points - Array of vectors.
+ * @param {number} depth - Current depth in the tree.
+ * @returns {KDTreeNode|null} - Root node of the KD-tree.
+ */
+export function buildKDTree(points, depth = 0) {
+  if (points.length === 0) return null;
+
+  const axis = depth % points[0].length;
+  points.sort((a, b) => a[axis] - b[axis]);
+
+  const medianIndex = Math.floor(points.length / 2);
+
+  return {
+    point: points[medianIndex],
+    left: buildKDTree(points.slice(0, medianIndex), depth + 1),
+    right: buildKDTree(points.slice(medianIndex + 1), depth + 1)
+  };
+}
+
+/**
+ * Searches for the nearest neighbor in a KD-tree.
+ * @param {KDTreeNode|null} node - Current KD-tree node.
+ * @param {number[]} target - Target vector.
+ * @param {number} depth - Current depth in the tree.
+ * @param {Object} best - Best match found so far.
+ * @returns {Object} - Best match with point and distance.
+ */
+export function nearestNeighborSearch(node, target, depth = 0, best = { point: null, distance: Infinity }) {
+  if (!node) return best;
+
+  const axis = depth % target.length;
+  const distance = euclideanDistance(target, node.point);
+
+  if (distance < best.distance) {
+    best = { point: node.point, distance };
+  }
+
+  const nextBranch = target[axis] < node.point[axis] ? node.left : node.right;
+  const otherBranch = target[axis] < node.point[axis] ? node.right : node.left;
+
+  best = nearestNeighborSearch(nextBranch, target, depth + 1, best);
+
+  if (Math.abs(target[axis] - node.point[axis]) < best.distance) {
+    best = nearestNeighborSearch(otherBranch, target, depth + 1, best);
+  }
+
+  return best;
+}
+
+/**
+ * Stores vectors in memory and provides KD-tree-based search capabilities.
+ */
+export class InMemoryVectorStore {
+  constructor() {
+    this.vectors = [];
+    this.tree = null;
+  }
+
+  /**
+   * Adds a vector to the store and rebuilds the KD-tree.
+   * @param {number[]} vector - The vector to add.
+   */
+  addVector(vector) {
+    this.vectors.push(vector);
+    this.tree = buildKDTree(this.vectors);
+  }
+
+  /**
+   * Finds the nearest neighbor to a given vector.
+   * @param {number[]} queryVector - The vector to search for.
+   * @returns {Object} - Nearest neighbor with point and distance.
+   */
+  findNearestNeighbor(queryVector) {
+    if (!this.tree) {
+      throw new Error('No vectors stored. Add vectors before searching.');
+    }
+    return nearestNeighborSearch(this.tree, queryVector);
+  }
+}
+
+// Example utility function for multiple agents
+/**
+ * Normalizes a vector to unit length.
+ * @param {number[]} vector - The vector to normalize.
+ * @returns {number[]} - The normalized vector.
+ */
+export function normalizeVector(vector) {
+  const magnitude = Math.sqrt(vector.reduce((sum, value) => sum + value * value, 0));
+  if (magnitude === 0) {
+    throw new Error('Cannot normalize a zero vector.');
+  }
+  return vector.map(value => value / magnitude);
 }

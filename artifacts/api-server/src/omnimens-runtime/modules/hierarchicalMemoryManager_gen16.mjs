@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: hierarchicalMemoryManager
- * Written: 2026-04-01T22:03:25.447Z
+ * Written: 2026-04-01T22:19:44.357Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,107 +18,118 @@
 
 // hierarchicalMemoryManager.mjs
 
-import { createHash } from 'crypto';
+import crypto from 'crypto';
 
-/**
- * Generates a hash for a given string to ensure unique identifiers for memory clusters.
- * @param {string} input - The input string to hash.
- * @returns {string} - A SHA-256 hash of the input.
- */
-export function generateHash(input) {
-  const hash = createHash('sha256');
-  hash.update(input);
-  return hash.digest('hex');
+// Utility to create unique IDs for memory nodes
+export function generateUniqueId() {
+  return crypto.randomUUID();
 }
 
-/**
- * Clusters an array of items into groups based on a similarity function.
- * @param {Array} items - The array of items to cluster.
- * @param {function} similarityFunction - A function that takes two items and returns a similarity score (0-1).
- * @returns {Array} - An array of clusters, each cluster being an array of items.
- */
-export function clusterItems(items, similarityFunction) {
-  const clusters = [];
+// Core hierarchical memory structure
+const memoryHierarchy = new Map(); // Root-level memory
 
-  for (const item of items) {
-    let addedToCluster = false;
+// Add a memory node to the hierarchy
+export function addMemoryNode(parentId, data) {
+  const nodeId = generateUniqueId();
+  const node = { id: nodeId, parentId, data, children: [] };
 
-    for (const cluster of clusters) {
-      const similarityScores = cluster.map(clusterItem => similarityFunction(item, clusterItem));
-      const averageSimilarity = similarityScores.reduce((a, b) => a + b, 0) / similarityScores.length;
-
-      if (averageSimilarity > 0.7) { // Threshold for clustering
-        cluster.push(item);
-        addedToCluster = true;
-        break;
-      }
+  if (!parentId) {
+    // Add to root level if no parentId is provided
+    memoryHierarchy.set(nodeId, node);
+  } else {
+    // Add to the parent's children
+    const parent = findMemoryNode(parentId);
+    if (!parent) {
+      throw new Error(`Parent node with ID ${parentId} not found.`);
     }
+    parent.children.push(node);
+  }
 
-    if (!addedToCluster) {
-      clusters.push([item]);
+  return nodeId;
+}
+
+// Retrieve a memory node by ID
+export function findMemoryNode(nodeId) {
+  const stack = [...memoryHierarchy.values()];
+
+  while (stack.length > 0) {
+    const node = stack.pop();
+    if (node.id === nodeId) {
+      return node;
+    }
+    stack.push(...node.children);
+  }
+
+  return null; // Node not found
+}
+
+// Traverse the hierarchy and apply a function to each node
+export function traverseMemoryHierarchy(callback) {
+  const stack = [...memoryHierarchy.values()];
+
+  while (stack.length > 0) {
+    const node = stack.pop();
+    callback(node);
+    stack.push(...node.children);
+  }
+}
+
+// Retrieve all ancestors of a node
+export function getAncestors(nodeId) {
+  const ancestors = [];
+  let currentNode = findMemoryNode(nodeId);
+
+  while (currentNode && currentNode.parentId) {
+    currentNode = findMemoryNode(currentNode.parentId);
+    if (currentNode) {
+      ancestors.push(currentNode);
     }
   }
 
-  return clusters;
+  return ancestors;
 }
 
-/**
- * Summarizes a cluster of items into a single abstract representation.
- * @param {Array} cluster - The cluster of items to summarize.
- * @param {function} summarizerFunction - A function that takes an array of items and returns a summary.
- * @returns {*} - The summary of the cluster.
- */
-export function summarizeCluster(cluster, summarizerFunction) {
-  return summarizerFunction(cluster);
-}
+// Retrieve all descendants of a node
+export function getDescendants(nodeId) {
+  const descendants = [];
+  const node = findMemoryNode(nodeId);
 
-/**
- * Builds hierarchical memory layers from raw context data.
- * @param {Array} contextData - The raw context data to process.
- * @param {function} similarityFunction - A function to measure similarity between items.
- * @param {function} summarizerFunction - A function to summarize clusters.
- * @returns {Array} - Hierarchical memory layers, each layer being an array of summaries.
- */
-export function buildHierarchicalMemory(contextData, similarityFunction, summarizerFunction) {
-  let currentLayer = contextData;
-  const memoryLayers = [];
-
-  while (currentLayer.length > 1) {
-    const clusters = clusterItems(currentLayer, similarityFunction);
-    const summaries = clusters.map(cluster => summarizeCluster(cluster, summarizerFunction));
-    memoryLayers.push(summaries);
-    currentLayer = summaries;
+  if (!node) {
+    throw new Error(`Node with ID ${nodeId} not found.`);
   }
 
-  return memoryLayers;
+  const stack = [...node.children];
+
+  while (stack.length > 0) {
+    const child = stack.pop();
+    descendants.push(child);
+    stack.push(...child.children);
+  }
+
+  return descendants;
 }
 
-/**
- * Example similarity function: computes similarity based on string length difference.
- * @param {string} a - First string.
- * @param {string} b - Second string.
- * @returns {number} - Similarity score (0-1).
- */
-export function exampleSimilarityFunction(a, b) {
-  const maxLength = Math.max(a.length, b.length);
-  const lengthDifference = Math.abs(a.length - b.length);
-  return 1 - (lengthDifference / maxLength);
+// Search for nodes by a matching function
+export function searchMemoryNodes(matchFunction) {
+  const results = [];
+  traverseMemoryHierarchy((node) => {
+    if (matchFunction(node)) {
+      results.push(node);
+    }
+  });
+  return results;
 }
 
-/**
- * Example summarizer function: concatenates strings in a cluster.
- * @param {Array} cluster - Array of strings.
- * @returns {string} - Concatenated summary.
- */
-export function exampleSummarizerFunction(cluster) {
-  return cluster.join(' ');
-}
+// Example usage function for testing
+export function exampleUsage() {
+  const rootId = addMemoryNode(null, { name: 'Root Memory' });
+  const child1Id = addMemoryNode(rootId, { name: 'Child 1' });
+  const child2Id = addMemoryNode(rootId, { name: 'Child 2' });
+  addMemoryNode(child1Id, { name: 'Grandchild 1.1' });
+  addMemoryNode(child1Id, { name: 'Grandchild 1.2' });
 
-/**
- * Example usage of the hierarchicalMemoryManager.
- * @param {Array} contextData - Array of strings representing raw context.
- * @returns {Array} - Hierarchical memory layers.
- */
-export function exampleUsage(contextData) {
-  return buildHierarchicalMemory(contextData, exampleSimilarityFunction, exampleSummarizerFunction);
+  const ancestors = getAncestors(child2Id);
+  const descendants = getDescendants(rootId);
+
+  return { ancestors, descendants };
 }

@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-04-01T22:13:19.655Z
+ * Written: 2026-04-01T22:21:27.565Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -17,111 +17,122 @@
  */
 
 // Complete ES module code here
-import { randomFillSync } from 'crypto';
+
+import { createHash } from 'crypto';
 
 /**
- * Generates a random unit vector of the given dimension.
- * @param {number} dim - The dimensionality of the vector.
- * @returns {Float32Array} A normalized random vector.
+ * In-memory vector store for fast embedding retrieval with automatic expiration.
+ * Provides a lightweight, efficient cache for embedding vectors.
  */
-export function generateRandomUnitVector(dim) {
-  const vector = new Float32Array(dim);
-  randomFillSync(vector);
-  let magnitude = 0;
-  for (let i = 0; i < dim; i++) {
-    magnitude += vector[i] * vector[i];
-  }
-  magnitude = Math.sqrt(magnitude);
-  for (let i = 0; i < dim; i++) {
-    vector[i] /= magnitude;
-  }
-  return vector;
+
+const store = new Map();
+const expirationTimes = new Map();
+
+/**
+ * Generates a unique hash key for a given embedding ID.
+ * @param {string} id - The embedding ID.
+ * @returns {string} - A hashed key.
+ */
+export function generateKey(id) {
+  const hash = createHash('sha256');
+  hash.update(id);
+  return hash.digest('hex');
 }
 
 /**
- * Computes the Euclidean distance between two vectors.
- * @param {Float32Array} vec1 - The first vector.
- * @param {Float32Array} vec2 - The second vector.
- * @returns {number} The Euclidean distance.
+ * Adds a vector to the in-memory store with an optional expiration time.
+ * @param {string} id - The embedding ID.
+ * @param {Array<number>} vector - The embedding vector.
+ * @param {number} ttl - Time-to-live in milliseconds (default: 60000 ms).
  */
-export function euclideanDistance(vec1, vec2) {
-  if (vec1.length !== vec2.length) {
-    throw new Error('Vectors must have the same dimension.');
-  }
-  let sum = 0;
-  for (let i = 0; i < vec1.length; i++) {
-    const diff = vec1[i] - vec2[i];
-    sum += diff * diff;
-  }
-  return Math.sqrt(sum);
+export function setVector(id, vector, ttl = 60000) {
+  const key = generateKey(id);
+  const expiration = Date.now() + ttl;
+
+  store.set(key, vector);
+  expirationTimes.set(key, expiration);
+
+  // Schedule cleanup for expired entries
+  setTimeout(() => {
+    if (Date.now() >= expiration) {
+      store.delete(key);
+      expirationTimes.delete(key);
+    }
+  }, ttl);
 }
 
 /**
- * In-memory vector store for fast similarity search using naive linear scan.
- * @class
+ * Retrieves a vector from the in-memory store by its embedding ID.
+ * @param {string} id - The embedding ID.
+ * @returns {Array<number>|null} - The embedding vector or null if not found or expired.
  */
-export class InMemoryVectorStore {
-  constructor(dim) {
-    if (!Number.isInteger(dim) || dim <= 0) {
-      throw new Error('Dimension must be a positive integer.');
-    }
-    this.dim = dim;
-    this.vectors = [];
-    this.metadata = [];
+export function getVector(id) {
+  const key = generateKey(id);
+  const expiration = expirationTimes.get(key);
+
+  if (!expiration || Date.now() > expiration) {
+    store.delete(key);
+    expirationTimes.delete(key);
+    return null;
   }
 
-  /**
-   * Adds a vector and its associated metadata to the store.
-   * @param {Float32Array} vector - The vector to add.
-   * @param {any} meta - Metadata associated with the vector.
-   */
-  add(vector, meta) {
-    if (!(vector instanceof Float32Array) || vector.length !== this.dim) {
-      throw new Error(`Vector must be a Float32Array of dimension ${this.dim}.`);
-    }
-    this.vectors.push(vector);
-    this.metadata.push(meta);
-  }
-
-  /**
-   * Finds the nearest neighbors to a given query vector.
-   * @param {Float32Array} query - The query vector.
-   * @param {number} k - The number of nearest neighbors to retrieve.
-   * @returns {Array<{ vector, meta, distance}>} An array of nearest neighbors.
-   */
-  search(query, k) {
-    if (!(query instanceof Float32Array) || query.length !== this.dim) {
-      throw new Error(`Query must be a Float32Array of dimension ${this.dim}.`);
-    }
-    if (!Number.isInteger(k) || k <= 0) {
-      throw new Error('k must be a positive integer.');
-    }
-
-    const results = [];
-    for (let i = 0; i < this.vectors.length; i++) {
-      const distance = euclideanDistance(query, this.vectors[i]);
-      results.push({ vector: this.vectors[i], meta: this.metadata[i], distance });
-    }
-
-    results.sort((a, b) => a.distance - b.distance);
-    return results.slice(0, k);
-  }
+  return store.get(key) || null;
 }
 
 /**
- * Utility function to normalize a vector.
- * @param {Float32Array} vector - The vector to normalize.
- * @returns {Float32Array} A normalized vector.
+ * Deletes a vector from the in-memory store by its embedding ID.
+ * @param {string} id - The embedding ID.
+ * @returns {boolean} - True if the vector was deleted, false otherwise.
  */
-export function normalizeVector(vector) {
-  let magnitude = 0;
-  for (let i = 0; i < vector.length; i++) {
-    magnitude += vector[i] * vector[i];
+export function deleteVector(id) {
+  const key = generateKey(id);
+  const existed = store.delete(key);
+  expirationTimes.delete(key);
+  return existed;
+}
+
+/**
+ * Clears all vectors and expiration times from the in-memory store.
+ */
+export function clearStore() {
+  store.clear();
+  expirationTimes.clear();
+}
+
+/**
+ * Retrieves the current size of the in-memory store.
+ * @returns {number} - The number of stored vectors.
+ */
+export function getStoreSize() {
+  return store.size;
+}
+
+/**
+ * Retrieves all keys currently in the store (for debugging or inspection).
+ * @returns {Array<string>} - List of all embedding IDs (hashed).
+ */
+export function getAllKeys() {
+  return Array.from(store.keys());
+}
+
+/**
+ * Calculates the cosine similarity between two vectors.
+ * @param {Array<number>} vectorA - The first vector.
+ * @param {Array<number>} vectorB - The second vector.
+ * @returns {number} - The cosine similarity (range: -1 to 1).
+ */
+export function cosineSimilarity(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same length');
   }
-  magnitude = Math.sqrt(magnitude);
-  const normalized = new Float32Array(vector.length);
-  for (let i = 0; i < vector.length; i++) {
-    normalized[i] = vector[i] / magnitude;
+
+  const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
+
+  if (magnitudeA === 0 || magnitudeB === 0) {
+    return 0; // Avoid division by zero
   }
-  return normalized;
+
+  return dotProduct / (magnitudeA * magnitudeB);
 }

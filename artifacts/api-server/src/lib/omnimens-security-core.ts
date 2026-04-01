@@ -1275,7 +1275,7 @@ function createBackup(): void {
     const backupFile = path.join(BACKUP_DIR, `ethical-safety-backup-${timestamp}.json`);
     fs.writeFileSync(backupFile, JSON.stringify({
       laws: ETHICAL_LAWS,
-      state: { ...state },
+      state: { ...ethical_safety_state },
       timestamp: Date.now(),
       isoDate: new Date().toISOString(),
       fileChecksum: ethical_safety_state.fileChecksum,

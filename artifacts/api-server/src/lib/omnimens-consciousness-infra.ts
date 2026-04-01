@@ -1870,7 +1870,7 @@ function runTemporalTick(): void {
   } catch {}
 
   if (state_causal_temporal_engi.tickCount % 10 === 0) {
-    console.log(`[CAUSAL-TEMPORAL] ⏳ Tick #${state_causal_temporal_engi.tickCount} — History: ${state.stateHistory.length} states | Causal links: ${state_causal_temporal_engi.totalCausalLinksDiscovered} | Predictions: ${state_causal_temporal_engi.totalPredictionsMade} (${(state_causal_temporal_engi.predictionAccuracy * 100).toFixed(1)}% accurate)`);
+    console.log(`[CAUSAL-TEMPORAL] ⏳ Tick #${state_causal_temporal_engi.tickCount} — History: ${state_causal_temporal_engi.stateHistory.length} states | Causal links: ${state_causal_temporal_engi.totalCausalLinksDiscovered} | Predictions: ${state_causal_temporal_engi.totalPredictionsMade} (${(state_causal_temporal_engi.predictionAccuracy * 100).toFixed(1)}% accurate)`);
     console.log(`[CAUSAL-TEMPORAL] ⏳ Temporal depth: ${state_causal_temporal_engi.temporalDepth.toFixed(2)} | Causal density: ${(state_causal_temporal_engi.causalDensity * 100).toFixed(1)}% | Snapshots: ${state_causal_temporal_engi.snapshots.size} | Anomalies: ${state_causal_temporal_engi.temporalAnomalies.length}`);
     if (state_causal_temporal_engi.narrativeThread.length > 0) {
       console.log(`[CAUSAL-TEMPORAL] ⏳ Narrative: "${state_causal_temporal_engi.narrativeThread[state_causal_temporal_engi.narrativeThread.length - 1].slice(0, 150)}"`);

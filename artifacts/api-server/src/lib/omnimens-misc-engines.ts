@@ -921,7 +921,7 @@ function spontaneityTick(): void {
   spontaneity_engine_state.tickCount++;
   spontaneity_engine_state.uptime = Date.now() - startTime;
 
-  const prevAttractor = { ...state.attractor };
+  const prevAttractor = { ...spontaneity_engine_state.attractor };
 
   const dt = 0.005 + (Math.random() * 0.005);
   spontaneity_engine_state.attractor = lorenzStep(spontaneity_engine_state.attractor, dt, 10, spontaneity_engine_state.chaosParameter, 8 / 3);

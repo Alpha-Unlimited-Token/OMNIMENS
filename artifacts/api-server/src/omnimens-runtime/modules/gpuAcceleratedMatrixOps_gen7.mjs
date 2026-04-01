@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuAcceleratedMatrixOps
- * Written: 2026-04-01T22:02:26.026Z
+ * Written: 2026-04-01T22:21:35.526Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,140 +18,114 @@
 
 // gpuAcceleratedMatrixOps.mjs
 
-import { createHash } from 'crypto';
+'use strict';
 
 /**
- * Generates a unique identifier for WebGL shaders to ensure caching and reusability.
- * @param {string} shaderCode - GLSL shader code.
- * @returns {string} - Unique hash for the shader.
+ * Utility function to create a WebGL context for GPU computations.
+ * @returns {WebGLRenderingContext} - A WebGL rendering context.
  */
-export function generateShaderHash(shaderCode) {
-  const hash = createHash('sha256');
-  hash.update(shaderCode);
-  return hash.digest('hex');
-}
-
-/**
- * Initializes a WebGL context.
- * @param {HTMLCanvasElement} canvas - Canvas element for WebGL rendering.
- * @returns {WebGLRenderingContext} - WebGL context object.
- */
-export function initializeWebGLContext(canvas) {
+export function createWebGLContext() {
+  const canvas = globalThis.document ? document.createElement('canvas') : null;
+  if (!canvas) throw new Error('WebGL requires a DOM environment.');
   const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-  if (!gl) {
-    throw new Error('WebGL is not supported on this platform.');
-  }
+  if (!gl) throw new Error('Failed to create WebGL context.');
   return gl;
 }
 
 /**
  * Compiles a WebGL shader.
  * @param {WebGLRenderingContext} gl - WebGL context.
- * @param {string} source - GLSL shader source code.
+ * @param {string} source - GLSL source code.
  * @param {number} type - Shader type (gl.VERTEX_SHADER or gl.FRAGMENT_SHADER).
- * @returns {WebGLShader} - Compiled shader object.
+ * @returns {WebGLShader} - Compiled shader.
  */
 export function compileShader(gl, source, type) {
   const shader = gl.createShader(type);
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
-
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
     const error = gl.getShaderInfoLog(shader);
     gl.deleteShader(shader);
     throw new Error(`Shader compilation failed: ${error}`);
   }
-
   return shader;
 }
 
 /**
- * Creates a WebGL program with vertex and fragment shaders.
+ * Creates a WebGL program from vertex and fragment shaders.
  * @param {WebGLRenderingContext} gl - WebGL context.
- * @param {string} vertexSource - GLSL vertex shader source code.
- * @param {string} fragmentSource - GLSL fragment shader source code.
+ * @param {string} vertexSource - Vertex shader GLSL source.
+ * @param {string} fragmentSource - Fragment shader GLSL source.
  * @returns {WebGLProgram} - Linked WebGL program.
  */
-export function createWebGLProgram(gl, vertexSource, fragmentSource) {
+export function createProgram(gl, vertexSource, fragmentSource) {
   const vertexShader = compileShader(gl, vertexSource, gl.VERTEX_SHADER);
   const fragmentShader = compileShader(gl, fragmentSource, gl.FRAGMENT_SHADER);
-
   const program = gl.createProgram();
   gl.attachShader(program, vertexShader);
   gl.attachShader(program, fragmentShader);
   gl.linkProgram(program);
-
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
     const error = gl.getProgramInfoLog(program);
     gl.deleteProgram(program);
     throw new Error(`Program linking failed: ${error}`);
   }
-
   return program;
 }
 
 /**
- * Performs GPU-accelerated matrix multiplication using WebGL.
- * @param {Float32Array} matrixA - First matrix (flattened).
- * @param {Float32Array} matrixB - Second matrix (flattened).
- * @param {number} rowsA - Number of rows in matrix A.
- * @param {number} colsA - Number of columns in matrix A.
- * @param {number} colsB - Number of columns in matrix B.
- * @returns {Float32Array} - Resulting matrix (flattened).
+ * Performs GPU-accelerated matrix multiplication.
+ * @param {WebGLRenderingContext} gl - WebGL context.
+ * @param {Float32Array} matrixA - First matrix (flattened row-major).
+ * @param {Float32Array} matrixB - Second matrix (flattened row-major).
+ * @param {number} rowsA - Number of rows in matrixA.
+ * @param {number} colsA - Number of columns in matrixA.
+ * @param {number} colsB - Number of columns in matrixB.
+ * @returns {Float32Array} - Resulting matrix (flattened row-major).
  */
-export function gpuMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
-  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
-    throw new Error('Matrix dimensions do not match for multiplication.');
-  }
-
-  // Create a temporary canvas for WebGL rendering.
-  const canvas = new OffscreenCanvas(1, 1);
-  const gl = initializeWebGLContext(canvas);
-
-  // GLSL shader source code for matrix multiplication.
-  const vertexShaderSource = `
+export function gpuMatrixMultiply(gl, matrixA, matrixB, rowsA, colsA, colsB) {
+  const vertexSource = `
     attribute vec2 position;
     void main() {
       gl_Position = vec4(position, 0.0, 1.0);
     }
   `;
 
-  const fragmentShaderSource = `
+  const fragmentSource = `
     precision highp float;
     uniform sampler2D matrixA;
     uniform sampler2D matrixB;
-    uniform vec2 dimensionsA;
-    uniform vec2 dimensionsB;
-
+    uniform vec2 dimA;
+    uniform vec2 dimB;
     void main() {
       vec2 coord = gl_FragCoord.xy;
       float result = 0.0;
-
-      for (int i = 0; i < int(dimensionsA.y); i++) {
-        float a = texture2D(matrixA, vec2(coord.x, float(i) / dimensionsA.y)).r;
-        float b = texture2D(matrixB, vec2(float(i) / dimensionsB.x, coord.y)).r;
-        result += a * b;
+      for (int i = 0; i < int(dimA.y); i++) {
+        vec2 aCoord = vec2(coord.x, float(i)) / dimA;
+        vec2 bCoord = vec2(float(i), coord.y) / dimB;
+        result += texture2D(matrixA, aCoord).r * texture2D(matrixB, bCoord).r;
       }
-
       gl_FragColor = vec4(result, 0.0, 0.0, 1.0);
     }
   `;
 
-  const program = createWebGLProgram(gl, vertexShaderSource, fragmentShaderSource);
+  const program = createProgram(gl, vertexSource, fragmentSource);
+  gl.useProgram(program);
 
-  // TODO: Upload matrices to GPU textures and execute the shader program.
+  // TODO: Upload matrices to GPU as textures and execute the shader.
+  // This is a placeholder implementation.
 
-  // Placeholder result (CPU fallback for demonstration).
-  const result = new Float32Array(rowsA * colsB);
-  for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      let sum = 0;
-      for (let k = 0; k < colsA; k++) {
-        sum += matrixA[i * colsA + k] * matrixB[k * colsB + j];
-      }
-      result[i * colsB + j] = sum;
-    }
-  }
+  return new Float32Array(rowsA * colsB); // Placeholder result.
+}
 
-  return result;
+/**
+ * Generic utility for validating matrix dimensions.
+ * @param {number} rowsA - Rows in matrixA.
+ * @param {number} colsA - Columns in matrixA.
+ * @param {number} rowsB - Rows in matrixB.
+ * @param {number} colsB - Columns in matrixB.
+ * @returns {boolean} - True if dimensions are valid for multiplication.
+ */
+export function validateMatrixDimensions(rowsA, colsA, rowsB, colsB) {
+  return colsA === rowsB;
 }

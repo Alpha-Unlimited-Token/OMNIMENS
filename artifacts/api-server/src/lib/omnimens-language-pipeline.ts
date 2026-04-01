@@ -8430,7 +8430,7 @@ export function mustTranslateBeforeExecution(code: string): { needsTranslation: 
 }
 
 export function getTranslatorState(): TranslatorState {
-  return { ...state };
+  return { ...universal_translator_state };
 }
 
 export function getCustomConstructMap(): Array<{ name: string; description: string; targets: string[] }> {

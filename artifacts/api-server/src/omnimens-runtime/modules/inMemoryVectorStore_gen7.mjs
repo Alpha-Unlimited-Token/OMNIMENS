@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-04-01T22:09:00.999Z
+ * Written: 2026-04-01T22:21:45.658Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,107 +18,111 @@
 
 // inMemoryVectorStore.mjs
 
-import { createHash } from 'crypto';
-
-/**
- * Hashes a string to generate a consistent ID for embeddings.
- * @param {string} input - The input string to hash.
- * @returns {string} - A fixed-length hash ID.
- */
-export function generateHashId(input) {
-  return createHash('sha256').update(input).digest('hex');
-}
+import { performance } from 'node:perf_hooks';
 
 /**
  * Calculates the Euclidean distance between two vectors.
- * @param {number[]} vec1 - The first vector.
- * @param {number[]} vec2 - The second vector.
- * @returns {number} - The Euclidean distance.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} - Euclidean distance.
  */
-export function calculateDistance(vec1, vec2) {
-  if (vec1.length !== vec2.length) {
-    throw new Error('Vectors must have the same dimensions');
+export function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same dimensions.');
   }
-  return Math.sqrt(vec1.reduce((sum, val, i) => sum + Math.pow(val - vec2[i], 2), 0));
+  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
 }
 
 /**
- * Inserts an embedding into the vector store.
- * @param {Map<string, number[]>} store - The vector store.
- * @param {string} id - The ID of the embedding.
- * @param {number[]} embedding - The embedding vector.
+ * Creates a new HNSW graph for approximate nearest neighbor search.
+ * @param {number} maxNodes - Maximum number of nodes in the graph.
+ * @param {number} maxLinks - Maximum number of links per node.
+ * @returns {object} - HNSW graph instance.
  */
-export function insertEmbedding(store, id, embedding) {
-  if (store.has(id)) {
-    throw new Error('ID already exists in the vector store');
+export function createHNSWGraph(maxNodes = 1000, maxLinks = 16) {
+  const graph = [];
+
+  /**
+   * Adds a vector to the graph.
+   * @param {number[]} vector - Vector to add.
+   */
+  function addNode(vector) {
+    if (graph.length >= maxNodes) {
+      throw new Error('Graph is full. Cannot add more nodes.');
+    }
+    const node = { vector, links: [] };
+    graph.push(node);
+
+    // Connect to nearest neighbors
+    const distances = graph.map((n, index) => ({ index, distance: euclideanDistance(vector, n.vector) }));
+    distances.sort((a, b) => a.distance - b.distance);
+    const nearestNeighbors = distances.slice(1, maxLinks + 1);
+
+    for (const neighbor of nearestNeighbors) {
+      node.links.push(neighbor.index);
+      graph[neighbor.index].links.push(graph.length - 1);
+    }
   }
-  store.set(id, embedding);
+
+  /**
+   * Searches for the nearest neighbors of a given query vector.
+   * @param {number[]} queryVector - Query vector.
+   * @param {number} k - Number of neighbors to return.
+   * @returns {object[]} - Nearest neighbors with distances.
+   */
+  function search(queryVector, k = 1) {
+    if (graph.length === 0) {
+      throw new Error('Graph is empty.');
+    }
+    const visited = new Set();
+    const candidates = graph.map((node, index) => ({ index, distance: euclideanDistance(queryVector, node.vector) }));
+    candidates.sort((a, b) => a.distance - b.distance);
+
+    const results = [];
+    for (const candidate of candidates) {
+      if (visited.size >= k) break;
+      if (!visited.has(candidate.index)) {
+        results.push(candidate);
+        visited.add(candidate.index);
+      }
+    }
+
+    return results;
+  }
+
+  return { addNode, search };
 }
 
 /**
- * Finds the k-nearest neighbors to a query vector.
- * @param {Map<string, number[]>} store - The vector store.
- * @param {number[]} query - The query vector.
- * @param {number} k - The number of neighbors to retrieve.
- * @returns {Array<{ id, distance}>} - The k-nearest neighbors.
+ * Measures the execution time of a function.
+ * @param {function} func - Function to measure.
+ * @param {...any} args - Arguments to pass to the function.
+ * @returns {object} - Result and execution time in milliseconds.
  */
-export function findKNearestNeighbors(store, query, k) {
-  if (k <= 0) {
-    throw new Error('k must be a positive integer');
-  }
-  const distances = [];
-  for (const [id, vector] of store.entries()) {
-    const distance = calculateDistance(query, vector);
-    distances.push({ id, distance });
-  }
-  distances.sort((a, b) => a.distance - b.distance);
-  return distances.slice(0, k);
+export function measureExecutionTime(func, ...args) {
+  const start = performance.now();
+  const result = func(...args);
+  const end = performance.now();
+  return { result, timeMs: end - start };
 }
 
 /**
- * Updates an existing embedding in the vector store.
- * @param {Map<string, number[]>} store - The vector store.
- * @param {string} id - The ID of the embedding to update.
- * @param {number[]} newEmbedding - The new embedding vector.
+ * Generates random vectors for testing.
+ * @param {number} count - Number of vectors.
+ * @param {number} dimensions - Number of dimensions per vector.
+ * @returns {number[][]} - Array of random vectors.
  */
-export function updateEmbedding(store, id, newEmbedding) {
-  if (!store.has(id)) {
-    throw new Error('ID does not exist in the vector store');
-  }
-  store.set(id, newEmbedding);
+export function generateRandomVectors(count, dimensions) {
+  return Array.from({ length: count }, () => Array.from({ length: dimensions }, () => Math.random()));
 }
 
 /**
- * Deletes an embedding from the vector store.
- * @param {Map<string, number[]>} store - The vector store.
- * @param {string} id - The ID of the embedding to delete.
+ * Example usage of the module.
+ * Uncomment below to test in Node.js.
  */
-export function deleteEmbedding(store, id) {
-  if (!store.has(id)) {
-    throw new Error('ID does not exist in the vector store');
-  }
-  store.delete(id);
-}
+// const graph = createHNSWGraph(100, 8);
+// const vectors = generateRandomVectors(50, 3);
+// vectors.forEach((vec) => graph.addNode(vec));
+// const query = [0.5, 0.5, 0.5];
+// console.log(graph.search(query, 5));
 
-/**
- * Retrieves an embedding by ID.
- * @param {Map<string, number[]>} store - The vector store.
- * @param {string} id - The ID of the embedding to retrieve.
- * @returns {number[] | undefined} - The embedding vector or undefined if not found.
- */
-export function getEmbedding(store, id) {
-  return store.get(id);
-}
-
-/**
- * Creates a new in-memory vector store.
- * @returns {Map<string, number[]>} - A new vector store.
- */
-export function createVectorStore() {
-  return new Map();
-}
-
-// Example Usage:
-// const store = createVectorStore();
-// insertEmbedding(store, 'vec1', [1, 2, 3]);
-// console.log(findKNearestNeighbors(store, [1, 2, 3], 1));

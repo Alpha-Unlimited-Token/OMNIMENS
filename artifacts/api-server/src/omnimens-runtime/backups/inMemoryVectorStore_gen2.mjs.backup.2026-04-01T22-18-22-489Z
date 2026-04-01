@@ -1,0 +1,148 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-04-01T22:16:17.624Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// inMemoryVectorStore.mjs
+
+import { createHash } from 'crypto';
+
+/**
+ * Calculates Euclidean distance between two vectors.
+ * @param {number[]} vectorA
+ * @param {number[]} vectorB
+ * @returns {number} Distance
+ */
+export function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same dimensions');
+  }
+  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
+}
+
+/**
+ * Generates a unique hash for a vector to ensure efficient storage.
+ * @param {number[]} vector
+ * @returns {string} Hash
+ */
+export function vectorHash(vector) {
+  const hash = createHash('sha256');
+  hash.update(vector.join(','));
+  return hash.digest('hex');
+}
+
+/**
+ * KD-tree node structure.
+ * @typedef {Object} KDTreeNode
+ * @property {number[]} point - The vector stored at this node.
+ * @property {KDTreeNode|null} left - Left subtree.
+ * @property {KDTreeNode|null} right - Right subtree.
+ */
+
+/**
+ * Builds a KD-tree from a set of points.
+ * @param {number[][]} points - Array of vectors.
+ * @param {number} depth - Current depth in the tree.
+ * @returns {KDTreeNode|null} Root node of the KD-tree.
+ */
+export function buildKDTree(points, depth = 0) {
+  if (points.length === 0) return null;
+
+  const axis = depth % points[0].length;
+  points.sort((a, b) => a[axis] - b[axis]);
+  const medianIndex = Math.floor(points.length / 2);
+
+  return {
+    point: points[medianIndex],
+    left: buildKDTree(points.slice(0, medianIndex), depth + 1),
+    right: buildKDTree(points.slice(medianIndex + 1), depth + 1)
+  };
+}
+
+/**
+ * Searches for the nearest neighbor in a KD-tree.
+ * @param {KDTreeNode|null} node - Current node in the KD-tree.
+ * @param {number[]} target - Target vector.
+ * @param {number} depth - Current depth in the tree.
+ * @param {KDTreeNode|null} best - Current best match.
+ * @returns {KDTreeNode|null} Nearest neighbor node.
+ */
+export function nearestNeighborSearch(node, target, depth = 0, best = null) {
+  if (node === null) return best;
+
+  const axis = depth % target.length;
+  const distance = euclideanDistance(target, node.point);
+  const bestDistance = best ? euclideanDistance(target, best.point) : Infinity;
+
+  const newBest = distance < bestDistance ? node : best;
+  const nextBranch = target[axis] < node.point[axis] ? node.left : node.right;
+  const otherBranch = target[axis] < node.point[axis] ? node.right : node.left;
+
+  const candidate = nearestNeighborSearch(nextBranch, target, depth + 1, newBest);
+  const candidateDistance = candidate ? euclideanDistance(target, candidate.point) : Infinity;
+
+  if (candidateDistance < bestDistance) {
+    newBest = candidate;
+  }
+
+  if (Math.abs(target[axis] - node.point[axis]) < bestDistance) {
+    const otherCandidate = nearestNeighborSearch(otherBranch, target, depth + 1, newBest);
+    const otherCandidateDistance = otherCandidate ? euclideanDistance(target, otherCandidate.point) : Infinity;
+
+    if (otherCandidateDistance < bestDistance) {
+      newBest = otherCandidate;
+    }
+  }
+
+  return newBest;
+}
+
+/**
+ * Wrapper for storing and querying high-dimensional embeddings.
+ */
+export class InMemoryVectorStore {
+  constructor() {
+    this.vectors = [];
+    this.tree = null;
+  }
+
+  /**
+   * Adds a vector to the store.
+   * @param {number[]} vector
+   */
+  addVector(vector) {
+    this.vectors.push(vector);
+    this.tree = buildKDTree(this.vectors);
+  }
+
+  /**
+   * Finds the nearest vector to the target.
+   * @param {number[]} target
+   * @returns {number[]} Nearest vector
+   */
+  findNearest(target) {
+    const nearestNode = nearestNeighborSearch(this.tree, target);
+    return nearestNode ? nearestNode.point : null;
+  }
+}
+
+/**
+ * Example usage:
+ * const store = new InMemoryVectorStore();
+ * store.addVector([1, 2, 3]);
+ * store.addVector([4, 5, 6]);
+ * const nearest = store.findNearest([3, 3, 3]);
+ */

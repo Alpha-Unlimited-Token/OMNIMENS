@@ -1,0 +1,145 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-04-01T22:16:08.354Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Complete ES module code here
+
+import { createHash } from 'crypto';
+
+/**
+ * Generate a hash-based locality-sensitive hash (LSH) bucket for a vector.
+ * @param {number[]} vector - The input vector.
+ * @param {number} numBuckets - Number of hash buckets.
+ * @returns {string} - A hash string representing the bucket.
+ */
+export function generateLSHBucket(vector, numBuckets) {
+  if (!Array.isArray(vector) || vector.length === 0) {
+    throw new Error('Input vector must be a non-empty array of numbers.');
+  }
+  if (!Number.isInteger(numBuckets) || numBuckets <= 0) {
+    throw new Error('Number of buckets must be a positive integer.');
+  }
+
+  const hash = createHash('sha256');
+  const scaledVector = vector.map((val) => Math.round(val * 1e6)); // Scale for precision
+  hash.update(scaledVector.join(','));
+  const fullHash = hash.digest('hex');
+  const bucketIndex = parseInt(fullHash.slice(0, 8), 16) % numBuckets;
+  return bucketIndex.toString();
+}
+
+/**
+ * Compute the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} - The Euclidean distance.
+ */
+export function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same length.');
+  }
+
+  return Math.sqrt(
+    vectorA.reduce((sum, val, idx) => sum + (val - vectorB[idx]) ** 2, 0)
+  );
+}
+
+/**
+ * In-memory vector store with LSH-based indexing.
+ */
+export class InMemoryVectorStore {
+  constructor(numBuckets = 100) {
+    if (!Number.isInteger(numBuckets) || numBuckets <= 0) {
+      throw new Error('Number of buckets must be a positive integer.');
+    }
+    this.numBuckets = numBuckets;
+    this.buckets = new Map(); // Map of bucket -> array of { id, vector }
+  }
+
+  /**
+   * Add a vector to the store.
+   * @param {string} id - Unique identifier for the vector.
+   * @param {number[]} vector - The vector to store.
+   */
+  addVector(id, vector) {
+    if (typeof id !== 'string' || id.trim() === '') {
+      throw new Error('ID must be a non-empty string.');
+    }
+    const bucket = generateLSHBucket(vector, this.numBuckets);
+    if (!this.buckets.has(bucket)) {
+      this.buckets.set(bucket, []);
+    }
+    this.buckets.get(bucket).push({ id, vector });
+  }
+
+  /**
+   * Retrieve the closest vector(s) to the query vector.
+   * @param {number[]} queryVector - The query vector.
+   * @param {number} k - Number of nearest neighbors to retrieve.
+   * @returns {Array<{ id, vector, distance}>} - Closest vectors.
+   */
+  queryNearest(queryVector, k = 1) {
+    if (!Number.isInteger(k) || k <= 0) {
+      throw new Error('k must be a positive integer.');
+    }
+
+    const bucket = generateLSHBucket(queryVector, this.numBuckets);
+    const candidates = this.buckets.get(bucket) || [];
+
+    const sortedCandidates = candidates
+      .map(({ id, vector }) => ({
+        id,
+        vector,
+        distance: euclideanDistance(queryVector, vector)
+      }))
+      .sort((a, b) => a.distance - b.distance);
+
+    return sortedCandidates.slice(0, k);
+  }
+}
+
+/**
+ * Normalize a vector to unit length.
+ * @param {number[]} vector - The input vector.
+ * @returns {number[]} - The normalized vector.
+ */
+export function normalizeVector(vector) {
+  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
+  if (magnitude === 0) {
+    throw new Error('Cannot normalize a zero vector.');
+  }
+  return vector.map((val) => val / magnitude);
+}
+
+/**
+ * Generate random vectors for testing or initialization.
+ * @param {number} dimensions - Number of dimensions.
+ * @param {number} count - Number of vectors to generate.
+ * @returns {number[][]} - Array of random vectors.
+ */
+export function generateRandomVectors(dimensions, count = 1) {
+  if (!Number.isInteger(dimensions) || dimensions <= 0) {
+    throw new Error('Dimensions must be a positive integer.');
+  }
+  if (!Number.isInteger(count) || count <= 0) {
+    throw new Error('Count must be a positive integer.');
+  }
+
+  return Array.from({ length: count }, () =>
+    Array.from({ length: dimensions }, () => Math.random() * 2 - 1)
+  );
+}

@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: hierarchicalMemoryManager
- * Written: 2026-03-24T11:24:29.293Z
+ * Written: 2026-04-01T22:21:31.973Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,131 +18,102 @@
 
 // hierarchicalMemoryManager.mjs
 
-import { createHash } from 'crypto';
+import crypto from 'crypto';
 
 /**
- * Generate a hash for embedding keys using SHA-256.
- * @param {string} key - The key to hash.
- * @returns {string} - The hashed key.
+ * Generate a fixed-size embedding for a given text using a simple hashing mechanism.
+ * @param {string} text - The input text to embed.
+ * @param {number} size - The desired size of the embedding.
+ * @returns {Uint8Array} - The fixed-size embedding as a Uint8Array.
  */
-export function hashKey(key) {
-  return createHash('sha256').update(key).digest('hex');
+export function generateEmbedding(text, size) {
+  const hash = crypto.createHash('sha256').update(text, 'utf8').digest();
+  const embedding = new Uint8Array(size);
+  for (let i = 0; i < size; i++) {
+    embedding[i] = hash[i % hash.length];
+  }
+  return embedding;
 }
 
 /**
- * Partition embeddings into shards based on hash values.
- * @param {Array<Object>} embeddings - Array of embedding objects with { key, vector }.
- * @param {number} numShards - Number of shards to partition into.
- * @returns {Object} - Shard map with shard IDs as keys and embedding arrays as values.
+ * Summarize an array of texts into a single compact representation.
+ * @param {string[]} texts - An array of texts to summarize.
+ * @param {number} embeddingSize - The size of the resulting summary embedding.
+ * @returns {Uint8Array} - The summarized embedding.
  */
-export function createShards(embeddings, numShards) {
-  const shards = {};
-  for (let i = 0; i < numShards; i++) {
-    shards[i] = [];
+export function summarizeTexts(texts, embeddingSize) {
+  const combinedText = texts.join(' ');
+  return generateEmbedding(combinedText, embeddingSize);
+}
+
+/**
+ * Manage hierarchical memory by periodically condensing older context into compact embeddings.
+ * @param {Array<{timestamp, text}>} memory - Array of memory objects with timestamps and text.
+ * @param {number} maxMemorySize - Maximum number of raw memory entries to retain.
+ * @param {number} embeddingSize - Size of the compact embeddings.
+ * @returns {Array<{timestamp, embedding}>} - Condensed memory hierarchy.
+ */
+export function manageMemoryHierarchy(memory, maxMemorySize, embeddingSize) {
+  if (!Array.isArray(memory) || memory.length === 0) return [];
+
+  // Sort memory by timestamp (oldest to newest)
+  memory.sort((a, b) => a.timestamp - b.timestamp);
+
+  // Retain the most recent entries up to maxMemorySize
+  const recentMemory = memory.slice(-maxMemorySize);
+
+  // Condense older entries into a single summary embedding
+  const olderMemory = memory.slice(0, -maxMemorySize);
+  let condensedMemory = [];
+  if (olderMemory.length > 0) {
+    const olderTexts = olderMemory.map(entry => entry.text);
+    const summaryEmbedding = summarizeTexts(olderTexts, embeddingSize);
+    condensedMemory.push({
+      timestamp: olderMemory[0].timestamp, // Use the oldest timestamp for the summary
+      embedding: summaryEmbedding
+    });
   }
 
-  embeddings.forEach(({ key, vector }) => {
-    const hash = hashKey(key);
-    const shardId = parseInt(hash.slice(-4), 16) % numShards;
-    shards[shardId].push({ key, vector });
-  });
+  // Convert recent memory to embeddings
+  const recentEmbeddings = recentMemory.map(entry => ({
+    timestamp: entry.timestamp,
+    embedding: generateEmbedding(entry.text, embeddingSize)
+  }));
 
-  return shards;
+  // Combine condensed and recent memory
+  return [...condensedMemory, ...recentEmbeddings];
 }
 
 /**
- * Perform hierarchical clustering on embedding vectors.
- * @param {Array<Object>} embeddings - Array of embedding objects with { key, vector }.
- * @param {number} clusterSize - Maximum number of embeddings per cluster.
- * @returns {Array<Array<Object>>} - Hierarchical clusters of embeddings.
+ * Utility function to format a timestamp for debugging or display purposes.
+ * @param {number} timestamp - The timestamp to format.
+ * @returns {string} - A human-readable date string.
  */
-export function hierarchicalCluster(embeddings, clusterSize) {
-  if (embeddings.length <= clusterSize) {
-    return [embeddings];
+export function formatTimestamp(timestamp) {
+  return new Date(timestamp).toISOString();
+}
+
+/**
+ * Utility function to compare two embeddings for similarity (cosine similarity approximation).
+ * @param {Uint8Array} embeddingA - The first embedding.
+ * @param {Uint8Array} embeddingB - The second embedding.
+ * @returns {number} - A similarity score between 0 and 1.
+ */
+export function compareEmbeddings(embeddingA, embeddingB) {
+  if (embeddingA.length !== embeddingB.length) throw new Error('Embeddings must be of the same size.');
+
+  let dotProduct = 0;
+  let magnitudeA = 0;
+  let magnitudeB = 0;
+
+  for (let i = 0; i < embeddingA.length; i++) {
+    dotProduct += embeddingA[i] * embeddingB[i];
+    magnitudeA += embeddingA[i] ** 2;
+    magnitudeB += embeddingB[i] ** 2;
   }
 
-  const clusters = [];
-  let currentCluster = [];
+  magnitudeA = Math.sqrt(magnitudeA);
+  magnitudeB = Math.sqrt(magnitudeB);
 
-  embeddings.forEach((embedding) => {
-    currentCluster.push(embedding);
-    if (currentCluster.length === clusterSize) {
-      clusters.push(currentCluster);
-      currentCluster = [];
-    }
-  });
-
-  if (currentCluster.length > 0) {
-    clusters.push(currentCluster);
-  }
-
-  return clusters;
-}
-
-/**
- * Retrieve embeddings from shards using a hashed key lookup.
- * @param {Object} shards - Shard map with shard IDs as keys and embedding arrays as values.
- * @param {string} key - The key to retrieve.
- * @returns {Object|null} - The embedding object if found, otherwise null.
- */
-export function retrieveFromShards(shards, key) {
-  const hash = hashKey(key);
-  const shardId = parseInt(hash.slice(-4), 16) % Object.keys(shards).length;
-
-  const shard = shards[shardId];
-  if (!shard) return null;
-
-  return shard.find((embedding) => embedding.key === key) || null;
-}
-
-/**
- * Scale embedding retrieval using hierarchical clustering and shard storage.
- * @param {Array<Object>} embeddings - Array of embedding objects with { key, vector }.
- * @param {number} numShards - Number of shards to partition into.
- * @param {number} clusterSize - Maximum number of embeddings per cluster.
- * @returns {Object} - Object containing shards and hierarchical clusters.
- */
-export function scaleEmbeddingRetrieval(embeddings, numShards, clusterSize) {
-  const shards = createShards(embeddings, numShards);
-  const hierarchicalClusters = hierarchicalCluster(embeddings, clusterSize);
-  return { shards, hierarchicalClusters };
-}
-
-/**
- * Compute Euclidean distance between two vectors.
- * @param {Array<number>} vectorA - First vector.
- * @param {Array<number>} vectorB - Second vector.
- * @returns {number} - Euclidean distance.
- */
-export function euclideanDistance(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must have the same length');
-  }
-
-  return Math.sqrt(
-    vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0)
-  );
-}
-
-/**
- * Find the nearest neighbor embedding based on Euclidean distance.
- * @param {Array<Object>} embeddings - Array of embedding objects with { key, vector }.
- * @param {Array<number>} queryVector - Query vector to compare.
- * @returns {Object|null} - Nearest neighbor embedding object or null if no embeddings exist.
- */
-export function findNearestNeighbor(embeddings, queryVector) {
-  if (embeddings.length === 0) return null;
-
-  let nearest = null;
-  let minDistance = Infinity;
-
-  embeddings.forEach(({ key, vector }) => {
-    const distance = euclideanDistance(vector, queryVector);
-    if (distance < minDistance) {
-      minDistance = distance;
-      nearest = { key, vector, distance };
-    }
-  });
-
-  return nearest;
+  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
 }

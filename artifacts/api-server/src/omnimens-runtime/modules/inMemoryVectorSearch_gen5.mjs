@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorSearch
- * Written: 2026-04-01T22:09:00.620Z
+ * Written: 2026-04-01T22:16:47.129Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,113 +18,145 @@
 
 // Complete ES module code here
 
-import { createHash } from 'crypto';
+import { performance } from 'perf_hooks';
 
 /**
- * Calculates the Euclidean distance between two vectors.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {number} - The Euclidean distance.
+ * Calculates Euclidean distance between two vectors.
+ * @param {Array<number>} vectorA - First vector.
+ * @param {Array<number>} vectorB - Second vector.
+ * @returns {number} - Euclidean distance.
  */
-export function euclideanDistance(vectorA, vectorB) {
+export function calculateEuclideanDistance(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must have the same dimensions.');
+    throw new Error("Vectors must have the same dimensions.");
   }
-  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
+  return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0));
 }
 
 /**
- * Generates a unique hash for a vector for indexing purposes.
- * @param {number[]} vector - The vector to hash.
- * @returns {string} - A unique hash string.
+ * Node structure for HNSW graph.
+ * @typedef {Object} HNSWNode
+ * @property {Array<number>} vector - The embedding vector.
+ * @property {Array<number>} neighbors - Indices of neighboring nodes.
  */
-export function hashVector(vector) {
-  const hash = createHash('sha256');
-  hash.update(vector.join(','));
-  return hash.digest('hex');
-}
 
 /**
- * Class implementing an in-memory HNSW graph for vector similarity search.
+ * Class implementing HNSW for approximate nearest neighbor search.
  */
-export class HNSWGraph {
-  constructor() {
-    this.nodes = new Map(); // Map of node hash -> { vector, neighbors }
+export class HNSW {
+  constructor(maxNeighbors = 16, efConstruction = 200) {
+    this.nodes = []; // Array of HNSWNode
+    this.maxNeighbors = maxNeighbors; // Maximum neighbors per node
+    this.efConstruction = efConstruction; // Search depth during graph construction
   }
 
   /**
-   * Adds a vector to the graph.
-   * @param {number[]} vector - The vector to add.
+   * Adds a new vector to the HNSW graph.
+   * @param {Array<number>} vector - The embedding vector to add.
    */
   addVector(vector) {
-    const vectorHash = hashVector(vector);
-    if (this.nodes.has(vectorHash)) {
-      throw new Error('Vector already exists in the graph.');
+    const newNode = { vector, neighbors: [] };
+    const newIndex = this.nodes.length;
+    this.nodes.push(newNode);
+
+    if (this.nodes.length === 1) return; // First node, no neighbors yet
+
+    const candidates = this._searchLayer(vector, this.efConstruction);
+
+    candidates.forEach((candidate) => {
+      this._connectNodes(newIndex, candidate);
+    });
+  }
+
+  /**
+   * Searches for the k nearest neighbors of a query vector.
+   * @param {Array<number>} queryVector - The query vector.
+   * @param {number} k - Number of neighbors to retrieve.
+   * @returns {Array<{ index, distance}>} - Array of k nearest neighbors.
+   */
+  search(queryVector, k = 1) {
+    if (this.nodes.length === 0) return [];
+
+    const candidates = this._searchLayer(queryVector, k);
+    return candidates.map((index) => ({
+      index,
+      distance: calculateEuclideanDistance(queryVector, this.nodes[index].vector)
+    })).sort((a, b) => a.distance - b.distance).slice(0, k);
+  }
+
+  /**
+   * Internal method to search a layer for nearest neighbors.
+   * @param {Array<number>} queryVector - The query vector.
+   * @param {number} ef - Search depth.
+   * @returns {Array<number>} - Indices of nearest neighbors.
+   */
+  _searchLayer(queryVector, ef) {
+    const visited = new Set();
+    const candidates = [0]; // Start with the first node
+    const results = [];
+
+    while (candidates.length && results.length < ef) {
+      const current = candidates.pop();
+      if (visited.has(current)) continue;
+      visited.add(current);
+
+      results.push(current);
+
+      const neighbors = this.nodes[current].neighbors;
+      neighbors.forEach((neighbor) => {
+        if (!visited.has(neighbor)) {
+          candidates.push(neighbor);
+        }
+      });
     }
 
-    this.nodes.set(vectorHash, { vector, neighbors: new Map() });
+    return results;
+  }
 
-    // Connect to nearest neighbors (basic implementation: brute force search for simplicity)
-    for (const [otherHash, otherNode] of this.nodes) {
-      if (otherHash !== vectorHash) {
-        const distance = euclideanDistance(vector, otherNode.vector);
-        this.nodes.get(vectorHash).neighbors.set(otherHash, distance);
-        otherNode.neighbors.set(vectorHash, distance);
+  /**
+   * Connects two nodes in the HNSW graph, respecting maxNeighbors limit.
+   * @param {number} indexA - Index of the first node.
+   * @param {number} indexB - Index of the second node.
+   */
+  _connectNodes(indexA, indexB) {
+    const nodeA = this.nodes[indexA];
+    const nodeB = this.nodes[indexB];
+
+    if (!nodeA.neighbors.includes(indexB)) {
+      nodeA.neighbors.push(indexB);
+      if (nodeA.neighbors.length > this.maxNeighbors) {
+        nodeA.neighbors.sort((a, b) => this._distanceToNode(indexA, a) - this._distanceToNode(indexA, b));
+        nodeA.neighbors.pop();
+      }
+    }
+
+    if (!nodeB.neighbors.includes(indexA)) {
+      nodeB.neighbors.push(indexA);
+      if (nodeB.neighbors.length > this.maxNeighbors) {
+        nodeB.neighbors.sort((a, b) => this._distanceToNode(indexB, a) - this._distanceToNode(indexB, b));
+        nodeB.neighbors.pop();
       }
     }
   }
 
   /**
-   * Searches for the k-nearest neighbors of a given vector.
-   * @param {number[]} queryVector - The vector to search for.
-   * @param {number} k - The number of neighbors to return.
-   * @returns {Array<{ vector, distance}>} - The k-nearest neighbors.
+   * Calculates the distance between a node and another node by index.
+   * @param {number} indexA - Index of the first node.
+   * @param {number} indexB - Index of the second node.
+   * @returns {number} - Distance between the two nodes.
    */
-  search(queryVector, k) {
-    const distances = [];
-
-    for (const { vector } of this.nodes.values()) {
-      const distance = euclideanDistance(queryVector, vector);
-      distances.push({ vector, distance });
-    }
-
-    return distances
-      .sort((a, b) => a.distance - b.distance)
-      .slice(0, k);
+  _distanceToNode(indexA, indexB) {
+    return calculateEuclideanDistance(this.nodes[indexA].vector, this.nodes[indexB].vector);
   }
 }
 
 /**
- * Utility function to normalize a vector (scale to unit length).
- * @param {number[]} vector - The vector to normalize.
- * @returns {number[]} - The normalized vector.
+ * Measures execution time of a function.
+ * @param {Function} func - The function to measure.
+ * @returns {number} - Execution time in milliseconds.
  */
-export function normalizeVector(vector) {
-  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
-  if (magnitude === 0) {
-    throw new Error('Cannot normalize a zero vector.');
-  }
-  return vector.map(val => val / magnitude);
-}
-
-/**
- * Utility function to calculate the cosine similarity between two vectors.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {number} - The cosine similarity.
- */
-export function cosineSimilarity(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must have the same dimensions.');
-  }
-
-  const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
-  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val * val, 0));
-  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val * val, 0));
-
-  if (magnitudeA === 0 || magnitudeB === 0) {
-    throw new Error('Cannot calculate cosine similarity with a zero vector.');
-  }
-
-  return dotProduct / (magnitudeA * magnitudeB);
+export function measureExecutionTime(func) {
+  const start = performance.now();
+  func();
+  return performance.now() - start;
 }

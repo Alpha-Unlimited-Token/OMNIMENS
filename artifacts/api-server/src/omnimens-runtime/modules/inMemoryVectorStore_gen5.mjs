@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-04-01T22:10:58.494Z
+ * Written: 2026-04-01T22:18:37.517Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,113 +18,111 @@
 
 // Complete ES module code here
 
-import { createHash } from 'crypto';
+import { performance } from 'node:perf_hooks';
 
 /**
- * Generates a unique hash for a vector to ensure uniqueness in the store.
- * @param {Array<number>} vector - The input vector.
- * @returns {string} - A unique hash string.
+ * Utility module for in-memory storage and retrieval of high-dimensional embeddings
+ * using a KD-tree data structure.
  */
-export function generateVectorHash(vector) {
-  const hash = createHash('sha256');
-  hash.update(vector.join(','));
-  return hash.digest('hex');
-}
 
-/**
- * Calculates the Euclidean distance between two vectors.
- * @param {Array<number>} vectorA - The first vector.
- * @param {Array<number>} vectorB - The second vector.
- * @returns {number} - The Euclidean distance.
- */
-export function calculateEuclideanDistance(vectorA, vectorB) {
+// Helper function to calculate Euclidean distance between two vectors
+export function euclideanDistance(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must have the same dimensions.');
+    throw new Error('Vectors must have the same dimensionality');
   }
-  return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0));
+  return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + (val - vectorB[idx]) ** 2, 0));
 }
 
-/**
- * In-memory vector store class using approximate nearest neighbor search.
- */
-export class InMemoryVectorStore {
-  constructor() {
-    this.vectors = new Map(); // Stores vectors with their hashes as keys.
-  }
-
-  /**
-   * Adds a vector to the store.
-   * @param {Array<number>} vector - The vector to add.
-   */
-  addVector(vector) {
-    const hash = generateVectorHash(vector);
-    if (this.vectors.has(hash)) {
-      throw new Error('Duplicate vector detected.');
-    }
-    this.vectors.set(hash, vector);
-  }
-
-  /**
-   * Finds the nearest neighbors to a given vector.
-   * @param {Array<number>} queryVector - The vector to search for.
-   * @param {number} k - The number of nearest neighbors to retrieve.
-   * @returns {Array<{ vector, distance}>} - The nearest neighbors.
-   */
-  findNearestNeighbors(queryVector, k = 1) {
-    if (k <= 0) {
-      throw new Error('k must be a positive integer.');
-    }
-
-    const distances = [];
-
-    for (const [_, vector] of this.vectors) {
-      const distance = calculateEuclideanDistance(queryVector, vector);
-      distances.push({ vector, distance });
-    }
-
-    distances.sort((a, b) => a.distance - b.distance);
-
-    return distances.slice(0, k);
-  }
-
-  /**
-   * Clears all vectors in the store.
-   */
-  clearStore() {
-    this.vectors.clear();
-  }
-
-  /**
-   * Returns the total number of vectors in the store.
-   * @returns {number} - The count of vectors in the store.
-   */
-  getVectorCount() {
-    return this.vectors.size;
+// KD-Tree Node class
+class KDTreeNode {
+  constructor(point, index, axis) {
+    this.point = point; // The vector/point stored at this node
+    this.index = index; // The index of the point in the original dataset
+    this.axis = axis; // The axis/dimension this node splits on
+    this.left = null; // Left child node
+    this.right = null; // Right child node
   }
 }
 
-/**
- * Utility function to normalize a vector.
- * @param {Array<number>} vector - The vector to normalize.
- * @returns {Array<number>} - The normalized vector.
- */
-export function normalizeVector(vector) {
-  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
-  if (magnitude === 0) {
-    throw new Error('Cannot normalize a zero vector.');
+// KD-Tree class for building and querying the tree
+export class KDTree {
+  constructor(points) {
+    if (!Array.isArray(points) || points.length === 0) {
+      throw new Error('Points array must be non-empty');
+    }
+    this.root = this._buildTree(points, 0);
   }
-  return vector.map(val => val / magnitude);
+
+  // Recursive function to build the KD-tree
+  _buildTree(points, depth) {
+    if (points.length === 0) return null;
+
+    const axis = depth % points[0].length; // Cycle through dimensions
+    points.sort((a, b) => a[0][axis] - b[0][axis]); // Sort by current axis
+
+    const medianIndex = Math.floor(points.length / 2);
+    const medianPoint = points[medianIndex];
+
+    const node = new KDTreeNode(medianPoint[0], medianPoint[1], axis);
+    node.left = this._buildTree(points.slice(0, medianIndex), depth + 1);
+    node.right = this._buildTree(points.slice(medianIndex + 1), depth + 1);
+
+    return node;
+  }
+
+  // Recursive nearest neighbor search
+  _nearest(node, target, depth, best) {
+    if (node === null) return best;
+
+    const axis = depth % target.length;
+    const dist = euclideanDistance(node.point, target);
+
+    if (!best || dist < best.distance) {
+      best = { node, distance: dist };
+    }
+
+    const nextBranch = target[axis] < node.point[axis] ? node.left : node.right;
+    const otherBranch = target[axis] < node.point[axis] ? node.right : node.left;
+
+    best = this._nearest(nextBranch, target, depth + 1, best);
+
+    if (Math.abs(target[axis] - node.point[axis]) < best.distance) {
+      best = this._nearest(otherBranch, target, depth + 1, best);
+    }
+
+    return best;
+  }
+
+  // Public method to find the nearest neighbor
+  findNearest(target) {
+    if (!Array.isArray(target) || target.length === 0) {
+      throw new Error('Target must be a non-empty array');
+    }
+    return this._nearest(this.root, target, 0, null);
+  }
 }
 
-/**
- * Utility function to generate random vectors for testing.
- * @param {number} dimensions - The number of dimensions for the vector.
- * @param {number} count - The number of vectors to generate.
- * @returns {Array<Array<number>>} - An array of random vectors.
- */
-export function generateRandomVectors(dimensions, count) {
-  if (dimensions <= 0 || count <= 0) {
-    throw new Error('Dimensions and count must be positive integers.');
+// Utility function to build a KD-tree from a dataset
+export function buildKDTree(data) {
+  if (!Array.isArray(data) || data.length === 0) {
+    throw new Error('Data must be a non-empty array of points');
   }
-  return Array.from({ length: count }, () => Array.from({ length: dimensions }, () => Math.random()));
+  const points = data.map((point, index) => [point, index]);
+  return new KDTree(points);
+}
+
+// Example utility to time nearest neighbor search
+export function timeNearestNeighborSearch(tree, target) {
+  const start = performance.now();
+  const result = tree.findNearest(target);
+  const end = performance.now();
+  return { result, timeMs: end - start };
+}
+
+// Example utility to calculate distances between multiple points
+export function calculateDistances(points, target) {
+  return points.map((point, index) => ({
+    index,
+    distance: euclideanDistance(point, target)
+  })).sort((a, b) => a.distance - b.distance);
 }

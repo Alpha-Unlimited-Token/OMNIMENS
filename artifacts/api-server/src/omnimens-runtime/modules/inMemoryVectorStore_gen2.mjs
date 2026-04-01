@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-04-01T22:13:20.183Z
+ * Written: 2026-04-01T22:18:22.486Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,97 +16,114 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// inMemoryVectorStore.mjs
+// Complete ES module code here
 
-import { createHash } from 'crypto';
+import { randomUUID } from 'crypto';
 
 /**
- * Computes the Euclidean distance between two vectors.
- * @param {number[]} vectorA - First vector.
- * @param {number[]} vectorB - Second vector.
- * @returns {number} - The Euclidean distance.
+ * Utility module for in-memory vector storage and retrieval using HNSW-like algorithm.
+ * Provides fast similarity search for embeddings.
  */
+
+// Helper function to calculate Euclidean distance between two vectors
 export function euclideanDistance(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must have the same dimensions.');
+    throw new Error('Vectors must have the same dimensions');
   }
-  return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0));
+  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
 }
 
-/**
- * Normalizes a vector to unit length.
- * @param {number[]} vector - Input vector.
- * @returns {number[]} - Normalized vector.
- */
+// Node structure for HNSW-like graph
+class Node {
+  constructor(id, vector) {
+    this.id = id;
+    this.vector = vector;
+    this.neighbors = new Set();
+  }
+}
+
+// Main class for the in-memory vector store
+export class InMemoryVectorStore {
+  constructor(maxNeighbors = 10) {
+    this.nodes = new Map();
+    this.maxNeighbors = maxNeighbors;
+  }
+
+  /**
+   * Add a vector to the store
+   * @param {Array<number>} vector - The embedding vector to store
+   * @returns {string} - Unique ID of the stored vector
+   */
+  addVector(vector) {
+    const id = randomUUID();
+    const newNode = new Node(id, vector);
+    this.nodes.set(id, newNode);
+
+    // Update neighbors for the new node
+    this._updateNeighbors(newNode);
+
+    return id;
+  }
+
+  /**
+   * Retrieve the most similar vectors to the query vector
+   * @param {Array<number>} queryVector - The vector to search for
+   * @param {number} k - Number of nearest neighbors to retrieve
+   * @returns {Array<{id, distance}>} - List of nearest neighbors
+   */
+  search(queryVector, k = 1) {
+    if (k <= 0) {
+      throw new Error('Number of neighbors (k) must be greater than 0');
+    }
+
+    const distances = Array.from(this.nodes.values()).map(node => ({
+      id: node.id,
+      distance: euclideanDistance(queryVector, node.vector)
+    }));
+
+    // Sort by distance and return top k
+    return distances.sort((a, b) => a.distance - b.distance).slice(0, k);
+  }
+
+  /**
+   * Internal method to update neighbors for a new node
+   * @param {Node} newNode - The newly added node
+   */
+  _updateNeighbors(newNode) {
+    const distances = Array.from(this.nodes.values())
+      .filter(node => node.id !== newNode.id)
+      .map(node => ({
+        node,
+        distance: euclideanDistance(newNode.vector, node.vector)
+      }));
+
+    // Sort by distance and select closest neighbors
+    distances.sort((a, b) => a.distance - b.distance);
+    const closestNeighbors = distances.slice(0, this.maxNeighbors);
+
+    for (const { node } of closestNeighbors) {
+      newNode.neighbors.add(node);
+      node.neighbors.add(newNode);
+    }
+  }
+}
+
+// Example utility function to normalize vectors
 export function normalizeVector(vector) {
   const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
   if (magnitude === 0) {
-    throw new Error('Cannot normalize a zero vector.');
+    throw new Error('Cannot normalize a zero vector');
   }
   return vector.map(val => val / magnitude);
 }
 
-/**
- * Hashes a vector into a unique string for indexing.
- * @param {number[]} vector - Input vector.
- * @returns {string} - Hashed string representation.
- */
-export function hashVector(vector) {
-  const hash = createHash('sha256');
-  hash.update(vector.join(','));
-  return hash.digest('hex');
+// Example utility function to generate random vectors
+export function generateRandomVector(dimensions, min = 0, max = 1) {
+  if (dimensions <= 0) {
+    throw new Error('Dimensions must be greater than 0');
+  }
+  return Array.from({ length: dimensions }, () => Math.random() * (max - min) + min);
 }
 
-/**
- * Class representing an in-memory vector store for ANN searches.
- */
-export class InMemoryVectorStore {
-  constructor() {
-    this.store = new Map();
-  }
-
-  /**
-   * Adds a vector and its associated metadata to the store.
-   * @param {number[]} vector - Input vector.
-   * @param {any} metadata - Associated metadata.
-   */
-  addVector(vector, metadata) {
-    const normalizedVector = normalizeVector(vector);
-    const key = hashVector(normalizedVector);
-    this.store.set(key, { vector: normalizedVector, metadata });
-  }
-
-  /**
-   * Finds the nearest neighbors to a query vector.
-   * @param {number[]} queryVector - Query vector.
-   * @param {number} k - Number of neighbors to retrieve.
-   * @returns {Array<{ vector, metadata, distance}>} - Nearest neighbors.
-   */
-  findNearestNeighbors(queryVector, k = 1) {
-    const normalizedQuery = normalizeVector(queryVector);
-    const distances = [];
-
-    for (const [key, { vector, metadata }] of this.store.entries()) {
-      const distance = euclideanDistance(normalizedQuery, vector);
-      distances.push({ vector, metadata, distance });
-    }
-
-    distances.sort((a, b) => a.distance - b.distance);
-    return distances.slice(0, k);
-  }
-
-  /**
-   * Clears all stored vectors.
-   */
-  clearStore() {
-    this.store.clear();
-  }
-}
-
-/**
- * Factory function to create a new vector store instance.
- * @returns {InMemoryVectorStore} - New vector store instance.
- */
-export function createVectorStore() {
-  return new InMemoryVectorStore();
-}
+// Exporting the module functionality
+export const vectorStore = new InMemoryVectorStore();

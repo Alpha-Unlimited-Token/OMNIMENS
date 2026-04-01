@@ -1,0 +1,137 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: hierarchicalMemoryManager
+ * Written: 2026-04-01T22:16:55.958Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+/**
+ * TRANSLATION STATUS:
+ * Novel constructs: attention
+ * All constructs have translation mappings
+ * Compiled targets: javascript: OK (3 IR steps) | python: OK (3 IR steps) | c: OK (3 IR steps) | x86_64: OK (3 IR steps) | arm64: OK (3 IR steps) | avr: OK (3 IR steps)
+ * Translation map version: 22
+ */
+// hierarchicalMemoryManager.mjs
+
+import { createHash } from 'crypto';
+
+/**
+ * Compresses and summarizes input data using hierarchical attention mechanisms.
+ * Provides utilities for storing, retrieving, and managing compressed context representations.
+ */
+
+// Helper function to hash data into a fixed-length identifier
+export function hashData(data) {
+  const hash = createHash('sha256');
+  hash.update(JSON.stringify(data));
+  return hash.digest('hex');
+}
+
+// Function to quantize vectors into fixed-size representations
+export function vectorQuantize(vector, numBuckets) {
+  if (!Array.isArray(vector) || typeof numBuckets !== 'number' || numBuckets <= 0) {
+    throw new Error('Invalid input to vectorQuantize: vector must be an array and numBuckets a positive number.');
+  }
+  const bucketSize = 1 / numBuckets;
+  return vector.map(value => Math.round(value / bucketSize) * bucketSize);
+}
+
+// Function to compute hierarchical attention scores
+export function hierarchicalAttention(contexts, queryVector) {
+  if (!Array.isArray(contexts) || !Array.isArray(queryVector)) {
+    throw new Error('Invalid input to hierarchicalAttention: contexts and queryVector must be arrays.');
+  }
+
+  return contexts.map(context => {
+    if (!Array.isArray(context)) {
+      throw new Error('Each context must be an array.');
+    }
+
+    // Compute dot product as a similarity measure
+    const dotProduct = context.reduce((sum, value, index) => {
+      return sum + (value * (queryVector[index] || 0));
+    }, 0);
+
+    // Normalize by vector magnitudes
+    const contextMagnitude = Math.sqrt(context.reduce((sum, value) => sum + value ** 2, 0));
+    const queryMagnitude = Math.sqrt(queryVector.reduce((sum, value) => sum + value ** 2, 0));
+
+    return dotProduct / (contextMagnitude * queryMagnitude || 1);
+  });
+}
+
+// Function to compress and store hierarchical context
+export function compressContext(contexts, compressionFactor = 0.5) {
+  if (!Array.isArray(contexts) || typeof compressionFactor !== 'number' || compressionFactor <= 0 || compressionFactor > 1) {
+    throw new Error('Invalid input to compressContext: contexts must be an array and compressionFactor a number between 0 and 1.');
+  }
+
+  const compressedContexts = contexts.map(context => {
+    if (!Array.isArray(context)) {
+      throw new Error('Each context must be an array.');
+    }
+
+    // Apply vector quantization to compress each context
+    const numBuckets = Math.ceil(context.length * compressionFactor);
+    return vectorQuantize(context, numBuckets);
+  });
+
+  return compressedContexts;
+}
+
+// Function to retrieve the most relevant context
+export function retrieveContext(compressedContexts, queryVector) {
+  if (!Array.isArray(compressedContexts) || !Array.isArray(queryVector)) {
+    throw new Error('Invalid input to retrieveContext: compressedContexts and queryVector must be arrays.');
+  }
+
+  // Compute attention scores
+  const scores = hierarchicalAttention(compressedContexts, queryVector);
+
+  // Find the index of the highest score
+  const bestMatchIndex = scores.indexOf(Math.max(...scores));
+
+  return compressedContexts[bestMatchIndex] || null;
+}
+
+// Function to summarize a set of contexts into a single representation
+export function summarizeContexts(contexts) {
+  if (!Array.isArray(contexts)) {
+    throw new Error('Invalid input to summarizeContexts: contexts must be an array.');
+  }
+
+  // Compute element-wise average of all contexts
+  const numContexts = contexts.length;
+  const contextLength = contexts[0]?.length || 0;
+
+  const summary = Array(contextLength).fill(0).map((_, index) => {
+    return contexts.reduce((sum, context) => sum + (context[index] || 0), 0) / numContexts;
+  });
+
+  return summary;
+}
+
+// Example of a utility function for cross-agent use
+export function cosineSimilarity(vectorA, vectorB) {
+  if (!Array.isArray(vectorA) || !Array.isArray(vectorB)) {
+    throw new Error('Invalid input to cosineSimilarity: vectorA and vectorB must be arrays.');
+  }
+
+  const dotProduct = vectorA.reduce((sum, value, index) => sum + (value * (vectorB[index] || 0)), 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, value) => sum + value ** 2, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, value) => sum + value ** 2, 0));
+
+  return dotProduct / (magnitudeA * magnitudeB || 1);
+}
