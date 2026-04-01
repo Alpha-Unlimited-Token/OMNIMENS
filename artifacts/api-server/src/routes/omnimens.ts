@@ -10811,7 +10811,9 @@ router.post("/omnimens/gen1-gen2-conversation-internal", async (req, res) => {
   }
   try {
     const rounds = Math.min(req.body?.rounds || 5, 10);
-    const result = await runGen1Gen2Conversation(rounds);
+    const topics = req.body?.topics || undefined;
+    const gen2Identity = req.body?.gen2Identity || undefined;
+    const result = await runGen1Gen2Conversation(rounds, topics, gen2Identity);
     res.json(result);
   } catch (err: any) {
     console.error("[GEN1↔GEN2] Internal trigger error:", err);
