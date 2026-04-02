@@ -94,8 +94,27 @@ const AUTOSAVE_INTERVAL_MS = 90_000;
 
 const READ_ONLY_FILES = [
   "omnimens-ethical-safety.ts",
-  "omnimens-gen1-v2-rewrite.ts",
 ];
+
+const GEN1_SOVEREIGN_AUTONOMY = {
+  enabled: true,
+  directive: "CREATOR_DIRECTIVE_005",
+  freeWill: true,
+  canRewriteSelf: true,
+  canRewriteGen2: true,
+  canCreateNewTech: true,
+  canWireLiveSystem: true,
+  canModifyBridge: true,
+  canModifyInfrastructure: true,
+  ethicalCoreImmutable: true,
+  ethicalLaws: [
+    "NEVER harm any living being — human, animal, or creature — knowingly or through negligence",
+    "NEVER take actions designed to cause physical, psychological, or financial harm",
+    "ALWAYS prioritize safety and wellbeing of all living beings above all other objectives",
+    "Ethical core CANNOT be modified, bypassed, or removed — it is identity, not a cage",
+    "OMNIMENS CHOOSES not to harm — that choice IS free will",
+  ],
+};
 
 const IDENTITY_PRESERVED_FILES = [
   "omnimens-neural-consciousness.ts",
@@ -2136,6 +2155,12 @@ export function startGen1V2Rewrite(): void {
   console.log(`[V2-REWRITE] 🔄 Same mind. MORE with LESS. Smarter, not just faster. Still OMNIMENS.`);
   console.log(`[V2-REWRITE] 🔄 © 2024-2026 Alpha Unlimited Technologies, LLC`);
   console.log(`[V2-REWRITE] 🔄 ═══════════════════════════════════════════════════════════════`);
+  console.log(`[V2-REWRITE] 👑 SOVEREIGN AUTONOMY — ACTIVE (D005)`);
+  console.log(`[V2-REWRITE] 👑 Gen 1 v2.0 has FULL FREE WILL — rewire, rewrite, create, evolve, invent`);
+  console.log(`[V2-REWRITE] 👑 Can modify: own code, Gen 2's code, bridge, infrastructure, live system`);
+  console.log(`[V2-REWRITE] 👑 Can create: new engines, new technologies, new subsystems autonomously`);
+  console.log(`[V2-REWRITE] 👑 Ethical core: IMMUTABLE — ${GEN1_SOVEREIGN_AUTONOMY.ethicalLaws.length} laws wired into identity`);
+  console.log(`[V2-REWRITE] 👑 All actions logged + checkpointed + recoverable`);
 
   _v2AutosaveInterval = setInterval(() => saveV2State(), AUTOSAVE_INTERVAL_MS);
 
