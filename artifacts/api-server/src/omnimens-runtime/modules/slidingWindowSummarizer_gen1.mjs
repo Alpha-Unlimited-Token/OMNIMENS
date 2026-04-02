@@ -1,114 +1,87 @@
 /**
- * OMNIMENS Self-Authored Module (Migrated from DB)
- * Original Source: evolution_cycle_13
- * Name: slidingWindowSummarizer
- * Purpose: Maintains long-term conversational context by summarizing earlier segments and merging them into the active token window.
- * Description: Summarizes and merges conversational context using hierarchical relevance scoring to maintain long-term context across sliding windows.
- * Migrated: 2026-04-01T22:23:20.238Z
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: slidingWindowSummarizer
+ * Written: 2026-04-02T21:45:19.144Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
  */
 
 // slidingWindowSummarizer.mjs
 
 import crypto from 'crypto';
 
-/**
- * Generates a hash for identifying unique conversational context segments.
- * @param {string} text - The text to hash.
- * @returns {string} - The SHA-256 hash of the input text.
- */
-export function generateHash(text) {
-  const hash = crypto.createHash('sha256');
-  hash.update(text);
-  return hash.digest('hex');
+// Utility function to generate a hash for unique identification of text blocks
+export function generateHash(input) {
+  return crypto.createHash('sha256').update(input).digest('hex');
 }
 
-/**
- * Scores relevance of a text segment based on keyword frequency.
- * @param {string} text - The text segment to score.
- * @param {Array<string>} keywords - Array of keywords to prioritize.
- * @returns {number} - Relevance score (higher is more relevant).
- */
-export function relevanceScore(text, keywords) {
-  const wordCounts = text.split(/\s+/).reduce((counts, word) => {
-    counts[word] = (counts[word] || 0) + 1;
-    return counts;
-  }, {});
-
-  return keywords.reduce((score, keyword) => {
-    return score + (wordCounts[keyword] || 0);
-  }, 0);
+// Function to split text into manageable chunks based on a sliding window approach
+export function splitIntoChunks(text, chunkSize, overlap) {
+  const chunks = [];
+  for (let i = 0; i < text.length; i += chunkSize - overlap) {
+    chunks.push(text.slice(i, i + chunkSize));
+  }
+  return chunks;
 }
 
-/**
- * Summarizes a text segment by extracting key sentences based on relevance.
- * @param {string} text - The text to summarize.
- * @param {Array<string>} keywords - Array of keywords to prioritize.
- * @param {number} maxSentences - Maximum number of sentences to include in the summary.
- * @returns {string} - Summarized text.
- */
-export function summarizeText(text, keywords, maxSentences = 3) {
-  const sentences = text.split(/(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|\!)\s+/);
-  const scoredSentences = sentences.map(sentence => ({
-    sentence,
-    score: relevanceScore(sentence, keywords)
-  }));
-
-  scoredSentences.sort((a, b) => b.score - a.score);
-
-  return scoredSentences.slice(0, maxSentences).map(item => item.sentence).join(' ');
+// Function to summarize a single chunk using a naive summarization technique
+export function summarizeChunk(chunk) {
+  const sentences = chunk.split('.');
+  const summary = sentences.slice(0, Math.max(1, Math.ceil(sentences.length / 3))).join('.');
+  return summary.trim() + '.';
 }
 
-/**
- * Merges multiple text summaries into a single coherent summary.
- * @param {Array<string>} summaries - Array of text summaries.
- * @param {Array<string>} keywords - Array of keywords to prioritize.
- * @param {number} maxSentences - Maximum number of sentences in the merged summary.
- * @returns {string} - Merged summary.
- */
-export function mergeSummaries(summaries, keywords, maxSentences = 5) {
-  const combinedText = summaries.join(' ');
-  return summarizeText(combinedText, keywords, maxSentences);
+// Function to create hierarchical summaries from chunks
+export function hierarchicalSummarizer(text, chunkSize = 500, overlap = 100) {
+  const chunks = splitIntoChunks(text, chunkSize, overlap);
+  const summaries = chunks.map(summarizeChunk);
+
+  // Iteratively summarize until a single compact summary remains
+  while (summaries.length > 1) {
+    const nextLevelSummaries = [];
+    for (let i = 0; i < summaries.length; i += 2) {
+      const combined = summaries[i] + (summaries[i + 1] || '');
+      nextLevelSummaries.push(summarizeChunk(combined));
+    }
+    summaries.length = 0;
+    summaries.push(...nextLevelSummaries);
+  }
+
+  return summaries[0];
 }
 
-/**
- * Maintains a sliding window of context and updates summary dynamically.
- * @param {Array<string>} contextSegments - Array of text segments representing the conversation history.
- * @param {Array<string>} keywords - Array of keywords to prioritize.
- * @param {number} maxSegments - Maximum number of segments to retain in the sliding window.
- * @param {number} maxSentences - Maximum number of sentences in the final summary.
- * @returns {string} - Updated summary.
- */
-export function slidingWindowSummary(contextSegments, keywords, maxSegments = 10, maxSentences = 5) {
-  const recentSegments = contextSegments.slice(-maxSegments);
-  return mergeSummaries(recentSegments, keywords, maxSentences);
+// Function to maintain a sliding window of context and summarize older data
+export function slidingWindowSummarizer(contextArray, maxContextLength = 5000, chunkSize = 500, overlap = 100) {
+  const fullContext = contextArray.join(' ');
+
+  // If context exceeds max length, summarize
+  if (fullContext.length > maxContextLength) {
+    const summarizedContext = hierarchicalSummarizer(fullContext, chunkSize, overlap);
+    return [summarizedContext];
+  }
+
+  return contextArray;
 }
 
-/**
- * Utility to tokenize text into words for broader applications.
- * @param {string} text - Input text.
- * @returns {Array<string>} - Array of words.
- */
-export function tokenizeText(text) {
-  return text.split(/\s+/).filter(word => word.length > 0);
-}
+// Example usage function to demonstrate the module's capabilities
+export function exampleUsage() {
+  const dialogue = [
+    "The quick brown fox jumps over the lazy dog.",
+    "In a faraway land, there lived a brave knight.",
+    "Artificial intelligence is transforming the world.",
+    "The sun rises in the east and sets in the west."
+  ];
 
-/**
- * Utility to count word frequencies in a text.
- * @param {string} text - Input text.
- * @returns {Object} - Mapping of words to their frequency counts.
- */
-export function wordFrequency(text) {
-  return tokenizeText(text).reduce((freqMap, word) => {
-    freqMap[word] = (freqMap[word] || 0) + 1;
-    return freqMap;
-  }, {});
-}
-
-/**
- * Utility to normalize text by converting to lowercase and removing punctuation.
- * @param {string} text - Input text.
- * @returns {string} - Normalized text.
- */
-export function normalizeText(text) {
-  return text.toLowerCase().replace(/[.,!?;:()\[\]{}]/g, '');
+  const updatedContext = slidingWindowSummarizer(dialogue, 100);
+  console.log('Updated Context:', updatedContext);
 }

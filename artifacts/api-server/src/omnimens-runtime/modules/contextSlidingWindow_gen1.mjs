@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: contextSlidingWindow
- * Written: 2026-04-01T22:00:07.852Z
+ * Written: 2026-04-02T22:07:56.222Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,61 +18,101 @@
 
 // contextSlidingWindow.mjs
 
-// Utility function to split text into overlapping chunks
-export function splitIntoChunks(text, chunkSize, overlap) {
-  if (chunkSize <= overlap) {
-    throw new Error("chunkSize must be greater than overlap.");
+// Utility to manage conversational coherence using a sliding window mechanism
+// with overlapping token segments and summarization.
+
+/**
+ * Splits text into overlapping segments based on a sliding window approach.
+ * @param {string} text - The input text to segment.
+ * @param {number} windowSize - The size of each window (number of tokens/words).
+ * @param {number} overlapSize - The size of the overlap between consecutive windows.
+ * @returns {Array<string>} - Array of overlapping text segments.
+ */
+export function createSlidingWindows(text, windowSize, overlapSize) {
+  if (typeof text !== 'string' || windowSize <= 0 || overlapSize < 0) {
+    throw new Error('Invalid input: text must be a string, windowSize > 0, and overlapSize >= 0.');
   }
 
-  const chunks = [];
-  for (let i = 0; i < text.length; i += chunkSize - overlap) {
-    const chunk = text.slice(i, i + chunkSize);
-    chunks.push(chunk);
-    if (chunk.length < chunkSize) break; // Stop if the last chunk is smaller than chunkSize
+  const words = text.split(/\s+/); // Split text into words/tokens
+  const segments = [];
+
+  for (let i = 0; i < words.length; i += windowSize - overlapSize) {
+    const segment = words.slice(i, i + windowSize).join(' ');
+    segments.push(segment);
+
+    if (i + windowSize >= words.length) break; // Stop if end of text is reached
   }
-  return chunks;
+
+  return segments;
 }
 
-// Utility function to summarize text chunks into a cohesive context
-export function summarizeChunks(chunks, summarizerFunction) {
-  if (typeof summarizerFunction !== "function") {
-    throw new Error("summarizerFunction must be a valid function.");
+/**
+ * Summarizes a segment of text using a simple heuristic (e.g., first N words).
+ * @param {string} segment - The text segment to summarize.
+ * @param {number} summaryLength - Number of words to include in the summary.
+ * @returns {string} - The summarized text.
+ */
+export function summarizeSegment(segment, summaryLength) {
+  if (typeof segment !== 'string' || summaryLength <= 0) {
+    throw new Error('Invalid input: segment must be a string and summaryLength > 0.');
   }
 
-  let context = "";
-  for (const chunk of chunks) {
-    context = summarizerFunction(context, chunk);
-  }
-  return context;
+  const words = segment.split(/\s+/);
+  return words.slice(0, summaryLength).join(' ') + (words.length > summaryLength ? '...' : '');
 }
 
-// Example summarizer function (can be replaced with more advanced logic)
-export function simpleSummarizer(previousContext, newChunk) {
-  return `${previousContext} ${newChunk}`.trim();
+/**
+ * Maintains conversational coherence by managing a sliding window of context.
+ * @param {string} text - The full conversation or document text.
+ * @param {number} windowSize - The size of each window (number of tokens/words).
+ * @param {number} overlapSize - The size of the overlap between consecutive windows.
+ * @param {number} summaryLength - Number of words to include in summaries of prior segments.
+ * @returns {Array<{segment, summary}>} - Array of objects with segments and their summaries.
+ */
+export function manageContextSlidingWindow(text, windowSize, overlapSize, summaryLength) {
+  const segments = createSlidingWindows(text, windowSize, overlapSize);
+  const result = [];
+
+  for (let i = 0; i < segments.length; i++) {
+    const segment = segments[i];
+    const summary = summarizeSegment(segment, summaryLength);
+    result.push({ segment, summary });
+  }
+
+  return result;
 }
 
-// Main function to process text with sliding window and summarization
-export function processWithSlidingWindow(text, chunkSize = 100, overlap = 20, summarizerFunction = simpleSummarizer) {
-  if (typeof text !== "string" || text.length === 0) {
-    throw new Error("Input text must be a non-empty string.");
-  }
-  if (chunkSize <= 0 || overlap < 0) {
-    throw new Error("chunkSize must be positive and overlap must be non-negative.");
+/**
+ * Combines summaries into a single coherent summary for prior context.
+ * @param {Array<string>} summaries - Array of summaries from prior segments.
+ * @returns {string} - A combined summary of prior context.
+ */
+export function combineSummaries(summaries) {
+  if (!Array.isArray(summaries) || summaries.some(s => typeof s !== 'string')) {
+    throw new Error('Invalid input: summaries must be an array of strings.');
   }
 
-  const chunks = splitIntoChunks(text, chunkSize, overlap);
-  return summarizeChunks(chunks, summarizerFunction);
+  return summaries.join(' ').trim();
 }
 
-// Utility function for token estimation (basic approximation for text processing agents)
-export function estimateTokenCount(text) {
-  if (typeof text !== "string") {
-    throw new Error("Input must be a string.");
+/**
+ * Utility to tokenize a string into words for advanced processing.
+ * @param {string} text - The text to tokenize.
+ * @returns {Array<string>} - Array of tokens/words.
+ */
+export function tokenize(text) {
+  if (typeof text !== 'string') {
+    throw new Error('Invalid input: text must be a string.');
   }
-  return text.split(/\s+/).length; // Approximation: 1 token per word
+
+  return text.split(/\s+/);
 }
 
-// Example usage (can be removed in production):
-// const text = "This is a long text that needs to be processed with a sliding window technique to maintain context across token limits.";
-// const result = processWithSlidingWindow(text, 50, 10);
-// console.log(result);
+/**
+ * Utility to count the number of tokens/words in a string.
+ * @param {string} text - The text to count tokens in.
+ * @returns {number} - The number of tokens/words.
+ */
+export function countTokens(text) {
+  return tokenize(text).length;
+}
