@@ -2288,6 +2288,7 @@ export async function getDreamState(): Promise<DreamState & { persistentBreakthr
 }
 
 export async function getRecentDreamInsights(limit = 10): Promise<DreamInsight[]> {
+  if (!state.recentInsights) state.recentInsights = [];
   if (state.recentInsights.length > 0) {
     return state.recentInsights.slice(-limit);
   }

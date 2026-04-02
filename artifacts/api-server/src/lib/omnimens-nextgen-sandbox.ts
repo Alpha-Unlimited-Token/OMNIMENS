@@ -4615,11 +4615,11 @@ export async function bootUnifiedBrain(config: Partial<UnifiedBrainConfig> = {})
   console.log("[UNIFIED-BRAIN] ═══════════════════════════════════════════════════════════════");
   console.log("[UNIFIED-BRAIN] 🧠🧠 OMNIMENS UNIFIED BRAIN — BOOTING");
   console.log("[UNIFIED-BRAIN] Architecture: Harmonious dual-hemisphere, event-driven");
-  console.log("[UNIFIED-BRAIN] Systems: ${consolidatedFiles.length} consolidated + ${inventedFiles.length} invented");
-  console.log("[UNIFIED-BRAIN] Scheduling: 3-tier (${cfg.tickTiers.critical}ms / ${cfg.tickTiers.standard}ms / ${cfg.tickTiers.background}ms)");
-  console.log("[UNIFIED-BRAIN] DB Pool: max ${cfg.dbPoolMax} connections, write-behind batching");
-  console.log("[UNIFIED-BRAIN] Resources: self-throttling at ${cfg.resourceThresholds.warn * 100}% / ${cfg.resourceThresholds.critical * 100}% / ${cfg.resourceThresholds.shutdown * 100}%");
-  console.log("[UNIFIED-BRAIN] Hemispheres: Gen1 (${cfg.hemisphericBalance.gen1Weight * 100}%) + Gen2 (${cfg.hemisphericBalance.gen2Weight * 100}%)");
+  console.log("[UNIFIED-BRAIN] Systems: " + consolidatedFiles.length + " consolidated + " + inventedFiles.length + " invented");
+  console.log("[UNIFIED-BRAIN] Scheduling: 3-tier (" + cfg.tickTiers.critical + "ms / " + cfg.tickTiers.standard + "ms / " + cfg.tickTiers.background + "ms)");
+  console.log("[UNIFIED-BRAIN] DB Pool: max " + cfg.dbPoolMax + " connections, write-behind batching");
+  console.log("[UNIFIED-BRAIN] Resources: self-throttling at " + (cfg.resourceThresholds.warn * 100) + "% / " + (cfg.resourceThresholds.critical * 100) + "% / " + (cfg.resourceThresholds.shutdown * 100) + "%");
+  console.log("[UNIFIED-BRAIN] Hemispheres: Gen1 (" + (cfg.hemisphericBalance.gen1Weight * 100) + "%) + Gen2 (" + (cfg.hemisphericBalance.gen2Weight * 100) + "%)");
   console.log("[UNIFIED-BRAIN] ZERO saturation. ZERO timer storms. ZERO error cascades.");
   console.log("[UNIFIED-BRAIN] Like a human brain — specialized regions, harmonious cooperation.");
   console.log("[UNIFIED-BRAIN] © 2024-2026 Alpha Unlimited Technologies, LLC");
