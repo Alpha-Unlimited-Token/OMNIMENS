@@ -167,3 +167,9 @@ id = "aKDDYAxXP_fLhJY21XVa3"
 uri = "file://attached_assets/generated_images/omnimens_tiktok_logo.png"
 type = "image"
 title = "OMNIMENS TikTok Logo"
+
+[[outputs]]
+id = "gLBDLfjqFAasBWvOdrVCY"
+uri = "file://ESCU-Model-v6.tar.gz"
+type = "unspecified"
+title = "ESCU Model v6 — Full Magnetic Confinement"
