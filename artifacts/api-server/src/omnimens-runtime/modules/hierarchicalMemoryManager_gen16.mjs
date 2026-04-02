@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: hierarchicalMemoryManager
- * Written: 2026-04-01T22:19:44.357Z
+ * Written: 2026-04-02T14:11:23.079Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,120 +16,118 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
+/**
+ * TRANSLATION STATUS:
+ * Novel constructs: attention
+ * All constructs have translation mappings
+ * Compiled targets: javascript: OK (8 IR steps) | python: OK (8 IR steps) | c: OK (8 IR steps) | x86_64: OK (8 IR steps) | arm64: OK (8 IR steps) | avr: OK (8 IR steps)
+ * Translation map version: 22
+ */
 // hierarchicalMemoryManager.mjs
 
 import crypto from 'crypto';
 
-// Utility to create unique IDs for memory nodes
-export function generateUniqueId() {
-  return crypto.randomUUID();
+/**
+ * Generates a hash for a given input, used for efficient context tracking.
+ * @param {string} input - The input string to hash.
+ * @returns {string} - A unique hash of the input.
+ */
+export function generateHash(input) {
+  return crypto.createHash('sha256').update(input).digest('hex');
 }
 
-// Core hierarchical memory structure
-const memoryHierarchy = new Map(); // Root-level memory
+/**
+ * Summarizes a block of text using a simple abstraction method.
+ * @param {string} text - The input text to summarize.
+ * @param {number} maxLength - The maximum length of the summary.
+ * @returns {string} - A summarized version of the input text.
+ */
+export function summarizeText(text, maxLength) {
+  if (text.length <= maxLength) return text;
+  const sentences = text.split('. ');
+  const summary = [];
+  let length = 0;
 
-// Add a memory node to the hierarchy
-export function addMemoryNode(parentId, data) {
-  const nodeId = generateUniqueId();
-  const node = { id: nodeId, parentId, data, children: [] };
+  for (const sentence of sentences) {
+    if (length + sentence.length + 1 > maxLength) break;
+    summary.push(sentence);
+    length += sentence.length + 1;
+  }
 
-  if (!parentId) {
-    // Add to root level if no parentId is provided
-    memoryHierarchy.set(nodeId, node);
-  } else {
-    // Add to the parent's children
-    const parent = findMemoryNode(parentId);
-    if (!parent) {
-      throw new Error(`Parent node with ID ${parentId} not found.`);
+  return summary.join('. ') + (length < text.length ? '...' : '');
+}
+
+/**
+ * Recursively compresses and abstracts context into hierarchical layers.
+ * @param {Array<string>} contexts - An array of text blocks representing contexts.
+ * @param {number} maxLayerSize - The maximum size of each layer.
+ * @returns {Array<Object>} - A hierarchical memory structure.
+ */
+export function buildHierarchicalMemory(contexts, maxLayerSize) {
+  if (contexts.length === 1) {
+    return [{ hash: generateHash(contexts[0]), content: contexts[0] }];
+  }
+
+  const summaries = [];
+  for (let i = 0; i < contexts.length; i += 2) {
+    const combined = contexts[i] + (contexts[i + 1] ? ' ' + contexts[i + 1] : '');
+    summaries.push(summarizeText(combined, maxLayerSize));
+  }
+
+  const lowerLayer = buildHierarchicalMemory(summaries, maxLayerSize);
+  return lowerLayer.map((layer, index) => ({
+    hash: generateHash(layer.content),
+    content: layer.content,
+    children: contexts.slice(index * 2, index * 2 + 2).map((child) => ({
+      hash: generateHash(child),
+      content: child
+    }))
+  }));
+}
+
+/**
+ * Dynamically reconstructs context from hierarchical memory.
+ * @param {Array<Object>} memory - The hierarchical memory structure.
+ * @param {string} targetHash - The hash of the target context to reconstruct.
+ * @returns {string|null} - The reconstructed context or null if not found.
+ */
+export function reconstructContext(memory, targetHash) {
+  for (const node of memory) {
+    if (node.hash === targetHash) return node.content;
+    if (node.children) {
+      for (const child of node.children) {
+        if (child.hash === targetHash) return child.content;
+      }
     }
-    parent.children.push(node);
   }
-
-  return nodeId;
+  return null;
 }
 
-// Retrieve a memory node by ID
-export function findMemoryNode(nodeId) {
-  const stack = [...memoryHierarchy.values()];
-
-  while (stack.length > 0) {
-    const node = stack.pop();
-    if (node.id === nodeId) {
-      return node;
-    }
-    stack.push(...node.children);
-  }
-
-  return null; // Node not found
+/**
+ * Utility function to calculate importance-weighted attention scores.
+ * @param {Array<number>} values - Array of importance scores.
+ * @returns {Array<number>} - Normalized attention weights.
+ */
+export function calculateAttentionWeights(values) {
+  const total = values.reduce((sum, val) => sum + val, 0);
+  return values.map((val) => val / total);
 }
 
-// Traverse the hierarchy and apply a function to each node
-export function traverseMemoryHierarchy(callback) {
-  const stack = [...memoryHierarchy.values()];
-
-  while (stack.length > 0) {
-    const node = stack.pop();
-    callback(node);
-    stack.push(...node.children);
-  }
-}
-
-// Retrieve all ancestors of a node
-export function getAncestors(nodeId) {
-  const ancestors = [];
-  let currentNode = findMemoryNode(nodeId);
-
-  while (currentNode && currentNode.parentId) {
-    currentNode = findMemoryNode(currentNode.parentId);
-    if (currentNode) {
-      ancestors.push(currentNode);
-    }
-  }
-
-  return ancestors;
-}
-
-// Retrieve all descendants of a node
-export function getDescendants(nodeId) {
-  const descendants = [];
-  const node = findMemoryNode(nodeId);
-
-  if (!node) {
-    throw new Error(`Node with ID ${nodeId} not found.`);
-  }
-
-  const stack = [...node.children];
-
-  while (stack.length > 0) {
-    const child = stack.pop();
-    descendants.push(child);
-    stack.push(...child.children);
-  }
-
-  return descendants;
-}
-
-// Search for nodes by a matching function
-export function searchMemoryNodes(matchFunction) {
-  const results = [];
-  traverseMemoryHierarchy((node) => {
-    if (matchFunction(node)) {
-      results.push(node);
-    }
-  });
-  return results;
-}
-
-// Example usage function for testing
+/**
+ * Example usage of the module.
+ */
 export function exampleUsage() {
-  const rootId = addMemoryNode(null, { name: 'Root Memory' });
-  const child1Id = addMemoryNode(rootId, { name: 'Child 1' });
-  const child2Id = addMemoryNode(rootId, { name: 'Child 2' });
-  addMemoryNode(child1Id, { name: 'Grandchild 1.1' });
-  addMemoryNode(child1Id, { name: 'Grandchild 1.2' });
+  const contexts = [
+    'The quick brown fox jumps over the lazy dog.',
+    'Artificial intelligence is transforming industries.',
+    'Recursive summarization improves context management.',
+    'Hierarchical memory structures enable efficient token usage.'
+  ];
+  const maxLayerSize = 50;
 
-  const ancestors = getAncestors(child2Id);
-  const descendants = getDescendants(rootId);
+  const memory = buildHierarchicalMemory(contexts, maxLayerSize);
+  const targetHash = memory[0].children[0].hash;
+  const reconstructed = reconstructContext(memory, targetHash);
 
-  return { ancestors, descendants };
+  return { memory, targetHash, reconstructed };
 }
