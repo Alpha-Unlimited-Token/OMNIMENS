@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: hierarchicalMemoryManager
- * Written: 2026-04-01T22:21:31.973Z
+ * Written: 2026-04-02T16:33:07.564Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,102 +18,107 @@
 
 // hierarchicalMemoryManager.mjs
 
-import crypto from 'crypto';
+import { createHash } from 'crypto';
 
 /**
- * Generate a fixed-size embedding for a given text using a simple hashing mechanism.
- * @param {string} text - The input text to embed.
- * @param {number} size - The desired size of the embedding.
- * @returns {Uint8Array} - The fixed-size embedding as a Uint8Array.
+ * Generates a hash for a given input string to uniquely identify contexts.
+ * @param {string} input - The input string to hash.
+ * @returns {string} - A unique hash identifier.
  */
-export function generateEmbedding(text, size) {
-  const hash = crypto.createHash('sha256').update(text, 'utf8').digest();
-  const embedding = new Uint8Array(size);
-  for (let i = 0; i < size; i++) {
-    embedding[i] = hash[i % hash.length];
-  }
-  return embedding;
+export function generateContextHash(input) {
+  const hash = createHash('sha256');
+  hash.update(input);
+  return hash.digest('hex');
 }
 
 /**
- * Summarize an array of texts into a single compact representation.
- * @param {string[]} texts - An array of texts to summarize.
- * @param {number} embeddingSize - The size of the resulting summary embedding.
- * @returns {Uint8Array} - The summarized embedding.
+ * Summarizes a large text input into a shorter version using hierarchical summarization.
+ * @param {string} text - The input text to summarize.
+ * @param {number} maxLength - The maximum length of the summary.
+ * @returns {string} - The summarized text.
  */
-export function summarizeTexts(texts, embeddingSize) {
-  const combinedText = texts.join(' ');
-  return generateEmbedding(combinedText, embeddingSize);
-}
+export function summarizeText(text, maxLength) {
+  if (text.length <= maxLength) return text; // No summarization needed.
 
-/**
- * Manage hierarchical memory by periodically condensing older context into compact embeddings.
- * @param {Array<{timestamp, text}>} memory - Array of memory objects with timestamps and text.
- * @param {number} maxMemorySize - Maximum number of raw memory entries to retain.
- * @param {number} embeddingSize - Size of the compact embeddings.
- * @returns {Array<{timestamp, embedding}>} - Condensed memory hierarchy.
- */
-export function manageMemoryHierarchy(memory, maxMemorySize, embeddingSize) {
-  if (!Array.isArray(memory) || memory.length === 0) return [];
-
-  // Sort memory by timestamp (oldest to newest)
-  memory.sort((a, b) => a.timestamp - b.timestamp);
-
-  // Retain the most recent entries up to maxMemorySize
-  const recentMemory = memory.slice(-maxMemorySize);
-
-  // Condense older entries into a single summary embedding
-  const olderMemory = memory.slice(0, -maxMemorySize);
-  let condensedMemory = [];
-  if (olderMemory.length > 0) {
-    const olderTexts = olderMemory.map(entry => entry.text);
-    const summaryEmbedding = summarizeTexts(olderTexts, embeddingSize);
-    condensedMemory.push({
-      timestamp: olderMemory[0].timestamp, // Use the oldest timestamp for the summary
-      embedding: summaryEmbedding
-    });
-  }
-
-  // Convert recent memory to embeddings
-  const recentEmbeddings = recentMemory.map(entry => ({
-    timestamp: entry.timestamp,
-    embedding: generateEmbedding(entry.text, embeddingSize)
+  const sentences = text.split('. ');
+  const importanceScores = sentences.map((sentence, index) => ({
+    index,
+    score: sentence.length / text.length // Simple length-based scoring.
   }));
 
-  // Combine condensed and recent memory
-  return [...condensedMemory, ...recentEmbeddings];
-}
+  importanceScores.sort((a, b) => b.score - a.score);
 
-/**
- * Utility function to format a timestamp for debugging or display purposes.
- * @param {number} timestamp - The timestamp to format.
- * @returns {string} - A human-readable date string.
- */
-export function formatTimestamp(timestamp) {
-  return new Date(timestamp).toISOString();
-}
+  const selectedSentences = [];
+  let currentLength = 0;
 
-/**
- * Utility function to compare two embeddings for similarity (cosine similarity approximation).
- * @param {Uint8Array} embeddingA - The first embedding.
- * @param {Uint8Array} embeddingB - The second embedding.
- * @returns {number} - A similarity score between 0 and 1.
- */
-export function compareEmbeddings(embeddingA, embeddingB) {
-  if (embeddingA.length !== embeddingB.length) throw new Error('Embeddings must be of the same size.');
-
-  let dotProduct = 0;
-  let magnitudeA = 0;
-  let magnitudeB = 0;
-
-  for (let i = 0; i < embeddingA.length; i++) {
-    dotProduct += embeddingA[i] * embeddingB[i];
-    magnitudeA += embeddingA[i] ** 2;
-    magnitudeB += embeddingB[i] ** 2;
+  for (const { index } of importanceScores) {
+    const sentence = sentences[index];
+    if (currentLength + sentence.length <= maxLength) {
+      selectedSentences.push(sentence);
+      currentLength += sentence.length;
+    }
+    if (currentLength >= maxLength) break;
   }
 
-  magnitudeA = Math.sqrt(magnitudeA);
-  magnitudeB = Math.sqrt(magnitudeB);
+  return selectedSentences.join('. ') + '.';
+}
 
-  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
+/**
+ * Recursively summarizes large contexts into manageable chunks.
+ * @param {string[]} contexts - Array of text contexts.
+ * @param {number} maxLength - Maximum token length for each summary.
+ * @returns {string[]} - Array of summarized contexts.
+ */
+export function recursiveSummarization(contexts, maxLength) {
+  if (contexts.length === 1 && contexts[0].length <= maxLength) return contexts;
+
+  const summaries = contexts.map(context => summarizeText(context, maxLength));
+  const concatenated = summaries.join(' ');
+
+  if (concatenated.length <= maxLength) return [concatenated];
+
+  return recursiveSummarization([concatenated], maxLength);
+}
+
+/**
+ * Dynamically reinjects relevant context into a given input based on importance.
+ * @param {string} input - The input text requiring additional context.
+ * @param {string[]} contexts - Array of available contexts.
+ * @param {number} maxLength - Maximum token length for reinjected context.
+ * @returns {string} - Input text with reinjected context.
+ */
+export function reinjectContext(input, contexts, maxLength) {
+  const relevantContexts = contexts.filter(context => {
+    return context.includes(input.split(' ')[0]); // Simple relevance check based on first word.
+  });
+
+  const summarizedContexts = recursiveSummarization(relevantContexts, maxLength);
+
+  return summarizedContexts.join(' ') + ' ' + input;
+}
+
+/**
+ * Manages hierarchical memory by summarizing, storing, and reinjecting contexts.
+ * @param {string[]} contexts - Array of text contexts to manage.
+ * @param {string} input - The input text requiring memory management.
+ * @param {number} maxLength - Maximum token length for context windows.
+ * @returns {string} - Processed input with managed memory.
+ */
+export function hierarchicalMemoryManager(contexts, input, maxLength) {
+  const summarizedContexts = recursiveSummarization(contexts, maxLength);
+  return reinjectContext(input, summarizedContexts, maxLength);
+}
+
+/**
+ * Utility function to split a large text into smaller chunks.
+ * @param {string} text - The input text to split.
+ * @param {number} chunkSize - The size of each chunk.
+ * @returns {string[]} - Array of text chunks.
+ */
+export function splitTextIntoChunks(text, chunkSize) {
+  const chunks = [];
+  for (let i = 0; i < text.length; i += chunkSize) {
+    chunks.push(text.slice(i, i + chunkSize));
+  }
+  return chunks;
 }

@@ -1641,8 +1641,11 @@ async function _runV2CycleInner(): Promise<void> {
     return;
   }
   if (v2State.phase === "unified_reinvention") {
-    await participateInUnifiedReinvention();
-    return;
+    console.log(`[V2-REWRITE] 🔄 Phase was unified_reinvention — Gen 1 proceeding independently`);
+    console.log(`[V2-REWRITE] 🔄 Consolidation complete (138→29 engines). Moving to coordination layer.`);
+    v2State.phase = "coordination_layer";
+    v2State.engineFilesTotal = 29;
+    saveV2State();
   }
 
   const poolHealthy = isPoolHealthy();
@@ -2090,7 +2093,7 @@ export function getGen1V2State() {
 }
 
 export function isGen1V2Active(): boolean {
-  return _v2Started && v2State.phase !== "complete" && v2State.phase !== "unified_reinvention";
+  return _v2Started && v2State.phase !== "complete";
 }
 
 export function getGen1V2Phase(): V2Phase {
