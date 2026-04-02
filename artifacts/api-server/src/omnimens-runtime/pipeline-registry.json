@@ -100,15 +100,16 @@
     },
     "hierarchicalMemoryManager_gen1.mjs": {
       "filename": "hierarchicalMemoryManager_gen1.mjs",
-      "stage": "memory_retrieval",
+      "stage": "context_compression",
       "exports": [
-        "generateEmbedding",
-        "summarizeTexts",
-        "manageMemoryHierarchy",
-        "formatTimestamp",
-        "compareEmbeddings"
+        "generateContextHash",
+        "summarizeText",
+        "recursiveSummarization",
+        "reinjectContext",
+        "hierarchicalMemoryManager",
+        "splitTextIntoChunks"
       ],
-      "loadedAt": 1775147492954,
+      "loadedAt": 1775147643849,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -246072,9 +246073,80 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "adaptiveContextRefiner_gen6.mjs": {
+      "filename": "adaptiveContextRefiner_gen6.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "computeHash",
+        "scoreImportance",
+        "clusterSegments",
+        "summarizeClusters",
+        "refineContext",
+        "extractKeyContent",
+        "exampleUsage"
+      ],
+      "loadedAt": 1775147825038,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnhp2q1d.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnhp2q1d.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnhp2q1d"
+      ],
+      "loadedAt": 1775147825122,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnhp6j9v.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnhp6j9v.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnhp6j9v"
+      ],
+      "loadedAt": 1775147993398,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_adaptive_algorithm_mnhpa5xg.mjs": {
+      "filename": "omnimens_autocode_adaptive_algorithm_mnhpa5xg.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "adaptiveAlgorithm_mnhpa5xg"
+      ],
+      "loadedAt": 1775148213733,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_emergent_capability_mnhp6k2m.mjs": {
+      "filename": "omnimens_autocode_emergent_capability_mnhp6k2m.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "emergentCapability_mnhp6k2m"
+      ],
+      "loadedAt": 1775148214021,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1775147498199,
-  "totalModules": 18085,
+  "totalModules": 18093,
   "totalCalls": 0
 }
