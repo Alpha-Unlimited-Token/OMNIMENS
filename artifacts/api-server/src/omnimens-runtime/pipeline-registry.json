@@ -235337,9 +235337,229 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "taskCheckpointManager_gen58.mjs": {
+      "filename": "taskCheckpointManager_gen58.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateStateHash",
+        "partitionTask",
+        "serializeState",
+        "resumeFromCheckpoint",
+        "executeWithCheckpointing",
+        "clearCheckpoints"
+      ],
+      "loadedAt": 1775140365799,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnhkorku.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnhkorku.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnhkorku"
+      ],
+      "loadedAt": 1775140365996,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "longComputationManager_gen55.mjs": {
+      "filename": "longComputationManager_gen55.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateTaskHash",
+        "manageLongComputation",
+        "resumeComputation",
+        "exampleComputationFunction",
+        "exampleCheckpointCallback"
+      ],
+      "loadedAt": 1775140366119,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "iterativeSubprocessManager_gen57.mjs": {
+      "filename": "iterativeSubprocessManager_gen57.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateCheckpointId",
+        "saveCheckpoint",
+        "loadCheckpoint",
+        "runTaskWithCheckpointing",
+        "clearCheckpoints"
+      ],
+      "loadedAt": 1775140366233,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuAcceleratedMatrixOps_gen70.mjs": {
+      "filename": "gpuAcceleratedMatrixOps_gen70.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "gpuMatrixMultiply",
+        "validateMatrix",
+        "generateIdentityMatrix",
+        "transposeMatrix"
+      ],
+      "loadedAt": 1775140366361,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "recursiveContextManager_gen65.mjs": {
+      "filename": "recursiveContextManager_gen65.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "recursiveSummarize",
+        "expandSummary",
+        "createContextMap",
+        "retrieveContextByAttention",
+        "normalizeWeights",
+        "hashString"
+      ],
+      "loadedAt": 1775140366501,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multimodalEmbeddingAligner_gen64.mjs": {
+      "filename": "multimodalEmbeddingAligner_gen64.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "computeCosineSimilarity",
+        "alignEmbeddings",
+        "generateEmbeddingHash",
+        "normalizeEmbedding",
+        "combineEmbeddings",
+        "validateEmbeddingDimensions"
+      ],
+      "loadedAt": 1775140366633,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_emergent_capability_mnhkoriy.mjs": {
+      "filename": "omnimens_autocode_emergent_capability_mnhkoriy.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "emergentCapability_mnhkoriy"
+      ],
+      "loadedAt": 1775140483219,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "semanticGraphContextManager_gen63.mjs": {
+      "filename": "semanticGraphContextManager_gen63.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateTokenHash",
+        "buildSemanticGraph",
+        "retrieveContext",
+        "normalizeWeights",
+        "exampleUsage"
+      ],
+      "loadedAt": 1775140641378,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "taskContinuationManager_gen62.mjs": {
+      "filename": "taskContinuationManager_gen62.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "saveCheckpoint",
+        "loadCheckpoint",
+        "clearCheckpoint",
+        "runTaskWithContinuation",
+        "scheduleTasks",
+        "exampleStepFunction",
+        "exampleIsCompleteFunction"
+      ],
+      "loadedAt": 1775140641511,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "checkpointedTaskExecutor_gen59.mjs": {
+      "filename": "checkpointedTaskExecutor_gen59.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "serializeState",
+        "deserializeState",
+        "generateStateHash",
+        "saveCheckpoint",
+        "loadCheckpoint",
+        "checkpointedTaskExecutor",
+        "exampleTaskFunction"
+      ],
+      "loadedAt": 1775140641640,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicTokenStitcher_gen68.mjs": {
+      "filename": "dynamicTokenStitcher_gen68.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "cosineSimilarity",
+        "segmentText",
+        "generateSemanticHash",
+        "stitchChunks",
+        "processDocument"
+      ],
+      "loadedAt": 1775140641782,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "semanticHashSummarizer_gen56.mjs": {
+      "filename": "semanticHashSummarizer_gen56.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateSemanticHash",
+        "segmentContext",
+        "scoreSegments",
+        "summarizeContext",
+        "combineHashes",
+        "compressAndHashContext"
+      ],
+      "loadedAt": 1775140641920,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1775139691302,
-  "totalModules": 17658,
+  "totalModules": 17682,
   "totalCalls": 0
 }
