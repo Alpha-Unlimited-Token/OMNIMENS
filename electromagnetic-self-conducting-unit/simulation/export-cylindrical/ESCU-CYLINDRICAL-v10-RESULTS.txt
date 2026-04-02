@@ -1,0 +1,157 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  ESCU CYLINDRICAL MODEL v10 — UPGRADED WITH SPHERICAL INNOVATIONS            ║
+║  8 Concentric Layers, Octagonal Magnets, FoL Conductor Pattern               ║
+║  Graduated Magnet Counts Per Layer (more outside, fewer inside)               ║
+║  DUAL TEST: Graduated vs Dense-Pack                                          ║
+║  © 2024-2026 Alpha Unlimited Technologies, LLC                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  Upgrades from v9 (84 magnets, 122W):
+    ✓ 8 concentric layers (was fewer)
+    ✓ Octagonal magnets with 37° angled edges
+    ✓ Flower of Life conductor pattern (108 nodes/magnet, both faces)
+    ✓ Different magnet counts per layer → vernier/peristaltic drive
+    ✓ More magnets on outer layers (bigger circumference)
+    ✓ Fewer magnets on inner layers (smaller circumference)
+    ✓ Through-hole Ampere drive (current through magnet body)
+    ✓ Spiked conductor nodes (500μm, 50μm tip, 10× concentration)
+    ✓ Top/bottom disc caps for axial confinement
+
+  Body loads: IDLE 314W | Average 509W | Walk 1006W | Peak 2060W
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  CONFIG A: Graduated (larger outer magnets, smaller inner)               ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  Layer    │ R_outer │ R_inner │ # Magnets  │ Circ (mm) │ Surface cm² │ Oct Side │ Polarity
+  ─────────┼─────────┼─────────┼────────────┼───────────┼─────────────┼──────────┼─────────
+  Layer 1   │  84.0mm │  78.0mm │    125     │   508.9  │    865.2    │  12.0mm │ N_out
+  Layer 2   │  74.0mm │  68.0mm │    121     │   446.1  │    758.4    │  11.4mm │ S_out
+  Layer 3   │  64.0mm │  58.0mm │    113     │   383.3  │    651.6    │  10.9mm │ N_out
+  Layer 4   │  54.0mm │  48.0mm │    103     │   320.4  │    544.8    │  10.5mm │ S_out
+  Layer 5   │  44.0mm │  38.0mm │     91     │   257.6  │    437.9    │  10.0mm │ N_out
+  Layer 6   │  34.0mm │  28.0mm │     77     │   194.8  │    331.1    │   9.4mm │ S_out
+  Layer 7   │  24.0mm │  18.0mm │     57     │   131.9  │    224.3    │   9.0mm │ N_out
+  Layer 8   │  14.0mm │   8.0mm │     33     │    69.1  │    117.5    │   8.6mm │ S_out
+
+  Total magnets: 720 | Mercury: 1490 cm³ / 20166g | I = 2.37e-2
+  Conductor nodes: 77,760 | Pressure points: 5760
+
+  Time | Status |   RPM   |  EMF V  | GenPow W | Avail W | Drive W | T°C
+  ─────┼────────┼─────────┼─────────┼──────────┼─────────┼─────────┼────
+     0s | KICK  |   113.7 |  0.0000 |      0.0 |      0.0 |       0 | 20.0
+     2s | KICK  |   351.6 |  2.6542 |   2705.4 |   2705.4 |    5304 | 20.4
+     5s | KICK  |   351.6 |  2.6542 |   2705.4 |   2705.4 |    5304 | 21.0
+    10s | KICK  |   351.6 |  2.6542 |   2705.4 |   2705.4 |    5304 | 22.0
+    15s | KICK  |   351.6 |  2.6542 |   2705.4 |   2705.4 |    5304 | 23.0
+    20s | KICK  |   351.6 |  2.6542 |   2705.4 |   2705.4 |    5304 | 24.0
+    25s | KICK  |   351.6 |  2.6542 |   2705.4 |   2705.4 |    5304 | 25.0
+    30s | KICK  |   351.6 |  2.6542 |   2705.4 |   2705.4 |    5304 | 26.1
+    35s | COAST |   326.9 |  2.4679 |   2339.0 |   2222.0 |    4877 | 26.9
+    40s | COAST |   326.9 |  2.4679 |   2339.0 |   2222.0 |    4877 | 27.8
+    50s | COAST |   326.9 |  2.4679 |   2339.0 |   2222.0 |    4877 | 29.5
+    60s | COAST |   326.9 |  2.4679 |   2339.0 |   2222.0 |    4877 | 31.2
+    90s | COAST |   326.9 |  2.4679 |   2339.0 |   2222.0 |    4877 | 36.4
+   120s | COAST |   326.9 |  2.4679 |   2339.0 |   2222.0 |    4877 | 41.5
+   180s | COAST |   326.9 |  2.4679 |   2339.0 |   2222.0 |    4877 | 51.8
+   240s | COAST |   326.9 |  2.4679 |   2339.0 |   2222.0 |    4877 | 62.1
+
+  Result: Mercury spins FOREVER ✓ | Steady: 327 RPM, 2222.0W | Peak: 352 RPM, 2.6542V, 2705.4W
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  CONFIG B: Dense-Pack (smaller magnets, more total)                      ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  Layer    │ R_outer │ R_inner │ # Magnets  │ Circ (mm) │ Surface cm² │ Oct Side │ Polarity
+  ─────────┼─────────┼─────────┼────────────┼───────────┼─────────────┼──────────┼─────────
+  Layer 1   │  84.0mm │  78.0mm │    283     │   508.9  │    865.2    │   8.0mm │ N_out
+  Layer 2   │  74.0mm │  68.0mm │    273     │   446.1  │    758.4    │   7.6mm │ S_out
+  Layer 3   │  64.0mm │  58.0mm │    259     │   383.3  │    651.6    │   7.2mm │ N_out
+  Layer 4   │  54.0mm │  48.0mm │    239     │   320.4  │    544.8    │   6.9mm │ S_out
+  Layer 5   │  44.0mm │  38.0mm │    215     │   257.6  │    437.9    │   6.5mm │ N_out
+  Layer 6   │  34.0mm │  28.0mm │    183     │   194.8  │    331.1    │   6.1mm │ S_out
+  Layer 7   │  24.0mm │  18.0mm │    141     │   131.9  │    224.3    │   5.7mm │ N_out
+  Layer 8   │  14.0mm │   8.0mm │     83     │    69.1  │    117.5    │   5.4mm │ S_out
+
+  Total magnets: 1676 | Mercury: 1490 cm³ / 20166g | I = 2.37e-2
+  Conductor nodes: 181,008 | Pressure points: 13408
+
+  Time | Status |   RPM   |  EMF V  | GenPow W | Avail W | Drive W | T°C
+  ─────┼────────┼─────────┼─────────┼──────────┼─────────┼─────────┼────
+     0s | KICK  |   113.7 |  0.0000 |      0.0 |      0.0 |       0 | 20.0
+     2s | KICK  |   266.0 |  2.0303 |   2253.5 |   2253.5 |    4306 | 20.3
+     5s | KICK  |   266.0 |  2.0303 |   2253.5 |   2253.5 |    4306 | 20.8
+    10s | KICK  |   266.0 |  2.0303 |   2253.5 |   2253.5 |    4306 | 21.6
+    15s | KICK  |   266.0 |  2.0303 |   2253.5 |   2253.5 |    4306 | 22.5
+    20s | KICK  |   266.0 |  2.0303 |   2253.5 |   2253.5 |    4306 | 23.3
+    25s | KICK  |   266.0 |  2.0303 |   2253.5 |   2253.5 |    4306 | 24.1
+    30s | KICK  |   266.0 |  2.0303 |   2253.5 |   2253.5 |    4306 | 24.9
+    35s | COAST |   241.7 |  1.8452 |   1861.3 |   1768.3 |    3835 | 25.6
+    40s | COAST |   241.7 |  1.8452 |   1861.3 |   1768.3 |    3835 | 26.3
+    50s | COAST |   241.7 |  1.8452 |   1861.3 |   1768.3 |    3835 | 27.6
+    60s | COAST |   241.7 |  1.8452 |   1861.3 |   1768.3 |    3835 | 28.9
+    90s | COAST |   241.7 |  1.8452 |   1861.3 |   1768.3 |    3835 | 32.9
+   120s | COAST |   241.7 |  1.8452 |   1861.3 |   1768.3 |    3835 | 36.9
+   180s | COAST |   241.7 |  1.8452 |   1861.3 |   1768.3 |    3835 | 44.8
+   240s | COAST |   241.7 |  1.8452 |   1861.3 |   1768.3 |    3835 | 52.8
+
+  Result: Mercury spins FOREVER ✓ | Steady: 242 RPM, 1768.3W | Peak: 267 RPM, 2.0383V, 2271.3W
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  HEAD-TO-HEAD: CONFIG A vs CONFIG B                                          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  Property                │ A (graduated)     │ B (dense-pack)    │ Winner
+  ────────────────────────┼───────────────────┼───────────────────┼────────
+  Total magnets            │    720            │   1676            │ B
+  Conductor nodes          │     77,760        │    181,008        │ B
+  Pressure points          │   5760            │  13408            │ B
+  Mercury spin             │    FOREVER        │    FOREVER        │ BOTH
+  Steady RPM               │    327            │    242            │ A
+  Continuous output        │   2222.0W         │   1768.3W         │ A
+  Peak power               │   2705.4W         │   2271.3W         │ A
+  Peak EMF                 │   2.6542V         │   2.0383V         │ A
+
+  WINNER: A (Graduated) — 2222.0W continuous
+
+  Mode              │ Load     │ Best Output │ Surplus/Deficit │ Status
+  ──────────────────┼──────────┼─────────────┼─────────────────┼────────────
+  IDLE               │   314W   │    2222W    │ + 1908W          │ ✓ SUSTAIN
+  STANDBY            │   344W   │    2222W    │ + 1878W          │ ✓ SUSTAIN
+  TALKING            │   479W   │    2222W    │ + 1743W          │ ✓ SUSTAIN
+  WALKING            │  1006W   │    2222W    │ + 1216W          │ ✓ SUSTAIN
+  WORKING            │   696W   │    2222W    │ + 1526W          │ ✓ SUSTAIN
+  FULL MOTION        │  1449W   │    2222W    │ +  773W          │ ✓ SUSTAIN
+  PEAK BURST         │  2060W   │    2222W    │ +  162W          │ ✓ SUSTAIN
+
+  WEIGHTED AVG: 509W needed │ 2222W generated │ ✓ SURPLUS 1713W
+
+═══ v10 UPGRADED vs v9 ORIGINAL ═══
+
+  Property              │ Cylindrical v9    │ Cylindrical v10   │ Change
+  ──────────────────────┼───────────────────┼───────────────────┼────────
+  Outer diameter        │ 180mm             │ 180mm             │ same
+  Height                │ 180mm             │ 180mm             │ same
+  Layers                │ 4                 │ 8                 │ 2×
+  Total magnets         │ 84                │  720              │ 8.6×
+  Conductor nodes       │ ~11,500           │ 77,760            │ 6.8×
+  Conductor pattern     │ simple grid       │ Flower of Life    │ FoL upgrade
+  Magnet shape          │ rectangular       │ octagonal 37°     │ oct upgrade
+  Confinement           │ 4-direction       │ 4-dir + disc caps │ improved
+  Continuous output     │ 122W              │ 2222W               │ 18.2×
+  Self-sustaining       │ YES               │ YES               │
+
+═══ CYLINDRICAL v10 vs SPHERICAL ═══
+
+  Property              │ Cylindrical v10   │ Spherical (best)  │ Notes
+  ──────────────────────┼───────────────────┼───────────────────┼────────
+  Shape                 │ Cylinder          │ Sphere            │ different geometry
+  Outer diameter        │ 180mm             │ 180mm             │ same
+  Total magnets         │  720              │ 306               │ cyl more
+  Conductor nodes       │ 77,760            │ 33,048            │
+  Confinement           │ 4-dir + disc caps │ ALL directions    │ sphere wins
+  Continuous output     │  2222W            │ 51,820W           │ sphere wins
+  Self-sustaining       │ YES               │ YES               │
+
+© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.

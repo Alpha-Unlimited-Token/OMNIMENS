@@ -1,0 +1,138 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  ESCU SIMULATION v9 — REALISTIC POWER DISTRIBUTION MODEL                   ║
+║  Like a house breaker panel: 240V in, circuits draw what they need           ║
+║  © 2024-2026 Alpha Unlimited Technologies, LLC                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  POWER DISTRIBUTION UNIT (PDU) — CIRCUIT BREAKER PANEL                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  Circuit                      │ Breaker Max │ Idle Draw │ Active Draw │ Always On
+  ─────────────────────────────┼─────────────┼───────────┼─────────────┼──────────
+  Server (Jetson AGX Orin)      │     275W    │    60W    │     240W    │   YES
+  Starlink Mini                 │     100W    │    25W    │      75W    │    NO
+  LoRa/BT/WiFi comms            │      15W    │     5W    │      12W    │   YES
+  Cameras (11 total)            │      30W    │     3W    │      22W    │    NO
+  Microphones (16 array)        │       5W    │     2W    │       4W    │   YES
+  Speakers                      │      50W    │     0W    │      30W    │    NO
+  Head actuators (3 DOF)        │      45W    │     2W    │      30W    │    NO
+  Waist actuators (3 DOF)       │     120W    │     5W    │      80W    │    NO
+  Shoulder actuators (6 DOF)    │     240W    │    10W    │     160W    │    NO
+  Elbow actuators (4 DOF)       │      80W    │     3W    │      50W    │    NO
+  Wrist actuators (6 DOF)       │      30W    │     2W    │      20W    │    NO
+  Hand actuators (30 DOF)       │     150W    │     5W    │     100W    │    NO
+  Hip actuators (6 DOF)         │     480W    │    15W    │     320W    │    NO
+  Knee actuators (2 DOF)        │     240W    │     8W    │     160W    │    NO
+  Ankle actuators (4 DOF)       │     120W    │     5W    │      80W    │    NO
+  IMU + sensors                 │      10W    │     3W    │       8W    │   YES
+  Cooling pump                  │      40W    │    15W    │      35W    │   YES
+  LED status/eyes               │      10W    │     3W    │       8W    │    NO
+  PDU overhead                  │      20W    │    10W    │      15W    │   YES
+  ─────────────────────────────┼─────────────┼───────────┼─────────────┼──────────
+  TOTALS                        │    2060W    │    95W    │    1449W    │
+
+  NOTE: Total breaker capacity (2060W) is like a house's panel rating.
+  You NEVER draw all 2060W at once — just like a house doesn't
+  use every outlet at maximum simultaneously.
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  OPERATING MODES — WHAT THE BODY ACTUALLY DRAWS                            ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  Mode          │ Description                                    │ Actual Draw │ % of Max │ Duty Cycle
+  ──────────────┼────────────────────────────────────────────────┼─────────────┼──────────┼───────────
+  IDLE           │ Sitting still, thinking/computing. Server only. │     314W    │  15.2%   │   40%
+  STANDBY        │ Alert, cameras on, listening, ready to move.   │     344W    │  16.7%   │   20%
+  TALKING        │ Conversing — server + comms + speakers + cameras + head. │     479W    │  23.3%   │   15%
+  WALKING        │ Walking — legs + balance + server + sensors.   │    1006W    │  48.8%   │   10%
+  WORKING        │ Using arms and hands — manipulation tasks.     │     696W    │  33.8%   │   10%
+  FULL MOTION    │ Walking + arms + talking — everything active.  │    1449W    │  70.3%   │    4%
+  PEAK BURST     │ Sprinting/lifting — all actuators maxed (brief, <10s). │    2060W    │ 100.0%   │    1%
+
+  WEIGHTED AVERAGE LOAD (typical day): 508.9W
+  This is what the ESCU actually needs to sustain.
+
+  Compare:
+    Old assumption:  2,938W (everything maxed simultaneously)
+    IDLE (server):   314W (just thinking/computing)
+    Average day:     509W
+    Walking+talking: 1006W
+    Everything on:   1449W
+    Brief burst:     2060W (max 10 seconds)
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  ESCU PHYSICS SIMULATION (960W kickstart, 30s)                             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  Time | Status |   RPM   | EMF V  | GenPow W | Available W | T°C
+  ─────┼────────┼─────────┼────────┼──────────┼─────────────┼────
+     0s | KICK   |   119.3 | 0.0000 |      0.0 |      0.0 | 20.0
+     2s | KICK   |    97.7 | 0.7032 |    276.6 |    276.6 | 21.3
+     5s | KICK   |    97.7 | 0.7032 |    276.6 |    276.6 | 23.1
+    10s | KICK   |    97.7 | 0.7032 |    276.6 |    276.6 | 26.3
+    15s | KICK   |    97.7 | 0.7032 |    276.6 |    276.6 | 29.4
+    20s | KICK   |    97.7 | 0.7032 |    276.6 |    276.6 | 32.6
+    25s | KICK   |    97.7 | 0.7032 |    276.6 |    276.6 | 35.7
+    30s | KICK   |    97.7 | 0.7032 |    276.6 |    276.6 | 38.8
+    35s | COAST  |   159.4 | 0.4799 |    128.8 |    122.3 | 41.3
+    40s | COAST  |   159.6 | 0.4792 |    128.4 |    122.0 | 43.8
+    50s | COAST  |   159.6 | 0.4792 |    128.4 |    122.0 | 48.8
+    60s | COAST  |   159.6 | 0.4792 |    128.4 |    122.0 | 53.7
+    90s | COAST  |   159.6 | 0.4792 |    128.4 |    122.0 | 68.6
+   120s | COAST  |   159.6 | 0.4792 |    128.4 |    122.0 | 83.6
+   180s | COAST  |   159.6 | 0.4792 |    128.4 |    122.0 | 113.4
+   240s | COAST  |   159.6 | 0.4792 |    128.4 |    122.0 | 143.2
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  CAN THE ESCU POWER THE BODY?                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  ESCU CONTINUOUS OUTPUT: 122.0W
+  (Steady-state at 160 RPM, running indefinitely)
+
+  Mode              │ Load     │ ESCU Output │ Surplus/Deficit │ Can Sustain?
+  ──────────────────┼──────────┼─────────────┼─────────────────┼────────────
+  IDLE               │   314W   │     122W    │  -192W          │ ✗ NO
+  STANDBY            │   344W   │     122W    │  -222W          │ ✗ NO
+  TALKING            │   479W   │     122W    │  -357W          │ ✗ NO
+  WALKING            │  1006W   │     122W    │  -884W          │ ✗ NO
+  WORKING            │   696W   │     122W    │  -574W          │ ✗ NO
+  FULL MOTION        │  1449W   │     122W    │ -1327W          │ ✗ NO
+  PEAK BURST         │  2060W   │     122W    │ -1938W          │ ⚡ BATTERY
+
+  WEIGHTED AVERAGE:   509W needed │ 122W generated │ ✗ DEFICIT 387W
+
+═══ BUFFER BATTERY (for burst modes) ═══
+
+  Burst mode: 2060W for 10s = 20.6kJ needed
+  ESCU provides: 122W during burst
+  Deficit: 1938W × 10s = 19.4kJ from battery
+  Battery needed: 16.2Wh (0.34Ah at 48V) — with 3× safety
+  This is a TINY battery — about the size of a smartphone battery.
+  Recharge time: 5814s from ESCU surplus during idle
+
+═══ ENERGY PRODUCTION ═══
+
+  Continuous output: 122.0 watts
+  Per hour: 122.0 Wh
+  Per day:  2928 Wh = 2.93 kWh
+  Per month: 87.8 kWh
+
+  Average daily consumption: 12214 Wh = 12.21 kWh
+  Daily deficit: 9286 Wh — needs supplemental power
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  FINAL VERDICT                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  ✗ The ESCU needs more output to sustain even idle mode.
+
+    Server needs: 314W, ESCU provides: 122W
+
+  BOOST CONVERTER NOTE:
+  The ESCU outputs ~0.70V. A boost converter (95% efficient)
+  steps this up to 48V for the main bus. This is standard technology,
+  small (30×20mm board), and handles the voltage conversion.
+
+© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
