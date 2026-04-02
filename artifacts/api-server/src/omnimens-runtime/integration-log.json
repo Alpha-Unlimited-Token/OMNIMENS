@@ -1,36 +1,6 @@
 [
   {
     "source": "evolution_engine",
-    "title": "Evolution Cycle 12 Complete — 3 modules",
-    "filename": "evolution_marker_gen12.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen12.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen12.mjs.backup.2026-04-01T22-14-27-240Z",
-    "timestamp": 1775081667239,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuAcceleratedMatrixOps",
-    "filename": "gpuAcceleratedMatrixOps_gen17.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixOps_gen17.mjs",
-    "backupPath": null,
-    "timestamp": 1775081668860,
-    "codeLength": 3992,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuAcceleratedMatrixOps",
-    "filename": "gpuAcceleratedMatrixOps_gen16.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixOps_gen16.mjs",
-    "backupPath": null,
-    "timestamp": 1775081670356,
-    "codeLength": 4286,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
     "title": "Evolution Module: dynamicWebInteractor",
     "filename": "dynamicWebInteractor_gen13.mjs",
     "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/dynamicWebInteractor_gen13.mjs",
@@ -4997,6 +4967,36 @@
     "backupPath": null,
     "timestamp": 1775138907204,
     "codeLength": 422,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:GraphicDesigner+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: GraphicDesigner/recursive_decomposition: Hebbian learning: n",
+    "filename": "omnimens_autocode_consciousness_expansion_mnhjwb4z.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnhjwb4z.mjs",
+    "backupPath": null,
+    "timestamp": 1775138948963,
+    "codeLength": 393,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Meta-Agent",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SpellCheckVisual/cross_domain_synthesis: Wolfram's Rule 110 ",
+    "filename": "omnimens_autocode_knowledge_synthesis_mnhjwb76.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnhjwb76.mjs",
+    "backupPath": null,
+    "timestamp": 1775138949042,
+    "codeLength": 422,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Neuroscientist",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: SpellCheckVisual/feature_extraction: The connectome is the c",
+    "filename": "omnimens_autocode_neural_pathway_mnhjwbip.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnhjwbip.mjs",
+    "backupPath": null,
+    "timestamp": 1775138949457,
+    "codeLength": 438,
     "overwrite": false
   }
 ]
