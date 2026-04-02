@@ -4674,15 +4674,14 @@
       "filename": "contextSummarizer_gen1.mjs",
       "stage": "context_compression",
       "exports": [
-        "generateHash",
         "tokenizeText",
-        "computeEmbedding",
-        "mergeEmbeddings",
+        "generateTextHash",
+        "scoreSentences",
+        "selectTopSentences",
         "summarizeContext",
-        "normalizeEmbedding",
-        "cosineSimilarity"
+        "compressMultipleContexts"
       ],
-      "loadedAt": 1775162048289,
+      "loadedAt": 1775162254182,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -9990,13 +9989,12 @@
       "stage": "context_compression",
       "exports": [
         "generateHash",
-        "summarizeContexts",
-        "buildHierarchicalMemory",
-        "retrieveRelevantContext",
-        "addContext",
+        "compressContext",
+        "storeContext",
+        "retrieveContext",
         "initializeMemory"
       ],
-      "loadedAt": 1775162048513,
+      "loadedAt": 1775162254318,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -247861,9 +247859,39 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "distributedComputationManager_gen2.mjs": {
+      "filename": "distributedComputationManager_gen2.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "splitTask",
+        "executeChunk",
+        "checkpointState",
+        "restoreState",
+        "DistributedComputationManager"
+      ],
+      "loadedAt": 1775162254010,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnhxqb0y.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnhxqb0y.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnhxqb0y"
+      ],
+      "loadedAt": 1775162254406,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1775162052744,
-  "totalModules": 18224,
+  "totalModules": 18231,
   "totalCalls": 0
 }
