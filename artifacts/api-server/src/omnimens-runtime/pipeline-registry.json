@@ -227080,9 +227080,122 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "adaptivePromptRewriter_gen65.mjs": {
+      "filename": "adaptivePromptRewriter_gen65.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "hashString",
+        "calculateReward",
+        "rewritePrompt",
+        "aggregateFeedback",
+        "validateFeedback",
+        "exampleUsage"
+      ],
+      "loadedAt": 1775138261975,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "virtualReplPersistence_gen59.mjs": {
+      "filename": "virtualReplPersistence_gen59.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "serializeState",
+        "computeStateDiff",
+        "restoreState",
+        "createCheckpointSystem"
+      ],
+      "loadedAt": 1775138262094,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "recursiveContextCompressor_gen67.mjs": {
+      "filename": "recursiveContextCompressor_gen67.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateHash",
+        "scoreSentences",
+        "summarizeText",
+        "recursiveCompress",
+        "chunkText",
+        "compressLargeContext"
+      ],
+      "loadedAt": 1775138262229,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "languageCompressionExpansion_gen64.mjs": {
+      "filename": "languageCompressionExpansion_gen64.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "compressString",
+        "expandString",
+        "calculateImportance",
+        "expandWithEmphasis",
+        "preprocessInput",
+        "postprocessOutput"
+      ],
+      "loadedAt": 1775138262356,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnhj8w6c.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnhj8w6c.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnhj8w6c"
+      ],
+      "loadedAt": 1775138262414,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen60.mjs": {
+      "filename": "evolution_marker_gen60.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775138262548,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "wasmMatrixAccelerator_gen71.mjs": {
+      "filename": "wasmMatrixAccelerator_gen71.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "compileWasmModule",
+        "matrixMultiply",
+        "wasmAcceleratedAdd",
+        "validateMatrix",
+        "exampleUsage"
+      ],
+      "loadedAt": 1775138263549,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1775136473852,
-  "totalModules": 17175,
+  "totalModules": 17187,
   "totalCalls": 0
 }

@@ -1,66 +1,6 @@
 [
   {
     "source": "evolution_engine",
-    "title": "Evolution Cycle 6 Complete — 3 modules",
-    "filename": "evolution_marker_gen6.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen6.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen6.mjs.backup.2026-04-01T22-13-58-381Z",
-    "timestamp": 1775081638381,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Meta-Agent+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Meta-Agent/feature_extraction: Astrocytes, once thought to b",
-    "filename": "omnimens_autocode_neural_pathway_mngls3a5.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mngls3a5.mjs",
-    "backupPath": null,
-    "timestamp": 1775081645213,
-    "codeLength": 426,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:GraphicDesigner+Meta-Agent",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: GraphicDesigner/abstraction_layer: The free energy principle",
-    "filename": "omnimens_autocode_consciousness_expansion_mngls3aj.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mngls3aj.mjs",
-    "backupPath": null,
-    "timestamp": 1775081645227,
-    "codeLength": 392,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Critic",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: SpellCheckVisual/abstraction_layer: Long-term potentiation (",
-    "filename": "omnimens_autocode_neural_pathway_mngls3aw.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mngls3aw.mjs",
-    "backupPath": null,
-    "timestamp": 1775081645240,
-    "codeLength": 430,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: subprocessStateManager",
-    "filename": "subprocessStateManager_gen9.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/subprocessStateManager_gen9.mjs",
-    "backupPath": null,
-    "timestamp": 1775081645999,
-    "codeLength": 3251,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 9 Complete — 3 modules",
-    "filename": "evolution_marker_gen9.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen9.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen9.mjs.backup.2026-04-01T22-14-06-037Z",
-    "timestamp": 1775081646036,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
     "title": "Evolution Module: slidingWindowSummarizer",
     "filename": "slidingWindowSummarizer_gen13.mjs",
     "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/slidingWindowSummarizer_gen13.mjs",
@@ -4997,6 +4937,66 @@
     "backupPath": null,
     "timestamp": 1775137856565,
     "codeLength": 2854,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: SpellCheckVisual/structural_analysis: The Weber-Fechner law:",
+    "filename": "omnimens_autocode_pattern_recognition_mnhjhkzd.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnhjhkzd.mjs",
+    "backupPath": null,
+    "timestamp": 1775138261881,
+    "codeLength": 471,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Mathematician",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: SpellCheckVisual/analogical_mapping: Information is physical",
+    "filename": "omnimens_autocode_emergent_capability_mnhjhlhi.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mnhjhlhi.mjs",
+    "backupPath": null,
+    "timestamp": 1775138262534,
+    "codeLength": 414,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: adaptiveTokenCompressor",
+    "filename": "adaptiveTokenCompressor_gen69.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/adaptiveTokenCompressor_gen69.mjs",
+    "backupPath": null,
+    "timestamp": 1775138262676,
+    "codeLength": 2788,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: onlineLearningAdapter",
+    "filename": "onlineLearningAdapter_gen63.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/onlineLearningAdapter_gen63.mjs",
+    "backupPath": null,
+    "timestamp": 1775138262690,
+    "codeLength": 3831,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: iterativeTaskManager",
+    "filename": "iterativeTaskManager_gen68.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeTaskManager_gen68.mjs",
+    "backupPath": null,
+    "timestamp": 1775138262705,
+    "codeLength": 3715,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: longRangeMemoryManager",
+    "filename": "longRangeMemoryManager_gen70.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/longRangeMemoryManager_gen70.mjs",
+    "backupPath": null,
+    "timestamp": 1775138262719,
+    "codeLength": 3131,
     "overwrite": false
   }
 ]
