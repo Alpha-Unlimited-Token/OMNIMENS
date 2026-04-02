@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: wasmMatrixEngine
- * Written: 2026-04-01T22:21:36.002Z
+ * Written: 2026-04-02T17:43:40.348Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,27 +18,21 @@
 
 // wasmMatrixEngine.mjs
 
-import { TextEncoder, TextDecoder } from 'util';
+import { readFile } from 'fs/promises';
+import { join } from 'path';
 
-// Utility to compile and instantiate WebAssembly modules
-export async function compileWasmModule(wasmSource) {
-  const wasmBytes = new Uint8Array(wasmSource);
-  const wasmModule = await WebAssembly.compile(wasmBytes);
-  return WebAssembly.instantiate(wasmModule);
+// Utility to load and compile WebAssembly modules
+export async function loadWasmModule(filePath) {
+  const absolutePath = join(process.cwd(), filePath);
+  const wasmBuffer = await readFile(absolutePath);
+  const wasmModule = await WebAssembly.compile(wasmBuffer);
+  return WebAssembly.instantiate(wasmModule, {});
 }
 
-// Create a WebAssembly module for basic matrix multiplication
-export const matrixMultiplicationWasm = new Uint8Array([
-  0x00, 0x61, 0x73, 0x6d, // WASM binary magic number
-  0x01, 0x00, 0x00, 0x00, // WASM version 1
-  // Custom WASM code for matrix multiplication
-  // This is a placeholder; replace with actual WASM bytes
-]);
-
-// Perform matrix multiplication using WebAssembly
-export async function multiplyMatrices(matrixA, matrixB) {
+// Matrix multiplication using WebAssembly
+export async function wasmMatrixMultiply(matrixA, matrixB, wasmFilePath = './matrix.wasm') {
   if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
-    throw new TypeError('Both inputs must be 2D arrays.');
+    throw new Error('Both inputs must be 2D arrays (matrices).');
   }
 
   const rowsA = matrixA.length;
@@ -47,72 +41,68 @@ export async function multiplyMatrices(matrixA, matrixB) {
   const colsB = matrixB[0].length;
 
   if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions do not align for multiplication.');
+    throw new Error('Number of columns in matrixA must match number of rows in matrixB.');
   }
 
-  const wasmInstance = await compileWasmModule(matrixMultiplicationWasm);
-  const { multiply } = wasmInstance.exports;
+  const wasmInstance = await loadWasmModule(wasmFilePath);
+  const { memory, multiplyMatrices } = wasmInstance.instance.exports;
 
-  // Flatten matrices into 1D arrays for WASM processing
-  const flatA = matrixA.flat();
-  const flatB = matrixB.flat();
-  const result = new Float32Array(rowsA * colsB);
+  const matrixAFlat = matrixA.flat();
+  const matrixBFlat = matrixB.flat();
+  const resultFlat = new Float64Array(rowsA * colsB);
 
-  // Call WASM function (assumes multiply is defined in WASM module)
-  multiply(flatA, flatB, result, rowsA, colsA, colsB);
+  const memoryBuffer = new Float64Array(memory.buffer);
+  const offsetA = 0;
+  const offsetB = offsetA + matrixAFlat.length;
+  const offsetResult = offsetB + matrixBFlat.length;
 
-  // Reconstruct 2D result matrix
-  const outputMatrix = [];
+  memoryBuffer.set(matrixAFlat, offsetA);
+  memoryBuffer.set(matrixBFlat, offsetB);
+
+  multiplyMatrices(offsetA, rowsA, colsA, offsetB, rowsB, colsB, offsetResult);
+
+  const result = [];
   for (let i = 0; i < rowsA; i++) {
-    outputMatrix.push(result.slice(i * colsB, (i + 1) * colsB));
+    result.push(Array.from(resultFlat.slice(i * colsB, (i + 1) * colsB)));
   }
 
-  return outputMatrix;
+  return result;
 }
 
-// Utility to validate if input is a valid 2D matrix
+// Example utility to validate matrix dimensions
 export function validateMatrix(matrix) {
   if (!Array.isArray(matrix) || matrix.length === 0 || !Array.isArray(matrix[0])) {
-    throw new TypeError('Input must be a non-empty 2D array.');
+    throw new Error('Input must be a 2D array (matrix).');
   }
 
-  const rowLength = matrix[0].length;
+  const columnCount = matrix[0].length;
   for (const row of matrix) {
-    if (!Array.isArray(row) || row.length !== rowLength) {
-      throw new Error('All rows in the matrix must have the same length.');
+    if (!Array.isArray(row) || row.length !== columnCount) {
+      throw new Error('All rows in the matrix must have the same number of columns.');
     }
   }
 
   return true;
 }
 
-// Example utility for generating random matrices
-export function generateRandomMatrix(rows, cols, min = 0, max = 1) {
-  if (rows <= 0 || cols <= 0) {
-    throw new RangeError('Matrix dimensions must be positive integers.');
+// Example usage (to be removed in production)
+(async () => {
+  try {
+    const matrixA = [
+      [1, 2],
+      [3, 4]
+    ];
+    const matrixB = [
+      [5, 6],
+      [7, 8]
+    ];
+
+    validateMatrix(matrixA);
+    validateMatrix(matrixB);
+
+    const result = await wasmMatrixMultiply(matrixA, matrixB);
+    console.log('Result:', result);
+  } catch (error) {
+    console.error(error);
   }
-
-  const matrix = [];
-  for (let i = 0; i < rows; i++) {
-    matrix.push(Array.from({ length: cols }, () => Math.random() * (max - min) + min));
-  }
-
-  return matrix;
-}
-
-// Example utility for transposing a matrix
-export function transposeMatrix(matrix) {
-  validateMatrix(matrix);
-
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-  const transposed = Array.from({ length: cols }, () => Array(rows).fill(0));
-
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      transposed[j][i] = matrix[i][j];
-    }
-  }
-
-  return transposed;
-}
+})();
