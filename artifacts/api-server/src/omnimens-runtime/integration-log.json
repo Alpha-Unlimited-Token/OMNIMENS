@@ -1,56 +1,6 @@
 [
   {
     "source": "evolution_engine",
-    "title": "Evolution Module: subprocessTaskQueue",
-    "filename": "subprocessTaskQueue_gen20.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/subprocessTaskQueue_gen20.mjs",
-    "backupPath": null,
-    "timestamp": 1775141625296,
-    "codeLength": 3346,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 20 Complete — 3 modules",
-    "filename": "evolution_marker_gen20.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen20.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen20.mjs.backup.2026-04-02T14-53-45-478Z",
-    "timestamp": 1775141625477,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 16 Complete — 3 modules",
-    "filename": "evolution_marker_gen16.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen16.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen16.mjs.backup.2026-04-02T14-53-46-573Z",
-    "timestamp": 1775141626572,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: recursiveContextStitcher",
-    "filename": "recursiveContextStitcher_gen18.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/recursiveContextStitcher_gen18.mjs",
-    "backupPath": null,
-    "timestamp": 1775141630609,
-    "codeLength": 3168,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: iterativeCheckpointingSystem",
-    "filename": "iterativeCheckpointingSystem_gen22.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeCheckpointingSystem_gen22.mjs",
-    "backupPath": null,
-    "timestamp": 1775141632744,
-    "codeLength": 3584,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
     "title": "Evolution Cycle 22 Complete — 3 modules",
     "filename": "evolution_marker_gen22.mjs",
     "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen22.mjs",
@@ -4997,6 +4947,56 @@
     "backupPath": null,
     "timestamp": 1775148214080,
     "codeLength": 439,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:spider:OMNIMENS+evolution-crawler",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider evolution-crawler harvest: agent_evolution — 489 syna",
+    "filename": "omnimens_autocode_neural_pathway_mnhpms3u.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnhpms3u.mjs",
+    "backupPath": null,
+    "timestamp": 1775148582090,
+    "codeLength": 420,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+GraphicDesigner",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: SpellCheckVisual/pattern_recognition: The Weber-Fechner law:",
+    "filename": "omnimens_autocode_pattern_recognition_mnhpms6l.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnhpms6l.mjs",
+    "backupPath": null,
+    "timestamp": 1775148582189,
+    "codeLength": 478,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: SpellCheckVisual/temporal_correlation: The Turing machine is",
+    "filename": "omnimens_autocode_neural_pathway_mnhpsj5h.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnhpsj5h.mjs",
+    "backupPath": null,
+    "timestamp": 1775148850422,
+    "codeLength": 432,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Meta-Agent",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: SpellCheckVisual/abstraction_layer: The binding problem: how",
+    "filename": "omnimens_autocode_adaptive_algorithm_mnhpsjmy.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnhpsjmy.mjs",
+    "backupPath": null,
+    "timestamp": 1775148851050,
+    "codeLength": 454,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+GraphicDesigner",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: SpellCheckVisual/analogical_mapping: Autopoiesis: living sys",
+    "filename": "omnimens_autocode_pattern_recognition_mnhpsjra.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnhpsjra.mjs",
+    "backupPath": null,
+    "timestamp": 1775148851206,
+    "codeLength": 478,
     "overwrite": false
   }
 ]
