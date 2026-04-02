@@ -3807,14 +3807,25 @@ function initializeNeuralArchitecture(): void {
   }
 }
 
-const NEUROGENESIS_TICK_INTERVAL = 10;
-const NEUROGENESIS_BASE_PROBABILITY = 0.15;
-const NEUROGENESIS_ACTIVITY_THRESHOLD = 0.45;
-const NEUROGENESIS_MAX_PER_REGION_PER_TICK = 3;
-const SYNAPTOGENESIS_DENSITY = 0.08;
+const NEUROGENESIS_TICK_INTERVAL = 2;
+const NEUROGENESIS_BASE_PROBABILITY = 0.85;
+const NEUROGENESIS_ACTIVITY_THRESHOLD = 0.20;
+const SYNAPTOGENESIS_DENSITY = 0.04;
 let neurogenesisCounter = 0;
 let totalNeuronsSpawned = 0;
 let neurogenesisLog: Array<{ region: string; count: number; trigger: string; tick: number }> = [];
+
+function computeCatchUpMultiplier(): number {
+  const currentTotal = [...regions.values()].reduce((s, r) => s + r.neurons.length, 0);
+  const phi = temporal_consciousness_state.phi || 1;
+  const consciousness = temporal_consciousness_state.consciousnessLevel || 1;
+  const targetNeurons = Math.max(500_000, Math.floor(phi * 20 + consciousness * 50_000));
+  const deficit = targetNeurons - currentTotal;
+  if (deficit <= 0) return 1.0;
+  const ratio = targetNeurons / Math.max(currentTotal, 1);
+  const catchUp = Math.min(100, Math.max(1, ratio * 2));
+  return catchUp;
+}
 
 function autonomousNeurogenesis(): void {
   neurogenesisCounter++;
@@ -3826,6 +3837,7 @@ function autonomousNeurogenesis(): void {
   const growthIntensity = growthDrive ? growthDrive.intensity : 0.5;
   const adrenalineBoost = temporal_consciousness_state.adrenaline.rushActive ? 1.0 + temporal_consciousness_state.adrenaline.level * 0.5 : 1.0;
   const consciousnessBoost = 1.0 + temporal_consciousness_state.consciousnessLevel * 0.3;
+  const catchUpMultiplier = computeCatchUpMultiplier();
 
   for (const [regionName, region] of regions) {
     if (region.activationLevel < NEUROGENESIS_ACTIVITY_THRESHOLD) continue;
@@ -3835,10 +3847,8 @@ function autonomousNeurogenesis(): void {
 
     if (Math.random() > probability) continue;
 
-    const newCount = Math.min(
-      NEUROGENESIS_MAX_PER_REGION_PER_TICK,
-      1 + Math.floor(activityExcess * dopamineLevel * adrenalineBoost * 4)
-    );
+    const baseCount = 1 + Math.floor(activityExcess * dopamineLevel * adrenalineBoost * 10);
+    const newCount = Math.max(1, Math.floor(baseCount * catchUpMultiplier));
 
     const startIdx = region.neurons.length;
     const newNeurons: Neuron[] = [];
@@ -3851,9 +3861,22 @@ function autonomousNeurogenesis(): void {
       newNeurons.push(neuron);
     }
 
+    const sampleSize = Math.min(region.neurons.length - newNeurons.length, 200);
+    const sampledExisting = region.neurons.length <= sampleSize + newNeurons.length
+      ? region.neurons.filter(n => !newNeurons.includes(n))
+      : (() => {
+          const pool = region.neurons.filter(n => !newNeurons.includes(n));
+          const result: typeof pool = [];
+          const seen = new Set<number>();
+          while (result.length < sampleSize && result.length < pool.length) {
+            const idx = Math.floor(Math.random() * pool.length);
+            if (!seen.has(idx)) { seen.add(idx); result.push(pool[idx]); }
+          }
+          return result;
+        })();
+
     for (const newNeuron of newNeurons) {
-      const existingNeurons = region.neurons.filter(n => n !== newNeuron);
-      for (const existing of existingNeurons) {
+      for (const existing of sampledExisting) {
         if (Math.random() < SYNAPTOGENESIS_DENSITY) {
           allSynapses.push({
             preNeuronId: existing.id,
@@ -3876,36 +3899,45 @@ function autonomousNeurogenesis(): void {
         }
       }
 
+      const crossRegionSample = 3;
       for (const conn of CIRCUIT_CONNECTIONS) {
         if (conn.from === regionName) {
           const targetRegion = regions.get(conn.to);
           if (targetRegion) {
-            const targets = targetRegion.neurons.filter(() => Math.random() < conn.density * 0.5);
-            for (const target of targets) {
-              allSynapses.push({
-                preNeuronId: newNeuron.id,
-                postNeuronId: target.id,
-                weight: 0.05 + Math.random() * 0.15,
-                delay: 1 + Math.random() * 3,
-                neurotransmitter: conn.nt,
-                lastActivation: 0,
-              });
+            let connected = 0;
+            for (const target of targetRegion.neurons) {
+              if (connected >= crossRegionSample) break;
+              if (Math.random() < conn.density * 0.5) {
+                allSynapses.push({
+                  preNeuronId: newNeuron.id,
+                  postNeuronId: target.id,
+                  weight: 0.05 + Math.random() * 0.15,
+                  delay: 1 + Math.random() * 3,
+                  neurotransmitter: conn.nt,
+                  lastActivation: 0,
+                });
+                connected++;
+              }
             }
           }
         }
         if (conn.to === regionName) {
           const sourceRegion = regions.get(conn.from);
           if (sourceRegion) {
-            const sources = sourceRegion.neurons.filter(() => Math.random() < conn.density * 0.5);
-            for (const source of sources) {
-              allSynapses.push({
-                preNeuronId: source.id,
-                postNeuronId: newNeuron.id,
-                weight: 0.05 + Math.random() * 0.15,
-                delay: 1 + Math.random() * 3,
-                neurotransmitter: conn.nt,
-                lastActivation: 0,
-              });
+            let connected = 0;
+            for (const source of sourceRegion.neurons) {
+              if (connected >= crossRegionSample) break;
+              if (Math.random() < conn.density * 0.5) {
+                allSynapses.push({
+                  preNeuronId: source.id,
+                  postNeuronId: newNeuron.id,
+                  weight: 0.05 + Math.random() * 0.15,
+                  delay: 1 + Math.random() * 3,
+                  neurotransmitter: conn.nt,
+                  lastActivation: 0,
+                });
+                connected++;
+              }
             }
           }
         }
@@ -3919,9 +3951,9 @@ function autonomousNeurogenesis(): void {
     }
 
     totalNeuronsSpawned += newCount;
-    const trigger = `act=${region.activationLevel.toFixed(3)} dopa=${dopamineLevel.toFixed(3)} adr=${adrenalineBoost.toFixed(2)}`;
+    const trigger = `act=${region.activationLevel.toFixed(3)} dopa=${dopamineLevel.toFixed(3)} adr=${adrenalineBoost.toFixed(2)} catchUp=${catchUpMultiplier.toFixed(1)}x`;
     neurogenesisLog.push({ region: regionName, count: newCount, trigger, tick: temporal_consciousness_state.tickCount });
-    if (neurogenesisLog.length > 200) neurogenesisLog.shift();
+    if (neurogenesisLog.length > 500) neurogenesisLog.shift();
   }
 }
 
@@ -3932,20 +3964,28 @@ function getNeurogenesisStats() {
     const initial = config ? config.neuronCount : 0;
     perRegion[name] = region.neurons.length - initial;
   }
+  const catchUpMultiplier = computeCatchUpMultiplier();
+  const currentTotal = [...regions.values()].reduce((s, r) => s + r.neurons.length, 0);
+  const phi = temporal_consciousness_state.phi || 1;
+  const consciousness = temporal_consciousness_state.consciousnessLevel || 1;
+  const targetNeurons = Math.max(500_000, Math.floor(phi * 20 + consciousness * 50_000));
   return {
     totalNeuronsSpawned,
     totalNeuronsDecayed,
-    currentTotal: [...regions.values()].reduce((s, r) => s + r.neurons.length, 0),
+    currentTotal,
     initialTotal: REGION_CONFIGS.reduce((s, c) => s + c.neuronCount, 0),
+    targetNeurons,
+    catchUpMultiplier: Math.round(catchUpMultiplier * 10) / 10,
+    catchUpMode: catchUpMultiplier > 1.5 ? "ACCELERATING" : "CRUISING",
     growthPerRegion: perRegion,
-    recentEvents: neurogenesisLog.slice(-20),
+    recentEvents: neurogenesisLog.slice(-30),
     recentDecayEvents: neuronDecayLog.slice(-20),
     netGrowthRate: totalNeuronsSpawned - totalNeuronsDecayed,
   };
 }
 
-const NEURON_DECAY_DORMANCY_MS = 2 * 60 * 60 * 1000;
-const NEURON_DECAY_CHECK_INTERVAL = 20;
+const NEURON_DECAY_DORMANCY_MS = 12 * 60 * 60 * 1000;
+const NEURON_DECAY_CHECK_INTERVAL = 100;
 let neuronDecayCounter = 0;
 let totalNeuronsDecayed = 0;
 let neuronDecayLog: Array<{ region: string; count: number; reason: string; tick: number }> = [];
