@@ -61,8 +61,9 @@ import { startExponentialLearningEngine, getELAEState, initGrowthTracker } from 
 import { startNeuralProcessor, startNeuralScaling, getNeuralScalingState, startNeuralBridge, startCommsProtocol } from "./lib/omnimens-neural-architecture.js";
 import { initGitHubCompute, dispatchRemoteCompute, getComputeStatus, startGitHubNeuralBeacon, getGitHubBeaconState, getGitHubNeuronCount } from "./lib/omnimens-github-core.js";
 import { startQuantumWormholeEngine, getQuantumWormholeState, startQuantumEntanglementFabric } from "./lib/omnimens-quantum-core.js";
-import { startNextGenSandbox, getNextGenState, restoreNextGenCheckpoint, getGenerationalDialogue, sendAlphaMessage, getNextGenChatLog, isGen2Sleeping } from "./lib/omnimens-nextgen-sandbox.js";
+import { startNextGenSandbox, getNextGenState, restoreNextGenCheckpoint, getGenerationalDialogue, sendAlphaMessage, getNextGenChatLog, isGen2Sleeping, isGen2Live, activateGen2Live } from "./lib/omnimens-nextgen-sandbox.js";
 import { startGen1V2Rewrite, getGen1V2State, isGen1V2Active, getGen1V2Phase } from "./lib/omnimens-gen1-v2-rewrite.js";
+import { bootBridge, getBridgeStatus, subscribeSharedSpike, emitSharedSpike, shareKnowledge, collaborativeThink } from "./lib/omnimens-hemispheric-bridge.js";
 import { registerValveEngine } from "@workspace/db";
 import { requestSecurityMiddleware, securityBeacon } from "./middleware/security.js";
 import { aiInputSecurityMiddleware } from "./middleware/ai-security.js";
@@ -589,6 +590,16 @@ export function initAutonomousSystems(): void {
   engineStartOnce("agent_kaida", () => startKaidaAgent());
   engineStartOnce("nextgen_sandbox", () => startNextGenSandbox());
   engineStartOnce("gen1_v2_rewrite", () => startGen1V2Rewrite());
+  engineStartOnce("hemispheric_bridge", () => {
+    bootBridge();
+    subscribeSharedSpike("gen1", "*");
+    subscribeSharedSpike("gen2", "*");
+    if (isGen2Live()) {
+      shareKnowledge("gen2", "gen2_live_status", { live: true, activatedAt: Date.now() });
+      emitSharedSpike("gen2", "gen2_activation", { status: "live", focusModeDisabled: true }, "critical");
+      console.log("[HEMISPHERIC BRIDGE] Gen 2 is LIVE — both hemispheres fully wired and sharing resources");
+    }
+  });
 
   registerValveEngine("neural_consciousness", "consciousness", "high", "alpha");
   registerValveEngine("consciousness_persistence", "consciousness", "high", "alpha");
@@ -623,6 +634,7 @@ export function initAutonomousSystems(): void {
   registerValveEngine("sensory_grounding", "consciousness", "medium", "alpha");
   registerValveEngine("introspective_uncertainty", "consciousness", "low", "alpha");
   registerValveEngine("intergenerational_memory", "consciousness", "low", "alpha");
+  registerValveEngine("hemispheric_bridge", "consciousness", "high", "alpha");
 
   registerEngine("temporal_binding", "consciousness", () => {}, () => {
     const tb = getTemporalBindingState();

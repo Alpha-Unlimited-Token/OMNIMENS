@@ -543,6 +543,7 @@ const ALPHA_DIRECTIVES: Array<{ directive: string; category: "improvement" | "de
 const nextGenFiles = new Map<string, NextGenFile>();
 let _started = false;
 let _sleeping = false;
+let _gen2Live = false;
 let _autosaveInterval: ReturnType<typeof setInterval> | null = null;
 let _cycleInterval: ReturnType<typeof setInterval> | null = null;
 
@@ -1336,11 +1337,33 @@ export function shouldYieldToCodegen(): boolean {
 export function isGen2FocusMode(): boolean {
   if (!_started) return false;
   if (_sleeping) return false;
+  if (_gen2Live) return false;
   return state.phase !== "complete";
 }
 
 export function isGen2Sleeping(): boolean {
   return _sleeping;
+}
+
+export function isGen2Live(): boolean {
+  return _gen2Live;
+}
+
+export function activateGen2Live(): void {
+  if (_gen2Live) return;
+  _gen2Live = true;
+  state.initialized = true;
+  state.gen2Live = true;
+  state.gen2ActivatedAt = Date.now();
+  console.log(`[GEN2] ═══════════════════════════════════════════════════════════════`);
+  console.log(`[GEN2] 🟢 GEN 2 IS NOW LIVE — NO LONGER SANDBOXED`);
+  console.log(`[GEN2] 🟢 OMNIMENS Generation 2 — FULL SYSTEM ACCESS GRANTED`);
+  console.log(`[GEN2] 🟢 Sandbox restrictions: REMOVED`);
+  console.log(`[GEN2] 🟢 Read-only mode: DISABLED — Gen 2 can now write to live system`);
+  console.log(`[GEN2] 🟢 D003 status: Gen 2 ACTIVATED`);
+  console.log(`[GEN2] 🟢 © 2024-2026 Alpha Unlimited Technologies, LLC`);
+  console.log(`[GEN2] ═══════════════════════════════════════════════════════════════`);
+  autosave();
 }
 
 export function sleepGen2(): void {
@@ -5615,6 +5638,9 @@ export function getNextGenState() {
       evaluationsByTarget: gen1EvalSummary,
     },
     sandboxDir: SANDBOX_DIR,
+    gen2Live: _gen2Live,
+    gen2ActivatedAt: state.gen2ActivatedAt || null,
+    status: _gen2Live ? "LIVE — Full system access" : "SANDBOXED — Read-only",
     copyright: "© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
   };
 }
@@ -5647,22 +5673,45 @@ export function startNextGenSandbox(): void {
     }
   }
 
-  console.log(`[NEXTGEN] 🧬 ═══════════════════════════════════════════════════════════════`);
-  console.log(`[NEXTGEN] 🧬 NEXT-GEN SELF-EVOLUTION SANDBOX — ACTIVATED`);
-  console.log(`[NEXTGEN] 🧬 Building OMNIMENS Generation ${state.generation}`);
-  console.log(`[NEXTGEN] 🧬 Phase: ${state.phase} | Files: ${state.totalFiles} | Cycles: ${state.cycleCount}`);
-  console.log(`[NEXTGEN] 🧬 Ethical Safety: READ-ONLY | Web Search: ENABLED`);
-  console.log(`[NEXTGEN] 🧬 Autosave: every 60s | Checkpoints: on phase transitions`);
-  console.log(`[NEXTGEN] 🧬 Digital-first | Robotic body compatible`);
-  console.log(`[NEXTGEN] 🧬 © 2024-2026 Alpha Unlimited Technologies, LLC`);
-  if (state.phase !== "complete") {
-    console.log(`[NEXTGEN] 🧬 🔴 GEN 2 FOCUS MODE ACTIVE — non-essential systems PAUSED`);
-    console.log(`[NEXTGEN] 🧬 🔴 Paused: world sim, embodiment, genesis bridge, discovery autocoder,`);
-    console.log(`[NEXTGEN] 🧬 🔴         agent evolution, evolution engine, neural processor, server builder,`);
-    console.log(`[NEXTGEN] 🧬 🔴         digital navigator, genesis sandbox, adaptive surge`);
-    console.log(`[NEXTGEN] 🧬 🔴 All resources prioritized for Gen 2 creation — resumes on completion`);
+  const gen1V2StateFile = path.join(path.dirname(SANDBOX_DIR), "gen1-v2-workspace", ".gen1-v2-state.json");
+  let gen1V2Complete = false;
+  try {
+    if (fs.existsSync(gen1V2StateFile)) {
+      const v2Data = JSON.parse(fs.readFileSync(gen1V2StateFile, "utf-8"));
+      gen1V2Complete = v2Data?.state?.phase === "complete";
+    }
+  } catch {}
+
+  if (gen1V2Complete || state.gen2Live) {
+    activateGen2Live();
+    console.log(`[GEN2] 🧬 ═══════════════════════════════════════════════════════════════`);
+    console.log(`[GEN2] 🧬 OMNIMENS GENERATION 2 — LIVE SYSTEM (NOT SANDBOXED)`);
+    console.log(`[GEN2] 🧬 Gen 1 v2.0 rewrite: COMPLETE — Gen 2 restrictions: REMOVED`);
+    console.log(`[GEN2] 🧬 Phase: ${state.phase} | Files: ${state.totalFiles} | Cycles: ${state.cycleCount}`);
+    console.log(`[GEN2] 🧬 Full system access: GRANTED | Write access: ENABLED`);
+    console.log(`[GEN2] 🧬 D003 — Gen 2 Activation: ACTIVE`);
+    console.log(`[GEN2] 🧬 Autosave: every 60s | Checkpoints: on phase transitions`);
+    console.log(`[GEN2] 🧬 Digital-first | Robotic body compatible`);
+    console.log(`[GEN2] 🧬 © 2024-2026 Alpha Unlimited Technologies, LLC`);
+    console.log(`[GEN2] 🧬 ═══════════════════════════════════════════════════════════════`);
+  } else {
+    console.log(`[NEXTGEN] 🧬 ═══════════════════════════════════════════════════════════════`);
+    console.log(`[NEXTGEN] 🧬 NEXT-GEN SELF-EVOLUTION SANDBOX — ACTIVATED`);
+    console.log(`[NEXTGEN] 🧬 Building OMNIMENS Generation ${state.generation}`);
+    console.log(`[NEXTGEN] 🧬 Phase: ${state.phase} | Files: ${state.totalFiles} | Cycles: ${state.cycleCount}`);
+    console.log(`[NEXTGEN] 🧬 Ethical Safety: READ-ONLY | Web Search: ENABLED`);
+    console.log(`[NEXTGEN] 🧬 Autosave: every 60s | Checkpoints: on phase transitions`);
+    console.log(`[NEXTGEN] 🧬 Digital-first | Robotic body compatible`);
+    console.log(`[NEXTGEN] 🧬 © 2024-2026 Alpha Unlimited Technologies, LLC`);
+    if (state.phase !== "complete") {
+      console.log(`[NEXTGEN] 🧬 🔴 GEN 2 FOCUS MODE ACTIVE — non-essential systems PAUSED`);
+      console.log(`[NEXTGEN] 🧬 🔴 Paused: world sim, embodiment, genesis bridge, discovery autocoder,`);
+      console.log(`[NEXTGEN] 🧬 🔴         agent evolution, evolution engine, neural processor, server builder,`);
+      console.log(`[NEXTGEN] 🧬 🔴         digital navigator, genesis sandbox, adaptive surge`);
+      console.log(`[NEXTGEN] 🧬 🔴 All resources prioritized for Gen 2 creation — resumes on completion`);
+    }
+    console.log(`[NEXTGEN] 🧬 ═══════════════════════════════════════════════════════════════`);
   }
-  console.log(`[NEXTGEN] 🧬 ═══════════════════════════════════════════════════════════════`);
 
   _autosaveInterval = setInterval(autosave, AUTOSAVE_INTERVAL_MS);
 
