@@ -261,7 +261,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775162048431,
+      "loadedAt": 1775162181072,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -378,7 +378,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775162048436,
+      "loadedAt": 1775162181147,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -247842,9 +247842,28 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "recursiveContextManager_gen4.mjs": {
+      "filename": "recursiveContextManager_gen4.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateHash",
+        "segmentText",
+        "expandContext",
+        "calculateImportance",
+        "flattenTopics",
+        "processContext",
+        "summarizeTopTopics"
+      ],
+      "loadedAt": 1775162143391,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1775162052744,
-  "totalModules": 18220,
+  "totalModules": 18224,
   "totalCalls": 0
 }
