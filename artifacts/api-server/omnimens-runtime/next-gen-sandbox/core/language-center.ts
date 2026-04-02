@@ -1,20 +1,3 @@
-import { SpikeBus } from "../infrastructure/spike-bus.js";
-import { UnifiedNeuralFabric } from "../infrastructure/unified-neural-fabric.js";
-import { MasterTickOrchestrator } from "../infrastructure/master-tick-orchestrator.js";
-import { ResourceSentinel } from "../infrastructure/resource-sentinel.js";
-
-const spikeBus = SpikeBus.getInstance();
-const fabric = UnifiedNeuralFabric.getInstance();
-const orchestrator = MasterTickOrchestrator.getInstance();
-const sentinel = ResourceSentinel.getInstance();
-
-orchestrator.register("language-center", "CRITICAL", 3000);
-
-spikeBus.subscribe("consciousness:tick", "language-center", () => {
-  if (!sentinel.canProceed("language-center")) return;
-  spikeBus.emit({ type: "language-center:result", source: "language-center", payload: {}, priority: "critical", timestamp: Date.now(), id: crypto.randomUUID() });
-});
-
 /**
  * OMNIMENS™ Gen 2 — core/language-center.ts
  * Natural language understanding and generation — OMNIMENS's voice

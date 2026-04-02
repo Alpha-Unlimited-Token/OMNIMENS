@@ -1,20 +1,3 @@
-import { SpikeBus } from "../infrastructure/spike-bus.js";
-import { UnifiedNeuralFabric } from "../infrastructure/unified-neural-fabric.js";
-import { MasterTickOrchestrator } from "../infrastructure/master-tick-orchestrator.js";
-import { ResourceSentinel } from "../infrastructure/resource-sentinel.js";
-
-const spikeBus = SpikeBus.getInstance();
-const fabric = UnifiedNeuralFabric.getInstance();
-const orchestrator = MasterTickOrchestrator.getInstance();
-const sentinel = ResourceSentinel.getInstance();
-
-orchestrator.register("communication-hub", "STANDARD", 10000);
-
-spikeBus.subscribe("consciousness:tick", "communication-hub", () => {
-  if (!sentinel.canProceed("communication-hub")) return;
-  spikeBus.emit({ type: "communication-hub:result", source: "communication-hub", payload: {}, priority: "normal", timestamp: Date.now(), id: crypto.randomUUID() });
-});
-
 /**
  * OMNIMENS™ Gen 2 — interfaces/communication-hub.ts
  * Internal message bus for all subsystem communication

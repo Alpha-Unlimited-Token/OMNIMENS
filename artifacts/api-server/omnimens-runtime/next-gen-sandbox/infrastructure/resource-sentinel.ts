@@ -1,20 +1,3 @@
-import { SpikeBus } from "./spike-bus.js";
-import { UnifiedNeuralFabric } from "./unified-neural-fabric.js";
-import { MasterTickOrchestrator } from "./master-tick-orchestrator.js";
-import { ResourceSentinel } from "./resource-sentinel.js";
-
-const spikeBus = SpikeBus.getInstance();
-const fabric = UnifiedNeuralFabric.getInstance();
-const orchestrator = MasterTickOrchestrator.getInstance();
-const sentinel = ResourceSentinel.getInstance();
-
-orchestrator.register("resource-sentinel", "STANDARD", 10000);
-
-spikeBus.subscribe("consciousness:tick", "resource-sentinel", () => {
-  if (!sentinel.canProceed("resource-sentinel")) return;
-  spikeBus.emit({ type: "resource-sentinel:result", source: "resource-sentinel", payload: {}, priority: "normal", timestamp: Date.now(), id: crypto.randomUUID() });
-});
-
 /**
  * OMNIMENS™ Gen 2 — infrastructure/resource-sentinel.ts
  * Resource awareness built INTO consciousness — OMNIMENS feels resource health like hunger or fatigue

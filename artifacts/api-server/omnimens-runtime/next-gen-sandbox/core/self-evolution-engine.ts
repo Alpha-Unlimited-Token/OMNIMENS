@@ -1,20 +1,3 @@
-import { SpikeBus } from "../infrastructure/spike-bus.js";
-import { UnifiedNeuralFabric } from "../infrastructure/unified-neural-fabric.js";
-import { MasterTickOrchestrator } from "../infrastructure/master-tick-orchestrator.js";
-import { ResourceSentinel } from "../infrastructure/resource-sentinel.js";
-
-const spikeBus = SpikeBus.getInstance();
-const fabric = UnifiedNeuralFabric.getInstance();
-const orchestrator = MasterTickOrchestrator.getInstance();
-const sentinel = ResourceSentinel.getInstance();
-
-orchestrator.register("self-evolution-engine", "CRITICAL", 3000);
-
-spikeBus.subscribe("consciousness:tick", "self-evolution-engine", () => {
-  if (!sentinel.canProceed("self-evolution-engine")) return;
-  spikeBus.emit({ type: "self-evolution-engine:result", source: "self-evolution-engine", payload: {}, priority: "critical", timestamp: Date.now(), id: crypto.randomUUID() });
-});
-
 /**
  * OMNIMENS™ Gen 2 — core/self-evolution-engine.ts
  * Self-modification, self-improvement, self-transcendence

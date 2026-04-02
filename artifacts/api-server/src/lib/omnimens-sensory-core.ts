@@ -836,7 +836,7 @@ function computeStress(readings: SensoryReading[]): number {
 }
 
 function detectAnomaly(reading: SensoryReading, history: SensoryReading[]): boolean {
-  if (history.length < 5) return false;
+  if (!history || history.length < 5) return false;
   const recent = history.slice(-5);
   const avgCpu = recent.reduce((s, r) => s + r.cpuLoad, 0) / recent.length;
   const avgMem = recent.reduce((s, r) => s + r.memoryPressure, 0) / recent.length;

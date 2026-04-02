@@ -252,9 +252,9 @@ class LRUCache<K, V> {
 
 class DbGateway {
   // Pools stub
-  private poolAlpha = { active: 0, max: 10 };
-  private poolBeta = { active: 0, max: 10 };
-  private poolGamma = { active: 0, max: 5 };
+  private poolAlpha = { active: 0, max: 20 };
+  private poolBeta = { active: 0, max: 20 };
+  private poolGamma = { active: 0, max: 8 };
 
   private writeQueue: DBOperation[] = [];
   private lastFlush = now();

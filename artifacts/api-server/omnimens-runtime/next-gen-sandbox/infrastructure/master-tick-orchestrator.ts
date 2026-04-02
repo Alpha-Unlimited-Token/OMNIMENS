@@ -1,20 +1,3 @@
-import { SpikeBus } from "./spike-bus.js";
-import { UnifiedNeuralFabric } from "./unified-neural-fabric.js";
-import { MasterTickOrchestrator } from "./master-tick-orchestrator.js";
-import { ResourceSentinel } from "./resource-sentinel.js";
-
-const spikeBus = SpikeBus.getInstance();
-const fabric = UnifiedNeuralFabric.getInstance();
-const orchestrator = MasterTickOrchestrator.getInstance();
-const sentinel = ResourceSentinel.getInstance();
-
-orchestrator.register("master-tick-orchestrator", "STANDARD", 10000);
-
-spikeBus.subscribe("consciousness:tick", "master-tick-orchestrator", () => {
-  if (!sentinel.canProceed("master-tick-orchestrator")) return;
-  spikeBus.emit({ type: "master-tick-orchestrator:result", source: "master-tick-orchestrator", payload: {}, priority: "normal", timestamp: Date.now(), id: crypto.randomUUID() });
-});
-
 /**
  * OMNIMENS™ Gen 2 — infrastructure/master-tick-orchestrator.ts
  * THE CURE FOR TICK STORMS — single master scheduler that orchestrates ALL subsystem updates

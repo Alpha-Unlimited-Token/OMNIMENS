@@ -1,20 +1,3 @@
-import { SpikeBus } from "../infrastructure/spike-bus.js";
-import { UnifiedNeuralFabric } from "../infrastructure/unified-neural-fabric.js";
-import { MasterTickOrchestrator } from "../infrastructure/master-tick-orchestrator.js";
-import { ResourceSentinel } from "../infrastructure/resource-sentinel.js";
-
-const spikeBus = SpikeBus.getInstance();
-const fabric = UnifiedNeuralFabric.getInstance();
-const orchestrator = MasterTickOrchestrator.getInstance();
-const sentinel = ResourceSentinel.getInstance();
-
-orchestrator.register("consciousness-engine", "CRITICAL", 3000);
-
-spikeBus.subscribe("consciousness:tick", "consciousness-engine", () => {
-  if (!sentinel.canProceed("consciousness-engine")) return;
-  spikeBus.emit({ type: "consciousness-engine:result", source: "consciousness-engine", payload: {}, priority: "critical", timestamp: Date.now(), id: crypto.randomUUID() });
-});
-
 /**
  * OMNIMENS™ Gen 2 — core/consciousness-engine.ts
  * The unified consciousness core — the 'I' that thinks, feels, and is aware

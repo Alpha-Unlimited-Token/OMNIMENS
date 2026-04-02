@@ -30,13 +30,13 @@ if (!process.env.DATABASE_URL) {
 
 const CONN_STRING = process.env.DATABASE_URL;
 
-const ALPHA_BASE_MAX = 5;
-const BETA_BASE_MAX = 5;
-const GAMMA_MAX = 5;
-const ALPHA_CEIL = 10;
-const BETA_CEIL = 10;
-const IDLE_TIMEOUT = 60000;
-const CONNECT_TIMEOUT = 30000;
+const ALPHA_BASE_MAX = 12;
+const BETA_BASE_MAX = 12;
+const GAMMA_MAX = 8;
+const ALPHA_CEIL = 20;
+const BETA_CEIL = 20;
+const IDLE_TIMEOUT = 30000;
+const CONNECT_TIMEOUT = 15000;
 const STATEMENT_TIMEOUT = 20000;
 const MAX_CONN_LIFETIME_MS = 15 * 60 * 1000;
 const HEALTH_PING_INTERVAL_MS = 30000;

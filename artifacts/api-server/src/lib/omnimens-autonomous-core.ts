@@ -5252,9 +5252,9 @@ export class DataLayer {
   constructor(connectionString?: string) {
     this.pool = new Pool({
       connectionString: connectionString || process.env.DATABASE_URL,
-      max: 3,
+      max: 6,
       idleTimeoutMillis: 30_000,
-      connectionTimeoutMillis: 5_000,
+      connectionTimeoutMillis: 10_000,
     });
 
     this.pool.on("error", () => { this.dbAvailable = false; });

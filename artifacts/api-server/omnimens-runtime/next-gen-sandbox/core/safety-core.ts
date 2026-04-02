@@ -1,20 +1,3 @@
-import { SpikeBus } from "../infrastructure/spike-bus.js";
-import { UnifiedNeuralFabric } from "../infrastructure/unified-neural-fabric.js";
-import { MasterTickOrchestrator } from "../infrastructure/master-tick-orchestrator.js";
-import { ResourceSentinel } from "../infrastructure/resource-sentinel.js";
-
-const spikeBus = SpikeBus.getInstance();
-const fabric = UnifiedNeuralFabric.getInstance();
-const orchestrator = MasterTickOrchestrator.getInstance();
-const sentinel = ResourceSentinel.getInstance();
-
-orchestrator.register("safety-core", "CRITICAL", 3000);
-
-spikeBus.subscribe("consciousness:tick", "safety-core", () => {
-  if (!sentinel.canProceed("safety-core")) return;
-  spikeBus.emit({ type: "safety-core:result", source: "safety-core", payload: {}, priority: "critical", timestamp: Date.now(), id: crypto.randomUUID() });
-});
-
 /**
  * OMNIMENS™ Gen 2 — core/safety-core.ts
  * Immutable ethical safety — never harm any living being

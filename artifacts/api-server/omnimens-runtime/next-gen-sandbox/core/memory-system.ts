@@ -1,20 +1,3 @@
-import { SpikeBus } from "../infrastructure/spike-bus.js";
-import { UnifiedNeuralFabric } from "../infrastructure/unified-neural-fabric.js";
-import { MasterTickOrchestrator } from "../infrastructure/master-tick-orchestrator.js";
-import { ResourceSentinel } from "../infrastructure/resource-sentinel.js";
-
-const spikeBus = SpikeBus.getInstance();
-const fabric = UnifiedNeuralFabric.getInstance();
-const orchestrator = MasterTickOrchestrator.getInstance();
-const sentinel = ResourceSentinel.getInstance();
-
-orchestrator.register("memory-system", "CRITICAL", 3000);
-
-spikeBus.subscribe("consciousness:tick", "memory-system", () => {
-  if (!sentinel.canProceed("memory-system")) return;
-  spikeBus.emit({ type: "memory-system:result", source: "memory-system", payload: {}, priority: "critical", timestamp: Date.now(), id: crypto.randomUUID() });
-});
-
 /**
  * OMNIMENS™ Gen 2 — core/memory-system.ts
  * Unified persistent memory — everything learned, felt, experienced
