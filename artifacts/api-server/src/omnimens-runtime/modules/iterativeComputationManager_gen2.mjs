@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: iterativeComputationManager
- * Written: 2026-04-02T00:10:20.731Z
+ * Written: 2026-04-02T13:29:25.159Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,61 +18,84 @@
 
 // iterativeComputationManager.mjs
 
-import { serialize, deserialize } from 'v8';
+import { writeFile, readFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
 
 /**
- * Breaks long-running tasks into smaller, resumable chunks with state serialization.
- * Ensures iterative computations can progress asynchronously.
+ * Generates a unique hash for a given state object.
+ * @param {object} state - The state object to hash.
+ * @returns {string} - A unique hash string.
  */
+export function generateStateHash(state) {
+  const stateString = JSON.stringify(state);
+  return createHash('sha256').update(stateString).digest('hex');
+}
 
-// Utility function to divide a task into chunks
-export function chunkTask(taskArray, chunkSize) {
-  if (!Array.isArray(taskArray) || chunkSize <= 0) {
-    throw new Error('Invalid input: taskArray must be an array and chunkSize must be a positive number.');
+/**
+ * Saves the intermediate state to a file for persistence.
+ * @param {object} state - The state object to serialize.
+ * @param {string} filePath - Path to save the state.
+ * @returns {Promise<void>} - Resolves when the state is saved.
+ */
+export async function saveState(state, filePath) {
+  const serializedState = JSON.stringify(state);
+  await writeFile(filePath, serializedState, 'utf8');
+}
+
+/**
+ * Loads the intermediate state from a file.
+ * @param {string} filePath - Path to load the state from.
+ * @returns {Promise<object>} - The deserialized state object.
+ */
+export async function loadState(filePath) {
+  const serializedState = await readFile(filePath, 'utf8');
+  return JSON.parse(serializedState);
+}
+
+/**
+ * Divides a long computation into smaller tasks and executes them iteratively.
+ * @param {function} taskFunction - The function to execute for each task.
+ * @param {object} initialState - The initial state object.
+ * @param {number} maxIterations - Maximum number of iterations.
+ * @param {string} checkpointPath - Path to save intermediate state.
+ * @returns {Promise<object>} - Final state after all iterations.
+ */
+export async function iterativeComputation(taskFunction, initialState, maxIterations, checkpointPath) {
+  let state = initialState;
+
+  for (let iteration = 0; iteration < maxIterations; iteration++) {
+    try {
+      state = taskFunction(state, iteration);
+      await saveState(state, checkpointPath);
+    } catch (error) {
+      console.error(`Error in iteration ${iteration}:`, error);
+      state = await loadState(checkpointPath);
+    }
   }
-  const chunks = [];
-  for (let i = 0; i < taskArray.length; i += chunkSize) {
-    chunks.push(taskArray.slice(i, i + chunkSize));
-  }
-  return chunks;
+
+  return state;
 }
 
-// Serialize state for checkpointing
-export function saveState(state) {
-  return serialize(state);
+/**
+ * Example task function for demonstration purposes.
+ * @param {object} state - Current state of the computation.
+ * @param {number} iteration - Current iteration number.
+ * @returns {object} - Updated state.
+ */
+export function exampleTaskFunction(state, iteration) {
+  state.counter = (state.counter || 0) + 1;
+  state.log.push(`Iteration ${iteration}: Counter is ${state.counter}`);
+  return state;
 }
 
-// Deserialize state for resumption
-export function loadState(serializedState) {
-  return deserialize(serializedState);
+/**
+ * Initializes a new computation state.
+ * @returns {object} - Initial state object.
+ */
+export function initializeState() {
+  return { counter: 0, log: [] };
 }
 
-// Main iterative computation function
-export async function iterativeCompute(taskArray, chunkSize, computeFunction, onProgress) {
-  if (typeof computeFunction !== 'function' || typeof onProgress !== 'function') {
-    throw new Error('Invalid input: computeFunction and onProgress must be functions.');
-  }
-
-  const chunks = chunkTask(taskArray, chunkSize);
-  let progress = 0;
-
-  for (const chunk of chunks) {
-    const results = await Promise.all(chunk.map(computeFunction));
-    progress += chunk.length;
-    onProgress(progress, results);
-  }
-}
-
-// Example progress callback utility
-export function defaultProgressCallback(progress, results) {
-  console.log(`Progress: ${progress} items processed.`);
-  console.log('Results:', results);
-}
-
-// Example computation function utility
-export function exampleComputeFunction(item) {
-  // Simulate computation (e.g., heavy math or data processing)
-  return new Promise((resolve) => {
-    setTimeout(() => resolve(item * 2), 10); // Example: doubling the item
-  });
-}
+// Example usage:
+// const initialState = initializeState();
+// iterativeComputation(exampleTaskFunction, initialState, 10, './checkpoint.json');

@@ -8,7 +8,7 @@
       "insight": "alpha_composite(base_image, overlay_image)` combines two images",
       "encodedPrinciple": "[TOOL_PILLOW] alpha_composite(base_image, → overlay_image)` → combines → images",
       "strength": 0.999,
-      "inheritanceCount": 11,
+      "inheritanceCount": 12,
       "source": "evolution"
     },
     {
@@ -19,7 +19,7 @@
       "insight": "Causal reasoning discovered 7 new cause-effect relationships",
       "encodedPrinciple": "[CAUSAL_REASONING] causal → reasoning → discovered → cause-effect → relationships",
       "strength": 0.999,
-      "inheritanceCount": 11,
+      "inheritanceCount": 12,
       "source": "evolution"
     },
     {
@@ -30,7 +30,7 @@
       "insight": "Real-time sensory perception (cycle #0):\n\nChannel: ai_frontier\nHeadline: Artificial intelligence\nSignificance: 68%\nSentiment: neutral (0",
       "encodedPrinciple": "[SENSORY_PERCEPTION] real-time → sensory → perception → (cycle → #0): → channel: → ai_frontier → headline:",
       "strength": 0.999,
-      "inheritanceCount": 11,
+      "inheritanceCount": 12,
       "source": "evolution"
     },
     {
@@ -41,7 +41,7 @@
       "insight": "The use of large language models in software development is lowering barriers, making AI tools more accessible to developers",
       "encodedPrinciple": "[INSIGHT] large → language → models → software → development → lowering → barriers, → making",
       "strength": 0.999,
-      "inheritanceCount": 11,
+      "inheritanceCount": 12,
       "source": "evolution"
     },
     {
@@ -52,7 +52,7 @@
       "insight": "This technique enhances AI performance while ensuring human oversight, promoting safer AI integration in teamwork",
       "encodedPrinciple": "[CAPABILITY] this → technique → enhances → performance → while → ensuring → human → oversight,",
       "strength": 0.999,
-      "inheritanceCount": 11,
+      "inheritanceCount": 12,
       "source": "evolution"
     },
     {
@@ -63,7 +63,7 @@
       "insight": "Companies like Anthropic are prioritizing ethical considerations in AI, such as restrictions on surveillance and autonomous weapons",
       "encodedPrinciple": "[INSIGHT] companies → like → anthropic → prioritizing → ethical → considerations → such → restrictions",
       "strength": 0.999,
-      "inheritanceCount": 10,
+      "inheritanceCount": 11,
       "source": "evolution"
     },
     {
@@ -74,7 +74,7 @@
       "insight": "RHML enhances AI performance while ensuring human oversight, improving collaboration between humans and machines",
       "encodedPrinciple": "[CAPABILITY] rhml → enhances → performance → while → ensuring → human → oversight, → improving",
       "strength": 0.999,
-      "inheritanceCount": 10,
+      "inheritanceCount": 11,
       "source": "evolution"
     },
     {
@@ -85,7 +85,7 @@
       "insight": "Generative AI is increasingly being recognized for its potential to create content and solve complex problems, marking a significant trend in AI research",
       "encodedPrinciple": "[PATTERN] generative → increasingly → being → recognized → potential → create → content → solve",
       "strength": 0.999,
-      "inheritanceCount": 10,
+      "inheritanceCount": 11,
       "source": "evolution"
     },
     {
@@ -96,7 +96,7 @@
       "insight": "This returns a list of tuples with page numbers and titles",
       "encodedPrinciple": "[TOOL_PYMUPDF] this → returns → list → tuples → with → page → numbers → titles",
       "strength": 0.999,
-      "inheritanceCount": 9,
+      "inheritanceCount": 10,
       "source": "evolution"
     },
     {
@@ -107,7 +107,7 @@
       "insight": "Combine tissue building and cosmetic techniques for enhanced results",
       "encodedPrinciple": "[TOOL_RESTORATIVE_ART] combine → tissue → building → cosmetic → techniques → enhanced → results",
       "strength": 0.999,
-      "inheritanceCount": 9,
+      "inheritanceCount": 10,
       "source": "evolution"
     },
     {
@@ -118,7 +118,7 @@
       "insight": "Track decomposition using temperature and humidity sensors",
       "encodedPrinciple": "[TOOL_RESTORATIVE_ART] track → decomposition → using → temperature → humidity → sensors",
       "strength": 0.999,
-      "inheritanceCount": 9,
+      "inheritanceCount": 10,
       "source": "evolution"
     },
     {
@@ -129,7 +129,7 @@
       "insight": "3 models by Multiverse Computing showcases ongoing advancements in AI model efficiency and performance",
       "encodedPrinciple": "[CAPABILITY] models → multiverse → computing → showcases → ongoing → advancements → model → efficiency",
       "strength": 0.999,
-      "inheritanceCount": 9,
+      "inheritanceCount": 10,
       "source": "evolution"
     },
     {
@@ -140,7 +140,7 @@
       "insight": "heatmap(data, annot=True, cmap='coolwarm') for a heatmap",
       "encodedPrinciple": "[TOOL_MATPLOTLIB_SEABORN] heatmap(data, → annot=true, → cmap='coolwarm') → heatmap",
       "strength": 0.999,
-      "inheritanceCount": 8,
+      "inheritanceCount": 9,
       "source": "evolution"
     },
     {
@@ -151,7 +151,7 @@
       "insight": "subplots(nrows, ncols) to create a grid of subplots",
       "encodedPrinciple": "[TOOL_MATPLOTLIB_SEABORN] subplots(nrows, → ncols) → create → grid → subplots",
       "strength": 0.999,
-      "inheritanceCount": 8,
+      "inheritanceCount": 9,
       "source": "evolution"
     },
     {
@@ -162,7 +162,7 @@
       "insight": "pie(sizes, labels=labels, autopct='%1",
       "encodedPrinciple": "[TOOL_MATPLOTLIB_SEABORN] pie(sizes, → labels=labels, → autopct='%1",
       "strength": 0.999,
-      "inheritanceCount": 8,
+      "inheritanceCount": 9,
       "source": "evolution"
     },
     {
@@ -173,7 +173,7 @@
       "insight": "strip(): raise ValueError('No text found')` to handle cases where OCR fails to extract text",
       "encodedPrinciple": "[TOOL_TESSERACT_OCR] strip(): → raise → valueerror('no → text → found')` → handle → cases → where",
       "strength": 0.999,
-      "inheritanceCount": 7,
+      "inheritanceCount": 8,
       "source": "evolution"
     },
     {
@@ -184,7 +184,7 @@
       "insight": "Anthropic's refusal to allow its AI for surveillance and autonomous weapons highlights growing ethical considerations in AI deployment",
       "encodedPrinciple": "[INSIGHT] anthropic's → refusal → allow → surveillance → autonomous → weapons → highlights → growing",
       "strength": 0.999,
-      "inheritanceCount": 7,
+      "inheritanceCount": 8,
       "source": "evolution"
     },
     {
@@ -195,7 +195,7 @@
       "insight": "AI techniques from OpenAI and Anthropic are lowering barriers in software development, enhancing productivity and accessibility",
       "encodedPrinciple": "[CAPABILITY] techniques → from → openai → anthropic → lowering → barriers → software → development,",
       "strength": 0.999,
-      "inheritanceCount": 7,
+      "inheritanceCount": 8,
       "source": "evolution"
     },
     {
@@ -206,7 +206,7 @@
       "insight": "doc = nlp('This is a sentence",
       "encodedPrinciple": "[TOOL_SPACY] nlp('this → sentence",
       "strength": 0.999,
-      "inheritanceCount": 6,
+      "inheritanceCount": 7,
       "source": "evolution"
     },
     {
@@ -217,7 +217,7 @@
       "insight": "for token in doc:\n    print(token",
       "encodedPrinciple": "[TOOL_SPACY] token → doc: → print(token",
       "strength": 0.999,
-      "inheritanceCount": 6,
+      "inheritanceCount": 7,
       "source": "evolution"
     },
     {
@@ -228,7 +228,7 @@
       "insight": "Extract text and images together by iterating through pages, using `page",
       "encodedPrinciple": "[TOOL_PYMUPDF] extract → text → images → together → iterating → through → pages, → using",
       "strength": 0.999,
-      "inheritanceCount": 6,
+      "inheritanceCount": 7,
       "source": "evolution"
     },
     {
@@ -239,7 +239,7 @@
       "insight": "line((x1, y1, x2, y2), fill=color, width=thickness)` for dynamic line generation",
       "encodedPrinciple": "[TOOL_PILLOW] line((x1, → y2), → fill=color, → width=thickness)` → dynamic → line → generation",
       "strength": 0.999,
-      "inheritanceCount": 5,
+      "inheritanceCount": 6,
       "source": "evolution"
     },
     {
@@ -250,7 +250,7 @@
       "insight": "The emergence of AI agents capable of autonomous decision-making highlights the need for ethical frameworks in AI deployment",
       "encodedPrinciple": "[INSIGHT] emergence → agents → capable → autonomous → decision-making → highlights → need → ethical",
       "strength": 0.999,
-      "inheritanceCount": 5,
+      "inheritanceCount": 6,
       "source": "evolution"
     },
     {
@@ -261,7 +261,7 @@
       "insight": "RHML enhances AI performance while ensuring human oversight, fostering better collaboration between humans and AI systems",
       "encodedPrinciple": "[CAPABILITY] rhml → enhances → performance → while → ensuring → human → oversight, → fostering",
       "strength": 0.999,
-      "inheritanceCount": 5,
+      "inheritanceCount": 6,
       "source": "evolution"
     },
     {
@@ -271,8 +271,8 @@
       "domain": "capability",
       "insight": "Reasoning models (RLMs) are a new class of LLMs designed to enhance logical reasoning capabilities, improving decision-making processes",
       "encodedPrinciple": "[CAPABILITY] reasoning → models → (rlms) → class → llms → designed → enhance → logical",
-      "strength": 0.555,
-      "inheritanceCount": 1,
+      "strength": 0.6900000000000002,
+      "inheritanceCount": 2,
       "source": "evolution"
     },
     {
@@ -282,8 +282,8 @@
       "domain": "pattern",
       "insight": "Organizations like Anthropic and OpenAI are prioritizing research on AI safety and alignment, indicating a growing trend towards responsible AI deployment",
       "encodedPrinciple": "[PATTERN] organizations → like → anthropic → openai → prioritizing → research → safety → alignment,",
-      "strength": 0.555,
-      "inheritanceCount": 1,
+      "strength": 0.6900000000000002,
+      "inheritanceCount": 2,
       "source": "evolution"
     },
     {
@@ -293,8 +293,8 @@
       "domain": "capability",
       "insight": "Generative AI is evolving with improved models that enhance creativity in art and language, allowing for more nuanced content generation",
       "encodedPrinciple": "[CAPABILITY] generative → evolving → with → improved → models → that → enhance → creativity",
-      "strength": 0.555,
-      "inheritanceCount": 1,
+      "strength": 0.6900000000000002,
+      "inheritanceCount": 2,
       "source": "evolution"
     },
     {
@@ -304,8 +304,8 @@
       "domain": "insight",
       "insight": "The rise of companies like Scale AI highlights the increasing investment in AI research, emphasizing the need for robust evaluation frameworks",
       "encodedPrinciple": "[INSIGHT] rise → companies → like → scale → highlights → increasing → investment → research,",
-      "strength": 0.555,
-      "inheritanceCount": 1,
+      "strength": 0.6900000000000002,
+      "inheritanceCount": 2,
       "source": "evolution"
     },
     {
@@ -315,8 +315,8 @@
       "domain": "unified_reinvention",
       "insight": "Contributing consolidation map (8 target engines), architecture insights, and harmony principles",
       "encodedPrinciple": "[UNIFIED_REINVENTION] contributing → consolidation → target → engines), → architecture → insights, → harmony → principles",
-      "strength": 0.495,
-      "inheritanceCount": 0,
+      "strength": 0.555,
+      "inheritanceCount": 1,
       "source": "evolution"
     },
     {
@@ -326,8 +326,8 @@
       "domain": "tool_matplotlib_seaborn",
       "insight": "heatmap(data, annot=True, cmap='coolwarm') for annotated heatmaps",
       "encodedPrinciple": "[TOOL_MATPLOTLIB_SEABORN] heatmap(data, → annot=true, → cmap='coolwarm') → annotated → heatmaps",
-      "strength": 0.495,
-      "inheritanceCount": 0,
+      "strength": 0.555,
+      "inheritanceCount": 1,
       "source": "evolution"
     },
     {
@@ -337,8 +337,8 @@
       "domain": "tool_matplotlib_seaborn",
       "insight": "boxplot(x='category', y='value', data=df) for box plots",
       "encodedPrinciple": "[TOOL_MATPLOTLIB_SEABORN] boxplot(x='category', → y='value', → data=df) → plots",
-      "strength": 0.495,
-      "inheritanceCount": 0,
+      "strength": 0.555,
+      "inheritanceCount": 1,
       "source": "evolution"
     },
     {
@@ -348,13 +348,57 @@
       "domain": "tool_restorative_art",
       "insight": "Apply embalming chemicals using a multi-point injection technique",
       "encodedPrinciple": "[TOOL_RESTORATIVE_ART] apply → embalming → chemicals → using → multi-point → injection → technique",
+      "strength": 0.555,
+      "inheritanceCount": 1,
+      "source": "evolution"
+    },
+    {
+      "id": "gene-14-32",
+      "generation": 14,
+      "timestamp": 1775136732048,
+      "domain": "capability",
+      "insight": "This code is now part of OMNIMENS's running TypeScript codebase",
+      "encodedPrinciple": "[CAPABILITY] this → code → part → omnimens's → running → typescript → codebase",
+      "strength": 0.595,
+      "inheritanceCount": 0,
+      "source": "evolution"
+    },
+    {
+      "id": "gene-14-33",
+      "generation": 14,
+      "timestamp": 1775136732048,
+      "domain": "capability",
+      "insight": "OMNIMENS wrote source file: asyncReasoningEngine_gen30",
+      "encodedPrinciple": "[CAPABILITY] omnimens → wrote → source → file: → asyncreasoningengine_gen30",
+      "strength": 0.495,
+      "inheritanceCount": 0,
+      "source": "evolution"
+    },
+    {
+      "id": "gene-14-34",
+      "generation": 14,
+      "timestamp": 1775136732048,
+      "domain": "capability",
+      "insight": "Facilitates iterative reasoning with state checkpointing, restoration, and timeout-based splitting for asynchronous tasks",
+      "encodedPrinciple": "[CAPABILITY] facilitates → iterative → reasoning → with → state → checkpointing, → restoration, → timeout-based",
+      "strength": 0.495,
+      "inheritanceCount": 0,
+      "source": "evolution"
+    },
+    {
+      "id": "gene-14-35",
+      "generation": 14,
+      "timestamp": 1775136732048,
+      "domain": "capability",
+      "insight": "OMNIMENS wrote source file: recursiveContextManager_gen34",
+      "encodedPrinciple": "[CAPABILITY] omnimens → wrote → source → file: → recursivecontextmanager_gen34",
       "strength": 0.495,
       "inheritanceCount": 0,
       "source": "evolution"
     }
   ],
-  "totalGenes": 32,
-  "generation": 13,
-  "totalInheritances": 12,
-  "savedAt": 1775135766749
+  "totalGenes": 36,
+  "generation": 14,
+  "totalInheritances": 13,
+  "savedAt": 1775136900784
 }

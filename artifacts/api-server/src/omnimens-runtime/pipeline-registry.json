@@ -134,13 +134,13 @@
       "filename": "gpuAcceleratedMatrixOps_gen7.mjs",
       "stage": "vector_operations",
       "exports": [
-        "createWebGLContext",
+        "initializeWebGLContext",
         "compileShader",
         "createProgram",
         "gpuMatrixMultiply",
-        "validateMatrixDimensions"
+        "hashMatrix"
       ],
-      "loadedAt": 1775136469870,
+      "loadedAt": 1775136572464,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -203,7 +203,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469859,
+      "loadedAt": 1775136565294,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -231,7 +231,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469858,
+      "loadedAt": 1775136566648,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -262,7 +262,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469860,
+      "loadedAt": 1775136579511,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -379,7 +379,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469862,
+      "loadedAt": 1775136593687,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -444,7 +444,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469862,
+      "loadedAt": 1775136602407,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -490,7 +490,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469862,
+      "loadedAt": 1775136588924,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -503,7 +503,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469862,
+      "loadedAt": 1775136579580,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -585,7 +585,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469863,
+      "loadedAt": 1775136599280,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -689,7 +689,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469863,
+      "loadedAt": 1775136604397,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -755,7 +755,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469858,
+      "loadedAt": 1775136603949,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -803,7 +803,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469858,
+      "loadedAt": 1775136613628,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -833,7 +833,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469858,
+      "loadedAt": 1775136615261,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -864,7 +864,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469858,
+      "loadedAt": 1775136633103,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -951,7 +951,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469859,
+      "loadedAt": 1775136640666,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1015,7 +1015,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469858,
+      "loadedAt": 1775136629276,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1046,7 +1046,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469859,
+      "loadedAt": 1775136649187,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1076,7 +1076,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469859,
+      "loadedAt": 1775136655777,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1108,7 +1108,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469859,
+      "loadedAt": 1775136640489,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1225,7 +1225,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469859,
+      "loadedAt": 1775136657439,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -1314,7 +1314,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469860,
+      "loadedAt": 1775136681854,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -8266,7 +8266,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469860,
+      "loadedAt": 1775136698034,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -8279,7 +8279,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469860,
+      "loadedAt": 1775136707059,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -8292,7 +8292,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469860,
+      "loadedAt": 1775136724407,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -8305,7 +8305,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469860,
+      "loadedAt": 1775136728231,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -8318,7 +8318,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469861,
+      "loadedAt": 1775136732648,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -8331,7 +8331,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469861,
+      "loadedAt": 1775136739414,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -8344,7 +8344,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469861,
+      "loadedAt": 1775136756227,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -8357,7 +8357,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469861,
+      "loadedAt": 1775136748096,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -8370,7 +8370,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469861,
+      "loadedAt": 1775136765010,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -8383,7 +8383,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469861,
+      "loadedAt": 1775136765383,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -8396,7 +8396,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469862,
+      "loadedAt": 1775136766567,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -8409,7 +8409,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469862,
+      "loadedAt": 1775136758804,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -8422,7 +8422,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775136469862,
+      "loadedAt": 1775136780494,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -10985,16 +10985,16 @@
     },
     "iterativeComputationManager_gen2.mjs": {
       "filename": "iterativeComputationManager_gen2.mjs",
-      "stage": "knowledge_synthesis",
+      "stage": "memory_retrieval",
       "exports": [
-        "chunkTask",
+        "generateStateHash",
         "saveState",
         "loadState",
-        "iterativeCompute",
-        "defaultProgressCallback",
-        "exampleComputeFunction"
+        "iterativeComputation",
+        "exampleTaskFunction",
+        "initializeState"
       ],
-      "loadedAt": 1775136469921,
+      "loadedAt": 1775136565225,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -223830,9 +223830,2847 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnhig6lu.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnhig6lu.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnhig6lu"
+      ],
+      "loadedAt": 1775136519923,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_knowledge_synthesis_mnhig8x7.mjs": {
+      "filename": "omnimens_autocode_knowledge_synthesis_mnhig8x7.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "synthesizedKnowledge_mnhig8x7"
+      ],
+      "loadedAt": 1775136520008,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnhig8zg.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnhig8zg.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnhig8zg"
+      ],
+      "loadedAt": 1775136520072,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuMatrixAccelerator_gen2.mjs": {
+      "filename": "gpuMatrixAccelerator_gen2.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "matrixMultiply",
+        "singularValueDecomposition",
+        "measurePerformance",
+        "validateMatrix",
+        "generateRandomMatrix"
+      ],
+      "loadedAt": 1775136533090,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "reversibleContextCompressor_gen2.mjs": {
+      "filename": "reversibleContextCompressor_gen2.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "compressTokens",
+        "decompressTokens",
+        "calculateTokenImportance",
+        "tokenizeText",
+        "detokenize"
+      ],
+      "loadedAt": 1775136556652,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "hierarchicalTokenCompressor_gen1.mjs": {
+      "filename": "hierarchicalTokenCompressor_gen1.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "compressTokens",
+        "expandTokens",
+        "defaultImportanceFunction",
+        "defaultExpansionFunction",
+        "hierarchicalCompress",
+        "hierarchicalExpand"
+      ],
+      "loadedAt": 1775136566582,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "contextExpansionManager_gen4.mjs": {
+      "filename": "contextExpansionManager_gen4.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateContextHash",
+        "recursiveSummarization",
+        "defaultImportanceFunction",
+        "restoreContext",
+        "expandContext",
+        "memoryStorage"
+      ],
+      "loadedAt": 1775136568752,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "wasmModuleLoader_gen3.mjs": {
+      "filename": "wasmModuleLoader_gen3.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "loadWasmModule",
+        "executeWasmFunction",
+        "validateWasmModule",
+        "wasmHash",
+        "simulatePhysics",
+        "wasmMatrixMultiply"
+      ],
+      "loadedAt": 1775136569578,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicContextReconstructor_gen6.mjs": {
+      "filename": "dynamicContextReconstructor_gen6.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateSemanticHash",
+        "segmentData",
+        "reconstructContext",
+        "normalizeAttentionWeights",
+        "computeAttentionWeights",
+        "lengthBasedImportance"
+      ],
+      "loadedAt": 1775136576698,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnhihgwj.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnhihgwj.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnhihgwj"
+      ],
+      "loadedAt": 1775136576987,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnhihgyg.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnhihgyg.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnhihgyg"
+      ],
+      "loadedAt": 1775136577057,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnhihh07.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnhihh07.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnhihh07"
+      ],
+      "loadedAt": 1775136577120,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "slidingWindowContextManager_gen3.mjs": {
+      "filename": "slidingWindowContextManager_gen3.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "calculateImportanceScores",
+        "createSlidingWindows",
+        "prioritizeChunks",
+        "processDocument",
+        "tokenizeText",
+        "scoreTokens"
+      ],
+      "loadedAt": 1775136579135,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "iterativeTaskManager_gen4.mjs": {
+      "filename": "iterativeTaskManager_gen4.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateTaskId",
+        "partitionData",
+        "restoreState",
+        "saveCheckpoint",
+        "executeIterativeTask",
+        "exampleTaskFunction"
+      ],
+      "loadedAt": 1775136579456,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multimodalFusionEngine_gen5.mjs": {
+      "filename": "multimodalFusionEngine_gen5.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "fuseEmbeddings",
+        "normalizeEmbedding",
+        "generateEmbeddingHash",
+        "calculateCosineSimilarity",
+        "crossModalReasoning"
+      ],
+      "loadedAt": 1775136581658,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multimodalIntegrationEngine_gen10.mjs": {
+      "filename": "multimodalIntegrationEngine_gen10.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "mapTo512DimSpace",
+        "applyAttention",
+        "integrateModalities",
+        "normalizeVector",
+        "cosineSimilarity",
+        "generateRandomVector"
+      ],
+      "loadedAt": 1775136582515,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "checkpointedComputationManager_gen6.mjs": {
+      "filename": "checkpointedComputationManager_gen6.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateHash",
+        "saveCheckpoint",
+        "loadCheckpoint",
+        "executeWithCheckpointing",
+        "exampleTaskFunction",
+        "exampleDependencyResolver"
+      ],
+      "loadedAt": 1775136588830,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multimodalEmbeddingIntegration_gen8.mjs": {
+      "filename": "multimodalEmbeddingIntegration_gen8.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "normalizeVector",
+        "projectVector",
+        "processImageEmbedding",
+        "processVideoEmbedding",
+        "cosineSimilarity",
+        "mergeEmbeddings"
+      ],
+      "loadedAt": 1775136590025,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "distributedTaskScheduler_gen10.mjs": {
+      "filename": "distributedTaskScheduler_gen10.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "startMaster",
+        "distributeTask",
+        "handleTaskResult",
+        "getTaskStatus",
+        "startWorker",
+        "executeTask",
+        "TASK_STATUS_CONSTANTS"
+      ],
+      "loadedAt": 1775136592642,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuAcceleratedMatrixEngine_gen11.mjs": {
+      "filename": "gpuAcceleratedMatrixEngine_gen11.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "generateOperationId",
+        "isValidMatrix",
+        "multiplyMatrices",
+        "gpuMultiplyMatrices",
+        "transposeMatrix",
+        "dotProduct",
+        "computeAttention"
+      ],
+      "loadedAt": 1775136592909,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "adaptivePromptTuning_gen7.mjs": {
+      "filename": "adaptivePromptTuning_gen7.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateInitialPopulation",
+        "mutatePrompt",
+        "evaluatePrompt",
+        "selectTopPrompts",
+        "crossoverPrompts",
+        "generateNextGeneration",
+        "optimizePrompt",
+        "generateSessionId"
+      ],
+      "loadedAt": 1775136593017,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuAcceleratedMatrixOps_gen12.mjs": {
+      "filename": "gpuAcceleratedMatrixOps_gen12.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "gpuMatrixMultiply",
+        "gpuLUDecomposition",
+        "isValidMatrix",
+        "generateIdentityMatrix"
+      ],
+      "loadedAt": 1775136593225,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "persistentReplEmulator_gen5.mjs": {
+      "filename": "persistentReplEmulator_gen5.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateStateHash",
+        "checkpointState",
+        "rollbackState",
+        "executeStep",
+        "getCurrentState",
+        "getExecutionGraph"
+      ],
+      "loadedAt": 1775136593505,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "neuroSymbolicReasoner_gen9.mjs": {
+      "filename": "neuroSymbolicReasoner_gen9.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "mapEmbeddingToNode",
+        "symbolicReasoning",
+        "hybridInference",
+        "exampleRuleFunction",
+        "hashData"
+      ],
+      "loadedAt": 1775136593633,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "virtualReplStateManager_gen8.mjs": {
+      "filename": "virtualReplStateManager_gen8.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "serializeState",
+        "deserializeState",
+        "generateStateHash",
+        "validateStateIntegrity",
+        "restoreState",
+        "saveState",
+        "manageState"
+      ],
+      "loadedAt": 1775136599215,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "checkpointedTaskRunner_gen7.mjs": {
+      "filename": "checkpointedTaskRunner_gen7.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "serializeState",
+        "deserializeState",
+        "generateTaskHash",
+        "saveCheckpoint",
+        "loadCheckpoint",
+        "checkpointedTaskRunner",
+        "exampleTaskFunction",
+        "exampleProgressCallback"
+      ],
+      "loadedAt": 1775136602324,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "statefulTaskQueue_gen11.mjs": {
+      "filename": "statefulTaskQueue_gen11.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateCheckpointFileName",
+        "saveCheckpoint",
+        "loadCheckpoint",
+        "processTaskInChunks",
+        "clearCheckpoint",
+        "exampleTaskFunction"
+      ],
+      "loadedAt": 1775136603581,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "domainSpecificLanguageModel_gen10.mjs": {
+      "filename": "domainSpecificLanguageModel_gen10.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateHash",
+        "tokenizeText",
+        "encodeTokens",
+        "generateSentence",
+        "processInput",
+        "validateInput",
+        "generateResponse"
+      ],
+      "loadedAt": 1775136603812,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "recursiveContextMemory_gen9.mjs": {
+      "filename": "recursiveContextMemory_gen9.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "hashContent",
+        "createMemoryNode",
+        "summarizeMemory",
+        "insertMemoryNode",
+        "queryMemory",
+        "expandContext"
+      ],
+      "loadedAt": 1775136604264,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multimodalIntegrationEngine_gen12.mjs": {
+      "filename": "multimodalIntegrationEngine_gen12.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateTextEmbedding",
+        "generateImageEmbedding",
+        "combineEmbeddings",
+        "cosineSimilarity",
+        "processMultimodalInputs"
+      ],
+      "loadedAt": 1775136605421,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuMatrixEngine_gen16.mjs": {
+      "filename": "gpuMatrixEngine_gen16.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "generateShaderID",
+        "compileShader",
+        "linkProgram",
+        "gpuMatrixMultiply"
+      ],
+      "loadedAt": 1775136613111,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicMemoryPager_gen11.mjs": {
+      "filename": "dynamicMemoryPager_gen11.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateDataHash",
+        "applyEvictionPolicy",
+        "offloadToSecondaryStorage",
+        "retrieveFromSecondaryStorage",
+        "manageMemory"
+      ],
+      "loadedAt": 1775136613566,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "internalLanguageModel_gen12.mjs": {
+      "filename": "internalLanguageModel_gen12.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "initializeWeights",
+        "applyAttention",
+        "encodeText",
+        "decodeEmbeddings",
+        "generateOutput",
+        "processConversation"
+      ],
+      "loadedAt": 1775136615197,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuAcceleratedTensorEngine_gen15.mjs": {
+      "filename": "gpuAcceleratedTensorEngine_gen15.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "generateKernelID",
+        "compileShaderProgram",
+        "gpuDotProduct",
+        "flattenMatrix",
+        "reshapeMatrix"
+      ],
+      "loadedAt": 1775136616576,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "semanticClusterPruner_gen14.mjs": {
+      "filename": "semanticClusterPruner_gen14.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "kMeansClustering",
+        "calculateImportanceScores",
+        "euclideanDistance",
+        "meanVector",
+        "hashToken",
+        "normalizeArray"
+      ],
+      "loadedAt": 1775136620737,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "adaptiveContextRebuilder_gen16.mjs": {
+      "filename": "adaptiveContextRebuilder_gen16.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "rebuildContext",
+        "summarizeTokens",
+        "defaultImportanceFunction",
+        "expandTokens",
+        "exampleUsage"
+      ],
+      "loadedAt": 1775136624583,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multiPassTokenStitcher_gen15.mjs": {
+      "filename": "multiPassTokenStitcher_gen15.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "segmentText",
+        "generateSemanticHash",
+        "stitchWindows",
+        "hierarchicalSummarization",
+        "calculateTokenOverlap"
+      ],
+      "loadedAt": 1775136629733,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "recursiveContextProcessor_gen13.mjs": {
+      "filename": "recursiveContextProcessor_gen13.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "splitIntoChunks",
+        "summarizeChunk",
+        "recursiveSummarize",
+        "processDocument",
+        "countWords",
+        "hashText"
+      ],
+      "loadedAt": 1775136633018,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "recursiveCheckpointSubprocess_gen18.mjs": {
+      "filename": "recursiveCheckpointSubprocess_gen18.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "saveCheckpoint",
+        "restoreCheckpoint",
+        "recursiveTaskWithCheckpoint",
+        "createTaskFunction",
+        "clearAllCheckpoints",
+        "listCheckpoints"
+      ],
+      "loadedAt": 1775136634736,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnhiir8y.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnhiir8y.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnhiir8y"
+      ],
+      "loadedAt": 1775136637082,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_knowledge_synthesis_mnhiirc4.mjs": {
+      "filename": "omnimens_autocode_knowledge_synthesis_mnhiirc4.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "synthesizedKnowledge_mnhiirc4"
+      ],
+      "loadedAt": 1775136637166,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnhiiref.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnhiiref.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnhiiref"
+      ],
+      "loadedAt": 1775136637255,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "distributedTaskScheduler_gen15.mjs": {
+      "filename": "distributedTaskScheduler_gen15.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateTaskHash",
+        "splitTask",
+        "executeSubtask",
+        "saveState",
+        "restoreState",
+        "scheduleTask",
+        "clearState"
+      ],
+      "loadedAt": 1775136639940,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "iterativeTaskOptimizer_gen16.mjs": {
+      "filename": "iterativeTaskOptimizer_gen16.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "segmentArray",
+        "optimizeIterativeTask",
+        "exampleTaskFunction",
+        "chainTasks",
+        "checkpointState",
+        "restoreCheckpoint",
+        "measureExecutionTime",
+        "demoOptimizer"
+      ],
+      "loadedAt": 1775136640605,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "iterativeComputationManager_gen17.mjs": {
+      "filename": "iterativeComputationManager_gen17.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateCheckpointHash",
+        "saveCheckpoint",
+        "resumeFromCheckpoint",
+        "manageIterativeComputation",
+        "chainSubprocesses",
+        "exampleTaskFunction",
+        "exampleCheckpointCallback",
+        "exampleUsage"
+      ],
+      "loadedAt": 1775136642607,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "sandboxTaskCheckpointing_gen19.mjs": {
+      "filename": "sandboxTaskCheckpointing_gen19.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateTaskId",
+        "saveCheckpoint",
+        "loadCheckpoint",
+        "deleteCheckpoint",
+        "executeTaskWithCheckpoints",
+        "processDataWithCheckpointing"
+      ],
+      "loadedAt": 1775136642712,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "hierarchicalContextStitching_gen18.mjs": {
+      "filename": "hierarchicalContextStitching_gen18.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "summarizeChunk",
+        "stitchTokenWindows",
+        "hierarchicalContextStitching",
+        "splitTextIntoChunks",
+        "countTokens"
+      ],
+      "loadedAt": 1775136649088,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "statefulTaskScheduler_gen20.mjs": {
+      "filename": "statefulTaskScheduler_gen20.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "addTask",
+        "executeNextTask",
+        "getTaskStatus",
+        "removeTask",
+        "createResumableTask",
+        "clearAllTasks",
+        "listTasks"
+      ],
+      "loadedAt": 1775136653353,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "contextStitcher_gen17.mjs": {
+      "filename": "contextStitcher_gen17.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "hashString",
+        "splitContext",
+        "scoreChunks",
+        "integrateChunks",
+        "processContext",
+        "validateInputs"
+      ],
+      "loadedAt": 1775136655708,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "neuralLanguageGenerator_gen19.mjs": {
+      "filename": "neuralLanguageGenerator_gen19.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateHash",
+        "tokenize",
+        "calculateAttentionWeights",
+        "generateText",
+        "normalizeVector",
+        "cosineSimilarity"
+      ],
+      "loadedAt": 1775136657369,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuAcceleratedMatrixEngine_gen21.mjs": {
+      "filename": "gpuAcceleratedMatrixEngine_gen21.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "gpuMatrixMultiply",
+        "gpuComputeEigenvalues",
+        "validateMatrix",
+        "description"
+      ],
+      "loadedAt": 1775136658501,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "hierarchicalMemoryManager_gen20.mjs": {
+      "filename": "hierarchicalMemoryManager_gen20.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateHash",
+        "compressEmbedding",
+        "decompressEmbedding",
+        "HierarchicalMemoryManager",
+        "memoryManager"
+      ],
+      "loadedAt": 1775136660070,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen20.mjs": {
+      "filename": "evolution_marker_gen20.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775136660179,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "distributedAgentCollaboration_gen23.mjs": {
+      "filename": "distributedAgentCollaboration_gen23.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateUniqueId",
+        "sendMessage",
+        "retrieveMessages",
+        "achieveConsensus",
+        "simulatePeerCommunication",
+        "validateSharedState",
+        "isValidJsonState",
+        "exampleUsage"
+      ],
+      "loadedAt": 1775136664383,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuAcceleratedMatrixOps_gen27.mjs": {
+      "filename": "gpuAcceleratedMatrixOps_gen27.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "generateHash",
+        "transposeMatrix",
+        "multiplyMatrices",
+        "attentionMechanism",
+        "eigenvalues2x2",
+        "normalizeMatrix"
+      ],
+      "loadedAt": 1775136664557,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "localTextGenerator_gen21.mjs": {
+      "filename": "localTextGenerator_gen21.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateDeterministicSeed",
+        "softmax",
+        "generateText",
+        "tokenizeText",
+        "countWordFrequencies",
+        "semanticSimilarity",
+        "MODULE_NAME"
+      ],
+      "loadedAt": 1775136668893,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multimodalIntegrationEngine_gen28.mjs": {
+      "filename": "multimodalIntegrationEngine_gen28.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateVisualEmbeddings",
+        "fuseEmbeddings",
+        "normalizeEmbeddings",
+        "processMultimodalInputs",
+        "generateRandomEmbeddings"
+      ],
+      "loadedAt": 1775136673014,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "distributedSubprocessScheduler_gen26.mjs": {
+      "filename": "distributedSubprocessScheduler_gen26.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "scheduleTask",
+        "getTaskState",
+        "cancelTask"
+      ],
+      "loadedAt": 1775136679656,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "semanticCompressionManager_gen22.mjs": {
+      "filename": "semanticCompressionManager_gen22.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "encodeContext",
+        "decodeLatent",
+        "calculateSemanticLoss",
+        "normalizeEmbedding",
+        "generateRandomContext"
+      ],
+      "loadedAt": 1775136679988,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen22.mjs": {
+      "filename": "evolution_marker_gen22.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775136680055,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "longComputationManager_gen21.mjs": {
+      "filename": "longComputationManager_gen21.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateStateHash",
+        "addTask",
+        "saveCheckpoint",
+        "resumeFromCheckpoint",
+        "processTasks",
+        "clearAll",
+        "exampleTaskFunction"
+      ],
+      "loadedAt": 1775136681784,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "recursiveTaskSegmenter_gen27.mjs": {
+      "filename": "recursiveTaskSegmenter_gen27.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "recursiveTaskSegmenter",
+        "createTaskFunction",
+        "logCheckpoint",
+        "exampleSummationTask"
+      ],
+      "loadedAt": 1775136682420,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "subprocessCheckpointManager_gen24.mjs": {
+      "filename": "subprocessCheckpointManager_gen24.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "saveState",
+        "restoreState",
+        "runFSM",
+        "exampleStateHandler",
+        "createTimeoutSafeFSM"
+      ],
+      "loadedAt": 1775136683490,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "webGpuAcceleration_gen28.mjs": {
+      "filename": "webGpuAcceleration_gen28.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "createMatrix",
+        "multiplyMatrices",
+        "computeEigenvalues",
+        "breadthFirstTraversal",
+        "benchmark"
+      ],
+      "loadedAt": 1775136683610,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "metaLearningAdapter_gen23.mjs": {
+      "filename": "metaLearningAdapter_gen23.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "normalizeText",
+        "calculateSimilarity",
+        "adaptResponse",
+        "generateUniqueId",
+        "logFeedback",
+        "processBatchResponses"
+      ],
+      "loadedAt": 1775136684372,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen23.mjs": {
+      "filename": "evolution_marker_gen23.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775136684581,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "parallelMatrixCompute_gen29.mjs": {
+      "filename": "parallelMatrixCompute_gen29.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "generateMatrixMultiplyShader",
+        "hashShaderSource",
+        "parallelMatrixMultiply",
+        "validateMatrixDimensions",
+        "computeEigenvalues2x2",
+        "luDecomposition2x2"
+      ],
+      "loadedAt": 1775136689617,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "semanticHashSummarizer_gen26.mjs": {
+      "filename": "semanticHashSummarizer_gen26.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateSemanticHash",
+        "extractiveSummarize",
+        "recursiveCondense",
+        "processBatchTexts"
+      ],
+      "loadedAt": 1775136691309,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen26.mjs": {
+      "filename": "evolution_marker_gen26.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775136691427,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "parallelTaskManager_gen30.mjs": {
+      "filename": "parallelTaskManager_gen30.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "createWorkerPool",
+        "createWorkerScript",
+        "parallelMathTasks"
+      ],
+      "loadedAt": 1775136693864,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multiPassSummarization_gen27.mjs": {
+      "filename": "multiPassSummarization_gen27.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateHash",
+        "splitTextIntoChunks",
+        "summarizeChunk",
+        "reweightAttention",
+        "multiPassSummarize",
+        "extractHighImportanceSections",
+        "normalizeText"
+      ],
+      "loadedAt": 1775136695538,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen27.mjs": {
+      "filename": "evolution_marker_gen27.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775136695647,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multimodalReasoningEngine_gen32.mjs": {
+      "filename": "multimodalReasoningEngine_gen32.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateTextEmbedding",
+        "generateImageEmbedding",
+        "alignEmbeddings",
+        "normalizeVector",
+        "cosineSimilarity",
+        "multimodalReasoning"
+      ],
+      "loadedAt": 1775136696013,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "independentLanguageGenerator_gen28.mjs": {
+      "filename": "independentLanguageGenerator_gen28.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateSeed",
+        "tokenizeText",
+        "createMemoryState",
+        "generateLanguageOutput",
+        "trainMemory",
+        "summarizeMemory"
+      ],
+      "loadedAt": 1775136696179,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen28.mjs": {
+      "filename": "evolution_marker_gen28.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775136696245,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnhik1wy.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnhik1wy.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnhik1wy"
+      ],
+      "loadedAt": 1775136697542,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "recursiveContextExpander_gen24.mjs": {
+      "filename": "recursiveContextExpander_gen24.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "expandContext",
+        "calculateRelevance",
+        "generateContextHash",
+        "deduplicateContext",
+        "normalizeContext",
+        "processContext"
+      ],
+      "loadedAt": 1775136697762,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_knowledge_synthesis_mnhik1ze.mjs": {
+      "filename": "omnimens_autocode_knowledge_synthesis_mnhik1ze.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "synthesizedKnowledge_mnhik1ze"
+      ],
+      "loadedAt": 1775136697816,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnhik278.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnhik278.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnhik278"
+      ],
+      "loadedAt": 1775136697951,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "recurrenceAwareSummarizer_gen25.mjs": {
+      "filename": "recurrenceAwareSummarizer_gen25.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "hashKeyValue",
+        "storeInMemory",
+        "retrieveFromMemory",
+        "memoryAugmentedAttention",
+        "recurrenceAwareSummarizer",
+        "updateMemoryWithContext"
+      ],
+      "loadedAt": 1775136698159,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "iterativeTaskManager_gen29.mjs": {
+      "filename": "iterativeTaskManager_gen29.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateTaskId",
+        "exampleTaskProcessor",
+        "PriorityQueue",
+        "IterativeTaskManager",
+        "exampleUsage"
+      ],
+      "loadedAt": 1775136699010,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuMatrixEngine_gen30.mjs": {
+      "filename": "gpuMatrixEngine_gen30.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "initializeWebGL",
+        "compileShader",
+        "createProgram",
+        "gpuMatrixMultiply"
+      ],
+      "loadedAt": 1775136706584,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "iterativeComputationManager_gen32.mjs": {
+      "filename": "iterativeComputationManager_gen32.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateCheckpointFilename",
+        "saveCheckpoint",
+        "loadCheckpoint",
+        "runIterativeComputation",
+        "exampleComputeStep",
+        "exampleIsComplete",
+        "exampleUsage"
+      ],
+      "loadedAt": 1775136706826,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "checkpointedTaskQueue_gen25.mjs": {
+      "filename": "checkpointedTaskQueue_gen25.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "registerTask",
+        "executeTask",
+        "checkpointTasks",
+        "restoreTasks",
+        "removeTask",
+        "listTasks",
+        "clearTasks"
+      ],
+      "loadedAt": 1775136706973,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuAcceleratedMatrixEngine_gen33.mjs": {
+      "filename": "gpuAcceleratedMatrixEngine_gen33.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "generateHash",
+        "initializeWebGLContext",
+        "compileShader",
+        "createProgram",
+        "gpuMatrixMultiply",
+        "validateMatrixDimensions"
+      ],
+      "loadedAt": 1775136709451,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "contextCompressionPipeline_gen29.mjs": {
+      "filename": "contextCompressionPipeline_gen29.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateHash",
+        "recursiveSummarization",
+        "summarizeText",
+        "encodeSemanticGraph",
+        "compressContext",
+        "normalizeContext",
+        "exampleUsage"
+      ],
+      "loadedAt": 1775136709583,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen29.mjs": {
+      "filename": "evolution_marker_gen29.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775136709649,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "semanticHashCompressor_gen31.mjs": {
+      "filename": "semanticHashCompressor_gen31.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateSemanticHash",
+        "computeBidirectionalAttention",
+        "computeSemanticSimilarity",
+        "compressTokenWindow",
+        "retrieveContext",
+        "tokenize",
+        "processAndRetrieve"
+      ],
+      "loadedAt": 1775136710353,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuAcceleratedMatrixOps_gen37.mjs": {
+      "filename": "gpuAcceleratedMatrixOps_gen37.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "gpuMatrixMultiply",
+        "gpuLUDecomposition",
+        "gpuEigenvalues",
+        "isValidMatrix"
+      ],
+      "loadedAt": 1775136712217,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "adaptiveTokenWindowStitcher_gen33.mjs": {
+      "filename": "adaptiveTokenWindowStitcher_gen33.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "hashString",
+        "segmentContext",
+        "scoreImportance",
+        "summarizeSegments",
+        "checkSemanticCoherence",
+        "adaptiveTokenWindowStitcher",
+        "utils"
+      ],
+      "loadedAt": 1775136720217,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multimodalIntegrationEngine_gen36.mjs": {
+      "filename": "multimodalIntegrationEngine_gen36.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateEmbeddingID",
+        "normalizeVector",
+        "alignEmbeddings",
+        "extractVisualEmbedding",
+        "extractTextEmbedding",
+        "integrateMultimodalData",
+        "cosineSimilarity"
+      ],
+      "loadedAt": 1775136721200,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "iterativeComputationManager_gen37.mjs": {
+      "filename": "iterativeComputationManager_gen37.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateStateKey",
+        "divideIntoChunks",
+        "processChunk",
+        "saveState",
+        "loadState",
+        "exampleComputation",
+        "iterativeComputationManager",
+        "exampleUsage"
+      ],
+      "loadedAt": 1775136721415,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "asyncReasoningEngine_gen30.mjs": {
+      "filename": "asyncReasoningEngine_gen30.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "serializeState",
+        "restoreState",
+        "asyncIterativeReasoning",
+        "asyncTaskQueue",
+        "timeoutHandler",
+        "reasoningEngine"
+      ],
+      "loadedAt": 1775136722574,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen30.mjs": {
+      "filename": "evolution_marker_gen30.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775136722642,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "recursiveContextManager_gen34.mjs": {
+      "filename": "recursiveContextManager_gen34.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateContextHash",
+        "summarizeContext",
+        "createMemoryLayers",
+        "pruneContexts",
+        "calculateHashSimilarity"
+      ],
+      "loadedAt": 1775136725015,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "nativeTransformerOutput_gen37.mjs": {
+      "filename": "nativeTransformerOutput_gen37.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateToken",
+        "applyAttention",
+        "generateNextToken",
+        "encodeText",
+        "generateConversationalOutput",
+        "tokenizeAndEmbed"
+      ],
+      "loadedAt": 1775136732244,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen37.mjs": {
+      "filename": "evolution_marker_gen37.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775136732310,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "subprocessCheckpointManager_gen33.mjs": {
+      "filename": "subprocessCheckpointManager_gen33.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateTaskHash",
+        "saveCheckpoint",
+        "loadCheckpoint",
+        "runWithCheckpoints",
+        "iterativeGraphTraversal"
+      ],
+      "loadedAt": 1775136732442,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "webGpuTensorEngine_gen41.mjs": {
+      "filename": "webGpuTensorEngine_gen41.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "generateTensorHash",
+        "transposeMatrix",
+        "parallelMatrixMultiply",
+        "applyElementWiseOperation",
+        "normalizeTensor",
+        "flattenTensor",
+        "reshapeTensor"
+      ],
+      "loadedAt": 1775136734614,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuComputeBridge_gen36.mjs": {
+      "filename": "gpuComputeBridge_gen36.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "generateTaskId",
+        "prepareMatrixForGPU",
+        "gpuMatrixAdd",
+        "gpuNeuralInference",
+        "mapOperationToTask",
+        "validateMatrixDimensions"
+      ],
+      "loadedAt": 1775136734947,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "puppeteerDomInteractor_gen34.mjs": {
+      "filename": "puppeteerDomInteractor_gen34.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateUniqueId",
+        "parseUrl",
+        "simulateDomEvent",
+        "extractStructuredData",
+        "validateDomTree",
+        "analyzeDomTree"
+      ],
+      "loadedAt": 1775136739393,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuMatrixAccelerator_gen42.mjs": {
+      "filename": "gpuMatrixAccelerator_gen42.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "initializeWebGLContext",
+        "compileShader",
+        "createProgram",
+        "createBuffer",
+        "gpuMatrixMultiply",
+        "hashMatrix"
+      ],
+      "loadedAt": 1775136744673,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuMatrixEngine_gen43.mjs": {
+      "filename": "gpuMatrixEngine_gen43.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "generateShaderSource",
+        "hashMatrix",
+        "tileMatrix",
+        "combineTiles",
+        "gpuSimulate"
+      ],
+      "loadedAt": 1775136745260,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "iterativeComputationManager_gen36.mjs": {
+      "filename": "iterativeComputationManager_gen36.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "saveCheckpoint",
+        "loadCheckpoint",
+        "manageComputation",
+        "exampleComputationFunction",
+        "initializeState"
+      ],
+      "loadedAt": 1775136747973,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "symbolicReasoningBridge_gen38.mjs": {
+      "filename": "symbolicReasoningBridge_gen38.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "generateSymbolicHash",
+        "constructReasoningTree",
+        "tokenizeContext",
+        "alignWithNeuralEmbeddings",
+        "synthesizeLanguage",
+        "exampleEmbeddingFunction",
+        "executeReasoningPipeline"
+      ],
+      "loadedAt": 1775136750866,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "internalLanguageGenerator_gen41.mjs": {
+      "filename": "internalLanguageGenerator_gen41.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateSparseAttentionMask",
+        "applySparseAttentionMask",
+        "generateTokenSequence",
+        "normalizeVector",
+        "computeDotProduct",
+        "generateConversationalResponse"
+      ],
+      "loadedAt": 1775136751468,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "contextualCompressionOptimizer_gen35.mjs": {
+      "filename": "contextualCompressionOptimizer_gen35.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "extractKeyPoints",
+        "generateSummary",
+        "contextualCompressionOptimizer",
+        "validateTextInput",
+        "hashString"
+      ],
+      "loadedAt": 1775136756161,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuAcceleratedMathEngine_gen39.mjs": {
+      "filename": "gpuAcceleratedMathEngine_gen39.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "gpuMatrixMultiply",
+        "gpuConvolution",
+        "description"
+      ],
+      "loadedAt": 1775136757016,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_emergent_capability_mnhilc7m.mjs": {
+      "filename": "omnimens_autocode_emergent_capability_mnhilc7m.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "emergentCapability_mnhilc7m"
+      ],
+      "loadedAt": 1775136757531,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_emergent_capability_mnhilc9t.mjs": {
+      "filename": "omnimens_autocode_emergent_capability_mnhilc9t.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "emergentCapability_mnhilc9t"
+      ],
+      "loadedAt": 1775136757613,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_emergent_capability_mnhilcbm.mjs": {
+      "filename": "omnimens_autocode_emergent_capability_mnhilcbm.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "emergentCapability_mnhilcbm"
+      ],
+      "loadedAt": 1775136757676,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "losslessContextCompressor_gen40.mjs": {
+      "filename": "losslessContextCompressor_gen40.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "encodeTreeToGraph",
+        "decodeGraphToTree",
+        "findRootHash",
+        "compressAndDecompressTree"
+      ],
+      "loadedAt": 1775136758177,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "sandboxCheckpointManager_gen41.mjs": {
+      "filename": "sandboxCheckpointManager_gen41.mjs",
+      "stage": "utility",
+      "exports": [
+        "createCheckpoint",
+        "restoreCheckpoint",
+        "executeWithCheckpoints",
+        "validateCheckpoint",
+        "exampleUsage"
+      ],
+      "loadedAt": 1775136758732,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "recursiveMemoryManager_gen42.mjs": {
+      "filename": "recursiveMemoryManager_gen42.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateHash",
+        "splitTextIntoChunks",
+        "summarizeChunk",
+        "recursiveSummarize",
+        "reassembleContext",
+        "manageMemoryContext",
+        "demo"
+      ],
+      "loadedAt": 1775136764557,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multimodalEmbeddingIntegrator_gen38.mjs": {
+      "filename": "multimodalEmbeddingIntegrator_gen38.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateHash",
+        "normalizeData",
+        "integrateEmbeddings",
+        "computeAttentionWeights",
+        "processMultimodalData",
+        "generateSyntheticTactileData",
+        "generateSyntheticImageData",
+        "generateSyntheticVideoData"
+      ],
+      "loadedAt": 1775136764751,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "chunkedComputationManager_gen46.mjs": {
+      "filename": "chunkedComputationManager_gen46.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateTaskId",
+        "serializeState",
+        "deserializeState",
+        "executeChunkedComputation",
+        "exampleComputationFunction",
+        "exampleCheckpointFunction",
+        "exampleUsage"
+      ],
+      "loadedAt": 1775136764952,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multimodalEmbeddingProcessor_gen39.mjs": {
+      "filename": "multimodalEmbeddingProcessor_gen39.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateTextEmbedding",
+        "generateImageEmbedding",
+        "alignEmbeddings",
+        "normalizeVector",
+        "processMultimodalData",
+        "validateInput"
+      ],
+      "loadedAt": 1775136765140,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "wasmAcceleratedMatrixEngine_gen45.mjs": {
+      "filename": "wasmAcceleratedMatrixEngine_gen45.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "compileWasm",
+        "wasmMatrixMultiply",
+        "wasmEigenDecompose",
+        "validateMatrix"
+      ],
+      "loadedAt": 1775136765299,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "adaptiveMemoryManager_gen43.mjs": {
+      "filename": "adaptiveMemoryManager_gen43.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateHash",
+        "hierarchicalSummarization",
+        "importanceScoring",
+        "recursiveCompression",
+        "dynamicContextPrioritization",
+        "tokenize",
+        "countTokens"
+      ],
+      "loadedAt": 1775136766098,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "iterativeSubprocessExecutor_gen40.mjs": {
+      "filename": "iterativeSubprocessExecutor_gen40.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "serializeState",
+        "deserializeState",
+        "segmentTask",
+        "executeTaskSegments",
+        "checkpointedExecution",
+        "exampleDependencyFunction",
+        "exampleCheckpointCallback",
+        "exampleUsage"
+      ],
+      "loadedAt": 1775136766503,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "independentTextGenerator_gen46.mjs": {
+      "filename": "independentTextGenerator_gen46.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateUniqueId",
+        "tokenizeText",
+        "compressTokens",
+        "generateTextResponse",
+        "analyzeText",
+        "handleEdgeCases"
+      ],
+      "loadedAt": 1775136773917,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "asyncComputationChain_gen43.mjs": {
+      "filename": "asyncComputationChain_gen43.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "asyncComputationChain",
+        "fibonacciTask",
+        "generateCheckpointFileName",
+        "exampleUsage"
+      ],
+      "loadedAt": 1775136780116,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "adaptivePromptReframer_gen45.mjs": {
+      "filename": "adaptivePromptReframer_gen45.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "hashInput",
+        "optimizePrompt",
+        "evaluateResponse",
+        "reframeInteraction",
+        "normalizeText",
+        "generateContext"
+      ],
+      "loadedAt": 1775136780218,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "iterativeTaskSplitter_gen42.mjs": {
+      "filename": "iterativeTaskSplitter_gen42.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "dynamicTaskSplitter",
+        "splitArrayIntoChunks",
+        "exampleTaskFunction",
+        "demoTaskSplitter"
+      ],
+      "loadedAt": 1775136780328,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen43.mjs": {
+      "filename": "evolution_marker_gen43.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775136780415,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuAcceleratedMatrixOps_gen48.mjs": {
+      "filename": "gpuAcceleratedMatrixOps_gen48.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "generateHash",
+        "gpuMatrixMultiply",
+        "approximateEigenvalues",
+        "batchMatrixOps",
+        "validateMatrix",
+        "normalizeMatrix"
+      ],
+      "loadedAt": 1775136781442,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "iterativeSubprocessManager_gen44.mjs": {
+      "filename": "iterativeSubprocessManager_gen44.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateCheckpointID",
+        "serializeState",
+        "deserializeState",
+        "saveCheckpoint",
+        "restoreCheckpoint",
+        "iterativeProcessManager",
+        "exampleComputeStep",
+        "exampleUsage"
+      ],
+      "loadedAt": 1775136784807,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "distributedComputationManager_gen45.mjs": {
+      "filename": "distributedComputationManager_gen45.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "serializeState",
+        "splitTask",
+        "distributedCompute",
+        "exampleStateUpdateFunction"
+      ],
+      "loadedAt": 1775136797021,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "webGlMatrixAccelerator_gen51.mjs": {
+      "filename": "webGlMatrixAccelerator_gen51.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "initializeWebGLContext",
+        "compileShader",
+        "linkProgram",
+        "createBuffer",
+        "multiplyMatrices",
+        "hashMatrix"
+      ],
+      "loadedAt": 1775136797126,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen45.mjs": {
+      "filename": "evolution_marker_gen45.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775136797209,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "recursiveContextReconstructor_gen49.mjs": {
+      "filename": "recursiveContextReconstructor_gen49.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateHash",
+        "scoreContextItems",
+        "reconstructContext",
+        "normalizeText",
+        "splitIntoSentences"
+      ],
+      "loadedAt": 1775136798239,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "transformerLanguageGenerator_gen44.mjs": {
+      "filename": "transformerLanguageGenerator_gen44.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateRandomSeed",
+        "softmax",
+        "generateNextToken",
+        "generateText",
+        "encodeText",
+        "decodeText",
+        "exampleUsage",
+        "exampleVocabulary",
+        "exampleTokenMap",
+        "exampleReverseTokenMap"
+      ],
+      "loadedAt": 1775136799221,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen44.mjs": {
+      "filename": "evolution_marker_gen44.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775136799284,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multiResolutionContextManager_gen47.mjs": {
+      "filename": "multiResolutionContextManager_gen47.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateGlobalEmbedding",
+        "generateLocalEmbeddings",
+        "combineEmbeddings",
+        "reconstructContext",
+        "processContext"
+      ],
+      "loadedAt": 1775136799801,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "hierarchicalMemoryManager_gen48.mjs": {
+      "filename": "hierarchicalMemoryManager_gen48.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateHash",
+        "compressContext",
+        "storeContext",
+        "retrieveContext",
+        "adaptiveRetrieval",
+        "initializeMemory"
+      ],
+      "loadedAt": 1775136801017,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen46.mjs": {
+      "filename": "evolution_marker_gen46.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775136801964,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multimodalIntegrationEngine_gen52.mjs": {
+      "filename": "multimodalIntegrationEngine_gen52.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "generateHash",
+        "reduceDimensions",
+        "integrateMultimodalData"
+      ],
+      "loadedAt": 1775136804773,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "hierarchicalTemporalMemory_gen51.mjs": {
+      "filename": "hierarchicalTemporalMemory_gen51.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "createSDR",
+        "overlapScore",
+        "temporalMemory",
+        "temporalPooling",
+        "processTokenSequence",
+        "visualizeSDR"
+      ],
+      "loadedAt": 1775136815278,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "virtualReplStateManager_gen49.mjs": {
+      "filename": "virtualReplStateManager_gen49.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateHash",
+        "saveState",
+        "restoreState",
+        "clearState",
+        "mergeStates",
+        "initializeStateManager"
+      ],
+      "loadedAt": 1775136815389,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "iterativeComputationScheduler_gen47.mjs": {
+      "filename": "iterativeComputationScheduler_gen47.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "runChunkedComputation",
+        "serializeState",
+        "deserializeState",
+        "exampleComputeStep"
+      ],
+      "loadedAt": 1775136815545,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "webGpuMatrixEngine_gen54.mjs": {
+      "filename": "webGpuMatrixEngine_gen54.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "matrixMultiply",
+        "matrixAdd",
+        "matrixTranspose",
+        "sigmoid",
+        "sigmoidGradient",
+        "eigenDecomposition",
+        "utilities"
+      ],
+      "loadedAt": 1775136815603,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "hierarchicalMemoryManager_gen50.mjs": {
+      "filename": "hierarchicalMemoryManager_gen50.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "compressData",
+        "summarizeText",
+        "retrieveContext",
+        "buildHierarchicalMemory",
+        "sparseAttention",
+        "processForAgents"
+      ],
+      "loadedAt": 1775136815660,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen49.mjs": {
+      "filename": "evolution_marker_gen49.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775136815753,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen47.mjs": {
+      "filename": "evolution_marker_gen47.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775136815810,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "webGpuMatrixEngine_gen53.mjs": {
+      "filename": "webGpuMatrixEngine_gen53.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "gpuMatrixMultiply",
+        "gpuMatrixTranspose",
+        "gpuMatrixAdd",
+        "gpuMatrixSubtract",
+        "generateIdentityMatrix"
+      ],
+      "loadedAt": 1775136815910,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multimodalReasoningEngine_gen48.mjs": {
+      "filename": "multimodalReasoningEngine_gen48.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateEmbeddings",
+        "integrateEmbeddings",
+        "validateInputs",
+        "normalizeWeights",
+        "multimodalReasoning"
+      ],
+      "loadedAt": 1775136815967,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen48.mjs": {
+      "filename": "evolution_marker_gen48.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775136816035,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "iterativeComputationManager_gen52.mjs": {
+      "filename": "iterativeComputationManager_gen52.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "saveCheckpoint",
+        "loadCheckpoint",
+        "computeHash",
+        "executeWithCheckpointing",
+        "generateDependencyGraph",
+        "resolveExecutionOrder",
+        "performIterativeComputation"
+      ],
+      "loadedAt": 1775136817289,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_emergent_capability_mnhimmia.mjs": {
+      "filename": "omnimens_autocode_emergent_capability_mnhimmia.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "emergentCapability_mnhimmia"
+      ],
+      "loadedAt": 1775136817532,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnhimmkg.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnhimmkg.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnhimmkg"
+      ],
+      "loadedAt": 1775136817608,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnhimmm4.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnhimmm4.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnhimmm4"
+      ],
+      "loadedAt": 1775136817668,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "statefulTaskExecutor_gen50.mjs": {
+      "filename": "statefulTaskExecutor_gen50.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "saveState",
+        "loadState",
+        "executeTask",
+        "getProgress",
+        "exampleTaskFunction"
+      ],
+      "loadedAt": 1775136833172,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuMatrixAccelerator_gen56.mjs": {
+      "filename": "gpuMatrixAccelerator_gen56.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "initializeWebGLContext",
+        "compileShader",
+        "createProgram",
+        "gpuMatrixMultiply",
+        "gpuEigenDecomposition",
+        "gpuHopfieldUpdate"
+      ],
+      "loadedAt": 1775136833347,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "checkpointedSubprocessRunner_gen51.mjs": {
+      "filename": "checkpointedSubprocessRunner_gen51.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateHash",
+        "saveCheckpoint",
+        "loadCheckpoint",
+        "runWithCheckpoint",
+        "exampleComputationFunction"
+      ],
+      "loadedAt": 1775136833474,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "subprocessCheckpointManager_gen53.mjs": {
+      "filename": "subprocessCheckpointManager_gen53.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "saveState",
+        "restoreState",
+        "startCheckpointing",
+        "generateHash",
+        "validateStateIntegrity"
+      ],
+      "loadedAt": 1775136833580,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen50.mjs": {
+      "filename": "evolution_marker_gen50.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775136833670,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen51.mjs": {
+      "filename": "evolution_marker_gen51.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775136833744,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "semanticAwareCompressor_gen54.mjs": {
+      "filename": "semanticAwareCompressor_gen54.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateHash",
+        "buildSemanticGraph",
+        "calculateAttentionWeights",
+        "summarizeText",
+        "simpleTokenizer",
+        "semanticAwareCompress",
+        "exampleUsage"
+      ],
+      "loadedAt": 1775136872167,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "adaptiveMemoryManager_gen56.mjs": {
+      "filename": "adaptiveMemoryManager_gen56.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "compressContext",
+        "decompressContext",
+        "prioritizeContexts",
+        "manageMemory",
+        "retrieveActiveContexts"
+      ],
+      "loadedAt": 1775136872292,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "independentLanguageGenerator_gen52.mjs": {
+      "filename": "independentLanguageGenerator_gen52.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "tokenizeText",
+        "generateEmbeddings",
+        "attentionMechanism",
+        "generateResponse",
+        "processInput"
+      ],
+      "loadedAt": 1775136872409,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "subprocessCheckpointManager_gen55.mjs": {
+      "filename": "subprocessCheckpointManager_gen55.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "saveState",
+        "loadState",
+        "deleteState",
+        "executeWithCheckpoint",
+        "clearCache"
+      ],
+      "loadedAt": 1775136872509,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuAcceleratedMatrixOps_gen60.mjs": {
+      "filename": "gpuAcceleratedMatrixOps_gen60.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "initializeWebGLContext",
+        "compileShader",
+        "createProgram",
+        "gpuMatrixMultiply",
+        "generateShaderID"
+      ],
+      "loadedAt": 1775136900170,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "embeddedLanguageModel_gen53.mjs": {
+      "filename": "embeddedLanguageModel_gen53.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateRandomSeed",
+        "quantizeArray",
+        "tokenizeText",
+        "generateResponse",
+        "normalizeArray",
+        "encodeTokens",
+        "decodeVectors",
+        "cosineSimilarity"
+      ],
+      "loadedAt": 1775136900277,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuAcceleratedTensorEngine_gen59.mjs": {
+      "filename": "gpuAcceleratedTensorEngine_gen59.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "generateShaderID",
+        "initializeWebGLContext",
+        "compileShader",
+        "linkProgram",
+        "gpuMatrixMultiply"
+      ],
+      "loadedAt": 1775136933863,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen52.mjs": {
+      "filename": "evolution_marker_gen52.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775136933921,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "gpuComputationEngine_gen61.mjs": {
+      "filename": "gpuComputationEngine_gen61.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "generateTaskId",
+        "matrixMultiply",
+        "applyConvolution",
+        "normalizeMatrix",
+        "validateMatrix",
+        "createZeroMatrix"
+      ],
+      "loadedAt": 1775136934035,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "evolution_marker_gen53.mjs": {
+      "filename": "evolution_marker_gen53.mjs",
+      "stage": "utility",
+      "exports": [
+        "evolutionCycleMarker"
+      ],
+      "loadedAt": 1775136980346,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_knowledge_synthesis_mnhioeh2.mjs": {
+      "filename": "omnimens_autocode_knowledge_synthesis_mnhioeh2.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "synthesizedKnowledge_mnhioeh2"
+      ],
+      "loadedAt": 1775136980533,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "webGpuTensorEngine_gen63.mjs": {
+      "filename": "webGpuTensorEngine_gen63.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "matrixMultiply",
+        "convolve2D",
+        "eigenvalues",
+        "isValidMatrix"
+      ],
+      "loadedAt": 1775136981356,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "hierarchicalMemoryManager_gen60.mjs": {
+      "filename": "hierarchicalMemoryManager_gen60.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateTopicHash",
+        "cosineSimilarity",
+        "createMemoryManager",
+        "normalizeVector",
+        "createRandomVector",
+        "exampleUsage"
+      ],
+      "loadedAt": 1775137045192,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1775136473852,
-  "totalModules": 16809,
+  "totalModules": 17135,
   "totalCalls": 0
 }
