@@ -202,7 +202,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775164960183,
+      "loadedAt": 1775165101707,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -261,7 +261,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775164960186,
+      "loadedAt": 1775165182095,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -378,7 +378,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775164960191,
+      "loadedAt": 1775165470258,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -248873,9 +248873,120 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "subprocessCheckpointManager_gen4.mjs": {
+      "filename": "subprocessCheckpointManager_gen4.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateStateHash",
+        "saveCheckpoint",
+        "restoreCheckpoint",
+        "runWithCheckpoints",
+        "clearCheckpoint",
+        "exampleComputeStep"
+      ],
+      "loadedAt": 1775165182261,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicPromptMiddleware_gen5.mjs": {
+      "filename": "dynamicPromptMiddleware_gen5.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "generateReasoningHash",
+        "generateDynamicPrompt",
+        "validatePrompt",
+        "processLLMOutput",
+        "mergeReasoningStates",
+        "extractReasoningContext"
+      ],
+      "loadedAt": 1775165182441,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "hierarchicalMemoryManager_gen6.mjs": {
+      "filename": "hierarchicalMemoryManager_gen6.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateMemoryHash",
+        "calculateMemoryScore",
+        "selectMemoryForRehydration",
+        "compressMemory",
+        "decompressMemory",
+        "manageMemoryQueue",
+        "rehydrateArchivedMemory"
+      ],
+      "loadedAt": 1775165182564,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnhzgwlz.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnhzgwlz.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnhzgwlz"
+      ],
+      "loadedAt": 1775165292500,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "distributedTaskScheduler_gen8.mjs": {
+      "filename": "distributedTaskScheduler_gen8.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "createMasterNode",
+        "createWorkerNode",
+        "aggregateResults",
+        "exampleTaskExecutor",
+        "exampleResultAggregator"
+      ],
+      "loadedAt": 1775165292664,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_emergent_capability_mnhzky0n.mjs": {
+      "filename": "omnimens_autocode_emergent_capability_mnhzky0n.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "emergentCapability_mnhzky0n"
+      ],
+      "loadedAt": 1775165469689,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnhzkxw0.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnhzkxw0.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnhzkxw0"
+      ],
+      "loadedAt": 1775165470330,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1775164964787,
-  "totalModules": 18294,
+  "totalModules": 18308,
   "totalCalls": 0
 }
