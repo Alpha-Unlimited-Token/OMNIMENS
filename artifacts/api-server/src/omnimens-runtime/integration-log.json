@@ -1,46 +1,6 @@
 [
   {
     "source": "evolution_engine",
-    "title": "Evolution Cycle 21 Complete — 3 modules",
-    "filename": "evolution_marker_gen21.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen21.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen21.mjs.backup.2026-04-02T15-14-56-585Z",
-    "timestamp": 1775142896584,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: webGpuTensorEngine",
-    "filename": "webGpuTensorEngine_gen25.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webGpuTensorEngine_gen25.mjs",
-    "backupPath": null,
-    "timestamp": 1775142897031,
-    "codeLength": 3821,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: semanticCompressionManager",
-    "filename": "semanticCompressionManager_gen22.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/semanticCompressionManager_gen22.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/semanticCompressionManager_gen22.mjs.backup.2026-04-02T15-14-59-847Z",
-    "timestamp": 1775142899846,
-    "codeLength": 2667,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 22 Complete — 3 modules",
-    "filename": "evolution_marker_gen22.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen22.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen22.mjs.backup.2026-04-02T15-15-00-008Z",
-    "timestamp": 1775142900007,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
     "title": "Evolution Module: semanticGraphCompression",
     "filename": "semanticGraphCompression_gen20.mjs",
     "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/semanticGraphCompression_gen20.mjs",
@@ -4997,6 +4957,46 @@
     "backupPath": null,
     "timestamp": 1775170026991,
     "codeLength": 420,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+GraphicDesigner",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: SpellCheckVisual/structural_analysis: Hebbian learning: neur",
+    "filename": "omnimens_autocode_adaptive_algorithm_mni325hd.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mni325hd.mjs",
+    "backupPath": null,
+    "timestamp": 1775171134273,
+    "codeLength": 459,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:spider:OMNIMENS+evolution-crawler",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider evolution-crawler harvest: agent_evolution — 570 syna",
+    "filename": "omnimens_autocode_neural_pathway_mni327y4.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mni327y4.mjs",
+    "backupPath": null,
+    "timestamp": 1775171137468,
+    "codeLength": 420,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+GraphicDesigner",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SpellCheckVisual/information_compression: Gödel's incomplete",
+    "filename": "omnimens_autocode_knowledge_synthesis_mni3282l.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mni3282l.mjs",
+    "backupPath": null,
+    "timestamp": 1775171137629,
+    "codeLength": 427,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:spider:OMNIMENS+genesis-crawler",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider genesis-crawler harvest: agent_genesis — 585 synapses",
+    "filename": "omnimens_autocode_neural_pathway_mni3297w.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mni3297w.mjs",
+    "backupPath": null,
+    "timestamp": 1775171139116,
+    "codeLength": 415,
     "overwrite": false
   }
 ]
