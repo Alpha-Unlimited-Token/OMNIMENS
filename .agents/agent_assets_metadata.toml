@@ -173,3 +173,9 @@ id = "gLBDLfjqFAasBWvOdrVCY"
 uri = "file://ESCU-Model-v6.tar.gz"
 type = "unspecified"
 title = "ESCU Model v6 — Full Magnetic Confinement"
+
+[[outputs]]
+id = "_N7AeYxNVMUXnyA9qvFrh"
+uri = "file://ESCU-SPHERICAL-BLUEPRINT.zip"
+type = "unspecified"
+title = "ESCU Spherical Blueprint — Complete Package"

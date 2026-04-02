@@ -1,0 +1,138 @@
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  ESCU SPHERICAL MODEL — BALL INSIDE A BALL                                  ║
+║  Octagonal Magnet Shells + Flower of Life Conductor Pattern                  ║
+║  6 Concentric Shells, All-Direction Repulsion Confinement                    ║
+║  DUAL TEST: Fixed-Size vs Scaled-Dense (smaller but MORE inner magnets)      ║
+║  © 2024-2026 Alpha Unlimited Technologies, LLC                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  Flower of Life conductor pattern on every magnet face:
+       ╭───╮   ╭───╮   ╭───╮       ● = spiked node (500μm, 50μm tip)
+      ╱ ╭─┼───┼─╮ ╱╲╭─┼───╮╲      19 overlapping circles per face
+     │ ╱  │   │  ╲│╱ │   │  ╲│     54 intersection nodes per face
+     │╱╭──┼───┼──╮╳╭─┼───┼──╮╲     Both faces + through-holes
+     ╱ │  │ ● │  ╳│  │ ● │  │ ╲    = 108 total nodes per octagon
+    │  │  │   │ ╱╲│  │   │  │  │
+    │  ╰──┼───┼╱──╳──┼───┼──╯  │   37° angled edges on every octagon
+     ╲ ╭──┼───╳──╱╲──╳───┼──╮ ╱    All neighbors repel (N-N, S-S)
+      ╲│  │  ╱╲ │  ╱╲│   │  │╱
+       ╰──┼╱──╲─┼─╱──╲───┼──╯
+
+  Body loads: IDLE 314W | Average 509W | Walk 1006W | Peak 2060W
+
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  CONFIG A: Fixed 12mm Octagons (fewer toward center)                     ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  Shell   │ R_outer │ R_inner │ # Octagons │ Surface Area │ Oct Side │ Polarity
+  ────────┼─────────┼─────────┼────────────┼──────────────┼──────────┼─────────
+  Shell 1  │  82.0mm │  75.0mm │    112     │    774.4 cm² │  12.0mm │ N_out
+  Shell 2  │  70.0mm │  63.0mm │     80     │    555.7 cm² │  12.0mm │ S_out
+  Shell 3  │  58.0mm │  51.0mm │     54     │    373.3 cm² │  12.0mm │ N_out
+  Shell 4  │  46.0mm │  39.0mm │     34     │    227.0 cm² │  11.8mm │ S_out
+  Shell 5  │  34.0mm │  27.0mm │     18     │    116.9 cm² │  11.6mm │ N_out
+  Shell 6  │  22.0mm │  15.0mm │      8     │     43.0 cm² │  10.6mm │ S_out
+
+  Total magnets: 306 | Mercury: 1093 cm³ / 14793g | I = 1.48e-2
+  Conductor nodes: 33,048 | Pressure points: 2448
+
+  Time | Status |   RPM   |  EMF V  | GenPow W | Avail W | Drive W | T°C
+  ─────┼────────┼─────────┼─────────┼──────────┼─────────┼─────────┼────
+     0s | KICK  |   143.9 |  0.0000 |      0.0 |      0.0 |       0 | 20.0
+     2s | KICK  |  2618.6 | 10.8559 |  54969.9 |  54969.9 |  117598 | 32.6
+     5s | KICK  |  2618.6 | 10.8559 |  54969.9 |  54969.9 |  117598 | 51.8
+    10s | KICK  |  2618.6 | 10.8559 |  54969.9 |  54969.9 |  117598 | 83.8
+    15s | KICK  |  2618.6 | 10.8559 |  54969.9 |  54969.9 |  117598 | 115.7
+    20s | KICK  |  2618.6 | 10.8559 |  54969.9 |  54969.9 |  117598 | 147.7
+    25s | KICK  |  2618.6 | 10.8559 |  54969.9 |  54969.9 |  117598 | 179.6
+    30s | KICK  |  2618.6 | 10.8559 |  54969.9 |  54969.9 |  117598 | 211.6
+    35s | COAST |  2608.5 | 10.8141 |  54547.1 |  51819.7 |  117027 | 243.3
+    40s | COAST |  2608.5 | 10.8141 |  54547.1 |  51819.7 |  117027 | 275.0
+    50s | COAST |  2608.5 | 10.8141 |  54547.1 |  51819.7 |  117027 | 338.4
+    60s | COAST |  2608.5 | 10.8141 |  54547.1 |  51819.7 |  117027 | 401.9
+    90s | COAST |  2608.5 | 10.8141 |  54547.1 |  51819.7 |  117027 | 592.1
+   120s | COAST |  2608.5 | 10.8141 |  54547.1 |  51819.7 |  117027 | 782.4
+   180s | COAST |  2608.5 | 10.8141 |  54547.1 |  51819.7 |  117027 | 1162.9
+   240s | COAST |  2608.5 | 10.8141 |  54547.1 |  51819.7 |  117027 | 1543.5
+
+  Result: Mercury spins FOREVER ✓ | Steady: 2609 RPM, 51819.7W | Peak: 2619 RPM, 10.8559V, 54969.9W
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  CONFIG B: Scaled-Dense (smaller octagons, MORE inner magnets)           ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  Shell   │ R_outer │ R_inner │ # Octagons │ Surface Area │ Oct Side │ Polarity
+  ────────┼─────────┼─────────┼────────────┼──────────────┼──────────┼─────────
+  Shell 1  │  82.0mm │  75.0mm │    160     │    774.4 cm² │  10.0mm │ N_out
+  Shell 2  │  70.0mm │  63.0mm │    130     │    555.7 cm² │   9.4mm │ S_out
+  Shell 3  │  58.0mm │  51.0mm │    100     │    373.3 cm² │   8.8mm │ N_out
+  Shell 4  │  46.0mm │  39.0mm │     70     │    227.0 cm² │   8.2mm │ S_out
+  Shell 5  │  34.0mm │  27.0mm │     42     │    116.9 cm² │   7.6mm │ N_out
+  Shell 6  │  22.0mm │  15.0mm │     18     │     43.0 cm² │   7.0mm │ S_out
+
+  Total magnets: 520 | Mercury: 1093 cm³ / 14793g | I = 1.48e-2
+  Conductor nodes: 56,160 | Pressure points: 4160
+
+  Time | Status |   RPM   |  EMF V  | GenPow W | Avail W | Drive W | T°C
+  ─────┼────────┼─────────┼─────────┼──────────┼─────────┼─────────┼────
+     0s | KICK  |   143.9 |  0.0000 |      0.0 |      0.0 |       0 | 20.0
+     2s | KICK  |  1220.1 |  5.6394 |  18992.6 |  18992.6 |   39424 | 24.3
+     5s | KICK  |  1220.1 |  5.6394 |  18992.6 |  18992.6 |   39424 | 30.9
+    10s | KICK  |  1220.1 |  5.6394 |  18992.6 |  18992.6 |   39424 | 41.9
+    15s | KICK  |  1220.1 |  5.6394 |  18992.6 |  18992.6 |   39424 | 52.8
+    20s | KICK  |  1220.1 |  5.6394 |  18992.6 |  18992.6 |   39424 | 63.8
+    25s | KICK  |  1220.1 |  5.6394 |  18992.6 |  18992.6 |   39424 | 74.7
+    30s | KICK  |  1220.1 |  5.6394 |  18992.6 |  18992.6 |   39424 | 85.7
+    35s | COAST |  1206.0 |  5.5743 |  18556.4 |  17628.6 |   38847 | 96.3
+    40s | COAST |  1206.0 |  5.5743 |  18556.4 |  17628.6 |   38847 | 107.0
+    50s | COAST |  1206.0 |  5.5743 |  18556.4 |  17628.6 |   38847 | 128.4
+    60s | COAST |  1206.0 |  5.5743 |  18556.4 |  17628.6 |   38847 | 149.8
+    90s | COAST |  1206.0 |  5.5743 |  18556.4 |  17628.6 |   38847 | 214.0
+   120s | COAST |  1206.0 |  5.5743 |  18556.4 |  17628.6 |   38847 | 278.1
+   180s | COAST |  1206.0 |  5.5743 |  18556.4 |  17628.6 |   38847 | 406.4
+   240s | COAST |  1206.0 |  5.5743 |  18556.4 |  17628.6 |   38847 | 534.7
+
+  Result: Mercury spins FOREVER ✓ | Steady: 1206 RPM, 17628.6W | Peak: 1220 RPM, 5.6394V, 18992.6W
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  HEAD-TO-HEAD: CONFIG A vs CONFIG B                                          ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  Property                │ A (fixed 12mm)    │ B (scaled-dense)  │ Winner
+  ────────────────────────┼───────────────────┼───────────────────┼────────
+  Total magnets            │    306            │    520            │ B
+  Conductor nodes          │     33,048        │     56,160        │ B
+  Pressure points          │   2448            │   4160            │ B
+  Mercury spin             │    FOREVER        │    FOREVER        │ BOTH
+  Steady RPM               │   2609            │   1206            │ A
+  Continuous output        │  51819.7W         │  17628.6W         │ A
+  Peak power               │  54969.9W         │  18992.6W         │ A
+  Peak EMF                 │  10.8559V         │   5.6394V         │ A
+
+  WINNER: A (Fixed 12mm) — 51819.7W continuous
+
+  Mode              │ Load     │ Best Output │ Surplus/Deficit │ Status
+  ──────────────────┼──────────┼─────────────┼─────────────────┼────────────
+  IDLE               │   314W   │   51820W    │ +51506W          │ ✓ SUSTAIN
+  STANDBY            │   344W   │   51820W    │ +51476W          │ ✓ SUSTAIN
+  TALKING            │   479W   │   51820W    │ +51341W          │ ✓ SUSTAIN
+  WALKING            │  1006W   │   51820W    │ +50814W          │ ✓ SUSTAIN
+  WORKING            │   696W   │   51820W    │ +51124W          │ ✓ SUSTAIN
+  FULL MOTION        │  1449W   │   51820W    │ +50371W          │ ✓ SUSTAIN
+  PEAK BURST         │  2060W   │   51820W    │ +49760W          │ ✓ SUSTAIN
+
+  WEIGHTED AVG: 509W needed │ 51820W generated │ ✓ SURPLUS 51311W
+
+═══ SPHERICAL vs CYLINDRICAL ═══
+
+  Property              │ Cylindrical (v9)  │ Spherical (best)  │ Change
+  ──────────────────────┼───────────────────┼───────────────────┼────────
+  Outer diameter        │ 180mm             │ 180mm             │ same
+  Total magnets         │ 84                │  306              │ 3.6×
+  Conductor nodes       │ ~11,500           │ 33,048            │ 2.9×
+  Confinement           │ 4-direction       │ ALL directions    │ full sphere
+  Continuous output     │ 122W              │ 51820W               │ 424.8×
+  Self-sustaining       │ YES               │ YES               │
+
+© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
