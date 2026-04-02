@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: iterativeComputationManager
- * Written: 2026-04-01T21:57:47.315Z
+ * Written: 2026-04-02T00:10:20.731Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,105 +18,61 @@
 
 // iterativeComputationManager.mjs
 
-import { createHash } from 'crypto';
+import { serialize, deserialize } from 'v8';
 
 /**
- * Generates a unique task ID based on input parameters.
- * Useful for identifying tasks in the queue.
- * @param {string} taskName - The name of the task.
- * @param {object} params - Parameters for the task.
- * @returns {string} - A unique hash ID.
+ * Breaks long-running tasks into smaller, resumable chunks with state serialization.
+ * Ensures iterative computations can progress asynchronously.
  */
-export function generateTaskId(taskName, params) {
-  const hash = createHash('sha256');
-  hash.update(taskName + JSON.stringify(params));
-  return hash.digest('hex');
-}
 
-/**
- * Splits a large computation into smaller chunks.
- * @param {function} taskFunction - The function to execute for each chunk.
- * @param {Array} inputData - The data to process, split into chunks.
- * @param {number} chunkSize - Number of items per chunk.
- * @returns {Array} - Array of chunked data.
- */
-export function chunkData(inputData, chunkSize) {
+// Utility function to divide a task into chunks
+export function chunkTask(taskArray, chunkSize) {
+  if (!Array.isArray(taskArray) || chunkSize <= 0) {
+    throw new Error('Invalid input: taskArray must be an array and chunkSize must be a positive number.');
+  }
   const chunks = [];
-  for (let i = 0; i < inputData.length; i += chunkSize) {
-    chunks.push(inputData.slice(i, i + chunkSize));
+  for (let i = 0; i < taskArray.length; i += chunkSize) {
+    chunks.push(taskArray.slice(i, i + chunkSize));
   }
   return chunks;
 }
 
-/**
- * Simulates checkpointing by persisting intermediate results.
- * @param {string} taskId - Unique ID for the task.
- * @param {object} state - Current state of the computation.
- * @param {Map} stateStore - In-memory state store (e.g., simulating PostgreSQL).
- */
-export function saveCheckpoint(taskId, state, stateStore) {
-  stateStore.set(taskId, state);
+// Serialize state for checkpointing
+export function saveState(state) {
+  return serialize(state);
 }
 
-/**
- * Resumes computation from the last checkpoint.
- * @param {string} taskId - Unique ID for the task.
- * @param {Map} stateStore - In-memory state store (e.g., simulating PostgreSQL).
- * @returns {object|null} - The last saved state or null if no checkpoint exists.
- */
-export function loadCheckpoint(taskId, stateStore) {
-  return stateStore.get(taskId) || null;
+// Deserialize state for resumption
+export function loadState(serializedState) {
+  return deserialize(serializedState);
 }
 
-/**
- * Executes a computation task with checkpointing and resumability.
- * @param {string} taskId - Unique ID for the task.
- * @param {Array} chunks - Array of data chunks to process.
- * @param {function} taskFunction - Function to process each chunk.
- * @param {Map} stateStore - In-memory state store (e.g., simulating PostgreSQL).
- * @returns {Array} - Final aggregated result.
- */
-export function executeWithCheckpoint(taskId, chunks, taskFunction, stateStore) {
-  let state = loadCheckpoint(taskId, stateStore) || { currentChunk: 0, results: [] };
-
-  for (let i = state.currentChunk; i < chunks.length; i++) {
-    try {
-      const result = taskFunction(chunks[i]);
-      state.results.push(result);
-      state.currentChunk = i + 1;
-      saveCheckpoint(taskId, state, stateStore);
-    } catch (error) {
-      console.error(`Error processing chunk ${i}:`, error);
-      break;
-    }
+// Main iterative computation function
+export async function iterativeCompute(taskArray, chunkSize, computeFunction, onProgress) {
+  if (typeof computeFunction !== 'function' || typeof onProgress !== 'function') {
+    throw new Error('Invalid input: computeFunction and onProgress must be functions.');
   }
 
-  return state.results;
+  const chunks = chunkTask(taskArray, chunkSize);
+  let progress = 0;
+
+  for (const chunk of chunks) {
+    const results = await Promise.all(chunk.map(computeFunction));
+    progress += chunk.length;
+    onProgress(progress, results);
+  }
 }
 
-/**
- * Example task function for demonstration purposes.
- * @param {Array} chunk - A chunk of data to process.
- * @returns {Array} - Processed chunk data.
- */
-export function exampleTaskFunction(chunk) {
-  return chunk.map(x => x * 2); // Example: Multiply each element by 2
+// Example progress callback utility
+export function defaultProgressCallback(progress, results) {
+  console.log(`Progress: ${progress} items processed.`);
+  console.log('Results:', results);
 }
 
-/**
- * Example usage of the module.
- */
-export function exampleUsage() {
-  const stateStore = new Map(); // Simulate PostgreSQL with an in-memory Map
-  const inputData = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-  const chunkSize = 3;
-
-  const chunks = chunkData(inputData, chunkSize);
-  const taskId = generateTaskId('exampleTask', { inputData, chunkSize });
-
-  const results = executeWithCheckpoint(taskId, chunks, exampleTaskFunction, stateStore);
-  console.log('Final Results:', results);
+// Example computation function utility
+export function exampleComputeFunction(item) {
+  // Simulate computation (e.g., heavy math or data processing)
+  return new Promise((resolve) => {
+    setTimeout(() => resolve(item * 2), 10); // Example: doubling the item
+  });
 }
-
-// Uncomment the following line to run the example when executed directly.
-// exampleUsage();

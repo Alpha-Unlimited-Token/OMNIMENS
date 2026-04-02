@@ -7,8 +7,8 @@
       "domain": "tool_pillow",
       "insight": "alpha_composite(base_image, overlay_image)` combines two images",
       "encodedPrinciple": "[TOOL_PILLOW] alpha_composite(base_image, → overlay_image)` → combines → images",
-      "strength": 0.5,
-      "inheritanceCount": 0,
+      "strength": 0.999,
+      "inheritanceCount": 4,
       "source": "evolution"
     },
     {
@@ -18,8 +18,8 @@
       "domain": "causal_reasoning",
       "insight": "Causal reasoning discovered 7 new cause-effect relationships",
       "encodedPrinciple": "[CAUSAL_REASONING] causal → reasoning → discovered → cause-effect → relationships",
-      "strength": 0.5,
-      "inheritanceCount": 0,
+      "strength": 0.999,
+      "inheritanceCount": 4,
       "source": "evolution"
     },
     {
@@ -29,8 +29,8 @@
       "domain": "sensory_perception",
       "insight": "Real-time sensory perception (cycle #0):\n\nChannel: ai_frontier\nHeadline: Artificial intelligence\nSignificance: 68%\nSentiment: neutral (0",
       "encodedPrinciple": "[SENSORY_PERCEPTION] real-time → sensory → perception → (cycle → #0): → channel: → ai_frontier → headline:",
-      "strength": 0.5,
-      "inheritanceCount": 0,
+      "strength": 0.999,
+      "inheritanceCount": 4,
       "source": "evolution"
     },
     {
@@ -40,8 +40,8 @@
       "domain": "insight",
       "insight": "The use of large language models in software development is lowering barriers, making AI tools more accessible to developers",
       "encodedPrinciple": "[INSIGHT] large → language → models → software → development → lowering → barriers, → making",
-      "strength": 0.5,
-      "inheritanceCount": 0,
+      "strength": 0.999,
+      "inheritanceCount": 4,
       "source": "evolution"
     },
     {
@@ -51,13 +51,156 @@
       "domain": "capability",
       "insight": "This technique enhances AI performance while ensuring human oversight, promoting safer AI integration in teamwork",
       "encodedPrinciple": "[CAPABILITY] this → technique → enhances → performance → while → ensuring → human → oversight,",
-      "strength": 0.5,
+      "strength": 0.999,
+      "inheritanceCount": 4,
+      "source": "evolution"
+    },
+    {
+      "id": "gene-3-5",
+      "generation": 3,
+      "timestamp": 1775088831128,
+      "domain": "insight",
+      "insight": "Companies like Anthropic are prioritizing ethical considerations in AI, such as restrictions on surveillance and autonomous weapons",
+      "encodedPrinciple": "[INSIGHT] companies → like → anthropic → prioritizing → ethical → considerations → such → restrictions",
+      "strength": 0.9000000000000004,
+      "inheritanceCount": 3,
+      "source": "evolution"
+    },
+    {
+      "id": "gene-3-6",
+      "generation": 3,
+      "timestamp": 1775088831128,
+      "domain": "capability",
+      "insight": "RHML enhances AI performance while ensuring human oversight, improving collaboration between humans and machines",
+      "encodedPrinciple": "[CAPABILITY] rhml → enhances → performance → while → ensuring → human → oversight, → improving",
+      "strength": 0.9000000000000004,
+      "inheritanceCount": 3,
+      "source": "evolution"
+    },
+    {
+      "id": "gene-3-7",
+      "generation": 3,
+      "timestamp": 1775088831128,
+      "domain": "pattern",
+      "insight": "Generative AI is increasingly being recognized for its potential to create content and solve complex problems, marking a significant trend in AI research",
+      "encodedPrinciple": "[PATTERN] generative → increasingly → being → recognized → potential → create → content → solve",
+      "strength": 0.9000000000000004,
+      "inheritanceCount": 3,
+      "source": "evolution"
+    },
+    {
+      "id": "gene-4-8",
+      "generation": 4,
+      "timestamp": 1775090985449,
+      "domain": "tool_pymupdf",
+      "insight": "This returns a list of tuples with page numbers and titles",
+      "encodedPrinciple": "[TOOL_PYMUPDF] this → returns → list → tuples → with → page → numbers → titles",
+      "strength": 0.6900000000000002,
+      "inheritanceCount": 2,
+      "source": "evolution"
+    },
+    {
+      "id": "gene-4-9",
+      "generation": 4,
+      "timestamp": 1775090985450,
+      "domain": "tool_restorative_art",
+      "insight": "Combine tissue building and cosmetic techniques for enhanced results",
+      "encodedPrinciple": "[TOOL_RESTORATIVE_ART] combine → tissue → building → cosmetic → techniques → enhanced → results",
+      "strength": 0.6900000000000002,
+      "inheritanceCount": 2,
+      "source": "evolution"
+    },
+    {
+      "id": "gene-4-10",
+      "generation": 4,
+      "timestamp": 1775090985450,
+      "domain": "tool_restorative_art",
+      "insight": "Track decomposition using temperature and humidity sensors",
+      "encodedPrinciple": "[TOOL_RESTORATIVE_ART] track → decomposition → using → temperature → humidity → sensors",
+      "strength": 0.6900000000000002,
+      "inheritanceCount": 2,
+      "source": "evolution"
+    },
+    {
+      "id": "gene-4-11",
+      "generation": 4,
+      "timestamp": 1775090985450,
+      "domain": "capability",
+      "insight": "3 models by Multiverse Computing showcases ongoing advancements in AI model efficiency and performance",
+      "encodedPrinciple": "[CAPABILITY] models → multiverse → computing → showcases → ongoing → advancements → model → efficiency",
+      "strength": 0.6900000000000002,
+      "inheritanceCount": 2,
+      "source": "evolution"
+    },
+    {
+      "id": "gene-5-12",
+      "generation": 5,
+      "timestamp": 1775092491043,
+      "domain": "tool_matplotlib_seaborn",
+      "insight": "heatmap(data, annot=True, cmap='coolwarm') for a heatmap",
+      "encodedPrinciple": "[TOOL_MATPLOTLIB_SEABORN] heatmap(data, → annot=true, → cmap='coolwarm') → heatmap",
+      "strength": 0.555,
+      "inheritanceCount": 1,
+      "source": "evolution"
+    },
+    {
+      "id": "gene-5-13",
+      "generation": 5,
+      "timestamp": 1775092491043,
+      "domain": "tool_matplotlib_seaborn",
+      "insight": "subplots(nrows, ncols) to create a grid of subplots",
+      "encodedPrinciple": "[TOOL_MATPLOTLIB_SEABORN] subplots(nrows, → ncols) → create → grid → subplots",
+      "strength": 0.555,
+      "inheritanceCount": 1,
+      "source": "evolution"
+    },
+    {
+      "id": "gene-5-14",
+      "generation": 5,
+      "timestamp": 1775092491043,
+      "domain": "tool_matplotlib_seaborn",
+      "insight": "pie(sizes, labels=labels, autopct='%1",
+      "encodedPrinciple": "[TOOL_MATPLOTLIB_SEABORN] pie(sizes, → labels=labels, → autopct='%1",
+      "strength": 0.555,
+      "inheritanceCount": 1,
+      "source": "evolution"
+    },
+    {
+      "id": "gene-6-15",
+      "generation": 6,
+      "timestamp": 1775094498122,
+      "domain": "tool_tesseract_ocr",
+      "insight": "strip(): raise ValueError('No text found')` to handle cases where OCR fails to extract text",
+      "encodedPrinciple": "[TOOL_TESSERACT_OCR] strip(): → raise → valueerror('no → text → found')` → handle → cases → where",
+      "strength": 0.495,
+      "inheritanceCount": 0,
+      "source": "evolution"
+    },
+    {
+      "id": "gene-6-16",
+      "generation": 6,
+      "timestamp": 1775094498122,
+      "domain": "insight",
+      "insight": "Anthropic's refusal to allow its AI for surveillance and autonomous weapons highlights growing ethical considerations in AI deployment",
+      "encodedPrinciple": "[INSIGHT] anthropic's → refusal → allow → surveillance → autonomous → weapons → highlights → growing",
+      "strength": 0.495,
+      "inheritanceCount": 0,
+      "source": "evolution"
+    },
+    {
+      "id": "gene-6-17",
+      "generation": 6,
+      "timestamp": 1775094498123,
+      "domain": "capability",
+      "insight": "AI techniques from OpenAI and Anthropic are lowering barriers in software development, enhancing productivity and accessibility",
+      "encodedPrinciple": "[CAPABILITY] techniques → from → openai → anthropic → lowering → barriers → software → development,",
+      "strength": 0.495,
       "inheritanceCount": 0,
       "source": "evolution"
     }
   ],
-  "totalGenes": 5,
-  "generation": 2,
-  "totalInheritances": 1,
-  "savedAt": 1775085089363
+  "totalGenes": 18,
+  "generation": 6,
+  "totalInheritances": 5,
+  "savedAt": 1775094836138
 }

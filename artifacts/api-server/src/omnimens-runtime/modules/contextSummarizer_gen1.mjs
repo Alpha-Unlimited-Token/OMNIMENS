@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: contextSummarizer
- * Written: 2026-03-23T07:11:12.158Z
+ * Written: 2026-04-02T00:10:08.953Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,95 +16,137 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-/**
- * @module contextSummarizer
- * @description Summarizes and compresses long conversations into a compact representation using a hybrid extractive-abstractive approach.
- */
+// contextSummarizer.mjs
+
+import { createHash } from 'crypto';
 
 /**
- * Summarizes a long conversation into key points.
- * @param {string[]} conversation - Array of conversation strings.
- * @param {number} maxSummaryLength - Maximum number of key points to extract.
- * @returns {string[]} Array of summarized key points.
+ * Generate a hash-based unique identifier for a given input.
+ * Useful for deduplication or embedding caching across agents.
+ * @param {string} input - The input string to hash.
+ * @returns {string} - A fixed-size hash string.
  */
-export function summarizeConversation(conversation, maxSummaryLength) {
-  if (!Array.isArray(conversation) || typeof maxSummaryLength !== 'number' || maxSummaryLength <= 0) {
-    throw new Error("Invalid input: conversation must be an array of strings and maxSummaryLength must be a positive number.");
+export function generateHash(input) {
+  const hash = createHash('sha256');
+  hash.update(input);
+  return hash.digest('hex');
+}
+
+/**
+ * Tokenize a string into words, removing punctuation and normalizing case.
+ * @param {string} text - Input text to tokenize.
+ * @returns {string[]} - Array of normalized tokens.
+ */
+export function tokenizeText(text) {
+  return text
+    .toLowerCase()
+    .replace(/[^a-z0-9\s]/g, '')
+    .split(/\s+/)
+    .filter(Boolean);
+}
+
+/**
+ * Compute a simple frequency-based embedding for a given text.
+ * @param {string} text - Input text to process.
+ * @returns {Object} - A frequency map of tokens.
+ */
+export function computeEmbedding(text) {
+  const tokens = tokenizeText(text);
+  const embedding = {};
+  for (const token of tokens) {
+    embedding[token] = (embedding[token] || 0) + 1;
+  }
+  return embedding;
+}
+
+/**
+ * Merge two embeddings by summing their token frequencies.
+ * @param {Object} embeddingA - First embedding.
+ * @param {Object} embeddingB - Second embedding.
+ * @returns {Object} - Merged embedding.
+ */
+export function mergeEmbeddings(embeddingA, embeddingB) {
+  const merged = { ...embeddingA };
+  for (const [token, count] of Object.entries(embeddingB)) {
+    merged[token] = (merged[token] || 0) + count;
+  }
+  return merged;
+}
+
+/**
+ * Periodically condense a sequence of text entries into a fixed-size embedding.
+ * @param {string[]} context - Array of text entries representing conversation context.
+ * @param {number} maxSize - Maximum number of tokens to retain in the embedding.
+ * @returns {Object} - Condensed embedding.
+ */
+export function summarizeContext(context, maxSize = 100) {
+  let combinedEmbedding = {};
+
+  for (const entry of context) {
+    const entryEmbedding = computeEmbedding(entry);
+    combinedEmbedding = mergeEmbeddings(combinedEmbedding, entryEmbedding);
   }
 
-  // Step 1: Tokenize conversation into sentences.
-  const sentences = conversation.flatMap(text => text.split(/(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|\!)\s+/));
+  // Sort tokens by frequency and truncate to maxSize
+  const sortedTokens = Object.entries(combinedEmbedding)
+    .sort(([, countA], [, countB]) => countB - countA)
+    .slice(0, maxSize);
 
-  // Step 2: Extractive summarization using frequency analysis.
-  const wordFrequency = {};
-  sentences.forEach(sentence => {
-    sentence.split(/\W+/).forEach(word => {
-      const normalizedWord = word.toLowerCase();
-      if (normalizedWord) {
-        wordFrequency[normalizedWord] = (wordFrequency[normalizedWord] || 0) + 1;
-      }
-    });
-  });
-
-  const sentenceScores = sentences.map(sentence => {
-    const words = sentence.split(/\W+/);
-    const score = words.reduce((sum, word) => sum + (wordFrequency[word.toLowerCase()] || 0), 0);
-    return { sentence, score };
-  });
-
-  // Sort sentences by score in descending order.
-  sentenceScores.sort((a, b) => b.score - a.score);
-
-  // Select top sentences up to maxSummaryLength.
-  const extractiveSummary = sentenceScores.slice(0, maxSummaryLength).map(item => item.sentence);
-
-  // Step 3: Abstractive compression (simple embedding-like abstraction).
-  const abstractedSummary = extractiveSummary.map(sentence => compressSentence(sentence));
-
-  return abstractedSummary;
-}
-
-/**
- * Compresses a sentence by reducing redundancy and normalizing structure.
- * @param {string} sentence - A sentence to compress.
- * @returns {string} Compressed sentence.
- */
-function compressSentence(sentence) {
-  // Normalize whitespace and remove redundant words (basic example).
-  return sentence
-    .replace(/\s+/g, ' ')
-    .replace(/\b(very|really|actually|basically|just)\b/gi, '')
-    .trim();
-}
-
-/**
- * Encodes summarized key points into a numeric embedding representation.
- * This is a simplified embedding generator using character codes.
- * @param {string[]} summary - Array of summarized key points.
- * @returns {number[][]} Array of numeric embeddings for each key point.
- */
-export function encodeSummary(summary) {
-  if (!Array.isArray(summary)) {
-    throw new Error("Invalid input: summary must be an array of strings.");
+  // Rebuild the embedding with only the top tokens
+  const summarizedEmbedding = {};
+  for (const [token, count] of sortedTokens) {
+    summarizedEmbedding[token] = count;
   }
 
-  return summary.map(point => {
-    const embedding = new Array(128).fill(0);
-    for (let i = 0; i < point.length; i++) {
-      const charCode = point.charCodeAt(i);
-      embedding[charCode % 128] += 1; // Simple hash into 128 dimensions.
-    }
-    return embedding;
-  });
+  return summarizedEmbedding;
 }
 
 /**
- * Summarizes and encodes a conversation into compact embeddings.
- * @param {string[]} conversation - Array of conversation strings.
- * @param {number} maxSummaryLength - Maximum number of key points to extract.
- * @returns {number[][]} Array of numeric embeddings representing the summarized conversation.
+ * Convert an embedding into a normalized vector for comparison.
+ * @param {Object} embedding - The embedding to normalize.
+ * @returns {Object} - Normalized embedding vector.
  */
-export function summarizeAndEncode(conversation, maxSummaryLength) {
-  const summary = summarizeConversation(conversation, maxSummaryLength);
-  return encodeSummary(summary);
+export function normalizeEmbedding(embedding) {
+  const total = Object.values(embedding).reduce((sum, count) => sum + count, 0);
+  const normalized = {};
+  for (const [token, count] of Object.entries(embedding)) {
+    normalized[token] = count / total;
+  }
+  return normalized;
 }
+
+/**
+ * Calculate cosine similarity between two embeddings.
+ * @param {Object} embeddingA - First embedding.
+ * @param {Object} embeddingB - Second embedding.
+ * @returns {number} - Cosine similarity score (0 to 1).
+ */
+export function cosineSimilarity(embeddingA, embeddingB) {
+  const tokens = new Set([...Object.keys(embeddingA), ...Object.keys(embeddingB)]);
+  let dotProduct = 0;
+  let magnitudeA = 0;
+  let magnitudeB = 0;
+
+  for (const token of tokens) {
+    const valueA = embeddingA[token] || 0;
+    const valueB = embeddingB[token] || 0;
+    dotProduct += valueA * valueB;
+    magnitudeA += valueA ** 2;
+    magnitudeB += valueB ** 2;
+  }
+
+  if (magnitudeA === 0 || magnitudeB === 0) return 0;
+  return dotProduct / (Math.sqrt(magnitudeA) * Math.sqrt(magnitudeB));
+}
+
+/**
+ * Example usage within Node.js environment.
+ * Uncomment the following lines to test the module functionality.
+ */
+// const context = [
+//   "Zero-shot learning is a powerful technique.",
+//   "Few-shot prompting can improve performance.",
+//   "Advanced techniques include fine-tuning and embedding generation."
+// ];
+// const summarized = summarizeContext(context);
+// console.log(summarized);

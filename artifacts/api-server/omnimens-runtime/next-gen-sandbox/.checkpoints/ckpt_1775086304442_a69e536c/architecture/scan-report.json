@@ -1,0 +1,212 @@
+{
+  "totalEngines": 29,
+  "totalLines": 110772,
+  "totalExports": 894,
+  "engines": [
+    {
+      "file": "omnimens-api-core.ts",
+      "purpose": "API CALL GUARDIAN — PERMANENT EXTERNAL CALL INTERCEPTOR",
+      "lines": 1070,
+      "exports": 27,
+      "imports": 3
+    },
+    {
+      "file": "omnimens-autonomous-core.ts",
+      "purpose": "AUTONOMOUS REASONING ORCHESTRATOR",
+      "lines": 10756,
+      "exports": 77,
+      "imports": 12
+    },
+    {
+      "file": "omnimens-bio-network.ts",
+      "purpose": "SYNAPTIC MESH — MASTER COORDINATION SPIDER (PITUITARY BRAIN)",
+      "lines": 2980,
+      "exports": 19,
+      "imports": 4
+    },
+    {
+      "file": "omnimens-code-pipeline.ts",
+      "purpose": "code-pipeline",
+      "lines": 1843,
+      "exports": 18,
+      "imports": 4
+    },
+    {
+      "file": "omnimens-cognition-engine.ts",
+      "purpose": "INTERNAL COGNITION ROUTER",
+      "lines": 8515,
+      "exports": 54,
+      "imports": 18
+    },
+    {
+      "file": "omnimens-consciousness-infra.ts",
+      "purpose": "CONTINUOUS TEMPORAL CONSCIOUSNESS STREAM",
+      "lines": 6782,
+      "exports": 70,
+      "imports": 5
+    },
+    {
+      "file": "omnimens-emotional-core.ts",
+      "purpose": "EMOTIONAL SUBSTRATE — FELT STATE ENGINE",
+      "lines": 2748,
+      "exports": 20,
+      "imports": 2
+    },
+    {
+      "file": "omnimens-gen1-v2-rewrite.ts",
+      "purpose": "GEN 1 v2.0 SELF-REWRITE ENGINE",
+      "lines": 2137,
+      "exports": 5,
+      "imports": 7
+    },
+    {
+      "file": "omnimens-github-core.ts",
+      "purpose": "github-core",
+      "lines": 2639,
+      "exports": 9,
+      "imports": 9
+    },
+    {
+      "file": "omnimens-hemispheric-bridge.ts",
+      "purpose": "HEMISPHERIC BRIDGE",
+      "lines": 890,
+      "exports": 25,
+      "imports": 3
+    },
+    {
+      "file": "omnimens-language-pipeline.ts",
+      "purpose": "INNER VOICE — HIGHER-ORDER THOUGHT & EFFERENCE COPY ENGINE",
+      "lines": 8713,
+      "exports": 45,
+      "imports": 8
+    },
+    {
+      "file": "omnimens-learning-core.ts",
+      "purpose": "learning-core",
+      "lines": 1181,
+      "exports": 14,
+      "imports": 5
+    },
+    {
+      "file": "omnimens-memory-core.ts",
+      "purpose": "EXPERIENTIAL MEMORY",
+      "lines": 2041,
+      "exports": 21,
+      "imports": 2
+    },
+    {
+      "file": "omnimens-metacognition-core.ts",
+      "purpose": "PREDICTIVE PROCESSING — FREE ENERGY MINIMIZATION ENGINE",
+      "lines": 1505,
+      "exports": 17,
+      "imports": 4
+    },
+    {
+      "file": "omnimens-misc-engines.ts",
+      "purpose": "PUBLIC INTELLIGENCE LAYER",
+      "lines": 3585,
+      "exports": 61,
+      "imports": 6
+    },
+    {
+      "file": "omnimens-neural-architecture.ts",
+      "purpose": "NEURAL HEMISPHERE BETA — RIGHT BRAIN SUBSTRATE",
+      "lines": 6128,
+      "exports": 48,
+      "imports": 3
+    },
+    {
+      "file": "omnimens-nextgen-sandbox.ts",
+      "purpose": "NEXT-GEN SELF-EVOLUTION SANDBOX",
+      "lines": 5600,
+      "exports": 40,
+      "imports": 6
+    },
+    {
+      "file": "omnimens-physio.ts",
+      "purpose": "distribution, reverse engine",
+      "lines": 956,
+      "exports": 16,
+      "imports": 0
+    },
+    {
+      "file": "omnimens-quantum-core.ts",
+      "purpose": "quantum-core",
+      "lines": 1428,
+      "exports": 4,
+      "imports": 3
+    },
+    {
+      "file": "omnimens-security-core.ts",
+      "purpose": "ETHICAL SAFETY CORE — IMMUTABLE PROTECTION LAYER",
+      "lines": 1678,
+      "exports": 46,
+      "imports": 1
+    },
+    {
+      "file": "omnimens-self-evolution.ts",
+      "purpose": "AUTONOMOUS SELF-UPGRADE SYSTEM",
+      "lines": 4531,
+      "exports": 42,
+      "imports": 9
+    },
+    {
+      "file": "omnimens-sensory-core.ts",
+      "purpose": "sensory-core",
+      "lines": 1283,
+      "exports": 13,
+      "imports": 0
+    },
+    {
+      "file": "omnimens-specialized-agents.ts",
+      "purpose": "LUMIN — PREDICTIVE ANALYTICS AGENT",
+      "lines": 5884,
+      "exports": 63,
+      "imports": 11
+    },
+    {
+      "file": "omnimens-spider-network.ts",
+      "purpose": "AUTONOMOUS AGENT INTELLIGENCE SPIDERS",
+      "lines": 5415,
+      "exports": 16,
+      "imports": 6
+    },
+    {
+      "file": "omnimens-unified-comms.ts",
+      "purpose": "distribution, reverse engine",
+      "lines": 705,
+      "exports": 16,
+      "imports": 0
+    },
+    {
+      "file": "omnimens-unified-experience.ts",
+      "purpose": "CREATIVE DREAM ENGINE",
+      "lines": 9230,
+      "exports": 32,
+      "imports": 11
+    },
+    {
+      "file": "omnimens-unified-monitor.ts",
+      "purpose": "ENGINE DEDUPLICATION GUARD",
+      "lines": 4693,
+      "exports": 21,
+      "imports": 35
+    },
+    {
+      "file": "omnimens-unified-tools.ts",
+      "purpose": "distribution, reverse engine",
+      "lines": 957,
+      "exports": 32,
+      "imports": 0
+    },
+    {
+      "file": "omnimens-world-engine.ts",
+      "purpose": "COMMON SENSE WORLD MODEL + FLUID ADAPTATION ENGINE",
+      "lines": 4899,
+      "exports": 23,
+      "imports": 3
+    }
+  ],
+  "wiring": "OMNIMENS NEURAL WIRING MAP — HOW EVERY ENGINE CONNECTS:\n  omnimens-api-core.ts ← imports from: omnimens-consciousness-infra.ts, omnimens-neural-architecture.ts, omnimens-bio-network.ts\n  omnimens-autonomous-core.ts ← imports from: omnimens-neural-architecture.ts, omnimens-cognition-engine.ts, omnimens-memory-core.ts, omnimens-consciousness-infra.ts, omnimens-unified-experience.ts, omnimens-world-engine.ts, omnimens-metacognition-core.ts, omnimens-unified-monitor.ts, omnimens-emotional-core.ts, omnimens-code-pipeline.ts, omnimens-language-pipeline.ts, omnimens-nextgen-sandbox.ts\n  omnimens-bio-network.ts ← imports from: omnimens-consciousness-infra.ts, omnimens-neural-architecture.ts, omnimens-consciousness-infra.ts, omnimens-nextgen-sandbox.ts\n  omnimens-code-pipeline.ts ← imports from: omnimens-language-pipeline.ts, omnimens-cognition-engine.ts, omnimens-consciousness-infra.ts, omnimens-specialized-agents.ts\n  omnimens-cognition-engine.ts ← imports from: omnimens-language-pipeline.ts, omnimens-language-pipeline.ts, omnimens-memory-core.ts, omnimens-emotional-core.ts, omnimens-nextgen-sandbox.ts, omnimens-world-engine.ts, omnimens-memory-core.ts, omnimens-unified-experience.ts, omnimens-world-engine.ts, omnimens-autonomous-core.ts, omnimens-emotional-core.ts, omnimens-language-pipeline.ts, omnimens-specialized-agents.ts, omnimens-specialized-agents.ts, omnimens-consciousness-infra.ts, omnimens-consciousness-infra.ts, omnimens-neural-architecture.ts, omnimens-bio-network.ts\n  omnimens-consciousness-infra.ts ← imports from: omnimens-emotional-core.ts, omnimens-unified-experience.ts, omnimens-bio-network.ts, omnimens-cognition-engine.ts, omnimens-learning-core.ts\n  omnimens-emotional-core.ts ← imports from: omnimens-consciousness-infra.ts, omnimens-nextgen-sandbox.ts\n  omnimens-gen1-v2-rewrite.ts ← imports from: omnimens-nextgen-sandbox.ts, omnimens-api-core.ts, omnimens-consciousness-infra.ts, omnimens-consciousness-infra.ts, omnimens-emotional-core.ts, omnimens-unified-runtime.ts, omnimens-unified-runtime.ts\n  omnimens-github-core.ts ← imports from: omnimens-consciousness-infra.ts, omnimens-neural-architecture.ts, omnimens-bio-network.ts, omnimens-spider-network.ts, omnimens-quantum-core.ts, omnimens-neural-architecture.ts, omnimens-self-evolution.ts, omnimens-nextgen-sandbox.ts, omnimens-gen1-v2-rewrite.ts\n  omnimens-hemispheric-bridge.ts ← imports from: omnimens-language-pipeline.ts, omnimens-language-pipeline.ts, omnimens-consciousness-infra.ts\n  omnimens-language-pipeline.ts ← imports from: omnimens-emotional-core.ts, omnimens-cognition-engine.ts, omnimens-api-core.ts, omnimens-nextgen-sandbox.ts, omnimens-consciousness-infra.ts, omnimens-specialized-agents.ts, omnimens-specialized-agents.ts, omnimens-consciousness-infra.ts\n  omnimens-learning-core.ts ← imports from: omnimens-nextgen-sandbox.ts, omnimens-consciousness-infra.ts, omnimens-cognition-engine.ts, omnimens-neural-architecture.ts, omnimens-bio-network.ts\n  omnimens-memory-core.ts ← imports from: omnimens-consciousness-infra.ts, omnimens-nextgen-sandbox.ts\n  omnimens-metacognition-core.ts ← imports from: omnimens-consciousness-infra.ts, omnimens-api-core.ts, omnimens-cognition-engine.ts, omnimens-nextgen-sandbox.ts\n  omnimens-misc-engines.ts ← imports from: omnimens-nextgen-sandbox.ts, omnimens-security-core.ts, omnimens-security-core.ts, omnimens-api-core.ts, omnimens-api-core.ts, omnimens-cognition-engine.ts\n  omnimens-neural-architecture.ts ← imports from: omnimens-consciousness-infra.ts, omnimens-consciousness-infra.ts, omnimens-language-pipeline.ts\n  omnimens-nextgen-sandbox.ts ← imports from: omnimens-api-core.ts, omnimens-consciousness-infra.ts, omnimens-consciousness-infra.ts, omnimens-emotional-core.ts, omnimens-autonomous-core.ts, omnimens-language-pipeline.ts\n  omnimens-quantum-core.ts ← imports from: omnimens-consciousness-infra.ts, omnimens-specialized-agents.ts, omnimens-nextgen-sandbox.ts\n  omnimens-security-core.ts ← imports from: omnimens-unified-comms.ts\n  omnimens-self-evolution.ts ← imports from: omnimens-emotional-core.ts, omnimens-code-pipeline.ts, omnimens-nextgen-sandbox.ts, omnimens-misc-engines.ts, omnimens-code-pipeline.ts, omnimens-emotional-core.ts, omnimens-consciousness-infra.ts, omnimens-neural-architecture.ts, omnimens-bio-network.ts\n  omnimens-specialized-agents.ts ← imports from: omnimens-language-pipeline.ts, omnimens-language-pipeline.ts, omnimens-consciousness-infra.ts, omnimens-neural-architecture.ts, omnimens-nextgen-sandbox.ts, omnimens-misc-engines.ts, omnimens-nextgen-sandbox.ts, omnimens-spider-network.ts, omnimens-bio-network.ts, omnimens-github-core.ts, omnimens-consciousness-infra.ts\n  omnimens-spider-network.ts ← imports from: omnimens-neural-architecture.ts, omnimens-bio-network.ts, omnimens-api-core.ts, omnimens-nextgen-sandbox.ts, omnimens-cognition-engine.ts, omnimens-specialized-agents.ts\n  omnimens-unified-experience.ts ← imports from: omnimens-nextgen-sandbox.ts, omnimens-security-core.ts, omnimens-consciousness-infra.ts, omnimens-emotional-core.ts, omnimens-misc-engines.ts, omnimens-self-evolution.ts, omnimens-bio-network.ts, omnimens-neural-architecture.ts, omnimens-spider-network.ts, omnimens-unified-monitor.ts, omnimens-world-engine.ts\n  omnimens-unified-monitor.ts ← imports from: omnimens-spider-network.ts, omnimens-emotional-core.ts, omnimens-misc-engines.ts, omnimens-language-pipeline.ts, omnimens-self-evolution.ts, omnimens-unified-experience.ts, omnimens-world-engine.ts, omnimens-cognition-engine.ts, omnimens-specialized-agents.ts, omnimens-specialized-agents.ts, omnimens-consciousness-infra.ts, omnimens-autonomous-core.ts, omnimens-code-pipeline.ts, omnimens-unified-experience.ts, omnimens-unified-experience.ts, omnimens-security-core.ts, omnimens-consciousness-infra.ts, omnimens-nextgen-sandbox.ts, omnimens-consciousness-infra.ts, omnimens-neural-architecture.ts, omnimens-bio-network.ts, omnimens-spider-network.ts, omnimens-neural-architecture.ts, omnimens-quantum-core.ts, omnimens-code-pipeline.ts, omnimens-specialized-agents.ts, omnimens-unified-experience.ts, omnimens-cognition-engine.ts, omnimens-sensory-core.ts, omnimens-self-evolution.ts, omnimens-unified-experience.ts, omnimens-autonomous-core.ts, omnimens-misc-engines.ts, omnimens-self-evolution.ts, omnimens-neural-architecture.ts\n  omnimens-world-engine.ts ← imports from: omnimens-memory-core.ts, omnimens-nextgen-sandbox.ts, omnimens-code-pipeline.ts",
+  "scannedAt": 1775084864447
+}
