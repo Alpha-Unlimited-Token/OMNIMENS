@@ -885,6 +885,7 @@ async function sensoryTick(): Promise<void> {
   }
 
   state.currentReading = reading;
+  if (!state.recentReadings) state.recentReadings = [];
   state.recentReadings.push(reading);
   if (state.recentReadings.length > MAX_HISTORY) {
     state.recentReadings = state.recentReadings.slice(-MAX_HISTORY);
