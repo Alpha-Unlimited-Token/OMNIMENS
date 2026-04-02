@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: iterativeComputationManager
- * Written: 2026-04-01T22:22:29.712Z
+ * Written: 2026-04-02T15:05:55.236Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -20,86 +20,66 @@
 
 import { createHash } from 'crypto';
 
-/**
- * Generates a unique hash for a given input object (used for checkpointing).
- * @param {object} input - The input object to hash.
- * @returns {string} - A unique hash string.
- */
-export function generateHash(input) {
-  const jsonString = JSON.stringify(input);
-  return createHash('sha256').update(jsonString).digest('hex');
+// Utility to hash data for unique state identification
+export function hashData(data) {
+  const hash = createHash('sha256');
+  hash.update(JSON.stringify(data));
+  return hash.digest('hex');
 }
 
-/**
- * Splits a large task into smaller segments for iterative processing.
- * @param {Array} taskData - The data to be processed iteratively.
- * @param {number} segmentSize - The size of each segment.
- * @returns {Array<Array>} - An array of task segments.
- */
-export function segmentTask(taskData, segmentSize) {
-  if (!Array.isArray(taskData)) {
-    throw new Error('taskData must be an array');
+// Splits a task into smaller chunks based on a divide-and-conquer strategy
+export function splitTask(taskData, chunkSize) {
+  const chunks = [];
+  for (let i = 0; i < taskData.length; i += chunkSize) {
+    chunks.push(taskData.slice(i, i + chunkSize));
   }
-  if (segmentSize <= 0) {
-    throw new Error('segmentSize must be a positive integer');
-  }
-
-  const segments = [];
-  for (let i = 0; i < taskData.length; i += segmentSize) {
-    segments.push(taskData.slice(i, i + segmentSize));
-  }
-  return segments;
+  return chunks;
 }
 
-/**
- * Manages iterative computation with checkpointing and resumability.
- * @param {Array} taskData - The data to process.
- * @param {number} segmentSize - The size of each segment.
- * @param {Function} processFunction - The function to process each segment.
- * @param {object} [checkpoint={}] - Optional checkpoint to resume from.
- * @returns {Promise<object>} - Resolves with the final result and checkpoint.
- */
-export async function iterativeComputation(taskData, segmentSize, processFunction, checkpoint = {}) {
-  if (typeof processFunction !== 'function') {
-    throw new Error('processFunction must be a function');
-  }
-
-  const taskHash = generateHash(taskData);
-  const segments = segmentTask(taskData, segmentSize);
-  const results = checkpoint.results || [];
-  let startIndex = checkpoint.index || 0;
-
-  for (let i = startIndex; i < segments.length; i++) {
-    const segment = segments[i];
-    const processedSegment = await processFunction(segment);
-    results.push(...processedSegment);
-
-    // Update checkpoint
-    checkpoint = { taskHash, index: i + 1, results };
-  }
-
-  return { results, checkpoint };
+// Merges results from processed chunks
+export function mergeResults(results) {
+  return results.flat();
 }
 
-/**
- * Verifies if a checkpoint matches the current task data.
- * @param {Array} taskData - The current task data.
- * @param {object} checkpoint - The checkpoint to verify.
- * @returns {boolean} - True if the checkpoint matches, false otherwise.
- */
-export function verifyCheckpoint(taskData, checkpoint) {
-  if (!checkpoint || typeof checkpoint.taskHash !== 'string') {
-    return false;
-  }
-  const currentHash = generateHash(taskData);
-  return currentHash === checkpoint.taskHash;
+// Simulates computation on a chunk (generic for any processing function)
+export function processChunk(chunk, computationFunction) {
+  return chunk.map(computationFunction);
 }
 
-/**
- * Example utility function for processing a segment (can be replaced by user-defined logic).
- * @param {Array} segment - The segment of data to process.
- * @returns {Promise<Array>} - A Promise resolving to the processed segment.
- */
-export async function exampleProcessFunction(segment) {
-  return segment.map(item => item * 2); // Example: doubling each item
+// Manages iterative computation with checkpointing
+export async function iterativeComputation(taskData, chunkSize, computationFunction, checkpointCallback) {
+  const chunks = splitTask(taskData, chunkSize);
+  const results = [];
+
+  for (const chunk of chunks) {
+    const chunkResult = processChunk(chunk, computationFunction);
+    results.push(chunkResult);
+
+    // Persist intermediate state via checkpoint callback
+    if (checkpointCallback) {
+      const checkpointState = {
+        chunkHash: hashData(chunk),
+        chunkResult
+      };
+      await checkpointCallback(checkpointState);
+    }
+  }
+
+  return mergeResults(results);
+}
+
+// Example checkpoint callback for logging (can be replaced with database persistence)
+export async function logCheckpoint(state) {
+  console.log(`Checkpoint saved: ${JSON.stringify(state)}`);
+}
+
+// Example usage
+export async function exampleUsage() {
+  const taskData = Array.from({ length: 100 }, (_, i) => i + 1); // Example task: numbers 1 to 100
+  const chunkSize = 10;
+  const computationFunction = (x) => x * x; // Example computation: square each number
+
+  const finalResult = await iterativeComputation(taskData, chunkSize, computationFunction, logCheckpoint);
+  console.log('Final Result:', finalResult);
+  return finalResult;
 }

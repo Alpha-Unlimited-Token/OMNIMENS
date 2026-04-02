@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: iterativeComputationManager
- * Written: 2026-04-02T13:31:46.759Z
+ * Written: 2026-04-02T15:07:23.127Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,97 +18,96 @@
 
 // iterativeComputationManager.mjs
 
-import { writeFileSync, readFileSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
-import { createHash } from 'node:crypto';
-
-const CHECKPOINT_DIR = './checkpoints';
+import { createHash } from 'crypto';
 
 /**
- * Generates a unique hash for a computation task based on its identifier.
- * @param {string} taskId - Unique identifier for the task.
- * @returns {string} - A hashed string for file naming.
- */
-export function generateCheckpointFilename(taskId) {
-  const hash = createHash('sha256').update(taskId).digest('hex');
-  return join(CHECKPOINT_DIR, `${hash}.json`);
-}
-
-/**
- * Saves the current state of a computation to a file.
- * @param {string} taskId - Unique identifier for the task.
+ * Generate a unique checkpoint ID based on task name and state.
+ * @param {string} taskName - Name of the task.
  * @param {object} state - Current state of the computation.
+ * @returns {string} Unique checkpoint ID.
  */
-export function saveCheckpoint(taskId, state) {
-  const filename = generateCheckpointFilename(taskId);
-  const serializedState = JSON.stringify(state);
-  writeFileSync(filename, serializedState, 'utf-8');
+export function generateCheckpointID(taskName, state) {
+  const hash = createHash('sha256');
+  hash.update(taskName + JSON.stringify(state));
+  return hash.digest('hex');
 }
 
 /**
- * Loads the last saved state of a computation from a file.
- * @param {string} taskId - Unique identifier for the task.
- * @returns {object|null} - The loaded state, or null if no checkpoint exists.
- */
-export function loadCheckpoint(taskId) {
-  const filename = generateCheckpointFilename(taskId);
-  if (existsSync(filename)) {
-    const serializedState = readFileSync(filename, 'utf-8');
-    return JSON.parse(serializedState);
-  }
-  return null;
-}
-
-/**
- * Performs iterative computation with checkpointing.
- * @param {string} taskId - Unique identifier for the task.
- * @param {function} computeStep - Function to execute one step of computation.
- * @param {function} isComplete - Function to determine if computation is complete.
+ * Divide a long-running computation into smaller subprocesses.
+ * @param {function} taskFunction - The main computation function.
  * @param {object} initialState - Initial state of the computation.
- * @returns {object} - Final state after computation.
+ * @param {function} checkpointFunction - Function to save intermediate state.
+ * @param {function} resumeFunction - Function to resume from a checkpoint.
+ * @returns {Promise<any>} Final result of the computation.
  */
-export function runIterativeComputation(taskId, computeStep, isComplete, initialState) {
-  let state = loadCheckpoint(taskId) || initialState;
+export async function runIterativeComputation(taskFunction, initialState, checkpointFunction, resumeFunction) {
+  let state = initialState;
+  let checkpointID = generateCheckpointID(taskFunction.name, state);
 
-  while (!isComplete(state)) {
-    state = computeStep(state);
-    saveCheckpoint(taskId, state);
+  while (!state.isComplete) {
+    try {
+      // Perform a single step of the computation
+      state = await taskFunction(state);
+
+      // Save intermediate state
+      checkpointID = generateCheckpointID(taskFunction.name, state);
+      await checkpointFunction(checkpointID, state);
+    } catch (error) {
+      // Attempt to resume from the last checkpoint
+      state = await resumeFunction(checkpointID);
+      if (!state) {
+        throw new Error('Failed to resume computation. No valid checkpoint found.');
+      }
+    }
   }
 
+  return state.result;
+}
+
+/**
+ * Save intermediate computation state (mock implementation).
+ * @param {string} checkpointID - Unique ID for the checkpoint.
+ * @param {object} state - Computation state to save.
+ */
+export async function saveCheckpoint(checkpointID, state) {
+  // Placeholder for saving state (e.g., memory, database, etc.)
+  console.log(`Checkpoint saved: ${checkpointID}`, state);
+}
+
+/**
+ * Resume computation from a checkpoint (mock implementation).
+ * @param {string} checkpointID - Unique ID for the checkpoint.
+ * @returns {object|null} Resumed state or null if not found.
+ */
+export async function resumeFromCheckpoint(checkpointID) {
+  // Placeholder for resuming state (e.g., memory, database, etc.)
+  console.log(`Attempting to resume from checkpoint: ${checkpointID}`);
+  return null; // Mock: No checkpoint found
+}
+
+/**
+ * Example task function for computation.
+ * @param {object} state - Current state of the computation.
+ * @returns {object} Updated state.
+ */
+export async function exampleTaskFunction(state) {
+  // Simulate computation step
+  state.progress += 10;
+  state.isComplete = state.progress >= 100;
+  state.result = state.isComplete ? 'Computation Complete' : null;
   return state;
 }
 
 /**
- * Example utility for generic mathematical computations.
- * @param {object} state - Current state containing a number.
- * @returns {object} - Updated state with the number incremented.
+ * Example usage of the iterative computation manager.
  */
-export function exampleComputeStep(state) {
-  return { ...state, number: state.number + 1 };
-}
-
-/**
- * Example completion condition for computations.
- * @param {object} state - Current state containing a number.
- * @returns {boolean} - True if the number reaches a threshold.
- */
-export function exampleIsComplete(state) {
-  return state.number >= 100;
-}
-
-/**
- * Example usage of the module.
- */
-export function exampleUsage() {
-  const taskId = 'exampleTask';
-  const initialState = { number: 0 };
-
-  const finalState = runIterativeComputation(
-    taskId,
-    exampleComputeStep,
-    exampleIsComplete,
-    initialState
+export async function exampleUsage() {
+  const initialState = { progress: 0, isComplete: false, result: null };
+  const finalResult = await runIterativeComputation(
+    exampleTaskFunction,
+    initialState,
+    saveCheckpoint,
+    resumeFromCheckpoint
   );
-
-  return finalState;
+  console.log('Final Result:', finalResult);
 }
