@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-04-01T22:18:26.885Z
+ * Written: 2026-04-02T15:12:48.031Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,124 +16,104 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// inMemoryVectorStore.mjs
+// Complete ES module code here
 
 import { createHash } from 'crypto';
 
 /**
- * Calculates Euclidean distance between two vectors.
- * @param {number[]} vectorA - First vector.
- * @param {number[]} vectorB - Second vector.
- * @returns {number} - Distance between vectors.
+ * Utility to store and retrieve high-dimensional embeddings for fast similarity search using HNSW-like graph.
  */
-export function euclideanDistance(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must have the same dimensions.');
+
+// Node structure for HNSW graph
+class Node {
+  constructor(id, embedding) {
+    this.id = id;
+    this.embedding = embedding;
+    this.neighbors = new Map(); // Layered neighbors
   }
-  return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0));
 }
 
-/**
- * Builds a k-d tree from a list of embeddings.
- * @param {Array<{ id, embedding}>} data - Array of objects with id and embedding.
- * @param {number} depth - Current depth in the tree (used internally).
- * @returns {object} - Root node of the k-d tree.
- */
-export function buildKdTree(data, depth = 0) {
-  if (data.length === 0) return null;
-
-  const k = data[0].embedding.length; // Dimensionality of embeddings.
-  const axis = depth % k;
-
-  data.sort((a, b) => a.embedding[axis] - b.embedding[axis]);
-  const medianIndex = Math.floor(data.length / 2);
-
-  return {
-    point: data[medianIndex],
-    left: buildKdTree(data.slice(0, medianIndex), depth + 1),
-    right: buildKdTree(data.slice(medianIndex + 1), depth + 1)
-  };
+// Utility function to calculate cosine similarity
+export function cosineSimilarity(vecA, vecB) {
+  const dotProduct = vecA.reduce((sum, val, i) => sum + val * vecB[i], 0);
+  const magnitudeA = Math.sqrt(vecA.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitudeB = Math.sqrt(vecB.reduce((sum, val) => sum + val ** 2, 0));
+  return dotProduct / (magnitudeA * magnitudeB);
 }
 
-/**
- * Searches the k-d tree for the nearest neighbor to a given target embedding.
- * @param {object} node - Root node of the k-d tree.
- * @param {number[]} target - Target embedding.
- * @param {number} depth - Current depth in the tree (used internally).
- * @param {object} best - Current best match (used internally).
- * @returns {object} - Nearest neighbor.
- */
-export function nearestNeighborSearch(node, target, depth = 0, best = { point, distance}) {
-  if (!node) return best;
-
-  const k = target.length;
-  const axis = depth % k;
-
-  const distance = euclideanDistance(node.point.embedding, target);
-  if (distance < best.distance) {
-    best = { point: node.point, distance };
+// HNSW-like graph implementation
+export class InMemoryVectorStore {
+  constructor(maxNeighbors = 10) {
+    this.nodes = new Map();
+    this.maxNeighbors = maxNeighbors; // Maximum neighbors per node
   }
 
-  const nextBranch = target[axis] < node.point.embedding[axis] ? node.left : node.right;
-  const otherBranch = target[axis] < node.point.embedding[axis] ? node.right : node.left;
+  // Add a new vector to the store
+  addVector(id, embedding) {
+    if (this.nodes.has(id)) {
+      throw new Error(`Vector with ID '${id}' already exists.`);
+    }
 
-  best = nearestNeighborSearch(nextBranch, target, depth + 1, best);
+    const newNode = new Node(id, embedding);
+    this.nodes.set(id, newNode);
 
-  if (Math.abs(target[axis] - node.point.embedding[axis]) < best.distance) {
-    best = nearestNeighborSearch(otherBranch, target, depth + 1, best);
+    // Connect to nearest neighbors
+    this._connectToNeighbors(newNode);
   }
 
-  return best;
+  // Retrieve nearest neighbors for a given vector
+  getNearestNeighbors(queryEmbedding, k = 5) {
+    const results = [];
+
+    for (const node of this.nodes.values()) {
+      const similarity = cosineSimilarity(queryEmbedding, node.embedding);
+      results.push({ id: node.id, similarity });
+    }
+
+    // Sort by similarity in descending order and return top k
+    return results.sort((a, b) => b.similarity - a.similarity).slice(0, k);
+  }
+
+  // Internal method to connect a new node to its nearest neighbors
+  _connectToNeighbors(newNode) {
+    const neighbors = [];
+
+    for (const node of this.nodes.values()) {
+      if (node.id !== newNode.id) {
+        const similarity = cosineSimilarity(newNode.embedding, node.embedding);
+        neighbors.push({ node, similarity });
+      }
+    }
+
+    // Sort by similarity in descending order and select top neighbors
+    neighbors.sort((a, b) => b.similarity - a.similarity);
+    const topNeighbors = neighbors.slice(0, this.maxNeighbors);
+
+    // Add bidirectional connections
+    for (const { node } of topNeighbors) {
+      newNode.neighbors.set(node.id, node);
+      node.neighbors.set(newNode.id, newNode);
+    }
+  }
+
+  // Utility to hash embeddings for unique identification (optional)
+  static hashEmbedding(embedding) {
+    const hash = createHash('sha256');
+    hash.update(embedding.join(','));
+    return hash.digest('hex');
+  }
 }
 
-/**
- * Adds a new embedding to the k-d tree.
- * @param {object} node - Root node of the k-d tree.
- * @param {object} newPoint - New point to add (with id and embedding).
- * @param {number} depth - Current depth in the tree (used internally).
- * @returns {object} - Updated k-d tree.
- */
-export function addToKdTree(node, newPoint, depth = 0) {
-  if (!node) return { point: newPoint, left, right};
+// Example usage
+export function exampleUsage() {
+  const store = new InMemoryVectorStore();
 
-  const k = newPoint.embedding.length;
-  const axis = depth % k;
+  // Add vectors
+  store.addVector('vec1', [0.1, 0.2, 0.3]);
+  store.addVector('vec2', [0.4, 0.5, 0.6]);
+  store.addVector('vec3', [0.7, 0.8, 0.9]);
 
-  if (newPoint.embedding[axis] < node.point.embedding[axis]) {
-    node.left = addToKdTree(node.left, newPoint, depth + 1);
-  } else {
-    node.right = addToKdTree(node.right, newPoint, depth + 1);
-  }
-
-  return node;
+  // Query nearest neighbors
+  const neighbors = store.getNearestNeighbors([0.15, 0.25, 0.35]);
+  return neighbors;
 }
-
-/**
- * Generates a unique ID for a new embedding.
- * @param {number[]} embedding - Embedding vector.
- * @returns {string} - Unique ID.
- */
-export function generateId(embedding) {
-  const hash = createHash('sha256');
-  hash.update(embedding.join(','));
-  return hash.digest('hex');
-}
-
-/**
- * Wrapper function to insert and search embeddings.
- */
-export const inMemoryVectorStore = {
-  tree,
-
-  add(embedding) {
-    const id = generateId(embedding);
-    const newPoint = { id, embedding };
-    this.tree = addToKdTree(this.tree, newPoint);
-    return id;
-  },
-
-  search(target) {
-    if (!this.tree) throw new Error('Tree is empty.');
-    return nearestNeighborSearch(this.tree, target).point;
-  }
-};

@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: iterativeComputationManager
- * Written: 2026-04-02T14:53:33.315Z
+ * Written: 2026-04-02T15:14:06.106Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,89 +18,132 @@
 
 // iterativeComputationManager.mjs
 
-import { createHash } from 'crypto';
-
-// In-memory persistence layer for simplicity (can be replaced with a database or file system)
-const persistenceLayer = new Map();
+import crypto from 'crypto';
 
 /**
- * Generates a unique hash for a computation state.
- * @param {Object} state - The computation state object.
- * @returns {string} - A unique hash representing the state.
+ * Utility function to serialize a state object into a JSON string.
+ * Ensures consistent serialization for checkpointing.
+ * @param {object} state - The state object to serialize.
+ * @returns {string} - Serialized JSON string.
  */
-export function generateStateHash(state) {
-  const hash = createHash('sha256');
-  hash.update(JSON.stringify(state));
-  return hash.digest('hex');
+export function serializeState(state) {
+  return JSON.stringify(state);
 }
 
 /**
- * Saves a computation state to the persistence layer.
- * @param {string} stateId - The unique identifier for the computation state.
- * @param {Object} state - The computation state to be saved.
+ * Utility function to deserialize a JSON string back into a state object.
+ * Handles parsing errors gracefully.
+ * @param {string} serializedState - The JSON string to deserialize.
+ * @returns {object|null} - Deserialized state object or null if invalid.
  */
-export function saveState(stateId, state) {
-  persistenceLayer.set(stateId, JSON.stringify(state));
-}
-
-/**
- * Loads a computation state from the persistence layer.
- * @param {string} stateId - The unique identifier for the computation state.
- * @returns {Object|null} - The loaded computation state, or null if not found.
- */
-export function loadState(stateId) {
-  const state = persistenceLayer.get(stateId);
-  return state ? JSON.parse(state) : null;
-}
-
-/**
- * Executes a long-running computation with checkpointing.
- * @param {string} stateId - The unique identifier for the computation.
- * @param {Function} computationFunction - The function that performs the computation, receiving (state, checkpoint).
- * @param {Object} initialState - The initial state of the computation.
- * @returns {Object} - The final result of the computation.
- */
-export async function executeWithCheckpointing(stateId, computationFunction, initialState) {
-  let state = loadState(stateId) || initialState;
-
-  const checkpoint = (updatedState) => {
-    saveState(stateId, updatedState);
-    state = updatedState;
-  };
-
-  const result = await computationFunction(state, checkpoint);
-
-  // Clear the state after successful completion
-  persistenceLayer.delete(stateId);
-
-  return result;
-}
-
-/**
- * Example computation function: Computes the sum of numbers in a range with checkpointing.
- * @param {Object} state - The current state of the computation.
- * @param {Function} checkpoint - Function to save the current state.
- * @returns {number} - The final sum.
- */
-export async function sumRangeWithCheckpointing(state, checkpoint) {
-  const { start, end, currentSum = 0 } = state;
-
-  let sum = currentSum;
-  for (let i = start; i <= end; i++) {
-    sum += i;
-
-    // Simulate checkpointing every 100 iterations
-    if (i % 100 === 0) {
-      checkpoint({ start: i + 1, end, currentSum: sum });
-    }
+export function deserializeState(serializedState) {
+  try {
+    return JSON.parse(serializedState);
+  } catch (error) {
+    return null;
   }
-
-  return sum;
 }
 
 /**
- * Clears all saved states in the persistence layer (for testing purposes).
+ * Generates a unique identifier for a computation task.
+ * Useful for tracking tasks across iterations.
+ * @returns {string} - A unique identifier string.
  */
-export function clearAllStates() {
-  persistenceLayer.clear();
+export function generateTaskId() {
+  return crypto.randomUUID();
+}
+
+/**
+ * Creates an iterative computation manager instance.
+ * Provides methods for managing asynchronous iterative computations.
+ * @returns {object} - Computation manager with utility methods.
+ */
+export function createComputationManager() {
+  const taskQueue = new Map();
+
+  return {
+    /**
+     * Adds a new task to the queue.
+     * @param {string} taskId - Unique identifier for the task.
+     * @param {function} computationFunction - Function representing the computation.
+     * @param {object} initialState - Initial state for the computation.
+     */
+    addTask(taskId, computationFunction, initialState) {
+      if (taskQueue.has(taskId)) {
+        throw new Error(`Task with ID ${taskId} already exists.`);
+      }
+      taskQueue.set(taskId, {
+        computationFunction,
+        state: initialState,
+        completed: false
+      });
+    },
+
+    /**
+     * Executes the next iteration of a task.
+     * @param {string} taskId - Unique identifier for the task.
+     * @returns {object|null} - Updated state or null if task is completed.
+     */
+    executeTaskIteration(taskId) {
+      const task = taskQueue.get(taskId);
+      if (!task) {
+        throw new Error(`Task with ID ${taskId} not found.`);
+      }
+      if (task.completed) {
+        return null;
+      }
+
+      const { computationFunction, state } = task;
+      const newState = computationFunction(state);
+
+      if (newState === null || newState.completed) {
+        task.completed = true;
+        taskQueue.delete(taskId);
+        return null;
+      }
+
+      task.state = newState;
+      return newState;
+    },
+
+    /**
+     * Retrieves the current state of a task.
+     * @param {string} taskId - Unique identifier for the task.
+     * @returns {object|null} - Current state or null if task is completed.
+     */
+    getTaskState(taskId) {
+      const task = taskQueue.get(taskId);
+      return task ? task.state : null;
+    },
+
+    /**
+     * Removes a task from the queue.
+     * @param {string} taskId - Unique identifier for the task.
+     */
+    removeTask(taskId) {
+      taskQueue.delete(taskId);
+    },
+
+    /**
+     * Lists all active task IDs.
+     * @returns {Array<string>} - Array of active task IDs.
+     */
+    listActiveTasks() {
+      return Array.from(taskQueue.keys());
+    }
+  };
+}
+
+/**
+ * Example computation function for testing.
+ * Simulates iterative computation by incrementing a counter.
+ * @param {object} state - Current state object.
+ * @returns {object} - Updated state object.
+ */
+export function exampleComputationFunction(state) {
+  const { counter, maxIterations } = state;
+  if (counter >= maxIterations) {
+    return { ...state, completed: true };
+  }
+  return { ...state, counter: counter + 1 };
 }

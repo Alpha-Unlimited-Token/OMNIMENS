@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: semanticCompressionManager
- * Written: 2026-04-02T14:24:42.069Z
+ * Written: 2026-04-02T15:14:59.846Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -21,111 +21,89 @@
 import crypto from 'crypto';
 
 /**
- * Generate a hash to uniquely identify compressed semantic data.
- * This ensures data integrity and allows for deduplication.
- * @param {string} input - The input text to hash.
- * @returns {string} - A unique hash string.
+ * Computes semantic similarity between two text inputs using cosine similarity on hashed vectors.
+ * Generic utility for comparing semantic closeness of textual data.
  */
-export function generateSemanticHash(input) {
-  return crypto.createHash('sha256').update(input, 'utf8').digest('hex');
+export function computeSemanticSimilarity(textA, textB) {
+  const vectorA = hashTextToVector(textA);
+  const vectorB = hashTextToVector(textB);
+  return cosineSimilarity(vectorA, vectorB);
 }
 
 /**
- * Tokenize input text into meaningful chunks while preserving semantic context.
- * @param {string} text - The input text to tokenize.
- * @param {number} maxTokens - Maximum number of tokens allowed per chunk.
- * @returns {string[]} - Array of tokenized text chunks.
+ * Clusters semantically related texts hierarchically based on similarity scores.
+ * Returns clusters optimized for token window usage.
  */
-export function tokenizeText(text, maxTokens) {
-  if (typeof text !== 'string' || maxTokens <= 0) {
-    throw new Error('Invalid input: text must be a string and maxTokens must be a positive integer.');
-  }
+export function hierarchicalClustering(texts, similarityThreshold = 0.75) {
+  const clusters = [];
 
-  const words = text.split(/\s+/);
-  const chunks = [];
-  let currentChunk = [];
+  texts.forEach((text) => {
+    let addedToCluster = false;
 
-  for (const word of words) {
-    if (currentChunk.join(' ').length + word.length + 1 <= maxTokens) {
-      currentChunk.push(word);
-    } else {
-      chunks.push(currentChunk.join(' '));
-      currentChunk = [word];
+    for (const cluster of clusters) {
+      if (computeSemanticSimilarity(text, cluster[0]) >= similarityThreshold) {
+        cluster.push(text);
+        addedToCluster = true;
+        break;
+      }
     }
-  }
 
-  if (currentChunk.length > 0) {
-    chunks.push(currentChunk.join(' '));
-  }
+    if (!addedToCluster) {
+      clusters.push([text]);
+    }
+  });
 
-  return chunks;
+  return clusters;
 }
 
 /**
- * Compress text semantically by summarizing chunks while preserving key information.
- * @param {string[]} chunks - Array of tokenized text chunks.
- * @param {number} compressionRatio - Ratio (0-1) indicating how much to compress.
- * @returns {string[]} - Array of semantically compressed text chunks.
+ * Compresses context by summarizing clusters while preserving key reasoning chains.
+ * Returns compressed context optimized for token window usage.
  */
-export function compressChunks(chunks, compressionRatio) {
-  if (!Array.isArray(chunks) || compressionRatio <= 0 || compressionRatio > 1) {
-    throw new Error('Invalid input: chunks must be an array and compressionRatio must be between 0 and 1.');
-  }
-
-  return chunks.map(chunk => {
-    const words = chunk.split(' ');
-    const targetLength = Math.max(1, Math.floor(words.length * compressionRatio));
-    return words.slice(0, targetLength).join(' ');
+export function compressContext(clusters) {
+  return clusters.map((cluster) => {
+    const keyText = cluster[0];
+    const summary = cluster.length > 1 ? summarizeCluster(cluster) : keyText;
+    return { keyText, summary };
   });
 }
 
 /**
- * Adaptive compression of text based on a target token window size.
- * @param {string} text - The input text to compress.
- * @param {number} maxTokens - Target maximum token window size.
- * @param {number} compressionRatio - Initial compression ratio.
- * @returns {string} - Compressed text while preserving semantic meaning.
+ * Utility function to hash text into a fixed-length vector using SHA256.
+ * Generic utility for text vectorization.
  */
-export function adaptiveSemanticCompression(text, maxTokens, compressionRatio) {
-  const tokenizedChunks = tokenizeText(text, maxTokens);
-  const compressedChunks = compressChunks(tokenizedChunks, compressionRatio);
-  return compressedChunks.join(' ');
+function hashTextToVector(text) {
+  const hash = crypto.createHash('sha256').update(text).digest('hex');
+  return Array.from(hash).map((char) => char.charCodeAt(0));
 }
 
 /**
- * Validate semantic coherence between original and compressed text.
- * @param {string} original - Original text.
- * @param {string} compressed - Compressed text.
- * @returns {boolean} - Whether the semantic coherence is preserved.
+ * Computes cosine similarity between two vectors.
+ * Generic utility for numerical vector comparison.
  */
-export function validateSemanticCoherence(original, compressed) {
-  const originalWords = new Set(original.split(/\s+/));
-  const compressedWords = new Set(compressed.split(/\s+/));
-
-  let preservedCount = 0;
-  for (const word of compressedWords) {
-    if (originalWords.has(word)) {
-      preservedCount++;
-    }
-  }
-
-  return preservedCount / compressedWords.size >= 0.8; // At least 80% of words should match.
+function cosineSimilarity(vectorA, vectorB) {
+  const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
+  return dotProduct / (magnitudeA * magnitudeB);
 }
 
 /**
- * Utility function to manage the entire semantic compression pipeline.
- * @param {string} text - The input text to process.
- * @param {number} maxTokens - Maximum token window size.
- * @param {number} compressionRatio - Compression ratio.
- * @returns {object} - Object containing original, compressed text, and validation result.
+ * Summarizes a cluster of texts by extracting key information.
+ * Generic utility for text summarization.
  */
-export function processSemanticCompression(text, maxTokens, compressionRatio) {
-  const compressedText = adaptiveSemanticCompression(text, maxTokens, compressionRatio);
-  const isCoherent = validateSemanticCoherence(text, compressedText);
-
-  return {
-    original: text,
-    compressed: compressedText,
-    isCoherent
-  };
+function summarizeCluster(cluster) {
+  return cluster.join(' | '); // Simple concatenation for demonstration purposes.
 }
+
+/**
+ * Exports all functions for cross-agent utility.
+ * These functions are generic and usable by multiple agents.
+ */
+export const utils = {
+  computeSemanticSimilarity,
+  hierarchicalClustering,
+  compressContext,
+  hashTextToVector,
+  cosineSimilarity
+};

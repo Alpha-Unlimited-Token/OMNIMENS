@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuAcceleratedMatrixEngine
- * Written: 2026-04-02T14:27:49.410Z
+ * Written: 2026-04-02T15:18:37.584Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,55 +18,36 @@
 
 // gpuAcceleratedMatrixEngine.mjs
 
-import { createHash } from 'crypto';
+import { performance } from 'perf_hooks';
 
 /**
- * Generates a unique identifier for caching purposes.
- * @param {string} input - Input string to hash.
- * @returns {string} - A unique hash identifier.
+ * Initializes a 2D matrix with given dimensions and fills it with a value.
+ * @param {number} rows - Number of rows in the matrix.
+ * @param {number} cols - Number of columns in the matrix.
+ * @param {number} fillValue - Value to fill the matrix with.
+ * @returns {Array<Array<number>>} A 2D matrix filled with the specified value.
  */
-export function generateHash(input) {
-  return createHash('sha256').update(input).digest('hex');
+export function createMatrix(rows, cols, fillValue = 0) {
+  return Array.from({ length: rows }, () => Array(cols).fill(fillValue));
 }
 
 /**
- * Initializes a WebGL-compatible GPU context for matrix operations.
- * @returns {WebGLRenderingContext | null} - The WebGL context or null if unavailable.
+ * Performs batched matrix multiplication on the CPU (fallback if GPU unavailable).
+ * @param {Array<Array<number>>} A - First matrix.
+ * @param {Array<Array<number>>} B - Second matrix.
+ * @returns {Array<Array<number>>} Result of A * B.
  */
-export function initializeGPUContext() {
-  const canvas = typeof document !== 'undefined' ? document.createElement('canvas') : null;
-  if (!canvas) return null;
-
-  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-  return gl || null;
-}
-
-/**
- * Performs matrix multiplication on the GPU using WebGL.
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {Promise<number[][]>} - The resulting matrix after multiplication.
- */
-export async function gpuMatrixMultiply(matrixA, matrixB) {
-  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
-    throw new Error('Both inputs must be 2D arrays.');
+export function multiplyMatrices(A, B) {
+  if (A[0].length !== B.length) {
+    throw new Error('Matrix dimensions do not match for multiplication.');
   }
 
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
+  const result = createMatrix(A.length, B[0].length);
 
-  if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions do not align for multiplication.');
-  }
-
-  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
-
-  for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      for (let k = 0; k < colsA; k++) {
-        result[i][j] += matrixA[i][k] * matrixB[k][j];
+  for (let i = 0; i < A.length; i++) {
+    for (let j = 0; j < B[0].length; j++) {
+      for (let k = 0; k < B.length; k++) {
+        result[i][j] += A[i][k] * B[k][j];
       }
     }
   }
@@ -75,53 +56,100 @@ export async function gpuMatrixMultiply(matrixA, matrixB) {
 }
 
 /**
- * Validates if a given 2D array is a proper matrix.
- * @param {any} matrix - The input to validate.
- * @returns {boolean} - True if valid matrix, false otherwise.
+ * Optimized sparse matrix multiplication for large sparse tensors.
+ * @param {Object} sparseA - Sparse representation of matrix A { rows, cols, values }.
+ * @param {Object} sparseB - Sparse representation of matrix B { rows, cols, values }.
+ * @returns {Object} Sparse representation of the result matrix.
  */
-export function isValidMatrix(matrix) {
-  if (!Array.isArray(matrix) || matrix.length === 0) return false;
-  const rowLength = matrix[0].length;
-  return matrix.every(row => Array.isArray(row) && row.length === rowLength);
-}
-
-/**
- * Transposes a given matrix (rows become columns and vice versa).
- * @param {number[][]} matrix - The matrix to transpose.
- * @returns {number[][]} - The transposed matrix.
- */
-export function transposeMatrix(matrix) {
-  if (!isValidMatrix(matrix)) {
-    throw new Error('Input must be a valid 2D matrix.');
+export function sparseMatrixMultiply(sparseA, sparseB) {
+  if (sparseA.cols !== sparseB.rows) {
+    throw new Error('Matrix dimensions do not match for multiplication.');
   }
 
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-  const transposed = Array.from({ length: cols }, () => Array(rows).fill(0));
+  const result = { rows: sparseA.rows, cols: sparseB.cols, values: {} };
 
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      transposed[j][i] = matrix[i][j];
+  for (const [keyA, valueA] of Object.entries(sparseA.values)) {
+    const [rowA, colA] = keyA.split(',').map(Number);
+
+    for (let colB = 0; colB < sparseB.cols; colB++) {
+      const keyB = `${colA},${colB}`;
+      if (sparseB.values[keyB] !== undefined) {
+        const resultKey = `${rowA},${colB}`;
+        result.values[resultKey] = (result.values[resultKey] || 0) + valueA * sparseB.values[keyB];
+      }
     }
   }
 
-  return transposed;
+  return result;
 }
 
 /**
- * Generates a random matrix with specified dimensions and value range.
- * @param {number} rows - Number of rows.
- * @param {number} cols - Number of columns.
- * @param {number} [min=0] - Minimum value (inclusive).
- * @param {number} [max=1] - Maximum value (exclusive).
- * @returns {number[][]} - The generated random matrix.
+ * Simulates GPU-accelerated batched matrix multiplication.
+ * @param {Array<Array<number>>} matrices - Array of matrices to multiply in sequence.
+ * @returns {Array<Array<number>>} Final result after sequential multiplication.
  */
-export function generateRandomMatrix(rows, cols, min = 0, max = 1) {
-  if (rows <= 0 || cols <= 0 || min >= max) {
-    throw new Error('Invalid dimensions or range for random matrix generation.');
+export function gpuSimulatedBatchMultiply(matrices) {
+  if (matrices.length < 2) {
+    throw new Error('At least two matrices are required for batch multiplication.');
   }
 
-  return Array.from({ length: rows }, () =>
-    Array.from({ length: cols }, () => Math.random() * (max - min) + min)
-  );
+  let result = matrices[0];
+
+  for (let i = 1; i < matrices.length; i++) {
+    result = multiplyMatrices(result, matrices[i]);
+  }
+
+  return result;
+}
+
+/**
+ * Measures the execution time of a matrix operation.
+ * @param {Function} operation - The matrix operation to measure.
+ * @param {...any} args - Arguments to pass to the operation.
+ * @returns {Object} Execution time and result of the operation.
+ */
+export function measureExecutionTime(operation, ...args) {
+  const start = performance.now();
+  const result = operation(...args);
+  const end = performance.now();
+
+  return {
+    executionTimeMs: end - start,
+    result
+  };
+}
+
+/**
+ * Converts a dense matrix to a sparse representation.
+ * @param {Array<Array<number>>} matrix - Dense matrix.
+ * @returns {Object} Sparse representation of the matrix.
+ */
+export function denseToSparse(matrix) {
+  const sparse = { rows: matrix.length, cols: matrix[0].length, values: {} };
+
+  for (let i = 0; i < matrix.length; i++) {
+    for (let j = 0; j < matrix[i].length; j++) {
+      if (matrix[i][j] !== 0) {
+        sparse.values[`${i},${j}`] = matrix[i][j];
+      }
+    }
+  }
+
+  return sparse;
+}
+
+/**
+ * Converts a sparse matrix to a dense representation.
+ * @param {Object} sparse - Sparse representation of a matrix.
+ * @returns {Array<Array<number>>} Dense matrix.
+ */
+export function sparseToDense(sparse) {
+  const dense = createMatrix(sparse.rows, sparse.cols);
+
+  for (const [key, value] of Object.entries(sparse.values)) {
+    const [row, col] = key.split(',').map(Number);
+    dense[row][col] = value;
+  }
+
+  return dense;
 }

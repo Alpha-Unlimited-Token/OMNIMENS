@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorCache
- * Written: 2026-04-01T22:10:50.413Z
+ * Written: 2026-04-02T15:12:41.639Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,64 +16,96 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// inMemoryVectorCache.mjs
+// Complete ES module code here
 
-import { createHash } from 'crypto';
+import { performance } from 'node:perf_hooks';
 
-// Utility function to calculate cosine similarity between two vectors
+/**
+ * inMemoryVectorCache: A fast, in-memory vector store with LRU eviction for caching embeddings.
+ */
+
+// Helper function to calculate cosine similarity between two vectors
 export function cosineSimilarity(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must have the same dimensions');
+    throw new Error('Vectors must be of the same length.');
   }
-  const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
-  const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a ** 2, 0));
-  const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b ** 2, 0));
+
+  const dotProduct = vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
+
+  if (magnitudeA === 0 || magnitudeB === 0) {
+    return 0; // Avoid division by zero
+  }
+
   return dotProduct / (magnitudeA * magnitudeB);
 }
 
-// Hash function for unique vector keys
-export function generateVectorKey(vector) {
-  const hash = createHash('sha256');
-  hash.update(JSON.stringify(vector));
-  return hash.digest('hex');
-}
-
-// In-memory vector store
-const vectorStore = new Map();
-
-// Add a vector to the store
-export function addVector(key, vector) {
-  if (!Array.isArray(vector) || vector.some(isNaN)) {
-    throw new Error('Vector must be an array of numbers');
+// LRU Cache Implementation
+export class InMemoryVectorCache {
+  constructor(maxSize = 100) {
+    this.maxSize = maxSize;
+    this.cache = new Map(); // JavaScript Map to store embeddings
   }
-  vectorStore.set(key, vector);
-}
 
-// Retrieve a vector by key
-export function getVector(key) {
-  return vectorStore.get(key) || null;
-}
+  // Add a vector to the cache
+  add(key, vector) {
+    if (this.cache.has(key)) {
+      this.cache.delete(key); // Remove existing entry to update its position
+    }
 
-// Find the nearest vector(s) to a given query vector
-export function findNearestVectors(queryVector, maxResults = 5) {
-  if (!Array.isArray(queryVector) || queryVector.some(isNaN)) {
-    throw new Error('Query vector must be an array of numbers');
+    this.cache.set(key, vector);
+
+    if (this.cache.size > this.maxSize) {
+      const oldestKey = this.cache.keys().next().value; // Get the oldest key
+      this.cache.delete(oldestKey); // Evict the least recently used item
+    }
   }
-  const similarities = [];
-  for (const [key, vector] of vectorStore.entries()) {
-    const similarity = cosineSimilarity(queryVector, vector);
-    similarities.push({ key, similarity });
+
+  // Retrieve a vector from the cache
+  get(key) {
+    if (!this.cache.has(key)) {
+      return null; // Key not found
+    }
+
+    const value = this.cache.get(key);
+    this.cache.delete(key); // Remove and re-add to update its position
+    this.cache.set(key, value);
+    return value;
   }
-  similarities.sort((a, b) => b.similarity - a.similarity);
-  return similarities.slice(0, maxResults);
+
+  // Check if a key exists in the cache
+  has(key) {
+    return this.cache.has(key);
+  }
+
+  // Remove a specific key from the cache
+  remove(key) {
+    this.cache.delete(key);
+  }
+
+  // Clear the entire cache
+  clear() {
+    this.cache.clear();
+  }
+
+  // Get all keys currently in the cache
+  keys() {
+    return Array.from(this.cache.keys());
+  }
 }
 
-// Clear all vectors from the store
-export function clearVectorStore() {
-  vectorStore.clear();
+// Utility function to measure execution time of a callback
+export function measureExecutionTime(callback) {
+  const start = performance.now();
+  const result = callback();
+  const end = performance.now();
+  return { result, timeTaken: end - start };
 }
 
-// Exported for introspection or debugging
-export function getAllVectors() {
-  return Array.from(vectorStore.entries());
-}
+// Example usage:
+// const cache = new InMemoryVectorCache(3);
+// cache.add('key1', [0.1, 0.2, 0.3]);
+// cache.add('key2', [0.4, 0.5, 0.6]);
+// console.log(cache.get('key1')); // [0.1, 0.2, 0.3]
+// console.log(cosineSimilarity([1, 0, 0], [0, 1, 0])); // 0

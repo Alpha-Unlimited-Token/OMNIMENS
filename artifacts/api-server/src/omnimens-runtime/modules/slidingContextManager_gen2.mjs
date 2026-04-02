@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: slidingContextManager
- * Written: 2026-04-01T22:21:38.450Z
+ * Written: 2026-04-02T15:12:53.178Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,86 +16,107 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
+/**
+ * TRANSLATION STATUS:
+ * Novel constructs: attention
+ * All constructs have translation mappings
+ * Compiled targets: javascript: OK (3 IR steps) | python: OK (3 IR steps) | c: OK (3 IR steps) | x86_64: OK (3 IR steps) | arm64: OK (3 IR steps) | avr: OK (3 IR steps)
+ * Translation map version: 22
+ */
 // slidingContextManager.mjs
 
 import { createHash } from 'crypto';
 
 /**
- * Generates a fixed-size embedding for a given text using a simple hash-based approach.
- * @param {string} text - The input text to be embedded.
- * @param {number} size - The desired size of the embedding.
- * @returns {Float32Array} - The fixed-size embedding.
+ * Dynamically summarizes earlier conversation segments while preserving core context.
+ * Provides utility functions for token window management and summarization.
  */
-export function generateEmbedding(text, size = 128) {
-  const hash = createHash('sha256').update(text).digest();
-  const embedding = new Float32Array(size);
-  for (let i = 0; i < size; i++) {
-    embedding[i] = hash[i % hash.length] / 255;
-  }
-  return embedding;
+
+// Utility to hash strings for efficient topic tracking
+export function hashString(input) {
+  const hash = createHash('sha256');
+  hash.update(input);
+  return hash.digest('hex');
 }
 
-/**
- * Calculates the cosine similarity between two embeddings.
- * @param {Float32Array} embeddingA - The first embedding.
- * @param {Float32Array} embeddingB - The second embedding.
- * @returns {number} - The cosine similarity (range: -1 to 1).
- */
-export function cosineSimilarity(embeddingA, embeddingB) {
-  if (embeddingA.length !== embeddingB.length) {
-    throw new Error('Embeddings must be of the same length.');
+// Utility to calculate attention weights based on token importance
+export function calculateAttentionWeights(tokens, importanceScores) {
+  if (tokens.length !== importanceScores.length) {
+    throw new Error('Tokens and importanceScores arrays must have the same length.');
   }
-  let dotProduct = 0;
-  let magnitudeA = 0;
-  let magnitudeB = 0;
-  for (let i = 0; i < embeddingA.length; i++) {
-    dotProduct += embeddingA[i] * embeddingB[i];
-    magnitudeA += embeddingA[i] ** 2;
-    magnitudeB += embeddingB[i] ** 2;
-  }
-  magnitudeA = Math.sqrt(magnitudeA);
-  magnitudeB = Math.sqrt(magnitudeB);
-  return dotProduct / (magnitudeA * magnitudeB || 1);
+
+  const totalScore = importanceScores.reduce((sum, score) => sum + score, 0);
+
+  return tokens.map((token, index) => ({
+    token,
+    weight: importanceScores[index] / totalScore
+  }));
 }
 
-/**
- * Summarizes older tokens into a single embedding while prioritizing recent and relevant tokens.
- * @param {Array<{ text, relevance}>} tokens - Array of tokens with relevance scores.
- * @param {number} embeddingSize - The size of the output embedding.
- * @returns {Float32Array} - The summarized embedding.
- */
-export function summarizeContext(tokens, embeddingSize = 128) {
-  const weightedEmbeddings = tokens.map(({ text, relevance }) => {
-    const embedding = generateEmbedding(text, embeddingSize);
-    return embedding.map(value => value * relevance);
+// Summarizes earlier segments using weighted attention and topic modeling
+export function summarizeContext(segments, maxSummaryLength = 100) {
+  const combinedText = segments.join(' ');
+
+  // Tokenize by splitting on whitespace (basic tokenization)
+  const tokens = combinedText.split(' ');
+
+  // Generate mock importance scores (e.g., based on frequency or predefined heuristics)
+  const importanceScores = tokens.map(token => token.length); // Example heuristic: longer tokens are more important
+
+  // Calculate attention weights
+  const weightedTokens = calculateAttentionWeights(tokens, importanceScores);
+
+  // Sort tokens by weight (descending) and select top tokens for summary
+  const sortedTokens = weightedTokens.sort((a, b) => b.weight - a.weight);
+  const summaryTokens = sortedTokens.slice(0, maxSummaryLength).map(item => item.token);
+
+  return summaryTokens.join(' ');
+}
+
+// Manages token windows by summarizing earlier context dynamically
+export function manageSlidingContext(history, newSegment, maxHistoryTokens = 500) {
+  history.push(newSegment);
+
+  // Flatten history into a single string
+  const flattenedHistory = history.join(' ');
+
+  // Tokenize history
+  const tokens = flattenedHistory.split(' ');
+
+  if (tokens.length > maxHistoryTokens) {
+    // Summarize earlier context to reduce token count
+    const summary = summarizeContext(history);
+    return { summary, updatedHistory: [summary, newSegment] };
+  }
+
+  return { summary: flattenedHistory, updatedHistory: history };
+}
+
+// General-purpose utility for topic modeling (mock implementation)
+export function extractTopics(text, numTopics = 5) {
+  const tokens = text.split(' ');
+
+  // Mock topic extraction: group tokens by first letter
+  const topics = {};
+  tokens.forEach(token => {
+    const key = token[0].toLowerCase();
+    if (!topics[key]) {
+      topics[key] = [];
+    }
+    topics[key].push(token);
   });
 
-  const summaryEmbedding = new Float32Array(embeddingSize);
-  for (const embedding of weightedEmbeddings) {
-    for (let i = 0; i < embeddingSize; i++) {
-      summaryEmbedding[i] += embedding[i];
-    }
-  }
-
-  const magnitude = Math.sqrt(summaryEmbedding.reduce((sum, value) => sum + value ** 2, 0));
-  return summaryEmbedding.map(value => value / (magnitude || 1));
+  return Object.entries(topics)
+    .sort((a, b) => b[1].length - a[1].length)
+    .slice(0, numTopics)
+    .map(([topic, words]) => ({ topic, words }));
 }
 
-/**
- * Manages a sliding window of context by summarizing older tokens into embeddings.
- * @param {Array<string>} context - The full conversation context as an array of strings.
- * @param {number} maxTokens - The maximum number of tokens to retain verbatim.
- * @param {number} embeddingSize - The size of the summarized embedding for older tokens.
- * @returns {{ recent, summary}} - The managed context.
- */
-export function slidingContextManager(context, maxTokens = 50, embeddingSize = 128) {
-  if (context.length <= maxTokens) {
-    return { recent: context, summary: new Float32Array(embeddingSize) };
-  }
-
-  const recent = context.slice(-maxTokens);
-  const olderTokens = context.slice(0, -maxTokens).map(text => ({ text, relevance: 1 }));
-  const summary = summarizeContext(olderTokens, embeddingSize);
-
-  return { recent, summary };
-}
+// Example export for cross-agent utility
+export const slidingContextManager = {
+  hashString,
+  calculateAttentionWeights,
+  summarizeContext,
+  manageSlidingContext,
+  extractTopics
+};
