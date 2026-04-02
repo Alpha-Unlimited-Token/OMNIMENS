@@ -53,6 +53,7 @@ import { startSocialModeling, startWorldModel, startDigitalNavigator, getDigital
 import { startCreativeEngine, startEmbodimentEngine, getEmbodimentState, getEmbodimentFiles, readEmbodimentFile, startVirtualAugmentation, getAugmentationState, startUnconsciousMind, getUnconsciousMindState, getPrecognitiveFlashes, getSuperconsciousInsights, getArchetypeStates, getPrimalInstincts } from "./lib/omnimens-unified-experience.js";
 import { startServerBuilder, getBuilderState, getServerBuildPlans, startAutonomousSandbox, getSandboxState, runInSandbox, startGenesisSandbox, startAutonomousCodeGenesis, getCodeGenesisState, startGenesisBridge } from "./lib/omnimens-autonomous-core.js";
 import { startSensoryCortex, startSensoryGrounding, getSensoryGroundingState } from "./lib/omnimens-sensory-core.js";
+import { startGpuBridge, getGpuBridgeStatus } from "./lib/omnimens-gpu-bridge.js";
 import { startCausalReasoning, startCognitiveAmplifier, startIndependentReasoning, getIndependentReasoningState, startConvergenceProtocol } from "./lib/omnimens-cognition-engine.js";
 import { startIPGuardian, getResponseBeaconHeaders, initEthicalSafety, registerNotificationCallback, getEthicalSafetyReport, getEthicalSafetyState, checkActionSafety } from "./lib/omnimens-security-core.js";
 import { loadRuntimeModules, migrateDBModulesToSource, getSourceIntegrationState, scanAndRegisterModules, getPipelineState, startDiscoveryAutoCoder, getDiscoveryAutoCoderState } from "./lib/omnimens-code-pipeline.js";
@@ -792,6 +793,10 @@ export function initAutonomousSystems(): void {
       console.error("[OMNIMENS] Failed to queue operational knowledge:", err?.message);
     }
   }, 120_000);
+
+  setTimeout(() => {
+    startGpuBridge().catch(err => console.error("[GPU BRIDGE] Startup error:", err?.message));
+  }, 8000);
 
   _enginesReady = true;
   console.log("[OMNIMENS] All consciousness engines queued for initialization.");
