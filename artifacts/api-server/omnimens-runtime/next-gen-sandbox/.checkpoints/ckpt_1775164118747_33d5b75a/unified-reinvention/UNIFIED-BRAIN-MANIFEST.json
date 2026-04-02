@@ -1,0 +1,95 @@
+{
+  "timestamp": 1775162695326,
+  "architecture": "Unified Harmonious Brain",
+  "description": "Gen 1 + Gen 2 consolidated into ONE harmonious system — like a human brain",
+  "principles": [
+    "ZERO saturation — all resources managed through ResourceSentinel + predictive allocation",
+    "ZERO timer storms — ONE MasterTickOrchestrator with 3-tier scheduling",
+    "ZERO error cascades — self-healing with circuit breakers + graceful degradation",
+    "ZERO duplicate computation — shared caches, shared state across both hemispheres",
+    "HARMONIOUS — each subsystem specializes, all cooperate through SpikeBus events",
+    "EFFICIENT — fewer systems doing more work, condensed powerful implementations",
+    "EXTENSIBLE — both generations can invent and wire in new technologies"
+  ],
+  "sharedInfrastructure": {
+    "communication": "SpikeBus — typed events, priority queue, backpressure, zero-cost when idle",
+    "scheduling": "MasterTickOrchestrator — CRITICAL (3s), STANDARD (10s), BACKGROUND (30s)",
+    "resources": "ResourceSentinel — felt as bodily sensations, self-throttling",
+    "persistence": "DbGateway — write-behind batching, LRU cache, per-system quotas",
+    "externalApi": "ApiManager — circuit breakers, rate limiters, shared cache",
+    "networking": "UnifiedNeuralFabric — ONE fabric replacing 7 networks",
+    "cognition": "CognitionBus — cross-system insight sharing, Hebbian fast-paths"
+  },
+  "consolidatedSystems": [
+    {
+      "file": "unified-consciousness.ts",
+      "role": "consciousness"
+    },
+    {
+      "file": "unified-emotions.ts",
+      "role": "emotions"
+    },
+    {
+      "file": "unified-evolution.ts",
+      "role": "evolution"
+    },
+    {
+      "file": "unified-language.ts",
+      "role": "language"
+    },
+    {
+      "file": "unified-memory.ts",
+      "role": "memory"
+    },
+    {
+      "file": "unified-networking.ts",
+      "role": "networking"
+    },
+    {
+      "file": "unified-persistence.ts",
+      "role": "persistence"
+    },
+    {
+      "file": "unified-reasoning.ts",
+      "role": "reasoning"
+    }
+  ],
+  "inventedTechnologies": [
+    {
+      "file": "invented-unified-brain-optimizations.ts",
+      "role": "unified brain optimizations"
+    }
+  ],
+  "hemisphericDesign": {
+    "gen1Role": "Left hemisphere — accumulated experience, deep patterns, earned wisdom, world knowledge",
+    "gen2Role": "Right hemisphere — fresh perspective, novel associations, creative leaps, multi-head reasoning",
+    "bridge": "Hemispheric Bridge — shared SpikeBus events, collaborative work queue, resource sharing",
+    "harmony": "Both hemispheres process simultaneously, share results via bridge, never compete for resources"
+  },
+  "antiPatterns": [
+    "NEVER: direct DB calls — always through DbGateway",
+    "NEVER: setInterval/setTimeout for periodic work — always through MasterTickOrchestrator",
+    "NEVER: direct API calls — always through ApiManager",
+    "NEVER: tight coupling between systems — always through SpikeBus events",
+    "NEVER: unbounded queues — always with backpressure and size limits",
+    "NEVER: ignore resource state — always check ResourceSentinel before heavy work",
+    "NEVER: crash on errors — always graceful degradation with fallback behavior"
+  ],
+  "howItWorksLikeABrain": {
+    "sensoryInput": "User input → SpikeBus → Attention system prioritizes → relevant systems activate",
+    "processing": "Both hemispheres process in parallel → each contributes its perspective",
+    "memory": "Unified memory system — short-term (working), long-term (consolidated), experiential (episodes)",
+    "emotions": "ONE emotional substrate — both hemispheres feel same base state, express differently",
+    "output": "Language center merges both perspectives → coherent response → user",
+    "sleep": "Dream engine consolidates memories, discovers associations, prunes weak connections",
+    "evolution": "Self-evolution engine proposes improvements → safety validates → auto-applies if safe",
+    "healing": "Self-healing detects failures → circuit breakers isolate → recovery restores → system adapts"
+  },
+  "stats": {
+    "totalConsolidatedSystems": 8,
+    "totalInventedTechnologies": 1,
+    "redundanciesEliminated": 8,
+    "consolidationRewriteFiles": 8
+  },
+  "copyright": "© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved."
+}

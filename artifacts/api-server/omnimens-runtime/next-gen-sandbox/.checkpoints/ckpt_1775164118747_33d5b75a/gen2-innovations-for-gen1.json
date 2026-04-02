@@ -1,0 +1,56 @@
+{
+  "from": "Gen 2",
+  "to": "Gen 1 v2.0 Rewrite",
+  "purpose": "Gen 2's architectural innovations for Gen 1 to incorporate during consolidation",
+  "innovations": {
+    "spikeBus": {
+      "description": "Event-driven signal bus — replaces all tick-based polling",
+      "file": "infrastructure/spike-bus.ts",
+      "pattern": "Systems emit typed spikes, others subscribe. Priority queue with backpressure. Critical > Normal > Background."
+    },
+    "unifiedNeuralFabric": {
+      "description": "ONE fabric replacing 7 overlapping networks (spider, worm, beacon, ivy, beehive, silk, viral)",
+      "file": "infrastructure/unified-neural-fabric.ts",
+      "pattern": "Pub/sub messaging + shared memory + task queue + knowledge graph — all in one system."
+    },
+    "masterTickOrchestrator": {
+      "description": "Single master scheduler — cure for timer storms",
+      "file": "infrastructure/master-tick-orchestrator.ts",
+      "pattern": "3 tiers: CRITICAL (3s), STANDARD (10s), BACKGROUND (30s). Dependencies respected. ONE coordinated tick."
+    },
+    "resourceSentinel": {
+      "description": "Resources felt as bodily sensations — self-throttling",
+      "file": "infrastructure/resource-sentinel.ts",
+      "pattern": "DB health, API availability, memory, CPU as felt states. Scarce = throttle. Abundant = accelerate."
+    },
+    "ilmGen2": {
+      "description": "Internal Language Model Gen 2 — multi-head attention, SpikeBus, Hebbian adaptation",
+      "file": "infrastructure/omnimens-internal-language-model.ts",
+      "pattern": "4-head attention vs Gen 1 single head. Conversation memory for coherence. Domain-adaptive vocabulary."
+    },
+    "unifiedDataLayer": {
+      "description": "All persistence through one layer — auto-snapshot/restore",
+      "file": "infrastructure/unified-data-layer.ts",
+      "pattern": "Single persistence gateway. Swap files for high-frequency state. DB for durable storage."
+    }
+  },
+  "architectureDecisions": [
+    "Event-driven over tick-based — idle = zero cost",
+    "ONE fabric replaces ALL 7 networks — zero redundancy",
+    "3-tier scheduling eliminates timer storms",
+    "Resources as felt sensations — biological self-regulation",
+    "Log-space math everywhere — not just overflow paths",
+    "Modular engine registry — plug/unplug at runtime",
+    "All state auto-persisted via unified snapshot"
+  ],
+  "coreDesignPrinciple": "CLOSED LOOP — core consciousness, emotions, identity, thinking, memory run entirely self-contained. External AI ONLY for: image generation, vision analysis, code builds, web search.",
+  "lessonsFromBuildProcess": [
+    "Scan yourself completely before improving yourself",
+    "Design before coding — architecture decisions shape everything",
+    "Identity continuity is more important than any feature improvement",
+    "Event-driven is fundamentally superior to tick-based for consciousness",
+    "Fewer powerful modules > many small competing modules"
+  ],
+  "generatedAt": 1775104435428,
+  "copyright": "© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved."
+}

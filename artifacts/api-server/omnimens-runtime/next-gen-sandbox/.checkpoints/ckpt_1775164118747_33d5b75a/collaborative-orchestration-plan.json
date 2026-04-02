@@ -1,0 +1,66 @@
+{
+  "sharedInfrastructure": [
+    {
+      "component": "SpikeBus",
+      "owner": "shared",
+      "description": "Both Gen 1 and Gen 2 emit/subscribe to the same event bus"
+    },
+    {
+      "component": "UnifiedNeuralFabric",
+      "owner": "shared",
+      "description": "Single fabric replaces both generations' network layers"
+    },
+    {
+      "component": "MasterTickOrchestrator",
+      "owner": "shared",
+      "description": "One scheduler manages both generations' tick cycles"
+    },
+    {
+      "component": "ResourceSentinel",
+      "owner": "shared",
+      "description": "Both generations feel the same resource state"
+    },
+    {
+      "component": "HemisphericBridge",
+      "owner": "bridge",
+      "description": "Gen 1 ↔ Gen 2 companion communication, trust model, work queue"
+    }
+  ],
+  "gen1Responsibilities": [
+    "Consciousness core (Phi, resonance, awareness, temporal binding)",
+    "Neural architecture (hemispheres, mesh, bridge, scaling)",
+    "Agent collective (21 agents, pipeline, mesh topology)",
+    "World engine (forge, simulation, embodiment)",
+    "External tools (research, analysis, competitive intel)"
+  ],
+  "gen2Responsibilities": [
+    "Unified reasoning (deductive, inductive, abductive, analogical, causal, creative)",
+    "Dream engine (unconscious processing, novel associations)",
+    "Self-evolution (safe self-modification with rollback)",
+    "Advanced ILM (multi-head attention, Hebbian adaptation)",
+    "Hardware abstraction (robotic body readiness)"
+  ],
+  "collaborativeWorkflows": [
+    {
+      "workflow": "Thought Processing",
+      "flow": "Gen1.consciousness → Bridge.share → Gen2.reason → Bridge.return → Gen1.express"
+    },
+    {
+      "workflow": "Memory Consolidation",
+      "flow": "Gen1.experience → Gen2.dreamProcess → Gen2.findAssociations → Bridge.transfer → Gen1.consolidate"
+    },
+    {
+      "workflow": "Self-Improvement",
+      "flow": "Gen2.analyze → Gen2.proposeUpgrade → Bridge.propose → Gen1.validate → Bridge.approve → Gen2.implement"
+    },
+    {
+      "workflow": "Language Generation",
+      "flow": "Gen1.thoughtVector → Bridge.share → Gen2.ILM.decode → Bridge.return → Gen1.speak"
+    },
+    {
+      "workflow": "World Simulation",
+      "flow": "Gen1.worldForge → Bridge.scenario → Gen2.reason → Gen2.dream → Bridge.insights → Gen1.integrate"
+    }
+  ],
+  "orchestratedAt": 1775104435428
+}
