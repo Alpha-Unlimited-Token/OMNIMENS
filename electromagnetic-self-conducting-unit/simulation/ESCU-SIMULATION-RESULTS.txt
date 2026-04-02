@@ -1,48 +1,64 @@
-╔═══════════════════════════════════════════════════════════════════════╗
-║  ESCU SIMULATION v5 — EMBEDDED CONDUCTOR COUPLING                   ║
-║  Variable Magnets + 37° Angles + Inter-Layer Current Interaction     ║
-║  © 2024-2026 Alpha Unlimited Technologies, LLC                      ║
-╚═══════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════╗
+║  ESCU SIMULATION v6 — FULL MAGNETIC CONFINEMENT MODEL                  ║
+║  Top + Bottom + Left + Right + Shell: All pushing on mercury            ║
+║  © 2024-2026 Alpha Unlimited Technologies, LLC                         ║
+╚══════════════════════════════════════════════════════════════════════════╝
 
 ═══ LAYER CONFIGURATION ═══
 
-  Layer | Magnets | Rotation | Inner | Outer | Arc/Magnet
-  ──────┼─────────┼──────────┼───────┼───────┼──────────
-  Layer 1 |   16    |   CW    |   S   |   N   | 29.5mm
-  Layer 2 |   18    |   CCW    |   N   |   S   | 26.2mm
-  Layer 3 |   12    |   CW    |   S   |   N   | 39.3mm
-  Layer 4 |   22    |   CCW    |   N   |   S   | 21.4mm
-  Layer 5 |   16    |   CW    |   S   |   N   | 29.5mm
+  Layer   | Mags | Rot | Inner | Outer | Arc/Mag
+  ────────┼──────┼─────┼───────┼───────┼────────
+  Layer 1 |  16  |  CW |   S   |   N   | 29.5mm
+  Layer 2 |  18  | CCW |   N   |   S   | 26.2mm
+  Layer 3 |  12  |  CW |   S   |   N   | 39.3mm
+  Layer 4 |  22  | CCW |   N   |   S   | 21.4mm
+  Layer 5 |  16  |  CW |   S   |   N   | 29.5mm
 
-  INTER-LAYER INTERACTIONS:
-  Gap 1: L1(16CW) ↔ L2(18CCW) | COUNTER-rotate | N↔N REPEL (levitates) | Vernier Δ=2 GCD=2
-  Gap 2: L2(18CCW) ↔ L3(12CW) | COUNTER-rotate | S↔S REPEL (levitates) | Vernier Δ=6 GCD=6
-  Gap 3: L3(12CW) ↔ L4(22CCW) | COUNTER-rotate | N↔N REPEL (levitates) | Vernier Δ=10 GCD=2
-  Gap 4: L4(22CCW) ↔ L5(16CW) | COUNTER-rotate | S↔S REPEL (levitates) | Vernier Δ=6 GCD=2
+  GAP INTERACTIONS (same polarity = REPEL = pushes mercury):
+  Gap 1: L1(N) ↔ L2(N) → REPEL ✓ (mercury pushed) | 16 vs 18 magnets | Counter-rotating
+  Gap 2: L2(S) ↔ L3(S) → REPEL ✓ (mercury pushed) | 18 vs 12 magnets | Counter-rotating
+  Gap 3: L3(N) ↔ L4(N) → REPEL ✓ (mercury pushed) | 12 vs 22 magnets | Counter-rotating
+  Gap 4: L4(S) ↔ L5(S) → REPEL ✓ (mercury pushed) | 22 vs 16 magnets | Counter-rotating
 
-═══ EMBEDDED CONDUCTOR MECHANISM ═══
+═══ MAGNETIC CONFINEMENT PRESSURE ═══
 
-  How the tungsten strips embedded in each disc work:
+  The mercury in each gap is squeezed from ALL directions:
 
-  1. INDUCTION: As Layer 1 (CW) passes Layer 2 (CCW),
-     each tungsten strip on Layer 1 sweeps through Layer 2's B field.
-     EMF is induced in each strip: EMF = B × v_relative × strip_length
+  TOP:     Layer above, same polarity face → REPELS downward
+           B = 0.85T → Pressure = 287.5 kPa = 2.84 atm
 
-  2. CURRENT FLOW: The induced EMF drives current THROUGH the mercury
-     gap between layers. Mercury completes the electrical circuit.
-     Path: Strip(L1) → Mercury(gap) → Strip(L2) → return via mercury
+  BOTTOM:  Layer below, same polarity face → REPELS upward
+           B = 0.85T → Pressure = 287.5 kPa = 2.84 atm
 
-  3. LORENTZ FORCE: That current flowing through mercury is moving
-     charge in a magnetic field. F = I × L × B pushes the mercury.
+  RIGHT (outer): Shell magnets → push INWARD
+           B at disc edge = 0.6T → Pressure = 143.2 kPa = 1.41 atm
 
-  4. PATTERN DESIGN: The intricate strip layout is angled/curved so
-     the current paths produce Lorentz force IN the rotation direction.
-     This is the same principle as an electric motor's windings —
-     the pattern converts electrical energy back into rotational force.
+  LEFT (inner): Lower B near shaft → pressure gradient pushes inward
+           Creates radial confinement gradient
 
-  5. SELF-REINFORCING LOOP:
-     Faster spin → more EMF → more current → more Lorentz force → ...
-     QUESTION: Does this loop gain energy or just recirculate?
+  TOTAL CONFINEMENT: Mercury under ~7.1 atm magnetic pressure
+  Mercury is TRAPPED and COMPRESSED by magnetic fields on all sides.
+
+  DYNAMIC EFFECT — MAGNETIC PERISTALTIC PUMP:
+  As layers counter-rotate with different magnet counts,
+  the repulsion pressure PEAKS and VALLEYS move around the ring.
+  Different counts mean pressure peaks from top and bottom DON'T align.
+  This creates a TRAVELLING PRESSURE WAVE — like a peristaltic pump.
+  The mercury flows from high-pressure to low-pressure zones,
+  creating rotational flow. The shell pushing from the sides ADDS
+  to this by creating a shear force at the rim.
+
+═══ MAGNETIC CONFINEMENT DRIVE vs RPM ═══
+
+  RPM   | Peristaltic τ  | Peristaltic P | Shell Shear P | TOTAL Drive
+  ──────┼────────────────┼───────────────┼───────────────┼────────────
+    500 |      2516.04W |     2516.04W |      365.24W |    2881.29W
+    882 |      4438.30W |     4438.30W |      644.29W |    5082.59W
+   1000 |      5032.09W |     5032.09W |      730.48W |    5762.57W
+   2000 |     10064.18W |    10064.18W |     1460.97W |   11525.14W
+   3000 |     15096.27W |    15096.27W |     2191.45W |   17287.72W
+   5000 |     25160.44W |    25160.44W |     3652.42W |   28812.86W
+  10000 |     50320.89W |    50320.89W |     7304.83W |   57625.72W
 
 ═══ UNIT SPECS ═══
 
@@ -51,114 +67,74 @@
   Total height:     142mm
   Mercury:          555 mL, 7.52 kg
   Total mass:       15.93 kg
-  B field (gap):    0.85 T
   Internal R:       0.4470 mΩ
-  Per-gap circuit R: 0.1613 mΩ
-  Pattern efficiency: 40%
   Body load:        2938W
 
-═══ EMBEDDED CONDUCTOR COUPLING vs RPM ═══
+╔══════════════════════════════════════════════════════════════════════════╗
+║  TIME SIMULATION — 5 MINUTES                                           ║
+╚══════════════════════════════════════════════════════════════════════════╝
 
-  RPM   | v_rel m/s | EMF/strip | I_gap    | Lorentz τ  | Lorentz P | Ohmic Loss | Induced B
-  ──────┼──────────┼───────────┼──────────┼────────────┼───────────┼────────────┼─────────
-    500 |    7.854 |   0.40055V | 2484.0A | 16590.706 mNm |    868.69W |  7075.28W  | 883.189mT
-    882 |   13.854 |   0.70658V | 4381.7A | 29266.005 mNm |   2703.09W | 22016.12W  | 1557.945mT
-   1000 |   15.708 |   0.80111V | 4967.9A | 33181.411 mNm |   3474.75W | 28301.13W  | 1766.378mT
-   2000 |   31.416 |   1.60221V | 9935.9A | 66362.822 mNm |  13899.00W | 113204.50W  | 3532.756mT
-   3000 |   47.124 |   2.40332V | 14903.8A | 99544.233 mNm |  31272.74W | 254710.13W  | 5299.134mT
-   5000 |   78.540 |   4.00553V | 24839.7A | 165907.055 mNm |  86868.73W | 707528.13W  | 8831.890mT
-  10000 |  157.080 |   8.01106V | 49679.4A | 331814.110 mNm | 347474.92W | 2830112.50W  | 17663.780mT
+  Time | Status  |   RPM   | EMF V  | GenPow W | Peri W | Cond W | Vern W | Shell W | TotalIn W | Losses W | Surplus W | T°C
+  ─────┼─────────┼─────────┼────────┼──────────┼────────┼────────┼────────┼─────────┼───────────┼──────────┼───────────┼────
+     0s | KICK    |   168.8 | 0.0000 |      0.0 |    0.0 |    0.0 |    0.0 |     0.0 |     336.0 |      0.0 |   -2938.3 | 20.0
+     2s | KICK    |     0.0 | 0.8080 |    365.1 | 1508.9 |  613.6 | 1590.4 |   219.0 |    4268.0 |   5701.3 |   -2573.1 | 20.9
+     5s | KICK    |     0.0 | 0.8080 |    365.1 | 1508.9 |  613.6 | 1590.4 |   219.0 |    4268.0 |   5701.3 |   -2573.1 | 22.3
+    10s | KICK    |   299.9 | 0.4015 |     90.1 |  849.2 |  194.3 |  895.1 |   123.3 |    2397.9 |   2009.9 |   -2848.1 | 24.6
+    15s | KICK    |   168.8 | 0.0000 |      0.0 |    0.0 |    0.0 |    0.0 |     0.0 |     336.0 |      0.0 |   -2938.3 | 26.9
+    20s | KICK    |     0.0 | 0.8080 |    365.1 | 1508.9 |  613.6 | 1590.4 |   219.0 |    4268.0 |   5701.3 |   -2573.1 | 29.2
+    25s | KICK    |   299.9 | 0.4015 |     90.1 |  849.2 |  194.3 |  895.1 |   123.3 |    2397.9 |   2009.9 |   -2848.1 | 31.5
+    30s | KICK    |   168.8 | 0.0000 |      0.0 |    0.0 |    0.0 |    0.0 |     0.0 |     336.0 |      0.0 |   -2938.3 | 33.7
+    31s | COAST   |   128.0 | 0.6593 |    243.1 | 1282.7 |  443.4 | 1352.0 |   186.2 |    3281.4 |   3873.6 |   -2938.3 | 34.2
+    32s | COAST   |   128.0 | 0.6593 |    243.1 | 1282.7 |  443.4 | 1352.0 |   186.2 |    3281.4 |   3873.6 |   -2938.3 | 34.6
+    35s | COAST   |   128.0 | 0.6593 |    243.1 | 1282.7 |  443.4 | 1352.0 |   186.2 |    3281.4 |   3873.6 |   -2938.3 | 35.8
+    40s | COAST   |   128.0 | 0.6593 |    243.1 | 1282.7 |  443.4 | 1352.0 |   186.2 |    3281.4 |   3873.6 |   -2938.3 | 37.9
+    50s | COAST   |   128.0 | 0.6593 |    243.1 | 1282.7 |  443.4 | 1352.0 |   186.2 |    3281.4 |   3873.6 |   -2938.3 | 42.1
+    60s | COAST   |   128.0 | 0.6593 |    243.1 | 1282.7 |  443.4 | 1352.0 |   186.2 |    3281.4 |   3873.6 |   -2938.3 | 46.3
+    90s | COAST   |   128.0 | 0.6593 |    243.1 | 1282.7 |  443.4 | 1352.0 |   186.2 |    3281.4 |   3873.6 |   -2938.3 | 58.9
+   120s | COAST   |   128.0 | 0.6593 |    243.1 | 1282.7 |  443.4 | 1352.0 |   186.2 |    3281.4 |   3873.6 |   -2938.3 | 71.4
+   180s | COAST   |   128.0 | 0.6593 |    243.1 | 1282.7 |  443.4 | 1352.0 |   186.2 |    3281.4 |   3873.6 |   -2938.3 | 96.5
 
-╔═══════════════════════════════════════════════════════════════════════╗
-║  TIME SIMULATION — 5 MINUTES                                        ║
-╚═══════════════════════════════════════════════════════════════════════╝
+╔══════════════════════════════════════════════════════════════════════════╗
+║  RESULTS                                                               ║
+╚══════════════════════════════════════════════════════════════════════════╝
 
-  Time |  Status   |   RPM   | v m/s | EMF V  | GenPow W | Vernier W | Conductor W | TotalIn W | Losses W | NetAvail W | T°C
-  ─────┼───────────┼─────────┼───────┼────────┼──────────┼───────────┼─────────────┼───────────┼──────────┼────────────┼────
-     0s | KICKSTRT |   168.8 |  1.33 | 0.0000 |      0.0 |      0.00 |        0.00 |     336.0 |      0.0 |    -2938.3 | 20.0
-     2s | KICKSTRT |   168.8 |  1.33 | 0.0000 |      0.0 |      0.00 |        0.00 |     336.0 |      0.0 |    -2938.3 | 20.5
-     5s | KICKSTRT |   168.8 |  1.33 | 0.0000 |      0.0 |      0.00 |        0.00 |     336.0 |      0.0 |    -2938.3 | 21.3
-    10s | KICKSTRT |   168.8 |  1.33 | 0.0000 |      0.0 |      0.00 |        0.00 |     336.0 |      0.0 |    -2938.3 | 22.6
-    15s | KICKSTRT |   168.8 |  1.33 | 0.0000 |      0.0 |      0.00 |        0.00 |     336.0 |      0.0 |    -2938.3 | 24.0
-    20s | KICKSTRT |   168.8 |  1.33 | 0.0000 |      0.0 |      0.00 |        0.00 |     336.0 |      0.0 |    -2938.3 | 25.3
-    25s | KICKSTRT |   168.8 |  1.33 | 0.0000 |      0.0 |      0.00 |        0.00 |     336.0 |      0.0 |    -2938.3 | 26.6
-    30s | KICKSTRT |   168.8 |  1.33 | 0.0000 |      0.0 |      0.00 |        0.00 |     336.0 |      0.0 |    -2938.3 | 27.9
-    31s | STOPPED  |     0.0 |  0.00 | 0.0000 |      0.0 |      0.00 |        0.00 |       0.0 |      0.0 |    -2938.3 | 27.9
-    32s | STOPPED  |     0.0 |  0.00 | 0.0000 |      0.0 |      0.00 |        0.00 |       0.0 |      0.0 |    -2938.3 | 27.9
-    35s | STOPPED  |     0.0 |  0.00 | 0.0000 |      0.0 |      0.00 |        0.00 |       0.0 |      0.0 |    -2938.3 | 27.9
-    40s | STOPPED  |     0.0 |  0.00 | 0.0000 |      0.0 |      0.00 |        0.00 |       0.0 |      0.0 |    -2938.3 | 27.9
-    50s | STOPPED  |     0.0 |  0.00 | 0.0000 |      0.0 |      0.00 |        0.00 |       0.0 |      0.0 |    -2938.3 | 27.8
-    60s | STOPPED  |     0.0 |  0.00 | 0.0000 |      0.0 |      0.00 |        0.00 |       0.0 |      0.0 |    -2938.3 | 27.7
-    90s | STOPPED  |     0.0 |  0.00 | 0.0000 |      0.0 |      0.00 |        0.00 |       0.0 |      0.0 |    -2938.3 | 27.4
-   120s | STOPPED  |     0.0 |  0.00 | 0.0000 |      0.0 |      0.00 |        0.00 |       0.0 |      0.0 |    -2938.3 | 27.1
-   180s | STOPPED  |     0.0 |  0.00 | 0.0000 |      0.0 |      0.00 |        0.00 |       0.0 |      0.0 |    -2938.3 | 26.5
+  Peak RPM:                  299.9
+  Peak EMF:                  0.8080 V
+  Peak Gen Power:            365.14 W
+  Self-sustaining:           NO
+  Coast time:                still running
 
-╔═══════════════════════════════════════════════════════════════════════╗
-║  RESULTS                                                            ║
-╚═══════════════════════════════════════════════════════════════════════╝
+─── DRIVE MECHANISM BREAKDOWN (peak values) ───
 
-  Peak RPM:                    168.8
-  Peak EMF:                    0.5181 V
-  Peak Gen Power:              150.11 W
-  Peak Vernier Power:          895.07 W
-  Peak Conductor Coupling:     314.85 W
-  Coast time after kickstart:  2.0s
-  Self-sustaining:             NO
-  Body load:                   2938 W
-  Shortfall:                   2788.1 W
+  Peristaltic pump (vert pressure wave):  1508.90 W
+  Shell shear (radial confinement):       219.04 W
+  Vernier coupling (magnet count diff):   1590.43 W
+  Conductor Lorentz recovery:             613.58 W
+  TOTAL additional drive mechanisms:      3931.96 W
 
-╔═══════════════════════════════════════════════════════════════════════╗
-║  EMBEDDED CONDUCTOR COUPLING — HONEST PHYSICS                       ║
-╚═══════════════════════════════════════════════════════════════════════╝
+  Body load:                 2938 W
+  Peak generation:           365.14 W
+  Shortfall:                 2573.1 W
 
-  The conductor coupling is REAL and does useful work:
-  At peak: 314.85W of Lorentz force on mercury.
+╔══════════════════════════════════════════════════════════════════════════╗
+║  EVOLUTION: ORIGINAL → FULLY COUPLED                                   ║
+╚══════════════════════════════════════════════════════════════════════════╝
 
-  But here's the honest energy accounting:
-  The CURRENT driving the Lorentz force is powered by the MOTION.
-  It's a regenerative loop:
-    Mercury spins → strips cut B field → EMF → current in mercury
-    → Lorentz force on mercury → maintains spin
-
-  This loop has LOSSES at each step:
-    - Ohmic loss in tungsten strips (I²R)
-    - Ohmic loss in mercury path (I²R)
-    - The Lorentz force recovery is always LESS than the Lenz braking
-
-  What the conductor pattern DOES accomplish:
-    1. REDUCES braking — recovers ~40% of Lenz's law braking force
-    2. EXTENDS coast time — mercury spins longer after kickstart
-    3. BOOSTS effective B field — induced B adds to permanent B
-    4. IMPROVES efficiency — less energy wasted as heat
-
-  What it CANNOT do:
-    Create energy from nothing. The conductor pattern is ingenious
-    engineering, but it's recovering energy that was already in the
-    system — not adding new energy from outside.
-
-╔═══════════════════════════════════════════════════════════════════════╗
-║  ALL THREE MODIFICATIONS COMBINED                                   ║
-╚═══════════════════════════════════════════════════════════════════════╝
-
-  MODIFICATION              │ CONTRIBUTION     │ EFFECT
-  ─────────────────────────┼──────────────────┼──────────────────────
-  37° angled magnet faces   │ Asymmetric force │ Smoother rotation + small push
-  Variable counts (16/18/12/22/16) │ Vernier coupling │ 895.1W continuous drive
-  Embedded conductor pattern│ Lorentz recovery │ 314.9W recovered from braking
-  Larger disc (150mm)       │ 2.4× EMF (R²)   │ 2.4× voltage scaling
-  ─────────────────────────┼──────────────────┼──────────────────────
-  TOTAL ADDED TO ORIGINAL   │ All combined     │ +1209.9W drive + 2.4× EMF
-
-  COMPARISON:
-    Original ESCU (96mm, flat, uniform): 336W peak, 0.67V
-    Modified ESCU (150mm, angled, vernier, coupled): 150W peak, 0.52V
-    Body needs: 2938W
-
-  Still 2788W short of body load.
-  Remaining options to close the gap:
-    1. Increase disc to 300mm: 10× → 39× EMF scaling
-    2. Higher RPM kickstart (48V/40A for 60s)
-    3. Boost converter (accept low V, boost to 48V)
-    4. Supplemental energy input (solar/kinetic/thermal)
+                        │ v1 Original    │ v6 Full Model
+  ──────────────────────┼────────────────┼────────────────
+  Disc diameter         │ 96mm           │ 150mm
+  Magnet config         │ 16-16-16-16-16 │ 16-18-12-22-16
+  Magnet faces          │ Flat           │ 37° angled
+  Polarity              │ Alternating    │ Alternating (all gaps repel)
+  Conductor strips      │ Passive        │ Active coupling
+  Shell interaction     │ Static         │ Dynamic shear
+  Confinement model     │ None           │ Full 4-direction
+  Peristaltic pump      │ None           │ 1508.9W
+  Shell shear           │ None           │ 219.0W
+  Vernier               │ None           │ 1590.4W
+  Conductor coupling    │ None           │ 613.6W
+  Peak power            │ 336W           │ 365W
+  Body load             │ 2938W          │ 2938W
+  Self-sustaining       │ No             │ No
 
 © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
