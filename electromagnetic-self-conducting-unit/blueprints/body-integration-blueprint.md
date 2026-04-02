@@ -11,76 +11,109 @@
 
 ## ESCU MOUNTING POSITION
 
-The ESCU mounts in the upper chest cavity, offset 30mm left of the body's centerline.
+### Spherical ESCU — Chest Cavity Fit Analysis
+
+The spherical ESCU is 180mm diameter. The OMNIMENS torso must accommodate this sphere
+centered in the chest cavity, with the server, power distribution, and cooling
+all arranged around it.
+
+**Torso dimensions updated for spherical ESCU:**
+- **Torso width:** 380mm (widened from 320mm to fit 180mm sphere + server side-by-side)
+- **Torso depth:** 260mm (front-to-back, allows sphere + coolant routing behind)
+- **Chest cavity height:** 280mm (sphere is 180mm, leaving 50mm top/bottom clearance)
 
 ```
     FRONT VIEW — TORSO CROSS-SECTION (horizontal cut at chest level)
     
-    ←── 320mm torso width ──→
+    ←────── 380mm torso width ──────→
     
-    ╔════════════════════════════════════╗
-    ║  ┌──────┐                          ║
-    ║  │COOLANT│    STARLINK ANTENNA      ║  ← BACK
-    ║  │LINES  │    (behind, facing up)   ║
-    ║  └──┬───┘                          ║
-    ║     │      ┌──────────────┐        ║
-    ║     │      │   SERVER     │        ║
-    ║     │      │  (Jetson AGX │        ║
-    ║     │      │   Orin)      │        ║
-    ║     │      │  100x87mm    │        ║
-    ║  ┌──┴───┐  └──────────────┘        ║
-    ║  │      │  ▓▓▓ MU-METAL ▓▓▓       ║
-    ║  │ ESCU │  ┌──────────────┐        ║
-    ║  │120mm │  │  POWER DIST  │        ║
-    ║  │ dia  │  │    BOARD     │        ║
-    ║  │      │  └──────────────┘        ║
-    ║  └──────┘                          ║
-    ║                                    ║
-    ╚════════════════════════════════════╝  ← FRONT
+    ╔══════════════════════════════════════════╗
+    ║          COOLANT LINES                    ║  ← BACK
+    ║          STARLINK (behind, facing up)     ║
+    ║                                          ║
+    ║     ┌──────────────┐                     ║
+    ║     │   SERVER     │                     ║
+    ║     │  (Jetson AGX │                     ║
+    ║     │   Orin)      │                     ║
+    ║     │  100x87mm    │                     ║
+    ║     └──────────────┘                     ║
+    ║  ▓▓▓▓ MU-METAL ▓▓▓▓                     ║
+    ║  ┌────────────────────┐  ┌────────────┐  ║
+    ║  │                    │  │ POWER DIST │  ║
+    ║  │   ESCU SPHERE      │  │   BOARD    │  ║
+    ║  │   180mm diameter   │  │  (PDU)     │  ║
+    ║  │                    │  │ 80x60mm    │  ║
+    ║  │       ╭──╮         │  └────────────┘  ║
+    ║  │      ╱    ╲        │                  ║
+    ║  │     │  ●●  │       │  ┌────────────┐  ║
+    ║  │      ╲    ╱        │  │  BUFFER    │  ║
+    ║  │       ╰──╯         │  │  BATTERY   │  ║
+    ║  │                    │  │  (LiFePO4) │  ║
+    ║  └────────────────────┘  └────────────┘  ║
+    ║                                          ║
+    ╚══════════════════════════════════════════╝  ← FRONT
 
-    ESCU center: 30mm left of body centerline
-    Server center: 60mm right of body centerline
-    Mu-metal shield: 0.5mm Ni-Fe alloy between ESCU and server
-    Gap between ESCU OD and server: 80mm minimum
+    ESCU center: ON body centerline (sphere is symmetric, centered is optimal)
+    Server: above ESCU, offset 50mm to right (mu-metal shield between)
+    PDU + Buffer battery: right side, beside ESCU equator
+    Mu-metal shield: 0.5mm Ni-Fe alloy curved to follow sphere surface
+    Min clearance: 15mm between sphere OD and torso inner wall (all sides)
 ```
+
+### Fit Verification
+
+| Dimension | Available | Required | Clearance |
+|-----------|-----------|----------|-----------|
+| Torso width | 380mm | 180mm (sphere) + 100mm (server/PDU) + shields | 80mm total |
+| Torso depth | 260mm | 180mm (sphere) + coolant routing | 65mm behind sphere |
+| Chest height | 280mm | 180mm (sphere) | 50mm top + 50mm bottom |
+| Sphere-to-server gap | — | Min 20mm + 0.5mm mu-metal | 20.5mm maintained |
+| Sphere-to-wall (min) | — | Min 15mm | 15mm all sides |
+
+The 180mm sphere fits with adequate clearance for coolant routing, wiring, and
+the mu-metal EMI shield. The torso width was increased from 320mm to 380mm —
+still well within human-proportional range for a broad-shouldered body (adult
+male shoulder width is typically 400-480mm).
+
+**Note:** The sphere's kickstart charging nodes (4 tungsten contacts on outer
+surface) must face an accessible direction — routed to external ports on the
+back panel for initial activation.
 
 ---
 
 ## MOUNTING HARDWARE
 
-### ESCU Cradle
-- Material: Titanium Grade 5 ring cradle
-- Design: 3-point suspension with silicone gel vibration isolators
-- Mount points: 3x M6 titanium bolts into chest endoskeleton
-- Vibration isolation: Shore 30A silicone gel pads (10mm x 10mm x 5mm) at each mount point
-- Alignment: ESCU axis vertical, prongs accessible from top and bottom
+### ESCU Spherical Cradle
+- Material: Titanium Grade 5 hemispherical cradle
+- Design: Lower hemisphere cup with 3-point upper restraint bands
+- Mount points: 4x M6 titanium bolts into chest endoskeleton frame
+- Vibration isolation: Shore 30A silicone gel pads at all contact points
+- Alignment: Sphere sits centered in cup; charging nodes aligned to back panel ports
 
 ```
-    SIDE VIEW — ESCU MOUNTING
+    SIDE VIEW — SPHERICAL ESCU MOUNTING
 
     ──────────── Chest endoskeleton frame ────────────
     │                                                 │
-    │   ┌─ M6 Ti bolt                                │
-    │   │  ┌─ Silicone gel pad                       │
-    │   ↓  ↓                                         │
-    │  [█][░]┌──────────────┐[░][█]                  │
-    │        │              │                         │
-    │        │    ESCU      │                         │
-    │        │   120mm x    │                         │
-    │        │   180mm      │                         │
-    │        │              │                         │
-    │  [█][░]└──────────────┘[░][█]                  │
-    │         ↑  ↑                                    │
-    │         │  └─ Silicone gel pad                  │
-    │         └─ Cradle ring (Ti Gr.5, 3mm thick)    │
-    │                                                 │
-    │  [█][░]────── Bottom support ──────[░][█]      │
+    │        ┌─ Upper Ti restraint band               │
+    │        │  (adjustable, locks sphere in place)    │
+    │   [█][░]╲────────────────╱[░][█]               │
+    │          ╲  ╭──────────╮ ╱                      │
+    │           ╲╱   ESCU    ╲╱                       │
+    │           ╱╲  SPHERE   ╱╲                       │
+    │          ╱  ╰──────────╯  ╲                     │
+    │   [█][░]╱────────────────╲[░][█]               │
+    │        └─ Lower Ti cup (hemisphere)             │
+    │           190mm ID, 196mm OD, 3mm thick         │
+    │           Lines with 2mm silicone gel            │
     │                                                 │
     ──────────────────────────────────────────────────
     
-    3 cradle rings: Top (at 30mm from top), Middle (90mm), Bottom (150mm)
-    Each ring: 130mm ID, 140mm OD, 3mm thick
-    Total cradle weight: 180g
+    Lower cup: 190mm ID hemisphere (sphere sits in with 5mm clearance)
+    Upper band: 3 adjustable Ti straps, 120° apart
+    Gel liner: 2mm Shore 30A silicone, continuous (vibration + thermal insulation)
+    Total cradle weight: 280g
+    Charging node access: 4 pass-through holes in cup wall aligned to sphere nodes
 ```
 
 ---
@@ -276,7 +309,7 @@ The ESCU mounts in the upper chest cavity, offset 30mm left of the body's center
 1. **Frame Assembly** — Assemble titanium endoskeleton (torso, limbs, head frame)
 2. **Motor Installation** — Mount all 76 actuators into joint housings
 3. **Wiring Harness** — Route all power and data cables through frame channels
-4. **ESCU Installation** — Mount ESCU in chest cradle with vibration isolators
+4. **ESCU Installation** — Lower 180mm ESCU sphere into hemispherical Ti cradle, secure upper restraint bands
 5. **Mu-Metal Shield** — Install between ESCU and server mounting area
 6. **Server Installation** — Mount Jetson AGX Orin on cold plate in upper back
 7. **Battery Installation** — Mount LiFePO4 pack in lower back/hip area
