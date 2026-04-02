@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: iterativeComputationManager
- * Written: 2026-04-02T15:04:06.209Z
+ * Written: 2026-04-02T21:23:26.012Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,82 +18,103 @@
 
 // iterativeComputationManager.mjs
 
-import { writeFileSync, readFileSync, existsSync } from 'fs';
-import { resolve } from 'path';
 import { createHash } from 'crypto';
 
 /**
- * Generates a unique hash for a given input string.
- * Useful for creating unique checkpoint filenames.
- * @param {string} input - The input string to hash.
- * @returns {string} - A unique hash.
+ * Generates a unique hash for a given task state, used for checkpointing.
+ * @param {object} state - The current state of the task.
+ * @returns {string} - A unique hash representing the state.
  */
-export function generateHash(input) {
-  return createHash('sha256').update(input).digest('hex');
+export function generateStateHash(state) {
+  const hash = createHash('sha256');
+  hash.update(JSON.stringify(state));
+  return hash.digest('hex');
 }
 
 /**
- * Saves the state of a computation to a checkpoint file.
- * @param {string} checkpointId - Unique identifier for the computation.
- * @param {object} state - The state to save.
+ * Breaks a computation into smaller tasks and manages their execution.
+ * @param {Array<Function>} tasks - Array of functions representing subtasks.
+ * @param {object} initialState - Initial state for the computation.
+ * @param {Function} checkpointCallback - Function to handle saving progress.
+ * @returns {Promise<object>} - Resolves with the final state after all tasks complete.
  */
-export function saveCheckpoint(checkpointId, state) {
-  const filePath = resolve(`./${checkpointId}.json`);
-  writeFileSync(filePath, JSON.stringify(state, null, 2), 'utf-8');
-}
+export async function manageComputation(tasks, initialState, checkpointCallback) {
+  let state = { ...initialState, completedTasks: [] };
 
-/**
- * Restores the state of a computation from a checkpoint file.
- * @param {string} checkpointId - Unique identifier for the computation.
- * @returns {object|null} - The restored state, or null if no checkpoint exists.
- */
-export function loadCheckpoint(checkpointId) {
-  const filePath = resolve(`./${checkpointId}.json`);
-  if (existsSync(filePath)) {
-    const fileContent = readFileSync(filePath, 'utf-8');
-    return JSON.parse(fileContent);
-  }
-  return null;
-}
+  for (let i = 0; i < tasks.length; i++) {
+    if (state.completedTasks.includes(i)) continue; // Skip already completed tasks
 
-/**
- * Executes a long-running computation with checkpointing.
- * Automatically saves and restores intermediate states.
- * @param {string} checkpointId - Unique identifier for the computation.
- * @param {function} computeStep - Function that performs a single computation step.
- * @param {function} isComplete - Function that checks if the computation is complete.
- * @param {object} initialState - Initial state of the computation.
- * @returns {object} - Final state of the computation.
- */
-export async function runWithCheckpointing(checkpointId, computeStep, isComplete, initialState) {
-  let state = loadCheckpoint(checkpointId) || initialState;
+    try {
+      const result = await tasks[i](state);
+      state = { ...state, ...result };
+      state.completedTasks.push(i);
 
-  while (!isComplete(state)) {
-    state = await computeStep(state);
-    saveCheckpoint(checkpointId, state);
+      // Save checkpoint after each task
+      await checkpointCallback(state);
+    } catch (error) {
+      console.error(`Error in task ${i}:`, error);
+      throw error; // Stop execution if a task fails
+    }
   }
 
   return state;
 }
 
 /**
- * Example utility function for iterative numerical computations.
- * Computes the sum of integers from 1 to a given target using checkpointing.
- * @param {string} checkpointId - Unique identifier for the computation.
- * @param {number} target - The target number to sum up to.
- * @returns {number} - The computed sum.
+ * Restores computation state from a checkpoint.
+ * @param {object} checkpoint - The checkpoint object.
+ * @returns {object} - Restored state.
  */
-export async function sumWithCheckpointing(checkpointId, target) {
-  const initialState = { current: 0, sum: 0 };
+export function restoreFromCheckpoint(checkpoint) {
+  return { ...checkpoint };
+}
 
-  const computeStep = async (state) => {
-    state.sum += state.current;
-    state.current += 1;
-    return state;
-  };
+/**
+ * Example checkpoint storage in memory (can be replaced with filesystem or database storage).
+ * @returns {Function[]} - Array of checkpoint management functions.
+ */
+export function createInMemoryCheckpointManager() {
+  let checkpoint = null;
 
-  const isComplete = (state) => state.current > target;
+  return [
+    async function save(state) {
+      checkpoint = JSON.parse(JSON.stringify(state));
+    },
+    function load() {
+      return checkpoint ? JSON.parse(JSON.stringify(checkpoint)) : null;
+    }
+  ];
+}
 
-  const finalState = await runWithCheckpointing(checkpointId, computeStep, isComplete, initialState);
-  return finalState.sum;
+/**
+ * Splits a large task into smaller chunks for processing.
+ * @param {Array} data - The data to be processed.
+ * @param {number} chunkSize - Size of each chunk.
+ * @returns {Array<Array>} - Array of data chunks.
+ */
+export function splitIntoChunks(data, chunkSize) {
+  const chunks = [];
+  for (let i = 0; i < data.length; i += chunkSize) {
+    chunks.push(data.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
+
+/**
+ * Example usage of the module.
+ */
+export async function exampleUsage() {
+  const [saveCheckpoint, loadCheckpoint] = createInMemoryCheckpointManager();
+
+  const tasks = [
+    async (state) => ({ sum: (state.sum || 0) + 1 }),
+    async (state) => ({ sum: state.sum * 2 }),
+    async (state) => ({ sum: state.sum - 3 })
+  ];
+
+  const initialState = { sum: 0 };
+  const restoredState = loadCheckpoint() || initialState;
+
+  const finalState = await manageComputation(tasks, restoredState, saveCheckpoint);
+  console.log('Final State:', finalState);
 }

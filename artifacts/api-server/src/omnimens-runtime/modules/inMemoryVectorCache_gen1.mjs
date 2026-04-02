@@ -1,126 +1,113 @@
 /**
- * @module inMemoryVectorCache
- * @description A high-performance in-memory cache for storing and retrieving embeddings with an LRU eviction policy.
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorCache
+ * Written: 2026-04-02T21:23:11.467Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
  */
+
+// inMemoryVectorCache.mjs
+
+import { createHash } from 'crypto';
 
 /**
- * Node.js built-in modules
+ * Utility function to calculate Euclidean distance between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} - Euclidean distance.
  */
-import crypto from "crypto";
-
-/**
- * @typedef {Object} CacheEntry
- * @property {string} key - The unique key for the embedding.
- * @property {Float32Array} embedding - The embedding vector.
- * @property {number} timestamp - The last access time for LRU eviction.
- */
-
-export class InMemoryVectorCache {
-  /**
-   * @param {number} maxSize - Maximum number of entries the cache can hold.
-   */
-  constructor(maxSize = 1000) {
-    if (maxSize <= 0) {
-      throw new Error('maxSize must be a positive integer.');
-    }
-
-    this.maxSize = maxSize;
-    this.cache = new Map(); // Key-value store for embeddings.
+export function calculateEuclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same dimensionality.');
   }
-
-  /**
-   * Generates a unique hash for a given key.
-   * @* @param {string} key - The key to hash.
-   * @returns {string} - A hashed representation of the key.
-   */
-  _hashKey(key) {
-    return crypto.createHash('sha256').update(key).digest('hex');
-  }
-
-  /**
-   * Adds or updates an embedding in the cache.
-   * @param {string} key - The unique identifier for the embedding.
-   * @param {Float32Array} embedding - The embedding vector to store.
-   */
-  set(key, embedding) {
-    if (!(embedding instanceof Float32Array)) {
-      throw new Error('Embedding must be a Float32Array.');
-    }
-
-    const hashedKey = this._hashKey(key);
-
-    // If the key already exists, update its timestamp and value.
-    if (this.cache.has(hashedKey)) {
-      this.cache.get(hashedKey).timestamp = Date.now();
-      this.cache.get(hashedKey).embedding = embedding;
-    } else {
-      // If the cache exceeds maxSize, evict the least recently used entry.
-      if (this.cache.size >= this.maxSize) {
-        this._evictLRU();
-      }
-
-      // Add the new entry.
-      this.cache.set(hashedKey, {
-        key,
-        embedding,
-        timestamp: Date.now()
-      });
-    }
-  }
-
-  /**
-   * Retrieves an embedding from the cache.
-   * @param {string} key - The unique identifier for the embedding.
-   * @returns {Float32Array|null} - The embedding vector, or null if not found.
-   */
-  get(key) {
-    const hashedKey = this._hashKey(key);
-
-    if (this.cache.has(hashedKey)) {
-      const entry = this.cache.get(hashedKey);
-      entry.timestamp = Date.now(); // Update access time for LRU.
-      return entry.embedding;
-    }
-
-    return null; // Key not found.
-  }
-
-  /**
-   * Evicts the least recently used (LRU) entry from the cache.
-   * @*/
-  _evictLRU() {
-    let oldestKey = null;
-    let oldestTimestamp = Infinity;
-
-    // Find the LRU entry.
-    for (const [key, entry] of this.cache.entries()) {
-      if (entry.timestamp < oldestTimestamp) {
-        oldestTimestamp = entry.timestamp;
-        oldestKey = key;
-      }
-    }
-
-    if (oldestKey !== null) {
-      this.cache.delete(oldestKey);
-    }
-  }
-
-  /**
-   * Clears all entries from the cache.
-   */
-  clear() {
-    this.cache.clear();
-  }
-
-  /**
-   * Returns the current size of the cache.
-   * @returns {number} - The number of entries in the cache.
-   */
-  size() {
-    return this.cache.size;
-  }
+  return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0));
 }
 
 /**
- * Exports an instance of the InMemoryVectorCache class.
+ * Generates a unique hash for a vector to use as a key in the cache.
+ * @param {number[]} vector - The vector to hash.
+ * @returns {string} - A unique hash string.
  */
+export function hashVector(vector) {
+  const hash = createHash('sha256');
+  hash.update(vector.join(','));
+  return hash.digest('hex');
+}
+
+/**
+ * In-memory vector cache for storing and retrieving high-dimensional embeddings.
+ */
+export const inMemoryVectorCache = {
+  _cache: new Map(),
+
+  /**
+   * Stores a vector in the cache with an optional associated value.
+   * @param {number[]} vector - The vector to store.
+   * @param {*} value - Optional value associated with the vector.
+   */
+  store(vector, value = null) {
+    const key = hashVector(vector);
+    this._cache.set(key, { vector, value });
+  },
+
+  /**
+   * Retrieves the closest vector(s) to the given query vector.
+   * @param {number[]} queryVector - The query vector.
+   * @param {number} k - Number of nearest neighbors to retrieve.
+   * @returns {Array<{ vector, value, distance}>} - Array of nearest neighbors.
+   */
+  retrieveNearest(queryVector, k = 1) {
+    if (k <= 0) {
+      throw new Error('k must be a positive integer.');
+    }
+
+    const distances = [];
+
+    for (const { vector, value } of this._cache.values()) {
+      const distance = calculateEuclideanDistance(queryVector, vector);
+      distances.push({ vector, value, distance });
+    }
+
+    distances.sort((a, b) => a.distance - b.distance);
+
+    return distances.slice(0, k);
+  },
+
+  /**
+   * Clears all vectors from the cache.
+   */
+  clear() {
+    this._cache.clear();
+  },
+
+  /**
+   * Returns the current size of the cache.
+   * @returns {number} - Number of vectors in the cache.
+   */
+  size() {
+    return this._cache.size;
+  }
+};
+
+/**
+ * Utility function to normalize a vector to unit length.
+ * @param {number[]} vector - The vector to normalize.
+ * @returns {number[]} - Normalized vector.
+ */
+export function normalizeVector(vector) {
+  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
+  if (magnitude === 0) {
+    throw new Error('Cannot normalize a zero vector.');
+  }
+  return vector.map(val => val / magnitude);
+}
