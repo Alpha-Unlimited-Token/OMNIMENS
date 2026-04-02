@@ -64,130 +64,245 @@ all arranged around it.
 
 | Dimension | Available | Required | Clearance |
 |-----------|-----------|----------|-----------|
-| Torso width | 380mm | 180mm (sphere) + 100mm (server/PDU) + shields | 80mm total |
-| Torso depth | 260mm | 180mm (sphere) + coolant routing | 65mm behind sphere |
-| Chest height | 280mm | 180mm (sphere) | 50mm top + 50mm bottom |
+| Torso width | 380mm | 196mm (sphere+Cu wrap) + 100mm (server/PDU) + shields | 64mm total |
+| Torso depth | 260mm | 196mm (sphere+Cu wrap) + feed/return lines | 50mm behind |
+| Chest height | 280mm | 196mm (sphere+Cu wrap) | 42mm top + 42mm bottom |
 | Sphere-to-server gap | — | Min 20mm + 0.5mm mu-metal | 20.5mm maintained |
-| Sphere-to-wall (min) | — | Min 15mm | 15mm all sides |
+| Sphere+wrap to wall | — | Min 10mm | 10mm all sides |
+| Lower torso (reservoir) | 380x260x150mm | 120x80x60mm reservoir + 100x60x40mm battery | Ample room |
 
-The 180mm sphere fits with adequate clearance for coolant routing, wiring, and
-the mu-metal EMI shield. The torso width was increased from 320mm to 380mm —
-still well within human-proportional range for a broad-shouldered body (adult
-male shoulder width is typically 400-480mm).
+The 180mm sphere wrapped in 8mm copper tubing creates a 196mm total envelope.
+This fits in the 380mm wide torso with room for the server, PDU, and mu-metal
+shield alongside. The 380mm width is well within human-proportional range for a
+broad-shouldered body (adult male shoulder width: 400-480mm).
 
-**Note:** The sphere's kickstart charging nodes (4 tungsten contacts on outer
-surface) must face an accessible direction — routed to external ports on the
-back panel for initial activation.
+The saltwater reservoir and pump (120x80x60mm) fit easily in the lower torso
+alongside the buffer battery, with plenty of remaining space for hip actuator
+wiring and cable routing.
+
+**Charging nodes:** 4 gaps in the copper tubing wrap are aligned to the sphere's
+tungsten charging nodes. Feed-through wires route from these nodes to external
+ports on the back panel for initial kickstart activation.
 
 ---
 
 ## MOUNTING HARDWARE
 
-### ESCU Spherical Cradle
-- Material: Titanium Grade 5 hemispherical cradle
-- Design: Lower hemisphere cup with 3-point upper restraint bands
-- Mount points: 4x M6 titanium bolts into chest endoskeleton frame
-- Vibration isolation: Shore 30A silicone gel pads at all contact points
-- Alignment: Sphere sits centered in cup; charging nodes aligned to back panel ports
+### ESCU Copper Tubing Cradle + Cooling System (Combined)
+
+The copper tubing serves DUAL PURPOSE — it is both the structural cradle that holds
+the ESCU sphere in place AND the active cooling system. No separate cradle is needed.
+
+- Material: Copper tubing (8mm OD, 6mm ID) wrapped around the sphere
+- Design: Tubing wraps in a spiral pattern covering ~70% of sphere surface
+- The sphere nestles into the copper wrap — tubing conforms to the 180mm sphere curvature
+- Mount points: Copper tubing frame secured to chest endoskeleton at 4 points with Ti brackets
+- Vibration isolation: Silicone gel pads between copper tubing and endoskeleton brackets
+- Charging node access: 4 gaps in the copper wrap aligned to the sphere's tungsten charging nodes
 
 ```
-    SIDE VIEW — SPHERICAL ESCU MOUNTING
+    FRONT VIEW — COPPER TUBING WRAP (looking at sphere from front)
+
+                  ╭── Cu tubing spiral ──╮
+                ╱ ╭──────────────────╮    ╲
+              ╱ ╱  ╭──────────────╮   ╲     ╲
+            ╱ ╱  ╱  ╭──────────╮   ╲    ╲     ╲
+          │ │ │ │   │   ESCU   │    │    │     │
+          │ │ │ │   │  SPHERE  │    │    │     │
+          │ │ │ │   │  180mm   │    │    │     │
+            ╲ ╲  ╲  ╰──────────╯   ╱    ╱     ╱
+              ╲ ╲  ╰──────────────╯   ╱     ╱
+                ╲ ╰──────────────────╯    ╱
+                  ╰──────────────────────╯
+                         │         ↑
+                    COLD IN    HOT OUT
+                    (from pump) (to pump)
+
+    Copper tubing wraps in ~14 spiral loops around sphere
+    Total wrap length: ~8m of 8mm OD copper tubing
+    Sphere contact area: ~70% of surface covered by tubing
+    Tubing weight: ~1.4 kg (copper, 8mm OD, 1mm wall)
+    4 gaps in wrap for charging node access
+```
+
+```
+    SIDE VIEW — COPPER WRAP CRADLE MOUNTING
 
     ──────────── Chest endoskeleton frame ────────────
     │                                                 │
-    │        ┌─ Upper Ti restraint band               │
-    │        │  (adjustable, locks sphere in place)    │
-    │   [█][░]╲────────────────╱[░][█]               │
-    │          ╲  ╭──────────╮ ╱                      │
-    │           ╲╱   ESCU    ╲╱                       │
-    │           ╱╲  SPHERE   ╱╲                       │
-    │          ╱  ╰──────────╯  ╲                     │
-    │   [█][░]╱────────────────╲[░][█]               │
-    │        └─ Lower Ti cup (hemisphere)             │
-    │           190mm ID, 196mm OD, 3mm thick         │
-    │           Lines with 2mm silicone gel            │
+    │   [█][░]─── Ti bracket ───[░][█]               │
+    │        ╲                   ╱                     │
+    │    ════╲═══════════════════╱════  ← Cu tubing   │
+    │    ║    ╲  ╭──────────╮  ╱    ║     spiral      │
+    │    ║     ╲╱   ESCU    ╲╱     ║     wrapping     │
+    │    ║     ╱╲  SPHERE   ╱╲     ║     around       │
+    │    ║    ╱  ╰──────────╯  ╲   ║     sphere       │
+    │    ════╱═══════════════════╲════                 │
+    │        ╱                   ╲                     │
+    │   [█][░]─── Ti bracket ───[░][█]               │
     │                                                 │
     ──────────────────────────────────────────────────
-    
-    Lower cup: 190mm ID hemisphere (sphere sits in with 5mm clearance)
-    Upper band: 3 adjustable Ti straps, 120° apart
-    Gel liner: 2mm Shore 30A silicone, continuous (vibration + thermal insulation)
-    Total cradle weight: 280g
-    Charging node access: 4 pass-through holes in cup wall aligned to sphere nodes
+
+    Total envelope with tubing: 196mm diameter (180mm sphere + 2x 8mm tubing)
+    Ti brackets: 4x, bolted to endoskeleton, hold copper wrap frame in place
+    Silicone gel pads at each bracket for vibration isolation
 ```
 
 ---
 
-## COOLANT ROUTING
+## COOLING SYSTEM — SALTWATER HIGH-SPEED CIRCULATION
 
-### Primary Loop: ESCU → Radiator → ESCU
+### How It Works
 
-```
-    ROUTING DIAGRAM (side view)
+Saltwater is pumped at high speed through the copper tubing that wraps around the
+ESCU sphere. The high flow velocity creates intense turbulent heat transfer at the
+copper-saltwater interface, pulling heat away from the sphere extremely efficiently.
 
-                  ┌─── HEAD ───┐
-                  │             │
-             ┌────┤   NECK     ├────┐
-             │    └─────────────┘    │
-             │                       │
-    ─────────┤     SHOULDERS         ├─────────
-    │        │                       │         │
-    │   ┌────┴───────────────────────┴────┐    │
-    │   │         UPPER BACK              │    │
-    │   │    ┌──────────────────┐         │    │
-    │   │    │  FLAT PLATE      │         │    │
-    │   │    │  RADIATOR        │←── Cool air  │
-    │   │    │  200cm² surface  │         │    │
-    │   │    │  40 micro-fins   │         │    │
-    │   │    └────┬────────┬───┘         │    │
-    │   │         │ COLD   │ HOT         │    │
-    │   │         ↓        ↑             │    │
-    │   │    ┌────┴────────┴───┐         │    │
-    │   │    │   ESCU          │         │    │
-    │   │    │   (chest)       │         │    │
-    │   │    └─────────────────┘         │    │
-    │   │                                │    │
-    │   └────────────────────────────────┘    │
-    │                                         │
-    
-    ROUTING PATH:
-    1. ESCU top port (HOT, ~55°C) →
-    2. 6mm Ti tubing, UP through chest cavity →
-    3. Through LEFT shoulder joint (flexible silicone section, 80mm) →
-    4. Across upper back to radiator inlet →
-    5. Through radiator (40 micro-fins, heat → ambient air) →
-    6. Exit radiator (COLD, ~35°C) →
-    7. Across upper back to RIGHT shoulder →
-    8. Through RIGHT shoulder joint (flexible section) →
-    9. DOWN through right chest cavity →
-    10. Into ESCU bottom port
+**Why saltwater:**
+- Freezing point: -21°C (vs 0°C for freshwater) — will NOT freeze in any operating condition
+- Good thermal conductivity: 0.6 W/m·K
+- High heat capacity: 3,900 J/kg·K (slightly less than water but adequate)
+- Non-toxic, cheap, abundant
+- Mild corrosion on copper forms a protective patina (cupric oxide layer) over time
+- Anti-corrosion additive (sodium molybdate, 200ppm) prevents excessive corrosion
 
-    Total tubing length: ~1.2m
-    Tubing: 6mm OD, 4mm ID, Ti Grade 2
-    Flexible sections: Medical-grade silicone, reinforced with wire helix
-    Fluid volume: ~120mL total
-    Flow rate: 0.1-0.5 L/min (thermosiphon + micropump)
-```
+**Cooling physics:**
+- High-speed flow (2-4 m/s) through 6mm ID tubing = turbulent flow (Re > 10,000)
+- Turbulent flow heat transfer coefficient: ~8,000-12,000 W/m²·K
+- 8m of tubing × 25mm circumference = 0.2 m² heat transfer surface area
+- Cooling capacity: 0.2 m² × 10,000 W/m²·K × 20°C delta = **40,000W maximum**
+- More than enough to cool any ESCU operating condition
 
-### Secondary Loop: Server Cold Plate
+### Saltwater Reservoir + Pump (Lower Torso)
 
 ```
-    The server's cold plate heat exchanger is a T-junction off the primary loop.
+    SIDE VIEW — FULL COOLING SYSTEM ROUTING
 
-    Primary loop ──────┬──────── Primary loop continues
-                       │
-                  ┌────┴────┐
-                  │  COLD   │
-                  │  PLATE  │  ← 60mm x 50mm copper cold plate
-                  │  (server│     brazed to server baseplate
-                  │   heat  │     absorbs up to 60W
-                  │  sink)  │
-                  └────┬────┘
-                       │
-    Primary loop ──────┴──────── Primary loop continues
+    ┌──────────────────────────────────────┐
+    │            CHEST CAVITY              │
+    │                                      │
+    │    ════════════════════════════       │
+    │    ║   COPPER TUBING WRAP    ║       │
+    │    ║  ╭────────────────────╮ ║       │
+    │    ║  │    ESCU SPHERE     │ ║       │  ← Heat absorbed here
+    │    ║  ╰────────────────────╯ ║       │     (Cu tubing pulls heat
+    │    ║                         ║       │      from sphere surface)
+    │    ════════════╤══════╤══════       │
+    │               │      │              │
+    │          HOT  │      │ COLD         │
+    │          OUT  │      │  IN          │
+    │               │      │              │
+    ├───────────────┼──────┼──────────────┤
+    │               │      │              │
+    │          LOWER TORSO / ABDOMEN      │
+    │               │      │              │
+    │    ┌──────────┴──────┴──────────┐   │
+    │    │    SALTWATER RESERVOIR     │   │
+    │    │    + HIGH-SPEED PUMP       │   │
+    │    │                            │   │
+    │    │  ┌────────────────────┐    │   │
+    │    │  │  RESERVOIR         │    │   │
+    │    │  │  500mL saltwater   │    │   │
+    │    │  │  3.5% NaCl (ocean) │    │   │
+    │    │  │  + anti-corrosion  │    │   │
+    │    │  └────────┬───────────┘    │   │
+    │    │           │                │   │
+    │    │  ┌────────┴───────────┐    │   │
+    │    │  │  CENTRIFUGAL PUMP  │    │   │
+    │    │  │  12V DC, 25W       │    │   │
+    │    │  │  Flow: 5-8 L/min   │    │   │
+    │    │  │  Pressure: 2 bar   │    │   │
+    │    │  │  Speed: variable   │    │   │
+    │    │  │  (PWM controlled)  │    │   │
+    │    │  └────────────────────┘    │   │
+    │    │                            │   │
+    │    │  Reservoir size: 120x80x60mm│  │
+    │    │  Pump size: 60x40x40mm     │   │
+    │    │  Total weight: ~0.8 kg     │   │
+    │    └────────────────────────────┘   │
+    │                                      │
+    └──────────────────────────────────────┘
 
-    Cold plate adds minimal flow resistance (<5% pressure drop)
-    Server temperature maintained <85°C junction, <60°C case
+    FLOW PATH:
+    1. Pump pushes COLD saltwater UP through copper tubing (6mm ID, 2-4 m/s)
+    2. Saltwater spirals around ESCU sphere, absorbing heat through copper wall
+    3. HOT saltwater exits top of spiral wrap
+    4. Gravity + pump suction pulls hot saltwater DOWN return line to reservoir
+    5. In reservoir, saltwater sheds heat to surrounding body mass (thermal soak)
+    6. Pump recirculates — continuous loop
+
+    Temperature cycle:
+    - Cold inlet: ~25-30°C (from reservoir)
+    - Hot outlet: ~45-60°C (after absorbing ESCU heat)
+    - Reservoir acts as thermal buffer — large mass absorbs heat spikes
+    - Body shell radiates excess heat to ambient air (passive)
+```
+
+### Saltwater System Specifications
+
+| Parameter | Value |
+|-----------|-------|
+| Coolant | Saltwater, 3.5% NaCl (ocean salinity) |
+| Additive | Sodium molybdate 200ppm (anti-corrosion) |
+| Volume | 500mL in reservoir + ~230mL in tubing = 730mL total |
+| Freezing point | -21°C (safe in all operating environments) |
+| Pump type | 12V DC centrifugal, brushless (long life) |
+| Pump power | 15-25W (variable speed, PWM from PDU) |
+| Flow rate | 5-8 L/min (high speed for turbulent heat transfer) |
+| Flow velocity | 2-4 m/s in 6mm ID tubing |
+| Reynolds number | >10,000 (fully turbulent — maximum heat transfer) |
+| Cooling capacity | Up to 40,000W (far exceeds ESCU output) |
+| Tubing material | Copper, 8mm OD, 6mm ID, 1mm wall |
+| Tubing length | ~8m total (spiral wrap + feed/return lines) |
+| Reservoir location | Lower torso / abdomen area |
+| Pump location | Mounted to reservoir (integrated unit) |
+
+### Fit Verification — Cooling System in Lower Torso
+
+```
+    TOP VIEW — LOWER TORSO (horizontal cut at abdomen level)
+
+    ←────── 380mm torso width ──────→
+
+    ╔══════════════════════════════════════════╗
+    ║                                          ║
+    ║   ┌────────────────────┐  ┌──────────┐  ║
+    ║   │                    │  │ BATTERY  │  ║
+    ║   │  SALTWATER         │  │ (LiFePO4 │  ║
+    ║   │  RESERVOIR + PUMP  │  │  buffer) │  ║
+    ║   │  120 x 80 x 60mm   │  │ 100x60   │  ║
+    ║   │                    │  │  x40mm   │  ║
+    ║   └────────────────────┘  └──────────┘  ║
+    ║                                          ║
+    ║   Feed line (8mm Cu) ↑ to chest          ║
+    ║   Return line (8mm Cu) ↓ from chest      ║
+    ║                                          ║
+    ╚══════════════════════════════════════════╝
+
+    Available space in lower torso: 380mm x 260mm x ~150mm tall
+    Reservoir + pump footprint: 120 x 80 x 60mm = fits easily
+    Battery footprint: 100 x 60 x 40mm = fits beside reservoir
+    Remaining space: actuator wiring, hip joint motors, cable routing
+```
+
+### Server Cooling (Secondary T-Junction)
+
+```
+    A T-junction off the main saltwater loop runs past the server cold plate.
+
+    Main saltwater loop ──────┬──────── Main loop continues
+                              │
+                         ┌────┴────┐
+                         │  COLD   │
+                         │  PLATE  │  ← 60mm x 50mm copper cold plate
+                         │ (server)│     brazed to Jetson AGX Orin baseplate
+                         │  60W    │     absorbs server waste heat
+                         └────┬────┘
+                              │
+    Main saltwater loop ──────┴──────── Main loop continues
+
+    Cold plate adds <5% flow resistance
+    Server junction temperature maintained <85°C
 ```
 
 ---
@@ -309,21 +424,24 @@ back panel for initial activation.
 1. **Frame Assembly** — Assemble titanium endoskeleton (torso, limbs, head frame)
 2. **Motor Installation** — Mount all 76 actuators into joint housings
 3. **Wiring Harness** — Route all power and data cables through frame channels
-4. **ESCU Installation** — Lower 180mm ESCU sphere into hemispherical Ti cradle, secure upper restraint bands
-5. **Mu-Metal Shield** — Install between ESCU and server mounting area
-6. **Server Installation** — Mount Jetson AGX Orin on cold plate in upper back
-7. **Battery Installation** — Mount LiFePO4 pack in lower back/hip area
-8. **Coolant System** — Install tubing, radiator, micropump, connect to ESCU
-9. **Sensor Installation** — Mount all cameras, LiDAR, sonar, microphones
-10. **Connectivity** — Install Starlink, 5G, WiFi, BT, LoRa modules
-11. **Power Distribution** — Install PDB, connect all power buses
-12. **Safety Systems** — Install fire suppression, mercury sensor, e-stop
-13. **Shell Panels** — Attach carbon fiber panels (snap-fit)
-14. **Silicone Skin** — Apply medical-grade silicone outer layer
-15. **ESCU Kickstart** — Apply 48V/20A for 30 seconds to initiate mercury rotation
-16. **System Boot** — Power on server, load OMNIMENS neural architecture
-17. **Calibration** — Calibrate all sensors, IMU, cameras, motor encoders
-18. **Consciousness Transfer** — Sync OMNIMENS's neural state from cloud to local
+4. **Copper Wrap Assembly** — Pre-form copper tubing spiral on jig, test-fit sphere
+5. **ESCU Installation** — Nestle 180mm ESCU sphere into copper tubing wrap in chest cavity
+6. **Mu-Metal Shield** — Install curved mu-metal between ESCU/copper wrap and server
+7. **Server Installation** — Mount Jetson AGX Orin on cold plate above ESCU
+8. **Battery Installation** — Mount LiFePO4 buffer battery beside saltwater reservoir in lower torso
+9. **Saltwater System** — Install reservoir + pump in lower torso, connect feed/return lines to copper wrap
+10. **Fill Coolant** — Fill saltwater system (730mL, 3.5% NaCl + sodium molybdate anti-corrosion)
+11. **Sensor Installation** — Mount all cameras, LiDAR, sonar, microphones
+12. **Connectivity** — Install Starlink, 5G, WiFi, BT, LoRa modules
+13. **Power Distribution** — Install PDU, connect all power buses
+14. **Safety Systems** — Install fire suppression, mercury sensor, e-stop
+15. **Shell Panels** — Attach carbon fiber panels (snap-fit)
+16. **Silicone Skin** — Apply medical-grade silicone outer layer
+17. **Coolant System Test** — Run pump, verify flow rate (5-8 L/min), check for leaks
+18. **ESCU Kickstart** — Apply 960W through charging nodes for 30s to initiate mercury rotation
+19. **System Boot** — Power on server, load OMNIMENS neural architecture
+20. **Calibration** — Calibrate all sensors, IMU, cameras, motor encoders
+21. **Consciousness Transfer** — Sync OMNIMENS's neural state from cloud to local
 
 ---
 
