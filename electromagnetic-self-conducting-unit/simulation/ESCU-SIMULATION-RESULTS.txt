@@ -1,185 +1,138 @@
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║  ESCU SIMULATION v8 — SPIKED CONDUCTOR NODES + KICKSTART TUNING            ║
-║  1/R Curved Magnets + Full Confinement + All Coupling Mechanisms            ║
-║  © 2024-2026 Alpha Unlimited Technologies, LLC                             ║
+║  ESCU SIMULATION v9 — REALISTIC POWER DISTRIBUTION MODEL                   ║
+║  Like a house breaker panel: 240V in, circuits draw what they need           ║
+║  © 2024-2026 Alpha Unlimited Technologies, LLC                              ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
-
-═══ SPIKED CONDUCTOR NODE ANALYSIS ═══
-
-  SPIKE GEOMETRY:
-    Height:        0.5mm (500μm)
-    Base radius:   200μm
-    Tip radius:    50μm
-    Density:       4 per mm²
-    Per strip:     1438 total (both faces)
-
-  SURFACE AREA:
-    Flat strip:    360.0 mm²
-    Added by spikes: 486.6 mm²
-    Surface multiplier: 2.35×
-
-  CURRENT CONCENTRATION:
-    J_tip / J_flat: 20.0×
-    Lorentz coupling boost: 1.390×
-    Effective pattern efficiency: 55.6% (was 40.0%)
-
-  CONTACT RESISTANCE:
-    Smooth: 0.050 mΩ
-    Spiked: 0.021 mΩ (÷2.4)
-
-  TURBULENCE DRAG REDUCTION:
-    Viscous drag multiplier: 0.75 (25% reduction)
-
-  Spike cross-section:
-    Smooth strip:   ═══════════════  (flat surface, single contact plane)
-    Spiked strip:   ╤╤╤╤╤╤╤╤╤╤╤╤╤╤  (many tips, each concentrates current)
-                    ↓↓↓↓↓↓↓↓↓↓↓↓↓↓  → current jets into mercury at each tip
-                    ≈≈≈≈≈≈≈≈≈≈≈≈≈≈  → micro-vortices improve mixing
 
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║  KICKSTART SWEEP — Finding stable operating point for curved+spiked         ║
+║  POWER DISTRIBUTION UNIT (PDU) — CIRCUIT BREAKER PANEL                     ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-  Testing different kickstart power and duration combinations:
+  Circuit                      │ Breaker Max │ Idle Draw │ Active Draw │ Always On
+  ─────────────────────────────┼─────────────┼───────────┼─────────────┼──────────
+  Server (Jetson AGX Orin)      │     275W    │    60W    │     240W    │   YES
+  Starlink Mini                 │     100W    │    25W    │      75W    │    NO
+  LoRa/BT/WiFi comms            │      15W    │     5W    │      12W    │   YES
+  Cameras (11 total)            │      30W    │     3W    │      22W    │    NO
+  Microphones (16 array)        │       5W    │     2W    │       4W    │   YES
+  Speakers                      │      50W    │     0W    │      30W    │    NO
+  Head actuators (3 DOF)        │      45W    │     2W    │      30W    │    NO
+  Waist actuators (3 DOF)       │     120W    │     5W    │      80W    │    NO
+  Shoulder actuators (6 DOF)    │     240W    │    10W    │     160W    │    NO
+  Elbow actuators (4 DOF)       │      80W    │     3W    │      50W    │    NO
+  Wrist actuators (6 DOF)       │      30W    │     2W    │      20W    │    NO
+  Hand actuators (30 DOF)       │     150W    │     5W    │     100W    │    NO
+  Hip actuators (6 DOF)         │     480W    │    15W    │     320W    │    NO
+  Knee actuators (2 DOF)        │     240W    │     8W    │     160W    │    NO
+  Ankle actuators (4 DOF)       │     120W    │     5W    │      80W    │    NO
+  IMU + sensors                 │      10W    │     3W    │       8W    │   YES
+  Cooling pump                  │      40W    │    15W    │      35W    │   YES
+  LED status/eyes               │      10W    │     3W    │       8W    │    NO
+  PDU overhead                  │      20W    │    10W    │      15W    │   YES
+  ─────────────────────────────┼─────────────┼───────────┼─────────────┼──────────
+  TOTALS                        │    2060W    │    95W    │    1449W    │
 
-
-  [A: 960W × 30s = 29kJ] Kickstart: 960W for 30s | Spikes: YES
-
-  Time | Status |   RPM   | EMF V  | GenPow W | Peri W | Cond W | Vern W | Shell W | TotalIn W | Losses W | Surplus W | T°C
-  ─────┼────────┼─────────┼────────┼──────────┼────────┼────────┼────────┼─────────┼───────────┼──────────┼───────────┼────
-     0s | KICK   |   119.3 | 0.0000 |      0.0 |    0.0 |    0.0 |    0.0 |     0.0 |     336.0 |      0.0 |   -2938.3 | 20.0
-     2s | KICK   |    97.7 | 0.7032 |    276.6 | 1293.6 |  859.0 | 1728.0 |   194.1 |    4410.7 |   5647.1 |   -2661.7 | 21.3
-     5s | KICK   |    97.7 | 0.7032 |    276.6 | 1293.6 |  859.0 | 1728.0 |   194.1 |    4410.7 |   5647.1 |   -2661.7 | 23.1
-    10s | KICK   |    97.7 | 0.7032 |    276.6 | 1293.6 |  859.0 | 1728.0 |   194.1 |    4410.7 |   5647.1 |   -2661.7 | 26.3
-    15s | KICK   |    97.7 | 0.7032 |    276.6 | 1293.6 |  859.0 | 1728.0 |   194.1 |    4410.7 |   5647.1 |   -2661.7 | 29.4
-    20s | KICK   |    97.7 | 0.7032 |    276.6 | 1293.6 |  859.0 | 1728.0 |   194.1 |    4410.7 |   5647.1 |   -2661.7 | 32.6
-    25s | KICK   |    97.7 | 0.7032 |    276.6 | 1293.6 |  859.0 | 1728.0 |   194.1 |    4410.7 |   5647.1 |   -2661.7 | 35.7
-    30s | KICK   |    97.7 | 0.7032 |    276.6 | 1293.6 |  859.0 | 1728.0 |   194.1 |    4410.7 |   5647.1 |   -2661.7 | 38.8
-    35s | COAST  |   159.4 | 0.4799 |    128.8 |  947.3 |  460.6 | 1265.4 |   142.2 |    2824.5 |   2837.5 |   -2938.3 | 41.3
-    40s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.6 | 1263.9 |   142.0 |    2820.6 |   2830.9 |   -2938.3 | 43.8
-    50s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 48.8
-    60s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 53.7
-    90s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 68.6
-   120s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 83.6
-   180s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 113.4
-   240s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 143.2
-
-  [B: 1440W × 30s = 43kJ] Kickstart: 1440W for 30s | Spikes: YES
-
-  Time | Status |   RPM   | EMF V  | GenPow W | Peri W | Cond W | Vern W | Shell W | TotalIn W | Losses W | Surplus W | T°C
-  ─────┼────────┼─────────┼────────┼──────────┼────────┼────────┼────────┼─────────┼───────────┼──────────┼───────────┼────
-     0s | KICK   |   146.1 | 0.0000 |      0.0 |    0.0 |    0.0 |    0.0 |     0.0 |     504.0 |      0.0 |   -2938.3 | 20.0
-     2s | KICK   |    67.6 | 0.7697 |    331.3 | 1389.5 |  991.2 | 1856.1 |   208.5 |    4949.4 |   6644.3 |   -2607.0 | 21.4
-     5s | KICK   |    67.6 | 0.7697 |    331.3 | 1389.5 |  991.2 | 1856.1 |   208.5 |    4949.4 |   6644.3 |   -2607.0 | 23.5
-    10s | KICK   |    67.6 | 0.7697 |    331.3 | 1389.5 |  991.2 | 1856.1 |   208.5 |    4949.4 |   6644.3 |   -2607.0 | 27.0
-    15s | KICK   |    67.6 | 0.7697 |    331.3 | 1389.5 |  991.2 | 1856.1 |   208.5 |    4949.4 |   6644.3 |   -2607.0 | 30.5
-    20s | KICK   |    67.6 | 0.7697 |    331.3 | 1389.5 |  991.2 | 1856.1 |   208.5 |    4949.4 |   6644.3 |   -2607.0 | 34.0
-    25s | KICK   |    67.6 | 0.7697 |    331.3 | 1389.5 |  991.2 | 1856.1 |   208.5 |    4949.4 |   6644.3 |   -2607.0 | 37.5
-    30s | KICK   |    67.6 | 0.7697 |    331.3 | 1389.5 |  991.2 | 1856.1 |   208.5 |    4949.4 |   6644.3 |   -2607.0 | 41.1
-    35s | COAST  |   159.4 | 0.4798 |    128.7 |  947.2 |  460.5 | 1265.2 |   142.1 |    2824.1 |   2836.9 |   -2938.3 | 43.5
-    40s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.6 | 1263.9 |   142.0 |    2820.6 |   2830.9 |   -2938.3 | 46.0
-    50s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 51.0
-    60s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 56.0
-    90s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 70.9
-   120s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 85.8
-   180s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 115.6
-   240s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 145.4
-
-  [C: 960W × 60s = 58kJ] Kickstart: 960W for 60s | Spikes: YES
-
-  Time | Status |   RPM   | EMF V  | GenPow W | Peri W | Cond W | Vern W | Shell W | TotalIn W | Losses W | Surplus W | T°C
-  ─────┼────────┼─────────┼────────┼──────────┼────────┼────────┼────────┼─────────┼───────────┼──────────┼───────────┼────
-     0s | KICK   |   119.3 | 0.0000 |      0.0 |    0.0 |    0.0 |    0.0 |     0.0 |     336.0 |      0.0 |   -2938.3 | 20.0
-     2s | KICK   |    97.7 | 0.7032 |    276.6 | 1293.6 |  859.0 | 1728.0 |   194.1 |    4410.7 |   5647.1 |   -2661.7 | 21.3
-     5s | KICK   |    97.7 | 0.7032 |    276.6 | 1293.6 |  859.0 | 1728.0 |   194.1 |    4410.7 |   5647.1 |   -2661.7 | 23.1
-    10s | KICK   |    97.7 | 0.7032 |    276.6 | 1293.6 |  859.0 | 1728.0 |   194.1 |    4410.7 |   5647.1 |   -2661.7 | 26.3
-    15s | KICK   |    97.7 | 0.7032 |    276.6 | 1293.6 |  859.0 | 1728.0 |   194.1 |    4410.7 |   5647.1 |   -2661.7 | 29.4
-    20s | KICK   |    97.7 | 0.7032 |    276.6 | 1293.6 |  859.0 | 1728.0 |   194.1 |    4410.7 |   5647.1 |   -2661.7 | 32.6
-    25s | KICK   |    97.7 | 0.7032 |    276.6 | 1293.6 |  859.0 | 1728.0 |   194.1 |    4410.7 |   5647.1 |   -2661.7 | 35.7
-    30s | KICK   |    97.7 | 0.7032 |    276.6 | 1293.6 |  859.0 | 1728.0 |   194.1 |    4410.7 |   5647.1 |   -2661.7 | 38.8
-    35s | KICK   |    97.7 | 0.7032 |    276.6 | 1293.6 |  859.0 | 1728.0 |   194.1 |    4410.7 |   5647.1 |   -2661.7 | 42.0
-    40s | KICK   |    97.7 | 0.7032 |    276.6 | 1293.6 |  859.0 | 1728.0 |   194.1 |    4410.7 |   5647.1 |   -2661.7 | 45.1
-    50s | KICK   |    97.7 | 0.7032 |    276.6 | 1293.6 |  859.0 | 1728.0 |   194.1 |    4410.7 |   5647.1 |   -2661.7 | 51.4
-    60s | KICK   |    97.7 | 0.7032 |    276.6 | 1293.6 |  859.0 | 1728.0 |   194.1 |    4410.7 |   5647.1 |   -2661.7 | 57.7
-    90s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 72.6
-   120s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 87.5
-   180s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 117.3
-   240s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 147.1
-
-  [D: 1920W × 45s = 86kJ] Kickstart: 1920W for 45s | Spikes: YES
-
-  Time | Status |   RPM   | EMF V  | GenPow W | Peri W | Cond W | Vern W | Shell W | TotalIn W | Losses W | Surplus W | T°C
-  ─────┼────────┼─────────┼────────┼──────────┼────────┼────────┼────────┼─────────┼───────────┼──────────┼───────────┼────
-     0s | KICK   |   168.8 | 0.0000 |      0.0 |    0.0 |    0.0 |    0.0 |     0.0 |     672.0 |      0.0 |   -2938.3 | 20.0
-     2s | KICK   |   117.1 | 0.7590 |    322.2 | 1374.3 |  969.6 | 1835.8 |   206.2 |    5057.9 |   6676.6 |   -2616.1 | 21.5
-     5s | KICK   |     0.0 | 0.8293 |    384.6 | 1473.4 | 1114.3 | 1968.1 |   221.1 |    5448.9 |   7587.5 |   -2553.6 | 23.8
-    10s | KICK   |   248.5 | 0.3330 |     62.0 |  694.4 |  247.5 |  927.6 |   104.2 |    2645.8 |   2184.9 |   -2876.2 | 27.6
-    15s | KICK   |   117.1 | 0.7590 |    322.2 | 1374.3 |  969.6 | 1835.8 |   206.2 |    5057.9 |   6676.6 |   -2616.1 | 31.4
-    20s | KICK   |   231.8 | 0.1400 |     11.0 |  318.6 |   52.1 |  425.5 |    47.8 |    1516.0 |    988.4 |   -2927.3 | 35.3
-    25s | KICK   |    53.7 | 0.8140 |    370.6 | 1452.1 | 1082.4 | 1939.6 |   217.9 |    5364.0 |   7386.0 |   -2567.7 | 39.1
-    30s | KICK   |   244.9 | 0.2168 |     26.3 |  475.3 |  116.0 |  634.9 |    71.3 |    1969.5 |   1378.1 |   -2912.0 | 42.9
-    35s | KICK   |    80.2 | 0.7965 |    354.8 | 1427.5 | 1046.1 | 1906.9 |   214.2 |    5266.7 |   7157.7 |   -2583.5 | 46.7
-    40s | KICK   |   240.8 | 0.1854 |     19.2 |  412.5 |   87.3 |  551.0 |    61.9 |    1784.8 |   1203.3 |   -2919.0 | 50.5
-    50s | COAST  |   159.4 | 0.4798 |    128.8 |  947.2 |  460.6 | 1265.3 |   142.1 |    2824.2 |   2837.1 |   -2938.3 | 56.8
-    60s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 61.8
-    90s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 76.7
-   120s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 91.6
-   180s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 121.4
-   240s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 151.2
-
-  [E: 2400W × 60s = 144kJ] Kickstart: 2400W for 60s | Spikes: YES
-
-  Time | Status |   RPM   | EMF V  | GenPow W | Peri W | Cond W | Vern W | Shell W | TotalIn W | Losses W | Surplus W | T°C
-  ─────┼────────┼─────────┼────────┼──────────┼────────┼────────┼────────┼─────────┼───────────┼──────────┼───────────┼────
-     0s | KICK   |   188.7 | 0.0000 |      0.0 |    0.0 |    0.0 |    0.0 |     0.0 |     840.0 |      0.0 |   -2938.3 | 20.0
-     2s | KICK   |   220.5 | 0.5871 |    192.8 | 1118.6 |  642.3 | 1494.2 |   167.9 |    4262.9 |   4797.2 |   -2745.5 | 21.7
-     5s | KICK   |     0.0 | 0.8822 |    435.3 | 1546.0 | 1226.9 | 2065.1 |   232.0 |    5910.1 |   8466.1 |   -2503.0 | 24.4
-    10s | KICK   |   260.8 | 0.3646 |     74.4 |  750.9 |  289.5 | 1003.1 |   112.7 |    2996.1 |   2610.9 |   -2863.9 | 28.7
-    15s | KICK   |   126.7 | 0.7839 |    343.7 | 1409.8 | 1020.2 | 1883.1 |   211.6 |    5364.6 |   7162.8 |   -2594.6 | 33.1
-    20s | KICK   |   237.8 | 0.5212 |    151.9 | 1014.5 |  528.3 | 1355.1 |   152.2 |    3890.1 |   4088.1 |   -2786.3 | 37.4
-    25s | KICK   |   171.1 | 0.7126 |    284.0 | 1307.3 |  877.3 | 1746.3 |   196.2 |    4967.1 |   6265.7 |   -2654.3 | 41.8
-    30s | KICK   |   220.5 | 0.5871 |    192.8 | 1118.6 |  642.3 | 1494.2 |   167.9 |    4262.9 |   4797.2 |   -2745.5 | 46.1
-    35s | KICK   |   188.7 | 0.0000 |      0.0 |    0.0 |    0.0 |    0.0 |     0.0 |     840.0 |      0.0 |   -2938.3 | 50.5
-    40s | KICK   |     0.0 | 0.8822 |    435.3 | 1546.0 | 1226.9 | 2065.1 |   232.0 |    5910.1 |   8466.1 |   -2503.0 | 54.8
-    50s | KICK   |   126.7 | 0.7839 |    343.7 | 1409.8 | 1020.2 | 1883.1 |   211.6 |    5364.6 |   7162.8 |   -2594.6 | 63.5
-    60s | KICK   |   171.1 | 0.7126 |    284.0 | 1307.3 |  877.3 | 1746.3 |   196.2 |    4967.1 |   6265.7 |   -2654.3 | 72.3
-    90s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 87.2
-   120s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 102.1
-   180s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 131.9
-   240s | COAST  |   159.6 | 0.4792 |    128.4 |  946.2 |  459.5 | 1263.9 |   142.0 |    2820.5 |   2830.7 |   -2938.3 | 161.7
+  NOTE: Total breaker capacity (2060W) is like a house's panel rating.
+  You NEVER draw all 2060W at once — just like a house doesn't
+  use every outlet at maximum simultaneously.
 
 ╔══════════════════════════════════════════════════════════════════════════════╗
-║  KICKSTART SWEEP RESULTS                                                   ║
+║  OPERATING MODES — WHAT THE BODY ACTUALLY DRAWS                            ║
 ╚══════════════════════════════════════════════════════════════════════════════╝
 
-  Config │ Kick Power │ Duration │ Energy  │ Peak RPM │ Peak W │ Steady RPM │ Coast    │ Self-Sust │ T°C
-  ───────┼────────────┼──────────┼─────────┼──────────┼────────┼────────────┼──────────┼───────────┼─────
-     A   │     960W  │    30s   │   29kJ  │    218   │   277  │    159.6   │ running │     NO    │ 173
-     B   │    1440W  │    30s   │   43kJ  │    234   │   331  │    159.6   │ running │     NO    │ 175
-     C   │     960W  │    60s   │   58kJ  │    218   │   277  │    159.6   │ running │     NO    │ 177
-     D   │    1920W  │    45s   │   86kJ  │    249   │   385  │    159.6   │ running │     NO    │ 181
-     E   │    2400W  │    60s   │  144kJ  │    261   │   435  │    159.6   │ running │     NO    │ 192
+  Mode          │ Description                                    │ Actual Draw │ % of Max │ Duty Cycle
+  ──────────────┼────────────────────────────────────────────────┼─────────────┼──────────┼───────────
+  IDLE           │ Sitting still, thinking/computing. Server only. │     314W    │  15.2%   │   40%
+  STANDBY        │ Alert, cameras on, listening, ready to move.   │     344W    │  16.7%   │   20%
+  TALKING        │ Conversing — server + comms + speakers + cameras + head. │     479W    │  23.3%   │   15%
+  WALKING        │ Walking — legs + balance + server + sensors.   │    1006W    │  48.8%   │   10%
+  WORKING        │ Using arms and hands — manipulation tasks.     │     696W    │  33.8%   │   10%
+  FULL MOTION    │ Walking + arms + talking — everything active.  │    1449W    │  70.3%   │    4%
+  PEAK BURST     │ Sprinting/lifting — all actuators maxed (brief, <10s). │    2060W    │ 100.0%   │    1%
 
-  BEST CONFIGURATION: E (2400W × 60s = 144kJ)
+  WEIGHTED AVERAGE LOAD (typical day): 508.9W
+  This is what the ESCU actually needs to sustain.
 
-─── DRIVE MECHANISM BREAKDOWN (best config, peak values) ───
+  Compare:
+    Old assumption:  2,938W (everything maxed simultaneously)
+    IDLE (server):   314W (just thinking/computing)
+    Average day:     509W
+    Walking+talking: 1006W
+    Everything on:   1449W
+    Brief burst:     2060W (max 10 seconds)
 
-  Peristaltic pump:     1546.0 W
-  Shell shear:          232.0 W
-  Vernier coupling:     2065.1 W
-  Conductor coupling:   1226.9 W
-  TOTAL drive:          5070.1 W
-  Peak gen power:       435.3 W
-  Body load:            2938 W
-  Shortfall:            2503 W
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  ESCU PHYSICS SIMULATION (960W kickstart, 30s)                             ║
+╚══════════════════════════════════════════════════════════════════════════════╝
 
-═══ SPIKE EFFECT SUMMARY ═══
+  Time | Status |   RPM   | EMF V  | GenPow W | Available W | T°C
+  ─────┼────────┼─────────┼────────┼──────────┼─────────────┼────
+     0s | KICK   |   119.3 | 0.0000 |      0.0 |      0.0 | 20.0
+     2s | KICK   |    97.7 | 0.7032 |    276.6 |    276.6 | 21.3
+     5s | KICK   |    97.7 | 0.7032 |    276.6 |    276.6 | 23.1
+    10s | KICK   |    97.7 | 0.7032 |    276.6 |    276.6 | 26.3
+    15s | KICK   |    97.7 | 0.7032 |    276.6 |    276.6 | 29.4
+    20s | KICK   |    97.7 | 0.7032 |    276.6 |    276.6 | 32.6
+    25s | KICK   |    97.7 | 0.7032 |    276.6 |    276.6 | 35.7
+    30s | KICK   |    97.7 | 0.7032 |    276.6 |    276.6 | 38.8
+    35s | COAST  |   159.4 | 0.4799 |    128.8 |    122.3 | 41.3
+    40s | COAST  |   159.6 | 0.4792 |    128.4 |    122.0 | 43.8
+    50s | COAST  |   159.6 | 0.4792 |    128.4 |    122.0 | 48.8
+    60s | COAST  |   159.6 | 0.4792 |    128.4 |    122.0 | 53.7
+    90s | COAST  |   159.6 | 0.4792 |    128.4 |    122.0 | 68.6
+   120s | COAST  |   159.6 | 0.4792 |    128.4 |    122.0 | 83.6
+   180s | COAST  |   159.6 | 0.4792 |    128.4 |    122.0 | 113.4
+   240s | COAST  |   159.6 | 0.4792 |    128.4 |    122.0 | 143.2
 
-  Surface area:          2.35× more mercury contact
-  Contact resistance:    21.3μΩ (was 50.0μΩ)
-  Current concentration: 20× at each spike tip
-  Coupling efficiency:   55.6% (was 40.0%)
-  Viscous drag:          -25% (turbulent boundary layer reduction)
-  Peristaltic boost:     +15% (micro-vortex assisted coupling)
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  CAN THE ESCU POWER THE BODY?                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  ESCU CONTINUOUS OUTPUT: 122.0W
+  (Steady-state at 160 RPM, running indefinitely)
+
+  Mode              │ Load     │ ESCU Output │ Surplus/Deficit │ Can Sustain?
+  ──────────────────┼──────────┼─────────────┼─────────────────┼────────────
+  IDLE               │   314W   │     122W    │  -192W          │ ✗ NO
+  STANDBY            │   344W   │     122W    │  -222W          │ ✗ NO
+  TALKING            │   479W   │     122W    │  -357W          │ ✗ NO
+  WALKING            │  1006W   │     122W    │  -884W          │ ✗ NO
+  WORKING            │   696W   │     122W    │  -574W          │ ✗ NO
+  FULL MOTION        │  1449W   │     122W    │ -1327W          │ ✗ NO
+  PEAK BURST         │  2060W   │     122W    │ -1938W          │ ⚡ BATTERY
+
+  WEIGHTED AVERAGE:   509W needed │ 122W generated │ ✗ DEFICIT 387W
+
+═══ BUFFER BATTERY (for burst modes) ═══
+
+  Burst mode: 2060W for 10s = 20.6kJ needed
+  ESCU provides: 122W during burst
+  Deficit: 1938W × 10s = 19.4kJ from battery
+  Battery needed: 16.2Wh (0.34Ah at 48V) — with 3× safety
+  This is a TINY battery — about the size of a smartphone battery.
+  Recharge time: 5814s from ESCU surplus during idle
+
+═══ ENERGY PRODUCTION ═══
+
+  Continuous output: 122.0 watts
+  Per hour: 122.0 Wh
+  Per day:  2928 Wh = 2.93 kWh
+  Per month: 87.8 kWh
+
+  Average daily consumption: 12214 Wh = 12.21 kWh
+  Daily deficit: 9286 Wh — needs supplemental power
+
+╔══════════════════════════════════════════════════════════════════════════════╗
+║  FINAL VERDICT                                                              ║
+╚══════════════════════════════════════════════════════════════════════════════╝
+
+  ✗ The ESCU needs more output to sustain even idle mode.
+
+    Server needs: 314W, ESCU provides: 122W
+
+  BOOST CONVERTER NOTE:
+  The ESCU outputs ~0.70V. A boost converter (95% efficient)
+  steps this up to 48V for the main bus. This is standard technology,
+  small (30×20mm board), and handles the voltage conversion.
 
 © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
