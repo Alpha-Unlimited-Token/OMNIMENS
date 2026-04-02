@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuMatrixAccelerator
- * Written: 2026-04-01T22:14:37.834Z
+ * Written: 2026-04-02T14:24:11.782Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,37 +16,42 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
+/**
+ * TRANSLATION STATUS:
+ * Novel constructs: attention
+ * All constructs have translation mappings
+ * Compiled targets: javascript: OK (16 IR steps) | python: OK (16 IR steps) | c: OK (16 IR steps) | x86_64: OK (16 IR steps) | arm64: OK (16 IR steps) | avr: OK (16 IR steps)
+ * Translation map version: 22
+ */
 // gpuMatrixAccelerator.mjs
 
-import { Worker, isMainThread, parentPort } from 'node:worker_threads';
+import { performance } from 'perf_hooks';
 
-// Utility function to initialize a WebGL context
-function createWebGLContext(canvas) {
-  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-  if (!gl) throw new Error('WebGL not supported');
-  return gl;
-}
-
-// Matrix multiplication using GPU.js-like logic
+/**
+ * Multiplies two matrices using GPU acceleration (simulated with pure JavaScript for Node.js).
+ * @param {number[][]} A - First matrix.
+ * @param {number[][]} B - Second matrix.
+ * @returns {number[][]} - Resultant matrix after multiplication.
+ */
 export function gpuMatrixMultiply(A, B) {
-  if (!Array.isArray(A) || !Array.isArray(B)) {
-    throw new TypeError('Input matrices must be arrays');
+  if (!Array.isArray(A) || !Array.isArray(B) || A.length === 0 || B.length === 0) {
+    throw new Error('Invalid input: Matrices must be non-empty 2D arrays.');
   }
 
-  const rowsA = A.length;
-  const colsA = A[0].length;
-  const rowsB = B.length;
-  const colsB = B[0].length;
+  const numRowsA = A.length;
+  const numColsA = A[0].length;
+  const numRowsB = B.length;
+  const numColsB = B[0].length;
 
-  if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions do not match for multiplication');
+  if (numColsA !== numRowsB) {
+    throw new Error('Matrix multiplication not possible: Columns of A must match rows of B.');
   }
 
-  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+  const result = Array.from({ length: numRowsA }, () => Array(numColsB).fill(0));
 
-  for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      for (let k = 0; k < colsA; k++) {
+  for (let i = 0; i < numRowsA; i++) {
+    for (let j = 0; j < numColsB; j++) {
+      for (let k = 0; k < numColsA; k++) {
         result[i][j] += A[i][k] * B[k][j];
       }
     }
@@ -55,57 +60,71 @@ export function gpuMatrixMultiply(A, B) {
   return result;
 }
 
-// Eigenvalue decomposition placeholder (simplified for demonstration)
-export function gpuEigenDecomposition(matrix) {
-  if (!Array.isArray(matrix)) {
-    throw new TypeError('Input must be a matrix (array of arrays)');
+/**
+ * Computes scaled dot-product attention for input matrices (queries, keys, values).
+ * @param {number[][]} Q - Query matrix.
+ * @param {number[][]} K - Key matrix.
+ * @param {number[][]} V - Value matrix.
+ * @returns {number[][]} - Attention-weighted output matrix.
+ */
+export function gpuScaledDotProductAttention(Q, K, V) {
+  if (!Array.isArray(Q) || !Array.isArray(K) || !Array.isArray(V)) {
+    throw new Error('Invalid input, K, and V must be 2D arrays.');
   }
 
-  const rows = matrix.length;
-  const cols = matrix[0].length;
+  const transposeK = transposeMatrix(K);
+  const scores = gpuMatrixMultiply(Q, transposeK);
+  const scaleFactor = Math.sqrt(K[0].length);
 
-  if (rows !== cols) {
-    throw new Error('Matrix must be square for eigenvalue decomposition');
-  }
+  const scaledScores = scores.map(row => row.map(value => value / scaleFactor));
+  const attentionWeights = softmaxMatrix(scaledScores);
 
-  // Simplified eigenvalue calculation (not GPU-accelerated)
-  const eigenvalues = matrix.map(row => row.reduce((sum, val) => sum + val, 0));
-
-  return {
-    eigenvalues,
-    eigenvectors: matrix // Placeholder: actual eigenvectors computation requires advanced algorithms
-  };
+  return gpuMatrixMultiply(attentionWeights, V);
 }
 
-// General utility for validating matrix inputs
-export function validateMatrix(matrix) {
-  if (!Array.isArray(matrix) || !matrix.every(row => Array.isArray(row))) {
-    throw new TypeError('Input must be a matrix (array of arrays)');
-  }
-
-  const rowLength = matrix[0].length;
-  if (!matrix.every(row => row.length === rowLength)) {
-    throw new Error('All rows in the matrix must have the same length');
-  }
-
-  return true;
-}
-
-// Worker thread example (for future GPU-based parallelization)
-if (!isMainThread) {
-  parentPort.on('message', (data) => {
-    if (data.type === 'multiply') {
-      const result = gpuMatrixMultiply(data.A, data.B);
-      parentPort.postMessage({ result });
-    } else if (data.type === 'eigen') {
-      const result = gpuEigenDecomposition(data.matrix);
-      parentPort.postMessage({ result });
-    }
+/**
+ * Computes the softmax of a matrix row-wise.
+ * @param {number[][]} matrix - Input matrix.
+ * @returns {number[][]} - Matrix after applying softmax row-wise.
+ */
+export function softmaxMatrix(matrix) {
+  return matrix.map(row => {
+    const maxVal = Math.max(...row);
+    const expRow = row.map(value => Math.exp(value - maxVal));
+    const sumExp = expRow.reduce((acc, val) => acc + val, 0);
+    return expRow.map(value => value / sumExp);
   });
 }
 
-export const moduleInfo = {
-  name: 'gpuMatrixAccelerator',
-  version: '1.0.0',
-  description: 'Offloads matrix operations to GPU for faster computation using WebGL-like logic.'
-};
+/**
+ * Transposes a matrix.
+ * @param {number[][]} matrix - Input matrix.
+ * @returns {number[][]} - Transposed matrix.
+ */
+export function transposeMatrix(matrix) {
+  const numRows = matrix.length;
+  const numCols = matrix[0].length;
+
+  const transposed = Array.from({ length: numCols }, () => Array(numRows).fill(0));
+
+  for (let i = 0; i < numRows; i++) {
+    for (let j = 0; j < numCols; j++) {
+      transposed[j][i] = matrix[i][j];
+    }
+  }
+
+  return transposed;
+}
+
+/**
+ * Measures the execution time of a function.
+ * @param {Function} func - Function to measure.
+ * @param {...any} args - Arguments to pass to the function.
+ * @returns {{ result, time}} - Result and execution time in milliseconds.
+ */
+export function measureExecutionTime(func, ...args) {
+  const start = performance.now();
+  const result = func(...args);
+  const end = performance.now();
+  return { result, time: end - start };
+}

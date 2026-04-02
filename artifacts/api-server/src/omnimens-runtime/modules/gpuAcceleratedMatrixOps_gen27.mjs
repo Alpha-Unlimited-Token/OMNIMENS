@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuAcceleratedMatrixOps
- * Written: 2026-04-02T13:31:04.483Z
+ * Written: 2026-04-02T14:24:52.040Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,20 +16,13 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-/**
- * TRANSLATION STATUS:
- * Novel constructs: attention
- * All constructs have translation mappings
- * Compiled targets: javascript: OK (11 IR steps) | python: OK (11 IR steps) | c: OK (11 IR steps) | x86_64: OK (11 IR steps) | arm64: OK (11 IR steps) | avr: OK (11 IR steps)
- * Translation map version: 22
- */
 // gpuAcceleratedMatrixOps.mjs
 
 import { createHash } from 'crypto';
 
 /**
- * Generates a unique hash for caching purposes.
- * @param {string} input - Input string to hash.
+ * Generate a unique hash for caching purposes based on input data.
+ * @param {string} input - The input string to hash.
  * @returns {string} - A unique hash string.
  */
 export function generateHash(input) {
@@ -37,37 +30,26 @@ export function generateHash(input) {
 }
 
 /**
- * Transposes a 2D matrix.
- * @param {number[][]} matrix - The input matrix.
- * @returns {number[][]} - The transposed matrix.
+ * Perform matrix multiplication using a pure algorithm.
+ * @param {number[][]} A - First matrix.
+ * @param {number[][]} B - Second matrix.
+ * @returns {number[][]} - Resultant matrix after multiplication.
  */
-export function transposeMatrix(matrix) {
-  if (!Array.isArray(matrix) || !Array.isArray(matrix[0])) {
-    throw new Error('Input must be a 2D array.');
-  }
-  return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
-}
+export function matrixMultiply(A, B) {
+  const rowsA = A.length;
+  const colsA = A[0].length;
+  const colsB = B[0].length;
 
-/**
- * Performs matrix multiplication using pure JavaScript.
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {number[][]} - The resulting matrix.
- */
-export function multiplyMatrices(matrixA, matrixB) {
-  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
-    throw new Error('Both inputs must be 2D arrays.');
-  }
-  if (matrixA[0].length !== matrixB.length) {
-    throw new Error('Number of columns in matrixA must match number of rows in matrixB.');
+  if (colsA !== B.length) {
+    throw new Error('Matrix dimensions do not align for multiplication.');
   }
 
-  const result = Array.from({ length: matrixA.length }, () => Array(matrixB[0].length).fill(0));
+  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
 
-  for (let i = 0; i < matrixA.length; i++) {
-    for (let j = 0; j < matrixB[0].length; j++) {
-      for (let k = 0; k < matrixB.length; k++) {
-        result[i][j] += matrixA[i][k] * matrixB[k][j];
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      for (let k = 0; k < colsA; k++) {
+        result[i][j] += A[i][k] * B[k][j];
       }
     }
   }
@@ -76,54 +58,76 @@ export function multiplyMatrices(matrixA, matrixB) {
 }
 
 /**
- * Applies a simple attention mechanism to a matrix.
- * @param {number[][]} query - Query matrix.
- * @param {number[][]} key - Key matrix.
- * @param {number[][]} value - Value matrix.
- * @returns {number[][]} - The attention-weighted output matrix.
+ * Approximate eigenvalues and eigenvectors using the power iteration method.
+ * @param {number[][]} matrix - The square matrix to analyze.
+ * @param {number} iterations - Number of iterations for convergence.
+ * @returns {{ eigenvalue, eigenvector}} - Dominant eigenvalue and eigenvector.
  */
-export function attentionMechanism(query, key, value) {
-  const keyTransposed = transposeMatrix(key);
-  const scores = multiplyMatrices(query, keyTransposed);
-
-  const softmax = scores.map(row => {
-    const max = Math.max(...row);
-    const exps = row.map(val => Math.exp(val - max));
-    const sumExps = exps.reduce((sum, val) => sum + val, 0);
-    return exps.map(val => val / sumExps);
-  });
-
-  return multiplyMatrices(softmax, value);
-}
-
-/**
- * Calculates the eigenvalues of a 2x2 matrix (special case for simplicity).
- * @param {number[][]} matrix - A 2x2 matrix.
- * @returns {number[]} - The eigenvalues.
- */
-export function eigenvalues2x2(matrix) {
-  if (!Array.isArray(matrix) || matrix.length !== 2 || matrix[0].length !== 2) {
-    throw new Error('Input must be a 2x2 matrix.');
+export function powerIteration(matrix, iterations = 1000) {
+  const n = matrix.length;
+  if (matrix.some(row => row.length !== n)) {
+    throw new Error('Matrix must be square.');
   }
 
-  const [a, b] = matrix[0];
-  const [c, d] = matrix[1];
-  const trace = a + d;
-  const determinant = a * d - b * c;
-  const discriminant = Math.sqrt(trace * trace - 4 * determinant);
+  let vector = Array(n).fill(1);
 
-  return [(trace + discriminant) / 2, (trace - discriminant) / 2];
+  for (let iter = 0; iter < iterations; iter++) {
+    const nextVector = matrixMultiply([vector], matrix)[0];
+    const norm = Math.sqrt(nextVector.reduce((sum, val) => sum + val ** 2, 0));
+    vector = nextVector.map(val => val / norm);
+  }
+
+  const eigenvalue = matrixMultiply([vector], matrix)[0].reduce((sum, val, i) => sum + val * vector[i], 0);
+
+  return { eigenvalue, eigenvector: vector };
 }
 
 /**
- * Normalizes a matrix to have values between 0 and 1.
- * @param {number[][]} matrix - The input matrix.
- * @returns {number[][]} - The normalized matrix.
+ * Update a Hopfield network memory state.
+ * @param {number[][]} weights - Weight matrix of the Hopfield network.
+ * @param {number[]} state - Current state vector.
+ * @returns {number[]} - Updated state vector.
  */
-export function normalizeMatrix(matrix) {
-  const flat = matrix.flat();
-  const min = Math.min(...flat);
-  const max = Math.max(...flat);
+export function hopfieldUpdate(weights, state) {
+  const n = weights.length;
+  if (weights.some(row => row.length !== n) || state.length !== n) {
+    throw new Error('Weights must be square and match the state vector size.');
+  }
 
-  return matrix.map(row => row.map(val => (val - min) / (max - min)));
+  return state.map((_, i) => {
+    const sum = weights[i].reduce((acc, w, j) => acc + w * state[j], 0);
+    return sum >= 0 ? 1 : -1;
+  });
+}
+
+/**
+ * Validate if a matrix is symmetric.
+ * @param {number[][]} matrix - The matrix to validate.
+ * @returns {boolean} - True if symmetric, false otherwise.
+ */
+export function isSymmetric(matrix) {
+  const n = matrix.length;
+  if (matrix.some(row => row.length !== n)) {
+    return false;
+  }
+
+  for (let i = 0; i < n; i++) {
+    for (let j = 0; j < n; j++) {
+      if (matrix[i][j] !== matrix[j][i]) {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+/**
+ * Normalize a vector.
+ * @param {number[]} vector - The vector to normalize.
+ * @returns {number[]} - Normalized vector.
+ */
+export function normalizeVector(vector) {
+  const norm = Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
+  return vector.map(val => val / norm);
 }

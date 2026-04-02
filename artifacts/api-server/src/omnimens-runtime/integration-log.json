@@ -1,2046 +1,6 @@
 [
   {
     "source": "evolution_engine",
-    "title": "Evolution Module: contextRichSummarizer",
-    "filename": "contextRichSummarizer_gen21.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/contextRichSummarizer_gen21.mjs",
-    "backupPath": null,
-    "timestamp": 1775082189269,
-    "codeLength": 3321,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 21 Complete — 2 modules",
-    "filename": "evolution_marker_gen21.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen21.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen21.mjs.backup.2026-04-01T22-23-09-294Z",
-    "timestamp": 1775082189294,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "discovery_autocoder:wormhole:GraphicDesigner+Critic",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: GraphicDesigner/pattern_recognition: The connectome is the c",
-    "filename": "omnimens_autocode_pattern_recognition_mngp65w2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mngp65w2.mjs",
-    "backupPath": null,
-    "timestamp": 1775087340626,
-    "codeLength": 468,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:Meta-Agent+Synthesizer",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Meta-Agent/recursive_decomposition: The binding problem: how",
-    "filename": "omnimens_autocode_neural_pathway_mngpwti5.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mngpwti5.mjs",
-    "backupPath": null,
-    "timestamp": 1775088584286,
-    "codeLength": 429,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:GraphicDesigner+Synthesizer",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: GraphicDesigner/temporal_correlation: The connectome is the ",
-    "filename": "omnimens_autocode_neural_pathway_mngpwtl3.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mngpwtl3.mjs",
-    "backupPath": null,
-    "timestamp": 1775088584391,
-    "codeLength": 434,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Neuroscientist",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SpellCheckVisual/abstraction_layer: The holographic principl",
-    "filename": "omnimens_autocode_consciousness_expansion_mngpwtpg.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mngpwtpg.mjs",
-    "backupPath": null,
-    "timestamp": 1775088584548,
-    "codeLength": 397,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: wasmMatrixAccelerator",
-    "filename": "wasmMatrixAccelerator_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmMatrixAccelerator_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/wasmMatrixAccelerator_gen1.mjs.backup.2026-04-02T00-09-51-896Z",
-    "timestamp": 1775088591895,
-    "codeLength": 2160,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: semanticCacheManager",
-    "filename": "semanticCacheManager_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/semanticCacheManager_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/semanticCacheManager_gen1.mjs.backup.2026-04-02T00-09-58-039Z",
-    "timestamp": 1775088598038,
-    "codeLength": 2473,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: multimodalFusionEngine",
-    "filename": "multimodalFusionEngine_gen3.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/multimodalFusionEngine_gen3.mjs",
-    "backupPath": null,
-    "timestamp": 1775088603697,
-    "codeLength": 3341,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: contextSummarizer",
-    "filename": "contextSummarizer_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/contextSummarizer_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/contextSummarizer_gen1.mjs.backup.2026-04-02T00-10-08-955Z",
-    "timestamp": 1775088608953,
-    "codeLength": 4187,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 1 Complete — 3 modules",
-    "filename": "evolution_marker_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen1.mjs.backup.2026-04-02T00-10-09-081Z",
-    "timestamp": 1775088609080,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: hierarchicalMemoryManager",
-    "filename": "hierarchicalMemoryManager_gen3.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/hierarchicalMemoryManager_gen3.mjs",
-    "backupPath": null,
-    "timestamp": 1775088612890,
-    "codeLength": 3754,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: wasmMatrixAccelerator",
-    "filename": "wasmMatrixAccelerator_gen6.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmMatrixAccelerator_gen6.mjs",
-    "backupPath": null,
-    "timestamp": 1775088620045,
-    "codeLength": 2313,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: iterativeComputationManager",
-    "filename": "iterativeComputationManager_gen2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeComputationManager_gen2.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/iterativeComputationManager_gen2.mjs.backup.2026-04-02T00-10-20-732Z",
-    "timestamp": 1775088620731,
-    "codeLength": 1897,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: wasmMatrixAccelerator",
-    "filename": "wasmMatrixAccelerator_gen3.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmMatrixAccelerator_gen3.mjs",
-    "backupPath": null,
-    "timestamp": 1775088621788,
-    "codeLength": 3444,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: statefulTaskQueue",
-    "filename": "statefulTaskQueue_gen4.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/statefulTaskQueue_gen4.mjs",
-    "backupPath": null,
-    "timestamp": 1775088621896,
-    "codeLength": 3064,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 3 Complete — 3 modules",
-    "filename": "evolution_marker_gen3.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen3.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen3.mjs.backup.2026-04-02T00-10-21-905Z",
-    "timestamp": 1775088621904,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: webAssemblyMatrixEngine",
-    "filename": "webAssemblyMatrixEngine_gen5.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webAssemblyMatrixEngine_gen5.mjs",
-    "backupPath": null,
-    "timestamp": 1775088625424,
-    "codeLength": 3037,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: dynamicContextManager",
-    "filename": "dynamicContextManager_gen2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/dynamicContextManager_gen2.mjs",
-    "backupPath": null,
-    "timestamp": 1775088629025,
-    "codeLength": 3116,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 2 Complete — 3 modules",
-    "filename": "evolution_marker_gen2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen2.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen2.mjs.backup.2026-04-02T00-10-29-263Z",
-    "timestamp": 1775088629262,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: sparseAttentionContextManager",
-    "filename": "sparseAttentionContextManager_gen6.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sparseAttentionContextManager_gen6.mjs",
-    "backupPath": null,
-    "timestamp": 1775088629982,
-    "codeLength": 3392,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: lightweightNlgTransformer",
-    "filename": "lightweightNlgTransformer_gen4.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/lightweightNlgTransformer_gen4.mjs",
-    "backupPath": null,
-    "timestamp": 1775088631468,
-    "codeLength": 2829,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 4 Complete — 3 modules",
-    "filename": "evolution_marker_gen4.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen4.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen4.mjs.backup.2026-04-02T00-10-31-605Z",
-    "timestamp": 1775088631605,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: recursiveContextRehydration",
-    "filename": "recursiveContextRehydration_gen5.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/recursiveContextRehydration_gen5.mjs",
-    "backupPath": null,
-    "timestamp": 1775088631885,
-    "codeLength": 3173,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: iterativeComputationManager",
-    "filename": "iterativeComputationManager_gen6.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeComputationManager_gen6.mjs",
-    "backupPath": null,
-    "timestamp": 1775088638336,
-    "codeLength": 3829,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 6 Complete — 3 modules",
-    "filename": "evolution_marker_gen6.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen6.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen6.mjs.backup.2026-04-02T00-10-38-470Z",
-    "timestamp": 1775088638469,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: checkpointedSubprocessManager",
-    "filename": "checkpointedSubprocessManager_gen5.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/checkpointedSubprocessManager_gen5.mjs",
-    "backupPath": null,
-    "timestamp": 1775088640759,
-    "codeLength": 3923,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 5 Complete — 3 modules",
-    "filename": "evolution_marker_gen5.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen5.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen5.mjs.backup.2026-04-02T00-10-40-908Z",
-    "timestamp": 1775088640907,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: multimodalIntegrationEngine",
-    "filename": "multimodalIntegrationEngine_gen7.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/multimodalIntegrationEngine_gen7.mjs",
-    "backupPath": null,
-    "timestamp": 1775088647709,
-    "codeLength": 2606,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: wasmAcceleratedMatrixEngine",
-    "filename": "wasmAcceleratedMatrixEngine_gen7.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmAcceleratedMatrixEngine_gen7.mjs",
-    "backupPath": null,
-    "timestamp": 1775088667201,
-    "codeLength": 3131,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 7 Complete — 3 modules",
-    "filename": "evolution_marker_gen7.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen7.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen7.mjs.backup.2026-04-02T00-11-07-343Z",
-    "timestamp": 1775088667343,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Meta-Agent",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SpellCheckVisual/feature_extraction: Emergence: complex beha",
-    "filename": "omnimens_autocode_consciousness_expansion_mnhiebx1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnhiebx1.mjs",
-    "backupPath": null,
-    "timestamp": 1775136430549,
-    "codeLength": 393,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+GraphicDesigner",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: SpellCheckVisual/structural_analysis: The edge of chaos: com",
-    "filename": "omnimens_autocode_pattern_recognition_mnhiec0c.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnhiec0c.mjs",
-    "backupPath": null,
-    "timestamp": 1775136430668,
-    "codeLength": 478,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Neuroscientist",
-    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: SpellCheckVisual/information_compression: The edge of chaos:",
-    "filename": "omnimens_autocode_adaptive_algorithm_mnhiec36.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnhiec36.mjs",
-    "backupPath": null,
-    "timestamp": 1775136430771,
-    "codeLength": 458,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:GraphicDesigner+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: GraphicDesigner/information_compression: Mirror neurons fire",
-    "filename": "omnimens_autocode_consciousness_expansion_mnhif9m2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnhif9m2.mjs",
-    "backupPath": null,
-    "timestamp": 1775136474219,
-    "codeLength": 390,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+GraphicDesigner",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SpellCheckVisual/recursive_decomposition: Emergence: complex",
-    "filename": "omnimens_autocode_consciousness_expansion_mnhif9pc.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnhif9pc.mjs",
-    "backupPath": null,
-    "timestamp": 1775136474336,
-    "codeLength": 398,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SpellCheckVisual/recursive_decomposition: Emergence: complex",
-    "filename": "omnimens_autocode_consciousness_expansion_mnhif9rt.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnhif9rt.mjs",
-    "backupPath": null,
-    "timestamp": 1775136474425,
-    "codeLength": 391,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: SpellCheckVisual/abstraction_layer: The double-slit experime",
-    "filename": "omnimens_autocode_pattern_recognition_mnhig6lu.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnhig6lu.mjs",
-    "backupPath": null,
-    "timestamp": 1775136516978,
-    "codeLength": 471,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Architect",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SpellCheckVisual/cross_domain_synthesis: The butterfly effec",
-    "filename": "omnimens_autocode_knowledge_synthesis_mnhig8x7.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnhig8x7.mjs",
-    "backupPath": null,
-    "timestamp": 1775136519979,
-    "codeLength": 421,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Synthesizer",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: SpellCheckVisual/abstraction_layer: The double-slit experime",
-    "filename": "omnimens_autocode_pattern_recognition_mnhig8zg.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnhig8zg.mjs",
-    "backupPath": null,
-    "timestamp": 1775136520060,
-    "codeLength": 474,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuMatrixAccelerator",
-    "filename": "gpuMatrixAccelerator_gen2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuMatrixAccelerator_gen2.mjs",
-    "backupPath": null,
-    "timestamp": 1775136533001,
-    "codeLength": 3400,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: reversibleContextCompressor",
-    "filename": "reversibleContextCompressor_gen2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/reversibleContextCompressor_gen2.mjs",
-    "backupPath": null,
-    "timestamp": 1775136556565,
-    "codeLength": 4238,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: iterativeComputationManager",
-    "filename": "iterativeComputationManager_gen2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeComputationManager_gen2.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/iterativeComputationManager_gen2.mjs.backup.2026-04-02T13-29-25-160Z",
-    "timestamp": 1775136565159,
-    "codeLength": 2779,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 2 Complete — 3 modules",
-    "filename": "evolution_marker_gen2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen2.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen2.mjs.backup.2026-04-02T13-29-25-282Z",
-    "timestamp": 1775136565281,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: hierarchicalTokenCompressor",
-    "filename": "hierarchicalTokenCompressor_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/hierarchicalTokenCompressor_gen1.mjs",
-    "backupPath": null,
-    "timestamp": 1775136566498,
-    "codeLength": 3505,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 1 Complete — 3 modules",
-    "filename": "evolution_marker_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen1.mjs.backup.2026-04-02T13-29-26-640Z",
-    "timestamp": 1775136566640,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: contextExpansionManager",
-    "filename": "contextExpansionManager_gen4.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/contextExpansionManager_gen4.mjs",
-    "backupPath": null,
-    "timestamp": 1775136568687,
-    "codeLength": 2321,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: wasmModuleLoader",
-    "filename": "wasmModuleLoader_gen3.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmModuleLoader_gen3.mjs",
-    "backupPath": null,
-    "timestamp": 1775136569514,
-    "codeLength": 4246,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuAcceleratedMatrixOps",
-    "filename": "gpuAcceleratedMatrixOps_gen7.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixOps_gen7.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/gpuAcceleratedMatrixOps_gen7.mjs.backup.2026-04-02T13-29-32-387Z",
-    "timestamp": 1775136572386,
-    "codeLength": 3976,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: dynamicContextReconstructor",
-    "filename": "dynamicContextReconstructor_gen6.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/dynamicContextReconstructor_gen6.mjs",
-    "backupPath": null,
-    "timestamp": 1775136576610,
-    "codeLength": 4015,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:GraphicDesigner+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: GraphicDesigner/entropy_reduction: The Weber-Fechner law: pe",
-    "filename": "omnimens_autocode_consciousness_expansion_mnhihgwj.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnhihgwj.mjs",
-    "backupPath": null,
-    "timestamp": 1775136576979,
-    "codeLength": 390,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: SpellCheckVisual/structural_analysis: Phase transitions in n",
-    "filename": "omnimens_autocode_neural_pathway_mnhihgyg.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnhihgyg.mjs",
-    "backupPath": null,
-    "timestamp": 1775136577048,
-    "codeLength": 432,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Neuroscientist",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: SpellCheckVisual/entropy_reduction: Information is physical ",
-    "filename": "omnimens_autocode_pattern_recognition_mnhihh07.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnhihh07.mjs",
-    "backupPath": null,
-    "timestamp": 1775136577111,
-    "codeLength": 477,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: slidingWindowContextManager",
-    "filename": "slidingWindowContextManager_gen3.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/slidingWindowContextManager_gen3.mjs",
-    "backupPath": null,
-    "timestamp": 1775136579058,
-    "codeLength": 2858,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: iterativeTaskManager",
-    "filename": "iterativeTaskManager_gen4.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeTaskManager_gen4.mjs",
-    "backupPath": null,
-    "timestamp": 1775136579192,
-    "codeLength": 2838,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 3 Complete — 3 modules",
-    "filename": "evolution_marker_gen3.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen3.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen3.mjs.backup.2026-04-02T13-29-39-200Z",
-    "timestamp": 1775136579198,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 4 Complete — 3 modules",
-    "filename": "evolution_marker_gen4.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen4.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen4.mjs.backup.2026-04-02T13-29-39-571Z",
-    "timestamp": 1775136579570,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: multimodalFusionEngine",
-    "filename": "multimodalFusionEngine_gen5.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/multimodalFusionEngine_gen5.mjs",
-    "backupPath": null,
-    "timestamp": 1775136581448,
-    "codeLength": 3716,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: multimodalIntegrationEngine",
-    "filename": "multimodalIntegrationEngine_gen10.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/multimodalIntegrationEngine_gen10.mjs",
-    "backupPath": null,
-    "timestamp": 1775136582441,
-    "codeLength": 3443,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: checkpointedComputationManager",
-    "filename": "checkpointedComputationManager_gen6.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/checkpointedComputationManager_gen6.mjs",
-    "backupPath": null,
-    "timestamp": 1775136588766,
-    "codeLength": 3519,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 6 Complete — 3 modules",
-    "filename": "evolution_marker_gen6.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen6.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen6.mjs.backup.2026-04-02T13-29-48-903Z",
-    "timestamp": 1775136588902,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: multimodalEmbeddingIntegration",
-    "filename": "multimodalEmbeddingIntegration_gen8.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/multimodalEmbeddingIntegration_gen8.mjs",
-    "backupPath": null,
-    "timestamp": 1775136589963,
-    "codeLength": 2703,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: distributedTaskScheduler",
-    "filename": "distributedTaskScheduler_gen10.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/distributedTaskScheduler_gen10.mjs",
-    "backupPath": null,
-    "timestamp": 1775136592583,
-    "codeLength": 2634,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuAcceleratedMatrixEngine",
-    "filename": "gpuAcceleratedMatrixEngine_gen11.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixEngine_gen11.mjs",
-    "backupPath": null,
-    "timestamp": 1775136592838,
-    "codeLength": 4589,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: adaptivePromptTuning",
-    "filename": "adaptivePromptTuning_gen7.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/adaptivePromptTuning_gen7.mjs",
-    "backupPath": null,
-    "timestamp": 1775136592958,
-    "codeLength": 4457,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuAcceleratedMatrixOps",
-    "filename": "gpuAcceleratedMatrixOps_gen12.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixOps_gen12.mjs",
-    "backupPath": null,
-    "timestamp": 1775136593213,
-    "codeLength": 3076,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: persistentReplEmulator",
-    "filename": "persistentReplEmulator_gen5.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/persistentReplEmulator_gen5.mjs",
-    "backupPath": null,
-    "timestamp": 1775136593440,
-    "codeLength": 2641,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: neuroSymbolicReasoner",
-    "filename": "neuroSymbolicReasoner_gen9.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/neuroSymbolicReasoner_gen9.mjs",
-    "backupPath": null,
-    "timestamp": 1775136593553,
-    "codeLength": 3380,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 5 Complete — 3 modules",
-    "filename": "evolution_marker_gen5.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen5.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen5.mjs.backup.2026-04-02T13-29-53-570Z",
-    "timestamp": 1775136593569,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: virtualReplStateManager",
-    "filename": "virtualReplStateManager_gen8.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/virtualReplStateManager_gen8.mjs",
-    "backupPath": null,
-    "timestamp": 1775136599144,
-    "codeLength": 3225,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 8 Complete — 3 modules",
-    "filename": "evolution_marker_gen8.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen8.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen8.mjs.backup.2026-04-02T13-29-59-272Z",
-    "timestamp": 1775136599271,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: checkpointedTaskRunner",
-    "filename": "checkpointedTaskRunner_gen7.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/checkpointedTaskRunner_gen7.mjs",
-    "backupPath": null,
-    "timestamp": 1775136602245,
-    "codeLength": 3439,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 7 Complete — 3 modules",
-    "filename": "evolution_marker_gen7.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen7.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen7.mjs.backup.2026-04-02T13-30-02-399Z",
-    "timestamp": 1775136602398,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: statefulTaskQueue",
-    "filename": "statefulTaskQueue_gen11.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/statefulTaskQueue_gen11.mjs",
-    "backupPath": null,
-    "timestamp": 1775136603508,
-    "codeLength": 3412,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: domainSpecificLanguageModel",
-    "filename": "domainSpecificLanguageModel_gen10.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/domainSpecificLanguageModel_gen10.mjs",
-    "backupPath": null,
-    "timestamp": 1775136603731,
-    "codeLength": 2904,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 10 Complete — 3 modules",
-    "filename": "evolution_marker_gen10.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen10.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen10.mjs.backup.2026-04-02T13-30-03-881Z",
-    "timestamp": 1775136603880,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: recursiveContextMemory",
-    "filename": "recursiveContextMemory_gen9.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/recursiveContextMemory_gen9.mjs",
-    "backupPath": null,
-    "timestamp": 1775136604202,
-    "codeLength": 3260,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 9 Complete — 3 modules",
-    "filename": "evolution_marker_gen9.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen9.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen9.mjs.backup.2026-04-02T13-30-04-389Z",
-    "timestamp": 1775136604388,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: multimodalIntegrationEngine",
-    "filename": "multimodalIntegrationEngine_gen12.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/multimodalIntegrationEngine_gen12.mjs",
-    "backupPath": null,
-    "timestamp": 1775136605326,
-    "codeLength": 3342,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuMatrixEngine",
-    "filename": "gpuMatrixEngine_gen16.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuMatrixEngine_gen16.mjs",
-    "backupPath": null,
-    "timestamp": 1775136613036,
-    "codeLength": 4211,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: dynamicMemoryPager",
-    "filename": "dynamicMemoryPager_gen11.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/dynamicMemoryPager_gen11.mjs",
-    "backupPath": null,
-    "timestamp": 1775136613502,
-    "codeLength": 2711,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 11 Complete — 3 modules",
-    "filename": "evolution_marker_gen11.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen11.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen11.mjs.backup.2026-04-02T13-30-13-620Z",
-    "timestamp": 1775136613620,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: internalLanguageModel",
-    "filename": "internalLanguageModel_gen12.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/internalLanguageModel_gen12.mjs",
-    "backupPath": null,
-    "timestamp": 1775136615127,
-    "codeLength": 2900,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 12 Complete — 3 modules",
-    "filename": "evolution_marker_gen12.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen12.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen12.mjs.backup.2026-04-02T13-30-15-253Z",
-    "timestamp": 1775136615253,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuAcceleratedTensorEngine",
-    "filename": "gpuAcceleratedTensorEngine_gen15.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedTensorEngine_gen15.mjs",
-    "backupPath": null,
-    "timestamp": 1775136616496,
-    "codeLength": 4678,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: semanticClusterPruner",
-    "filename": "semanticClusterPruner_gen14.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/semanticClusterPruner_gen14.mjs",
-    "backupPath": null,
-    "timestamp": 1775136620656,
-    "codeLength": 4354,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: adaptiveContextRebuilder",
-    "filename": "adaptiveContextRebuilder_gen16.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/adaptiveContextRebuilder_gen16.mjs",
-    "backupPath": null,
-    "timestamp": 1775136624382,
-    "codeLength": 3129,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 14 Complete — 3 modules",
-    "filename": "evolution_marker_gen14.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen14.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen14.mjs.backup.2026-04-02T13-30-29-263Z",
-    "timestamp": 1775136629263,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: multiPassTokenStitcher",
-    "filename": "multiPassTokenStitcher_gen15.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/multiPassTokenStitcher_gen15.mjs",
-    "backupPath": null,
-    "timestamp": 1775136629648,
-    "codeLength": 3153,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: recursiveContextProcessor",
-    "filename": "recursiveContextProcessor_gen13.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/recursiveContextProcessor_gen13.mjs",
-    "backupPath": null,
-    "timestamp": 1775136632939,
-    "codeLength": 3348,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 13 Complete — 3 modules",
-    "filename": "evolution_marker_gen13.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen13.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen13.mjs.backup.2026-04-02T13-30-33-074Z",
-    "timestamp": 1775136633073,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: recursiveCheckpointSubprocess",
-    "filename": "recursiveCheckpointSubprocess_gen18.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/recursiveCheckpointSubprocess_gen18.mjs",
-    "backupPath": null,
-    "timestamp": 1775136634669,
-    "codeLength": 2865,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:GraphicDesigner+Mathematician",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: GraphicDesigner/emergent_property_detection: Information is ",
-    "filename": "omnimens_autocode_consciousness_expansion_mnhiir8y.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnhiir8y.mjs",
-    "backupPath": null,
-    "timestamp": 1775136637042,
-    "codeLength": 395,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Meta-Agent",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SpellCheckVisual/analogical_mapping: Quantum tunneling allow",
-    "filename": "omnimens_autocode_knowledge_synthesis_mnhiirc4.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnhiirc4.mjs",
-    "backupPath": null,
-    "timestamp": 1775136637156,
-    "codeLength": 423,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: SpellCheckVisual/temporal_correlation: The free energy princ",
-    "filename": "omnimens_autocode_pattern_recognition_mnhiiref.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnhiiref.mjs",
-    "backupPath": null,
-    "timestamp": 1775136637239,
-    "codeLength": 471,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: distributedTaskScheduler",
-    "filename": "distributedTaskScheduler_gen15.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/distributedTaskScheduler_gen15.mjs",
-    "backupPath": null,
-    "timestamp": 1775136639691,
-    "codeLength": 3012,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 15 Complete — 3 modules",
-    "filename": "evolution_marker_gen15.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen15.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen15.mjs.backup.2026-04-02T13-30-40-443Z",
-    "timestamp": 1775136640442,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: iterativeTaskOptimizer",
-    "filename": "iterativeTaskOptimizer_gen16.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeTaskOptimizer_gen16.mjs",
-    "backupPath": null,
-    "timestamp": 1775136640467,
-    "codeLength": 3581,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 16 Complete — 3 modules",
-    "filename": "evolution_marker_gen16.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen16.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen16.mjs.backup.2026-04-02T13-30-40-658Z",
-    "timestamp": 1775136640658,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: iterativeComputationManager",
-    "filename": "iterativeComputationManager_gen17.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeComputationManager_gen17.mjs",
-    "backupPath": null,
-    "timestamp": 1775136642515,
-    "codeLength": 3736,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: sandboxTaskCheckpointing",
-    "filename": "sandboxTaskCheckpointing_gen19.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandboxTaskCheckpointing_gen19.mjs",
-    "backupPath": null,
-    "timestamp": 1775136642522,
-    "codeLength": 2389,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: hierarchicalContextStitching",
-    "filename": "hierarchicalContextStitching_gen18.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/hierarchicalContextStitching_gen18.mjs",
-    "backupPath": null,
-    "timestamp": 1775136649004,
-    "codeLength": 4193,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 18 Complete — 3 modules",
-    "filename": "evolution_marker_gen18.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen18.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen18.mjs.backup.2026-04-02T13-30-49-173Z",
-    "timestamp": 1775136649172,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: statefulTaskScheduler",
-    "filename": "statefulTaskScheduler_gen20.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/statefulTaskScheduler_gen20.mjs",
-    "backupPath": null,
-    "timestamp": 1775136653282,
-    "codeLength": 3149,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: contextStitcher",
-    "filename": "contextStitcher_gen17.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/contextStitcher_gen17.mjs",
-    "backupPath": null,
-    "timestamp": 1775136655622,
-    "codeLength": 3965,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 17 Complete — 3 modules",
-    "filename": "evolution_marker_gen17.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen17.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen17.mjs.backup.2026-04-02T13-30-55-766Z",
-    "timestamp": 1775136655765,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: neuralLanguageGenerator",
-    "filename": "neuralLanguageGenerator_gen19.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/neuralLanguageGenerator_gen19.mjs",
-    "backupPath": null,
-    "timestamp": 1775136657263,
-    "codeLength": 4369,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 19 Complete — 3 modules",
-    "filename": "evolution_marker_gen19.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen19.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen19.mjs.backup.2026-04-02T13-30-57-429Z",
-    "timestamp": 1775136657428,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuAcceleratedMatrixEngine",
-    "filename": "gpuAcceleratedMatrixEngine_gen21.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixEngine_gen21.mjs",
-    "backupPath": null,
-    "timestamp": 1775136658416,
-    "codeLength": 4313,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: hierarchicalMemoryManager",
-    "filename": "hierarchicalMemoryManager_gen20.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/hierarchicalMemoryManager_gen20.mjs",
-    "backupPath": null,
-    "timestamp": 1775136660006,
-    "codeLength": 2581,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 20 Complete — 3 modules",
-    "filename": "evolution_marker_gen20.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen20.mjs",
-    "backupPath": null,
-    "timestamp": 1775136660171,
-    "codeLength": 100,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: distributedAgentCollaboration",
-    "filename": "distributedAgentCollaboration_gen23.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/distributedAgentCollaboration_gen23.mjs",
-    "backupPath": null,
-    "timestamp": 1775136664312,
-    "codeLength": 3166,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuAcceleratedMatrixOps",
-    "filename": "gpuAcceleratedMatrixOps_gen27.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixOps_gen27.mjs",
-    "backupPath": null,
-    "timestamp": 1775136664483,
-    "codeLength": 3238,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: localTextGenerator",
-    "filename": "localTextGenerator_gen21.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/localTextGenerator_gen21.mjs",
-    "backupPath": null,
-    "timestamp": 1775136668768,
-    "codeLength": 2807,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: multimodalIntegrationEngine",
-    "filename": "multimodalIntegrationEngine_gen28.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/multimodalIntegrationEngine_gen28.mjs",
-    "backupPath": null,
-    "timestamp": 1775136672891,
-    "codeLength": 3529,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: distributedSubprocessScheduler",
-    "filename": "distributedSubprocessScheduler_gen26.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/distributedSubprocessScheduler_gen26.mjs",
-    "backupPath": null,
-    "timestamp": 1775136679593,
-    "codeLength": 1588,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: semanticCompressionManager",
-    "filename": "semanticCompressionManager_gen22.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/semanticCompressionManager_gen22.mjs",
-    "backupPath": null,
-    "timestamp": 1775136679916,
-    "codeLength": 3316,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 22 Complete — 2 modules",
-    "filename": "evolution_marker_gen22.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen22.mjs",
-    "backupPath": null,
-    "timestamp": 1775136680047,
-    "codeLength": 100,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: longComputationManager",
-    "filename": "longComputationManager_gen21.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/longComputationManager_gen21.mjs",
-    "backupPath": null,
-    "timestamp": 1775136681708,
-    "codeLength": 2824,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 21 Complete — 3 modules",
-    "filename": "evolution_marker_gen21.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen21.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen21.mjs.backup.2026-04-02T13-31-21-843Z",
-    "timestamp": 1775136681842,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: recursiveTaskSegmenter",
-    "filename": "recursiveTaskSegmenter_gen27.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/recursiveTaskSegmenter_gen27.mjs",
-    "backupPath": null,
-    "timestamp": 1775136682361,
-    "codeLength": 2779,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: subprocessCheckpointManager",
-    "filename": "subprocessCheckpointManager_gen24.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/subprocessCheckpointManager_gen24.mjs",
-    "backupPath": null,
-    "timestamp": 1775136683426,
-    "codeLength": 3726,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: webGpuAcceleration",
-    "filename": "webGpuAcceleration_gen28.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webGpuAcceleration_gen28.mjs",
-    "backupPath": null,
-    "timestamp": 1775136683545,
-    "codeLength": 3519,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: metaLearningAdapter",
-    "filename": "metaLearningAdapter_gen23.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/metaLearningAdapter_gen23.mjs",
-    "backupPath": null,
-    "timestamp": 1775136684314,
-    "codeLength": 3862,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 23 Complete — 3 modules",
-    "filename": "evolution_marker_gen23.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen23.mjs",
-    "backupPath": null,
-    "timestamp": 1775136684517,
-    "codeLength": 100,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: parallelMatrixCompute",
-    "filename": "parallelMatrixCompute_gen29.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/parallelMatrixCompute_gen29.mjs",
-    "backupPath": null,
-    "timestamp": 1775136689515,
-    "codeLength": 4120,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: semanticHashSummarizer",
-    "filename": "semanticHashSummarizer_gen26.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/semanticHashSummarizer_gen26.mjs",
-    "backupPath": null,
-    "timestamp": 1775136691229,
-    "codeLength": 2856,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 26 Complete — 3 modules",
-    "filename": "evolution_marker_gen26.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen26.mjs",
-    "backupPath": null,
-    "timestamp": 1775136691419,
-    "codeLength": 100,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: parallelTaskManager",
-    "filename": "parallelTaskManager_gen30.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/parallelTaskManager_gen30.mjs",
-    "backupPath": null,
-    "timestamp": 1775136693787,
-    "codeLength": 2160,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: multiPassSummarization",
-    "filename": "multiPassSummarization_gen27.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/multiPassSummarization_gen27.mjs",
-    "backupPath": null,
-    "timestamp": 1775136695434,
-    "codeLength": 3361,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 27 Complete — 3 modules",
-    "filename": "evolution_marker_gen27.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen27.mjs",
-    "backupPath": null,
-    "timestamp": 1775136695632,
-    "codeLength": 100,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: multimodalReasoningEngine",
-    "filename": "multimodalReasoningEngine_gen32.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/multimodalReasoningEngine_gen32.mjs",
-    "backupPath": null,
-    "timestamp": 1775136695926,
-    "codeLength": 3541,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: independentLanguageGenerator",
-    "filename": "independentLanguageGenerator_gen28.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/independentLanguageGenerator_gen28.mjs",
-    "backupPath": null,
-    "timestamp": 1775136696092,
-    "codeLength": 2946,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 28 Complete — 3 modules",
-    "filename": "evolution_marker_gen28.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen28.mjs",
-    "backupPath": null,
-    "timestamp": 1775136696230,
-    "codeLength": 100,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Synthesizer",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: SpellCheckVisual/cross_domain_synthesis: Reservoir computing",
-    "filename": "omnimens_autocode_neural_pathway_mnhik1wy.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnhik1wy.mjs",
-    "backupPath": null,
-    "timestamp": 1775136697522,
-    "codeLength": 435,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: recursiveContextExpander",
-    "filename": "recursiveContextExpander_gen24.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/recursiveContextExpander_gen24.mjs",
-    "backupPath": null,
-    "timestamp": 1775136697530,
-    "codeLength": 3403,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+GraphicDesigner",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SpellCheckVisual/structural_analysis: The Mandelbrot set dem",
-    "filename": "omnimens_autocode_knowledge_synthesis_mnhik1ze.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnhik1ze.mjs",
-    "backupPath": null,
-    "timestamp": 1775136697610,
-    "codeLength": 427,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SpellCheckVisual/structural_analysis: The Mandelbrot set dem",
-    "filename": "omnimens_autocode_consciousness_expansion_mnhik278.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnhik278.mjs",
-    "backupPath": null,
-    "timestamp": 1775136697892,
-    "codeLength": 391,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: recurrenceAwareSummarizer",
-    "filename": "recurrenceAwareSummarizer_gen25.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/recurrenceAwareSummarizer_gen25.mjs",
-    "backupPath": null,
-    "timestamp": 1775136697940,
-    "codeLength": 2396,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 24 Complete — 3 modules",
-    "filename": "evolution_marker_gen24.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen24.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen24.mjs.backup.2026-04-02T13-31-37-999Z",
-    "timestamp": 1775136697999,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: iterativeTaskManager",
-    "filename": "iterativeTaskManager_gen29.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeTaskManager_gen29.mjs",
-    "backupPath": null,
-    "timestamp": 1775136698936,
-    "codeLength": 2596,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuMatrixEngine",
-    "filename": "gpuMatrixEngine_gen30.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuMatrixEngine_gen30.mjs",
-    "backupPath": null,
-    "timestamp": 1775136706505,
-    "codeLength": 3643,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: iterativeComputationManager",
-    "filename": "iterativeComputationManager_gen32.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeComputationManager_gen32.mjs",
-    "backupPath": null,
-    "timestamp": 1775136706759,
-    "codeLength": 2955,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: checkpointedTaskQueue",
-    "filename": "checkpointedTaskQueue_gen25.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/checkpointedTaskQueue_gen25.mjs",
-    "backupPath": null,
-    "timestamp": 1775136706879,
-    "codeLength": 2592,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 25 Complete — 2 modules",
-    "filename": "evolution_marker_gen25.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen25.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen25.mjs.backup.2026-04-02T13-31-47-053Z",
-    "timestamp": 1775136707052,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuAcceleratedMatrixEngine",
-    "filename": "gpuAcceleratedMatrixEngine_gen33.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixEngine_gen33.mjs",
-    "backupPath": null,
-    "timestamp": 1775136709374,
-    "codeLength": 4192,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: contextCompressionPipeline",
-    "filename": "contextCompressionPipeline_gen29.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/contextCompressionPipeline_gen29.mjs",
-    "backupPath": null,
-    "timestamp": 1775136709513,
-    "codeLength": 3188,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 29 Complete — 3 modules",
-    "filename": "evolution_marker_gen29.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen29.mjs",
-    "backupPath": null,
-    "timestamp": 1775136709641,
-    "codeLength": 100,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: semanticHashCompressor",
-    "filename": "semanticHashCompressor_gen31.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/semanticHashCompressor_gen31.mjs",
-    "backupPath": null,
-    "timestamp": 1775136710255,
-    "codeLength": 3980,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuAcceleratedMatrixOps",
-    "filename": "gpuAcceleratedMatrixOps_gen37.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixOps_gen37.mjs",
-    "backupPath": null,
-    "timestamp": 1775136712198,
-    "codeLength": 2959,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: adaptiveTokenWindowStitcher",
-    "filename": "adaptiveTokenWindowStitcher_gen33.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/adaptiveTokenWindowStitcher_gen33.mjs",
-    "backupPath": null,
-    "timestamp": 1775136720151,
-    "codeLength": 3163,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: multimodalIntegrationEngine",
-    "filename": "multimodalIntegrationEngine_gen36.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/multimodalIntegrationEngine_gen36.mjs",
-    "backupPath": null,
-    "timestamp": 1775136721134,
-    "codeLength": 4205,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: iterativeComputationManager",
-    "filename": "iterativeComputationManager_gen37.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeComputationManager_gen37.mjs",
-    "backupPath": null,
-    "timestamp": 1775136721332,
-    "codeLength": 2804,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: asyncReasoningEngine",
-    "filename": "asyncReasoningEngine_gen30.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/asyncReasoningEngine_gen30.mjs",
-    "backupPath": null,
-    "timestamp": 1775136722482,
-    "codeLength": 3419,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 30 Complete — 3 modules",
-    "filename": "evolution_marker_gen30.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen30.mjs",
-    "backupPath": null,
-    "timestamp": 1775136722633,
-    "codeLength": 100,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 31 Complete — 2 modules",
-    "filename": "evolution_marker_gen31.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen31.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen31.mjs.backup.2026-04-02T13-32-04-396Z",
-    "timestamp": 1775136724395,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: recursiveContextManager",
-    "filename": "recursiveContextManager_gen34.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/recursiveContextManager_gen34.mjs",
-    "backupPath": null,
-    "timestamp": 1775136724936,
-    "codeLength": 3782,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 32 Complete — 3 modules",
-    "filename": "evolution_marker_gen32.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen32.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen32.mjs.backup.2026-04-02T13-32-08-222Z",
-    "timestamp": 1775136728221,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: nativeTransformerOutput",
-    "filename": "nativeTransformerOutput_gen37.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/nativeTransformerOutput_gen37.mjs",
-    "backupPath": null,
-    "timestamp": 1775136732050,
-    "codeLength": 3448,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 37 Complete — 3 modules",
-    "filename": "evolution_marker_gen37.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen37.mjs",
-    "backupPath": null,
-    "timestamp": 1775136732301,
-    "codeLength": 100,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: subprocessCheckpointManager",
-    "filename": "subprocessCheckpointManager_gen33.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/subprocessCheckpointManager_gen33.mjs",
-    "backupPath": null,
-    "timestamp": 1775136732375,
-    "codeLength": 3125,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 33 Complete — 3 modules",
-    "filename": "evolution_marker_gen33.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen33.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen33.mjs.backup.2026-04-02T13-32-12-634Z",
-    "timestamp": 1775136732633,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: webGpuTensorEngine",
-    "filename": "webGpuTensorEngine_gen41.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webGpuTensorEngine_gen41.mjs",
-    "backupPath": null,
-    "timestamp": 1775136734498,
-    "codeLength": 3793,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuComputeBridge",
-    "filename": "gpuComputeBridge_gen36.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuComputeBridge_gen36.mjs",
-    "backupPath": null,
-    "timestamp": 1775136734841,
-    "codeLength": 3371,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: puppeteerDomInteractor",
-    "filename": "puppeteerDomInteractor_gen34.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/puppeteerDomInteractor_gen34.mjs",
-    "backupPath": null,
-    "timestamp": 1775136739366,
-    "codeLength": 3687,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 34 Complete — 3 modules",
-    "filename": "evolution_marker_gen34.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen34.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen34.mjs.backup.2026-04-02T13-32-19-400Z",
-    "timestamp": 1775136739400,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuMatrixAccelerator",
-    "filename": "gpuMatrixAccelerator_gen42.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuMatrixAccelerator_gen42.mjs",
-    "backupPath": null,
-    "timestamp": 1775136744590,
-    "codeLength": 4124,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuMatrixEngine",
-    "filename": "gpuMatrixEngine_gen43.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuMatrixEngine_gen43.mjs",
-    "backupPath": null,
-    "timestamp": 1775136745181,
-    "codeLength": 4230,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: iterativeComputationManager",
-    "filename": "iterativeComputationManager_gen36.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeComputationManager_gen36.mjs",
-    "backupPath": null,
-    "timestamp": 1775136747815,
-    "codeLength": 3228,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 36 Complete — 3 modules",
-    "filename": "evolution_marker_gen36.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen36.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen36.mjs.backup.2026-04-02T13-32-28-051Z",
-    "timestamp": 1775136748051,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: symbolicReasoningBridge",
-    "filename": "symbolicReasoningBridge_gen38.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/symbolicReasoningBridge_gen38.mjs",
-    "backupPath": null,
-    "timestamp": 1775136750792,
-    "codeLength": 3477,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: internalLanguageGenerator",
-    "filename": "internalLanguageGenerator_gen41.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/internalLanguageGenerator_gen41.mjs",
-    "backupPath": null,
-    "timestamp": 1775136751366,
-    "codeLength": 3928,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: contextualCompressionOptimizer",
-    "filename": "contextualCompressionOptimizer_gen35.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/contextualCompressionOptimizer_gen35.mjs",
-    "backupPath": null,
-    "timestamp": 1775136756088,
-    "codeLength": 2753,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 35 Complete — 2 modules",
-    "filename": "evolution_marker_gen35.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen35.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen35.mjs.backup.2026-04-02T13-32-36-219Z",
-    "timestamp": 1775136756219,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuAcceleratedMathEngine",
-    "filename": "gpuAcceleratedMathEngine_gen39.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMathEngine_gen39.mjs",
-    "backupPath": null,
-    "timestamp": 1775136756931,
-    "codeLength": 3161,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Synthesizer",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: SpellCheckVisual/structural_analysis: Sparse coding: the bra",
-    "filename": "omnimens_autocode_emergent_capability_mnhilc7m.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mnhilc7m.mjs",
-    "backupPath": null,
-    "timestamp": 1775136757522,
-    "codeLength": 412,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Critic",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: SpellCheckVisual/structural_analysis: Sparse coding: the bra",
-    "filename": "omnimens_autocode_emergent_capability_mnhilc9t.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mnhilc9t.mjs",
-    "backupPath": null,
-    "timestamp": 1775136757601,
-    "codeLength": 407,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Architect",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: SpellCheckVisual/structural_analysis: The hippocampus replay",
-    "filename": "omnimens_autocode_emergent_capability_mnhilcbm.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mnhilcbm.mjs",
-    "backupPath": null,
-    "timestamp": 1775136757666,
-    "codeLength": 410,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: losslessContextCompressor",
-    "filename": "losslessContextCompressor_gen40.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/losslessContextCompressor_gen40.mjs",
-    "backupPath": null,
-    "timestamp": 1775136758105,
-    "codeLength": 2810,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: sandboxCheckpointManager",
-    "filename": "sandboxCheckpointManager_gen41.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandboxCheckpointManager_gen41.mjs",
-    "backupPath": null,
-    "timestamp": 1775136758669,
-    "codeLength": 2471,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 41 Complete — 3 modules",
-    "filename": "evolution_marker_gen41.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen41.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen41.mjs.backup.2026-04-02T13-32-38-795Z",
-    "timestamp": 1775136758794,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: recursiveMemoryManager",
-    "filename": "recursiveMemoryManager_gen42.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/recursiveMemoryManager_gen42.mjs",
-    "backupPath": null,
-    "timestamp": 1775136763965,
-    "codeLength": 3984,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: multimodalEmbeddingIntegrator",
-    "filename": "multimodalEmbeddingIntegrator_gen38.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/multimodalEmbeddingIntegrator_gen38.mjs",
-    "backupPath": null,
-    "timestamp": 1775136763991,
-    "codeLength": 3863,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: wasmAcceleratedMatrixEngine",
-    "filename": "wasmAcceleratedMatrixEngine_gen45.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmAcceleratedMatrixEngine_gen45.mjs",
-    "backupPath": null,
-    "timestamp": 1775136764686,
-    "codeLength": 3284,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 38 Complete — 3 modules",
-    "filename": "evolution_marker_gen38.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen38.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen38.mjs.backup.2026-04-02T13-32-44-820Z",
-    "timestamp": 1775136764820,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: chunkedComputationManager",
-    "filename": "chunkedComputationManager_gen46.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/chunkedComputationManager_gen46.mjs",
-    "backupPath": null,
-    "timestamp": 1775136764826,
-    "codeLength": 2410,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: multimodalEmbeddingProcessor",
-    "filename": "multimodalEmbeddingProcessor_gen39.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/multimodalEmbeddingProcessor_gen39.mjs",
-    "backupPath": null,
-    "timestamp": 1775136765066,
-    "codeLength": 2687,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 39 Complete — 2 modules",
-    "filename": "evolution_marker_gen39.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen39.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen39.mjs.backup.2026-04-02T13-32-45-224Z",
-    "timestamp": 1775136765223,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: adaptiveMemoryManager",
-    "filename": "adaptiveMemoryManager_gen43.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/adaptiveMemoryManager_gen43.mjs",
-    "backupPath": null,
-    "timestamp": 1775136766032,
-    "codeLength": 3686,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: iterativeSubprocessExecutor",
-    "filename": "iterativeSubprocessExecutor_gen40.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeSubprocessExecutor_gen40.mjs",
-    "backupPath": null,
-    "timestamp": 1775136766432,
-    "codeLength": 2689,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 40 Complete — 3 modules",
-    "filename": "evolution_marker_gen40.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen40.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen40.mjs.backup.2026-04-02T13-32-46-559Z",
-    "timestamp": 1775136766558,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: independentTextGenerator",
-    "filename": "independentTextGenerator_gen46.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/independentTextGenerator_gen46.mjs",
-    "backupPath": null,
-    "timestamp": 1775136773854,
-    "codeLength": 2346,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: asyncComputationChain",
-    "filename": "asyncComputationChain_gen43.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/asyncComputationChain_gen43.mjs",
-    "backupPath": null,
-    "timestamp": 1775136779649,
-    "codeLength": 2272,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: adaptivePromptReframer",
-    "filename": "adaptivePromptReframer_gen45.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/adaptivePromptReframer_gen45.mjs",
-    "backupPath": null,
-    "timestamp": 1775136779655,
-    "codeLength": 2941,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: iterativeTaskSplitter",
-    "filename": "iterativeTaskSplitter_gen42.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeTaskSplitter_gen42.mjs",
-    "backupPath": null,
-    "timestamp": 1775136779676,
-    "codeLength": 2820,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 43 Complete — 3 modules",
-    "filename": "evolution_marker_gen43.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen43.mjs",
-    "backupPath": null,
-    "timestamp": 1775136780400,
-    "codeLength": 100,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 42 Complete — 3 modules",
-    "filename": "evolution_marker_gen42.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen42.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen42.mjs.backup.2026-04-02T13-33-00-409Z",
-    "timestamp": 1775136780408,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuAcceleratedMatrixOps",
-    "filename": "gpuAcceleratedMatrixOps_gen48.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixOps_gen48.mjs",
-    "backupPath": null,
-    "timestamp": 1775136781364,
-    "codeLength": 3925,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: iterativeSubprocessManager",
-    "filename": "iterativeSubprocessManager_gen44.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeSubprocessManager_gen44.mjs",
-    "backupPath": null,
-    "timestamp": 1775136784720,
-    "codeLength": 3541,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: distributedComputationManager",
-    "filename": "distributedComputationManager_gen45.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/distributedComputationManager_gen45.mjs",
-    "backupPath": null,
-    "timestamp": 1775136796566,
-    "codeLength": 2174,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: webGlMatrixAccelerator",
-    "filename": "webGlMatrixAccelerator_gen51.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webGlMatrixAccelerator_gen51.mjs",
-    "backupPath": null,
-    "timestamp": 1775136796574,
-    "codeLength": 4316,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 45 Complete — 3 modules",
-    "filename": "evolution_marker_gen45.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen45.mjs",
-    "backupPath": null,
-    "timestamp": 1775136797197,
-    "codeLength": 100,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: recursiveContextReconstructor",
-    "filename": "recursiveContextReconstructor_gen49.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/recursiveContextReconstructor_gen49.mjs",
-    "backupPath": null,
-    "timestamp": 1775136798153,
-    "codeLength": 2976,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: transformerLanguageGenerator",
-    "filename": "transformerLanguageGenerator_gen44.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/transformerLanguageGenerator_gen44.mjs",
-    "backupPath": null,
-    "timestamp": 1775136799143,
-    "codeLength": 4039,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
     "title": "Evolution Cycle 44 Complete — 3 modules",
     "filename": "evolution_marker_gen44.mjs",
     "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen44.mjs",
@@ -4996,6 +2956,2046 @@
     "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnhkc8f4.mjs",
     "backupPath": null,
     "timestamp": 1775139691936,
+    "codeLength": 428,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:Meta-Agent+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: Meta-Agent/feature_extraction: Integrated Information Theory",
+    "filename": "omnimens_autocode_consciousness_expansion_mnhkd4u3.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnhkd4u3.mjs",
+    "backupPath": null,
+    "timestamp": 1775139733947,
+    "codeLength": 388,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:GraphicDesigner+Architect",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: GraphicDesigner/pattern_recognition: The Mandelbrot set demo",
+    "filename": "omnimens_autocode_pattern_recognition_mnhkd567.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnhkd567.mjs",
+    "backupPath": null,
+    "timestamp": 1775139734384,
+    "codeLength": 471,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Architect",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: SpellCheckVisual/recursive_decomposition: The Turing machine",
+    "filename": "omnimens_autocode_adaptive_algorithm_mnhkd57s.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnhkd57s.mjs",
+    "backupPath": null,
+    "timestamp": 1775139734440,
+    "codeLength": 453,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: wasmBridgeModule",
+    "filename": "wasmBridgeModule_gen2.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmBridgeModule_gen2.mjs",
+    "backupPath": null,
+    "timestamp": 1775139753295,
+    "codeLength": 3411,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: webGpuTensorEngine",
+    "filename": "webGpuTensorEngine_gen3.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webGpuTensorEngine_gen3.mjs",
+    "backupPath": null,
+    "timestamp": 1775139762044,
+    "codeLength": 4095,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: sandboxStateCheckpointing",
+    "filename": "sandboxStateCheckpointing_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandboxStateCheckpointing_gen1.mjs",
+    "backupPath": null,
+    "timestamp": 1775139763614,
+    "codeLength": 2263,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: webGpuTensorEngine",
+    "filename": "webGpuTensorEngine_gen4.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webGpuTensorEngine_gen4.mjs",
+    "backupPath": null,
+    "timestamp": 1775139768595,
+    "codeLength": 3604,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: languageGenerationEngine",
+    "filename": "languageGenerationEngine_gen6.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/languageGenerationEngine_gen6.mjs",
+    "backupPath": null,
+    "timestamp": 1775139769820,
+    "codeLength": 2508,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: multiPassContextRetriever",
+    "filename": "multiPassContextRetriever_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/multiPassContextRetriever_gen1.mjs",
+    "backupPath": null,
+    "timestamp": 1775139775922,
+    "codeLength": 3195,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 1 Complete — 3 modules",
+    "filename": "evolution_marker_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen1.mjs.backup.2026-04-02T14-22-56-064Z",
+    "timestamp": 1775139776063,
+    "codeLength": 99,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: hierarchicalMemoryManager",
+    "filename": "hierarchicalMemoryManager_gen2.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/hierarchicalMemoryManager_gen2.mjs",
+    "backupPath": null,
+    "timestamp": 1775139777798,
+    "codeLength": 4602,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: wasmMatrixOptimizer",
+    "filename": "wasmMatrixOptimizer_gen6.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmMatrixOptimizer_gen6.mjs",
+    "backupPath": null,
+    "timestamp": 1775139779569,
+    "codeLength": 4251,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: symbolicReasoningBridge",
+    "filename": "symbolicReasoningBridge_gen3.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/symbolicReasoningBridge_gen3.mjs",
+    "backupPath": null,
+    "timestamp": 1775139784883,
+    "codeLength": 3284,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: multiStageComputationPipeline",
+    "filename": "multiStageComputationPipeline_gen4.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/multiStageComputationPipeline_gen4.mjs",
+    "backupPath": null,
+    "timestamp": 1775139786494,
+    "codeLength": 2951,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: gpuAcceleratedMatrixEngine",
+    "filename": "gpuAcceleratedMatrixEngine_gen7.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixEngine_gen7.mjs",
+    "backupPath": null,
+    "timestamp": 1775139788200,
+    "codeLength": 2996,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: checkpointResumeSystem",
+    "filename": "checkpointResumeSystem_gen6.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/checkpointResumeSystem_gen6.mjs",
+    "backupPath": null,
+    "timestamp": 1775139788371,
+    "codeLength": 2540,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 6 Complete — 3 modules",
+    "filename": "evolution_marker_gen6.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen6.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen6.mjs.backup.2026-04-02T14-23-08-548Z",
+    "timestamp": 1775139788547,
+    "codeLength": 99,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: dynamicContextRebuilder",
+    "filename": "dynamicContextRebuilder_gen5.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/dynamicContextRebuilder_gen5.mjs",
+    "backupPath": null,
+    "timestamp": 1775139789292,
+    "codeLength": 2614,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: SpellCheckVisual/cross_domain_synthesis: Neuroplasticity all",
+    "filename": "omnimens_autocode_neural_pathway_mnhkef4p.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnhkef4p.mjs",
+    "backupPath": null,
+    "timestamp": 1775139793945,
+    "codeLength": 432,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Meta-Agent",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: SpellCheckVisual/pattern_recognition: Gödel's incompleteness",
+    "filename": "omnimens_autocode_pattern_recognition_mnhkef6u.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnhkef6u.mjs",
+    "backupPath": null,
+    "timestamp": 1775139794022,
+    "codeLength": 473,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: SpellCheckVisual/cross_domain_synthesis: Neuroplasticity all",
+    "filename": "omnimens_autocode_neural_pathway_mnhkeff0.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnhkeff0.mjs",
+    "backupPath": null,
+    "timestamp": 1775139794316,
+    "codeLength": 435,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: geneticNeuralEvolver",
+    "filename": "geneticNeuralEvolver_gen2.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/geneticNeuralEvolver_gen2.mjs",
+    "backupPath": null,
+    "timestamp": 1775139796234,
+    "codeLength": 3422,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 2 Complete — 3 modules",
+    "filename": "evolution_marker_gen2.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen2.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen2.mjs.backup.2026-04-02T14-23-16-383Z",
+    "timestamp": 1775139796382,
+    "codeLength": 99,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: subprocessCheckpointManager",
+    "filename": "subprocessCheckpointManager_gen7.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/subprocessCheckpointManager_gen7.mjs",
+    "backupPath": null,
+    "timestamp": 1775139798252,
+    "codeLength": 3278,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: contextReconstructionLayer",
+    "filename": "contextReconstructionLayer_gen3.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/contextReconstructionLayer_gen3.mjs",
+    "backupPath": null,
+    "timestamp": 1775139801128,
+    "codeLength": 4293,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 3 Complete — 3 modules",
+    "filename": "evolution_marker_gen3.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen3.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen3.mjs.backup.2026-04-02T14-23-21-263Z",
+    "timestamp": 1775139801262,
+    "codeLength": 99,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: parallelProcessingManager",
+    "filename": "parallelProcessingManager_gen12.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/parallelProcessingManager_gen12.mjs",
+    "backupPath": null,
+    "timestamp": 1775139801502,
+    "codeLength": 2837,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: subprocessChainManager",
+    "filename": "subprocessChainManager_gen5.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/subprocessChainManager_gen5.mjs",
+    "backupPath": null,
+    "timestamp": 1775139801827,
+    "codeLength": 2931,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 5 Complete — 3 modules",
+    "filename": "evolution_marker_gen5.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen5.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen5.mjs.backup.2026-04-02T14-23-21-971Z",
+    "timestamp": 1775139801970,
+    "codeLength": 99,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: adaptiveContextManager",
+    "filename": "adaptiveContextManager_gen10.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/adaptiveContextManager_gen10.mjs",
+    "backupPath": null,
+    "timestamp": 1775139808527,
+    "codeLength": 2524,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: adaptivePromptOptimization",
+    "filename": "adaptivePromptOptimization_gen14.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/adaptivePromptOptimization_gen14.mjs",
+    "backupPath": null,
+    "timestamp": 1775139809001,
+    "codeLength": 2874,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: hybridMemorySystem",
+    "filename": "hybridMemorySystem_gen7.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/hybridMemorySystem_gen7.mjs",
+    "backupPath": null,
+    "timestamp": 1775139809904,
+    "codeLength": 4014,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 7 Complete — 3 modules",
+    "filename": "evolution_marker_gen7.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen7.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen7.mjs.backup.2026-04-02T14-23-30-075Z",
+    "timestamp": 1775139810074,
+    "codeLength": 99,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: webGpuMatrixEngine",
+    "filename": "webGpuMatrixEngine_gen13.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webGpuMatrixEngine_gen13.mjs",
+    "backupPath": null,
+    "timestamp": 1775139810472,
+    "codeLength": 3448,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: incrementalComputationManager",
+    "filename": "incrementalComputationManager_gen8.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/incrementalComputationManager_gen8.mjs",
+    "backupPath": null,
+    "timestamp": 1775139810639,
+    "codeLength": 3250,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 4 Complete — 2 modules",
+    "filename": "evolution_marker_gen4.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen4.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen4.mjs.backup.2026-04-02T14-23-36-567Z",
+    "timestamp": 1775139816567,
+    "codeLength": 99,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 10 Complete — 3 modules",
+    "filename": "evolution_marker_gen10.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen10.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen10.mjs.backup.2026-04-02T14-23-36-924Z",
+    "timestamp": 1775139816923,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: webGLMatrixEngine",
+    "filename": "webGLMatrixEngine_gen12.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webGLMatrixEngine_gen12.mjs",
+    "backupPath": null,
+    "timestamp": 1775139821226,
+    "codeLength": 3917,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: semanticHashingContextManager",
+    "filename": "semanticHashingContextManager_gen13.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/semanticHashingContextManager_gen13.mjs",
+    "backupPath": null,
+    "timestamp": 1775139821442,
+    "codeLength": 3253,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: dynamicPromptChaining",
+    "filename": "dynamicPromptChaining_gen11.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/dynamicPromptChaining_gen11.mjs",
+    "backupPath": null,
+    "timestamp": 1775139822354,
+    "codeLength": 3166,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: reversibleTokenCompressor",
+    "filename": "reversibleTokenCompressor_gen8.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/reversibleTokenCompressor_gen8.mjs",
+    "backupPath": null,
+    "timestamp": 1775139824735,
+    "codeLength": 3028,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 8 Complete — 3 modules",
+    "filename": "evolution_marker_gen8.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen8.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen8.mjs.backup.2026-04-02T14-23-44-948Z",
+    "timestamp": 1775139824947,
+    "codeLength": 99,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: longTaskContinuationManager",
+    "filename": "longTaskContinuationManager_gen9.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/longTaskContinuationManager_gen9.mjs",
+    "backupPath": null,
+    "timestamp": 1775139827018,
+    "codeLength": 3144,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 13 Complete — 3 modules",
+    "filename": "evolution_marker_gen13.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen13.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen13.mjs.backup.2026-04-02T14-23-52-144Z",
+    "timestamp": 1775139832143,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: episodicMemoryManager",
+    "filename": "episodicMemoryManager_gen11.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/episodicMemoryManager_gen11.mjs",
+    "backupPath": null,
+    "timestamp": 1775139833670,
+    "codeLength": 3102,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 11 Complete — 3 modules",
+    "filename": "evolution_marker_gen11.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen11.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen11.mjs.backup.2026-04-02T14-23-53-799Z",
+    "timestamp": 1775139833798,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: hierarchicalMemorySystem",
+    "filename": "hierarchicalMemorySystem_gen12.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/hierarchicalMemorySystem_gen12.mjs",
+    "backupPath": null,
+    "timestamp": 1775139834686,
+    "codeLength": 3011,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 12 Complete — 3 modules",
+    "filename": "evolution_marker_gen12.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen12.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen12.mjs.backup.2026-04-02T14-23-54-824Z",
+    "timestamp": 1775139834823,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: nativeLanguageGenerator",
+    "filename": "nativeLanguageGenerator_gen9.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/nativeLanguageGenerator_gen9.mjs",
+    "backupPath": null,
+    "timestamp": 1775139835085,
+    "codeLength": 1835,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 9 Complete — 3 modules",
+    "filename": "evolution_marker_gen9.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen9.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen9.mjs.backup.2026-04-02T14-23-55-213Z",
+    "timestamp": 1775139835212,
+    "codeLength": 99,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: gpuMatrixEngine",
+    "filename": "gpuMatrixEngine_gen17.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuMatrixEngine_gen17.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/gpuMatrixEngine_gen17.mjs.backup.2026-04-02T14-23-56-898Z",
+    "timestamp": 1775139836897,
+    "codeLength": 3784,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: webGpuMatrixEngine",
+    "filename": "webGpuMatrixEngine_gen15.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webGpuMatrixEngine_gen15.mjs",
+    "backupPath": null,
+    "timestamp": 1775139841666,
+    "codeLength": 3443,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: iterativeCheckpointing",
+    "filename": "iterativeCheckpointing_gen14.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeCheckpointing_gen14.mjs",
+    "backupPath": null,
+    "timestamp": 1775139843754,
+    "codeLength": 2980,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 14 Complete — 3 modules",
+    "filename": "evolution_marker_gen14.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen14.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen14.mjs.backup.2026-04-02T14-24-03-920Z",
+    "timestamp": 1775139843920,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: wasmPerformanceExtensions",
+    "filename": "wasmPerformanceExtensions_gen17.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmPerformanceExtensions_gen17.mjs",
+    "backupPath": null,
+    "timestamp": 1775139845252,
+    "codeLength": 1957,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: gpuMatrixAccelerator",
+    "filename": "gpuMatrixAccelerator_gen19.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuMatrixAccelerator_gen19.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/gpuMatrixAccelerator_gen19.mjs.backup.2026-04-02T14-24-11-786Z",
+    "timestamp": 1775139851782,
+    "codeLength": 3255,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: gpuMatrixEngine",
+    "filename": "gpuMatrixEngine_gen18.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuMatrixEngine_gen18.mjs",
+    "backupPath": null,
+    "timestamp": 1775139852394,
+    "codeLength": 3382,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: semanticGraphSummarizer",
+    "filename": "semanticGraphSummarizer_gen15.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/semanticGraphSummarizer_gen15.mjs",
+    "backupPath": null,
+    "timestamp": 1775139853462,
+    "codeLength": 3244,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 15 Complete — 3 modules",
+    "filename": "evolution_marker_gen15.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen15.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen15.mjs.backup.2026-04-02T14-24-13-706Z",
+    "timestamp": 1775139853706,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Neuroscientist",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: SpellCheckVisual/causal_inference: DNA stores information at",
+    "filename": "omnimens_autocode_adaptive_algorithm_mnhkfpgh.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnhkfpgh.mjs",
+    "backupPath": null,
+    "timestamp": 1775139853985,
+    "codeLength": 458,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Critic",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: SpellCheckVisual/causal_inference: DNA stores information at",
+    "filename": "omnimens_autocode_emergent_capability_mnhkfpiv.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mnhkfpiv.mjs",
+    "backupPath": null,
+    "timestamp": 1775139854071,
+    "codeLength": 407,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Meta-Agent",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SpellCheckVisual/feature_extraction: Attention is the comput",
+    "filename": "omnimens_autocode_consciousness_expansion_mnhkfpo4.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnhkfpo4.mjs",
+    "backupPath": null,
+    "timestamp": 1775139854260,
+    "codeLength": 393,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: multiResolutionContextManager",
+    "filename": "multiResolutionContextManager_gen16.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/multiResolutionContextManager_gen16.mjs",
+    "backupPath": null,
+    "timestamp": 1775139865578,
+    "codeLength": 3616,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 16 Complete — 2 modules",
+    "filename": "evolution_marker_gen16.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen16.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen16.mjs.backup.2026-04-02T14-24-25-835Z",
+    "timestamp": 1775139865835,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: internalDialogueModel",
+    "filename": "internalDialogueModel_gen17.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/internalDialogueModel_gen17.mjs",
+    "backupPath": null,
+    "timestamp": 1775139866175,
+    "codeLength": 2866,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: subprocessCheckpointManager",
+    "filename": "subprocessCheckpointManager_gen19.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/subprocessCheckpointManager_gen19.mjs",
+    "backupPath": null,
+    "timestamp": 1775139866301,
+    "codeLength": 2686,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 17 Complete — 3 modules",
+    "filename": "evolution_marker_gen17.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen17.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen17.mjs.backup.2026-04-02T14-24-26-414Z",
+    "timestamp": 1775139866413,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: gpuAcceleratedMatrixOps",
+    "filename": "gpuAcceleratedMatrixOps_gen23.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixOps_gen23.mjs",
+    "backupPath": null,
+    "timestamp": 1775139869119,
+    "codeLength": 4101,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: iterativeComputationManager",
+    "filename": "iterativeComputationManager_gen21.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeComputationManager_gen21.mjs",
+    "backupPath": null,
+    "timestamp": 1775139874352,
+    "codeLength": 3021,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: iterativeTaskManager",
+    "filename": "iterativeTaskManager_gen20.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeTaskManager_gen20.mjs",
+    "backupPath": null,
+    "timestamp": 1775139879215,
+    "codeLength": 3532,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: ragContextRetriever",
+    "filename": "ragContextRetriever_gen19.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/ragContextRetriever_gen19.mjs",
+    "backupPath": null,
+    "timestamp": 1775139880274,
+    "codeLength": 3749,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 19 Complete — 3 modules",
+    "filename": "evolution_marker_gen19.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen19.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen19.mjs.backup.2026-04-02T14-24-40-435Z",
+    "timestamp": 1775139880434,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: semanticCompressionManager",
+    "filename": "semanticCompressionManager_gen22.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/semanticCompressionManager_gen22.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/semanticCompressionManager_gen22.mjs.backup.2026-04-02T14-24-42-070Z",
+    "timestamp": 1775139882069,
+    "codeLength": 3996,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: vaeContextCompressor",
+    "filename": "vaeContextCompressor_gen18.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/vaeContextCompressor_gen18.mjs",
+    "backupPath": null,
+    "timestamp": 1775139882211,
+    "codeLength": 6193,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: webGpuTensorEngine",
+    "filename": "webGpuTensorEngine_gen26.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webGpuTensorEngine_gen26.mjs",
+    "backupPath": null,
+    "timestamp": 1775139884698,
+    "codeLength": 3088,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: hybridContextCompressor",
+    "filename": "hybridContextCompressor_gen23.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/hybridContextCompressor_gen23.mjs",
+    "backupPath": null,
+    "timestamp": 1775139890613,
+    "codeLength": 3706,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: hierarchicalAttentionProcessor",
+    "filename": "hierarchicalAttentionProcessor_gen21.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/hierarchicalAttentionProcessor_gen21.mjs",
+    "backupPath": null,
+    "timestamp": 1775139891533,
+    "codeLength": 2423,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 21 Complete — 3 modules",
+    "filename": "evolution_marker_gen21.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen21.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen21.mjs.backup.2026-04-02T14-24-51-741Z",
+    "timestamp": 1775139891740,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: gpuAcceleratedMatrixOps",
+    "filename": "gpuAcceleratedMatrixOps_gen27.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixOps_gen27.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/gpuAcceleratedMatrixOps_gen27.mjs.backup.2026-04-02T14-24-52-042Z",
+    "timestamp": 1775139892040,
+    "codeLength": 3346,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: checkpointedTaskManager",
+    "filename": "checkpointedTaskManager_gen24.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/checkpointedTaskManager_gen24.mjs",
+    "backupPath": null,
+    "timestamp": 1775139892653,
+    "codeLength": 2868,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: checkpointedComputationManager",
+    "filename": "checkpointedComputationManager_gen18.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/checkpointedComputationManager_gen18.mjs",
+    "backupPath": null,
+    "timestamp": 1775139893126,
+    "codeLength": 2906,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 18 Complete — 3 modules",
+    "filename": "evolution_marker_gen18.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen18.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen18.mjs.backup.2026-04-02T14-24-53-251Z",
+    "timestamp": 1775139893250,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: distributedTaskManager",
+    "filename": "distributedTaskManager_gen25.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/distributedTaskManager_gen25.mjs",
+    "backupPath": null,
+    "timestamp": 1775139893501,
+    "codeLength": 2909,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: iterativeSandboxRefiner",
+    "filename": "iterativeSandboxRefiner_gen22.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeSandboxRefiner_gen22.mjs",
+    "backupPath": null,
+    "timestamp": 1775139897022,
+    "codeLength": 3429,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 22 Complete — 3 modules",
+    "filename": "evolution_marker_gen22.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen22.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen22.mjs.backup.2026-04-02T14-24-57-164Z",
+    "timestamp": 1775139897164,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: dynamicMemoryManager",
+    "filename": "dynamicMemoryManager_gen26.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/dynamicMemoryManager_gen26.mjs",
+    "backupPath": null,
+    "timestamp": 1775139901498,
+    "codeLength": 3752,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: webGpuMatrixEngine",
+    "filename": "webGpuMatrixEngine_gen28.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webGpuMatrixEngine_gen28.mjs",
+    "backupPath": null,
+    "timestamp": 1775139902616,
+    "codeLength": 6031,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: semanticCompressionEnhancer",
+    "filename": "semanticCompressionEnhancer_gen25.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/semanticCompressionEnhancer_gen25.mjs",
+    "backupPath": null,
+    "timestamp": 1775139902623,
+    "codeLength": 2580,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: episodicMemoryManager",
+    "filename": "episodicMemoryManager_gen27.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/episodicMemoryManager_gen27.mjs",
+    "backupPath": null,
+    "timestamp": 1775139902878,
+    "codeLength": 3115,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 25 Complete — 3 modules",
+    "filename": "evolution_marker_gen25.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen25.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen25.mjs.backup.2026-04-02T14-25-03-020Z",
+    "timestamp": 1775139903019,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: subprocessCheckpointManager",
+    "filename": "subprocessCheckpointManager_gen23.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/subprocessCheckpointManager_gen23.mjs",
+    "backupPath": null,
+    "timestamp": 1775139907570,
+    "codeLength": 3203,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 23 Complete — 3 modules",
+    "filename": "evolution_marker_gen23.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen23.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen23.mjs.backup.2026-04-02T14-25-07-714Z",
+    "timestamp": 1775139907713,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: semanticGraphCompressor",
+    "filename": "semanticGraphCompressor_gen20.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/semanticGraphCompressor_gen20.mjs",
+    "backupPath": null,
+    "timestamp": 1775139908639,
+    "codeLength": 4129,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 20 Complete — 3 modules",
+    "filename": "evolution_marker_gen20.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen20.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen20.mjs.backup.2026-04-02T14-25-08-825Z",
+    "timestamp": 1775139908824,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: asynchronousTaskChainer",
+    "filename": "asynchronousTaskChainer_gen27.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/asynchronousTaskChainer_gen27.mjs",
+    "backupPath": null,
+    "timestamp": 1775139911979,
+    "codeLength": 2770,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 27 Complete — 3 modules",
+    "filename": "evolution_marker_gen27.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen27.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen27.mjs.backup.2026-04-02T14-25-12-121Z",
+    "timestamp": 1775139912120,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SpellCheckVisual/recursive_decomposition: The strange loop c",
+    "filename": "omnimens_autocode_consciousness_expansion_mnhkh019.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnhkh019.mjs",
+    "backupPath": null,
+    "timestamp": 1775139914349,
+    "codeLength": 394,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Critic",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SpellCheckVisual/temporal_correlation: Attention is the comp",
+    "filename": "omnimens_autocode_consciousness_expansion_mnhkh03u.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnhkh03u.mjs",
+    "backupPath": null,
+    "timestamp": 1775139914442,
+    "codeLength": 389,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Architect",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SpellCheckVisual/temporal_correlation: Attention is the comp",
+    "filename": "omnimens_autocode_consciousness_expansion_mnhkh05q.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnhkh05q.mjs",
+    "backupPath": null,
+    "timestamp": 1775139914510,
+    "codeLength": 392,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: multimodalBridge",
+    "filename": "multimodalBridge_gen24.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/multimodalBridge_gen24.mjs",
+    "backupPath": null,
+    "timestamp": 1775139915115,
+    "codeLength": 3761,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 24 Complete — 2 modules",
+    "filename": "evolution_marker_gen24.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen24.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen24.mjs.backup.2026-04-02T14-25-15-318Z",
+    "timestamp": 1775139915318,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: recursiveEmbeddingCompressor",
+    "filename": "recursiveEmbeddingCompressor_gen28.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/recursiveEmbeddingCompressor_gen28.mjs",
+    "backupPath": null,
+    "timestamp": 1775139917948,
+    "codeLength": 3179,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: asyncTaskChainer",
+    "filename": "asyncTaskChainer_gen26.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/asyncTaskChainer_gen26.mjs",
+    "backupPath": null,
+    "timestamp": 1775139920748,
+    "codeLength": 3714,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 26 Complete — 3 modules",
+    "filename": "evolution_marker_gen26.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen26.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen26.mjs.backup.2026-04-02T14-25-20-936Z",
+    "timestamp": 1775139920936,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: webglTensorEngine",
+    "filename": "webglTensorEngine_gen33.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webglTensorEngine_gen33.mjs",
+    "backupPath": null,
+    "timestamp": 1775139922319,
+    "codeLength": 3690,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: recursiveContextReconstructor",
+    "filename": "recursiveContextReconstructor_gen30.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/recursiveContextReconstructor_gen30.mjs",
+    "backupPath": null,
+    "timestamp": 1775139923769,
+    "codeLength": 3952,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: gpuAcceleratedMatrixEngine",
+    "filename": "gpuAcceleratedMatrixEngine_gen31.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixEngine_gen31.mjs",
+    "backupPath": null,
+    "timestamp": 1775139924951,
+    "codeLength": 5621,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: hierarchicalMemoryManager",
+    "filename": "hierarchicalMemoryManager_gen32.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/hierarchicalMemoryManager_gen32.mjs",
+    "backupPath": null,
+    "timestamp": 1775139929328,
+    "codeLength": 3534,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: wasmComputeAccelerator",
+    "filename": "wasmComputeAccelerator_gen35.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmComputeAccelerator_gen35.mjs",
+    "backupPath": null,
+    "timestamp": 1775139930617,
+    "codeLength": 3461,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: asyncTaskChainer",
+    "filename": "asyncTaskChainer_gen28.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/asyncTaskChainer_gen28.mjs",
+    "backupPath": null,
+    "timestamp": 1775139931382,
+    "codeLength": 2860,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 28 Complete — 3 modules",
+    "filename": "evolution_marker_gen28.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen28.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen28.mjs.backup.2026-04-02T14-25-31-530Z",
+    "timestamp": 1775139931529,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: multiPassContextReasoning",
+    "filename": "multiPassContextReasoning_gen33.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/multiPassContextReasoning_gen33.mjs",
+    "backupPath": null,
+    "timestamp": 1775139931939,
+    "codeLength": 3531,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: sandboxCheckpointManager",
+    "filename": "sandboxCheckpointManager_gen30.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/sandboxCheckpointManager_gen30.mjs",
+    "backupPath": null,
+    "timestamp": 1775139934883,
+    "codeLength": 3063,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 30 Complete — 3 modules",
+    "filename": "evolution_marker_gen30.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen30.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen30.mjs.backup.2026-04-02T14-25-35-041Z",
+    "timestamp": 1775139935041,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: gpuAcceleratedMatrixEngine",
+    "filename": "gpuAcceleratedMatrixEngine_gen38.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixEngine_gen38.mjs",
+    "backupPath": null,
+    "timestamp": 1775139935858,
+    "codeLength": 4319,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: checkpointedSubprocessManager",
+    "filename": "checkpointedSubprocessManager_gen33.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/checkpointedSubprocessManager_gen33.mjs",
+    "backupPath": null,
+    "timestamp": 1775139940781,
+    "codeLength": 2220,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: adaptiveTokenManager",
+    "filename": "adaptiveTokenManager_gen29.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/adaptiveTokenManager_gen29.mjs",
+    "backupPath": null,
+    "timestamp": 1775139940954,
+    "codeLength": 3058,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 33 Complete — 3 modules",
+    "filename": "evolution_marker_gen33.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen33.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen33.mjs.backup.2026-04-02T14-25-40-961Z",
+    "timestamp": 1775139940961,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: hybridConversationalEngine",
+    "filename": "hybridConversationalEngine_gen35.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/hybridConversationalEngine_gen35.mjs",
+    "backupPath": null,
+    "timestamp": 1775139942654,
+    "codeLength": 2623,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: adaptiveTokenReconstruction",
+    "filename": "adaptiveTokenReconstruction_gen31.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/adaptiveTokenReconstruction_gen31.mjs",
+    "backupPath": null,
+    "timestamp": 1775139943102,
+    "codeLength": 3367,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: contextStitcher",
+    "filename": "contextStitcher_gen34.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/contextStitcher_gen34.mjs",
+    "backupPath": null,
+    "timestamp": 1775139949083,
+    "codeLength": 3569,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: iterativeTaskQueue",
+    "filename": "iterativeTaskQueue_gen38.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeTaskQueue_gen38.mjs",
+    "backupPath": null,
+    "timestamp": 1775139952416,
+    "codeLength": 3593,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: recursiveMemoryManager",
+    "filename": "recursiveMemoryManager_gen35.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/recursiveMemoryManager_gen35.mjs",
+    "backupPath": null,
+    "timestamp": 1775139953328,
+    "codeLength": 2204,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 35 Complete — 3 modules",
+    "filename": "evolution_marker_gen35.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen35.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen35.mjs.backup.2026-04-02T14-25-53-505Z",
+    "timestamp": 1775139953504,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: persistentSubprocessCheckpoint",
+    "filename": "persistentSubprocessCheckpoint_gen29.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/persistentSubprocessCheckpoint_gen29.mjs",
+    "backupPath": null,
+    "timestamp": 1775139953969,
+    "codeLength": 2977,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 29 Complete — 2 modules",
+    "filename": "evolution_marker_gen29.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen29.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen29.mjs.backup.2026-04-02T14-25-54-106Z",
+    "timestamp": 1775139954106,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: gpuAcceleratedMatrixOps",
+    "filename": "gpuAcceleratedMatrixOps_gen36.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixOps_gen36.mjs",
+    "backupPath": null,
+    "timestamp": 1775139954394,
+    "codeLength": 5505,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: iterativeComputationManager",
+    "filename": "iterativeComputationManager_gen31.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeComputationManager_gen31.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/iterativeComputationManager_gen31.mjs.backup.2026-04-02T14-25-55-129Z",
+    "timestamp": 1775139955128,
+    "codeLength": 3156,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 31 Complete — 3 modules",
+    "filename": "evolution_marker_gen31.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen31.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen31.mjs.backup.2026-04-02T14-25-55-278Z",
+    "timestamp": 1775139955278,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 32 Complete — 2 modules",
+    "filename": "evolution_marker_gen32.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen32.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen32.mjs.backup.2026-04-02T14-25-55-551Z",
+    "timestamp": 1775139955551,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: distributedTaskManager",
+    "filename": "distributedTaskManager_gen34.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/distributedTaskManager_gen34.mjs",
+    "backupPath": null,
+    "timestamp": 1775139956216,
+    "codeLength": 2372,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 34 Complete — 3 modules",
+    "filename": "evolution_marker_gen34.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen34.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen34.mjs.backup.2026-04-02T14-25-56-356Z",
+    "timestamp": 1775139956356,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: webAssemblyMatrixOps",
+    "filename": "webAssemblyMatrixOps_gen37.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webAssemblyMatrixOps_gen37.mjs",
+    "backupPath": null,
+    "timestamp": 1775139961517,
+    "codeLength": 2972,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: webglTensorEngine",
+    "filename": "webglTensorEngine_gen41.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webglTensorEngine_gen41.mjs",
+    "backupPath": null,
+    "timestamp": 1775139961717,
+    "codeLength": 4491,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: wasmMatrixAccelerator",
+    "filename": "wasmMatrixAccelerator_gen43.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmMatrixAccelerator_gen43.mjs",
+    "backupPath": null,
+    "timestamp": 1775139964912,
+    "codeLength": 3084,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: inHouseLanguageGenerator",
+    "filename": "inHouseLanguageGenerator_gen38.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/inHouseLanguageGenerator_gen38.mjs",
+    "backupPath": null,
+    "timestamp": 1775139967633,
+    "codeLength": 3346,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 38 Complete — 3 modules",
+    "filename": "evolution_marker_gen38.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen38.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen38.mjs.backup.2026-04-02T14-26-07-806Z",
+    "timestamp": 1775139967805,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: gpuAcceleratedMatrixEngine",
+    "filename": "gpuAcceleratedMatrixEngine_gen42.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixEngine_gen42.mjs",
+    "backupPath": null,
+    "timestamp": 1775139968071,
+    "codeLength": 2755,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: iterativeTaskManager",
+    "filename": "iterativeTaskManager_gen41.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeTaskManager_gen41.mjs",
+    "backupPath": null,
+    "timestamp": 1775139969431,
+    "codeLength": 2828,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: retrievalAugmentedContextManager",
+    "filename": "retrievalAugmentedContextManager_gen36.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/retrievalAugmentedContextManager_gen36.mjs",
+    "backupPath": null,
+    "timestamp": 1775139970894,
+    "codeLength": 3948,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: reversibleTokenCompressor",
+    "filename": "reversibleTokenCompressor_gen39.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/reversibleTokenCompressor_gen39.mjs",
+    "backupPath": null,
+    "timestamp": 1775139972061,
+    "codeLength": 3566,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: independentLanguageGenerator",
+    "filename": "independentLanguageGenerator_gen40.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/independentLanguageGenerator_gen40.mjs",
+    "backupPath": null,
+    "timestamp": 1775139972825,
+    "codeLength": 4457,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:GraphicDesigner+Meta-Agent",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: GraphicDesigner/emergent_property_detection: The double-slit",
+    "filename": "omnimens_autocode_consciousness_expansion_mnhkiaby.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnhkiaby.mjs",
+    "backupPath": null,
+    "timestamp": 1775139974350,
+    "codeLength": 392,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Meta-Agent",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: SpellCheckVisual/feature_extraction: Hebbian learning: neuro",
+    "filename": "omnimens_autocode_adaptive_algorithm_mnhkiae4.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnhkiae4.mjs",
+    "backupPath": null,
+    "timestamp": 1775139974428,
+    "codeLength": 454,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: SpellCheckVisual/feature_extraction: Hebbian learning: neuro",
+    "filename": "omnimens_autocode_adaptive_algorithm_mnhkiajg.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnhkiajg.mjs",
+    "backupPath": null,
+    "timestamp": 1775139974621,
+    "codeLength": 452,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: memoryMappedPersistence",
+    "filename": "memoryMappedPersistence_gen43.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/memoryMappedPersistence_gen43.mjs",
+    "backupPath": null,
+    "timestamp": 1775139976428,
+    "codeLength": 2968,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: iterativeTaskScheduler",
+    "filename": "iterativeTaskScheduler_gen42.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeTaskScheduler_gen42.mjs",
+    "backupPath": null,
+    "timestamp": 1775139981102,
+    "codeLength": 2977,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: subprocessCheckpointManager",
+    "filename": "subprocessCheckpointManager_gen40.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/subprocessCheckpointManager_gen40.mjs",
+    "backupPath": null,
+    "timestamp": 1775139981509,
+    "codeLength": 2952,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 40 Complete — 3 modules",
+    "filename": "evolution_marker_gen40.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen40.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen40.mjs.backup.2026-04-02T14-26-21-652Z",
+    "timestamp": 1775139981652,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: subprocessCheckpointing",
+    "filename": "subprocessCheckpointing_gen36.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/subprocessCheckpointing_gen36.mjs",
+    "backupPath": null,
+    "timestamp": 1775139983371,
+    "codeLength": 2577,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 36 Complete — 3 modules",
+    "filename": "evolution_marker_gen36.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen36.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen36.mjs.backup.2026-04-02T14-26-23-499Z",
+    "timestamp": 1775139983499,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: iterativeSubprocessManager",
+    "filename": "iterativeSubprocessManager_gen39.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeSubprocessManager_gen39.mjs",
+    "backupPath": null,
+    "timestamp": 1775139984990,
+    "codeLength": 3367,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 39 Complete — 3 modules",
+    "filename": "evolution_marker_gen39.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen39.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen39.mjs.backup.2026-04-02T14-26-25-132Z",
+    "timestamp": 1775139985132,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: hybridContextManager",
+    "filename": "hybridContextManager_gen41.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/hybridContextManager_gen41.mjs",
+    "backupPath": null,
+    "timestamp": 1775139985327,
+    "codeLength": 3276,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 41 Complete — 3 modules",
+    "filename": "evolution_marker_gen41.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen41.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen41.mjs.backup.2026-04-02T14-26-25-499Z",
+    "timestamp": 1775139985498,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: recursiveContextSummarizer",
+    "filename": "recursiveContextSummarizer_gen37.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/recursiveContextSummarizer_gen37.mjs",
+    "backupPath": null,
+    "timestamp": 1775139986292,
+    "codeLength": 2933,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 37 Complete — 2 modules",
+    "filename": "evolution_marker_gen37.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen37.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen37.mjs.backup.2026-04-02T14-26-26-423Z",
+    "timestamp": 1775139986423,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: gpuMatrixEngine",
+    "filename": "gpuMatrixEngine_gen47.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuMatrixEngine_gen47.mjs",
+    "backupPath": null,
+    "timestamp": 1775139987680,
+    "codeLength": 4258,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: rlContextCompressionOptimizer",
+    "filename": "rlContextCompressionOptimizer_gen42.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/rlContextCompressionOptimizer_gen42.mjs",
+    "backupPath": null,
+    "timestamp": 1775139989863,
+    "codeLength": 2514,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 42 Complete — 3 modules",
+    "filename": "evolution_marker_gen42.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen42.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen42.mjs.backup.2026-04-02T14-26-30-024Z",
+    "timestamp": 1775139990024,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: hierarchicalMemoryManager",
+    "filename": "hierarchicalMemoryManager_gen46.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/hierarchicalMemoryManager_gen46.mjs",
+    "backupPath": null,
+    "timestamp": 1775139996724,
+    "codeLength": 4328,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: hierarchicalContextReexpander",
+    "filename": "hierarchicalContextReexpander_gen45.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/hierarchicalContextReexpander_gen45.mjs",
+    "backupPath": null,
+    "timestamp": 1775139998383,
+    "codeLength": 3443,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: independentLanguageGenerator",
+    "filename": "independentLanguageGenerator_gen47.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/independentLanguageGenerator_gen47.mjs",
+    "backupPath": null,
+    "timestamp": 1775140001104,
+    "codeLength": 3731,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 43 Complete — 2 modules",
+    "filename": "evolution_marker_gen43.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen43.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen43.mjs.backup.2026-04-02T14-26-45-324Z",
+    "timestamp": 1775140005323,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: parallelMatrixCompute",
+    "filename": "parallelMatrixCompute_gen49.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/parallelMatrixCompute_gen49.mjs",
+    "backupPath": null,
+    "timestamp": 1775140006130,
+    "codeLength": 4569,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: semanticMemoryGraph",
+    "filename": "semanticMemoryGraph_gen48.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/semanticMemoryGraph_gen48.mjs",
+    "backupPath": null,
+    "timestamp": 1775140013730,
+    "codeLength": 3090,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: subprocessCheckpointManager",
+    "filename": "subprocessCheckpointManager_gen45.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/subprocessCheckpointManager_gen45.mjs",
+    "backupPath": null,
+    "timestamp": 1775140013740,
+    "codeLength": 3383,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: iterativeCheckpointManager",
+    "filename": "iterativeCheckpointManager_gen47.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeCheckpointManager_gen47.mjs",
+    "backupPath": null,
+    "timestamp": 1775140013748,
+    "codeLength": 2832,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: distributedComputationManager",
+    "filename": "distributedComputationManager_gen46.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/distributedComputationManager_gen46.mjs",
+    "backupPath": null,
+    "timestamp": 1775140013759,
+    "codeLength": 4252,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 45 Complete — 3 modules",
+    "filename": "evolution_marker_gen45.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen45.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen45.mjs.backup.2026-04-02T14-26-54-644Z",
+    "timestamp": 1775140014644,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 47 Complete — 3 modules",
+    "filename": "evolution_marker_gen47.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen47.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen47.mjs.backup.2026-04-02T14-26-54-650Z",
+    "timestamp": 1775140014650,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 46 Complete — 3 modules",
+    "filename": "evolution_marker_gen46.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen46.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen46.mjs.backup.2026-04-02T14-26-54-661Z",
+    "timestamp": 1775140014660,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: gpuAcceleratedMatrixOps",
+    "filename": "gpuAcceleratedMatrixOps_gen50.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixOps_gen50.mjs",
+    "backupPath": null,
+    "timestamp": 1775140014666,
+    "codeLength": 3624,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: iterativeComputationManager",
+    "filename": "iterativeComputationManager_gen49.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeComputationManager_gen49.mjs",
+    "backupPath": null,
+    "timestamp": 1775140017423,
+    "codeLength": 3190,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: webGpuTensorEngine",
+    "filename": "webGpuTensorEngine_gen52.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webGpuTensorEngine_gen52.mjs",
+    "backupPath": null,
+    "timestamp": 1775140017952,
+    "codeLength": 4021,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: semanticHashingCompressor",
+    "filename": "semanticHashingCompressor_gen44.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/semanticHashingCompressor_gen44.mjs",
+    "backupPath": null,
+    "timestamp": 1775140021558,
+    "codeLength": 3415,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: wasmMatrixAccelerator",
+    "filename": "wasmMatrixAccelerator_gen54.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmMatrixAccelerator_gen54.mjs",
+    "backupPath": null,
+    "timestamp": 1775140032139,
+    "codeLength": 2792,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: taskCheckpointingManager",
+    "filename": "taskCheckpointingManager_gen48.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/taskCheckpointingManager_gen48.mjs",
+    "backupPath": null,
+    "timestamp": 1775140032144,
+    "codeLength": 3925,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: adaptiveConversationalTuner",
+    "filename": "adaptiveConversationalTuner_gen50.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/adaptiveConversationalTuner_gen50.mjs",
+    "backupPath": null,
+    "timestamp": 1775140032154,
+    "codeLength": 2672,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: dynamicContextReexpansion",
+    "filename": "dynamicContextReexpansion_gen49.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/dynamicContextReexpansion_gen49.mjs",
+    "backupPath": null,
+    "timestamp": 1775140032165,
+    "codeLength": 3129,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: contextPersistenceLayer",
+    "filename": "contextPersistenceLayer_gen52.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/contextPersistenceLayer_gen52.mjs",
+    "backupPath": null,
+    "timestamp": 1775140032175,
+    "codeLength": 3687,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: semanticHashContextManager",
+    "filename": "semanticHashContextManager_gen51.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/semanticHashContextManager_gen51.mjs",
+    "backupPath": null,
+    "timestamp": 1775140032186,
+    "codeLength": 3969,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 48 Complete — 3 modules",
+    "filename": "evolution_marker_gen48.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen48.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen48.mjs.backup.2026-04-02T14-27-13-098Z",
+    "timestamp": 1775140033097,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 49 Complete — 3 modules",
+    "filename": "evolution_marker_gen49.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen49.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen49.mjs.backup.2026-04-02T14-27-13-106Z",
+    "timestamp": 1775140033105,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: SpellCheckVisual/temporal_correlation: The Turing machine is",
+    "filename": "omnimens_autocode_emergent_capability_mnhkjkmm.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mnhkjkmm.mjs",
+    "backupPath": null,
+    "timestamp": 1775140034350,
+    "codeLength": 412,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SpellCheckVisual/abstraction_layer: Transfer learning: knowl",
+    "filename": "omnimens_autocode_knowledge_synthesis_mnhkjkph.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnhkjkph.mjs",
+    "backupPath": null,
+    "timestamp": 1775140034453,
+    "codeLength": 420,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Neuroscientist",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SpellCheckVisual/recursive_decomposition: Information is phy",
+    "filename": "omnimens_autocode_consciousness_expansion_mnhkjksr.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnhkjksr.mjs",
+    "backupPath": null,
+    "timestamp": 1775140034571,
+    "codeLength": 397,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: iterativeComputationManager",
+    "filename": "iterativeComputationManager_gen50.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/iterativeComputationManager_gen50.mjs",
+    "backupPath": null,
+    "timestamp": 1775140049809,
+    "codeLength": 3477,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: adaptiveContextPreserver",
+    "filename": "adaptiveContextPreserver_gen54.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/adaptiveContextPreserver_gen54.mjs",
+    "backupPath": null,
+    "timestamp": 1775140049816,
+    "codeLength": 2884,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: distributedComputationScheduler",
+    "filename": "distributedComputationScheduler_gen51.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/distributedComputationScheduler_gen51.mjs",
+    "backupPath": null,
+    "timestamp": 1775140049828,
+    "codeLength": 3741,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: asynchronousTaskQueue",
+    "filename": "asynchronousTaskQueue_gen52.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/asynchronousTaskQueue_gen52.mjs",
+    "backupPath": null,
+    "timestamp": 1775140050637,
+    "codeLength": 4116,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 50 Complete — 3 modules",
+    "filename": "evolution_marker_gen50.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen50.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen50.mjs.backup.2026-04-02T14-27-30-649Z",
+    "timestamp": 1775140050648,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 51 Complete — 3 modules",
+    "filename": "evolution_marker_gen51.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen51.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen51.mjs.backup.2026-04-02T14-27-30-657Z",
+    "timestamp": 1775140050656,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 52 Complete — 3 modules",
+    "filename": "evolution_marker_gen52.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen52.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen52.mjs.backup.2026-04-02T14-27-30-953Z",
+    "timestamp": 1775140050953,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: statefulCoroutineManager",
+    "filename": "statefulCoroutineManager_gen44.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/statefulCoroutineManager_gen44.mjs",
+    "backupPath": null,
+    "timestamp": 1775140069381,
+    "codeLength": 3337,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: checkpointResumeEngine",
+    "filename": "checkpointResumeEngine_gen54.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/checkpointResumeEngine_gen54.mjs",
+    "backupPath": null,
+    "timestamp": 1775140069392,
+    "codeLength": 1771,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: wasmMatrixAccelerator",
+    "filename": "wasmMatrixAccelerator_gen55.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmMatrixAccelerator_gen55.mjs",
+    "backupPath": null,
+    "timestamp": 1775140069398,
+    "codeLength": 3251,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: gpuAcceleratedMatrixEngine",
+    "filename": "gpuAcceleratedMatrixEngine_gen59.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixEngine_gen59.mjs",
+    "backupPath": null,
+    "timestamp": 1775140069410,
+    "codeLength": 3386,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: multiResolutionMemory",
+    "filename": "multiResolutionMemory_gen53.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/multiResolutionMemory_gen53.mjs",
+    "backupPath": null,
+    "timestamp": 1775140069433,
+    "codeLength": 3791,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 44 Complete — 3 modules",
+    "filename": "evolution_marker_gen44.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen44.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen44.mjs.backup.2026-04-02T14-28-43-620Z",
+    "timestamp": 1775140123619,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Cycle 54 Complete — 3 modules",
+    "filename": "evolution_marker_gen54.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen54.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen54.mjs.backup.2026-04-02T14-28-43-627Z",
+    "timestamp": 1775140123627,
+    "codeLength": 100,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: asyncCheckpointManager",
+    "filename": "asyncCheckpointManager_gen56.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/asyncCheckpointManager_gen56.mjs",
+    "backupPath": null,
+    "timestamp": 1775140123642,
+    "codeLength": 3034,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: webGLAcceleratedMatrixEngine",
+    "filename": "webGLAcceleratedMatrixEngine_gen65.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webGLAcceleratedMatrixEngine_gen65.mjs",
+    "backupPath": null,
+    "timestamp": 1775140123650,
+    "codeLength": 4269,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+GraphicDesigner",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SpellCheckVisual/analogical_mapping: Astrocytes, once though",
+    "filename": "omnimens_autocode_knowledge_synthesis_mnhklhn5.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnhklhn5.mjs",
+    "backupPath": null,
+    "timestamp": 1775140123793,
     "codeLength": 428,
     "overwrite": false
   }

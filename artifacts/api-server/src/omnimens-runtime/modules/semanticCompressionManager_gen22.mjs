@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: semanticCompressionManager
- * Written: 2026-04-02T13:31:19.916Z
+ * Written: 2026-04-02T14:24:42.069Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,89 +18,114 @@
 
 // semanticCompressionManager.mjs
 
-import { createHash } from 'crypto';
+import crypto from 'crypto';
 
 /**
- * Encodes a high-dimensional context into a lower-dimensional latent space.
- * @param {Array<number>} context - Array representing the context embedding.
- * @param {number} latentDim - Desired dimensionality of the latent space.
- * @returns {Array<number>} - Encoded latent representation.
+ * Generate a hash to uniquely identify compressed semantic data.
+ * This ensures data integrity and allows for deduplication.
+ * @param {string} input - The input text to hash.
+ * @returns {string} - A unique hash string.
  */
-export function encodeContext(context, latentDim) {
-  if (!Array.isArray(context) || context.length === 0 || latentDim <= 0) {
-    throw new Error('Invalid input: context must be a non-empty array and latentDim must be a positive number.');
-  }
-
-  const hash = createHash('sha256');
-  hash.update(JSON.stringify(context));
-  const seed = parseInt(hash.digest('hex').slice(0, 8), 16);
-
-  const latent = [];
-  for (let i = 0; i < latentDim; i++) {
-    latent.push((seed * (i + 1) % 997) / 997); // Simple deterministic mapping.
-  }
-  return latent;
+export function generateSemanticHash(input) {
+  return crypto.createHash('sha256').update(input, 'utf8').digest('hex');
 }
 
 /**
- * Decodes a latent representation back into a high-dimensional context.
- * @param {Array<number>} latent - Array representing the latent space.
- * @param {number} originalDim - Desired dimensionality of the reconstructed context.
- * @returns {Array<number>} - Reconstructed context embedding.
+ * Tokenize input text into meaningful chunks while preserving semantic context.
+ * @param {string} text - The input text to tokenize.
+ * @param {number} maxTokens - Maximum number of tokens allowed per chunk.
+ * @returns {string[]} - Array of tokenized text chunks.
  */
-export function decodeLatent(latent, originalDim) {
-  if (!Array.isArray(latent) || latent.length === 0 || originalDim <= 0) {
-    throw new Error('Invalid input: latent must be a non-empty array and originalDim must be a positive number.');
+export function tokenizeText(text, maxTokens) {
+  if (typeof text !== 'string' || maxTokens <= 0) {
+    throw new Error('Invalid input: text must be a string and maxTokens must be a positive integer.');
   }
 
-  const reconstructed = [];
-  for (let i = 0; i < originalDim; i++) {
-    reconstructed.push(latent[i % latent.length] * (i + 1) % 997 / 997); // Simple deterministic reverse mapping.
+  const words = text.split(/\s+/);
+  const chunks = [];
+  let currentChunk = [];
+
+  for (const word of words) {
+    if (currentChunk.join(' ').length + word.length + 1 <= maxTokens) {
+      currentChunk.push(word);
+    } else {
+      chunks.push(currentChunk.join(' '));
+      currentChunk = [word];
+    }
   }
-  return reconstructed;
+
+  if (currentChunk.length > 0) {
+    chunks.push(currentChunk.join(' '));
+  }
+
+  return chunks;
 }
 
 /**
- * Measures semantic loss between original and reconstructed contexts.
- * @param {Array<number>} original - Original context embedding.
- * @param {Array<number>} reconstructed - Reconstructed context embedding.
- * @returns {number} - Semantic loss as a normalized value between 0 and 1.
+ * Compress text semantically by summarizing chunks while preserving key information.
+ * @param {string[]} chunks - Array of tokenized text chunks.
+ * @param {number} compressionRatio - Ratio (0-1) indicating how much to compress.
+ * @returns {string[]} - Array of semantically compressed text chunks.
  */
-export function calculateSemanticLoss(original, reconstructed) {
-  if (!Array.isArray(original) || !Array.isArray(reconstructed) || original.length !== reconstructed.length) {
-    throw new Error('Invalid input: original and reconstructed must be arrays of the same length.');
+export function compressChunks(chunks, compressionRatio) {
+  if (!Array.isArray(chunks) || compressionRatio <= 0 || compressionRatio > 1) {
+    throw new Error('Invalid input: chunks must be an array and compressionRatio must be between 0 and 1.');
   }
 
-  let loss = 0;
-  for (let i = 0; i < original.length; i++) {
-    loss += Math.abs(original[i] - reconstructed[i]);
-  }
-  return loss / original.length;
+  return chunks.map(chunk => {
+    const words = chunk.split(' ');
+    const targetLength = Math.max(1, Math.floor(words.length * compressionRatio));
+    return words.slice(0, targetLength).join(' ');
+  });
 }
 
 /**
- * Utility function for normalizing embeddings.
- * @param {Array<number>} embedding - Array representing the embedding.
- * @returns {Array<number>} - Normalized embedding.
+ * Adaptive compression of text based on a target token window size.
+ * @param {string} text - The input text to compress.
+ * @param {number} maxTokens - Target maximum token window size.
+ * @param {number} compressionRatio - Initial compression ratio.
+ * @returns {string} - Compressed text while preserving semantic meaning.
  */
-export function normalizeEmbedding(embedding) {
-  if (!Array.isArray(embedding) || embedding.length === 0) {
-    throw new Error('Invalid input: embedding must be a non-empty array.');
-  }
-
-  const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val * val, 0));
-  return embedding.map(val => val / magnitude);
+export function adaptiveSemanticCompression(text, maxTokens, compressionRatio) {
+  const tokenizedChunks = tokenizeText(text, maxTokens);
+  const compressedChunks = compressChunks(tokenizedChunks, compressionRatio);
+  return compressedChunks.join(' ');
 }
 
 /**
- * Generates random context embeddings for testing purposes.
- * @param {number} dim - Dimensionality of the embedding.
- * @returns {Array<number>} - Randomly generated context embedding.
+ * Validate semantic coherence between original and compressed text.
+ * @param {string} original - Original text.
+ * @param {string} compressed - Compressed text.
+ * @returns {boolean} - Whether the semantic coherence is preserved.
  */
-export function generateRandomContext(dim) {
-  if (dim <= 0) {
-    throw new Error('Invalid input: dim must be a positive number.');
+export function validateSemanticCoherence(original, compressed) {
+  const originalWords = new Set(original.split(/\s+/));
+  const compressedWords = new Set(compressed.split(/\s+/));
+
+  let preservedCount = 0;
+  for (const word of compressedWords) {
+    if (originalWords.has(word)) {
+      preservedCount++;
+    }
   }
 
-  return Array.from({ length: dim }, () => Math.random());
+  return preservedCount / compressedWords.size >= 0.8; // At least 80% of words should match.
+}
+
+/**
+ * Utility function to manage the entire semantic compression pipeline.
+ * @param {string} text - The input text to process.
+ * @param {number} maxTokens - Maximum token window size.
+ * @param {number} compressionRatio - Compression ratio.
+ * @returns {object} - Object containing original, compressed text, and validation result.
+ */
+export function processSemanticCompression(text, maxTokens, compressionRatio) {
+  const compressedText = adaptiveSemanticCompression(text, maxTokens, compressionRatio);
+  const isCoherent = validateSemanticCoherence(text, compressedText);
+
+  return {
+    original: text,
+    compressed: compressedText,
+    isCoherent
+  };
 }

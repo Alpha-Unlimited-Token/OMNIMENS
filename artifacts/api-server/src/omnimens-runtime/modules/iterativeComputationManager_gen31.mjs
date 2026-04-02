@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: iterativeComputationManager
- * Written: 2026-04-02T14:12:22.185Z
+ * Written: 2026-04-02T14:25:55.128Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,70 +18,100 @@
 
 // iterativeComputationManager.mjs
 
-import crypto from 'crypto';
+import { createHash } from 'crypto';
 
-// Utility function to generate unique IDs for computation tasks
-export function generateTaskId() {
-  return crypto.randomUUID();
+/**
+ * Utility to manage iterative computations with checkpointing and dependency graphs.
+ * Allows complex workflows to resume after interruptions.
+ */
+
+const stateStore = new Map();
+
+/**
+ * Generates a unique hash for a computation state.
+ * @param {Object} state - The computation state object.
+ * @returns {string} - A unique hash representing the state.
+ */
+export function generateStateHash(state) {
+  const stateString = JSON.stringify(state);
+  return createHash('sha256').update(stateString).digest('hex');
 }
 
-// In-memory store for intermediate states
-const computationStore = new Map();
-
-// Save intermediate state for a task
-export function saveState(taskId, state) {
-  computationStore.set(taskId, state);
+/**
+ * Saves a computation state snapshot.
+ * @param {string} id - Unique identifier for the computation.
+ * @param {Object} state - The computation state object.
+ */
+export function saveState(id, state) {
+  const stateHash = generateStateHash(state);
+  stateStore.set(id, { state, stateHash });
 }
 
-// Retrieve intermediate state for a task
-export function loadState(taskId) {
-  return computationStore.get(taskId) || null;
+/**
+ * Retrieves a saved computation state.
+ * @param {string} id - Unique identifier for the computation.
+ * @returns {Object|null} - The saved state object or null if not found.
+ */
+export function loadState(id) {
+  return stateStore.has(id) ? stateStore.get(id).state : null;
 }
 
-// Delete state for a completed or canceled task
-export function deleteState(taskId) {
-  computationStore.delete(taskId);
+/**
+ * Checks if a computation state has changed.
+ * @param {string} id - Unique identifier for the computation.
+ * @param {Object} newState - The new computation state object.
+ * @returns {boolean} - True if the state has changed, false otherwise.
+ */
+export function hasStateChanged(id, newState) {
+  const savedState = stateStore.get(id);
+  if (!savedState) return true;
+  const newStateHash = generateStateHash(newState);
+  return savedState.stateHash !== newStateHash;
 }
 
-// Perform iterative computation
-export function iterativeCompute(taskId, atomicFunction, initialState, maxIterations = 1000) {
-  let state = loadState(taskId) || initialState;
-  let iterations = 0;
+/**
+ * Executes a computation step based on dependencies.
+ * @param {Object} dependencies - Dependency graph for the computation.
+ * @param {Function} computeStep - Function to execute a single computation step.
+ * @returns {Object} - The result of the computation step.
+ */
+export function executeStep(dependencies, computeStep) {
+  const resolvedDependencies = {};
 
-  while (iterations < maxIterations) {
-    try {
-      const { nextState, isComplete } = atomicFunction(state);
-      if (isComplete) {
-        deleteState(taskId); // Clean up store
-        return nextState; // Final result
-      }
-      saveState(taskId, nextState); // Save intermediate state
-      state = nextState;
-      iterations++;
-    } catch (error) {
-      throw new Error(`Error during computation: ${error.message}`);
+  for (const [key, dependency] of Object.entries(dependencies)) {
+    if (typeof dependency === 'function') {
+      resolvedDependencies[key] = dependency();
+    } else {
+      resolvedDependencies[key] = dependency;
     }
   }
 
-  throw new Error("Max iterations reached. Consider resuming later.");
+  return computeStep(resolvedDependencies);
 }
 
-// Example atomic function for testing
-export function exampleAtomicFunction(state) {
-  const nextState = state + 1;
-  const isComplete = nextState >= 10; // Example stopping condition
-  return { nextState, isComplete };
-}
+/**
+ * Manages iterative workflows by checkpointing and resuming computations.
+ * @param {string} id - Unique identifier for the workflow.
+ * @param {Object} dependencies - Dependency graph for the computation.
+ * @param {Function} computeStep - Function to execute a single computation step.
+ * @returns {Object} - The result of the computation step.
+ */
+export function manageWorkflow(id, dependencies, computeStep) {
+  const previousState = loadState(id);
+  const currentState = { dependencies, computeStep: computeStep.toString() };
 
-// Example usage
-export function exampleUsage() {
-  const taskId = generateTaskId();
-  const initialState = 0;
-
-  try {
-    const result = iterativeCompute(taskId, exampleAtomicFunction, initialState);
+  if (!previousState || hasStateChanged(id, currentState)) {
+    const result = executeStep(dependencies, computeStep);
+    saveState(id, currentState);
     return result;
-  } catch (error) {
-    return `Computation failed: ${error.message}`;
   }
+
+  return previousState.result;
+}
+
+/**
+ * Clears all stored states (use cautiously).
+ */
+export function clearAllStates() {
+  stateStore.clear();
 }
