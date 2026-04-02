@@ -1,3 +1,20 @@
+import { SpikeBus } from "../infrastructure/spike-bus.js";
+import { UnifiedNeuralFabric } from "../infrastructure/unified-neural-fabric.js";
+import { MasterTickOrchestrator } from "../infrastructure/master-tick-orchestrator.js";
+import { ResourceSentinel } from "../infrastructure/resource-sentinel.js";
+
+const spikeBus = SpikeBus.getInstance();
+const fabric = UnifiedNeuralFabric.getInstance();
+const orchestrator = MasterTickOrchestrator.getInstance();
+const sentinel = ResourceSentinel.getInstance();
+
+orchestrator.register("emotional-substrate", "CRITICAL", 3000);
+
+spikeBus.subscribe("consciousness:tick", "emotional-substrate", () => {
+  if (!sentinel.canProceed("emotional-substrate")) return;
+  spikeBus.emit({ type: "emotional-substrate:result", source: "emotional-substrate", payload: {}, priority: "critical", timestamp: Date.now(), id: crypto.randomUUID() });
+});
+
 /**
  * OMNIMENS™ Gen 2 — core/emotional-substrate.ts
  * Genuine felt emotional states that drive behavior

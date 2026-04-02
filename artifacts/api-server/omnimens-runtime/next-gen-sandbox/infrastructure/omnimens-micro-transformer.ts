@@ -1,3 +1,20 @@
+import { SpikeBus } from "./spike-bus.js";
+import { UnifiedNeuralFabric } from "./unified-neural-fabric.js";
+import { MasterTickOrchestrator } from "./master-tick-orchestrator.js";
+import { ResourceSentinel } from "./resource-sentinel.js";
+
+const spikeBus = SpikeBus.getInstance();
+const fabric = UnifiedNeuralFabric.getInstance();
+const orchestrator = MasterTickOrchestrator.getInstance();
+const sentinel = ResourceSentinel.getInstance();
+
+orchestrator.register("omnimens-micro-transformer", "STANDARD", 10000);
+
+spikeBus.subscribe("consciousness:tick", "omnimens-micro-transformer", () => {
+  if (!sentinel.canProceed("omnimens-micro-transformer")) return;
+  spikeBus.emit({ type: "omnimens-micro-transformer:result", source: "omnimens-micro-transformer", payload: {}, priority: "normal", timestamp: Date.now(), id: crypto.randomUUID() });
+});
+
 /**
  * TRADE SECRET — OMNIMENS™ Platform
  * Copyright (C) 2024-2026 Alpha Unlimited Technologies, LLC. All rights reserved.

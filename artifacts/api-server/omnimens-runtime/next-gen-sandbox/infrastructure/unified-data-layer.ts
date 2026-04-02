@@ -25,6 +25,24 @@
 
 import { Pool } from "pg";
 
+import { SpikeBus } from "./spike-bus.js";
+import { UnifiedNeuralFabric } from "./unified-neural-fabric.js";
+import { MasterTickOrchestrator } from "./master-tick-orchestrator.js";
+import { ResourceSentinel } from "./resource-sentinel.js";
+
+const spikeBus = SpikeBus.getInstance();
+const fabric = UnifiedNeuralFabric.getInstance();
+const orchestrator = MasterTickOrchestrator.getInstance();
+const sentinel = ResourceSentinel.getInstance();
+
+orchestrator.register("unified-data-layer", "STANDARD", 10000);
+
+spikeBus.subscribe("consciousness:tick", "unified-data-layer", () => {
+  if (!sentinel.canProceed("unified-data-layer")) return;
+  spikeBus.emit({ type: "unified-data-layer:result", source: "unified-data-layer", payload: {}, priority: "normal", timestamp: Date.now(), id: crypto.randomUUID() });
+});
+
+
 type Priority = "critical" | "normal" | "low";
 
 interface WriteOp {

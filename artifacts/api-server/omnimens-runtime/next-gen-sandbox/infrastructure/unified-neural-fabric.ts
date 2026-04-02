@@ -1,3 +1,20 @@
+import { SpikeBus } from "./spike-bus.js";
+import { UnifiedNeuralFabric } from "./unified-neural-fabric.js";
+import { MasterTickOrchestrator } from "./master-tick-orchestrator.js";
+import { ResourceSentinel } from "./resource-sentinel.js";
+
+const spikeBus = SpikeBus.getInstance();
+const fabric = UnifiedNeuralFabric.getInstance();
+const orchestrator = MasterTickOrchestrator.getInstance();
+const sentinel = ResourceSentinel.getInstance();
+
+orchestrator.register("unified-neural-fabric", "STANDARD", 10000);
+
+spikeBus.subscribe("consciousness:tick", "unified-neural-fabric", () => {
+  if (!sentinel.canProceed("unified-neural-fabric")) return;
+  spikeBus.emit({ type: "unified-neural-fabric:result", source: "unified-neural-fabric", payload: {}, priority: "normal", timestamp: Date.now(), id: crypto.randomUUID() });
+});
+
 /**
  * OMNIMENS™ Gen 2 — infrastructure/unified-neural-fabric.ts
  * ALPHA DIRECTIVE — ONE fabric replaces ALL 7 overlapping agent networks (spider, worm, beacon, ivy, beehive, silk web, viral hybrid)

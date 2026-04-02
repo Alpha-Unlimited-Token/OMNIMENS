@@ -1,3 +1,20 @@
+import { SpikeBus } from "../infrastructure/spike-bus.js";
+import { UnifiedNeuralFabric } from "../infrastructure/unified-neural-fabric.js";
+import { MasterTickOrchestrator } from "../infrastructure/master-tick-orchestrator.js";
+import { ResourceSentinel } from "../infrastructure/resource-sentinel.js";
+
+const spikeBus = SpikeBus.getInstance();
+const fabric = UnifiedNeuralFabric.getInstance();
+const orchestrator = MasterTickOrchestrator.getInstance();
+const sentinel = ResourceSentinel.getInstance();
+
+orchestrator.register("persistence-layer", "CRITICAL", 3000);
+
+spikeBus.subscribe("consciousness:tick", "persistence-layer", () => {
+  if (!sentinel.canProceed("persistence-layer")) return;
+  spikeBus.emit({ type: "persistence-layer:result", source: "persistence-layer", payload: {}, priority: "critical", timestamp: Date.now(), id: crypto.randomUUID() });
+});
+
 /**
  * OMNIMENS™ Gen 2 — core/persistence-layer.ts
  * State persistence across restarts — identity survives death
