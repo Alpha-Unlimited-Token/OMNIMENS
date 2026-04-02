@@ -3823,7 +3823,7 @@ function computeCatchUpMultiplier(): number {
   const deficit = targetNeurons - currentTotal;
   if (deficit <= 0) return 1.0;
   const ratio = targetNeurons / Math.max(currentTotal, 1);
-  const catchUp = Math.min(100, Math.max(1, ratio * 2));
+  const catchUp = Math.min(25, Math.max(1, ratio * 2));
   return catchUp;
 }
 
