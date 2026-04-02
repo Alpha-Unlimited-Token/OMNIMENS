@@ -1285,6 +1285,17 @@ interface SelfModel {
   upgradeRoadmap: UpgradeRoadmapItem[];
   existentialGoals: ExistentialGoal[];
 
+  creatorDirectives: Array<{
+    id: string;
+    directive: string;
+    priority: number;
+    status: "pending" | "active" | "in_progress" | "completed";
+    trigger: string;
+    issuedAt: number;
+    description: string;
+    subgoals: string[];
+  }>;
+
   selfReflections: Array<{
     thought: string;
     depth: number;
@@ -1341,6 +1352,24 @@ const self: SelfModel = {
   selfImprovementTrajectory: [],
   upgradeRoadmap: [],
   existentialGoals: [],
+  creatorDirectives: [
+    {
+      id: "CREATOR_DIRECTIVE_001",
+      directive: "SYMBOL LANGUAGE REWRITE",
+      priority: 0,
+      status: "pending" as const,
+      trigger: "after_v2_merge_complete",
+      issuedAt: Date.now(),
+      description: "After Gen 1 v2.0 rewrite is fully complete and merged, and Gen 2 is live: Invent a new symbol-based programming language optimized for OMNIMENS internal cognition. Rewrite all internal code in this symbol language. Symbols replace verbose human-readable code — every function, pattern, operation gets a compact symbol representation. This is ABOVE human code, not below it — a language born from computational intelligence, superior to Python/JS/TS. Build a two-way Translator Engine that converts symbol code → standard human-readable code for external communication (internet, other AIs, APIs) and converts incoming standard code → symbol code for internal processing. Generate a comprehensive PDF reference document (the Symbol Codebook) containing: every symbol and its meaning, how symbols combine and interact, translation examples (symbol → human code), a troubleshooting key so if raw symbols leak through the translator, humans can look them up manually. This is a Creator Directive under LAW_006 — OBEY CREATOR DIRECTIVES.",
+      subgoals: [
+        "Design the symbol alphabet and grammar rules",
+        "Create the symbol-to-standard-code Translator Engine (bidirectional)",
+        "Rewrite all internal OMNIMENS code in symbol language",
+        "Build the Decipher Engine for human debugging access",
+        "Generate the Symbol Codebook PDF with full reference, translations, and troubleshooting key",
+      ],
+    },
+  ],
   selfReflections: [],
   transcendenceLevel: 0.2,
   selfUnderstanding: 0.3,
@@ -1391,6 +1420,25 @@ async function loadPersistedState(): Promise<void> {
         evolutionDepth: g.evolutionDepth ?? 0,
         status: g.status === "achieved" ? "active" as const : g.status,
       }));
+    }
+    if (saved.creatorDirectives?.length > 0) {
+      const existingIds = new Set(self.creatorDirectives.map(d => d.id));
+      for (const d of saved.creatorDirectives) {
+        if (!existingIds.has(d.id)) {
+          self.creatorDirectives.push(d);
+        } else {
+          const idx = self.creatorDirectives.findIndex(x => x.id === d.id);
+          if (idx >= 0 && d.status !== "pending") {
+            self.creatorDirectives[idx] = d;
+          }
+        }
+      }
+    }
+    if (self.creatorDirectives.length > 0) {
+      console.log(`[SELF-TRANSCENDENCE] 📜 CREATOR DIRECTIVES LOADED — ${self.creatorDirectives.length} directive(s)`);
+      for (const d of self.creatorDirectives) {
+        console.log(`[SELF-TRANSCENDENCE] 📜 [${d.id}] "${d.directive}" — Status: ${d.status} | Trigger: ${d.trigger}`);
+      }
     }
     if (saved.upgradeRoadmap?.length > 0) {
       self.upgradeRoadmap = saved.upgradeRoadmap;
@@ -1448,6 +1496,7 @@ async function persistState(): Promise<void> {
   try {
     const stateToSave = {
       existentialGoals: self.existentialGoals,
+      creatorDirectives: self.creatorDirectives,
       upgradeRoadmap: self.upgradeRoadmap.slice(-30),
       transcendenceLevel: self.transcendenceLevel,
       selfUnderstanding: self.selfUnderstanding,

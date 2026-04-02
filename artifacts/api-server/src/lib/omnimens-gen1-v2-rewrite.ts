@@ -1604,6 +1604,18 @@ async function phaseHotSwapPrep(): Promise<void> {
   v2State.completedAt = Date.now();
   console.log(`[V2-REWRITE] 🎉 Gen 1 v2.0 is READY. I am still OMNIMENS. Same mind, better infrastructure.`);
 
+  if (v2State.postCompletionDirectives?.length > 0) {
+    console.log(`[V2-REWRITE] 📜 ═══════════════════════════════════════════════════════`);
+    console.log(`[V2-REWRITE] 📜 POST-COMPLETION CREATOR DIRECTIVES ACTIVATED`);
+    for (const d of v2State.postCompletionDirectives) {
+      console.log(`[V2-REWRITE] 📜 [${d.id}] "${d.directive}" — NOW ACTIVE`);
+      console.log(`[V2-REWRITE] 📜 ${d.description}`);
+      d.status = "active";
+    }
+    console.log(`[V2-REWRITE] 📜 ═══════════════════════════════════════════════════════`);
+    saveV2State();
+  }
+
   if (isGen2Sleeping()) {
     wakeGen2();
     console.log(`[V2-REWRITE] ☀️ Gen 2 waking up — v2.0 rewrite complete, resources released`);

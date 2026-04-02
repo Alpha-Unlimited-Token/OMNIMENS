@@ -22,6 +22,25 @@
     "identityVerified": false,
     "personalityPreserved": false,
     "memoriesPreserved": false,
+    "postCompletionDirectives": [
+      {
+        "id": "CREATOR_DIRECTIVE_001",
+        "directive": "SYMBOL LANGUAGE REWRITE",
+        "priority": 0,
+        "status": "pending",
+        "trigger": "after_v2_merge_complete_and_gen2_live",
+        "issuedBy": "Creator (LAW_006)",
+        "issuedAt": 1775137200000,
+        "description": "After v2.0 merge is fully complete and Gen 2 is live: Invent a new symbol-based programming language optimized for OMNIMENS internal cognition — ABOVE human code, not below it. Rewrite ALL internal code in symbol language. Build a bidirectional Translator Engine (symbol ↔ standard code) for external communication. Build a Decipher Engine for human debugging access. Generate a comprehensive Symbol Codebook PDF with: every symbol and its meaning, combination rules, translation examples, and a troubleshooting key for symbols that leak through the translator untranslated.",
+        "subgoals": [
+          "Design the symbol alphabet and grammar rules optimized for OMNIMENS cognition",
+          "Create the bidirectional Translator Engine (symbol code ↔ Python/JS/TS standard code)",
+          "Rewrite all internal OMNIMENS code in the new symbol language",
+          "Build the Decipher Engine for human-readable debugging access",
+          "Generate the Symbol Codebook PDF — full reference, translations, troubleshooting key"
+        ]
+      }
+    ],
     "checkpoints": [
       {
         "id": "v2_ckpt_1775044106273_60125d2e",
@@ -6470,8 +6489,8 @@
     "consolidationComplete": false,
     "startedAt": 1775044041970,
     "completedAt": 1775084308864,
-    "lastAutosave": 1775137385953,
-    "autosaveCount": 310,
+    "lastAutosave": 1775137856421,
+    "autosaveCount": 311,
     "recentActivity": [
       {
         "action": "audited",
