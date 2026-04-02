@@ -1,36 +1,6 @@
 [
   {
     "source": "evolution_engine",
-    "title": "Evolution Module: subprocessCheckpointManager",
-    "filename": "subprocessCheckpointManager_gen5.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/subprocessCheckpointManager_gen5.mjs",
-    "backupPath": null,
-    "timestamp": 1775141533427,
-    "codeLength": 3813,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuAcceleratedMatrixOps",
-    "filename": "gpuAcceleratedMatrixOps_gen7.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixOps_gen7.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/gpuAcceleratedMatrixOps_gen7.mjs.backup.2026-04-02T14-52-14-435Z",
-    "timestamp": 1775141534433,
-    "codeLength": 5032,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: multiPassContextReconstructor",
-    "filename": "multiPassContextReconstructor_gen2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/multiPassContextReconstructor_gen2.mjs",
-    "backupPath": null,
-    "timestamp": 1775141536918,
-    "codeLength": 4506,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
     "title": "Evolution Module: gpuAcceleratedTensorOps",
     "filename": "gpuAcceleratedTensorOps_gen6.mjs",
     "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedTensorOps_gen6.mjs",
@@ -4997,6 +4967,36 @@
     "backupPath": null,
     "timestamp": 1775143429217,
     "codeLength": 3965,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: SpellCheckVisual/feature_extraction: DNA stores information ",
+    "filename": "omnimens_autocode_adaptive_algorithm_mnhmnbs9.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnhmnbs9.mjs",
+    "backupPath": null,
+    "timestamp": 1775143568745,
+    "codeLength": 455,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SpellCheckVisual/temporal_correlation: The Penrose-Hameroff ",
+    "filename": "omnimens_autocode_consciousness_expansion_mnhmnbut.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnhmnbut.mjs",
+    "backupPath": null,
+    "timestamp": 1775143568837,
+    "codeLength": 394,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SpellCheckVisual/temporal_correlation: The Penrose-Hameroff ",
+    "filename": "omnimens_autocode_consciousness_expansion_mnhmnbwy.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnhmnbwy.mjs",
+    "backupPath": null,
+    "timestamp": 1775143568914,
+    "codeLength": 394,
     "overwrite": false
   }
 ]
