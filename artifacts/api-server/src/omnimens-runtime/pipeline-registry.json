@@ -261,7 +261,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775167631509,
+      "loadedAt": 1775168123216,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -378,7 +378,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775167631513,
+      "loadedAt": 1775168342846,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -489,7 +489,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775167631515,
+      "loadedAt": 1775168712864,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -502,7 +502,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775167631511,
+      "loadedAt": 1775167946042,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -239529,16 +239529,16 @@
     },
     "hierarchicalMemoryManager_gen4.mjs": {
       "filename": "hierarchicalMemoryManager_gen4.mjs",
-      "stage": "confidence_scoring",
+      "stage": "memory_retrieval",
       "exports": [
-        "calculateImportanceScore",
-        "calculateEntropy",
-        "segmentText",
-        "hierarchicalSummarization",
-        "summarizeChunks",
-        "hierarchicalMemoryManager"
+        "generateHash",
+        "createMemoryTree",
+        "summarizeNodes",
+        "queryMemoryTree",
+        "createKeywordRelevanceFunction",
+        "flattenMemoryTree"
       ],
-      "loadedAt": 1775167631584,
+      "loadedAt": 1775167769627,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -249941,9 +249941,266 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "multimodalIntegrationLayer_gen8.mjs": {
+      "filename": "multimodalIntegrationLayer_gen8.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "normalizeEmbedding",
+        "linearTransform",
+        "applyActivation",
+        "unifyEmbeddings",
+        "hashEmbedding",
+        "exampleUsage"
+      ],
+      "loadedAt": 1775167769418,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "contextRefinementSummarizer_gen7.mjs": {
+      "filename": "contextRefinementSummarizer_gen7.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateHash",
+        "semanticClustering",
+        "summarizeCluster",
+        "recursiveRefinement",
+        "summarizeText",
+        "chunkText",
+        "summarizeChunks"
+      ],
+      "loadedAt": 1775167769762,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "iterativeSubprocessManager_gen6.mjs": {
+      "filename": "iterativeSubprocessManager_gen6.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "saveState",
+        "loadState",
+        "manageSubprocess",
+        "createNumericalProcessor",
+        "createStringProcessor"
+      ],
+      "loadedAt": 1775167769885,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_emergent_capability_mni1230b.mjs": {
+      "filename": "omnimens_autocode_emergent_capability_mni1230b.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "emergentCapability_mni1230b"
+      ],
+      "loadedAt": 1775167842619,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicWebIntegrator_gen3.mjs": {
+      "filename": "dynamicWebIntegrator_gen3.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "parseUrl",
+        "extractDomElements",
+        "generateHash",
+        "filterDomElements",
+        "dynamicContentProcessor"
+      ],
+      "loadedAt": 1775167842837,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_knowledge_synthesis_mni13lp6.mjs": {
+      "filename": "omnimens_autocode_knowledge_synthesis_mni13lp6.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "synthesizedKnowledge_mni13lp6"
+      ],
+      "loadedAt": 1775167945954,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "iterativeTaskQueueManager_gen5.mjs": {
+      "filename": "iterativeTaskQueueManager_gen5.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateTaskId",
+        "saveTaskState",
+        "getTaskState",
+        "deleteTaskState",
+        "chunkTaskData",
+        "processChunk",
+        "iterativeTaskQueueManager",
+        "squareNumber",
+        "reverseText",
+        "doubleArrayValues"
+      ],
+      "loadedAt": 1775167946172,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mni15tf3.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mni15tf3.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mni15tf3"
+      ],
+      "loadedAt": 1775168122909,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multiResolutionContextManager_gen6.mjs": {
+      "filename": "multiResolutionContextManager_gen6.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateContentHash",
+        "createMultiResolutionRepresentation",
+        "mergeRepresentations",
+        "extractRelevantDetails",
+        "tokenizeDocument"
+      ],
+      "loadedAt": 1775168123120,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mni19lz6.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mni19lz6.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mni19lz6"
+      ],
+      "loadedAt": 1775168342749,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_knowledge_synthesis_mni15tbz.mjs": {
+      "filename": "omnimens_autocode_knowledge_synthesis_mni15tbz.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "synthesizedKnowledge_mni15tbz"
+      ],
+      "loadedAt": 1775168342975,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mni1ebl8.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mni1ebl8.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mni1ebl8"
+      ],
+      "loadedAt": 1775168712776,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "slidingWindowExtender_gen9.mjs": {
+      "filename": "slidingWindowExtender_gen9.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateHash",
+        "createSlidingWindows",
+        "calculateImportanceScore",
+        "hierarchicalSummarization",
+        "extendTokenWindow",
+        "processLongDocument"
+      ],
+      "loadedAt": 1775168713058,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "neuroSymbolicReasoningEngine_gen8.mjs": {
+      "filename": "neuroSymbolicReasoningEngine_gen8.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "calculateSemanticSimilarity",
+        "backwardChaining",
+        "hybridReasoning",
+        "findClosestSymbol",
+        "generateSymbolHash"
+      ],
+      "loadedAt": 1775168713542,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "iterativeComputationManager_gen7.mjs": {
+      "filename": "iterativeComputationManager_gen7.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "createCheckpoint",
+        "segmentTask",
+        "restoreStateFromCheckpoint",
+        "trackDependencies",
+        "exampleComputation",
+        "computeSum",
+        "computeAverage",
+        "computeVariance",
+        "iterativeComputationManager"
+      ],
+      "loadedAt": 1775168713801,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mni1ebhu.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mni1ebhu.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mni1ebhu"
+      ],
+      "loadedAt": 1775168713876,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1775167635767,
-  "totalModules": 18358,
+  "totalModules": 18389,
   "totalCalls": 0
 }

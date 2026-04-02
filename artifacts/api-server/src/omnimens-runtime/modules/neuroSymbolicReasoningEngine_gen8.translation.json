@@ -1,0 +1,67 @@
+{
+  "copyright": "Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.",
+  "sourceFile": "neuroSymbolicReasoningEngine_gen8.mjs",
+  "translatedAt": "2026-04-02T22:19:02.931Z",
+  "novelConstructs": [
+    "neural"
+  ],
+  "untranslatedConstructs": [],
+  "targets": {
+    "javascript": {
+      "success": true,
+      "type": "digital",
+      "irSteps": 10,
+      "symbols": 6,
+      "output": "// Auto-translated by OMNIMENS Universal Translator\n// Target: JavaScript/TypeScript (Node.js Runtime)\n// Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.\n// PROPRIETARY AND CONFIDENTIAL — Unauthorized use prohibited.\n\n  // Novel construct: neural \"embeddings\" — Neural processing layer — parallel weighted computation\n  const embeddings = { weights: new Float64Array(128), activate: (input) => input.reduce((s, v, i) => s + v * embeddings.weights[i], 0) };\n  // Novel construct: neural \"embeddings\" — Neural processing layer — parallel weighted computation\n  const embeddings = { weights: new Float64Array(128), activate: (input) => input.reduce((s, v, i) => s + v * embeddings.weights[i], 0) };\n  // Novel construct: neural \"embeddings\" — Neural processing layer — parallel weighted computation\n  const embeddings = { weights: new Float64Array(128), activate: (input) => input.reduce((s, v, i) => s + v * embeddings.weights[i], 0) };\n  // Novel construct: neural \"embeddings\" — Neural processing layer — parallel weighted computation\n  const embeddings = { weights: new Float64Array(128), activate: (input) => input.reduce((s, v, i) => s + v * embeddings.weights[i], 0) };\n  let closestSymbol;\n  _stack.push(symbol);\n  closestSymbol = _stack.pop();\n  let highestSimilarity;\n  _stack.push(-);\n  highestSimilarity = _stack.pop();"
+    },
+    "python": {
+      "success": true,
+      "type": "digital",
+      "irSteps": 10,
+      "symbols": 6,
+      "output": "# Auto-translated by OMNIMENS Universal Translator\n# Target: Python 3 (ML/AI Ecosystem)\n# Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.\n# PROPRIETARY AND CONFIDENTIAL — Unauthorized use prohibited.\n\n    # Novel construct: neural \"embeddings\" — Neural processing layer — parallel weighted computation\n    embeddings = {'weights': [0.0]*128, 'activate': lambda inp: sum(v*w for v,w in zip(inp, embeddings['weights']))}\n    # Novel construct: neural \"embeddings\" — Neural processing layer — parallel weighted computation\n    embeddings = {'weights': [0.0]*128, 'activate': lambda inp: sum(v*w for v,w in zip(inp, embeddings['weights']))}\n    # Novel construct: neural \"embeddings\" — Neural processing layer — parallel weighted computation\n    embeddings = {'weights': [0.0]*128, 'activate': lambda inp: sum(v*w for v,w in zip(inp, embeddings['weights']))}\n    # Novel construct: neural \"embeddings\" — Neural processing layer — parallel weighted computation\n    embeddings = {'weights': [0.0]*128, 'activate': lambda inp: sum(v*w for v,w in zip(inp, embeddings['weights']))}\n    closestSymbol = None\n    _stack.append(symbol)\n    closestSymbol = _stack.pop()\n    highestSimilarity = None\n    _stack.append(-)\n    highestSimilarity = _stack.pop()"
+    },
+    "c": {
+      "success": true,
+      "type": "digital",
+      "irSteps": 10,
+      "symbols": 6,
+      "output": "// Auto-translated by OMNIMENS Universal Translator\n// Target: C99 (Native OS Execution)\n// Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.\n// PROPRIETARY AND CONFIDENTIAL — Unauthorized use prohibited.\n#include <stdio.h>\n#include <stdlib.h>\n\n  /* Novel construct: neural \"embeddings\" — Neural processing layer — parallel weighted computation */\n  struct neural_embeddings { double weights[128]; double activate(double* input, int len) { double s=0; for(int i=0;i<len;i++) s+=input[i]*weights[i]; return s; } };\n  /* Novel construct: neural \"embeddings\" — Neural processing layer — parallel weighted computation */\n  struct neural_embeddings { double weights[128]; double activate(double* input, int len) { double s=0; for(int i=0;i<len;i++) s+=input[i]*weights[i]; return s; } };\n  /* Novel construct: neural \"embeddings\" — Neural processing layer — parallel weighted computation */\n  struct neural_embeddings { double weights[128]; double activate(double* input, int len) { double s=0; for(int i=0;i<len;i++) s+=input[i]*weights[i]; return s; } };\n  /* Novel construct: neural \"embeddings\" — Neural processing layer — parallel weighted computation */\n  struct neural_embeddings { double weights[128]; double activate(double* input, int len) { double s=0; for(int i=0;i<len;i++) s+=input[i]*weights[i]; return s; } };\n  double closestSymbol = 0;\n  _stack[_sp++] = symbol;\n  closestSymbol = _stack[--_sp];\n  double highestSimilarity = 0;\n  _stack[_sp++] = -;\n  highestSimilarity = _stack[--_sp];"
+    },
+    "wasm": {
+      "success": true,
+      "type": "digital",
+      "irSteps": 10,
+      "symbols": 6,
+      "output": ";; Auto-translated by OMNIMENS Universal Translator\n;; Target: WebAssembly\n;; Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.\n;; PROPRIETARY AND CONFIDENTIAL\n(module\n  (func (export \"main\") (result i32)\n    (i32.const 0)\n    (i32.const 0)\n    i32.const 0\n  )\n)"
+    },
+    "x86_64": {
+      "success": true,
+      "type": "physical",
+      "irSteps": 10,
+      "symbols": 6,
+      "output": "; Auto-translated by OMNIMENS Universal Translator\n; Target: x86_64 Assembly\n; Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.\n; PROPRIETARY AND CONFIDENTIAL\n.section .text\n.globl _start\n_start:\n  ; Novel: neural embeddings\n  ; neural embeddings — SIMD dot product\n  vmovapd ymm0, [rsi]\n  vmulpd ymm0, ymm0, [rdi]\n  vhaddpd ymm0, ymm0, ymm0\n  ; Novel: neural embeddings\n  ; neural embeddings — SIMD dot product\n  vmovapd ymm0, [rsi]\n  vmulpd ymm0, ymm0, [rdi]\n  vhaddpd ymm0, ymm0, ymm0\n  ; Novel: neural embeddings\n  ; neural embeddings — SIMD dot product\n  vmovapd ymm0, [rsi]\n  vmulpd ymm0, ymm0, [rdi]\n  vhaddpd ymm0, ymm0, ymm0\n  ; Novel: neural embeddings\n  ; neural embeddings — SIMD dot product\n  vmovapd ymm0, [rsi]\n  vmulpd ymm0, ymm0, [rdi]\n  vhaddpd ymm0, ymm0, ymm0\n  ; alloc closestSymbol\n  mov rax, symbol\n  mov [rbp-8], rax\n  ; alloc highestSimilarity\n  mov rax, -\n  mov [rbp-8], rax"
+    },
+    "arm64": {
+      "success": true,
+      "type": "physical",
+      "irSteps": 10,
+      "symbols": 6,
+      "output": "; Auto-translated by OMNIMENS Universal Translator\n; Target: ARM64\n; Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.\n; PROPRIETARY AND CONFIDENTIAL\n.text\n.globl _start\n_start:\n  // Novel: neural embeddings\n  // Novel: neural embeddings\n  // Novel: neural embeddings\n  // Novel: neural embeddings\n  mov x0, #symbol\n  mov x0, #-"
+    },
+    "avr": {
+      "success": true,
+      "type": "physical",
+      "irSteps": 10,
+      "symbols": 6,
+      "output": "; Auto-translated by OMNIMENS Universal Translator\n; Target: Arduino AVR\n; Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.\n; PROPRIETARY AND CONFIDENTIAL\n.org 0x0000\n  rjmp main\nmain:\n  ldi r16, 0\n  ldi r16, 0"
+    },
+    "esp32": {
+      "success": true,
+      "type": "physical",
+      "irSteps": 10,
+      "symbols": 6,
+      "output": "// Auto-translated by OMNIMENS Universal Translator\n// Target: ESP32 (Arduino Framework)\n// Copyright © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.\n// PROPRIETARY AND CONFIDENTIAL — Unauthorized use prohibited.\n#include \"Arduino.h\"\n\n  float closestSymbol = 0;\n  float _val = symbol;\n  closestSymbol = _val;\n  float highestSimilarity = 0;\n  float _val = -;\n  highestSimilarity = _val;"
+    }
+  }
+}

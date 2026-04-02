@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: hierarchicalMemoryManager
- * Written: 2026-04-02T15:04:18.936Z
+ * Written: 2026-04-02T22:08:47.103Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,122 +18,116 @@
 
 // hierarchicalMemoryManager.mjs
 
-import crypto from 'crypto';
+import { createHash } from 'crypto';
 
 /**
- * Generates a semantic importance score for a given text segment.
- * @param {string} text - The text segment to score.
- * @returns {number} - A score between 0 and 1 representing semantic importance.
+ * Generate a unique hash for a given input to identify nodes.
+ * @param {string} input - The input string to hash.
+ * @returns {string} - A SHA-256 hash of the input.
  */
-export function calculateImportanceScore(text) {
-  if (!text || typeof text !== 'string') return 0;
-
-  const lengthFactor = Math.min(text.length / 1000, 1); // Normalize length to a max of 1000 characters
-  const entropy = calculateEntropy(text); // Measure information density
-
-  return (lengthFactor + entropy) / 2; // Combine factors for a balanced score
+export function generateHash(input) {
+  return createHash('sha256').update(input).digest('hex');
 }
 
 /**
- * Calculates the Shannon entropy of a given string.
- * @param {string} text - The input string.
- * @returns {number} - The entropy value (0 to 1).
+ * Create a hierarchical memory tree structure for organizing embeddings and summaries.
+ * @param {Array} data - Array of data objects to organize.
+ * @param {number} compressionFactor - Number of items to summarize per level.
+ * @returns {Object} - The root node of the hierarchical memory tree.
  */
-export function calculateEntropy(text) {
-  const frequency = {};
-  for (const char of text) {
-    frequency[char] = (frequency[char] || 0) + 1;
+export function createMemoryTree(data, compressionFactor = 5) {
+  if (!Array.isArray(data) || data.length === 0) {
+    throw new Error('Data must be a non-empty array.');
+  }
+  if (compressionFactor < 2) {
+    throw new Error('Compression factor must be at least 2.');
   }
 
-  const totalChars = text.length;
-  let entropy = 0;
-
-  for (const char in frequency) {
-    const p = frequency[char] / totalChars;
-    entropy -= p * Math.log2(p);
-  }
-
-  return entropy / Math.log2(totalChars); // Normalize entropy to [0, 1]
-}
-
-/**
- * Segments text into smaller chunks based on semantic boundaries.
- * @param {string} text - The input text to segment.
- * @param {number} chunkSize - Approximate size of each chunk in characters.
- * @returns {string[]} - An array of text chunks.
- */
-export function segmentText(text, chunkSize = 500) {
-  if (!text || typeof text !== 'string' || chunkSize <= 0) return [];
-
-  const sentences = text.split(/(?<=[.!?])\s+/); // Split by sentence boundaries
-  const chunks = [];
-  let currentChunk = '';
-
-  for (const sentence of sentences) {
-    if ((currentChunk + sentence).length > chunkSize) {
-      chunks.push(currentChunk.trim());
-      currentChunk = '';
+  const buildTree = (nodes) => {
+    if (nodes.length <= compressionFactor) {
+      return {
+        id: generateHash(JSON.stringify(nodes)),
+        summary: summarizeNodes(nodes),
+        children: nodes
+      };
     }
-    currentChunk += sentence + ' ';
-  }
 
-  if (currentChunk.trim()) chunks.push(currentChunk.trim());
+    const groupedNodes = [];
+    for (let i = 0; i < nodes.length; i += compressionFactor) {
+      groupedNodes.push(nodes.slice(i, i + compressionFactor));
+    }
 
-  return chunks;
-}
+    const parentNodes = groupedNodes.map(group => ({
+      id: generateHash(JSON.stringify(group)),
+      summary: summarizeNodes(group),
+      children: group
+    }));
 
-/**
- * Summarizes a collection of text chunks hierarchically.
- * @param {string[]} chunks - An array of text chunks.
- * @param {number} maxDepth - The maximum depth of summarization hierarchy.
- * @returns {string} - A hierarchical summary of the input chunks.
- */
-export function hierarchicalSummarization(chunks, maxDepth = 3) {
-  if (!Array.isArray(chunks) || chunks.length === 0 || maxDepth <= 0) return '';
-
-  if (chunks.length === 1 || maxDepth === 1) {
-    return summarizeChunks(chunks);
-  }
-
-  const midPoint = Math.ceil(chunks.length / 2);
-  const leftSummary = hierarchicalSummarization(chunks.slice(0, midPoint), maxDepth - 1);
-  const rightSummary = hierarchicalSummarization(chunks.slice(midPoint), maxDepth - 1);
-
-  return summarizeChunks([leftSummary, rightSummary]);
-}
-
-/**
- * Summarizes an array of text chunks into a single summary.
- * @param {string[]} chunks - An array of text chunks.
- * @returns {string} - A single summary.
- */
-export function summarizeChunks(chunks) {
-  if (!Array.isArray(chunks) || chunks.length === 0) return '';
-
-  const concatenated = chunks.join(' ');
-  const words = concatenated.split(' ');
-  const summaryLength = Math.min(Math.floor(words.length / 4), 100); // Summarize to 25% of original length, max 100 words
-
-  return words.slice(0, summaryLength).join(' ') + '...';
-}
-
-/**
- * Main function to manage hierarchical memory.
- * @param {string} text - The input text to process.
- * @param {number} chunkSize - Approximate size of each chunk in characters.
- * @param {number} maxDepth - The maximum depth of summarization hierarchy.
- * @returns {object} - An object containing segmented text, importance scores, and hierarchical summary.
- */
-export function hierarchicalMemoryManager(text, chunkSize = 500, maxDepth = 3) {
-  if (!text || typeof text !== 'string') return { error: 'Invalid input text' };
-
-  const segments = segmentText(text, chunkSize);
-  const scores = segments.map(calculateImportanceScore);
-  const summary = hierarchicalSummarization(segments, maxDepth);
-
-  return {
-    segments,
-    scores,
-    summary
+    return buildTree(parentNodes);
   };
+
+  return buildTree(data.map(item => ({ id: generateHash(JSON.stringify(item)), data: item })));
+}
+
+/**
+ * Summarize a group of nodes into a single summary string.
+ * @param {Array} nodes - Array of nodes to summarize.
+ * @returns {string} - A summary of the nodes.
+ */
+export function summarizeNodes(nodes) {
+  return nodes.map(node => node.data || node.summary).join(' | ');
+}
+
+/**
+ * Retrieve relevant data from the memory tree based on a query.
+ * @param {Object} tree - The hierarchical memory tree.
+ * @param {Function} relevanceFunction - A function to evaluate relevance of nodes.
+ * @returns {Array} - Relevant data nodes.
+ */
+export function queryMemoryTree(tree, relevanceFunction) {
+  const results = [];
+
+  const traverse = (node) => {
+    if (relevanceFunction(node)) {
+      if (node.children && node.children.length > 0) {
+        node.children.forEach(traverse);
+      } else {
+        results.push(node.data);
+      }
+    }
+  };
+
+  traverse(tree);
+  return results;
+}
+
+/**
+ * Example relevance function to match nodes containing a specific keyword.
+ * @param {string} keyword - The keyword to match.
+ * @returns {Function} - A relevance function for use in queryMemoryTree.
+ */
+export function createKeywordRelevanceFunction(keyword) {
+  return (node) => {
+    const content = node.data || node.summary;
+    return content && content.toLowerCase().includes(keyword.toLowerCase());
+  };
+}
+
+/**
+ * Flatten the hierarchical memory tree into a single array of nodes.
+ * @param {Object} tree - The hierarchical memory tree.
+ * @returns {Array} - Flattened array of all nodes in the tree.
+ */
+export function flattenMemoryTree(tree) {
+  const nodes = [];
+
+  const traverse = (node) => {
+    nodes.push(node);
+    if (node.children && node.children.length > 0) {
+      node.children.forEach(traverse);
+    }
+  };
+
+  traverse(tree);
+  return nodes;
 }
