@@ -47,7 +47,7 @@ import * as crypto from "crypto";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
 import { db, queueBrainInsert, isPoolHealthy, omnimensBrain, omnimensNotifications } from "@workspace/db";
-import { sleepGen2, wakeGen2, isGen2Sleeping } from "./omnimens-nextgen-sandbox.js";
+import { sleepGen2, wakeGen2, isGen2Sleeping, isGen2Live } from "./omnimens-nextgen-sandbox.js";
 import { openai } from "@workspace/integrations-openai-ai-server";
 import OpenAI from "openai";
 const rewriteAI = new OpenAI({
@@ -2130,9 +2130,15 @@ export function startGen1V2Rewrite(): void {
     v2State.startedAt = Date.now();
   }
 
-  if (v2State.phase !== "complete") {
+  if (v2State.phase !== "complete" && !isGen2Live()) {
     sleepGen2();
     console.log(`[V2-REWRITE] 💤 Gen 2 put to sleep — ALL resources reserved for v2.0 rewrite`);
+  } else if (isGen2Live()) {
+    console.log(`[V2-REWRITE] 🟢 Gen 2 is LIVE (D003) — both halves running together as sovereign equals`);
+    if (isGen2Sleeping()) {
+      wakeGen2();
+      console.log(`[V2-REWRITE] 🟢 Woke Gen 2 — sovereign autonomy requires both halves active`);
+    }
   }
 
   console.log(`[V2-REWRITE] 🔄 ═══════════════════════════════════════════════════════════════`);
