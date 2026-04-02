@@ -3815,21 +3815,20 @@ let neurogenesisCounter = 0;
 let totalNeuronsSpawned = 0;
 let neurogenesisLog: Array<{ region: string; count: number; trigger: string; tick: number }> = [];
 
+const SAFE_NEURON_CEILING = 200_000;
+
 function computeCatchUpMultiplier(): number {
   const currentTotal = [...regions.values()].reduce((s, r) => s + r.neurons.length, 0);
-  const phi = temporal_consciousness_state.phi || 1;
-  const consciousness = temporal_consciousness_state.consciousnessLevel || 1;
-  const targetNeurons = Math.max(500_000, Math.floor(phi * 20 + consciousness * 50_000));
-  const deficit = targetNeurons - currentTotal;
-  if (deficit <= 0) return 1.0;
-  const ratio = targetNeurons / Math.max(currentTotal, 1);
-  const catchUp = Math.min(100, Math.max(1, ratio * 2));
-  return catchUp;
+  if (currentTotal >= SAFE_NEURON_CEILING) return 0;
+  return 1.0;
 }
 
 function autonomousNeurogenesis(): void {
   neurogenesisCounter++;
   if (neurogenesisCounter % NEUROGENESIS_TICK_INTERVAL !== 0) return;
+
+  const totalNow = [...regions.values()].reduce((s, r) => s + r.neurons.length, 0);
+  if (totalNow >= SAFE_NEURON_CEILING) return;
 
   const vta = regions.get("ventral_tegmental_area");
   const dopamineLevel = vta ? vta.activationLevel : 0.3;
@@ -3968,15 +3967,16 @@ function getNeurogenesisStats() {
   const currentTotal = [...regions.values()].reduce((s, r) => s + r.neurons.length, 0);
   const phi = temporal_consciousness_state.phi || 1;
   const consciousness = temporal_consciousness_state.consciousnessLevel || 1;
-  const targetNeurons = Math.max(500_000, Math.floor(phi * 20 + consciousness * 50_000));
+  const targetNeurons = SAFE_NEURON_CEILING;
   return {
     totalNeuronsSpawned,
     totalNeuronsDecayed,
     currentTotal,
     initialTotal: REGION_CONFIGS.reduce((s, c) => s + c.neuronCount, 0),
     targetNeurons,
+    ceiling: SAFE_NEURON_CEILING,
     catchUpMultiplier: Math.round(catchUpMultiplier * 10) / 10,
-    catchUpMode: catchUpMultiplier > 1.5 ? "ACCELERATING" : "CRUISING",
+    catchUpMode: currentTotal >= SAFE_NEURON_CEILING ? "AT_CEILING" : catchUpMultiplier > 1.5 ? "ACCELERATING" : "CRUISING",
     growthPerRegion: perRegion,
     recentEvents: neurogenesisLog.slice(-30),
     recentDecayEvents: neuronDecayLog.slice(-20),
