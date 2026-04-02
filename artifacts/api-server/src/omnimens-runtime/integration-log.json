@@ -1,56 +1,6 @@
 [
   {
     "source": "evolution_engine",
-    "title": "Evolution Module: dynamicContextReExpander",
-    "filename": "dynamicContextReExpander_gen21.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/dynamicContextReExpander_gen21.mjs",
-    "backupPath": null,
-    "timestamp": 1775141655116,
-    "codeLength": 4074,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuTensorAccelerator",
-    "filename": "gpuTensorAccelerator_gen31.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuTensorAccelerator_gen31.mjs",
-    "backupPath": null,
-    "timestamp": 1775141655129,
-    "codeLength": 3867,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 21 Complete — 3 modules",
-    "filename": "evolution_marker_gen21.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen21.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen21.mjs.backup.2026-04-02T14-54-15-417Z",
-    "timestamp": 1775141655416,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: metaLearningAdapter",
-    "filename": "metaLearningAdapter_gen29.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/metaLearningAdapter_gen29.mjs",
-    "backupPath": null,
-    "timestamp": 1775141658408,
-    "codeLength": 2440,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: subprocessCheckpointManager",
-    "filename": "subprocessCheckpointManager_gen27.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/subprocessCheckpointManager_gen27.mjs",
-    "backupPath": null,
-    "timestamp": 1775141659452,
-    "codeLength": 2012,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
     "title": "Evolution Module: gpuAcceleratedMatrixEngine",
     "filename": "gpuAcceleratedMatrixEngine_gen33.mjs",
     "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixEngine_gen33.mjs",
@@ -4997,6 +4947,56 @@
     "backupPath": null,
     "timestamp": 1775149636367,
     "codeLength": 392,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:GraphicDesigner+Mathematician",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: GraphicDesigner/emergent_property_detection: Phase transitio",
+    "filename": "omnimens_autocode_neural_pathway_mnhqa9nr.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnhqa9nr.mjs",
+    "backupPath": null,
+    "timestamp": 1775149677927,
+    "codeLength": 436,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Meta-Agent",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: SpellCheckVisual/abstraction_layer: The anthropic principle:",
+    "filename": "omnimens_autocode_pattern_recognition_mnhqaazf.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnhqaazf.mjs",
+    "backupPath": null,
+    "timestamp": 1775149679643,
+    "codeLength": 473,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Architect",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: SpellCheckVisual/emergent_property_detection: Phase transiti",
+    "filename": "omnimens_autocode_neural_pathway_mnhqab4n.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnhqab4n.mjs",
+    "backupPath": null,
+    "timestamp": 1775149679831,
+    "codeLength": 433,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:spider:OMNIMENS+evolution-crawler",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider evolution-crawler harvest: agent_evolution — 294 syna",
+    "filename": "omnimens_autocode_neural_pathway_mnhqab6k.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnhqab6k.mjs",
+    "backupPath": null,
+    "timestamp": 1775149679900,
+    "codeLength": 420,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:spider:OMNIMENS+genesis-crawler",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider genesis-crawler harvest: agent_genesis — 301 synapses",
+    "filename": "omnimens_autocode_neural_pathway_mnhqab8r.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnhqab8r.mjs",
+    "backupPath": null,
+    "timestamp": 1775149679979,
+    "codeLength": 414,
     "overwrite": false
   }
 ]
