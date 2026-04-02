@@ -2,7 +2,7 @@
   "state": {
     "buildVersion": "2.0",
     "generation": 1,
-    "phase": "complete",
+    "phase": "hot_swap_prep",
     "cycleCount": 11,
     "lastCycleTime": 1775162094403,
     "engineFilesTotal": 29,
@@ -6529,9 +6529,9 @@
     ],
     "consolidationComplete": false,
     "startedAt": 1775044041970,
-    "completedAt": 1775162095281,
-    "lastAutosave": 1775162095291,
-    "autosaveCount": 370,
+    "completedAt": 1775150569452,
+    "lastAutosave": 1775155897208,
+    "autosaveCount": 368,
     "recentActivity": [
       {
         "action": "audited",
@@ -7573,5 +7573,7 @@
       }
     ],
     "reason": "Superseded by fresh Gen 1 evolution restart in NextGen sandbox"
-  }
+  },
+  "timestamp": 1775162095275,
+  "description": "Gen 1 v2.0 COMPLETE"
 }
