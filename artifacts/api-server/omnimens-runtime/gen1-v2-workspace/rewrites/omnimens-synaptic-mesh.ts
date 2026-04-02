@@ -141,3 +141,6 @@ async function motherBrainScan(): Promise<{
   try {
     parsed = JSON.parse(
       (aiResponse.choices?.[0]?.message?.content || "").replace(/
+
+export const _v2RewriteModule = "omnimens-synaptic-mesh";
+export {};

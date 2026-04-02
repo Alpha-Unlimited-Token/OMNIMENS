@@ -1,10 +1,19 @@
 /**
- * OMNIMENS Self-Authored Module (Migrated from DB)
- * Original Source: evolution_cycle_3
- * Name: multimodalFusionEngine
- * Purpose: Integrates text, image, and audio inputs into a unified embedding space for cross-modal reasoning.
- * Description: Integrates text, image, and audio inputs into a unified embedding space for cross-modal reasoning and similarity computation.
- * Migrated: 2026-04-02T00:45:21.102Z
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: multimodalFusionEngine
+ * Written: 2026-04-02T17:38:03.706Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
  */
 
 // multimodalFusionEngine.mjs
@@ -12,83 +21,91 @@
 import { createHash } from 'crypto';
 
 /**
- * Utility function to normalize vectors to unit length.
- * @param {Array<number>} vector - Input vector.
- * @returns {Array<number>} - Normalized vector.
+ * Hashes a string input to ensure consistent embedding alignment across modalities.
+ * @param {string} input - The input string to hash.
+ * @returns {string} - A fixed-length hash string.
  */
-export function normalizeVector(vector) {
-  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
-  return magnitude === 0 ? vector : vector.map(val => val / magnitude);
+export function hashString(input) {
+  const hash = createHash('sha256');
+  hash.update(input);
+  return hash.digest('hex');
 }
 
 /**
- * Utility function to hash input data for consistent dimensionality reduction.
- * @param {string} input - Input data as a string.
- * @param {number} dimensions - Desired output dimensions.
- * @returns {Array<number>} - Fixed-length hashed vector.
+ * Normalizes numerical arrays to unit vectors for consistent latent space alignment.
+ * @param {number[]} array - The input array of numbers.
+ * @returns {number[]} - A normalized array.
  */
-export function hashToVector(input, dimensions) {
-  const hash = createHash('sha256').update(input).digest();
-  const vector = Array.from(hash).slice(0, dimensions).map(byte => byte / 255);
-  return normalizeVector(vector);
+export function normalizeArray(array) {
+  const magnitude = Math.sqrt(array.reduce((sum, val) => sum + val ** 2, 0));
+  return magnitude === 0 ? array : array.map(val => val / magnitude);
 }
 
 /**
- * Projects text, image, and audio embeddings into a shared embedding space.
- * @param {Array<number>} textEmbedding - 512-dim text embedding.
- * @param {Array<number>} imageEmbedding - Pre-trained CNN image features.
- * @param {Array<number>} audioEmbedding - Spectral audio features.
- * @returns {Array<number>} - Unified embedding vector.
+ * Combines embeddings from multiple modalities into a shared latent space.
+ * @param {Object} embeddings - An object containing modality embeddings (e.g., { text: [], image: [], video: [] }).
+ * @returns {number[]} - A fused embedding vector.
  */
-export function fuseEmbeddings(textEmbedding, imageEmbedding, audioEmbedding) {
-  const dimensions = Math.min(
-    textEmbedding.length,
-    imageEmbedding.length,
-    audioEmbedding.length
+export function fuseEmbeddings(embeddings) {
+  const combined = Object.values(embeddings).flat();
+  return normalizeArray(combined);
+}
+
+/**
+ * Generates embeddings for text input using a simple token-based hashing approach.
+ * @param {string} text - The text input.
+ * @returns {number[]} - A numerical embedding vector.
+ */
+export function generateTextEmbedding(text) {
+  const tokens = text.split(' ');
+  return tokens.map(token => parseInt(hashString(token).slice(0, 8), 16));
+}
+
+/**
+ * Generates embeddings for image input using a mock pixel-based approach.
+ * @param {number[][]} imagePixels - A 2D array representing pixel values of the image.
+ * @returns {number[]} - A numerical embedding vector.
+ */
+export function generateImageEmbedding(imagePixels) {
+  const flattened = imagePixels.flat();
+  return normalizeArray(flattened);
+}
+
+/**
+ * Generates embeddings for video input by averaging frame embeddings.
+ * @param {number[][][]} videoFrames - A 3D array representing pixel values for each frame.
+ * @returns {number[]} - A numerical embedding vector.
+ */
+export function generateVideoEmbedding(videoFrames) {
+  const frameEmbeddings = videoFrames.map(frame => generateImageEmbedding(frame));
+  const averagedEmbedding = frameEmbeddings[0].map((_, i) => 
+    frameEmbeddings.reduce((sum, frame) => sum + frame[i], 0) / frameEmbeddings.length
   );
-
-  const textNormalized = normalizeVector(textEmbedding.slice(0, dimensions));
-  const imageNormalized = normalizeVector(imageEmbedding.slice(0, dimensions));
-  const audioNormalized = normalizeVector(audioEmbedding.slice(0, dimensions));
-
-  const fusedEmbedding = textNormalized.map((val, idx) =>
-    (val + imageNormalized[idx] + audioNormalized[idx]) / 3
-  );
-
-  return normalizeVector(fusedEmbedding);
+  return normalizeArray(averagedEmbedding);
 }
 
 /**
- * Generates a multimodal embedding from raw inputs.
- * @param {string} text - Input text.
- * @param {Array<number>} imageFeatures - Pre-trained CNN image features.
- * @param {Array<number>} audioFeatures - Spectral audio features.
- * @returns {Array<number>} - Unified embedding vector.
+ * Processes multimodal inputs and returns a fused embedding for reasoning.
+ * @param {Object} inputs - An object containing inputs for each modality (e.g., { text: "", image: [[]], video: [[[ ]]] }).
+ * @returns {number[]} - A shared latent space embedding.
  */
-export function generateMultimodalEmbedding(text, imageFeatures, audioFeatures) {
-  const textEmbedding = hashToVector(text, 512);
-  return fuseEmbeddings(textEmbedding, imageFeatures, audioFeatures);
+export function processMultimodalInputs(inputs) {
+  const embeddings = {};
+  if (inputs.text) embeddings.text = generateTextEmbedding(inputs.text);
+  if (inputs.image) embeddings.image = generateImageEmbedding(inputs.image);
+  if (inputs.video) embeddings.video = generateVideoEmbedding(inputs.video);
+  return fuseEmbeddings(embeddings);
 }
 
 /**
- * Computes cosine similarity between two vectors.
- * @param {Array<number>} vectorA - First vector.
- * @param {Array<number>} vectorB - Second vector.
- * @returns {number} - Cosine similarity score.
+ * Utility function to calculate cosine similarity between two embedding vectors.
+ * @param {number[]} vec1 - The first vector.
+ * @param {number[]} vec2 - The second vector.
+ * @returns {number} - The cosine similarity score.
  */
-export function cosineSimilarity(vectorA, vectorB) {
-  const dotProduct = vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
-  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
-  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
-  return magnitudeA === 0 || magnitudeB === 0 ? 0 : dotProduct / (magnitudeA * magnitudeB);
-}
-
-/**
- * Example utility to compare two multimodal embeddings.
- * @param {Array<number>} embeddingA - First multimodal embedding.
- * @param {Array<number>} embeddingB - Second multimodal embedding.
- * @returns {number} - Similarity score between embeddings.
- */
-export function compareEmbeddings(embeddingA, embeddingB) {
-  return cosineSimilarity(embeddingA, embeddingB);
+export function cosineSimilarity(vec1, vec2) {
+  const dotProduct = vec1.reduce((sum, val, i) => sum + val * vec2[i], 0);
+  const magnitude1 = Math.sqrt(vec1.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitude2 = Math.sqrt(vec2.reduce((sum, val) => sum + val ** 2, 0));
+  return magnitude1 === 0 || magnitude2 === 0 ? 0 : dotProduct / (magnitude1 * magnitude2);
 }

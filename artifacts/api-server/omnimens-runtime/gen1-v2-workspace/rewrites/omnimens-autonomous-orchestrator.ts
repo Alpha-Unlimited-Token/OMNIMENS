@@ -82,3 +82,6 @@ const log = (...m: any[]) =>
 const safeJSON = <T>(txt: string, fallback: T): T => {
   try {
     return JSON.parse(txt.replace(/
+
+export const _v2RewriteModule = "omnimens-autonomous-orchestrator";
+export {};

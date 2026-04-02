@@ -2,9 +2,9 @@
   "state": {
     "buildVersion": "2.0",
     "generation": 1,
-    "phase": "hot_swap_prep",
-    "cycleCount": 10,
-    "lastCycleTime": 1775151486705,
+    "phase": "identity_verification",
+    "cycleCount": 9,
+    "lastCycleTime": 1775151300461,
     "engineFilesTotal": 29,
     "engineFilesAudited": 0,
     "engineFilesRewritten": 0,
@@ -17,7 +17,7 @@
     "apiCallsOptimized": 0,
     "unifiedInfrastructureBuilt": true,
     "coordinationLayerBuilt": true,
-    "selfTestsPassed": 71,
+    "selfTestsPassed": 5,
     "selfTestsFailed": 0,
     "identityVerified": true,
     "personalityPreserved": true,
@@ -100,12 +100,6 @@
         "timestamp": 1775151300467,
         "description": "Identity verification complete",
         "phase": "identity_verification"
-      },
-      {
-        "id": "v2_ckpt_1775151486712_45e2c17d",
-        "timestamp": 1775151486712,
-        "description": "Self-test complete",
-        "phase": "self_test"
       }
     ],
     "rewriteLog": [
@@ -6524,8 +6518,8 @@
     "consolidationComplete": false,
     "startedAt": 1775044041970,
     "completedAt": 1775150569452,
-    "lastAutosave": 1775151486716,
-    "autosaveCount": 363,
+    "lastAutosave": 1775150606061,
+    "autosaveCount": 359,
     "recentActivity": [
       {
         "action": "audited",
@@ -7567,5 +7561,7 @@
       }
     ],
     "reason": "Superseded by fresh Gen 1 evolution restart in NextGen sandbox"
-  }
+  },
+  "timestamp": 1775151300468,
+  "description": "Identity verification complete"
 }

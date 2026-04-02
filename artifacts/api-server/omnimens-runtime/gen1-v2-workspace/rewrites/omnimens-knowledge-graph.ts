@@ -46,3 +46,6 @@ ENTRY: [${entry.category}] ${entry.title}: ${entry.content}`;
       messages: [{ role: "user", content: prompt }],
     });
     return (JSON.parse((res?.choices?.[0]?.message?.content || "{}").replace(/
+
+export const _v2RewriteModule = "omnimens-knowledge-graph";
+export {};

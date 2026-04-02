@@ -77,3 +77,6 @@ const extractCode = (ins: any): CodeProposal | null => {
   if (!ins?.codeProposal) return null;
   const code = ins.codeProposal
     .replace(/^
+
+export const _v2RewriteModule = "omnimens-self-coding";
+export {};

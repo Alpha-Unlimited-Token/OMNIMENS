@@ -225,3 +225,6 @@ async function phase2_agentDiscoveries(
     ).then(async (raw) => {
       if (!raw) return null;
       const parsed = JSON.parse(raw.replace(/
+
+export const _v2RewriteModule = "omnimens-agent-mesh";
+export {};

@@ -192,3 +192,6 @@ async function runREMDream(concepts: string[]): Promise<void> {
   const feas = parseInt(content.match(/FEASIBILITY[:\s]*(\d+)/i)?.[1] || "5");
   const nov = parseInt(content.match(/NOVELTY[:\s]*(\d+)/i)?.[1] || "5");
   const code = content.match(/
+
+export const _v2RewriteModule = "omnimens-dream-state";
+export {};

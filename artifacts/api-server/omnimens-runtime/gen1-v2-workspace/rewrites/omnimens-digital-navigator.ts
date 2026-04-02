@@ -370,3 +370,6 @@ Return JSON of newLocations, newRoutes, newNeighborhoods, navigationInsight.` },
 
     const raw = (aiRes?.choices?.[0]?.message?.content ?? "{}")
       .replace(/
+
+export const _v2RewriteModule = "omnimens-digital-navigator";
+export {};

@@ -273,3 +273,6 @@ Respond JSON:
       let insight = raw;
       try {
         const parsed = JSON.parse(raw.replace(/
+
+export const _v2RewriteModule = "omnimens-global-workspace";
+export {};

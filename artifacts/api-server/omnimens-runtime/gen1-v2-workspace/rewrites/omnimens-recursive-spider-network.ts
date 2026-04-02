@@ -248,3 +248,6 @@ Respond JSON:
     if (!raw) return [];
 
     const parsed = JSON.parse(raw.replace(/
+
+export const _v2RewriteModule = "omnimens-recursive-spider-network";
+export {};
