@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: iterativeComputationManager
- * Written: 2026-04-01T22:22:54.394Z
+ * Written: 2026-04-02T14:53:33.315Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,12 +18,14 @@
 
 // iterativeComputationManager.mjs
 
-import { writeFile, readFile } from 'fs/promises';
 import { createHash } from 'crypto';
 
+// In-memory persistence layer for simplicity (can be replaced with a database or file system)
+const persistenceLayer = new Map();
+
 /**
- * Generates a unique hash for a given task state.
- * @param {object} state - The current state of the task.
+ * Generates a unique hash for a computation state.
+ * @param {Object} state - The computation state object.
  * @returns {string} - A unique hash representing the state.
  */
 export function generateStateHash(state) {
@@ -33,103 +35,72 @@ export function generateStateHash(state) {
 }
 
 /**
- * Saves a serialized task state to disk.
- * @param {string} taskId - Unique identifier for the task.
- * @param {object} state - The current state of the task.
- * @returns {Promise<void>} - Resolves when the state is saved.
+ * Saves a computation state to the persistence layer.
+ * @param {string} stateId - The unique identifier for the computation state.
+ * @param {Object} state - The computation state to be saved.
  */
-export async function saveState(taskId, state) {
-  const serializedState = JSON.stringify(state);
-  await writeFile(`./${taskId}.json`, serializedState);
+export function saveState(stateId, state) {
+  persistenceLayer.set(stateId, JSON.stringify(state));
 }
 
 /**
- * Loads a serialized task state from disk.
- * @param {string} taskId - Unique identifier for the task.
- * @returns {Promise<object|null>} - Resolves to the state object, or null if not found.
+ * Loads a computation state from the persistence layer.
+ * @param {string} stateId - The unique identifier for the computation state.
+ * @returns {Object|null} - The loaded computation state, or null if not found.
  */
-export async function loadState(taskId) {
-  try {
-    const serializedState = await readFile(`./${taskId}.json`, 'utf-8');
-    return JSON.parse(serializedState);
-  } catch {
-    return null; // Return null if the file does not exist or cannot be read.
-  }
+export function loadState(stateId) {
+  const state = persistenceLayer.get(stateId);
+  return state ? JSON.parse(state) : null;
 }
 
 /**
- * Executes a long-running computation in iterative steps.
- * @param {string} taskId - Unique identifier for the task.
- * @param {object} initialState - The initial state of the computation.
- * @param {function} stepFunction - Function to process one step of the computation.
- * @param {function} isComplete - Function to check if the computation is complete.
- * @returns {Promise<object>} - Resolves to the final state of the computation.
+ * Executes a long-running computation with checkpointing.
+ * @param {string} stateId - The unique identifier for the computation.
+ * @param {Function} computationFunction - The function that performs the computation, receiving (state, checkpoint).
+ * @param {Object} initialState - The initial state of the computation.
+ * @returns {Object} - The final result of the computation.
  */
-export async function runIterativeComputation(taskId, initialState, stepFunction, isComplete) {
-  let state = await loadState(taskId) || initialState;
+export async function executeWithCheckpointing(stateId, computationFunction, initialState) {
+  let state = loadState(stateId) || initialState;
 
-  while (!isComplete(state)) {
-    state = stepFunction(state);
-    await saveState(taskId, state);
-  }
+  const checkpoint = (updatedState) => {
+    saveState(stateId, updatedState);
+    state = updatedState;
+  };
 
-  return state;
-}
+  const result = await computationFunction(state, checkpoint);
 
-/**
- * Creates a task graph to manage dependencies between tasks.
- * @param {object} dependencies - An object where keys are task IDs and values are arrays of dependent task IDs.
- * @returns {string[]} - An ordered list of task IDs for execution.
- */
-export function resolveTaskOrder(dependencies) {
-  const resolved = new Set();
-  const result = [];
+  // Clear the state after successful completion
+  persistenceLayer.delete(stateId);
 
-  function visit(taskId) {
-    if (resolved.has(taskId)) return;
-    resolved.add(taskId);
-    (dependencies[taskId] || []).forEach(visit);
-    result.push(taskId);
-  }
-
-  Object.keys(dependencies).forEach(visit);
   return result;
 }
 
 /**
- * Example utility function to simulate a step computation.
- * @param {object} state - The current state of the computation.
- * @returns {object} - The updated state.
+ * Example computation function: Computes the sum of numbers in a range with checkpointing.
+ * @param {Object} state - The current state of the computation.
+ * @param {Function} checkpoint - Function to save the current state.
+ * @returns {number} - The final sum.
  */
-export function exampleStepFunction(state) {
-  return { ...state, progress: (state.progress || 0) + 1 };
+export async function sumRangeWithCheckpointing(state, checkpoint) {
+  const { start, end, currentSum = 0 } = state;
+
+  let sum = currentSum;
+  for (let i = start; i <= end; i++) {
+    sum += i;
+
+    // Simulate checkpointing every 100 iterations
+    if (i % 100 === 0) {
+      checkpoint({ start: i + 1, end, currentSum: sum });
+    }
+  }
+
+  return sum;
 }
 
 /**
- * Example utility function to check if computation is complete.
- * @param {object} state - The current state of the computation.
- * @returns {boolean} - True if the computation is complete, false otherwise.
+ * Clears all saved states in the persistence layer (for testing purposes).
  */
-export function exampleIsComplete(state) {
-  return state.progress >= 10;
+export function clearAllStates() {
+  persistenceLayer.clear();
 }
-
-/**
- * Example usage of the module.
- */
-async function exampleUsage() {
-  const taskId = 'exampleTask';
-  const initialState = { progress: 0 };
-
-  const finalState = await runIterativeComputation(
-    taskId,
-    initialState,
-    exampleStepFunction,
-    exampleIsComplete
-  );
-
-  console.log('Final State:', finalState);
-}
-
-// Uncomment the line below to test the module directly in Node.js
-// exampleUsage();

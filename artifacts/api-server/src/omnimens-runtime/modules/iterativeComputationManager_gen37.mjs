@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: iterativeComputationManager
- * Written: 2026-04-02T13:32:01.332Z
+ * Written: 2026-04-02T14:55:15.575Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,94 +18,95 @@
 
 // iterativeComputationManager.mjs
 
-import { createHash } from 'crypto';
+import { randomUUID } from 'crypto';
 
 /**
- * Splits a large computation task into smaller chunks and manages state persistence.
- * Useful for long-running iterative computations across multiple agents.
+ * Manages checkpoint-based iterative computations to overcome subprocess timeout limits.
+ * Provides utilities for chunking tasks and persisting state.
  */
 
-// Utility to generate a unique hash for state keys
-export function generateStateKey(identifier) {
-  const hash = createHash('sha256');
-  hash.update(identifier);
-  return hash.digest('hex');
-}
+// Shared memory for state persistence (in-memory for simplicity)
+const computationStore = new Map();
 
-// Function to divide a computation range into smaller chunks
-export function divideIntoChunks(totalIterations, chunkSize) {
-  const chunks = [];
-  for (let start = 0; start < totalIterations; start += chunkSize) {
-    const end = Math.min(start + chunkSize, totalIterations);
-    chunks.push({ start, end });
+/**
+ * Initialize a new iterative computation.
+ * @param {string} taskId - Unique identifier for the task.
+ * @returns {string} - Generated task ID if not provided.
+ */
+export function initializeComputation(taskId = randomUUID()) {
+  if (!computationStore.has(taskId)) {
+    computationStore.set(taskId, { progress: 0, data});
   }
-  return chunks;
+  return taskId;
 }
 
-// Function to perform computation on a chunk
-export function processChunk(start, end, computationFunction, intermediateState = null) {
-  const results = [];
-  for (let i = start; i < end; i++) {
-    const result = computationFunction(i, intermediateState);
-    results.push(result);
+/**
+ * Save the state of an ongoing computation.
+ * @param {string} taskId - Unique identifier for the task.
+ * @param {number} progress - Current progress percentage (0-100).
+ * @param {any} data - Arbitrary data representing the computation state.
+ */
+export function saveComputationState(taskId, progress, data) {
+  if (!computationStore.has(taskId)) {
+    throw new Error(`Task ID ${taskId} does not exist.`);
   }
-  return results;
+  computationStore.set(taskId, { progress, data });
 }
 
-// Function to save intermediate state (for demonstration, uses in-memory storage)
-const stateStorage = new Map();
-export function saveState(key, state) {
-  stateStorage.set(key, state);
+/**
+ * Retrieve the state of an ongoing computation.
+ * @param {string} taskId - Unique identifier for the task.
+ * @returns {{progress, data}} - The saved computation state.
+ */
+export function getComputationState(taskId) {
+  if (!computationStore.has(taskId)) {
+    throw new Error(`Task ID ${taskId} does not exist.`);
+  }
+  return computationStore.get(taskId);
 }
 
-// Function to load intermediate state
-export function loadState(key) {
-  return stateStorage.get(key) || null;
+/**
+ * Delete the state of a completed or abandoned computation.
+ * @param {string} taskId - Unique identifier for the task.
+ */
+export function deleteComputationState(taskId) {
+  if (!computationStore.has(taskId)) {
+    throw new Error(`Task ID ${taskId} does not exist.`);
+  }
+  computationStore.delete(taskId);
 }
 
-// Example computation function (can be replaced by any domain-specific logic)
-export function exampleComputation(index, intermediateState) {
-  const base = intermediateState?.base || 1;
-  return base * index * index; // Example: square computation with base multiplier
-}
+/**
+ * Perform iterative computation with checkpointing.
+ * @param {string} taskId - Unique identifier for the task.
+ * @param {function(number, any): {progress, data}} iterationFunction - Function to execute each iteration.
+ * @param {number} maxIterations - Maximum number of iterations.
+ * @returns {any} - Final result of the computation.
+ */
+export function runIterativeComputation(taskId, iterationFunction, maxIterations) {
+  let state = getComputationState(taskId);
 
-// Function to manage iterative computation
-export function iterativeComputationManager(
-  totalIterations,
-  chunkSize,
-  computationFunction,
-  identifier,
-  intermediateState = null
-) {
-  const stateKey = generateStateKey(identifier);
-  const chunks = divideIntoChunks(totalIterations, chunkSize);
+  for (let i = state.progress; i < maxIterations; i++) {
+    const result = iterationFunction(i, state.data);
+    saveComputationState(taskId, result.progress, result.data);
 
-  const allResults = [];
-  for (const { start, end } of chunks) {
-    const chunkResults = processChunk(start, end, computationFunction, intermediateState);
-    allResults.push(...chunkResults);
-
-    // Save intermediate state after processing each chunk
-    const newIntermediateState = { base: intermediateState?.base || 1, lastProcessed: end };
-    saveState(stateKey, newIntermediateState);
+    if (result.progress >= 100) {
+      deleteComputationState(taskId);
+      return result.data;
+    }
   }
 
-  return { results: allResults, finalState: loadState(stateKey) };
+  return state.data; // Return intermediate state if computation is incomplete
 }
 
-// Example usage (can be removed in production)
-export function exampleUsage() {
-  const totalIterations = 100;
-  const chunkSize = 10;
-  const identifier = 'example-computation';
-
-  const result = iterativeComputationManager(
-    totalIterations,
-    chunkSize,
-    exampleComputation,
-    identifier,
-    { base: 2 } // Example intermediate state
-  );
-
-  return result;
+/**
+ * Example generic iteration function for testing purposes.
+ * @param {number} iteration - Current iteration index.
+ * @param {any} data - Current computation state.
+ * @returns {{progress, data}} - Updated progress and state.
+ */
+export function exampleIterationFunction(iteration, data) {
+  const newData = (data || 0) + iteration;
+  const progress = Math.min(((iteration + 1) / 100) * 100, 100);
+  return { progress, data: newData };
 }

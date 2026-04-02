@@ -1,79 +1,112 @@
 /**
- * OMNIMENS Self-Authored Module (Migrated from DB)
- * Original Source: evolution_cycle_5
- * Name: gpuOffloadManager
- * Purpose: Offloads GPU-intensive computations to external services while maintaining local independence for lighter tasks.
- * Description: Manages GPU offloading for matrix-heavy computations while supporting local lightweight tasks and providing reusable matrix utilities.
- * Migrated: 2026-04-01T22:23:20.240Z
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: gpuOffloadManager
+ * Written: 2026-04-02T15:03:23.080Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
  */
 
 // gpuOffloadManager.mjs
 
-import { Worker } from 'node:worker_threads';
+import { createHash } from 'crypto';
 
 /**
- * Schedules tasks for GPU offloading or local computation based on complexity.
- * Provides utility functions for matrix operations and task management.
+ * Splits a computational task into smaller chunks for GPU offloading.
+ * @param {Array} data - The input data to be processed.
+ * @param {number} chunkSize - The size of each chunk.
+ * @returns {Array} An array of data chunks.
  */
-
-// Utility function to determine task complexity
-export function isGpuTask(matrix) {
-  return matrix.length * matrix[0].length > 10000; // Example threshold for GPU offload
+export function splitTask(data, chunkSize) {
+  if (!Array.isArray(data) || chunkSize <= 0) {
+    throw new Error("Invalid input: data must be an array and chunkSize must be a positive number.");
+  }
+  const chunks = [];
+  for (let i = 0; i < data.length; i += chunkSize) {
+    chunks.push(data.slice(i, i + chunkSize));
+  }
+  return chunks;
 }
 
-// Offload task to GPU-enabled external service (mocked as a worker thread)
-export function offloadToGpu(taskData) {
-  return new Promise((resolve, reject) => {
-    const worker = new Worker(`
-      const { parentPort } = require('worker_threads');
+/**
+ * Generates a unique hash for a given task to ensure idempotency.
+ * @param {string} taskData - The stringified task data.
+ * @returns {string} A unique hash for the task.
+ */
+export function generateTaskHash(taskData) {
+  if (typeof taskData !== 'string') {
+    throw new Error("Invalid input: taskData must be a string.");
+  }
+  return createHash('sha256').update(taskData).digest('hex');
+}
 
-      parentPort.on('message', (data) => {
-        const result = data.matrix.map(row => row.map(value => value * 2)); // Mock GPU computation
-        parentPort.postMessage(result);
+/**
+ * Simulates an asynchronous API call to a GPU server for computation.
+ * @param {Object} task - The task to be processed.
+ * @returns {Promise<Object>} A promise that resolves with the result of the computation.
+ */
+export async function offloadToGpuServer(task) {
+  if (typeof task !== 'object' || task === null) {
+    throw new Error("Invalid input: task must be a non-null object.");
+  }
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve({
+        taskId: generateTaskHash(JSON.stringify(task)),
+        result: task.data.map((x) => x * 2), // Example operation: doubling each element
+        status: 'completed'
       });
-    `, { eval: true });
-
-    worker.on('message', resolve);
-    worker.on('error', reject);
-    worker.postMessage(taskData);
+    }, Math.random() * 1000 + 500); // Simulate network latency
   });
 }
 
-// Perform local computation for lightweight tasks
-export function computeLocally(matrix) {
-  return matrix.map(row => row.map(value => value * 2)); // Example local computation
+/**
+ * Manages the queue of tasks and handles their offloading to GPU servers.
+ * @param {Array} tasks - An array of tasks to be processed.
+ * @returns {Promise<Array>} A promise that resolves with the results of all tasks.
+ */
+export async function manageTaskQueue(tasks) {
+  if (!Array.isArray(tasks)) {
+    throw new Error("Invalid input: tasks must be an array.");
+  }
+  const results = [];
+  for (const task of tasks) {
+    const result = await offloadToGpuServer(task);
+    results.push(result);
+  }
+  return results;
 }
 
-// Task scheduler to route tasks based on complexity
-export async function scheduleTask(matrix) {
-  if (isGpuTask(matrix)) {
-    return await offloadToGpu({ matrix });
-  } else {
-    return computeLocally(matrix);
-  }
+/**
+ * Utility function to validate and prepare tasks for GPU offloading.
+ * @param {Array} data - The input data to be processed.
+ * @param {number} chunkSize - The size of each chunk.
+ * @returns {Array} An array of prepared tasks.
+ */
+export function prepareTasks(data, chunkSize) {
+  const chunks = splitTask(data, chunkSize);
+  return chunks.map((chunk, index) => ({
+    id: index,
+    data: chunk
+  }));
 }
 
-// Generic utility for matrix multiplication
-export function multiplyMatrices(matrixA, matrixB) {
-  if (matrixA[0].length !== matrixB.length) {
-    throw new Error('Matrix dimensions do not match for multiplication.');
-  }
-
-  const result = Array(matrixA.length).fill(null).map(() => Array(matrixB[0].length).fill(0));
-
-  for (let i = 0; i < matrixA.length; i++) {
-    for (let j = 0; j < matrixB[0].length; j++) {
-      for (let k = 0; k < matrixB.length; k++) {
-        result[i][j] += matrixA[i][k] * matrixB[k][j];
-      }
-    }
-  }
-
-  return result;
-}
-
-// Example matrix-heavy operation using the scheduler
-export async function performMatrixOperation(matrixA, matrixB) {
-  const product = multiplyMatrices(matrixA, matrixB);
-  return await scheduleTask(product);
+/**
+ * Main function to offload computational tasks to GPU servers.
+ * @param {Array} data - The input data to be processed.
+ * @param {number} chunkSize - The size of each chunk.
+ * @returns {Promise<Array>} A promise that resolves with the results of all computations.
+ */
+export async function offloadComputation(data, chunkSize) {
+  const tasks = prepareTasks(data, chunkSize);
+  return await manageTaskQueue(tasks);
 }

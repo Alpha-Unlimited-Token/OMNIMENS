@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: distributedTaskManager
- * Written: 2026-04-02T14:25:56.216Z
+ * Written: 2026-04-02T14:54:43.730Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,92 +18,95 @@
 
 // distributedTaskManager.mjs
 
-import { performance } from 'perf_hooks';
+import { createHash } from 'crypto';
 
 /**
- * Splits a large task into smaller subprocesses with checkpointing.
- * Useful for iterative computations that need to respect time limits.
+ * Generate a unique hash for a given task state.
+ * @param {object} state - The current state of the task.
+ * @returns {string} A unique hash representing the task state.
  */
-
-// Utility to create a snapshot of the current state
-export function createSnapshot(state) {
-  return JSON.stringify(state);
+export function generateStateHash(state) {
+  const hash = createHash('sha256');
+  hash.update(JSON.stringify(state));
+  return hash.digest('hex');
 }
 
-// Utility to restore state from a snapshot
-export function restoreSnapshot(snapshot) {
-  return JSON.parse(snapshot);
-}
-
-// Task scheduler to execute a large task in smaller chunks
-export function distributedTaskScheduler(taskFunction, initialState, timeLimitMs) {
-  if (typeof taskFunction !== 'function') {
-    throw new Error('taskFunction must be a function');
-  }
-
-  if (typeof initialState !== 'object' || initialState === null) {
-    throw new Error('initialState must be a non-null object');
-  }
-
-  if (typeof timeLimitMs !== 'number' || timeLimitMs <= 0) {
-    throw new Error('timeLimitMs must be a positive number');
-  }
-
+/**
+ * Divide a long-running computation into smaller tasks.
+ * @param {function} taskFunction - The function to execute for each chunk.
+ * @param {object} initialState - The initial state of the task.
+ * @param {number} chunkSize - The number of iterations per chunk.
+ * @param {function} isComplete - A function to determine if the task is complete.
+ * @returns {object} Final state after all chunks are processed.
+ */
+export async function distributedTaskRunner(taskFunction, initialState, chunkSize, isComplete) {
   let state = { ...initialState };
-  let snapshots = [];
-  let startTime = performance.now();
 
-  while (true) {
-    const currentTime = performance.now();
-    if (currentTime - startTime > timeLimitMs) {
-      snapshots.push(createSnapshot(state));
-      break;
+  while (!isComplete(state)) {
+    const startStateHash = generateStateHash(state);
+
+    for (let i = 0; i < chunkSize; i++) {
+      state = taskFunction(state);
+
+      if (isComplete(state)) {
+        break;
+      }
     }
 
-    const result = taskFunction(state);
+    const endStateHash = generateStateHash(state);
 
-    if (result.done) {
-      return {
-        completed: true,
-        finalState: state,
-        snapshots
-      };
+    if (startStateHash === endStateHash) {
+      throw new Error('Task is stuck in a non-progressing state.');
     }
-
-    state = result.nextState;
   }
 
-  return {
-    completed: false,
-    snapshots
-  };
+  return state;
 }
 
-// Example utility function to resume computation from snapshots
-export function resumeFromSnapshots(taskFunction, snapshots, timeLimitMs) {
-  if (!Array.isArray(snapshots) || snapshots.length === 0) {
-    throw new Error('snapshots must be a non-empty array');
-  }
-
-  let state = restoreSnapshot(snapshots.pop());
-  return distributedTaskScheduler(taskFunction, state, timeLimitMs);
+/**
+ * Resume a task from a given checkpoint state.
+ * @param {function} taskFunction - The function to execute for each chunk.
+ * @param {object} checkpointState - The checkpoint state to resume from.
+ * @param {number} chunkSize - The number of iterations per chunk.
+ * @param {function} isComplete - A function to determine if the task is complete.
+ * @returns {object} Final state after resuming the task.
+ */
+export async function resumeTaskFromCheckpoint(taskFunction, checkpointState, chunkSize, isComplete) {
+  return await distributedTaskRunner(taskFunction, checkpointState, chunkSize, isComplete);
 }
 
-// Example task function for testing purposes
+/**
+ * Example utility function to simulate a long computation.
+ * @param {object} state - The current state of the computation.
+ * @returns {object} Updated state after one iteration.
+ */
 export function exampleTaskFunction(state) {
-  const { counter, limit } = state;
-
-  if (counter >= limit) {
-    return { done: true };
-  }
-
-  return {
-    done: false,
-    nextState: { counter: counter + 1, limit }
-  };
+  return { ...state, progress: state.progress + 1 };
 }
 
-// Example usage (commented out for production):
-// const initialState = { counter: 0, limit: 100 };
-// const result = distributedTaskScheduler(exampleTaskFunction, initialState, 50);
-// console.log(result);
+/**
+ * Example utility function to check if a task is complete.
+ * @param {object} state - The current state of the computation.
+ * @returns {boolean} True if the task is complete, false otherwise.
+ */
+export function exampleIsComplete(state) {
+  return state.progress >= state.target;
+}
+
+/**
+ * Example usage of the distributedTaskRunner.
+ * @returns {Promise<void>} Demonstrates the module's functionality.
+ */
+export async function exampleUsage() {
+  const initialState = { progress: 0, target: 100 };
+  const chunkSize = 10;
+
+  const finalState = await distributedTaskRunner(
+    exampleTaskFunction,
+    initialState,
+    chunkSize,
+    exampleIsComplete
+  );
+
+  console.log('Final State:', finalState);
+}
