@@ -230,7 +230,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775162048427,
+      "loadedAt": 1775162498216,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -489,7 +489,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775162048437,
+      "loadedAt": 1775162695382,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -247889,9 +247889,135 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnhxrtsj.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnhxrtsj.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnhxrtsj"
+      ],
+      "loadedAt": 1775162347322,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "sandboxCheckpointManager_gen6.mjs": {
+      "filename": "sandboxCheckpointManager_gen6.mjs",
+      "stage": "utility",
+      "exports": [
+        "generateStateHash",
+        "saveCheckpoint",
+        "loadCheckpoint",
+        "deleteCheckpoint",
+        "checkpointExists",
+        "resumeOrStart"
+      ],
+      "loadedAt": 1775162347513,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnhxttdc.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnhxttdc.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnhxttdc"
+      ],
+      "loadedAt": 1775162498301,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnhxtths.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnhxtths.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnhxtths"
+      ],
+      "loadedAt": 1775162498367,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "sparseHierarchicalMemory_gen7.mjs": {
+      "filename": "sparseHierarchicalMemory_gen7.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "generateTokenHash",
+        "sparseAttention",
+        "defaultScoringFunction",
+        "splitContextWithSparseAttention",
+        "analyzeTokenDistribution"
+      ],
+      "loadedAt": 1775162695523,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnhxx1yx.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnhxx1yx.mjs",
+      "stage": "confidence_scoring",
+      "exports": [
+        "newNeuralPathway_mnhxx1yx"
+      ],
+      "loadedAt": 1775162695584,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnhxx20u.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnhxx20u.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnhxx20u"
+      ],
+      "loadedAt": 1775162695650,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnhy1a6y.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnhy1a6y.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnhy1a6y"
+      ],
+      "loadedAt": 1775163035406,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnhy1a8y.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnhy1a8y.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnhy1a8y"
+      ],
+      "loadedAt": 1775163035675,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1775162052744,
-  "totalModules": 18231,
+  "totalModules": 18244,
   "totalCalls": 0
 }
