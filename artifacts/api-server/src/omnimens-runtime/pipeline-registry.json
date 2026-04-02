@@ -226063,7 +226063,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775139687057,
+      "loadedAt": 1775140161109,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -226647,16 +226647,16 @@
     },
     "hierarchicalMemoryManager_gen60.mjs": {
       "filename": "hierarchicalMemoryManager_gen60.mjs",
-      "stage": "memory_retrieval",
+      "stage": "context_compression",
       "exports": [
-        "generateTopicHash",
-        "cosineSimilarity",
-        "createMemoryManager",
-        "normalizeVector",
-        "createRandomVector",
+        "generateMetadataHash",
+        "hierarchicalSummarization",
+        "indexMemory",
+        "retrieveMemory",
+        "dynamicRecomposition",
         "exampleUsage"
       ],
-      "loadedAt": 1775139687111,
+      "loadedAt": 1775140210082,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -227042,7 +227042,7 @@
       "exports": [
         "evolutionCycleMarker"
       ],
-      "loadedAt": 1775139687059,
+      "loadedAt": 1775140161363,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -235235,9 +235235,111 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "webGLAcceleratedMatrixEngine_gen65.mjs": {
+      "filename": "webGLAcceleratedMatrixEngine_gen65.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "initializeWebGLContext",
+        "compileShader",
+        "createProgram",
+        "gpuMatrixMultiply",
+        "createTexture",
+        "readPixels",
+        "generateUniqueID",
+        "modulePurpose"
+      ],
+      "loadedAt": 1775140161031,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "asyncCheckpointManager_gen56.mjs": {
+      "filename": "asyncCheckpointManager_gen56.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "saveStateToBuffer",
+        "restoreStateFromBuffer",
+        "asyncCheckpoint",
+        "segmentedComputation",
+        "exampleComputation"
+      ],
+      "loadedAt": 1775140161308,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "semanticHashingContextManager_gen59.mjs": {
+      "filename": "semanticHashingContextManager_gen59.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateSemanticHash",
+        "updateRecurrentState",
+        "encodeSequence",
+        "decodeSequence",
+        "initializeZeroVector",
+        "normalizeVector"
+      ],
+      "loadedAt": 1775140209853,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "webGLMatrixAccelerator_gen61.mjs": {
+      "filename": "webGLMatrixAccelerator_gen61.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "createWebGLContext",
+        "compileShader",
+        "createProgram",
+        "gpuMatrixMultiply",
+        "gpuEigenvalues",
+        "gpuHopfieldUpdate",
+        "matrixMultiply",
+        "eigenvalues",
+        "hopfieldUpdate"
+      ],
+      "loadedAt": 1775140209965,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_knowledge_synthesis_mnhklhn5.mjs": {
+      "filename": "omnimens_autocode_knowledge_synthesis_mnhklhn5.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "synthesizedKnowledge_mnhklhn5"
+      ],
+      "loadedAt": 1775140210159,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnhkncbr.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnhkncbr.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnhkncbr"
+      ],
+      "loadedAt": 1775140276584,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1775139691302,
-  "totalModules": 17644,
+  "totalModules": 17658,
   "totalCalls": 0
 }

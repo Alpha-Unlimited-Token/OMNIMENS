@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: hierarchicalMemoryManager
- * Written: 2026-04-02T13:36:20.505Z
+ * Written: 2026-04-02T14:29:21.442Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -21,140 +21,90 @@
 import { createHash } from 'crypto';
 
 /**
- * Generates a hash for a given string to ensure unique topic identifiers.
- * @param {string} input - The input string to hash.
- * @returns {string} - The hashed string.
+ * Generate a hash for metadata indexing.
+ * @param {string} metadata - Metadata string to hash.
+ * @returns {string} - SHA-256 hash of the metadata.
  */
-export function generateTopicHash(input) {
-  return createHash('sha256').update(input).digest('hex');
+export function generateMetadataHash(metadata) {
+  const hash = createHash('sha256');
+  hash.update(metadata);
+  return hash.digest('hex');
 }
 
 /**
- * Calculates cosine similarity between two vectors.
- * @param {number[]} vecA - First vector.
- * @param {number[]} vecB - Second vector.
- * @returns {number} - Cosine similarity score.
+ * Perform hierarchical summarization on token windows.
+ * @param {Array<string>} tokenWindows - Array of token windows to summarize.
+ * @param {number} maxDepth - Maximum depth of recursion for summarization.
+ * @returns {string} - Final recursive summary.
  */
-export function cosineSimilarity(vecA, vecB) {
-  const dotProduct = vecA.reduce((sum, a, idx) => sum + a * vecB[idx], 0);
-  const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
-  const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
-  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
-}
-
-/**
- * Creates a dynamic hierarchical memory structure for context preservation.
- * @returns {object} - Memory manager instance.
- */
-export function createMemoryManager() {
-  const memory = new Map();
-
-  /**
-   * Adds or updates a memory entry based on topic relevance.
-   * @param {string} topic - Topic identifier.
-   * @param {string} content - Context information.
-   * @param {number[]} vector - Numerical representation of the content.
-   */
-  function addMemory(topic, content, vector) {
-    const topicHash = generateTopicHash(topic);
-    const existing = memory.get(topicHash);
-
-    if (existing) {
-      const similarity = cosineSimilarity(existing.vector, vector);
-      if (similarity > 0.8) {
-        existing.content.push(content);
-        existing.recency = Date.now();
-      } else {
-        memory.set(topicHash, {
-          content: [content],
-          vector,
-          recency: Date.now()
-        });
-      }
-    } else {
-      memory.set(topicHash, {
-        content: [content],
-        vector,
-        recency: Date.now()
-      });
-    }
+export function hierarchicalSummarization(tokenWindows, maxDepth = 3) {
+  if (maxDepth <= 0 || tokenWindows.length <= 1) {
+    return tokenWindows.join(' ');
   }
 
-  /**
-   * Retrieves the most relevant memory entries for a given topic.
-   * @param {string} topic - Topic identifier.
-   * @param {number[]} vector - Numerical representation of the query.
-   * @returns {Array} - Sorted list of relevant memory entries.
-   */
-  function retrieveMemory(topic, vector) {
-    const topicHash = generateTopicHash(topic);
-    const entries = Array.from(memory.values());
-
-    return entries
-      .map(entry => ({
-        content: entry.content,
-        score: cosineSimilarity(entry.vector, vector),
-        recency: entry.recency
-      }))
-      .filter(entry => entry.score > 0.5)
-      .sort((a, b) => b.score - a.score || b.recency - a.recency);
+  const summaries = [];
+  for (let i = 0; i < tokenWindows.length; i += 2) {
+    const chunk = tokenWindows.slice(i, i + 2).join(' ');
+    summaries.push(chunk);
   }
 
-  /**
-   * Clears memory entries older than a given threshold.
-   * @param {number} ageThreshold - Maximum age in milliseconds.
-   */
-  function clearOldMemory(ageThreshold) {
-    const now = Date.now();
-    for (const [key, entry] of memory.entries()) {
-      if (now - entry.recency > ageThreshold) {
-        memory.delete(key);
-      }
-    }
-  }
-
-  return {
-    addMemory,
-    retrieveMemory,
-    clearOldMemory
-  };
+  return hierarchicalSummarization(summaries, maxDepth - 1);
 }
 
 /**
- * Utility function to normalize a vector.
- * @param {number[]} vector - Input vector.
- * @returns {number[]} - Normalized vector.
+ * Index memory using metadata and store compressed summaries.
+ * @param {Map<string, string>} memoryStore - External memory store (key-value map).
+ * @param {string} metadata - Metadata to index the memory.
+ * @param {string} summary - Compressed summary to store.
  */
-export function normalizeVector(vector) {
-  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
-  return magnitude ? vector.map(val => val / magnitude) : vector;
+export function indexMemory(memoryStore, metadata, summary) {
+  const hash = generateMetadataHash(metadata);
+  memoryStore.set(hash, summary);
 }
 
 /**
- * Utility function to create a random vector for testing purposes.
- * @param {number} length - Length of the vector.
- * @returns {number[]} - Random vector.
+ * Retrieve memory using metadata.
+ * @param {Map<string, string>} memoryStore - External memory store (key-value map).
+ * @param {string} metadata - Metadata to retrieve the memory.
+ * @returns {string|null} - Retrieved summary or null if not found.
  */
-export function createRandomVector(length) {
-  return Array.from({ length }, () => Math.random());
+export function retrieveMemory(memoryStore, metadata) {
+  const hash = generateMetadataHash(metadata);
+  return memoryStore.get(hash) || null;
+}
+
+/**
+ * Dynamically recompose memory for long-term dependencies.
+ * @param {Array<string>} tokenWindows - Array of token windows.
+ * @param {Map<string, string>} memoryStore - External memory store (key-value map).
+ * @param {string} metadata - Metadata for recomposition context.
+ * @returns {string} - Reconstructed memory with long-term dependencies.
+ */
+export function dynamicRecomposition(tokenWindows, memoryStore, metadata) {
+  const retrievedMemory = retrieveMemory(memoryStore, metadata);
+  const currentSummary = hierarchicalSummarization(tokenWindows);
+
+  if (retrievedMemory) {
+    return `${retrievedMemory} ${currentSummary}`;
+  }
+
+  return currentSummary;
 }
 
 /**
  * Example usage of the hierarchicalMemoryManager module.
  */
 export function exampleUsage() {
-  const manager = createMemoryManager();
+  const memoryStore = new Map();
+  const tokenWindows = ["The quick brown fox", "jumps over the lazy dog", "and runs away into the forest"];
+  const metadata = "example-context-1";
 
-  const topic = "neural networks";
-  const content = "Transformers are powerful architectures for AI.";
-  const vector = normalizeVector([0.9, 0.1, 0.4, 0.7]);
+  // Summarize and store memory
+  const summary = hierarchicalSummarization(tokenWindows);
+  indexMemory(memoryStore, metadata, summary);
 
-  manager.addMemory(topic, content, vector);
+  // Retrieve and recompose memory
+  const recomposedMemory = dynamicRecomposition(["A new event occurs"], memoryStore, metadata);
 
-  const queryVector = normalizeVector([0.8, 0.2, 0.5, 0.6]);
-  const results = manager.retrieveMemory(topic, queryVector);
-
-  console.log("Relevant memories:", results);
+  return recomposedMemory;
 }
-
-exampleUsage();
