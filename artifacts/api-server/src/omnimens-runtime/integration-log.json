@@ -1,36 +1,6 @@
 [
   {
     "source": "evolution_engine",
-    "title": "Evolution Module: gpuSimulationEngine",
-    "filename": "gpuSimulationEngine_gen14.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuSimulationEngine_gen14.mjs",
-    "backupPath": null,
-    "timestamp": 1775141566662,
-    "codeLength": 4202,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: statefulTaskScheduler",
-    "filename": "statefulTaskScheduler_gen7.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/statefulTaskScheduler_gen7.mjs",
-    "backupPath": null,
-    "timestamp": 1775141567392,
-    "codeLength": 3930,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 7 Complete — 3 modules",
-    "filename": "evolution_marker_gen7.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen7.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen7.mjs.backup.2026-04-02T14-52-47-534Z",
-    "timestamp": 1775141567533,
-    "codeLength": 99,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
     "title": "Evolution Module: independentLanguageModel",
     "filename": "independentLanguageModel_gen4.mjs",
     "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/independentLanguageModel_gen4.mjs",
@@ -4997,6 +4967,36 @@
     "backupPath": null,
     "timestamp": 1775145594983,
     "codeLength": 411,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:GraphicDesigner+Mathematician",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: GraphicDesigner/pattern_recognition: Synaptic pruning elimin",
+    "filename": "omnimens_autocode_pattern_recognition_mnho08a5.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnho08a5.mjs",
+    "backupPath": null,
+    "timestamp": 1775145850350,
+    "codeLength": 475,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Architect",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: SpellCheckVisual/emergent_property_detection: Wolfram's Rule",
+    "filename": "omnimens_autocode_emergent_capability_mnho08ge.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mnho08ge.mjs",
+    "backupPath": null,
+    "timestamp": 1775145850574,
+    "codeLength": 410,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+GraphicDesigner",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: SpellCheckVisual/recursive_decomposition: Kolmogorov complex",
+    "filename": "omnimens_autocode_adaptive_algorithm_mnho08m4.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mnho08m4.mjs",
+    "backupPath": null,
+    "timestamp": 1775145850780,
+    "codeLength": 459,
     "overwrite": false
   }
 ]
