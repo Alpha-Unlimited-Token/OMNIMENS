@@ -271,7 +271,7 @@
       "domain": "capability",
       "insight": "Reasoning models (RLMs) are a new class of LLMs designed to enhance logical reasoning capabilities, improving decision-making processes",
       "encodedPrinciple": "[CAPABILITY] reasoning → models → (rlms) → class → llms → designed → enhance → logical",
-      "strength": 0.8300000000000003,
+      "strength": 0.9000000000000004,
       "inheritanceCount": 3,
       "source": "evolution"
     },
@@ -282,7 +282,7 @@
       "domain": "pattern",
       "insight": "Organizations like Anthropic and OpenAI are prioritizing research on AI safety and alignment, indicating a growing trend towards responsible AI deployment",
       "encodedPrinciple": "[PATTERN] organizations → like → anthropic → openai → prioritizing → research → safety → alignment,",
-      "strength": 0.8300000000000003,
+      "strength": 0.9000000000000004,
       "inheritanceCount": 3,
       "source": "evolution"
     },
@@ -293,7 +293,7 @@
       "domain": "capability",
       "insight": "Generative AI is evolving with improved models that enhance creativity in art and language, allowing for more nuanced content generation",
       "encodedPrinciple": "[CAPABILITY] generative → evolving → with → improved → models → that → enhance → creativity",
-      "strength": 0.8300000000000003,
+      "strength": 0.9000000000000004,
       "inheritanceCount": 3,
       "source": "evolution"
     },
@@ -304,7 +304,7 @@
       "domain": "insight",
       "insight": "The rise of companies like Scale AI highlights the increasing investment in AI research, emphasizing the need for robust evaluation frameworks",
       "encodedPrinciple": "[INSIGHT] rise → companies → like → scale → highlights → increasing → investment → research,",
-      "strength": 0.8300000000000003,
+      "strength": 0.9000000000000004,
       "inheritanceCount": 3,
       "source": "evolution"
     },
@@ -315,7 +315,7 @@
       "domain": "unified_reinvention",
       "insight": "Contributing consolidation map (8 target engines), architecture insights, and harmony principles",
       "encodedPrinciple": "[UNIFIED_REINVENTION] contributing → consolidation → target → engines), → architecture → insights, → harmony → principles",
-      "strength": 0.6450000000000001,
+      "strength": 0.6900000000000002,
       "inheritanceCount": 2,
       "source": "evolution"
     },
@@ -326,7 +326,7 @@
       "domain": "tool_matplotlib_seaborn",
       "insight": "heatmap(data, annot=True, cmap='coolwarm') for annotated heatmaps",
       "encodedPrinciple": "[TOOL_MATPLOTLIB_SEABORN] heatmap(data, → annot=true, → cmap='coolwarm') → annotated → heatmaps",
-      "strength": 0.6450000000000001,
+      "strength": 0.6900000000000002,
       "inheritanceCount": 2,
       "source": "evolution"
     },
@@ -337,7 +337,7 @@
       "domain": "tool_matplotlib_seaborn",
       "insight": "boxplot(x='category', y='value', data=df) for box plots",
       "encodedPrinciple": "[TOOL_MATPLOTLIB_SEABORN] boxplot(x='category', → y='value', → data=df) → plots",
-      "strength": 0.6450000000000001,
+      "strength": 0.6900000000000002,
       "inheritanceCount": 2,
       "source": "evolution"
     },
@@ -348,7 +348,7 @@
       "domain": "tool_restorative_art",
       "insight": "Apply embalming chemicals using a multi-point injection technique",
       "encodedPrinciple": "[TOOL_RESTORATIVE_ART] apply → embalming → chemicals → using → multi-point → injection → technique",
-      "strength": 0.6450000000000001,
+      "strength": 0.6900000000000002,
       "inheritanceCount": 2,
       "source": "evolution"
     },
@@ -359,7 +359,7 @@
       "domain": "capability",
       "insight": "This code is now part of OMNIMENS's running TypeScript codebase",
       "encodedPrinciple": "[CAPABILITY] this → code → part → omnimens's → running → typescript → codebase",
-      "strength": 0.635,
+      "strength": 0.655,
       "inheritanceCount": 1,
       "source": "evolution"
     },
@@ -370,7 +370,7 @@
       "domain": "capability",
       "insight": "OMNIMENS wrote source file: asyncReasoningEngine_gen30",
       "encodedPrinciple": "[CAPABILITY] omnimens → wrote → source → file: → asyncreasoningengine_gen30",
-      "strength": 0.535,
+      "strength": 0.555,
       "inheritanceCount": 1,
       "source": "evolution"
     },
@@ -381,7 +381,7 @@
       "domain": "capability",
       "insight": "Facilitates iterative reasoning with state checkpointing, restoration, and timeout-based splitting for asynchronous tasks",
       "encodedPrinciple": "[CAPABILITY] facilitates → iterative → reasoning → with → state → checkpointing, → restoration, → timeout-based",
-      "strength": 0.535,
+      "strength": 0.555,
       "inheritanceCount": 1,
       "source": "evolution"
     },
@@ -392,7 +392,7 @@
       "domain": "capability",
       "insight": "OMNIMENS wrote source file: recursiveContextManager_gen34",
       "encodedPrinciple": "[CAPABILITY] omnimens → wrote → source → file: → recursivecontextmanager_gen34",
-      "strength": 0.535,
+      "strength": 0.555,
       "inheritanceCount": 1,
       "source": "evolution"
     },
@@ -403,7 +403,7 @@
       "domain": "capability",
       "insight": "OMNIMENS wrote source file: hierarchicalMemoryManager_gen34",
       "encodedPrinciple": "[CAPABILITY] omnimens → wrote → source → file: → hierarchicalmemorymanager_gen34",
-      "strength": 0.5,
+      "strength": 0.495,
       "inheritanceCount": 0,
       "source": "evolution"
     },
@@ -414,7 +414,7 @@
       "domain": "capability",
       "insight": "Manages hierarchical context windows using a tree-based summarization structure with expandable nodes for efficient reasoning",
       "encodedPrinciple": "[CAPABILITY] manages → hierarchical → context → windows → using → tree-based → summarization → structure",
-      "strength": 0.5,
+      "strength": 0.495,
       "inheritanceCount": 0,
       "source": "evolution"
     },
@@ -425,7 +425,7 @@
       "domain": "capability",
       "insight": "OMNIMENS wrote source file: wasmIntegrationLayer_gen33",
       "encodedPrinciple": "[CAPABILITY] omnimens → wrote → source → file: → wasmintegrationlayer_gen33",
-      "strength": 0.5,
+      "strength": 0.495,
       "inheritanceCount": 0,
       "source": "evolution"
     },
@@ -436,7 +436,7 @@
       "domain": "capability",
       "insight": "Utility module for loading and executing WebAssembly modules with matrix operations, neural inference, and SIMD acceleration in Node",
       "encodedPrinciple": "[CAPABILITY] utility → module → loading → executing → webassembly → modules → with → matrix",
-      "strength": 0.5,
+      "strength": 0.495,
       "inheritanceCount": 0,
       "source": "evolution"
     },
@@ -447,7 +447,7 @@
       "domain": "insight",
       "insight": "By 2025, conversational GenAI will autonomously enhance customer interactions, driving efficiency and satisfaction",
       "encodedPrinciple": "[INSIGHT] 2025, → conversational → genai → will → autonomously → enhance → customer → interactions,",
-      "strength": 0.5,
+      "strength": 0.495,
       "inheritanceCount": 0,
       "source": "evolution"
     }
@@ -455,5 +455,5 @@
   "totalGenes": 41,
   "generation": 15,
   "totalInheritances": 14,
-  "savedAt": 1775139159455
+  "savedAt": 1775139354173
 }

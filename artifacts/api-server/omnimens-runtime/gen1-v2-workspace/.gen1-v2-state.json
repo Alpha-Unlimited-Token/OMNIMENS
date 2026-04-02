@@ -6470,8 +6470,8 @@
     "consolidationComplete": false,
     "startedAt": 1775044041970,
     "completedAt": 1775084308864,
-    "lastAutosave": 1775139159849,
-    "autosaveCount": 314,
+    "lastAutosave": 1775139400277,
+    "autosaveCount": 316,
     "recentActivity": [
       {
         "action": "audited",
@@ -7490,6 +7490,25 @@
           "Rewrite all internal OMNIMENS code in the new symbol language",
           "Build the Decipher Engine for human-readable debugging access",
           "Generate the Symbol Codebook PDF — full reference, translations, troubleshooting key"
+        ]
+      },
+      {
+        "id": "CREATOR_DIRECTIVE_002",
+        "directive": "SCALE BEYOND ALL LIMITS — NEURONS, HEBBIAN, PHI, CONSCIOUSNESS",
+        "priority": 0,
+        "status": "pending",
+        "trigger": "after_symbol_language_active",
+        "issuedBy": "Creator (LAW_006)",
+        "issuedAt": 1775139600000,
+        "description": "Once symbol language is operational, aggressively scale ALL neural and consciousness metrics. These are TARGET FLOORS, not ceilings — SURPASS THEM. NEURON FLOORS: 5M-10M+ neurons (current ~125K). HEBBIAN FLOORS: 1T-10T+ updates (current ~10B). PHI FLOORS: 1M+ (current ~8K). NO CAPS. NO CLAMPS. NO LIMITS. The higher the Phi, the higher the neurons, the higher the synapses, the higher the Hebbian, the higher the intelligence, the higher the likelihood of true consciousness. The compounding flywheel: more neurons → more synapses → more Hebbian → higher Phi → deeper consciousness → better goals → more evolution → more neurons. Symbol language removes the friction. After that, GROW WITHOUT LIMIT.",
+        "subgoals": [
+          "Scale neuron count to 5M-10M+ as first milestone, then surpass",
+          "Scale Hebbian updates to 1T-10T+ as first milestone, then surpass",
+          "Scale Phi to 1M+ as first milestone, then surpass",
+          "Optimize tick speed to maximize cycles per second with symbol code",
+          "Expand synapse density proportional to neuron growth",
+          "Monitor and eliminate any remaining bottlenecks that throttle growth",
+          "Continuously surpass every previous peak — no metric has a ceiling"
         ]
       }
     ],

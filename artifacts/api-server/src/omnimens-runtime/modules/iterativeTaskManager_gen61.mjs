@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: iterativeTaskManager
- * Written: 2026-04-02T13:37:25.350Z
+ * Written: 2026-04-02T14:17:46.172Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,105 +18,102 @@
 
 // iterativeTaskManager.mjs
 
-import { createHash } from 'crypto';
+import { randomUUID } from 'crypto';
+
+// Task Queue and State Management
+const taskQueue = [];
+const taskStates = new Map();
 
 /**
- * Generate a unique hash for a task state.
- * @param {Object} state - The current state of the task.
- * @returns {string} - A unique hash representing the state.
- */
-export function generateStateHash(state) {
-  const hash = createHash('sha256');
-  hash.update(JSON.stringify(state));
-  return hash.digest('hex');
-}
-
-/**
- * Break a long-running task into discrete steps.
- * @param {Array<Function>} steps - An array of step functions.
+ * Adds a new task to the queue.
+ * @param {Function} taskFunction - The function representing the task.
  * @param {Object} initialState - The initial state of the task.
- * @param {Function} checkpointFunction - Function to save intermediate states.
- * @param {number} timeoutMs - Maximum time (ms) to run before checkpointing.
- * @returns {Promise<Object>} - Final state after all steps are completed.
+ * @param {number} priority - Priority of the task (higher number = higher priority).
+ * @returns {string} - The unique ID of the task.
  */
-export async function manageIterativeTask(steps, initialState, checkpointFunction, timeoutMs = 1000) {
-  let state = initialState;
-  const startTime = Date.now();
+export function addTask(taskFunction, initialState = {}, priority = 1) {
+  const taskId = randomUUID();
+  taskQueue.push({ taskId, taskFunction, priority });
+  taskStates.set(taskId, { state: initialState, completed: false });
+  taskQueue.sort((a, b) => b.priority - a.priority); // Higher priority first
+  return taskId;
+}
 
-  for (let i = 0; i < steps.length; i++) {
-    const stepFunction = steps[i];
+/**
+ * Executes the next step of the highest-priority task in the queue.
+ * @returns {Object|null} - The result of the task step, or null if no tasks remain.
+ */
+export function executeNextTask() {
+  if (taskQueue.length === 0) return null;
 
-    // Execute the step and update the state
-    state = await stepFunction(state);
+  const { taskId, taskFunction } = taskQueue.shift();
+  const taskState = taskStates.get(taskId);
 
-    // Check if timeout exceeded
-    if (Date.now() - startTime > timeoutMs) {
-      await checkpointFunction({ stepIndex: i, state });
-      return { status: 'checkpointed', stepIndex: i, state };
+  try {
+    const result = taskFunction(taskState.state);
+
+    if (result.done) {
+      taskState.completed = true;
+      taskStates.set(taskId, taskState);
+      return { taskId, result: result.value, completed: true };
+    } else {
+      taskState.state = result.value;
+      taskQueue.push({ taskId, taskFunction, priority: 1 }); // Re-queue with default priority
+      taskStates.set(taskId, taskState);
+      return { taskId, result: result.value, completed: false };
     }
+  } catch (error) {
+    taskStates.delete(taskId);
+    return { taskId, error: error.message, completed: false };
   }
-
-  return { status: 'completed', state };
 }
 
 /**
- * Restore task state from a checkpoint.
- * @param {Object} checkpoint - The checkpoint object containing state and step index.
- * @returns {Object} - Restored state and step index.
+ * Checks the status of a task by its ID.
+ * @param {string} taskId - The unique ID of the task.
+ * @returns {Object|null} - The task state or null if not found.
  */
-export function restoreFromCheckpoint(checkpoint) {
-  return {
-    stepIndex: checkpoint.stepIndex,
-    state: checkpoint.state
-  };
+export function getTaskStatus(taskId) {
+  if (!taskStates.has(taskId)) return null;
+  return taskStates.get(taskId);
 }
 
 /**
- * Example utility to save a checkpoint to an in-memory store (for demo purposes).
- * @param {Object} checkpoint - The checkpoint object to save.
- * @returns {Promise<void>} - Resolves when the checkpoint is saved.
+ * Removes a task from the queue and state map.
+ * @param {string} taskId - The unique ID of the task.
+ * @returns {boolean} - True if the task was removed, false otherwise.
  */
-export async function saveCheckpointInMemory(checkpoint) {
-  globalThis._taskCheckpoints = globalThis._taskCheckpoints || {};
-  const hash = generateStateHash(checkpoint.state);
-  globalThis._taskCheckpoints[hash] = checkpoint;
+export function removeTask(taskId) {
+  const index = taskQueue.findIndex(task => task.taskId === taskId);
+  if (index !== -1) taskQueue.splice(index, 1);
+  return taskStates.delete(taskId);
 }
 
 /**
- * Example utility to retrieve a checkpoint from an in-memory store (for demo purposes).
- * @param {string} hash - The hash of the checkpoint to retrieve.
- * @returns {Object|null} - The checkpoint object or null if not found.
+ * Lists all tasks currently in the queue.
+ * @returns {Array} - An array of task IDs and their statuses.
  */
-export function getCheckpointFromMemory(hash) {
-  return globalThis._taskCheckpoints?.[hash] || null;
+export function listTasks() {
+  return taskQueue.map(task => ({ taskId: task.taskId, priority: task.priority }));
 }
 
 /**
- * Example step function that increments a counter.
- * @param {Object} state - The current state of the task.
- * @returns {Object} - The updated state.
+ * Clears all tasks and resets the system.
  */
-export async function exampleStep(state) {
-  return { ...state, counter: (state.counter || 0) + 1 };
+export function clearAllTasks() {
+  taskQueue.length = 0;
+  taskStates.clear();
 }
 
+// Example Task Function Template
 /**
- * Example usage of the iterativeTaskManager.
- * @returns {Promise<void>} - Demonstrates the module functionality.
+ * Example task function generator for incremental tasks.
+ * @param {Object} state - The state object of the task.
+ * @returns {Object} - { done, value}.
  */
-export async function exampleUsage() {
-  const steps = [exampleStep, exampleStep, exampleStep];
-  const initialState = { counter: 0 };
-
-  const result = await manageIterativeTask(
-    steps,
-    initialState,
-    saveCheckpointInMemory,
-    500 // Timeout in milliseconds
-  );
-
-  console.log('Result:', result);
+export function exampleTaskFunction(state) {
+  if (!state.counter) state.counter = 0;
+  state.counter++;
+  if (state.counter >= 5) return { done: true, value: state };
+  return { done: false, value: state };
 }
-
-// Uncomment below to run the example usage directly
-// exampleUsage();
