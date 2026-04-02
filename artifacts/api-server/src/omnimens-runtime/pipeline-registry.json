@@ -247328,9 +247328,52 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "distributedTaskManager_gen6.mjs": {
+      "filename": "distributedTaskManager_gen6.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "createWorkerManager",
+        "serializeManagerState",
+        "deserializeManagerState",
+        "exampleUsage",
+        "workerScript"
+      ],
+      "loadedAt": 1775155897291,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnhsh1fa.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnhsh1fa.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnhsh1fa"
+      ],
+      "loadedAt": 1775155897355,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnht309b.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnht309b.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnht309b"
+      ],
+      "loadedAt": 1775155898344,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1775151256092,
-  "totalModules": 18188,
+  "totalModules": 18192,
   "totalCalls": 0
 }
