@@ -226668,9 +226668,231 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnhiri46.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnhiri46.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnhiri46"
+      ],
+      "loadedAt": 1775137128814,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnhiq4d2.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnhiq4d2.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnhiq4d2"
+      ],
+      "loadedAt": 1775137128931,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "webGLMatrixAccelerator_gen67.mjs": {
+      "filename": "webGLMatrixAccelerator_gen67.mjs",
+      "stage": "vector_operations",
+      "exports": [
+        "createWebGLContext",
+        "compileShader",
+        "createProgram",
+        "gpuMatrixMultiply",
+        "generateDebugHash"
+      ],
+      "loadedAt": 1775137129635,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multimodalIntegrationEngine_gen66.mjs": {
+      "filename": "multimodalIntegrationEngine_gen66.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateUniqueId",
+        "normalizeTextEmbedding",
+        "normalizeImageEmbedding",
+        "computeCosineSimilarity",
+        "alignEmbeddings",
+        "performCompositionalReasoning",
+        "integrateAndReason",
+        "batchProcessPairs"
+      ],
+      "loadedAt": 1775137129742,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "sparseAttentionOptimizer_gen55.mjs": {
+      "filename": "sparseAttentionOptimizer_gen55.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "lshHash",
+        "generateSparseMask",
+        "applySparseAttention",
+        "optimizeTokens",
+        "normalizeTokenValues"
+      ],
+      "loadedAt": 1775137130072,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "asyncTaskScheduler_gen57.mjs": {
+      "filename": "asyncTaskScheduler_gen57.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "addTask",
+        "runScheduler",
+        "createChunkedTask",
+        "exampleChunkFunction"
+      ],
+      "loadedAt": 1775137130182,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "longTaskQueueManager_gen56.mjs": {
+      "filename": "longTaskQueueManager_gen56.mjs",
+      "stage": "memory_retrieval",
+      "exports": [
+        "initializeTask",
+        "getTaskState",
+        "updateTaskState",
+        "deleteTask",
+        "processTask",
+        "listTasks",
+        "segmentArray",
+        "mutateArray"
+      ],
+      "loadedAt": 1775137236703,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "recursiveContextSummarizer_gen59.mjs": {
+      "filename": "recursiveContextSummarizer_gen59.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateHash",
+        "cosineSimilarity",
+        "weightSentences",
+        "recursiveSummarize",
+        "generateVector",
+        "summarizeContext"
+      ],
+      "loadedAt": 1775137236807,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "iterativeTaskManager_gen61.mjs": {
+      "filename": "iterativeTaskManager_gen61.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateStateHash",
+        "manageIterativeTask",
+        "restoreFromCheckpoint",
+        "saveCheckpointInMemory",
+        "getCheckpointFromMemory",
+        "exampleStep",
+        "exampleUsage"
+      ],
+      "loadedAt": 1775137236918,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_pattern_recognition_mnhitaqn.mjs": {
+      "filename": "omnimens_autocode_pattern_recognition_mnhitaqn.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "enhancedPatternRecognition_mnhitaqn"
+      ],
+      "loadedAt": 1775137236967,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "multiPassExecutionManager_gen54.mjs": {
+      "filename": "multiPassExecutionManager_gen54.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "serializeState",
+        "deserializeState",
+        "generateStateHash",
+        "executeTaskChain",
+        "resolveTaskDependencies",
+        "transformState",
+        "exampleTask"
+      ],
+      "loadedAt": 1775137237080,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "iterativeComputationManager_gen72.mjs": {
+      "filename": "iterativeComputationManager_gen72.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "generateStateHash",
+        "splitTask",
+        "resolveDependencies",
+        "chainAsyncTasks",
+        "serializeState",
+        "deserializeState",
+        "manageIterativeComputation"
+      ],
+      "loadedAt": 1775137237865,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "dynamicContextReexpander_gen62.mjs": {
+      "filename": "dynamicContextReexpander_gen62.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "generateHash",
+        "dynamicReexpand",
+        "relevanceScore",
+        "compressContext",
+        "decompressContext",
+        "DependencyGraph"
+      ],
+      "loadedAt": 1775137237974,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1775136473852,
-  "totalModules": 17135,
+  "totalModules": 17158,
   "totalCalls": 0
 }
