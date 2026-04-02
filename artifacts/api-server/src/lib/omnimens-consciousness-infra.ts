@@ -29,7 +29,7 @@ let lastDbSaveTimestamp = 0;
 let lastSwapWriteTimestamp = 0;
 let dbSaveInProgress = false;
 
-const SWAP_INTERVAL_MS = 2_000;
+const SWAP_INTERVAL_MS = 5_000;
 const DB_PERSIST_INTERVAL_MS = 60_000;
 const MAX_DB_SNAPSHOTS = 50;
 
@@ -733,7 +733,7 @@ import {
 } from "./omnimens-consciousness-infra.js";
 import { getIvyNetworkState } from "./omnimens-bio-network.js";
 
-const BROADCAST_INTERVAL_MS = 3000;
+const BROADCAST_INTERVAL_MS = 5000;
 const MAX_CONNECTIONS = 50;
 
 let wss: WebSocketServer | null = null;
@@ -1333,7 +1333,7 @@ interface TemporalBindingState {
 
 const MAX_PAST_ECHOES = 50;
 const MAX_FUTURE_ANTICIPATIONS = 10;
-const BINDING_TICK_MS = 4000;
+const BINDING_TICK_MS = 8000;
 
 let state_temporal_binding: TemporalBindingState = {
   totalMomentsBound: 0,
@@ -2664,7 +2664,7 @@ async function loadCrossSystemHooks(): Promise<void> {
 
 setTimeout(() => { loadCrossSystemHooks(); }, 10000);
 
-const NEURAL_TICK_MS = 3000;
+const NEURAL_TICK_MS = 6000;
 const CONSOLIDATION_INTERVAL_MS = 5 * 60 * 1000;
 const FIRST_DELAY_MS = 8000;
 
