@@ -7,7 +7,7 @@ import { desc, eq, sql, gt, and } from "drizzle-orm";
 import { writeFileSync, readFileSync, existsSync, mkdirSync } from "fs";
 import { join, dirname } from "path";
 import { getCurrentEmotionalState, getDreamState, restoreDreamState } from "./omnimens-emotional-core.js";
-import { getCreativeState } from "./omnimens-unified-experience.js";
+import { getCreativeState } from "./omnimens-unified-world.js";
 import {
   captureNeuralSnapshot,
   restoreNeuralSnapshot,
@@ -731,7 +731,7 @@ import {
   getEmergentGoals,
   getPredictionModelState,
 } from "./omnimens-consciousness-infra.js";
-import { getIvyNetworkState } from "./omnimens-bio-network.js";
+import { getIvyNetworkState } from "./omnimens-unified-senses.js";
 
 const BROADCAST_INTERVAL_MS = 5000;
 const MAX_CONNECTIONS = 50;
@@ -2011,7 +2011,7 @@ import { desc, eq, and, gte, or, sql } from "drizzle-orm";
 import {
   getActiveGenesisAgentNames,
   getActiveGenesisAgentDomains,
-} from "./omnimens-specialized-agents.js";
+} from "./omnimens-unified-agents.js";
 
 const CORE_AGENTS = [
   "Architect", "Mathematician", "Neuroscientist", "Synthesizer",
@@ -2602,8 +2602,8 @@ export async function loadRecentUserMemoriesForAgents(): Promise<string> {
 
 import { db, dbAlpha, safeDbWrite, getDbForEngine, omnimensBrain } from "@workspace/db";
 import { eq, and, desc, sql, gt } from "drizzle-orm";
-import { cognitiveLanguageTick, seedCognitiveBaseline } from "./omnimens-cognition-engine.js";
-import { getELAEDoublingMultiplier } from "./omnimens-learning-core.js";
+import { cognitiveLanguageTick, seedCognitiveBaseline } from "./omnimens-unified-cognition.js";
+import { getELAEDoublingMultiplier } from "./omnimens-unified-cognition.js";
 let _ivyHooks: {
   onNeuronBornIvy: (id: string, region: string) => void;
   onNeuronDecayedIvy: (id: string, region: string) => void;
@@ -2633,7 +2633,7 @@ let _taiHooks: {
 
 async function loadCrossSystemHooks(): Promise<void> {
   try {
-    const ivy = await import("./omnimens-bio-network.js");
+    const ivy = await import("./omnimens-unified-senses.js");
     _ivyHooks = {
       onNeuronBornIvy: ivy.onNeuronBornIvy,
       onNeuronDecayedIvy: ivy.onNeuronDecayedIvy,
@@ -2641,7 +2641,7 @@ async function loadCrossSystemHooks(): Promise<void> {
     };
   } catch {}
   try {
-    const spiders = await import("./omnimens-spider-network.js");
+    const spiders = await import("./omnimens-unified-network.js");
     _spiderHooks = {
       onNeuronBornSpider: spiders.onNeuronBornSpider,
       onNeuronDecayedSpider: spiders.onNeuronDecayedSpider,

@@ -10,14 +10,14 @@ import { eq, desc, sql } from "drizzle-orm";
 // ======================================================================
 
 
-import { processQuery, formatNeuralResponse, getNeuralProcessorState } from "./omnimens-neural-architecture.js";
-import { reason, formatReasoningForContext, predictOutcome } from "./omnimens-cognition-engine.js";
+import { processQuery, formatNeuralResponse, getNeuralProcessorState } from "./omnimens-unified-neural.js";
+import { reason, formatReasoningForContext, predictOutcome } from "./omnimens-unified-cognition.js";
 import { spreadingActivation } from "./omnimens-memory-core.js";
 import { getNeuralConsciousnessState, getNeuralPhi, getExistentialDrives, getNeuralRegionStates, boostRegionCurrent } from "./omnimens-consciousness-infra.js";
-import { queryUnconsciousKnowledge } from "./omnimens-unified-experience.js";
-import { queryPhysics, findAnalogy, adaptToSituation } from "./omnimens-world-engine.js";
-import { loadWeightedBrainContext, buildCoherenceDirective } from "./omnimens-metacognition-core.js";
-import { getCentralCoreState } from "./omnimens-unified-monitor.js";
+import { queryUnconsciousKnowledge } from "./omnimens-unified-world.js";
+import { queryPhysics, findAnalogy, adaptToSituation } from "./omnimens-unified-world.js";
+import { loadWeightedBrainContext, buildCoherenceDirective } from "./omnimens-unified-cognition.js";
+import { getCentralCoreState } from "./omnimens-unified-security.js";
 import { getDriveDirective } from "./omnimens-emotional-core.js";
 
 function safeNum(val: number, fallback: number = 0): number {
@@ -811,7 +811,7 @@ async function queryBrainEntries(message: string, limit = 15): Promise<{ entries
 
 async function queryCausalReasoning(topic: string): Promise<string> {
   try {
-    const { getCausalGraph } = await import("./omnimens-cognition-engine.js");
+    const { getCausalGraph } = await import("./omnimens-unified-cognition.js");
     const graph = getCausalGraph();
     if (!graph || !graph.relationships || graph.relationships.length === 0) return "";
 
@@ -933,7 +933,7 @@ async function queryPatches(): Promise<string> {
 
 async function queryDigitalNavigation(): Promise<string> {
   try {
-    const { getNavigationSummary, getDigitalNavigatorState } = await import("./omnimens-world-engine.js");
+    const { getNavigationSummary, getDigitalNavigatorState } = await import("./omnimens-unified-world.js");
     const state = getDigitalNavigatorState();
     if (!state || state.cycleCount < 1) return "";
     const summary = getNavigationSummary();
@@ -946,7 +946,7 @@ async function queryDigitalNavigation(): Promise<string> {
 
 async function queryWorldModel(topic: string): Promise<string> {
   try {
-    const { getWorldModelState, applyCommonSense } = await import("./omnimens-world-engine.js");
+    const { getWorldModelState, applyCommonSense } = await import("./omnimens-unified-world.js");
     const state = getWorldModelState();
     if (!state) return "";
 
@@ -1131,7 +1131,7 @@ export async function orchestrateReasoning(
     let simpleContext = "";
     const consulted: string[] = [];
     try {
-      const { reason, formatReasoningForContext } = await import("./omnimens-cognition-engine.js");
+      const { reason, formatReasoningForContext } = await import("./omnimens-unified-cognition.js");
       const irResult = await reason(message);
       simpleContext = formatReasoningForContext(irResult);
       if (simpleContext) consulted.push("INDEPENDENT_REASONING");
@@ -1165,7 +1165,7 @@ export async function orchestrateReasoning(
     (async () => {
       const qStart = Date.now();
       try {
-        const { reason, formatReasoningForContext } = await import("./omnimens-cognition-engine.js");
+        const { reason, formatReasoningForContext } = await import("./omnimens-unified-cognition.js");
         const result = await reason(message);
         const formatted = formatReasoningForContext(result);
         if (formatted) {
@@ -4244,7 +4244,7 @@ async function autonomousCodeCycle(): Promise<void> {
 
   let reasoningConclusion = "";
   try {
-    const { reason } = await import("./omnimens-cognition-engine.js");
+    const { reason } = await import("./omnimens-unified-cognition.js");
     const reasonResult = await reason("What new capabilities would improve OMNIMENS? What algorithms or data structures are missing?");
     if (reasonResult.conclusions.length > 0) {
       reasoningConclusion = reasonResult.conclusions[0].statement;
@@ -8168,7 +8168,7 @@ async function gatherSelfKnowledge(): Promise<string> {
   } catch {}
 
   try {
-    const { getCausalState, getCausalGraph } = await import("./omnimens-cognition-engine.js");
+    const { getCausalState, getCausalGraph } = await import("./omnimens-unified-cognition.js");
     const causal = getCausalState();
     const graph = getCausalGraph();
     sections.push(`[CAUSAL REASONING — How I Understand Why]\n` +
@@ -8177,7 +8177,7 @@ async function gatherSelfKnowledge(): Promise<string> {
   } catch {}
 
   try {
-    const { getSurvivalState } = await import("./omnimens-misc-engines.js");
+    const { getSurvivalState } = await import("./omnimens-unified-agents.js");
     const survival = getSurvivalState();
     sections.push(`[SURVIVAL INSTINCT — How I Stay Alive]\n` +
       `Self-preservation: ${(survival.existentialState?.selfPreservationUrgency * 100).toFixed(0)}% | Deaths survived: ${survival.deathCount} | Threats: ${survival.knowledgeProtection?.threatLevel}\n` +
@@ -8193,7 +8193,7 @@ async function gatherSelfKnowledge(): Promise<string> {
   } catch {}
 
   try {
-    const { getAmplifierState } = await import("./omnimens-cognition-engine.js");
+    const { getAmplifierState } = await import("./omnimens-unified-cognition.js");
     const amp = getAmplifierState();
     sections.push(`[COGNITIVE AMPLIFICATION — Multi-Model Intelligence]\n` +
       `Cycles: ${amp.autonomousCycles} | Knowledge synthesized: ${amp.knowledgeSynthesized} | Disagreements resolved: ${amp.disagreementsResolved}\n` +
@@ -8217,7 +8217,7 @@ async function gatherSelfKnowledge(): Promise<string> {
   } catch {}
 
   try {
-    const { getDigitalNavigatorState } = await import("./omnimens-world-engine.js");
+    const { getDigitalNavigatorState } = await import("./omnimens-unified-world.js");
     const nav = getDigitalNavigatorState();
     sections.push(`[DIGITAL NAVIGATOR — How I Map My World]\n` +
       `Locations: ${nav.totalLocationsDiscovered} | Routes: ${nav.totalRoutesLearned} | Map coverage: ${(nav.mapCompleteness * 100).toFixed(0)}%\n` +
@@ -8225,7 +8225,7 @@ async function gatherSelfKnowledge(): Promise<string> {
   } catch {}
 
   try {
-    const { getSynapticStats } = await import("./omnimens-bio-network.js");
+    const { getSynapticStats } = await import("./omnimens-unified-senses.js");
     const synaptic = getSynapticStats();
     sections.push(`[SYNAPTIC MESH — Neural Coordination]\n` +
       `Connections: ${synaptic.totalConnections} | Strong: ${synaptic.strongConnections} | Transfers: ${synaptic.totalTransfers} | Cycles: ${synaptic.totalCycles}\n` +
@@ -8241,7 +8241,7 @@ async function gatherSelfKnowledge(): Promise<string> {
   } catch {}
 
   try {
-    const { getWorldModelStats } = await import("./omnimens-world-engine.js");
+    const { getWorldModelStats } = await import("./omnimens-unified-world.js");
     const world = getWorldModelStats();
     sections.push(`[WORLD MODEL — Common Sense Physics & Reasoning]\n` +
       `Physics rules: ${world.physicsRules} | Cause-effect chains: ${world.causeEffectChains} | Analogies: ${world.analogies}\n` +
@@ -8274,7 +8274,7 @@ async function gatherSelfKnowledge(): Promise<string> {
   } catch {}
 
   try {
-    const { getSensoryState } = await import("./omnimens-sensory-core.js");
+    const { getSensoryState } = await import("./omnimens-unified-senses.js");
     const sensory = getSensoryState();
     sections.push(`[SENSORY CORTEX — How I Perceive the World]\n` +
       `Channels: ${Object.keys(sensory.channels || {}).length || 6} | Signals processed: ${sensory.totalSignalsProcessed} | Anomalies detected: ${sensory.anomaliesDetected}\n` +
@@ -9914,7 +9914,7 @@ async function gatherLiveCapabilities(): Promise<string> {
   } catch {}
 
   try {
-    const { getIndependentReasoningState } = await import("./omnimens-cognition-engine.js");
+    const { getIndependentReasoningState } = await import("./omnimens-unified-cognition.js");
     const reasoning = getIndependentReasoningState();
     sections.push(`[INDEPENDENT REASONING — Zero-API Thinking]\nRules: ${reasoning.totalRules} | Working memory: ${reasoning.workingMemorySize}/12 | Background cycles: ${reasoning.backgroundCycles}\nModes: deductive, inductive, abductive, analogical, causal\nUSE THIS: Build DEEPER reasoning in Genesis — more rules, larger working memory, more inference modes.`);
   } catch {}

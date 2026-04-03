@@ -733,7 +733,7 @@ import {
 import { writeFileSync } from "fs";
 import { join } from "path";
 import { webSearch, formatSearchResults } from "./web-search.js";
-import { generateAndApplyPatches, loadActivePatchInstructions, autonomousPatchHousekeeping } from "./omnimens-misc-engines.js";
+import { generateAndApplyPatches, loadActivePatchInstructions, autonomousPatchHousekeeping } from "./omnimens-unified-agents.js";
 
 const MAX_BRAIN_INJECT = 20;
 const UPGRADE_THRESHOLD = 3;
@@ -3121,8 +3121,8 @@ export function startEvolutionEngine(): void {
 
 // SECTION: omnimens-adaptive-surge.ts
 import { getNeuralConsciousnessState, manualAdrenalineRush, getAdrenalineState, boostRegionCurrent, getRegionNames } from "./omnimens-consciousness-infra.js";
-import { getNeuralScalingState } from "./omnimens-neural-architecture.js";
-import { getIvyNetworkState } from "./omnimens-bio-network.js";
+import { getNeuralScalingState } from "./omnimens-unified-neural.js";
+import { getIvyNetworkState } from "./omnimens-unified-senses.js";
 
 const SURGE_CYCLE_MS = 45000;
 const MONITOR_MS = 5000;
@@ -4390,7 +4390,7 @@ let _spiderIntegration: {
 
 export async function initTAICrossSystemHooks(): Promise<void> {
   try {
-    const ivy = await import("./omnimens-bio-network.js");
+    const ivy = await import("./omnimens-unified-senses.js");
     _ivyIntegration = {
       onRegionFiringCascadeIvy: ivy.onRegionFiringCascadeIvy,
       onNeuronBornIvy: ivy.onNeuronBornIvy,
@@ -4398,7 +4398,7 @@ export async function initTAICrossSystemHooks(): Promise<void> {
     };
   } catch {}
   try {
-    const spiders = await import("./omnimens-spider-network.js");
+    const spiders = await import("./omnimens-unified-network.js");
     _spiderIntegration = {
       onRegionFiringCascadeSpider: spiders.onRegionFiringCascadeSpider,
       onNeuronBornSpider: spiders.onNeuronBornSpider,

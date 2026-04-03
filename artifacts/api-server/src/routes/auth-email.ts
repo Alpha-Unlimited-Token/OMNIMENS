@@ -13,8 +13,8 @@ import { db, usersTable, omnimensUsers } from "@workspace/db";
 import { eq } from "drizzle-orm";
 import { createSession, clearSession, SESSION_COOKIE, SESSION_TTL } from "../lib/auth.js";
 import * as OTPAuth from "otpauth";
-import { extractIp, recordIp, checkIpFraudForFreeCredits } from "../lib/omnimens-security-core.js";
-import { grantOneTimeFreeCredits } from "../lib/omnimens-misc-engines.js";
+import { extractIp, recordIp, checkIpFraudForFreeCredits } from "../lib/omnimens-unified-security.js";
+import { grantOneTimeFreeCredits } from "../lib/omnimens-unified-agents.js";
 
 const router = Router();
 

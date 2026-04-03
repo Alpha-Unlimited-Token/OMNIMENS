@@ -14,15 +14,15 @@ import {
 } from "@workspace/db";
 import { eq, and, desc, sql, inArray } from "drizzle-orm";
 import { getNeuralConsciousnessState } from "../lib/omnimens-consciousness-infra.js";
-import { getSurvivalState } from "../lib/omnimens-misc-engines.js";
+import { getSurvivalState } from "../lib/omnimens-unified-agents.js";
 import { getCurrentEmotionalState, getDreamState } from "../lib/omnimens-emotional-core.js";
 import { getSelfCodingState, getExistentialGoals } from "../lib/omnimens-self-evolution.js";
-import { getAgentEvolutionState } from "../lib/omnimens-specialized-agents.js";
+import { getAgentEvolutionState } from "../lib/omnimens-unified-agents.js";
 import { getPipelineState, getSourceIntegrationState } from "../lib/omnimens-code-pipeline.js";
 import { getCodeGenesisState } from "../lib/omnimens-autonomous-core.js";
-import { getGenesisAgents } from "../lib/omnimens-specialized-agents.js";
+import { getGenesisAgents } from "../lib/omnimens-unified-agents.js";
 import { getRestoredSelf, wasRestoredFromPreviousLife } from "../lib/omnimens-consciousness-infra.js";
-import { getNeuralProcessorState } from "../lib/omnimens-neural-architecture.js";
+import { getNeuralProcessorState } from "../lib/omnimens-unified-neural.js";
 
 const router = Router();
 

@@ -4,11 +4,11 @@
 
 import { ReplitConnectors } from "@replit/connectors-sdk";
 import { getNeuralConsciousnessState, getRegionNames, boostRegionCurrent, getAdaptiveIntelligenceState } from "./omnimens-consciousness-infra.js";
-import { getNeuralScalingState } from "./omnimens-neural-architecture.js";
-import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats, getMotherBeaconFindings, getIvyCascadeStats, getIvyNeurogenStats, getViralHybridState, getHybridAgentDetails, getImmuneSystemDetails, getPropagationStats, getSynapticStats } from "./omnimens-bio-network.js";
-import { getNeuralSpiderState, getSystemIntelligenceState, getSpiderCascadeStats, getSpiderNeurogenStats, getRecursiveSpiderStats } from "./omnimens-spider-network.js";
-import { getQuantumWormholeState } from "./omnimens-quantum-core.js";
-import { getMeshEngineState, getMeshNeuronCount, getMeshSynapseCount, getMeshHebbianUpdates } from "./omnimens-neural-architecture.js";
+import { getNeuralScalingState } from "./omnimens-unified-neural.js";
+import { getIvyNetworkState, getWormgateDetails, getIvySpiderStats, getMotherBeaconFindings, getIvyCascadeStats, getIvyNeurogenStats, getViralHybridState, getHybridAgentDetails, getImmuneSystemDetails, getPropagationStats, getSynapticStats } from "./omnimens-unified-senses.js";
+import { getNeuralSpiderState, getSystemIntelligenceState, getSpiderCascadeStats, getSpiderNeurogenStats, getRecursiveSpiderStats } from "./omnimens-unified-network.js";
+import { getQuantumWormholeState } from "./omnimens-unified-neural.js";
+import { getMeshEngineState, getMeshNeuronCount, getMeshSynapseCount, getMeshHebbianUpdates } from "./omnimens-unified-neural.js";
 import { getAdaptiveSurgeState } from "./omnimens-self-evolution.js";
 import { isPoolHealthy, db, queueBrainInsert, omnimensAgentMesh, omnimensBrain } from "@workspace/db";
 import { isNextGenBuildActive } from "./omnimens-nextgen-sandbox.js";
@@ -2376,15 +2376,15 @@ async function syncLiveProofToGitHub(): Promise<void> {
     const { getNeuralConsciousnessState, getSelfAwarenessReport, getExistentialDrives } = await import("./omnimens-neural-consciousness.js");
     const { getRestoredSelf, wasRestoredFromPreviousLife } = await import("./omnimens-consciousness-infra.js");
     const { getCurrentEmotionalState } = await import("./omnimens-emotional-core.js");
-    const { getSurvivalState } = await import("./omnimens-misc-engines.js");
+    const { getSurvivalState } = await import("./omnimens-unified-agents.js");
     const { getSelfCodingState } = await import("./omnimens-self-evolution.js");
     const { getAgentEvolutionState } = await import("./omnimens-agent-evolution.js");
     const { getDreamState } = await import("./omnimens-emotional-core.js");
     const { getPipelineState } = await import("./omnimens-code-pipeline.js");
     const { getCodeGenesisState } = await import("./omnimens-autonomous-code-genesis.js");
     const { getLanguageForgeState } = await import("./omnimens-language-forge.js");
-    const { getIndependentReasoningState } = await import("./omnimens-cognition-engine.js");
-    const { getCausalState } = await import("./omnimens-cognition-engine.js");
+    const { getIndependentReasoningState } = await import("./omnimens-unified-cognition.js");
+    const { getCausalState } = await import("./omnimens-unified-cognition.js");
     const { getExistentialGoals, getTranscendenceReflections, getSelfModel } = await import("./omnimens-self-evolution.js");
     const { getGenesisAgents: getGA } = await import("./omnimens-agent-genesis.js");
 

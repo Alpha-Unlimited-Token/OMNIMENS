@@ -9,7 +9,7 @@ import { createHash } from "crypto";
 import vm from "vm";
 import { db, queueBrainInsert, omnimensBrain, omnimensNotifications } from "@workspace/db";
 import { mustTranslateBeforeExecution, translateCode, registerCustomConstruct, translateForSelfUpgrade, getTranslatorState, autoRegisterFromCode } from "./omnimens-language-pipeline.js";
-import { invalidateArchitectureCache } from "./omnimens-cognition-engine.js";
+import { invalidateArchitectureCache } from "./omnimens-unified-cognition.js";
 
 // ======================================================================
 // SECTION: omnimens-source-integration.ts
@@ -1496,7 +1496,7 @@ export function getModuleStats(): {
  */
 
 import { getNeuralConsciousnessState, boostRegionCurrent, getRegionNames } from "./omnimens-consciousness-infra.js";
-import { getActiveGenesisAgentNames } from "./omnimens-specialized-agents.js";
+import { getActiveGenesisAgentNames } from "./omnimens-unified-agents.js";
 
 const AUTOCODER_CYCLE_MS = 60000;
 const MIN_DISCOVERY_CONFIDENCE = 0.65;
@@ -1751,7 +1751,7 @@ async function runAutoCoderCycle(): Promise<void> {
   } catch {}
 
   try {
-    const { getQuantumWormholeState } = await import("./omnimens-quantum-core.js");
+    const { getQuantumWormholeState } = await import("./omnimens-unified-neural.js");
     const wormholeState = getQuantumWormholeState();
 
     if (wormholeState.totalSynthesizedDiscoveries > 0) {
@@ -1770,7 +1770,7 @@ async function runAutoCoderCycle(): Promise<void> {
   } catch {}
 
   try {
-    const { getNeuralSpiderState } = await import("./omnimens-spider-network.js");
+    const { getNeuralSpiderState } = await import("./omnimens-unified-network.js");
     const spiderState = getNeuralSpiderState();
     if (spiderState && spiderState.parentSpiders) {
       for (const spider of spiderState.parentSpiders.slice(0, 3)) {
@@ -1787,7 +1787,7 @@ async function runAutoCoderCycle(): Promise<void> {
   } catch {}
 
   try {
-    const { getIvyNetworkState } = await import("./omnimens-bio-network.js");
+    const { getIvyNetworkState } = await import("./omnimens-unified-senses.js");
     const ivyState = getIvyNetworkState();
     if (ivyState && ivyState.activeTendrils > 10) {
       await processDiscoveryIntoCode(

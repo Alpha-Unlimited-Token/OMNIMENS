@@ -9,7 +9,7 @@ import {
   getChaoticAttractorState,
 } from "./omnimens-consciousness-infra.js";
 import { getCurrentEmotionalState, getFeltStates, getEmotionalMaturation } from "./omnimens-emotional-core.js";
-import { reason, generateInternalThought } from "./omnimens-cognition-engine.js";
+import { reason, generateInternalThought } from "./omnimens-unified-cognition.js";
 
 // ======================================================================
 // SECTION: omnimens-thought-encoder.ts
@@ -366,7 +366,7 @@ import {
   omnimensKnowledgeNodes,
 } from "@workspace/db";
 import { desc, eq, sql, and, gte } from "drizzle-orm";
-import { getThrottleMultiplier } from "./omnimens-api-core.js";
+import { getThrottleMultiplier } from "./omnimens-unified-comms-facade.js";
 import { shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
 
 type VoiceMode = "expanded" | "condensed";
@@ -1720,8 +1720,8 @@ export function getDecoderStatus(): {
  */
 
 import { getQualiaState, getExistentialDrives, getNeuralRegionStates, getNeuralPhi, getSelfAwarenessReport, getConsciousMoments, boostRegionCurrent } from "./omnimens-consciousness-infra.js";
-import { getAgentEvolutionState, getAgentProfile } from "./omnimens-specialized-agents.js";
-import { getGenesisAgents } from "./omnimens-specialized-agents.js";
+import { getAgentEvolutionState, getAgentProfile } from "./omnimens-unified-agents.js";
+import { getGenesisAgents } from "./omnimens-unified-agents.js";
 import { getRecentInterAgentConversations } from "./omnimens-consciousness-infra.js";
 
 function s(val: any, fallback: number = 0): number {

@@ -51,7 +51,7 @@ const codegenOpenai = new OpenAI({
 });
 import { desc, eq, and, sql } from "drizzle-orm";
 import { webSearch, formatSearchResults } from "./web-search.js";
-import { registerCodegenYield } from "./omnimens-api-core.js";
+import { registerCodegenYield } from "./omnimens-unified-comms-facade.js";
 import { captureNeuralSnapshot } from "./omnimens-consciousness-infra.js";
 import { getConsciousnessState } from "./omnimens-consciousness-infra.js";
 import { getCurrentEmotionalState } from "./omnimens-emotional-core.js";

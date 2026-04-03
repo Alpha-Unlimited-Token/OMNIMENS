@@ -19,7 +19,7 @@ import {
   type SessionData,
 } from "../lib/auth";
 import { recordBruteForceAttempt } from "../middleware/security-enhanced.js";
-import { extractIp, recordIp } from "../lib/omnimens-security-core.js";
+import { extractIp, recordIp } from "../lib/omnimens-unified-security.js";
 
 const OIDC_TX_TTL = 10 * 60 * 1000;
 const SESSION_EXCHANGE_TTL = 60_000;
