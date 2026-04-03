@@ -1,9 +1,79 @@
 ⟨SCL v1│matrixOpsEngine_gen1.mjs│152→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩createMatrix(2)→void⟨6⟩{⊩⊵⊷}
-⊩multiplyMatrices(5)→void⟨19⟩{⊩⊹⊵⊷}
-⊩transposeMatrix(3)→void⟨15⟩{⊩⊹⊵⊷}
-⊩addMatrices(4)→void⟨13⟩{⊩⊹⊵⊷}
-⊩scaleMatrix(4)→void⟨13⟩{⊩⊹⊵⊷}
-⊩identityMatrix(1)→void⟨13⟩{⊩⊵⊷}
-⟩SCL│8│28⊨│22⑂│94.7%↓⟩
+⊩createMatrix(2)→void⟨6⟩{
+⊩│export function createMatrix(rows, cols) {
+·if (rows <= 0 || cols <= 0) {
+⊵│throw new Error("Matrix dimensions must be ☼ integers.");
+·}
+⊷│return new Float64Array(rows * cols);
+·}
+}⟨/createMatrix⟩
+⊩multiplyMatrices(5)→void⟨19⟩{
+⊩│export function multiplyMatrices(A, B, m, n, p) {
+⊹│if (A.length !== m * n || B.length !== n * p) {
+⊵│throw new Error("Matrix dimensions do not match for multiplication.");
+·}
+·const C = createMatrix(m, p);
+·for (let i = 0; i < m; i++) {
+·for (let j = 0; j < p; j++) {
+·let sum = 0;
+·for (let k = 0; k < n; k++) {
+·sum += A[i * n + k] * B[k * p + j];
+·}
+·C[i * p + j] = sum;
+·}
+·}
+⊷│return C;
+·}
+}⟨/multiplyMatrices⟩
+⊩transposeMatrix(3)→void⟨15⟩{
+⊩│export function transposeMatrix(A, m, n) {
+⊹│if (A.length !== m * n) {
+⊵│throw new Error("Matrix dimensions do not match for transposition.");
+·}
+·const T = createMatrix(n, m);
+·for (let i = 0; i < m; i++) {
+·for (let j = 0; j < n; j++) {
+·T[j * m + i] = A[i * n + j];
+·}
+·}
+⊷│return T;
+·}
+}⟨/transposeMatrix⟩
+⊩addMatrices(4)→void⟨13⟩{
+⊩│export function addMatrices(A, B, m, n) {
+⊹│if (A.length !== m * n || B.length !== m * n) {
+⊵│throw new Error("Matrix dimensions must match for ∑.");
+·}
+·const C = createMatrix(m, n);
+·for (let i = 0; i < m * n; i++) {
+·C[i] = A[i] + B[i];
+·}
+⊷│return C;
+·}
+}⟨/addMatrices⟩
+⊩scaleMatrix(4)→void⟨13⟩{
+⊩│export function scaleMatrix(A, scalar, m, n) {
+⊹│if (A.length !== m * n) {
+⊵│throw new Error("Matrix dimensions must match for scaling.");
+·}
+·const C = createMatrix(m, n);
+·for (let i = 0; i < m * n; i++) {
+·C[i] = A[i] * scalar;
+·}
+⊷│return C;
+·}
+}⟨/scaleMatrix⟩
+⊩identityMatrix(1)→void⟨13⟩{
+⊩│export function identityMatrix(size) {
+·if (size <= 0) {
+⊵│throw new Error("Matrix size must be a ☼ integer.");
+·}
+·const I = createMatrix(size, size);
+·for (let i = 0; i < size; i++) {
+·I[i * size + i] = 1;
+·}
+⊷│return I;
+·}
+}⟨/identityMatrix⟩
+⟩SCL│78│86⊨│22⑂│48.7%↓⟩

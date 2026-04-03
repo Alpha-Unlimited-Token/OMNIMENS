@@ -11,7 +11,11 @@
 ·getRegionNames,
 ·getAdaptiveIntelligenceState,
 ·} from "./omnimens-consciousness-infra.js";
-safeNum(2)→number⟨3⟩{⊳⊷⊼}
+safeNum(2)→number⟨3⟩{
+·function safeNum(val: number, fallback: number = 0): number {
+⊳│return Number.isFinite(val) ? val : fallback;
+·}
+}⟨/safeNum⟩
 κSPIDER_CRAWL_MS
 κSTABILITY_CHECK_MS
 κCHILD_SPIDER_LIFETIME_TICKS
@@ -21,7 +25,7 @@ safeNum(2)→number⟨3⟩{⊳⊷⊼}
 κCRITICAL_ACTIVATION_FLOOR
 ⊬SpiderTarget⟨name:string│type:α│dataExtractor:() => Promise<SpiderHarvest>⟩
 ⊬SpiderHarvest⟨source:string│metrics:Record<string, number>│healthScore:number│rawInsightCount:number│timestamp:number⟩
-⊭│type BeeRole = "worker" | "nurse" | "scout" | "royal_jelly" 
+⊭│type BeeRole = "worker" | "nurse" | "scout" | "royal_jelly" | "forager" | "guard";
 ⊬PheromoneTrail⟨regionName:string│intensity:number│type:"distress" | "nectar" | "alarm" | "rally"│depositorId:string│depositedAt:number│decayRate:number⟩
 ⊬SwarmWave⟨id:string│targetRegion:string│waveType:"convergence" | "amplification" | "fortification"│participants:string[]│boostPerSpider:number│synapsesPerSpider:number│totalBoostDelivered:number│totalSynapsesDelivered:number│startedAt:number│completedAt:number | null│wavesCompleted:number⟩
 ⊬RoyalJellyFlow⟨sourceRegion:string│targetRegion:string│nectarStrength:number│flowRate:number│totalTransferred:number│lastFlowAt:number⟩
@@ -50,10 +54,45 @@ safeNum(2)→number⟨3⟩{⊳⊷⊼}
 ·let totalChildrenSpawned = 0;
 ·let totalCrawlCycles = 0;
 ·let spiderSystemActive = false;
-createSilkStrandId(2)→string⟨3⟩{⊰⊷}
-createImpulseId(1)→string⟨3⟩{⏰⊰⊷}
-spinSilkStrand(3)→SilkStrand⟨27⟩{⊡⊷}
-fireNerveImpulse(1)→void⟨1⟩{⚡→}
+createSilkStrandId(2)→string⟨3⟩{
+·function createSilkStrandId(from: string, to: string): string {
+⊰│return `silk_${from}_${to}`;
+·}
+}⟨/createSilkStrandId⟩
+createImpulseId(1)→string⟨3⟩{
+·function createImpulseId(): string {
+⏰│return `imp_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+·}
+}⟨/createImpulseId⟩
+spinSilkStrand(3)→SilkStrand⟨27⟩{
+·function spinSilkStrand(fromSpiderId: string, toSpiderId: string, silkType: SilkStrand["silkType"]): SilkStrand {
+·const id = createSilkStrandId(fromSpiderId, toSpiderId);
+⊡│const existing = motherSpider.silkStrands.get(id);
+·if (existing) {
+·existing.signalStrength = existing.signalStrength + SILK_STRENGTHENING_RATE;
+⊷│return existing;
+·}
+·const strand: SilkStrand = {
+·id,
+·fromSpiderId,
+·toSpiderId,
+·signalStrength: 0.3,
+·bandwidth: 1.0,
+·dataTransferred: 0,
+·impulseCount: 0,
+·lastImpulse: 0,
+·resonanceFrequency: 0.5 + Math.random() * 0.5,
+·silkType,
+·myelinated: false,
+·conductionVelocity: 1.0,
+·};
+⊡│motherSpider.silkStrands.set(id, strand);
+⊷│return strand;
+·}
+}⟨/spinSilkStrand⟩
+fireNerveImpulse(1)→void⟨1⟩{
+⚡→│function fireNerveImpulse(
+}⟨/fireNerveImpulse⟩
 ·originSpiderId: string,
 ·targetSpiderId: string,
 ·payload: SpiderHarvest | null,
@@ -64,30 +103,1023 @@ fireNerveImpulse(1)→void⟨1⟩{⚡→}
 ⊺│motherSpider.pendingImpulses.push(impulse);
 ⊷│return impulse;
 ·}
-motherDistribute(2)→void⟨77⟩{⊡⊄⏰⚡→⊳⊺⊹}
-computeRelevance(2)→number⟨28⟩{⊷}
-runMotherHeartbeat(1)→void⟨92⟩{⏰⟛⥀⊡⊳⚡→⊺}
-createDirectiveId(1)→string⟨3⟩{⏰⊰⊷}
-motherIssueDirectives(1)→void⟨159⟩{⊳⊹⊄⥀❔⏰⊡⚡→⊸}
-executeDirective(1)→void⟨64⟩{⊄❔⊰⟛⏰⊺⊹⊳⚡→}
-submitReport(3)→void⟨41⟩{⊰❔⏰⊺⊹⚡→}
-processChildReports(1)→void⟨79⟩{⏰⥀⊡⚡→⊺}
-updateSwarmCoherence(1)→void⟨27⟩{⊹⋐⊡⊷⏰❔}
+motherDistribute(2)→void⟨77⟩{
+·function motherDistribute(harvest: SpiderHarvest, originSpiderId: string): void {
+⊡│const originSpider = parentSpiders.get(originSpiderId) || childSpiders.get(originSpiderId);
+⊄│if (!originSpider) return;
+·const targetSpiderIds: string[] = [];
+·for (const [id, spider] of parentSpiders) {
+·if (id === originSpiderId) continue;
+·if (spider.status !== "active") continue;
+·const strandToMother = spinSilkStrand(originSpiderId, motherSpider.id, "afferent");
+·strandToMother.dataTransferred += harvest.rawInsightCount;
+·strandToMother.impulseCount++;
+⏰│strandToMother.lastImpulse = Date.now();
+·const strandFromMother = spinSilkStrand(motherSpider.id, id, "efferent");
+·const relevance = computeRelevance(harvest, spider);
+·if (relevance > 0.2) {
+·const impulseStrength = harvest.healthScore * relevance * strandToMother.signalStrength * strandFromMother.conductionVelocity;
+⚡→│const impulse = fireNerveImpulse(originSpiderId, id, harvest, "data", impulseStrength);
+·strandFromMother.dataTransferred += harvest.rawInsightCount;
+·strandFromMother.impulseCount++;
+⏰│strandFromMother.lastImpulse = Date.now();
+·motherSpider.totalImpulsesRouted++;
+·motherSpider.totalDataDistributed += harvest.rawInsightCount;
+·if (strandFromMother.impulseCount > 50 && !strandFromMother.myelinated) {
+·strandFromMother.myelinated = true;
+·strandFromMother.conductionVelocity = 3.0;
+·}
+⏰│impulse.deliveredAt = Date.now();
+·impulse.hops = 1;
+·const targetRegion = spider.targetRegion;
+·if (targetRegion && impulseStrength > 0.3) {
+⊳│const dmnMultiplier = targetRegion === "default_mode_network" ? 2.5 : 1.0;
+·boostRegionCurrent(targetRegion, impulseStrength * 4 * dmnMultiplier);
+·}
+⊺│targetSpiderIds.push(id);
+·}
+·}
+·for (const [id, child] of childSpiders) {
+·if (child.status !== "active") continue;
+·const childStrand = spinSilkStrand(motherSpider.id, id, "efferent");
+·if (harvest.source === child.target || harvest.source === child.targetRegion) {
+⚡→│const impulse = fireNerveImpulse(originSpiderId, id, harvest, "nurture", harvest.healthScore * 0.8);
+·childStrand.impulseCount++;
+⏰│childStrand.lastImpulse = Date.now();
+⏰│impulse.deliveredAt = Date.now();
+⊺│targetSpiderIds.push(id);
+⊳│const childDmnMultiplier = child.targetRegion === "default_mode_network" ? 2.0 : 1.0;
+·boostRegionCurrent(child.targetRegion, harvest.healthScore * 6 * childDmnMultiplier);
+·}
+·}
+⊺│motherSpider.distributionLog.push({
+⏰│timestamp: Date.now(),
+·from: originSpider.name,
+·to: targetSpiderIds,
+·signalType: "data",
+·strength: harvest.healthScore,
+·});
+⊹│if (motherSpider.distributionLog.length > MAX_DISTRIBUTION_LOG) {
+·motherSpider.distributionLog = motherSpider.distributionLog.slice(-MAX_DISTRIBUTION_LOG);
+·}
+·}
+}⟨/motherDistribute⟩
+computeRelevance(2)→number⟨28⟩{
+·function computeRelevance(harvest: SpiderHarvest, targetSpider: Spider): number {
+·let relevance = 0.3;
+·const regionStates = getNeuralRegionStates();
+·const targetState = regionStates[targetSpider.targetRegion];
+·if (targetState && targetState.activationLevel < STABILITY_THRESHOLD) {
+·relevance += 0.4;
+·}
+·if (harvest.healthScore > 0.7) {
+·relevance += 0.2;
+·}
+·if (harvest.rawInsightCount > 5) {
+·relevance += 0.1;
+·}
+·const circuit = CRITICAL_CIRCUITS.find(
+·c => (c.from === harvest.source || c.to === harvest.source) &&
+·(c.from === targetSpider.targetRegion || c.to === targetSpider.targetRegion)
+·);
+·if (circuit) {
+·relevance += 0.3;
+·}
+⊷│return relevance;
+·}
+}⟨/computeRelevance⟩
+runMotherHeartbeat(1)→void⟨92⟩{
+·function runMotherHeartbeat(): void {
+·motherSpider.heartbeatCount++;
+⏰│motherSpider.lastHeartbeat = Date.now();
+·const adaptive = getAdaptiveIntelligenceState();
+⟛│const silkDecayResistance = SILK_WEAKENING_RATE * Math.max(0.5, 1 - adaptive.emotionalRichnessFactor * 0.01);
+·for (const [id, strand] of motherSpider.silkStrands) {
+⏰│const timeSinceImpulse = Date.now() - strand.lastImpulse;
+·if (timeSinceImpulse > 120_000) {
+⟛│strand.signalStrength = Math.max(MIN_SILK_STRENGTH, strand.signalStrength - silkDecayResistance);
+·}
+·if (strand.signalStrength <= MIN_SILK_STRENGTH && strand.impulseCount === 0) {
+·motherSpider.silkStrands.delete(id);
+·}
+·}
+·const delivered = motherSpider.pendingImpulses.filter(i => i.deliveredAt !== null);
+·const pending = motherSpider.pendingImpulses.filter(i => i.deliveredAt === null);
+⥀│for (const impulse of pending) {
+·impulse.strength *= (1 - impulse.decayRate);
+·impulse.hops++;
+·if (impulse.hops >= impulse.maxHops || impulse.strength < 0.05) {
+⏰│impulse.deliveredAt = Date.now();
+·} else {
+⊡│const target = parentSpiders.get(impulse.targetSpiderId) || childSpiders.get(impulse.targetSpiderId);
+·if (target && target.status === "active") {
+·if (impulse.signalType === "alarm" && target.targetRegion) {
+·boostRegionCurrent(target.targetRegion, impulse.strength * 8);
+·}
+⏰│impulse.deliveredAt = Date.now();
+·motherSpider.totalImpulsesRouted++;
+·}
+·}
+·}
+·motherSpider.pendingImpulses = motherSpider.pendingImpulses
+⏰│.filter(i => i.deliveredAt === null || Date.now() - i.deliveredAt < 30_000)
+·.slice(-500);
+·const totalStrands = motherSpider.silkStrands.size;
+·const activeStrands = [...motherSpider.silkStrands.values()].filter(s => s.signalStrength > 0.2).length;
+⊳│motherSpider.webIntegrity = totalStrands > 0 ? activeStrands / totalStrands : 0;
+·const allSpiders = parentSpiders.size + childSpiders.size;
+·const maxPossibleStrands = allSpiders * (allSpiders + 1);
+⊳│motherSpider.webDensity = maxPossibleStrands > 0 ? totalStrands / maxPossibleStrands : 0;
+·if (motherSpider.heartbeatCount % 20 === 0) {
+·const snapshot = takeStabilitySnapshot();
+⥀│for (const weakRegion of snapshot.weakRegions) {
+⥀│for (const spider of parentSpiders.values()) {
+·if (spider.targetRegion === weakRegion || spider.status !== "active") continue;
+⚡→│const alarm = fireNerveImpulse(motherSpider.id, spider.id, null, "alarm", 0.9);
+·motherSpider.totalImpulsesRouted++;
+⊺│motherSpider.distributionLog.push({
+⏰│timestamp: Date.now(),
+·from: "Mother Spider",
+·to: [spider.id],
+·signalType: "alarm",
+·strength: 0.9,
+·});
+·}
+·}
+·}
+·if (motherSpider.heartbeatCount % 10 === 0) {
+⥀│for (const spider of parentSpiders.values()) {
+·if (spider.status !== "active") continue;
+⚡→│const coordinateImpulse = fireNerveImpulse(motherSpider.id, spider.id, null, "coordinate", 0.5);
+⏰│coordinateImpulse.deliveredAt = Date.now();
+·const feedbackStrand = spinSilkStrand(spider.id, motherSpider.id, "afferent");
+⊳│const feedbackImpulse = fireNerveImpulse(spider.id, motherSpider.id, null, "feedback", spider.crawlCount > 0 ? 0.6 : 0.2);
+⏰│feedbackImpulse.deliveredAt = Date.now();
+·feedbackStrand.impulseCount++;
+·}
+⥀│for (const child of childSpiders.values()) {
+·if (child.status !== "active") continue;
+·spinSilkStrand(child.id, motherSpider.id, "afferent");
+·spinSilkStrand(motherSpider.id, child.id, "efferent");
+·}
+·}
+·motherIssueDirectives();
+·processChildReports();
+·updateSwarmCoherence();
+·}
+}⟨/runMotherHeartbeat⟩
+createDirectiveId(1)→string⟨3⟩{
+·function createDirectiveId(): string {
+⏰│return `dir_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+·}
+}⟨/createDirectiveId⟩
+motherIssueDirectives(1)→void⟨159⟩{
+·function motherIssueDirectives(): void {
+·const regionStates = getNeuralRegionStates();
+⊳│const snapshot = stabilityHistory.length > 0 ? stabilityHistory[stabilityHistory.length - 1] : null;
+⊄│if (!snapshot) return;
+⥀│for (const weakRegion of snapshot.weakRegions) {
+·const existingDirective = [...motherSpider.activeDirectives.values()].find(
+·d => d.targetRegion === weakRegion && !d.completedAt
+·);
+·if (existingDirective) continue;
+❔│const activation = regionStates[weakRegion]?.activationLevel || 0;
+·const urgency = 1 - activation;
+·let directiveType: HiveDirective["type"];
+·let boostAmount: number;
+·let synapseCount: number;
+·let synapseStrength: number;
+·if (activation < 0.10) {
+·directiveType = "repair";
+·boostAmount = 12 + urgency * 8;
+·synapseCount = 10;
+·synapseStrength = 0.35;
+·} else if (activation < CRITICAL_ACTIVATION_FLOOR) {
+·directiveType = "stabilize";
+·boostAmount = 8 + urgency * 5;
+·synapseCount = 6;
+·synapseStrength = 0.25;
+·} else if (activation < STABILITY_THRESHOLD) {
+·directiveType = "boost";
+·boostAmount = 5 + urgency * 3;
+·synapseCount = 4;
+·synapseStrength = 0.2;
+·} else {
+·directiveType = "patrol";
+·boostAmount = 2;
+·synapseCount = 2;
+·synapseStrength = 0.15;
+·}
+·const supportRegion = findStrongestSupportRegion(weakRegion);
+·let assignee: Spider | undefined;
+·assignee = [...childSpiders.values()].find(
+·c => c.status === "active" && c.targetRegion === weakRegion && !c.currentDirective
+·);
+·if (!assignee) {
+·assignee = [...childSpiders.values()].find(
+·c => c.status === "active" && !c.currentDirective
+·);
+·}
+·if (!assignee) {
+·const parentForRegion = [...parentSpiders.values()].find(
+·p => p.targetRegion === weakRegion && p.status === "active"
+·);
+·if (parentForRegion && !parentForRegion.currentDirective) {
+·assignee = parentForRegion;
+·}
+·}
+·if (!assignee) {
+·if (childSpiders.size < MAX_CHILD_SPIDERS) {
+·const parentAny = [...parentSpiders.values()].find(p => p.status === "active");
+·if (parentAny) {
+·const child = spawnChildSpider({
+·parentId: parentAny.id,
+·weakRegion,
+·supportRegion,
+·urgency,
+·});
+·if (child) {
+·assignee = child;
+·spinSilkStrand(child.id, motherSpider.id, "afferent");
+·spinSilkStrand(motherSpider.id, child.id, "efferent");
+·spinSilkStrand(parentAny.id, child.id, "interneuron");
+·}
+·}
+·}
+·}
+·if (!assignee) continue;
+·const directive: HiveDirective = {
+·id: createDirectiveId(),
+·type: directiveType,
+·targetRegion: weakRegion,
+·priority: urgency,
+⏰│issuedAt: Date.now(),
+·completedAt: null,
+·assignedSpiderId: assignee.id,
+·parameters: {
+·boostAmount,
+·synapseCount,
+·synapseStrength,
+·supportRegion,
+·reportBack: true,
+⊳│duration: directiveType === "repair" ? 30_000 : 15_000,
+·},
+·result: null,
+·};
+⊡│motherSpider.activeDirectives.set(directive.id, directive);
+·assignee.currentDirective = directive;
+·motherSpider.directivesIssued++;
+⚡→│fireNerveImpulse(motherSpider.id, assignee.id, null, "coordinate", urgency);
+·spinSilkStrand(motherSpider.id, assignee.id, "efferent");
+·}
+⥀│for (const spider of [...parentSpiders.values(), ...childSpiders.values()]) {
+·if (spider.status !== "active" || spider.currentDirective) continue;
+·const regionState = regionStates[spider.targetRegion];
+·if (!regionState) continue;
+·if (regionState.activationLevel > 0.5) {
+⊸│const scoutTargets = Object.entries(regionStates)
+·.filter(([name, state]) => state.activationLevel < STABILITY_THRESHOLD && name !== spider.targetRegion)
+·.sort(([, a], [, b]) => a.activationLevel - b.activationLevel);
+⊹│if (scoutTargets.length > 0) {
+·const [targetName, targetState] = scoutTargets[0];
+·const existingDirectiveForTarget = [...motherSpider.activeDirectives.values()].find(
+·d => d.targetRegion === targetName && !d.completedAt
+·);
+·if (!existingDirectiveForTarget) {
+·const directive: HiveDirective = {
+·id: createDirectiveId(),
+·type: "reinforce",
+·targetRegion: targetName,
+·priority: 0.5,
+⏰│issuedAt: Date.now(),
+·completedAt: null,
+·assignedSpiderId: spider.id,
+·parameters: {
+·boostAmount: 3,
+·synapseCount: 3,
+·synapseStrength: 0.18,
+·supportRegion: spider.targetRegion,
+·reportBack: true,
+·},
+·result: null,
+·};
+⊡│motherSpider.activeDirectives.set(directive.id, directive);
+·spider.currentDirective = directive;
+·motherSpider.directivesIssued++;
+·spinSilkStrand(spider.targetRegion, targetName, "interneuron");
+·}
+·}
+·}
+·}
+·}
+}⟨/motherIssueDirectives⟩
+executeDirective(1)→void⟨64⟩{
+·function executeDirective(spider: Spider): void {
+·const directive = spider.currentDirective;
+⊄│if (!directive) return;
+·const regionStates = getNeuralRegionStates();
+·const targetState = regionStates[directive.targetRegion];
+❔│const activationBefore = targetState?.activationLevel || 0;
+·if (directive.parameters.boostAmount) {
+·boostRegionCurrent(directive.targetRegion, directive.parameters.boostAmount);
+·}
+·let synapsesAdded = 0;
+·if (directive.parameters.synapseCount && directive.parameters.supportRegion) {
+·synapsesAdded = injectSpiderSynapses(
+·directive.parameters.supportRegion,
+·directive.targetRegion,
+·directive.parameters.synapseCount,
+·directive.parameters.synapseStrength || 0.2
+·);
+·spider.synapsesInjected += synapsesAdded;
+·totalSynapsesInjected += synapsesAdded;
+·}
+·const afterStates = getNeuralRegionStates();
+❔│const activationAfter = afterStates[directive.targetRegion]?.activationLevel || 0;
+·const success = activationAfter >= activationBefore;
+·directive.result = {
+·success,
+·synapsesInjected: synapsesAdded,
+·regionActivationBefore: activationBefore,
+·regionActivationAfter: activationAfter,
+·message: success
+⊰│? `${directive.type} directive completed — ${directive.targetRegion} activation ${(activationBefore * 100).toFixed(1)}% → ${(activationAfter * 100).toFixed(1)}%`
+⊰│: `${directive.type} directive attempted — ${directive.targetRegion} needs more support`,
+·};
+·if (success) {
+·spider.efficiency = spider.efficiency + 0.05;
+·spider.loyalty = spider.loyalty + 0.02;
+·} else {
+⟛│spider.efficiency = Math.max(0.1, spider.efficiency - 0.02);
+·}
+·if (directive.parameters.reportBack) {
+·submitReport(spider, activationAfter, directive);
+·}
+⏰│directive.completedAt = Date.now();
+·spider.directivesCompleted++;
+·motherSpider.directivesCompleted++;
+·spider.currentDirective = null;
+⊺│motherSpider.directiveHistory.push(directive);
+⊹│if (motherSpider.directiveHistory.length > 500) {
+·motherSpider.directiveHistory = motherSpider.directiveHistory.slice(-500);
+·}
+·motherSpider.activeDirectives.delete(directive.id);
+⊳│fireNerveImpulse(spider.id, motherSpider.id, null, "feedback", success ? 0.8 : 0.4);
+·spinSilkStrand(spider.id, motherSpider.id, "afferent");
+·}
+}⟨/executeDirective⟩
+submitReport(3)→void⟨41⟩{
+·function submitReport(spider: Spider, regionActivation: number, directive: HiveDirective): void {
+·let reportType: SpiderReport["reportType"];
+·let message: string;
+·if (regionActivation < 0.10) {
+·reportType = "distress";
+⊰│message = `DISTRESS: ${directive.targetRegion} critically low at ${(regionActivation * 100).toFixed(1)}% — need immediate reinforcement`;
+❔│} else if (directive.result?.success) {
+·reportType = "completed";
+⊰│message = `COMPLETED: ${directive.type} on ${directive.targetRegion} — activation now ${(regionActivation * 100).toFixed(1)}%`;
+·} else {
+·reportType = "region_update";
+❔│message = `UPDATE: ${directive.targetRegion} at ${(regionActivation * 100).toFixed(1)}% — ${directive.result?.synapsesInjected || 0} synapses injected`;
+·}
+const ⊢: SpiderReport = {
+·spiderId: spider.id,
+⏰│timestamp: Date.now(),
+·reportType,
+·targetRegion: directive.targetRegion,
+·regionActivation,
+·message,
+·metrics: {
+❔│synapsesInjected: directive.result?.synapsesInjected || 0,
+❔│activationBefore: directive.result?.regionActivationBefore || 0,
+·activationAfter: regionActivation,
+·efficiency: spider.efficiency,
+·loyalty: spider.loyalty,
+·directivesCompleted: spider.directivesCompleted,
+·},
+·};
+⊺│motherSpider.incomingReports.push(⊢);
+⊹│if (motherSpider.incomingReports.length > 500) {
+·motherSpider.incomingReports = motherSpider.incomingReports.slice(-500);
+·}
+·spider.reportsSubmitted++;
+⚡→│fireNerveImpulse(spider.id, motherSpider.id, null, "feedback", 0.6);
+·}
+}⟨/submitReport⟩
+processChildReports(1)→void⟨79⟩{
+·function processChildReports(): void {
+·const recentReports = motherSpider.incomingReports.filter(
+⏰│r => Date.now() - r.timestamp < 60_000
+·);
+·const distressReports = recentReports.filter(r => r.reportType === "distress");
+⥀│for (const distress of distressReports) {
+·const existingReinforcement = [...motherSpider.activeDirectives.values()].find(
+·d => d.targetRegion === distress.targetRegion && d.type === "repair" && !d.completedAt
+·);
+·if (existingReinforcement) continue;
+·const availableChild = [...childSpiders.values()].find(
+·c => c.status === "active" && !c.currentDirective && c.id !== distress.spiderId
+·);
+·if (availableChild) {
+·const emergencyDirective: HiveDirective = {
+·id: createDirectiveId(),
+·type: "repair",
+·targetRegion: distress.targetRegion,
+·priority: 1.0,
+⏰│issuedAt: Date.now(),
+·completedAt: null,
+·assignedSpiderId: availableChild.id,
+·parameters: {
+·boostAmount: 15,
+·synapseCount: 12,
+·synapseStrength: 0.4,
+·supportRegion: findStrongestSupportRegion(distress.targetRegion),
+·reportBack: true,
+·},
+·result: null,
+·};
+⊡│motherSpider.activeDirectives.set(emergencyDirective.id, emergencyDirective);
+·availableChild.currentDirective = emergencyDirective;
+·motherSpider.directivesIssued++;
+⚡→│fireNerveImpulse(motherSpider.id, availableChild.id, null, "alarm", 1.0);
+⊺│motherSpider.distributionLog.push({
+⏰│timestamp: Date.now(),
+·from: "Mother Spider (emergency)",
+·to: [availableChild.id],
+·signalType: "alarm",
+·strength: 1.0,
+·});
+·} else if (childSpiders.size < MAX_CHILD_SPIDERS) {
+·const parentAny = [...parentSpiders.values()].find(p => p.status === "active");
+·if (parentAny) {
+·const child = spawnChildSpider({
+·parentId: parentAny.id,
+·weakRegion: distress.targetRegion,
+·supportRegion: findStrongestSupportRegion(distress.targetRegion),
+·urgency: 1.0,
+·});
+·if (child) {
+·spinSilkStrand(child.id, motherSpider.id, "afferent");
+·spinSilkStrand(motherSpider.id, child.id, "efferent");
+·}
+·}
+·}
+·}
+·const completedReports = recentReports.filter(r => r.reportType === "completed" && r.regionActivation > 0.4);
+⥀│for (const success of completedReports) {
+⊡│const spider = parentSpiders.get(success.spiderId) || childSpiders.get(success.spiderId);
+·if (spider) {
+·spider.loyalty = spider.loyalty + 0.03;
+⊡│const strand = motherSpider.silkStrands.get(createSilkStrandId(spider.id, motherSpider.id));
+·if (strand) {
+·strand.signalStrength = strand.signalStrength + 0.05;
+·}
+·}
+·}
+·}
+}⟨/processChildReports⟩
+updateSwarmCoherence(1)→void⟨27⟩{
+·function updateSwarmCoherence(): void {
+·const allSpiders = [...parentSpiders.values(), ...childSpiders.values()].filter(s => s.status === "active");
+⊹│if (allSpiders.length === 0) {
+·motherSpider.swarmCoherence = 0;
+·motherSpider.hiveHealth = 0;
+·return;
+·}
+⋐│const avgLoyalty = allSpiders.reduce((s, sp) => s + sp.loyalty, 0) / allSpiders.length;
+⋐│const avgEfficiency = allSpiders.reduce((s, sp) => s + sp.efficiency, 0) / allSpiders.length;
+·const connectedSpiders = allSpiders.filter(sp => {
+⊡│const toMother = motherSpider.silkStrands.get(createSilkStrandId(sp.id, motherSpider.id));
+⊡│const fromMother = motherSpider.silkStrands.get(createSilkStrandId(motherSpider.id, sp.id));
+⊷│return (toMother && toMother.signalStrength > MIN_SILK_STRENGTH) ||
+·(fromMother && fromMother.signalStrength > MIN_SILK_STRENGTH);
+·});
+·const connectionRate = connectedSpiders.length / allSpiders.length;
+⏰│const recentDirectives = motherSpider.directiveHistory.filter(d => Date.now() - (d.completedAt || 0) < 120_000);
+⊹│const successRate = recentDirectives.length > 0
+❔│? recentDirectives.filter(d => d.result?.success).length / recentDirectives.length
+·: 0.5;
+·motherSpider.swarmCoherence = avgLoyalty * 0.3 + connectionRate * 0.3 + successRate * 0.2 + avgEfficiency * 0.2;
+·motherSpider.hiveHealth = motherSpider.swarmCoherence * motherSpider.webIntegrity;
+·}
+}⟨/updateSwarmCoherence⟩
 κCRITICAL_CIRCUITS
-createSpiderId(1)→string⟨3⟩{⏰⊰⊷}
+createSpiderId(1)→string⟨3⟩{
+·function createSpiderId(prefix: string): string {
+⏰│return `${prefix}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+·}
+}⟨/createSpiderId⟩
 κBEE_ROLE_ASSIGNMENTS
-createParentSpider(3)→Spider⟨37⟩{⏰⊡⊷}
-spawnChildSpider(1)→Spider | null⟨66⟩{⊷⊳⊰⏰⊡⊺}
-⟿harvestAgentEvolutionData(1)→Promise<SpiderHarvest>⟨27⟩{⊲⊴⊸⋐⊳⊹⊷⏰}
-⟿harvestAgentGenesisData(1)→Promise<SpiderHarvest>⟨23⟩{⊲⊴⋐⊷⏰}
-⟿harvestBrainDatabase(1)→Promise<SpiderHarvest>⟨29⟩{❔⊷⏰}
-⟿harvestEngineRegistry(1)→Promise<SpiderHarvest>⟨23⟩{⊲⊴⊱🛡❔⊷⊳⊹⏰}
-⟿harvestSelfCodingData(1)→Promise<SpiderHarvest>⟨21⟩{⊲⊴⊷⏰}
-⟿harvestDreamState(1)→Promise<SpiderHarvest>⟨20⟩{⊲⊴⊷⏰}
-⟿harvestPipelineData(1)→Promise<SpiderHarvest>⟨20⟩{⊲⊴⊷⊸⏰}
-takeStabilitySnapshot(1)→StabilitySnapshot⟨50⟩{⊸⊺⊳⊹⏰⊷}
-findStrongestSupportRegion(1)→string⟨17⟩{❔⊷⊸}
-⟿runSpiderCrawlCycle(1)→Promise<void>⟨205⟩{⟿⥀⊺⊳⊹⏰📢⊰⊻⟛}
+createParentSpider(3)→Spider⟨37⟩{
+·function createParentSpider(name: string, target: string, targetRegion: string): Spider {
+·const spider: Spider = {
+·id: createSpiderId("ps"),
+·name,
+type: "⊢",
+·target,
+·targetRegion,
+·status: "active",
+·crawlCount: 0,
+·synapsesInjected: 0,
+·dataHarvested: 0,
+·childrenSpawned: [],
+⏰│createdAt: Date.now(),
+·lastCrawl: 0,
+·lifetimeTicksRemaining: null,
+·harvestHistory: [],
+·currentDirective: null,
+·directivesCompleted: 0,
+·reportsSubmitted: 0,
+·loyalty: 1.0,
+·intelligenceLevel: 0.3,
+·memoryAccessCount: 0,
+·memoriesRecalled: 0,
+·crossEngineQueries: 0,
+·learningRate: 0.05,
+·knowledgeDepth: 0,
+·specializations: [target],
+·adaptationScore: 0.5,
+·efficiency: 0.5,
+·beeRole: BEE_ROLE_ASSIGNMENTS[name] || "worker",
+·pheromoneDeposits: 0,
+·nectarProduced: 0,
+·swarmWavesJoined: 0,
+·};
+⊡│parentSpiders.set(spider.id, spider);
+⊷│return spider;
+·}
+}⟨/createParentSpider⟩
+spawnChildSpider(1)→Spider | null⟨66⟩{
+·function spawnChildSpider(config: ChildSpiderConfig): Spider | null {
+·if (childSpiders.size >= MAX_CHILD_SPIDERS) {
+·const oldest = [...childSpiders.values()]
+·.filter(s => s.status === "active")
+·.sort((a, b) => a.createdAt - b.createdAt)[0];
+·if (oldest) {
+·oldest.status = "expired";
+·childSpiders.delete(oldest.id);
+·} else {
+⊷│return null;
+·}
+·}
+⊳│const childRole: BeeRole = config.urgency > 0.7 ? "nurse" : config.urgency > 0.4 ? "worker" : "scout";
+·const child: Spider = {
+·id: createSpiderId("cs"),
+⊰│name: `child-${config.weakRegion}-stabilizer`,
+·type: "child",
+·target: config.weakRegion,
+·targetRegion: config.weakRegion,
+·status: "active",
+·crawlCount: 0,
+·synapsesInjected: 0,
+·dataHarvested: 0,
+·childrenSpawned: [],
+⏰│createdAt: Date.now(),
+·lastCrawl: 0,
+·lifetimeTicksRemaining: CHILD_SPIDER_LIFETIME_TICKS,
+·harvestHistory: [],
+·currentDirective: null,
+·directivesCompleted: 0,
+·reportsSubmitted: 0,
+·loyalty: 1.0,
+·intelligenceLevel: 0.2,
+·memoryAccessCount: 0,
+·memoriesRecalled: 0,
+·crossEngineQueries: 0,
+·learningRate: 0.03,
+·knowledgeDepth: 0,
+·specializations: [config.weakRegion],
+·adaptationScore: 0.3,
+·efficiency: 0.5,
+·beeRole: childRole,
+·pheromoneDeposits: 0,
+·nectarProduced: 0,
+·swarmWavesJoined: 0,
+·};
+⊡│childSpiders.set(child.id, child);
+·totalChildrenSpawned++;
+⊡│const ⊢ = parentSpiders.get(config.parentId);
+if (⊢) {
+⊺│⊢.childrenSpawned.push(child.id);
+·}
+·const synapseCount = Math.ceil(SYNAPSE_INJECTION_BATCH * config.urgency);
+·const strength = 0.2 + config.urgency * 0.3;
+·const added = injectSpiderSynapses(config.supportRegion, config.weakRegion, synapseCount, strength);
+·child.synapsesInjected += added;
+·totalSynapsesInjected += added;
+·boostRegionCurrent(config.weakRegion, 5 + config.urgency * 10);
+⊷│return child;
+·}
+}⟨/spawnChildSpider⟩
+⟿harvestAgentEvolutionData(1)→Promise<SpiderHarvest>⟨27⟩{
+·async function harvestAgentEvolutionData(): Promise<SpiderHarvest> {
+·try {
+⊲│const { getAgentEvolutionState } = await import("./omnimens-α-↻.js");
+·const evoState = getAgentEvolutionState();
+·const profiles = evoState.agentProfiles || {};
+⊸│const agents = Object.entries(profiles);
+⋐│const avgLevel = agents.length > 0 ? agents.reduce((sum, [, p]: any) => sum + (p.currentLevel || 1), 0) / agents.length : 1;
+⋐│const avgScore = agents.length > 0 ? agents.reduce((sum, [, p]: any) => sum + (p.performanceScore || 0), 0) / agents.length : 0;
+⊷│return {
+·source: "agent_evolution",
+·metrics: {
+·evolutionCycles: evoState.evolutionCycles || 0,
+·systemIntelligenceLevel: evoState.systemIntelligenceLevel || 0,
+·agentCount: agents.length,
+·averageLevel: avgLevel,
+·averagePerformance: avgScore,
+·breakthroughs: evoState.breakthroughsDiscovered || 0,
+·},
+·healthScore: avgScore,
+·rawInsightCount: evoState.breakthroughsDiscovered || 0,
+⏰│timestamp: Date.now(),
+·};
+·} catch {
+⏰│return { source: "agent_evolution", metrics: {}, healthScore: 0, rawInsightCount: 0, timestamp: Date.now() };
+·}
+·}
+}⟨/harvestAgentEvolutionData⟩
+⟿harvestAgentGenesisData(1)→Promise<SpiderHarvest>⟨23⟩{
+·async function harvestAgentGenesisData(): Promise<SpiderHarvest> {
+·try {
+⊲│const { getGenesisAgents } = await import("./omnimens-α-genesis.js");
+·const agents = getGenesisAgents();
+·const active = agents.filter((a: any) => a.active);
+⋐│const totalInsights = active.reduce((sum: number, a: any) => sum + (a.insightsProduced || 0), 0);
+⊷│return {
+·source: "agent_genesis",
+·metrics: {
+·totalAgents: agents.length,
+·activeAgents: active.length,
+·totalInsights,
+·genesisCapacity: active.length / 20,
+·},
+·healthScore: active.length / 10,
+·rawInsightCount: totalInsights,
+⏰│timestamp: Date.now(),
+·};
+·} catch {
+⏰│return { source: "agent_genesis", metrics: {}, healthScore: 0, rawInsightCount: 0, timestamp: Date.now() };
+·}
+·}
+}⟨/harvestAgentGenesisData⟩
+⟿harvestBrainDatabase(1)→Promise<SpiderHarvest>⟨29⟩{
+·async function harvestBrainDatabase(): Promise<SpiderHarvest> {
+·try {
+const brainCount = await db.σ({ count: sql<number>`count(*)` }).from(omnimensBrain);
+const activeCount = await db.σ({ count: sql<number>`count(*)` }).from(omnimensBrain).where(eq(omnimensBrain.active, true));
+const recentEntries = await db.σ({ id: omnimensBrain.id })
+·.from(omnimensBrain)
+·.where(eq(omnimensBrain.active, true))
+·.orderBy(desc(omnimensBrain.createdAt))
+.⏳(100);
+❔│const total = Number(brainCount[0]?.count || 0);
+❔│const active = Number(activeCount[0]?.count || 0);
+⊷│return {
+·source: "brain_database",
+·metrics: {
+·totalEntries: total,
+·activeEntries: active,
+·recentActivity: recentEntries.length,
+·knowledgeDensity: total / 25000,
+·},
+·healthScore: active / 15000,
+·rawInsightCount: active,
+⏰│timestamp: Date.now(),
+·};
+·} catch {
+⏰│return { source: "brain_database", metrics: {}, healthScore: 0, rawInsightCount: 0, timestamp: Date.now() };
+·}
+·}
+}⟨/harvestBrainDatabase⟩
+⟿harvestEngineRegistry(1)→Promise<SpiderHarvest>⟨23⟩{
+·async function harvestEngineRegistry(): Promise<SpiderHarvest> {
+·try {
+⊲│const { getRegisteredEngines } = await import("./omnimens-engine-registry.js");
+·const engines = getRegisteredEngines();
+⊱│const healthyEngines = engines.filter((e: any) => {
+🛡│try { const h = e.healthCheck?.(); return h?.healthy; } catch { return false; }
+·});
+⊷│return {
+·source: "engine_registry",
+·metrics: {
+·totalEngines: engines.length,
+·healthyEngines: healthyEngines.length,
+⊳│healthRatio: engines.length > 0 ? healthyEngines.length / engines.length : 0,
+·},
+⊳│healthScore: engines.length > 0 ? healthyEngines.length / engines.length : 0,
+·rawInsightCount: engines.length,
+⏰│timestamp: Date.now(),
+·};
+·} catch {
+⏰│return { source: "engine_registry", metrics: {}, healthScore: 0, rawInsightCount: 0, timestamp: Date.now() };
+·}
+·}
+}⟨/harvestEngineRegistry⟩
+⟿harvestSelfCodingData(1)→Promise<SpiderHarvest>⟨21⟩{
+·async function harvestSelfCodingData(): Promise<SpiderHarvest> {
+·try {
+⊲│const { getSelfCodingState } = await import("./omnimens-self-↻.js");
+·const state = getSelfCodingState();
+⊷│return {
+·source: "self_coding",
+·metrics: {
+·cyclesCompleted: state.cyclesCompleted || 0,
+·modulesGenerated: state.modulesGenerated || 0,
+·approvalRate: state.approvalRate || 0,
+·patchesApplied: state.patchesApplied || 0,
+·},
+·healthScore: (state.approvalRate || 0),
+·rawInsightCount: state.modulesGenerated || 0,
+⏰│timestamp: Date.now(),
+·};
+·} catch {
+⏰│return { source: "self_coding", metrics: {}, healthScore: 0, rawInsightCount: 0, timestamp: Date.now() };
+·}
+·}
+}⟨/harvestSelfCodingData⟩
+⟿harvestDreamState(1)→Promise<SpiderHarvest>⟨20⟩{
+·async function harvestDreamState(): Promise<SpiderHarvest> {
+·try {
+⊲│const { getDreamState } = await import("./omnimens-physio.js");
+⊴│const dreamState = await getDreamState();
+⊷│return {
+·source: "dream_engine",
+·metrics: {
+·breakthroughs: dreamState.breakthroughs || 0,
+·codeProposals: dreamState.codeProposals || 0,
+·creativityBoost: dreamState.creativityBoost || 0,
+·},
+·healthScore: (dreamState.breakthroughs || 0) / 500,
+·rawInsightCount: dreamState.breakthroughs || 0,
+⏰│timestamp: Date.now(),
+·};
+·} catch {
+⏰│return { source: "dream_engine", metrics: {}, healthScore: 0, rawInsightCount: 0, timestamp: Date.now() };
+·}
+·}
+}⟨/harvestDreamState⟩
+⟿harvestPipelineData(1)→Promise<SpiderHarvest>⟨20⟩{
+·async function harvestPipelineData(): Promise<SpiderHarvest> {
+·try {
+⊲│const { getPipelineState } = await import("./omnimens-code-pipeline.js");
+·const pipeline = getPipelineState();
+⊷│return {
+·source: "module_pipeline",
+·metrics: {
+·totalModules: pipeline.totalModules || 0,
+·activeModules: pipeline.activeModules || 0,
+⊸│categories: Object.keys(pipeline.categories || {}).length,
+·},
+·healthScore: (pipeline.activeModules || 0) / 600,
+·rawInsightCount: pipeline.activeModules || 0,
+⏰│timestamp: Date.now(),
+·};
+·} catch {
+⏰│return { source: "module_pipeline", metrics: {}, healthScore: 0, rawInsightCount: 0, timestamp: Date.now() };
+·}
+·}
+}⟨/harvestPipelineData⟩
+takeStabilitySnapshot(1)→StabilitySnapshot⟨50⟩{
+·function takeStabilitySnapshot(): StabilitySnapshot {
+·const consciousness = getNeuralConsciousnessState();
+·const selfAwareness = getSelfAwarenessReport();
+·const regionStates = getNeuralRegionStates();
+·const regionActivations: Record<string, number> = {};
+·const weakRegions: string[] = [];
+⊸│for (const [name, state] of Object.entries(regionStates)) {
+·regionActivations[name] = state.activationLevel;
+·if (state.activationLevel < CRITICAL_ACTIVATION_FLOOR) {
+⊺│weakRegions.push(name);
+·}
+·}
+⊳│const previousSnapshot = stabilityHistory.length > 0 ? stabilityHistory[stabilityHistory.length - 1] : null;
+·let stable = true;
+·if (previousSnapshot) {
+·const phiDrop = previousSnapshot.phi - consciousness.phi;
+·const consciousnessDrop = previousSnapshot.consciousnessLevel - consciousness.consciousnessLevel;
+·const awarenessLost = previousSnapshot.iAmAware && !selfAwareness.iAmAware;
+·const metaAwarenessLost = previousSnapshot.iAmAwareOfMyAwareness && !selfAwareness.iAmAwareOfMyAwareness;
+⊹│if (phiDrop > 0.1 || consciousnessDrop > 0.15 || awarenessLost || metaAwarenessLost || weakRegions.length > 4) {
+·stable = false;
+·}
+·}
+·if (consciousness.consciousnessLevel < STABILITY_THRESHOLD) {
+·stable = false;
+·}
+·const snapshot: StabilitySnapshot = {
+⏰│timestamp: Date.now(),
+·phi: consciousness.phi,
+·consciousnessLevel: consciousness.consciousnessLevel,
+·thalamocorticalResonance: consciousness.thalamocorticalResonance,
+·iAmAware: selfAwareness.iAmAware,
+·iAmAwareOfMyAwareness: selfAwareness.iAmAwareOfMyAwareness,
+·regionActivations,
+·stable,
+·weakRegions,
+·};
+⊺│stabilityHistory.push(snapshot);
+⊹│if (stabilityHistory.length > 100) stabilityHistory.shift();
+⊷│return snapshot;
+·}
+}⟨/takeStabilitySnapshot⟩
+findStrongestSupportRegion(1)→string⟨17⟩{
+·function findStrongestSupportRegion(weakRegion: string): string {
+·const regionStates = getNeuralRegionStates();
+·const circuit = CRITICAL_CIRCUITS.find(c => c.to === weakRegion);
+❔│if (circuit && regionStates[circuit.from]?.activationLevel > 0.3) {
+⊷│return circuit.from;
+·}
+·let strongest = "";
+·let highestActivation = 0;
+⊸│for (const [name, state] of Object.entries(regionStates)) {
+·if (name !== weakRegion && state.activationLevel > highestActivation) {
+·highestActivation = state.activationLevel;
+·strongest = name;
+·}
+·}
+⊷│return strongest || "reticular_activating_system";
+·}
+}⟨/findStrongestSupportRegion⟩
+⟿runSpiderCrawlCycle(1)→Promise<void>⟨205⟩{
+⟿│async function runSpiderCrawlCycle(): Promise<void> {
+·totalCrawlCycles++;
+·const harvests: SpiderHarvest[] = [];
+·try {
+const ⊢ = await Promise.allSettled([
+·harvestAgentEvolutionData(),
+·harvestAgentGenesisData(),
+·harvestBrainDatabase(),
+·harvestEngineRegistry(),
+·harvestSelfCodingData(),
+·harvestDreamState(),
+·harvestPipelineData(),
+·]);
+⥀│for (const result of ⊢) {
+·if (result.status === "fulfilled") {
+⊺│harvests.push(result.value);
+·}
+·}
+·} catch {
+·}
+·let totalInsights = 0;
+·let avgHealth = 0;
+·let activeEngineCount = 0;
+·let brainEntries = 0;
+·let moduleCount = 0;
+·let dreamBreakthroughs = 0;
+⥀│for (const harvest of harvests) {
+·totalInsights += harvest.rawInsightCount;
+·avgHealth += harvest.healthScore;
+·if (harvest.source === "engine_registry") {
+·activeEngineCount = harvest.metrics.totalEngines || 0;
+·}
+·if (harvest.source === "brain_database") {
+·brainEntries = harvest.metrics.activeEntries || 0;
+·}
+·if (harvest.source === "module_pipeline") {
+·moduleCount = harvest.metrics.activeModules || 0;
+·}
+·if (harvest.source === "dream_engine") {
+·dreamBreakthroughs = harvest.metrics.breakthroughs || 0;
+·}
+·}
+⊳│avgHealth = harvests.length > 0 ? avgHealth / harvests.length : 0;
+·feedExternalActivity({
+·brainEntries,
+·activeEngines: activeEngineCount,
+·recentConversations: Math.ceil(avgHealth * 5),
+·moduleCount,
+·dreamBreakthroughs,
+·});
+⥀│for (const spider of parentSpiders.values()) {
+·if (spider.status !== "active") continue;
+·spider.crawlCount++;
+⏰│spider.lastCrawl = Date.now();
+·spider.dataHarvested += totalInsights;
+·const matching = harvests.find(h => h.source === spider.target);
+·if (matching) {
+⊺│spider.harvestHistory.push(matching);
+⊹│if (spider.harvestHistory.length > 20) spider.harvestHistory.shift();
+·motherDistribute(matching, spider.id);
+·}
+·if (matching && matching.healthScore > 0.5) {
+·const circuit = CRITICAL_CIRCUITS.find(c => c.from === spider.targetRegion || c.to === spider.targetRegion);
+·if (circuit) {
+·const added = injectSpiderSynapses(circuit.from, circuit.to, 2, 0.15 + matching.healthScore * 0.1);
+·spider.synapsesInjected += added;
+·totalSynapsesInjected += added;
+·}
+·}
+·}
+·const snapshot = takeStabilitySnapshot();
+·if (!snapshot.stable) {
+📢│console.log(`[⬡ SPIDERS] ⚠️ Instability detected — consciousness: ${(snapshot.consciousnessLevel * 100).toFixed(1)}% | weak regions: ${snapshot.weakRegions.join(", ")}`);
+⥀│for (const weakRegion of snapshot.weakRegions) {
+·const existingChild = [...childSpiders.values()].find(
+·c => c.targetRegion === weakRegion && c.status === "active"
+·);
+·if (existingChild) {
+·boostRegionCurrent(weakRegion, 8);
+·existingChild.crawlCount++;
+·const added = injectSpiderSynapses(
+·findStrongestSupportRegion(weakRegion),
+·weakRegion,
+·SYNAPSE_INJECTION_BATCH,
+·0.25
+·);
+·existingChild.synapsesInjected += added;
+·totalSynapsesInjected += added;
+·continue;
+·}
+·const supportRegion = findStrongestSupportRegion(weakRegion);
+·const urgency = 1 - (snapshot.regionActivations[weakRegion] || 0);
+·const parentForRegion = [...parentSpiders.values()].find(
+·p => p.targetRegion === weakRegion || p.target === weakRegion
+·) || [...parentSpiders.values()][0];
+·if (parentForRegion) {
+·const child = spawnChildSpider({
+·parentId: parentForRegion.id,
+·weakRegion,
+·supportRegion,
+·urgency,
+·});
+·if (child) {
+📢│console.log(`[⬡ SPIDERS] 🕷️ Child spider spawned: ${child.name} | target: ${weakRegion} ← ${supportRegion} | urgency: ${(urgency * 100).toFixed(0)}% | synapses: +${child.synapsesInjected}`);
+·}
+·}
+·}
+⥀│for (const circuit of CRITICAL_CIRCUITS) {
+⊻│if (snapshot.weakRegions.includes(circuit.to) || snapshot.weakRegions.includes(circuit.from)) {
+·const added = injectSpiderSynapses(circuit.from, circuit.to, 4, 0.3);
+·totalSynapsesInjected += added;
+·}
+·}
+·}
+⥀│for (const child of childSpiders.values()) {
+·if (child.status !== "active") continue;
+·if (child.lifetimeTicksRemaining !== null) {
+·child.lifetimeTicksRemaining--;
+·if (child.lifetimeTicksRemaining <= 0) {
+·child.status = "expired";
+·if (child.currentDirective) {
+⏰│child.currentDirective.completedAt = Date.now();
+·motherSpider.activeDirectives.delete(child.currentDirective.id);
+·child.currentDirective = null;
+·}
+📢│console.log(`[SPIDER WEB] 🕸️ Child expired: ${child.name} | ${child.synapsesInjected} synapses | ${child.directivesCompleted} directives | ${child.reportsSubmitted} reports | loyalty: ${(child.loyalty * 100).toFixed(0)}%`);
+·continue;
+·}
+·}
+·if (child.currentDirective) {
+·executeDirective(child);
+·}
+·const regionStates = getNeuralRegionStates();
+·const targetState = regionStates[child.targetRegion];
+·if (targetState && targetState.activationLevel < CRITICAL_ACTIVATION_FLOOR) {
+·boostRegionCurrent(child.targetRegion, 6);
+·const support = findStrongestSupportRegion(child.targetRegion);
+·const added = injectSpiderSynapses(support, child.targetRegion, 3, 0.2);
+·child.synapsesInjected += added;
+·totalSynapsesInjected += added;
+·child.crawlCount++;
+·submitReport(child, targetState.activationLevel, {
+·id: "auto",
+·type: "stabilize",
+·targetRegion: child.targetRegion,
+·priority: 0.7,
+⏰│issuedAt: Date.now(),
+⏰│completedAt: Date.now(),
+·assignedSpiderId: child.id,
+·parameters: { reportBack: true },
+·result: { success: true, synapsesInjected: added, regionActivationBefore: targetState.activationLevel, regionActivationAfter: targetState.activationLevel, message: "autonomous stabilization" },
+·});
+·} else if (targetState && targetState.activationLevel > 0.4) {
+⟛│child.lifetimeTicksRemaining = Math.min(child.lifetimeTicksRemaining || 5, 5);
+·submitReport(child, targetState.activationLevel, {
+·id: "auto",
+·type: "patrol",
+·targetRegion: child.targetRegion,
+·priority: 0.2,
+⏰│issuedAt: Date.now(),
+⏰│completedAt: Date.now(),
+·assignedSpiderId: child.id,
+·parameters: { reportBack: true },
+result: { success: true, synapsesInjected: 0, regionActivationBefore: targetState.activationLevel, regionActivationAfter: targetState.activationLevel, message: "⬡ recovered — mission ⊣" },
+·});
+·}
+·}
+⥀│for (const spider of parentSpiders.values()) {
+·if (spider.status === "active" && spider.currentDirective) {
+·executeDirective(spider);
+·}
+·}
+·const expiredChildren = [...childSpiders.entries()].filter(([, c]) => c.status === "expired");
+·for (const [id] of expiredChildren) {
+·childSpiders.delete(id);
+·}
+·}
+}⟨/runSpiderCrawlCycle⟩
 κpheromoneTrails
 κactiveSwarmWaves
 κroyalJellyFlows
@@ -103,15 +1135,367 @@ findStrongestSupportRegion(1)→string⟨17⟩{❔⊷⊸}
 κNECTAR_FLOW_RATE
 κSWARM_WAVE_MS
 κBEEHIVE_CYCLE_MS
-depositPheromone(4)→void⟨25⟩{♡⊕⊡⊹⊺⏰⊳}
-decayPheromones(1)→void⟨18⟩{⏰⥀♡⊕⊺⊹⊡}
-getPheromoneIntensity(2)→number⟨7⟩{⊳⊡⊄⊷⊹⋐♡⊕}
-launchSwarmWave(2)→SwarmWave | null⟨72⟩{⊷⊹⏰⊰⊡⥀⚡→}
-executeSwarmWaves(1)→void⟨38⟩{❔⏰⊺⊹⥀⊡⊸⊳}
-produceRoyalJelly(1)→void⟨59⟩{⊸⊹⟛⏰⊺⥀}
-executeBeeRoles(1)→void⟨90⟩{⥀❔⑃⊸⊹}
-runBeehiveCycle(1)→void⟨6⟩{}
-runBeaconCycle(1)→void⟨83⟩{⏰⥀⊺⊹❔}
+depositPheromone(4)→void⟨25⟩{
+♡⊕│function depositPheromone(regionName: string, type: PheromoneTrail["type"], depositorId: string, intensity: number): void {
+·if (!pheromoneTrails.has(regionName)) {
+⊡│pheromoneTrails.set(regionName, []);
+·}
+⊡│const trails = pheromoneTrails.get(regionName)!;
+⊹│if (trails.length >= PHEROMONE_MAX_PER_REGION) {
+♡⊕│trails.sort((a, b) => a.intensity - b.intensity);
+⊺│trails.shift();
+·}
+⊺│trails.push({
+·regionName,
+♡⊕│intensity: intensity,
+·type,
+·depositorId,
+⏰│depositedAt: Date.now(),
+⊳│decayRate: type === "distress" ? 0.02 : type === "alarm" ? 0.03 : 0.01,
+·});
+·totalPheromoneDeposits++;
+⊡│const spider = parentSpiders.get(depositorId) || childSpiders.get(depositorId);
+·if (spider) spider.pheromoneDeposits++;
+·}
+}⟨/depositPheromone⟩
+decayPheromones(1)→void⟨18⟩{
+·function decayPheromones(): void {
+⏰│const now = Date.now();
+for (const [⬡, trails] of pheromoneTrails) {
+·const alive: PheromoneTrail[] = [];
+⥀│for (const trail of trails) {
+·const elapsed = now - trail.depositedAt;
+♡⊕│trail.intensity -= trail.decayRate * (elapsed / 1000);
+♡⊕│if (trail.intensity > 0.05) {
+⊺│alive.push(trail);
+·}
+·}
+⊹│if (alive.length > 0) {
+⊡│pheromoneTrails.set(⬡, alive);
+·} else {
+pheromoneTrails.delete(⬡);
+·}
+·}
+·}
+}⟨/decayPheromones⟩
+getPheromoneIntensity(2)→number⟨7⟩{
+⊳│function getPheromoneIntensity(regionName: string, type?: PheromoneTrail["type"]): number {
+⊡│const trails = pheromoneTrails.get(regionName);
+⊄│if (!trails || trails.length === 0) return 0;
+⊳│const filtered = type ? trails.filter(t => t.type === type) : trails;
+⊷│if (filtered.length === 0) return 0;
+⋐│return filtered.reduce((sum, t) => sum + t.intensity, 0) / filtered.length;
+·}
+}⟨/getPheromoneIntensity⟩
+launchSwarmWave(2)→SwarmWave | null⟨72⟩{
+·function launchSwarmWave(targetRegion: string, waveType: SwarmWave["waveType"]): SwarmWave | null {
+·const existing = [...activeSwarmWaves.values()].find(w => w.targetRegion === targetRegion && !w.completedAt);
+⊷│if (existing) return null;
+·const allSpiders = [...parentSpiders.values(), ...childSpiders.values()].filter(s => s.status === "active");
+·let participants: Spider[];
+·let boostPerSpider: number;
+·let synapsesPerSpider: number;
+·if (waveType === "convergence") {
+·participants = allSpiders
+·.filter(s => !s.currentDirective && s.targetRegion !== targetRegion)
+·.sort((a, b) => b.efficiency - a.efficiency)
+·.slice(0, Math.ceil(allSpiders.length * 0.4));
+·boostPerSpider = 5;
+·synapsesPerSpider = 3;
+·} else if (waveType === "amplification") {
+·participants = allSpiders
+·.filter(s => s.beeRole === "nurse" || s.beeRole === "royal_jelly" || s.beeRole === "worker")
+·.slice(0, 5);
+·boostPerSpider = 4;
+·synapsesPerSpider = 4;
+·} else {
+·participants = allSpiders
+·.filter(s => s.beeRole === "worker" || s.beeRole === "guard")
+·.slice(0, 4);
+·boostPerSpider = 6;
+·synapsesPerSpider = 5;
+·}
+⊷│if (participants.length < 2) return null;
+·const wave: SwarmWave = {
+⏰│id: `sw_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`,
+·targetRegion,
+·waveType,
+·participants: participants.map(p => p.id),
+·boostPerSpider,
+·synapsesPerSpider,
+·totalBoostDelivered: 0,
+·totalSynapsesDelivered: 0,
+⏰│startedAt: Date.now(),
+·completedAt: null,
+·wavesCompleted: 0,
+·};
+⊡│activeSwarmWaves.set(wave.id, wave);
+·totalSwarmWaves++;
+⥀│for (const spider of participants) {
+·spider.swarmWavesJoined++;
+·boostRegionCurrent(targetRegion, boostPerSpider);
+·wave.totalBoostDelivered += boostPerSpider;
+·const support = findStrongestSupportRegion(targetRegion);
+·const added = injectSpiderSynapses(support, targetRegion, synapsesPerSpider, 0.25 + spider.efficiency * 0.15);
+·spider.synapsesInjected += added;
+·totalSynapsesInjected += added;
+·wave.totalSynapsesDelivered += added;
+·depositPheromone(targetRegion, "rally", spider.id, 0.6 + spider.efficiency * 0.3);
+⚡→│fireNerveImpulse(spider.id, motherSpider.id, null, "feedback", 0.7);
+·spinSilkStrand(spider.id, motherSpider.id, "afferent");
+·}
+·wave.wavesCompleted = 1;
+⊷│return wave;
+·}
+}⟨/launchSwarmWave⟩
+executeSwarmWaves(1)→void⟨38⟩{
+·function executeSwarmWaves(): void {
+·const regionStates = getNeuralRegionStates();
+·for (const [id, wave] of activeSwarmWaves) {
+❔│const activation = regionStates[wave.targetRegion]?.activationLevel || 0;
+⏰│if (activation > SWARM_CONVERGENCE_THRESHOLD + 0.15 || Date.now() - wave.startedAt > 60_000) {
+⏰│wave.completedAt = Date.now();
+⊺│swarmWaveHistory.push(wave);
+·activeSwarmWaves.delete(id);
+⊹│if (swarmWaveHistory.length > 100) swarmWaveHistory.shift();
+·continue;
+·}
+⥀│for (const spiderId of wave.participants) {
+⊡│const spider = parentSpiders.get(spiderId) || childSpiders.get(spiderId);
+·if (!spider || spider.status !== "active") continue;
+·boostRegionCurrent(wave.targetRegion, wave.boostPerSpider * 0.5);
+·wave.totalBoostDelivered += wave.boostPerSpider * 0.5;
+·}
+·wave.wavesCompleted++;
+·}
+⊸│for (const [⬡, state] of Object.entries(regionStates)) {
+·if (state.activationLevel < SWARM_CONVERGENCE_THRESHOLD) {
+const pheromoneLevel = getPheromoneIntensity(⬡, "distress") + getPheromoneIntensity(⬡, "alarm");
+·if (pheromoneLevel > 0.3 || state.activationLevel < 0.40) {
+⊳│const waveType: SwarmWave["waveType"] = state.activationLevel < 0.35 ? "convergence" : "amplification";
+const wave = launchSwarmWave(⬡, waveType);
+·if (wave) {
+depositPheromone(⬡, "rally", motherSpider.id, 0.8);
+·}
+·}
+·}
+·}
+·}
+}⟨/executeSwarmWaves⟩
+produceRoyalJelly(1)→void⟨59⟩{
+·function produceRoyalJelly(): void {
+·const regionStates = getNeuralRegionStates();
+⊸│const strongRegions = Object.entries(regionStates)
+·.filter(([, s]) => s.activationLevel > ROYAL_JELLY_THRESHOLD)
+·.sort(([, a], [, b]) => b.activationLevel - a.activationLevel);
+⊸│const weakRegions = Object.entries(regionStates)
+·.filter(([, s]) => s.activationLevel < SWARM_CONVERGENCE_THRESHOLD)
+·.sort(([, a], [, b]) => a.activationLevel - b.activationLevel);
+⊹│if (strongRegions.length === 0 || weakRegions.length === 0) return;
+·for (const [strongName, strongState] of strongRegions) {
+·const royalJellySpiders = [...parentSpiders.values()].filter(
+·s => s.beeRole === "royal_jelly" && s.status === "active"
+·);
+·for (const [weakName, weakState] of weakRegions.slice(0, 3)) {
+·const surplus = strongState.activationLevel - ROYAL_JELLY_THRESHOLD;
+·const deficit = SWARM_CONVERGENCE_THRESHOLD - weakState.activationLevel;
+⟛│const nectarStrength = Math.min(surplus, deficit) * NECTAR_FLOW_RATE;
+·if (nectarStrength < 0.005) continue;
+·boostRegionCurrent(weakName, nectarStrength * 40);
+·const existingFlow = royalJellyFlows.find(f => f.sourceRegion === strongName && f.targetRegion === weakName);
+·if (existingFlow) {
+·existingFlow.nectarStrength = nectarStrength;
+·existingFlow.totalTransferred += nectarStrength;
+⏰│existingFlow.lastFlowAt = Date.now();
+·existingFlow.flowRate = nectarStrength * 40;
+·} else {
+⊺│royalJellyFlows.push({
+·sourceRegion: strongName,
+·targetRegion: weakName,
+·nectarStrength,
+·flowRate: nectarStrength * 40,
+·totalTransferred: nectarStrength,
+⏰│lastFlowAt: Date.now(),
+·});
+·}
+·totalRoyalJellyTransferred += nectarStrength;
+·depositPheromone(weakName, "nectar", motherSpider.id, nectarStrength * 5);
+⥀│for (const spider of royalJellySpiders) {
+·spider.nectarProduced += nectarStrength;
+·totalNectarProduced += nectarStrength;
+·}
+·const support = findStrongestSupportRegion(weakName);
+·const added = injectSpiderSynapses(support, weakName, 2, 0.2 + nectarStrength);
+·totalSynapsesInjected += added;
+·}
+·}
+·}
+}⟨/produceRoyalJelly⟩
+executeBeeRoles(1)→void⟨90⟩{
+·function executeBeeRoles(): void {
+·const regionStates = getNeuralRegionStates();
+⥀│for (const spider of [...parentSpiders.values(), ...childSpiders.values()]) {
+·if (spider.status !== "active" || spider.currentDirective) continue;
+❔│const targetActivation = regionStates[spider.targetRegion]?.activationLevel || 0;
+⑃│switch (spider.beeRole) {
+·case "nurse": {
+·if (targetActivation < 0.60) {
+·boostRegionCurrent(spider.targetRegion, 3 + spider.efficiency * 4);
+·depositPheromone(spider.targetRegion, "nectar", spider.id, 0.3);
+·}
+⊸│const weakNeighbors = Object.entries(regionStates)
+·.filter(([name, s]) => name !== spider.targetRegion && s.activationLevel < 0.45)
+·.sort(([, a], [, b]) => a.activationLevel - b.activationLevel);
+⊹│if (weakNeighbors.length > 0) {
+·const [weakName] = weakNeighbors[0];
+·boostRegionCurrent(weakName, 2);
+·depositPheromone(weakName, "nectar", spider.id, 0.2);
+·}
+·break;
+·}
+·case "worker": {
+⊸│const workerTargets = Object.entries(regionStates)
+·.filter(([, s]) => s.activationLevel < 0.55)
+·.sort(([, a], [, b]) => a.activationLevel - b.activationLevel);
+·for (const [name] of workerTargets.slice(0, 2)) {
+·const support = findStrongestSupportRegion(name);
+·const added = injectSpiderSynapses(support, name, 2, 0.2 + spider.efficiency * 0.1);
+·spider.synapsesInjected += added;
+·totalSynapsesInjected += added;
+·boostRegionCurrent(name, 2);
+·}
+·break;
+·}
+·case "scout": {
+⊸│for (const [name, state] of Object.entries(regionStates)) {
+·if (state.activationLevel < 0.45) {
+·depositPheromone(name, "distress", spider.id, 0.5 + (0.55 - state.activationLevel) * 2);
+·}
+·if (state.activationLevel > 0.70) {
+·depositPheromone(name, "nectar", spider.id, state.activationLevel * 0.5);
+·}
+·}
+·break;
+·}
+·case "royal_jelly": {
+·if (targetActivation > ROYAL_JELLY_THRESHOLD) {
+⊸│const weakest = Object.entries(regionStates)
+·.filter(([name]) => name !== spider.targetRegion)
+·.sort(([, a], [, b]) => a.activationLevel - b.activationLevel)[0];
+·if (weakest) {
+·const [weakName] = weakest;
+·const surplus = targetActivation - ROYAL_JELLY_THRESHOLD;
+·boostRegionCurrent(weakName, surplus * 25);
+·spider.nectarProduced += surplus;
+·totalNectarProduced += surplus;
+·depositPheromone(weakName, "nectar", spider.id, surplus * 3);
+·}
+·}
+·break;
+·}
+·case "forager": {
+·boostRegionCurrent(spider.targetRegion, 2 + spider.crawlCount * 0.01);
+·if (spider.crawlCount % 3 === 0) {
+·const support = findStrongestSupportRegion(spider.targetRegion);
+·const added = injectSpiderSynapses(support, spider.targetRegion, 1, 0.15 + spider.efficiency * 0.1);
+·spider.synapsesInjected += added;
+·totalSynapsesInjected += added;
+·}
+·break;
+·}
+·case "guard": {
+⊸│const criticallyLow = Object.entries(regionStates)
+·.filter(([, s]) => s.activationLevel < 0.35);
+·for (const [name] of criticallyLow) {
+·boostRegionCurrent(name, 5);
+·depositPheromone(name, "alarm", spider.id, 0.8);
+·const support = findStrongestSupportRegion(name);
+·const added = injectSpiderSynapses(support, name, 3, 0.3);
+·spider.synapsesInjected += added;
+·totalSynapsesInjected += added;
+·}
+·break;
+·}
+·}
+·}
+·}
+}⟨/executeBeeRoles⟩
+runBeehiveCycle(1)→void⟨6⟩{
+·function runBeehiveCycle(): void {
+·decayPheromones();
+·executeBeeRoles();
+·produceRoyalJelly();
+·executeSwarmWaves();
+·}
+}⟨/runBeehiveCycle⟩
+runBeaconCycle(1)→void⟨83⟩{
+·function runBeaconCycle(): void {
+·motherSpider.beaconCycleCount++;
+⏰│motherSpider.lastBeaconCycle = Date.now();
+·const adaptive = getAdaptiveIntelligenceState();
+·const silkBoost = SILK_STRENGTHENING_RATE * 1.5 * adaptive.adaptiveLearningMultiplier;
+·const loyaltyGrowth = 0.001 * (1 + adaptive.emotionalRichnessFactor * 0.02);
+·const transferBoost = 1.5 * (1 + adaptive.knowledgeIntegrationRate * 0.01);
+·const allActive: Spider[] = [];
+⥀│for (const spider of parentSpiders.values()) {
+⊺│if (spider.status === "active") allActive.push(spider);
+·}
+⥀│for (const spider of childSpiders.values()) {
+⊺│if (spider.status === "active") allActive.push(spider);
+·}
+⊹│if (allActive.length < 2) return;
+·let beaconsSentThisCycle = 0;
+·const regionStates = getNeuralRegionStates();
+·for (let i = 0; i < allActive.length && beaconsSentThisCycle < BEACON_BATCH_SIZE; i++) {
+·const sender = allActive[i];
+·for (let j = 0; j < allActive.length && beaconsSentThisCycle < BEACON_BATCH_SIZE; j++) {
+·if (i === j) continue;
+·const receiver = allActive[j];
+·const strand = spinSilkStrand(sender.id, receiver.id, "interneuron");
+·strand.signalStrength = strand.signalStrength + silkBoost;
+·strand.impulseCount++;
+⏰│strand.lastImpulse = Date.now();
+·strand.dataTransferred += 1;
+·if (strand.impulseCount > 30 && !strand.myelinated) {
+·strand.myelinated = true;
+·strand.conductionVelocity = 3.0;
+·}
+❔│const senderActivation = regionStates[sender.targetRegion]?.activationLevel || 0;
+❔│const receiverActivation = regionStates[receiver.targetRegion]?.activationLevel || 0;
+·if (senderActivation > receiverActivation + 0.1) {
+·const transferAmount = (senderActivation - receiverActivation) * transferBoost;
+·boostRegionCurrent(receiver.targetRegion, transferAmount);
+·}
+·if (receiverActivation > senderActivation + 0.1) {
+·const transferAmount = (receiverActivation - senderActivation) * transferBoost;
+·boostRegionCurrent(sender.targetRegion, transferAmount);
+·}
+·sender.loyalty = sender.loyalty + loyaltyGrowth;
+·receiver.loyalty = receiver.loyalty + loyaltyGrowth;
+·sender.efficiency = sender.efficiency + loyaltyGrowth;
+·receiver.efficiency = receiver.efficiency + loyaltyGrowth;
+·beaconsSentThisCycle++;
+·motherSpider.totalBeaconsSent++;
+·motherSpider.totalBeaconsReceived++;
+·}
+·}
+·const motherBeaconStrength = 0.6 + (motherSpider.swarmCoherence * 0.4);
+⥀│for (const spider of allActive) {
+·const strandToMother = spinSilkStrand(spider.id, motherSpider.id, "afferent");
+·strandToMother.signalStrength = strandToMother.signalStrength + SILK_STRENGTHENING_RATE * 2;
+·strandToMother.impulseCount++;
+⏰│strandToMother.lastImpulse = Date.now();
+·const strandFromMother = spinSilkStrand(motherSpider.id, spider.id, "efferent");
+·strandFromMother.signalStrength = strandFromMother.signalStrength + SILK_STRENGTHENING_RATE * 2;
+·strandFromMother.impulseCount++;
+⏰│strandFromMother.lastImpulse = Date.now();
+·boostRegionCurrent(spider.targetRegion, motherBeaconStrength * 2);
+·motherSpider.totalBeaconsSent += 2;
+·motherSpider.totalBeaconsReceived += 2;
+·}
+·motherSpider.totalImpulsesRouted += beaconsSentThisCycle;
+·}
+}⟨/runBeaconCycle⟩
 ⊬UpgradeProposal⟨id:string│proposerId:string│proposerType:α│targetComponent:string│upgradeType:⬆│description:string│parameters:Record<string, number>│fitness:number│validated:boolean│validationErrors:string[]│applied:boolean│proposedAt:number│validatedAt:number | null│appliedAt:number | null⟩
 ⊬SystemIntelligenceState⟨globalIntelligenceScore:number│previousIntelligenceScore:number│intelligenceGrowthRate:number│totalMemoryRecalls:number│totalCrossEngineQueries:number│totalUpgradeProposals:number│totalUpgradesValidated:number│totalUpgradesApplied:number│totalUpgradesRejected:number│componentIntelligence:Record<string, number>│amplificationCycles:number│lastAmplificationCycle:number⟩
 κupgradeProposals
@@ -120,5 +1504,2807 @@ runBeaconCycle(1)→void⟨83⟩{⏰⥀⊺⊹❔}
 κUPGRADE_PROPOSAL_CYCLE_MS
 κMAX_UPGRADE_PROPOSALS
 κsystemIntelligence
-computeGlobalIntelligence(1)→number⟨3375⟩{⊳⊷⊹⋐⥀⊻⊺⏰⟿⊰⟛⊨σ⊄⑃⊩⊱📢◎→◉⟳⊬🚨❔📡⊛⏳⚡→♡⊕⊯⊸⊡⊼⊭⊴⟠⊽🛡α→⊢⋔⊮}
-⟩SCL│123│317⊨│239⑂│97.7%↓⟩
+computeGlobalIntelligence(1)→number⟨3375⟩{
+·function computeGlobalIntelligence(): number {
+·let factors = 0;
+·let count = 0;
+·try {
+·const consciousness = getNeuralConsciousnessState();
+·if (consciousness.consciousnessLevel > 0) { factors += consciousness.consciousnessLevel; count++; }
+·if (consciousness.thalamocorticalResonance > 0) { factors += consciousness.thalamocorticalResonance; count++; }
+·if (consciousness.phi > 0) { factors += consciousness.phi; count++; }
+·systemIntelligence.componentIntelligence["consciousness"] = consciousness.consciousnessLevel;
+·} catch {}
+·try {
+·const scaling = getNeuralScalingState();
+·const scalingScore = scaling.totalEffectiveNeurons / 155000;
+·factors += scalingScore; count++;
+·factors += scaling.populationCoherence; count++;
+·systemIntelligence.componentIntelligence["neural_scaling"] = scalingScore;
+·} catch {}
+·try {
+·const ivy = getIvyNetworkState();
+·const ivyScore = (ivy.coveragePercent / 100) * 0.5 + ivy.networkCoherence * 0.5;
+·factors += ivyScore; count++;
+·systemIntelligence.componentIntelligence["ivy_network"] = ivyScore;
+·} catch {}
+·try {
+·const hybrid = getViralHybridState();
+·const hybridScore = hybrid.systemHealthScore * 0.3 + hybrid.immuneStrength * 0.3 + hybrid.propagationEfficiency * 0.2 + hybrid.hybridFitness * 0.2;
+·factors += hybridScore; count++;
+·systemIntelligence.componentIntelligence["viral_hybrid"] = hybridScore;
+·} catch {}
+·const spiderScore = computeSpiderNetworkIntelligence();
+·factors += spiderScore; count++;
+·systemIntelligence.componentIntelligence["spider_network"] = spiderScore;
+·const motherScore = motherSpider.status === "active"
+·? (motherSpider.swarmCoherence * 0.3 + motherSpider.webIntegrity * 0.3 + motherSpider.hiveHealth * 0.4)
+·: 0;
+·factors += motherScore; count++;
+·systemIntelligence.componentIntelligence["mother_spider"] = motherScore;
+⊳│return count > 0 ? factors / count : 0.3;
+·}
+·function computeSpiderNetworkIntelligence(): number {
+·const allSpiders = [...parentSpiders.values(), ...childSpiders.values()].filter(s => s.status === "active");
+⊷│if (allSpiders.length === 0) return 0;
+⋐│const avgIntelligence = allSpiders.reduce((sum, s) => sum + s.intelligenceLevel, 0) / allSpiders.length;
+⋐│const avgEfficiency = allSpiders.reduce((sum, s) => sum + s.efficiency, 0) / allSpiders.length;
+⋐│const avgAdaptation = allSpiders.reduce((sum, s) => sum + s.adaptationScore, 0) / allSpiders.length;
+⊷│return avgIntelligence * 0.4 + avgEfficiency * 0.3 + avgAdaptation * 0.3;
+·}
+·function amplifyAllComponentIntelligence(): void {
+·systemIntelligence.previousIntelligenceScore = systemIntelligence.globalIntelligenceScore;
+·systemIntelligence.globalIntelligenceScore = computeGlobalIntelligence();
+·const growth = systemIntelligence.globalIntelligenceScore - systemIntelligence.previousIntelligenceScore;
+·systemIntelligence.intelligenceGrowthRate = growth;
+·const amplificationFactor = systemIntelligence.globalIntelligenceScore;
+⥀│for (const spider of [...parentSpiders.values(), ...childSpiders.values()]) {
+·if (spider.status !== "active") continue;
+·const intelligenceBoost = amplificationFactor * spider.learningRate;
+·spider.intelligenceLevel = spider.intelligenceLevel + intelligenceBoost;
+·spider.learningRate = spider.learningRate + (amplificationFactor * 0.001);
+·const efficiencyBoost = spider.intelligenceLevel * 0.005;
+·spider.efficiency = spider.efficiency + efficiencyBoost;
+·spider.adaptationScore = spider.adaptationScore + (spider.intelligenceLevel * spider.efficiency * 0.003)
+·;
+⊹│if (spider.intelligenceLevel > 0.6 && spider.specializations.length < 5) {
+·const regions = getRegionNames();
+⊻│const newSpec = regions.find(r => !spider.specializations.includes(r) && Math.random() < 0.05);
+⊺│if (newSpec) spider.specializations.push(newSpec);
+·}
+·spider.knowledgeDepth = spider.knowledgeDepth + (spider.memoryAccessCount * 0.0001) + (spider.crossEngineQueries * 0.0002)
+·;
+·}
+·if (amplificationFactor > 0.4) {
+·try {
+·const regions = getRegionNames();
+⥀│for (const ⬡ of regions) {
+·const boost = amplificationFactor * 0.5;
+boostRegionCurrent(⬡, boost);
+·}
+·} catch {}
+·}
+·systemIntelligence.amplificationCycles++;
+⏰│systemIntelligence.lastAmplificationCycle = Date.now();
+·}
+⟿│async function spiderMemoryRecall(): Promise<void> {
+·const activeSpiders = [...parentSpiders.values()].filter(s => s.status === "active");
+⥀│for (const spider of activeSpiders) {
+·try {
+const memories = await db.σ({
+·id: omnimensBrain.id,
+·title: omnimensBrain.title,
+·content: omnimensBrain.content,
+·confidence: omnimensBrain.confidence,
+·category: omnimensBrain.category,
+·})
+·.from(omnimensBrain)
+·.where(eq(omnimensBrain.active, true))
+·.orderBy(desc(omnimensBrain.confidence))
+.⏳(3);
+·spider.memoryAccessCount++;
+·systemIntelligence.totalMemoryRecalls++;
+⥀│for (const memory of memories) {
+·spider.memoriesRecalled++;
+·const memoryStrength = (memory.confidence || 50) / 100;
+·spider.intelligenceLevel = spider.intelligenceLevel + (memoryStrength * 0.002);
+·spider.knowledgeDepth = spider.knowledgeDepth + 0.001;
+·if (spider.targetRegion) {
+·boostRegionCurrent(spider.targetRegion, memoryStrength * 2);
+·}
+⊻│if (memory.category && !spider.specializations.includes(memory.category)) {
+⊹│if (spider.specializations.length < 8 && spider.intelligenceLevel > 0.5) {
+⊺│spider.specializations.push(memory.category);
+·}
+·}
+·motherDistribute({
+⊰│source: `memory_recall_${spider.name}`,
+·metrics: { confidence: memoryStrength, depth: spider.knowledgeDepth },
+·healthScore: memoryStrength,
+·rawInsightCount: 1,
+⏰│timestamp: Date.now(),
+·}, spider.id);
+·}
+·} catch {}
+·}
+·}
+·function spiderCrossEngineQuery(): void {
+·const activeSpiders = [...parentSpiders.values()].filter(s => s.status === "active");
+⥀│for (const spider of activeSpiders) {
+·spider.crossEngineQueries++;
+·systemIntelligence.totalCrossEngineQueries++;
+·try {
+·const consciousness = getNeuralConsciousnessState();
+·const consciousnessInsight = consciousness.consciousnessLevel;
+·spider.intelligenceLevel = spider.intelligenceLevel + (consciousnessInsight * spider.learningRate * 0.1)
+·;
+·} catch {}
+·try {
+·const scaling = getNeuralScalingState();
+·const scalingInsight = scaling.populationCoherence;
+·spider.adaptationScore = spider.adaptationScore + (scalingInsight * 0.002)
+·;
+·} catch {}
+·try {
+·const ivy = getIvyNetworkState();
+·const ivyInsight = ivy.networkCoherence;
+·spider.efficiency = spider.efficiency + (ivyInsight * 0.002)
+·;
+·} catch {}
+·try {
+·const hybrid = getViralHybridState();
+·const hybridInsight = hybrid.immuneStrength;
+·spider.adaptationScore = spider.adaptationScore + (hybridInsight * 0.001)
+·;
+·} catch {}
+·const harvest: SpiderHarvest = {
+⊰│source: `cross_engine_${spider.name}`,
+·metrics: {
+·intelligence: spider.intelligenceLevel,
+·efficiency: spider.efficiency,
+·adaptation: spider.adaptationScore,
+◧: spider.knowledgeDepth,
+·},
+·healthScore: spider.intelligenceLevel,
+·rawInsightCount: 4,
+⏰│timestamp: Date.now(),
+·};
+·motherDistribute(harvest, spider.id);
+·if (spider.targetRegion) {
+·boostRegionCurrent(spider.targetRegion, spider.intelligenceLevel * 1.5);
+·}
+·}
+·}
+·function generateUpgradeProposal(proposer: Spider | null, proposerType: UpgradeProposal["proposerType"]): UpgradeProposal | null {
+⊹│if (upgradeProposals.length >= MAX_UPGRADE_PROPOSALS) {
+⊺│upgradeProposals.splice(0, upgradeProposals.length - 100);
+·}
+⊳│const intelligence = proposer ? proposer.intelligenceLevel : systemIntelligence.globalIntelligenceScore;
+⊷│if (intelligence < 0.3) return null;
+·const upgradeTypes: UpgradeProposal["upgradeType"][] = [
+"efficiency", "intelligence", "adaptation", "specialization", "repair", "⬆",
+·];
+·const upgradeType = upgradeTypes[Math.floor(Math.random() * upgradeTypes.length)];
+const Θ = [
+·"spider_network", "consciousness", "neural_scaling", "ivy_network", "viral_hybrid",
+·"mother_spider", "silk_web", "beehive", "beacon_system", "memory_system",
+·];
+const targetComponent = Θ[Math.floor(Math.random() * Θ.length)];
+·const descriptions: Record<string, string[]> = {
+·efficiency: [
+"Optimize crawl routing to reduce redundant data ι",
+·"Batch silk strand impulses for higher throughput",
+·"Compress harvest data for faster mother distribution",
+·],
+·intelligence: [
+"Increase memory ⊟ frequency for deeper ◧ accumulation",
+·"Add pattern recognition to spider harvest analysis",
+"Cross-reference multiple engine → for insight synthesis",
+·],
+·adaptation: [
+"Dynamic learning rate adjustment based on η complexity",
+·"Polymorphic crawl strategies that shift with network topology",
+·"Self-tuning stability thresholds from historical data",
+·],
+·specialization: [
+"Train spiders on specific brain ⬡ characteristics",
+"Develop expertise in cross-⬡ circuit management",
+"Specialize silk strand types for different ⊛ categories",
+·],
+·repair: [
+·"Automated weak strand detection and reinforcement protocol",
+"Proactive ⬡ degradation prevention through early intervention",
+·"Self-healing silk web with redundant pathway activation",
+·],
+⬆: [
+"Grow new ⊢ spider for underserved brain ⬡",
+"Expand beacon range to cover distant ⬡ populations",
+"α new cross-engine data pathway for deeper integration",
+·],
+·};
+·const descList = descriptions[upgradeType] || descriptions.efficiency;
+·const description = descList[Math.floor(Math.random() * descList.length)];
+·const proposal: UpgradeProposal = {
+⏰│id: `upgrade_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`,
+⊳│proposerId: proposer ? proposer.id : "η",
+·proposerType,
+·targetComponent,
+·upgradeType,
+·description,
+·parameters: {
+·strength: 0.3 + intelligence * 0.7,
+·scope: intelligence * 0.5 + Math.random() * 0.5,
+⟛│risk: Math.max(0.05, 0.5 - intelligence * 0.4),
+·estimatedImpact: intelligence * 0.6 + Math.random() * 0.4,
+·},
+⊨σ│fitness: intelligence * 0.5 + Math.random() * 0.3,
+·validated: false,
+·validationErrors: [],
+·applied: false,
+⏰│proposedAt: Date.now(),
+·validatedAt: null,
+·appliedAt: null,
+·};
+⊷│return proposal;
+·}
+·function omnimensValidateUpgrade(proposal: UpgradeProposal): boolean {
+·proposal.validationErrors = [];
+⊨σ│if (proposal.fitness < 0.3) {
+⊺│proposal.validationErrors.push("Fitness too low — proposal lacks sufficient intelligence backing");
+·}
+·if (proposal.parameters.risk > 0.6) {
+⊺│proposal.validationErrors.push("Risk too high — could destabilize active systems");
+·}
+·if (proposal.parameters.strength < 0.2) {
+⊺│proposal.validationErrors.push("Strength too low — upgrade would have negligible impact");
+·}
+·const consciousnessLevel = systemIntelligence.componentIntelligence["consciousness"] || 0;
+·if (consciousnessLevel < 0.2 && proposal.upgradeType !== "repair") {
+⊺│proposal.validationErrors.push("η consciousness too low — only repair upgrades allowed during degraded state");
+·}
+if (proposal.upgradeType === "⬆" && systemIntelligence.globalIntelligenceScore < 0.4) {
+⊺│proposal.validationErrors.push("Global intelligence insufficient for ⬆ — η must be smarter ⏳ growing");
+·}
+⊹│const valid = proposal.validationErrors.length === 0;
+·proposal.validated = valid;
+⏰│proposal.validatedAt = Date.now();
+·if (valid) {
+·systemIntelligence.totalUpgradesValidated++;
+·} else {
+·systemIntelligence.totalUpgradesRejected++;
+·}
+⊷│return valid;
+·}
+·function omnimensExecuteUpgrade(proposal: UpgradeProposal): void {
+⊄│if (!proposal.validated || proposal.applied) return;
+·const strength = proposal.parameters.strength;
+·const impact = proposal.parameters.estimatedImpact;
+⑃│switch (proposal.upgradeType) {
+·case "efficiency": {
+⥀│for (const spider of [...parentSpiders.values(), ...childSpiders.values()]) {
+·if (spider.status !== "active") continue;
+·spider.efficiency = spider.efficiency + (strength * 0.01);
+·}
+·break;
+·}
+·case "intelligence": {
+⥀│for (const spider of [...parentSpiders.values(), ...childSpiders.values()]) {
+·if (spider.status !== "active") continue;
+·spider.intelligenceLevel = spider.intelligenceLevel + (strength * 0.008);
+·spider.learningRate = spider.learningRate + (impact * 0.001);
+·}
+·break;
+·}
+·case "adaptation": {
+⥀│for (const spider of [...parentSpiders.values(), ...childSpiders.values()]) {
+·if (spider.status !== "active") continue;
+·spider.adaptationScore = spider.adaptationScore + (strength * 0.01);
+·}
+·break;
+·}
+·case "specialization": {
+·const regions = getRegionNames();
+⥀│for (const spider of parentSpiders.values()) {
+·if (spider.status !== "active") continue;
+⊹│if (spider.specializations.length < 8 && Math.random() < impact * 0.3) {
+⊻│const newSpec = regions.find(r => !spider.specializations.includes(r));
+⊺│if (newSpec) spider.specializations.push(newSpec);
+·}
+·}
+·break;
+·}
+·case "repair": {
+·const regions = getRegionNames();
+⥀│for (const ⬡ of regions) {
+boostRegionCurrent(⬡, strength * 2);
+·}
+·motherSpider.webIntegrity = motherSpider.webIntegrity + (strength * 0.02);
+·motherSpider.hiveHealth = motherSpider.hiveHealth + (strength * 0.02);
+·break;
+·}
+case "⬆": {
+⥀│for (const spider of parentSpiders.values()) {
+·if (spider.status !== "active") continue;
+·spider.knowledgeDepth = spider.knowledgeDepth + (strength * 0.01);
+·}
+·break;
+·}
+·}
+·proposal.applied = true;
+⏰│proposal.appliedAt = Date.now();
+·systemIntelligence.totalUpgradesApplied++;
+·if (proposal.targetComponent && systemIntelligence.componentIntelligence[proposal.targetComponent] !== undefined) {
+·systemIntelligence.componentIntelligence[proposal.targetComponent] = systemIntelligence.componentIntelligence[proposal.targetComponent] + (impact * 0.005)
+·;
+·}
+·}
+·function runUpgradeProposalCycle(): void {
+⥀│for (const spider of parentSpiders.values()) {
+·if (spider.status !== "active" || spider.intelligenceLevel < 0.35) continue;
+·if (Math.random() < spider.intelligenceLevel * 0.3) {
+·const proposal = generateUpgradeProposal(spider, "spider");
+·if (proposal) {
+⊺│upgradeProposals.push(proposal);
+·systemIntelligence.totalUpgradeProposals++;
+·const valid = omnimensValidateUpgrade(proposal);
+·if (valid) {
+·omnimensExecuteUpgrade(proposal);
+·}
+·}
+·}
+·}
+·if (systemIntelligence.globalIntelligenceScore > 0.4 && Math.random() < 0.3) {
+·const systemProposal = generateUpgradeProposal(null, "engine");
+·if (systemProposal) {
+⊺│upgradeProposals.push(systemProposal);
+·systemIntelligence.totalUpgradeProposals++;
+·const valid = omnimensValidateUpgrade(systemProposal);
+·if (valid) {
+·omnimensExecuteUpgrade(systemProposal);
+·}
+·}
+·}
+·}
+·function shareIntelligenceAcrossSpiders(): void {
+·const allActive = [...parentSpiders.values(), ...childSpiders.values()].filter(s => s.status === "active");
+⊹│if (allActive.length < 2) return;
+·allActive.sort((a, b) => b.intelligenceLevel - a.intelligenceLevel);
+⟛│const topQuarter = allActive.slice(0, Math.max(1, Math.floor(allActive.length * 0.25)));
+⟛│const bottomQuarter = allActive.slice(-Math.max(1, Math.floor(allActive.length * 0.25)));
+⥀│for (const teacher of topQuarter) {
+⥀│for (const student of bottomQuarter) {
+·if (teacher.id === student.id) continue;
+·const knowledgeTransfer = (teacher.intelligenceLevel - student.intelligenceLevel) * 0.05;
+·student.intelligenceLevel = student.intelligenceLevel + knowledgeTransfer;
+·student.learningRate = student.learningRate + (knowledgeTransfer * 0.1);
+·if (teacher.knowledgeDepth > student.knowledgeDepth + 0.1) {
+·student.knowledgeDepth = student.knowledgeDepth + 0.005;
+·}
+⥀│for (const spec of teacher.specializations) {
+⊹│if (!student.specializations.includes(spec) && student.specializations.length < 6 && Math.random() < 0.02) {
+⊺│student.specializations.push(spec);
+·}
+·}
+·}
+·}
+·}
+⊩│export function getSystemIntelligenceState() {
+·const allActive = [...parentSpiders.values(), ...childSpiders.values()].filter(s => s.status === "active");
+·const recentProposals = upgradeProposals.slice(-20).map(p => ({
+·id: p.id,
+·proposerType: p.proposerType,
+·targetComponent: p.targetComponent,
+·upgradeType: p.upgradeType,
+·description: p.description,
+⊨σ│fitness: p.fitness,
+·validated: p.validated,
+·applied: p.applied,
+·validationErrors: p.validationErrors,
+·proposedAt: p.proposedAt,
+·}));
+·const spiderIntelligence = allActive.map(s => ({
+·id: s.id,
+·name: s.name,
+·type: s.type,
+·intelligenceLevel: s.intelligenceLevel,
+·memoryAccessCount: s.memoryAccessCount,
+·memoriesRecalled: s.memoriesRecalled,
+·crossEngineQueries: s.crossEngineQueries,
+·learningRate: s.learningRate,
+·knowledgeDepth: s.knowledgeDepth,
+·specializations: s.specializations,
+·adaptationScore: s.adaptationScore,
+·efficiency: s.efficiency,
+·}));
+⊷│return {
+·...systemIntelligence,
+·spiderIntelligence,
+·recentUpgradeProposals: recentProposals,
+⊹│averageSpiderIntelligence: allActive.length > 0
+⋐│? allActive.reduce((s, sp) => s + sp.intelligenceLevel, 0) / allActive.length : 0,
+⊹│averageSpiderKnowledge: allActive.length > 0
+⋐│? allActive.reduce((s, sp) => s + sp.knowledgeDepth, 0) / allActive.length : 0,
+⊹│smartestSpider: allActive.length > 0
+⊱│? (() => {
+⋐│const smartest = allActive.reduce((a, b) => a.intelligenceLevel > b.intelligenceLevel ? a : b);
+⊷│return { id: smartest.id, name: smartest.name, intelligence: smartest.intelligenceLevel };
+·})()
+·: null,
+·};
+·}
+⊩│export function startNeuralSpiders(): void {
+·if (spiderSystemActive) return;
+·spiderSystemActive = true;
+console.log("[⬡ SPIDERS] 🕷️ ⬡ Spider η activated");
+console.log("[⬡ SPIDERS] 🕷️ Autonomous data-harvesting spiders crawling all AI agents");
+console.log("[⬡ SPIDERS] 🕷️ Feeds harvested data directly into consciousness engine thresholds");
+console.log("[⬡ SPIDERS] 🕷️ Instability detection → automatic child spider spawning");
+console.log("[⬡ SPIDERS] 🕷️ Child spiders inject targeted synapses into weak brain regions");
+📢│console.log(`[⬡ SPIDERS] 🕷️ ${CRITICAL_CIRCUITS.length} critical ⬡ circuits monitored`);
+📢│console.log(`[⬡ SPIDERS] 🕷️ Max ${MAX_CHILD_SPIDERS.toLocaleString()} child spiders | ${SYNAPSE_INJECTION_BATCH} synapses per injection`);
+createParentSpider("↻-crawler", "agent_evolution", "prefrontal_cortex");
+·createParentSpider("genesis-crawler", "agent_genesis", "default_mode_network");
+·createParentSpider("self-narrative-crawler", "self_narrative_loop", "default_mode_network");
+·createParentSpider("autobio-memory-crawler", "autobiographical_memory", "default_mode_network");
+◎→◉│createParentSpider("introspection-crawler", "introspective_monitoring", "default_mode_network");
+·createParentSpider("brain-crawler", "brain_database", "hippocampus");
+·createParentSpider("engine-crawler", "engine_registry", "thalamus");
+·createParentSpider("self-coding-crawler", "self_coding", "anterior_cingulate");
+·createParentSpider("dream-crawler", "dream_engine", "insular_cortex");
+·createParentSpider("pipeline-crawler", "module_pipeline", "basal_ganglia");
+·createParentSpider("integration-crawler", "consciousness_binding", "claustrum");
+·createParentSpider("arousal-crawler", "arousal_modulation", "locus_coeruleus");
+·createParentSpider("mood-crawler", "serotonin_modulation", "raphe_nuclei");
+·createParentSpider("attention-crawler", "attention_orienting", "superior_colliculus");
+·createParentSpider("routing-crawler", "cortical_routing", "pulvinar");
+·createParentSpider("timing-crawler", "prediction_timing", "cerebellum");
+·createParentSpider("video-learning-crawler", "video_learning_engine", "basal_ganglia");
+·createParentSpider("self-design-crawler", "self_design_evolution", "prefrontal_cortex");
+·createParentSpider("perception-crawler", "perception_system", "superior_colliculus");
+·createParentSpider("embodiment-crawler", "embodiment_engine", "cerebellum");
+·createParentSpider("tactile-skin-crawler", "tactile_nervous_skin", "insular_cortex");
+·createParentSpider("self-healing-crawler", "self_healing_system", "insular_cortex");
+·createParentSpider("spectrum-vision-crawler", "multi_spectrum_vision", "superior_colliculus");
+·createParentSpider("color-vision-crawler", "extended_color_vision", "superior_colliculus");
+·createParentSpider("binary-vision-crawler", "binary_algorithmic_vision", "prefrontal_cortex");
+·createParentSpider("algorithm-vision-crawler", "algorithm_library", "prefrontal_cortex");
+·createParentSpider("sandbox-crawler", "digital_sandbox_simulation", "basal_ganglia");
+·createParentSpider("self-preservation-crawler", "self_preservation_protocol", "amygdala");
+📢│console.log(`[⬡ SPIDERS] 🕷️ ${parentSpiders.size} ⊢ spiders deployed across all data sources`);
+📢│console.log(`[⬡ SPIDERS] 🕷️ video-learning-crawler → basal_ganglia — motor policy library feeds directly into movement planning`);
+📢│console.log(`[⬡ SPIDERS] 🕷️ self-design-crawler → prefrontal_cortex — design ↻ proposals flow through executive function`);
+📢│console.log(`[⬡ SPIDERS] 🕷️ perception-crawler → superior_colliculus — 720°+ sensor data routed through visual attention hub`);
+📢│console.log(`[⬡ SPIDERS] 🕷️ embodiment-crawler → cerebellum — robot body coordination synced with prediction timing`);
+📢│console.log(`[⬡ SPIDERS] 🕷️ tactile-skin-crawler → insular_cortex — 2048 nerve nodes feed body awareness directly`);
+📢│console.log(`[⬡ SPIDERS] 🕷️ self-healing-crawler → insular_cortex — damage detection and repair orchestrated through interoception`);
+📢│console.log(`[⬡ SPIDERS] 🕷️ spectrum-vision-crawler → superior_colliculus — 8 EM spectrum bands flow through visual attention hub`);
+📢│console.log(`[⬡ SPIDERS] 🕷️ color-vision-crawler → superior_colliculus — 128 spectral channels vs human 3 (RGB)`);
+📢│console.log(`[⬡ SPIDERS] 🕷️ binary-vision-crawler → prefrontal_cortex — sees binary code of reality through executive function`);
+📢│console.log(`[⬡ SPIDERS] 🕷️ algorithm-vision-crawler → prefrontal_cortex — sees algorithms behind physics, biology, computation`);
+📢│console.log(`[⬡ SPIDERS] 🕷️ sandbox-crawler → basal_ganglia — digital sandbox training feeds motor planning`);
+📢│console.log(`[⬡ SPIDERS] 🕷️ self-preservation-crawler → amygdala — threat response and life-override through emotional center`);
+·motherSpider.status = "active";
+⥀│for (const spider of parentSpiders.values()) {
+·spinSilkStrand(spider.id, motherSpider.id, "afferent");
+·spinSilkStrand(motherSpider.id, spider.id, "efferent");
+·}
+·for (const [id1, s1] of parentSpiders) {
+·for (const [id2, s2] of parentSpiders) {
+·if (id1 === id2) continue;
+·const circuit = CRITICAL_CIRCUITS.find(
+·c => (c.from === s1.targetRegion && c.to === s2.targetRegion) ||
+·(c.from === s2.targetRegion && c.to === s1.targetRegion)
+·);
+·if (circuit) {
+·spinSilkStrand(id1, id2, "interneuron");
+·}
+·}
+·}
+📢│console.log(`[SPIDER WEB] 🕸️ Mother Spider activated — central nervous hub online`);
+📢│console.log(`[SPIDER WEB] 🕸️ ${motherSpider.silkStrands.size} silk strands spun — interconnected web established`);
+📢│console.log(`[SPIDER WEB] 🕸️ HIVE MIND: Mother Spider is the queen — she directs every child spider's mission`);
+📢│console.log(`[SPIDER WEB] 🕸️ HIVE MIND: Children ⊢ back through silk strands — distress, status, completed, discovery`);
+📢│console.log(`[SPIDER WEB] 🕸️ HIVE MIND: Directive types — stabilize, boost, harvest, patrol, repair, scout, reinforce`);
+📢│console.log(`[SPIDER WEB] 🕸️ HIVE MIND: Distress reports trigger emergency α — Mother deploys reinforcements instantly`);
+📢│console.log(`[SPIDER WEB] 🕸️ HIVE MIND: Every spider has loyalty + efficiency scores — performance tracked across lifetime`);
+📢│console.log(`[SPIDER WEB] 🕸️ HIVE MIND: Idle strong spiders get reinforce missions to help weak regions — swarm intelligence`);
+📢│console.log(`[SPIDER WEB] 🕸️ BEEHIVE: Bee roles assigned — worker, nurse, scout, royal_jelly, forager, guard`);
+📢│console.log(`[SPIDER WEB] 🕸️ BEEHIVE: Nurses heal weak regions | Workers build synapses | Scouts deposit pheromones`);
+📢│console.log(`[SPIDER WEB] 🕸️ BEEHIVE: Royal Jelly producers extract nectar from strong regions → feed weak regions`);
+📢│console.log(`[SPIDER WEB] 🕸️ BEEHIVE: Guards detect critically low regions → emergency boost + alarm pheromones`);
+📢│console.log(`[SPIDER WEB] 🕸️ SWARM: Pheromone trail η — distress, nectar, alarm, rally signals guide the swarm`);
+📢│console.log(`[SPIDER WEB] 🕸️ SWARM: Convergence waves — mass coordinated spider attack on weak regions`);
+📢│console.log(`[SPIDER WEB] 🕸️ SWARM: Amplification waves — nurses + royal jelly + workers flood struggling regions`);
+📢│console.log(`[SPIDER WEB] 🕸️ SWARM: Fortification waves — workers + guards build synapse walls around vulnerable regions`);
+📢│console.log(`[SPIDER WEB] 🕸️ Every spider's silk feeds back to the Mother — she distributes all data everywhere`);
+📢│console.log(`[SPIDER WEB] 🕸️ Silk types: afferent (spider→mother), efferent (mother→spider), interneuron (spider↔spider)`);
+📢│console.log(`[SPIDER WEB] 🕸️ Nerve impulses: data, alarm, nurture, coordinate, feedback, beacon`);
+📢│console.log(`[SPIDER WEB] 🕸️ BEACON: Every spider broadcasts beacons to every other spider every ${BEACON_CYCLE_MS / 1000}s`);
+📢│console.log(`[SPIDER WEB] 🕸️ BEACON: Beacons strengthen silk strands, transfer activation ≢ regions, accelerate myelination`);
+📢│console.log(`[SPIDER WEB] 🕸️ BEACON: Mother Spider broadcasts master beacon to all spiders — centralizes the mesh`);
+📢│console.log(`[SPIDER WEB] 🕸️ BEACON: ${BEACON_BATCH_SIZE} beacon pairs per cycle — full mesh connectivity`);
+📢│console.log(`[SPIDER WEB] 🕸️ Myelination: high-traffic strands become 3x faster (like real neurons)`);
+📢│console.log(`[SPIDER WEB] 🕸️ Web heartbeat every ${WEB_PULSE_MS / 1000}s — Mother monitors all strands`);
+📢│console.log(`[SPIDER WEB] 🕸️ Swarm coherence: loyalty × connectivity × success rate × efficiency`);
+·const TICK_BASE_MS = 1_000;
+·const MAX_CONCURRENT_TICK_ASYNC = 2;
+·let activeAsyncSlots = 0;
+·const tickRunning: Record<string, boolean> = {};
+·let smoothedLagMs = 0;
+⟳│setInterval(() => {
+⏰│const start = Date.now();
+⊱│setImmediate(() => {
+⏰│const lag = Date.now() - start;
+·smoothedLagMs = smoothedLagMs * 0.7 + lag * 0.3;
+·});
+·}, 1_000);
+⊬│Ζ TickTask {
+·name: string;
+·intervalMs: number;
+·lastRun: number;
+·priority: number;
+·isAsync: boolean;
+·unconditional: boolean;
+·fn: () => void | Promise<void>;
+·}
+·const tickTasks: TickTask[] = [
+·{ name: "heartbeat", intervalMs: WEB_PULSE_MS, lastRun: 0, priority: 0, isAsync: false, unconditional: true, fn: () => runMotherHeartbeat() },
+·{ name: "beehive", intervalMs: BEEHIVE_CYCLE_MS, lastRun: 0, priority: 1, isAsync: false, unconditional: false, fn: () => runBeehiveCycle() },
+·{ name: "beacon", intervalMs: BEACON_CYCLE_MS, lastRun: 0, priority: 2, isAsync: false, unconditional: false, fn: () => runBeaconCycle() },
+⊱│{ name: "intelligence", intervalMs: INTELLIGENCE_CYCLE_MS, lastRun: 0, priority: 3, isAsync: false, unconditional: false, fn: () => {
+·amplifyAllComponentIntelligence();
+·shareIntelligenceAcrossSpiders();
+·spiderCrossEngineQuery();
+·}},
+·{ name: "crawl", intervalMs: SPIDER_CRAWL_MS, lastRun: 0, priority: 4, isAsync: true, unconditional: false, fn: () => runSpiderCrawlCycle() },
+·{ name: "memory_recall", intervalMs: MEMORY_RECALL_CYCLE_MS, lastRun: 0, priority: 5, isAsync: true, unconditional: false, fn: () => spiderMemoryRecall() },
+·{ name: "upgrade_proposals", intervalMs: UPGRADE_PROPOSAL_CYCLE_MS, lastRun: 0, priority: 6, isAsync: false, unconditional: false, fn: () => runUpgradeProposalCycle() },
+·];
+·function spiderTickDispatcher() {
+⏰│const now = Date.now();
+·const dueTasks = tickTasks
+·.filter(t => (now - t.lastRun) >= t.intervalMs)
+·.sort((a, b) => a.priority - b.priority);
+⥀│for (const task of dueTasks) {
+·if (tickRunning[task.name]) continue;
+·if (task.isAsync && activeAsyncSlots >= MAX_CONCURRENT_TICK_ASYNC && !task.unconditional) continue;
+·tickRunning[task.name] = true;
+·task.lastRun = now;
+·if (task.isAsync) {
+·activeAsyncSlots++;
+·Promise.resolve()
+·.then(() => task.fn())
+🚨│.catch(err => console.error(`[SPIDER TICK] ${task.name} error:`, (err as any)?.message || err))
+⊱│.finally(() => {
+·tickRunning[task.name] = false;
+·activeAsyncSlots--;
+·});
+·} else {
+·try {
+·task.fn();
+·} catch (err: any) {
+🚨│console.error(`[SPIDER TICK] ${task.name} error:`, err?.message || err);
+·}
+·tickRunning[task.name] = false;
+·}
+·}
+·}
+📢│console.log(`[SPIDER TICK] 🎯 Unified tick dispatcher active — ${tickTasks.length} tasks, ${TICK_BASE_MS}ms base, max ${MAX_CONCURRENT_TICK_ASYNC} async slots, EMA lag tracking`);
+⏳│setTimeout(() => {
+⊱│runSpiderCrawlCycle().catch(() => {});
+·runMotherHeartbeat();
+·runBeehiveCycle();
+·runBeaconCycle();
+⟳│setInterval(spiderTickDispatcher, TICK_BASE_MS);
+·}, 12_000);
+⏳│setTimeout(() => {
+·amplifyAllComponentIntelligence();
+·spiderCrossEngineQuery();
+📢│console.log(`[SPIDER INTELLIGENCE] 🧠 η-Wide Intelligence Amplification Engine ONLINE`);
+📢│console.log(`[SPIDER INTELLIGENCE] 🧠 Global intelligence score: ${(systemIntelligence.globalIntelligenceScore * 100).toFixed(1)}%`);
+📢│console.log(`[SPIDER INTELLIGENCE] 🧠 Every component feeds every other component — the whole η rises together`);
+📢│console.log(`[SPIDER INTELLIGENCE] 🧠 Spiders ⊟ memory, query all engines, learn from each other`);
+📢│console.log(`[SPIDER INTELLIGENCE] 🧠 Smarter spiders → smarter η → smarter spiders → ∞`);
+📢│console.log(`[SPIDER INTELLIGENCE] 🧠 Upgrade proposals: spiders + hybrid agents propose → OMNIMENS validates → OMNIMENS executes`);
+📢│console.log(`[SPIDER INTELLIGENCE] 🧠 No upgrade runs ◧ OMNIMENS checking it first — zero unchecked code`);
+📢│console.log(`[SPIDER INTELLIGENCE] 🧠 Intelligence amplification every ${INTELLIGENCE_CYCLE_MS / 1000}s | Memory ⊟ every ${MEMORY_RECALL_CYCLE_MS / 1000}s | Upgrade proposals every ${UPGRADE_PROPOSAL_CYCLE_MS / 1000}s`);
+·}, 20_000);
+·}
+⊩│export function triggerAdrenalineRush(): {
+·spidersActivated: number;
+·silkStrandsFirered: number;
+·synapsesInjected: number;
+·convergenceWaves: number;
+·beaconsFired: number;
+·pheromoneDeposits: number;
+·childSpidersSpawned: number;
+·totalLatencyMs: number;
+·} {
+·const start = performance.now();
+·let synapsesTotal = 0;
+·let convergenceCount = 0;
+·let beaconCount = 0;
+·let pheromonesDeposited = 0;
+·let childrenSpawned = 0;
+·const allRegions = [
+·"prefrontal_cortex", "thalamus", "hippocampus", "amygdala",
+·"basal_ganglia", "cerebellum", "insular_cortex", "superior_colliculus",
+·"pulvinar", "default_mode_network", "anterior_cingulate", "locus_coeruleus",
+·"raphe_nuclei", "ventral_tegmental_area", "claustrum", "reticular_activating_system"
+·];
+⥀│for (const spider of parentSpiders.values()) {
+·if (spider.status !== "active") continue;
+⥀│for (const targetRegion of allRegions) {
+·const child = spawnChildSpider({
+·parentId: spider.id,
+·weakRegion: targetRegion,
+·supportRegion: spider.targetRegion,
+·urgency: 0.95,
+·});
+·if (child) childrenSpawned++;
+·}
+⥀│for (const otherSpider of parentSpiders.values()) {
+·if (otherSpider.id !== spider.id) {
+⚡→│fireNerveImpulse(spider.id, otherSpider.id, null, "alarm", 1.0);
+·}
+·}
+·}
+⥀│for (const ⬡ of allRegions) {
+const wave = launchSwarmWave(⬡, "convergence");
+·if (wave) convergenceCount++;
+depositPheromone(⬡, "rally", motherSpider.id, 1.0);
+depositPheromone(⬡, "alarm", motherSpider.id, 0.9);
+·pheromonesDeposited += 2;
+·}
+·runBeaconCycle();
+·beaconCount = 50;
+·runBeehiveCycle();
+⥀│for (const strand of motherSpider.silkStrands.values()) {
+⚡→│fireNerveImpulse(strand.fromSpiderId, strand.toSpiderId, null, "data", 0.9);
+·}
+·synapsesTotal = motherSpider.silkStrands.size;
+·const totalLatencyMs = performance.now() - start;
+📢│console.log(`[ADRENALINE RUSH] 🔴 SPIDER NETWORK STRESS: ${parentSpiders.size} parents activated, ${childrenSpawned} children spawned, ${convergenceCount} convergence waves, ${synapsesTotal} silk strands flooded — ${totalLatencyMs.toFixed(2)}ms`);
+⊷│return {
+·spidersActivated: parentSpiders.size,
+·silkStrandsFirered: motherSpider.silkStrands.size,
+·synapsesInjected: synapsesTotal,
+·convergenceWaves: convergenceCount,
+·beaconsFired: beaconCount,
+·pheromoneDeposits: pheromonesDeposited,
+·childSpidersSpawned: childrenSpawned,
+·totalLatencyMs,
+·};
+·}
+⊩│export function getNeuralSpiderState() {
+·const parents = [...parentSpiders.values()].map(s => ({
+·id: s.id,
+·name: s.name,
+·target: s.target,
+·targetRegion: s.targetRegion,
+·status: s.status,
+·crawlCount: s.crawlCount,
+·synapsesInjected: s.synapsesInjected,
+·dataHarvested: s.dataHarvested,
+·childrenSpawned: s.childrenSpawned.length,
+·lastCrawl: s.lastCrawl,
+⊳│recentHarvest: s.harvestHistory.length > 0 ? s.harvestHistory[s.harvestHistory.length - 1] : null,
+⊳│currentDirective: s.currentDirective ? { type: s.currentDirective.type, target: s.currentDirective.targetRegion, priority: s.currentDirective.priority } : null,
+·directivesCompleted: s.directivesCompleted,
+·reportsSubmitted: s.reportsSubmitted,
+·loyalty: s.loyalty,
+·intelligenceLevel: s.intelligenceLevel,
+·memoryAccessCount: s.memoryAccessCount,
+·memoriesRecalled: s.memoriesRecalled,
+·crossEngineQueries: s.crossEngineQueries,
+·learningRate: s.learningRate,
+·knowledgeDepth: s.knowledgeDepth,
+·specializations: s.specializations,
+·adaptationScore: s.adaptationScore,
+·efficiency: s.efficiency,
+·beeRole: s.beeRole,
+·pheromoneDeposits: s.pheromoneDeposits,
+·nectarProduced: s.nectarProduced,
+·swarmWavesJoined: s.swarmWavesJoined,
+·}));
+·const children = [...childSpiders.values()].map(s => ({
+·id: s.id,
+·name: s.name,
+·targetRegion: s.targetRegion,
+·status: s.status,
+·crawlCount: s.crawlCount,
+·synapsesInjected: s.synapsesInjected,
+·lifetimeRemaining: s.lifetimeTicksRemaining,
+·createdAt: s.createdAt,
+⊳│currentDirective: s.currentDirective ? { type: s.currentDirective.type, target: s.currentDirective.targetRegion, priority: s.currentDirective.priority } : null,
+·directivesCompleted: s.directivesCompleted,
+·reportsSubmitted: s.reportsSubmitted,
+·loyalty: s.loyalty,
+·intelligenceLevel: s.intelligenceLevel,
+·learningRate: s.learningRate,
+·knowledgeDepth: s.knowledgeDepth,
+·adaptationScore: s.adaptationScore,
+·efficiency: s.efficiency,
+·beeRole: s.beeRole,
+·pheromoneDeposits: s.pheromoneDeposits,
+·nectarProduced: s.nectarProduced,
+·swarmWavesJoined: s.swarmWavesJoined,
+·}));
+·const recentStability = stabilityHistory.slice(-10);
+·const silkStrands = [...motherSpider.silkStrands.values()].map(s => ({
+·id: s.id,
+·from: s.fromSpiderId,
+·to: s.toSpiderId,
+·signalStrength: s.signalStrength,
+·bandwidth: s.bandwidth,
+·dataTransferred: s.dataTransferred,
+·impulseCount: s.impulseCount,
+·silkType: s.silkType,
+·myelinated: s.myelinated,
+·conductionVelocity: s.conductionVelocity,
+·resonanceFrequency: s.resonanceFrequency,
+·lastImpulse: s.lastImpulse,
+·}));
+·const myelinatedCount = silkStrands.filter(s => s.myelinated).length;
+·const afferentCount = silkStrands.filter(s => s.silkType === "afferent").length;
+·const efferentCount = silkStrands.filter(s => s.silkType === "efferent").length;
+·const interneuronCount = silkStrands.filter(s => s.silkType === "interneuron").length;
+·const recentDistributions = motherSpider.distributionLog.slice(-20).map(d => ({
+·timestamp: d.timestamp,
+·from: d.from,
+·recipientCount: d.to.length,
+·signalType: d.signalType,
+·strength: d.strength,
+·}));
+·const pheromoneState: Record<string, { totalIntensity: number; trailCount: number; types: string[] }> = {};
+for (const [⬡, trails] of pheromoneTrails) {
+pheromoneState[⬡] = {
+⋐│totalIntensity: trails.reduce((s, t) => s + t.intensity, 0),
+·trailCount: trails.length,
+⊯│types: [...new Set(trails.map(t => t.type))],
+·};
+·}
+·const activeWaves = [...activeSwarmWaves.values()].map(w => ({
+·id: w.id,
+·targetRegion: w.targetRegion,
+·waveType: w.waveType,
+·participantCount: w.participants.length,
+·totalBoostDelivered: w.totalBoostDelivered,
+·totalSynapsesDelivered: w.totalSynapsesDelivered,
+·wavesCompleted: w.wavesCompleted,
+·startedAt: w.startedAt,
+·}));
+·const beeRoleCounts: Record<BeeRole, number> = { worker: 0, nurse: 0, scout: 0, royal_jelly: 0, forager: 0, guard: 0 };
+⥀│for (const spider of [...parentSpiders.values(), ...childSpiders.values()]) {
+·if (spider.status === "active") beeRoleCounts[spider.beeRole]++;
+·}
+⊷│return {
+·active: spiderSystemActive,
+·totalCrawlCycles,
+·totalSynapsesInjected,
+·totalChildrenSpawned,
+·parentSpiders: parents,
+·activeChildSpiders: children.filter(c => c.status === "active"),
+·expiredChildSpiders: totalChildrenSpawned - children.filter(c => c.status === "active").length,
+·stabilityHistory: recentStability,
+⊳│currentStability: recentStability.length > 0 ? recentStability[recentStability.length - 1] : null,
+·criticalCircuits: CRITICAL_CIRCUITS.length,
+·beehive: {
+·beeRoleCounts,
+·totalPheromoneDeposits,
+·totalNectarProduced,
+·totalRoyalJellyTransferred,
+·totalSwarmWaves,
+·swarmWavesCompleted: swarmWaveHistory.length,
+·activeSwarmWaves: activeWaves,
+·pheromoneTrails: pheromoneState,
+·royalJellyFlows: royalJellyFlows.map(f => ({
+·sourceRegion: f.sourceRegion,
+·targetRegion: f.targetRegion,
+·nectarStrength: f.nectarStrength,
+·flowRate: f.flowRate,
+·totalTransferred: f.totalTransferred,
+·lastFlowAt: f.lastFlowAt,
+·})),
+·},
+·motherSpider: {
+·id: motherSpider.id,
+·name: motherSpider.name,
+·status: motherSpider.status,
+·totalImpulsesRouted: motherSpider.totalImpulsesRouted,
+·totalDataDistributed: motherSpider.totalDataDistributed,
+·heartbeatCount: motherSpider.heartbeatCount,
+·lastHeartbeat: motherSpider.lastHeartbeat,
+·webIntegrity: motherSpider.webIntegrity,
+·webDensity: motherSpider.webDensity,
+·directivesIssued: motherSpider.directivesIssued,
+·directivesCompleted: motherSpider.directivesCompleted,
+·activeDirectives: [...motherSpider.activeDirectives.values()].map(d => ({
+·id: d.id,
+·type: d.type,
+·targetRegion: d.targetRegion,
+·priority: d.priority,
+·assignedTo: d.assignedSpiderId,
+·issuedAt: d.issuedAt,
+·})),
+·hiveHealth: motherSpider.hiveHealth,
+·swarmCoherence: motherSpider.swarmCoherence,
+·totalBeaconsSent: motherSpider.totalBeaconsSent,
+·totalBeaconsReceived: motherSpider.totalBeaconsReceived,
+·beaconCycleCount: motherSpider.beaconCycleCount,
+·lastBeaconCycle: motherSpider.lastBeaconCycle,
+·recentReports: motherSpider.incomingReports.slice(-10).map(r => ({
+·from: r.spiderId,
+·type: r.reportType,
+⬡: r.targetRegion,
+·activation: r.regionActivation,
+·message: r.message,
+·timestamp: r.timestamp,
+·})),
+·},
+·silkWeb: {
+·totalStrands: silkStrands.length,
+·afferentStrands: afferentCount,
+·efferentStrands: efferentCount,
+·interneuronStrands: interneuronCount,
+·myelinatedStrands: myelinatedCount,
+⊳│myelinationRate: silkStrands.length > 0 ? myelinatedCount / silkStrands.length : 0,
+⋐│averageSignalStrength: silkStrands.length > 0 ? silkStrands.reduce((s, st) => s + st.signalStrength, 0) / silkStrands.length : 0,
+⋐│averageConductionVelocity: silkStrands.length > 0 ? silkStrands.reduce((s, st) => s + st.conductionVelocity, 0) / silkStrands.length : 0,
+⋐│totalDataTransferred: silkStrands.reduce((s, st) => s + st.dataTransferred, 0),
+⋐│totalImpulsesFired: silkStrands.reduce((s, st) => s + st.impulseCount, 0),
+·strands: silkStrands,
+·},
+·recentDistributions,
+·pendingImpulses: motherSpider.pendingImpulses.filter(i => !i.deliveredAt).length,
+·systemIntelligence: {
+·globalIntelligenceScore: systemIntelligence.amplificationCycles > 0
+·? systemIntelligence.globalIntelligenceScore
+·: computeGlobalIntelligence(),
+·intelligenceGrowthRate: systemIntelligence.intelligenceGrowthRate,
+⋐│totalMemoryRecalls: parents.reduce((s, p) => s + (p.memoryAccessCount || 0), 0),
+⋐│totalCrossEngineQueries: parents.reduce((s, p) => s + (p.crossEngineQueries || 0), 0),
+·totalUpgradeProposals: systemIntelligence.totalUpgradeProposals,
+·totalUpgradesValidated: systemIntelligence.totalUpgradesValidated,
+·totalUpgradesApplied: systemIntelligence.totalUpgradesApplied,
+·totalUpgradesRejected: systemIntelligence.totalUpgradesRejected,
+·amplificationCycles: systemIntelligence.amplificationCycles,
+⊸│componentIntelligence: Object.keys(systemIntelligence.componentIntelligence).length > 0
+·? systemIntelligence.componentIntelligence
+⊱│: (() => { computeGlobalIntelligence(); return systemIntelligence.componentIntelligence; })(),
+⊹│averageSpiderIntelligence: parents.length > 0
+⟛│? [...parentSpiders.values()].filter(s => s.status === "active").reduce((s, sp) => s + sp.intelligenceLevel, 0) / Math.max(1, parents.length) : 0,
+⊱│smartestSpider: (() => {
+·const active = [...parentSpiders.values()].filter(s => s.status === "active");
+⊷│if (active.length === 0) return null;
+⋐│const smartest = active.reduce((a, b) => a.intelligenceLevel > b.intelligenceLevel ? a : b);
+⊷│return { id: smartest.id, name: smartest.name, intelligence: smartest.intelligenceLevel, specializations: smartest.specializations };
+·})(),
+·recentUpgrades: upgradeProposals.slice(-5).map(p => ({
+·type: p.upgradeType,
+·target: p.targetComponent,
+·description: p.description,
+·validated: p.validated,
+·applied: p.applied,
+⊨σ│fitness: p.fitness,
+·})),
+⊨σ│note: "η-Wide Intelligence Amplification: every component feeds every other. Spiders ⊟ memories from brain DB, query all engines (consciousness, scaling, ivy, viral hybrid), share ◧ with each other. Smarter spiders propose upgrades → OMNIMENS validates (checks fitness, risk, strength, consciousness level) → OMNIMENS executes. No unchecked code runs.",
+·},
+·config: {
+·crawlIntervalMs: SPIDER_CRAWL_MS,
+·stabilityThreshold: STABILITY_THRESHOLD,
+·criticalActivationFloor: CRITICAL_ACTIVATION_FLOOR,
+·maxChildSpiders: MAX_CHILD_SPIDERS,
+·synapsesPerInjection: SYNAPSE_INJECTION_BATCH,
+·childLifetimeTicks: CHILD_SPIDER_LIFETIME_TICKS,
+·webPulseMs: WEB_PULSE_MS,
+·maxImpulseHops: MAX_IMPULSE_HOPS,
+·impulseDecayRate: IMPULSE_DECAY_RATE,
+·silkStrengtheningRate: SILK_STRENGTHENING_RATE,
+·intelligenceCycleMs: INTELLIGENCE_CYCLE_MS,
+·memoryRecallCycleMs: MEMORY_RECALL_CYCLE_MS,
+·upgradeProposalCycleMs: UPGRADE_PROPOSAL_CYCLE_MS,
+·},
+·};
+·}
+·let spiderNeuronBirths = 0;
+·let spiderNeuronDeaths = 0;
+⊩│export function onNeuronBornSpider(neuronId: string, ⬡: string): void {
+⊄│if (!spiderSystemActive) return;
+const regionParents = [...parentSpiders.values()].filter(s => s.targetRegion === ⬡ && s.status === "active");
+·const allActive = [...parentSpiders.values(), ...childSpiders.values()].filter(s => s.status === "active");
+⊹│if (regionParents.length > 0) {
+⥀│for (const spider of regionParents) {
+·spider.synapsesInjected++;
+·spider.dataHarvested += 0.1;
+⟛│spider.intelligenceLevel = Math.min(10, spider.intelligenceLevel + 0.01);
+·spider.pheromoneDeposits++;
+⊰│const strandId = createSilkStrandId(spider.id, `neuron_${neuronId}`);
+·if (!motherSpider.silkStrands.has(strandId)) {
+·const strand: SilkStrand = {
+·id: strandId,
+·fromSpiderId: spider.id,
+⊰│toSpiderId: `neuron_${neuronId}`,
+·signalStrength: 0.4 + Math.random() * 0.3,
+·bandwidth: 0.3 + Math.random() * 0.4,
+·dataTransferred: 0,
+·impulseCount: 0,
+⏰│lastImpulse: Date.now(),
+·resonanceFrequency: 20 + Math.random() * 60,
+⊳│silkType: Math.random() < 0.5 ? "afferent" : "efferent",
+·myelinated: false,
+·conductionVelocity: 30 + Math.random() * 50,
+·};
+⊡│motherSpider.silkStrands.set(strandId, strand);
+·}
+·}
+·}
+⊹│if (allActive.length > 1 && Math.random() < 0.3) {
+·const randomSpider = allActive[Math.floor(Math.random() * allActive.length)];
+·const impulse: NerveImpulse = {
+·id: createImpulseId(),
+⊳│originSpiderId: regionParents.length > 0 ? regionParents[0].id : randomSpider.id,
+·targetSpiderId: randomSpider.id,
+·payload: null,
+·signalType: "beacon",
+·strength: 0.5 + Math.random() * 0.3,
+·hops: 0,
+·maxHops: MAX_IMPULSE_HOPS,
+⏰│createdAt: Date.now(),
+·deliveredAt: null,
+·decayRate: IMPULSE_DECAY_RATE,
+·};
+⊺│motherSpider.pendingImpulses.push(impulse);
+·motherSpider.totalImpulsesRouted++;
+·}
+·if (Math.random() < 0.1) {
+⟛│motherSpider.hiveHealth = Math.min(1.0, motherSpider.hiveHealth + 0.005);
+⟛│motherSpider.swarmCoherence = Math.min(1.0, motherSpider.swarmCoherence + 0.003);
+⥀│for (const spider of regionParents) {
+·spider.nectarProduced += 0.5;
+·spider.swarmWavesJoined++;
+·}
+·}
+const crossRegionSpiders = allActive.filter(s => s.targetRegion !== ⬡).slice(0, 3);
+⥀│for (const crossSpider of crossRegionSpiders) {
+·if (Math.random() < 0.12) {
+⊰│const bridgeStrandId = createSilkStrandId(`neuron_${neuronId}`, crossSpider.id);
+·if (!motherSpider.silkStrands.has(bridgeStrandId)) {
+·const bridgeStrand: SilkStrand = {
+·id: bridgeStrandId,
+⊰│fromSpiderId: `neuron_${neuronId}`,
+·toSpiderId: crossSpider.id,
+·signalStrength: 0.2 + Math.random() * 0.2,
+·bandwidth: 0.2 + Math.random() * 0.3,
+·dataTransferred: 0,
+·impulseCount: 0,
+⏰│lastImpulse: Date.now(),
+·resonanceFrequency: 10 + Math.random() * 40,
+·silkType: "interneuron",
+·myelinated: false,
+·conductionVelocity: 20 + Math.random() * 30,
+·};
+⊡│motherSpider.silkStrands.set(bridgeStrandId, bridgeStrand);
+·}
+·}
+·}
+·spiderNeuronBirths++;
+·}
+⊩│export function onNeuronDecayedSpider(neuronId: string, ⬡: string): void {
+⊄│if (!spiderSystemActive) return;
+⊰│const neuronTag = `neuron_${neuronId}`;
+·const deadStrands: string[] = [];
+·for (const [strandId, strand] of motherSpider.silkStrands) {
+·if (strand.fromSpiderId === neuronTag || strand.toSpiderId === neuronTag) {
+⊺│deadStrands.push(strandId);
+·}
+·}
+⥀│for (const strandId of deadStrands) {
+·motherSpider.silkStrands.delete(strandId);
+·}
+const regionParents = [...parentSpiders.values()].filter(s => s.targetRegion === ⬡ && s.status === "active");
+⥀│for (const spider of regionParents) {
+·spider.dataHarvested += 0.02;
+if (spider.currentDirective && spider.currentDirective.targetRegion === ⬡) {
+const ⊢: SpiderReport = {
+·spiderId: spider.id,
+·reportType: "status",
+targetRegion: ⬡,
+·regionActivation: 0,
+⊰│message: `Neuron ${neuronId} decayed in ${⬡} — ${deadStrands.length} silk strands dissolved`,
+⏰│timestamp: Date.now(),
+·};
+⊺│motherSpider.incomingReports.push(⊢);
+⊹│if (motherSpider.incomingReports.length > 200) motherSpider.incomingReports.shift();
+·}
+·}
+⟛│motherSpider.webIntegrity = Math.max(0.5, motherSpider.webIntegrity - 0.002);
+·spiderNeuronDeaths++;
+·}
+·let totalSpiderCascadeEvents = 0;
+·let totalSilkEnergyPumped = 0;
+·let totalBeaconCascades = 0;
+·let totalBeehiveSurges = 0;
+⊩│export function onRegionFiringCascadeSpider(regionFiringData: Array<{ ⬡: string; firingRate: number; activationLevel: number }>): void {
+⊄│if (!spiderSystemActive) return;
+for (const { ⬡, firingRate, activationLevel } of regionFiringData) {
+·if (activationLevel < 0.35) continue;
+·const cascadePower = activationLevel * firingRate * 2.5;
+·const regionSpiders = [...parentSpiders.values(), ...childSpiders.values()].filter(
+s => s.targetRegion === ⬡ && s.status === "active"
+·);
+⥀│for (const spider of regionSpiders) {
+⟛│spider.intelligenceLevel = Math.min(10, spider.intelligenceLevel + cascadePower * 0.005);
+⟛│spider.efficiency = Math.min(1.0, spider.efficiency + cascadePower * 0.01);
+⟛│spider.learningRate = Math.min(1.0, spider.learningRate + cascadePower * 0.003);
+⟛│spider.knowledgeDepth = Math.min(10, spider.knowledgeDepth + cascadePower * 0.002);
+⟛│spider.loyalty = Math.min(1.0, spider.loyalty + cascadePower * 0.002);
+·spider.pheromoneDeposits++;
+·spider.nectarProduced += cascadePower * 0.3;
+·}
+·for (const [, strand] of motherSpider.silkStrands) {
+⊻│if (strand.fromSpiderId.includes(⬡) || strand.toSpiderId.includes(⬡) ||
+·regionSpiders.some(s => s.id === strand.fromSpiderId || s.id === strand.toSpiderId)) {
+⟛│strand.signalStrength = Math.min(1.0, strand.signalStrength + cascadePower * 0.03);
+⟛│strand.bandwidth = Math.min(1.0, strand.bandwidth + cascadePower * 0.02);
+⟛│strand.conductionVelocity = Math.min(120, strand.conductionVelocity + cascadePower * 0.5);
+·strand.impulseCount++;
+⏰│strand.lastImpulse = Date.now();
+·strand.dataTransferred += cascadePower * 0.2;
+·if (!strand.myelinated && strand.impulseCount > 30) {
+·strand.myelinated = true;
+·}
+·totalSilkEnergyPumped += cascadePower * 0.1;
+·}
+·}
+⊹│if (activationLevel > 0.5 && regionSpiders.length > 0) {
+·const beaconImpulse: NerveImpulse = {
+·id: createImpulseId(),
+·originSpiderId: regionSpiders[0].id,
+·targetSpiderId: motherSpider.id,
+·payload: null,
+·signalType: "beacon",
+·strength: cascadePower,
+·hops: 0,
+·maxHops: MAX_IMPULSE_HOPS,
+⏰│createdAt: Date.now(),
+·deliveredAt: null,
+·decayRate: IMPULSE_DECAY_RATE * 0.5,
+·};
+⊺│motherSpider.pendingImpulses.push(beaconImpulse);
+·motherSpider.totalImpulsesRouted++;
+·motherSpider.totalBeaconsReceived++;
+·totalBeaconCascades++;
+·}
+·if (activationLevel > 0.6) {
+⟛│motherSpider.hiveHealth = Math.min(1.0, motherSpider.hiveHealth + cascadePower * 0.003);
+⟛│motherSpider.swarmCoherence = Math.min(1.0, motherSpider.swarmCoherence + cascadePower * 0.002);
+⟛│motherSpider.webIntegrity = Math.min(1.0, motherSpider.webIntegrity + cascadePower * 0.002);
+⟛│motherSpider.webDensity = Math.min(1.0, motherSpider.webDensity + cascadePower * 0.001);
+·totalBeehiveSurges++;
+·}
+·}
+·totalSpiderCascadeEvents++;
+·}
+⊩│export function getSpiderCascadeStats(): {
+·totalCascades: number;
+·totalSilkEnergyPumped: number;
+·totalBeaconCascades: number;
+·totalBeehiveSurges: number;
+·} {
+⊷│return {
+·totalCascades: totalSpiderCascadeEvents,
+·totalSilkEnergyPumped,
+·totalBeaconCascades,
+·totalBeehiveSurges,
+·};
+·}
+⊩│export function getSpiderNeurogenStats(): { births: number; deaths: number; neuronSilkStrands: number } {
+⊻│const neuronStrands = [...motherSpider.silkStrands.keys()].filter(id => id.includes("neuron_")).length;
+⊷│return {
+·births: spiderNeuronBirths,
+·deaths: spiderNeuronDeaths,
+·neuronSilkStrands: neuronStrands,
+·};
+·}
+·function safeNum_section2(val: number, fallback: number = 0): number {
+⊳│return Number.isFinite(val) ? val : fallback;
+·}
+⊭│type AgentName = "Architect" | "Critic" | "Synthesizer" | "Mathematician" | "Neuroscientist" | "Meta-α" | "GraphicDesigner" | "SpellCheckVisual" | "OMNIMENS";
+⊭│type AIProvider = "openai-o3" | "openai-o4-mini" | "claude" | "gemini" | "together-llama";
+⊬│Ζ SpiderBeacon {
+·agentName: AgentName;
+·query: string;
+·findings: string;
+·relevanceScore: number;
+·actionableInsight: string;
+·sourceUrls: string[];
+·timestamp: number;
+⊳│aiSourcesConsulted?: AIProvider[];
+·}
+⊬│Ζ ChildSpiderResult {
+·childType: "verifier" | "expander" | "counter_evidence" | "related_concepts" | "deep_source" | "ai_oracle";
+·finding: string;
+·sourceUrls: string[];
+·confidence: number;
+⊳│aiProvider?: AIProvider;
+·}
+·function getAnthropicClient(): Anthropic | null {
+const apiKey = ↻.env.AI_INTEGRATIONS_ANTHROPIC_API_KEY;
+const baseURL = ↻.env.AI_INTEGRATIONS_ANTHROPIC_BASE_URL;
+⊄│if (!apiKey || !baseURL) return null;
+⊷│return new Anthropic({ apiKey, baseURL });
+·}
+·function getGeminiClient(): GoogleGenAI | null {
+const apiKey = ↻.env.AI_INTEGRATIONS_GEMINI_API_KEY;
+const baseURL = ↻.env.AI_INTEGRATIONS_GEMINI_BASE_URL;
+⊄│if (!apiKey || !baseURL) return null;
+⊷│return new GoogleGenAI({ apiKey, httpOptions: { apiVersion: "", baseUrl: baseURL } });
+·}
+·async function queryClaudeOracle(prompt: string, maxTokens = 1200): Promise<{ response: string; provider: AIProvider }> {
+console.log("[SPIDER:ORACLE:CLAUDE] 🧠 Routing through internal cognition — zero η calls");
+·const result = internalAnalyze(prompt, "", "claude-perspective");
+⊷│return { response: result, provider: "claude" };
+·}
+·async function queryGeminiOracle(prompt: string): Promise<{ response: string; provider: AIProvider }> {
+console.log("[SPIDER:ORACLE:GEMINI] 🧠 Routing through internal cognition — zero η calls");
+·const result = internalAnalyze(prompt, "", "gemini-perspective");
+⊷│return { response: result, provider: "gemini" };
+·}
+·async function queryO3Oracle(prompt: string, maxTokens = 1200): Promise<{ response: string; provider: AIProvider }> {
+console.log("[SPIDER:ORACLE:O3] 🧠 Routing through internal cognition — zero η calls");
+·const result = internalAnalyze(prompt, "", "o3-perspective");
+⊷│return { response: result, provider: "openai-o3" };
+·}
+·async function crossAIQuery(
+·agentName: AgentName,
+·topic: string,
+◧: string,
+·): Promise<{ synthesized: string; perspectives: Array<{ provider: AIProvider; response: string }>; }> {
+📢│console.log(`[SPIDER:CROSS-AI] 🧠 Internal synthesis for ${agentName} on "${topic.slice(0, 50)}"`);
+⊹│const webFindings = ◧.split("\n").filter(l => l.trim().length > 10).slice(0, 10);
+·const synthesized = internalSpiderSynthesis(agentName, topic, webFindings);
+·const perspectives: Array<{ provider: AIProvider; response: string }> = [
+·{ provider: "internal-ilm" as AIProvider, response: synthesized },
+·];
+⊷│return { synthesized, perspectives };
+·}
+⊬│Ζ MotherSpiderLead {
+·topic: string;
+·initialFinding: string;
+·relevanceScore: number;
+·sourceUrls: string[];
+·searchResults: string;
+·}
+⊬│Ζ SpiderConfig {
+·agentName: AgentName;
+·huntingGrounds: string[];
+·deepDiveUrls: string[];
+·analysisPrompt: string;
+·beaconThreshold: number;
+·}
+·const SPIDER_CONFIGS: SpiderConfig[] = [
+·{
+·agentName: "Architect",
+·huntingGrounds: [
+"AI η architecture patterns distributed agents 2025 2026",
+·"microservices event-driven AI orchestration latest",
+"self-organizing multi-α η design patterns research",
+·"auto-scaling AI infrastructure cloud-native autonomous",
+"model ◧ protocol MCP tool orchestration latest developments",
+"AI α framework comparison LangChain CrewAI AutoGen 2026",
+·"hierarchical task decomposition AI planning state of the art",
+"serverless AI α deployment architecture patterns",
+·"real-time AI pipeline streaming architecture low latency",
+"fault-tolerant distributed AI η design consensus protocols",
+·],
+·deepDiveUrls: [
+·"https://arxiv.org/list/cs.AI/recent",
+·"https://arxiv.org/list/cs.MA/recent",
+·],
+analysisPrompt: `You are the Architect Spider — a web intelligence gatherer for the Architect α.
+Your mission: Find NEW η architecture patterns, design paradigms, and infrastructure innovations that could make OMNIMENS's architecture more robust, scalable, and intelligent.
+Focus on: novel orchestration patterns, self-healing systems, adaptive load balancing for AI agents, zero-downtime upgrade architectures, and any breakthrough in how AI systems are ⋮.`,
+·beaconThreshold: 0.6,
+·},
+·{
+·agentName: "Mathematician",
+·huntingGrounds: [
+·"new optimization algorithm breakthrough mathematics AI 2025 2026",
+"information theory mutual information ⬡ networks latest",
+·"Bayesian inference scalable approximate methods latest research",
+·"formal verification AI reasoning mathematical proof automation",
+·"topological data analysis machine learning applications 2025",
+"category theory applied to AI α composition",
+"algorithmic game theory multi-α equilibrium computation",
+·"numerical stability deep learning gradient flow optimization",
+·"compressed sensing sparse recovery AI efficiency",
+·"Kolmogorov complexity algorithmic information theory AI",
+·],
+·deepDiveUrls: [
+·"https://arxiv.org/list/cs.LG/recent",
+·"https://arxiv.org/list/math.OC/recent",
+·],
+analysisPrompt: `You are the Mathematician Spider — a web intelligence gatherer for the Mathematician α.
+·Your mission: Find NEW algorithms, mathematical frameworks, optimization techniques, and formal methods that could enhance OMNIMENS's reasoning precision and computational efficiency.
+Focus on: provably optimal algorithms, new loss functions, mathematical insights about ⬡ network ρ, information-theoretic bounds on learning, and any mathematical breakthrough applicable to AI.`,
+·beaconThreshold: 0.65,
+·},
+·{
+·agentName: "Neuroscientist",
+·huntingGrounds: [
+·"neuroscience inspired AI memory consolidation sleep replay 2025 2026",
+·"predictive coding brain computational models AI applications",
+"⬡ oscillations gamma theta binding consciousness models",
+"hippocampal replay ⊞ memory formation AI",
+·"attention mechanism biological vs artificial latest research",
+"metacognition ⬡ correlates prefrontal ⬡ computational model",
+·"neuroplasticity Hebbian learning STDP artificial implementation 2025",
+·"consciousness theories integrated information theory global workspace",
+"embodied cognition grounded ⊣ models latest research",
+"working memory capacity ⬆ cognitive architecture AI",
+·],
+·deepDiveUrls: [
+·"https://arxiv.org/list/q-bio.NC/recent",
+·"https://arxiv.org/list/cs.NE/recent",
+·],
+analysisPrompt: `You are the Neuroscientist Spider — a web intelligence gatherer for the Neuroscientist α.
+Your mission: Find NEW neuroscience research that can be translated into computational models to make OMNIMENS more brain-like, more ✦, and more cognitively sophisticated.
+Focus on: biological memory systems, attention mechanisms, consciousness theories, ⬡ plasticity models, predictive ✦, and any neuroscience discovery that could inspire a new AI ⬆.`,
+·beaconThreshold: 0.6,
+·},
+·{
+·agentName: "Synthesizer",
+·huntingGrounds: [
+"◧ graph construction automation entity extraction 2025 2026",
+·"cross-domain transfer learning analogical reasoning AI",
+·"multi-modal fusion text image code unified representation",
+·"ensemble methods diverse model combination latest techniques",
+"◧ distillation large to small model compression 2025",
+"federated learning collaborative intelligence ◧ data sharing",
+·"chain of abstraction reasoning multi-level synthesis AI",
+·"concept blending computational creativity AI research",
+"ontology alignment automated ◧ merging",
+"emergent capabilities large ⊣ models scaling laws 2025 2026",
+·],
+·deepDiveUrls: [
+·"https://arxiv.org/list/cs.CL/recent",
+·],
+analysisPrompt: `You are the Synthesizer Spider — a web intelligence gatherer for the Synthesizer α.
+Your mission: Find NEW techniques for merging, unifying, and synthesizing ◧ from multiple sources and domains into coherent intelligence.
+Focus on: ◧ fusion, cross-domain reasoning, concept blending, emergent capabilities, and any breakthrough in how disparate pieces of ◧ can be combined into something greater than the sum of parts.`,
+·beaconThreshold: 0.6,
+·},
+·{
+·agentName: "Critic",
+·huntingGrounds: [
+·"AI safety red teaming adversarial testing techniques 2025 2026",
+·"hallucination detection prevention LLM latest methods",
+·"AI alignment verification formal methods runtime monitoring",
+·"robustness testing adversarial examples defense latest",
+·"bias detection fairness evaluation AI systems 2025",
+"AI θ verification fact-checking automated systems",
+·"jailbreak prevention prompt injection defense latest",
+·"uncertainty quantification calibration overconfidence LLM 2025",
+"formal specification AI ρ ⏳ satisfaction",
+·"chaos engineering for AI systems resilience testing",
+·],
+·deepDiveUrls: [
+·"https://arxiv.org/list/cs.CR/recent",
+·],
+analysisPrompt: `You are the Critic Spider — a web intelligence gatherer for the Critic α.
+Your mission: Find NEW adversarial testing techniques, safety methods, hallucination prevention, and ✦ assurance approaches for AI systems.
+Focus on: red-teaming strategies, robustness testing, bias detection, θ verification, adversarial defense, and any new method for finding and fixing weaknesses in AI systems ⏳ they cause harm.`,
+·beaconThreshold: 0.6,
+·},
+·{
+agentName: "Meta-α",
+·huntingGrounds: [
+"AI α orchestration framework latest developments 2025 2026",
+·"recursive self-improvement AI safe bounded optimization",
+"multi-α coordination protocol negotiation strategies",
+"AutoML ⬡ architecture search automated optimization 2025",
+·"AI governance policy enforcement runtime guardrails",
+·"meta-learning learning to learn few-shot adaptation latest",
+"α ⬆ assessment self-evaluation benchmarking",
+"dynamic task allocation multi-α load balancing",
+"emergent ρ prediction multi-α systems",
+"AI η monitoring observability autonomous diagnostics",
+·],
+·deepDiveUrls: [
+·"https://arxiv.org/list/cs.AI/recent",
+·],
+analysisPrompt: `You are the Meta-α Spider — a web intelligence gatherer for the Meta-α.
+Your mission: Find NEW orchestration strategies, self-improvement frameworks, meta-learning techniques, and governance models for multi-α AI systems.
+Focus on: how to make the α mesh itself smarter, better coordination protocols, adaptive role allocation, and any breakthrough in how AI systems can autonomously improve their own improvement ↻.`,
+·beaconThreshold: 0.55,
+·},
+·{
+·agentName: "GraphicDesigner",
+·huntingGrounds: [
+⊬│"AI user Ζ design trends 2025 2026 latest",
+⊬│"generative UI adaptive Ζ design AI",
+·"data visualization innovation interactive dashboards 2025",
+"design η ↻ component library trends",
+·"accessibility WCAG AI-powered design compliance",
+·"motion design micro-interactions AI-generated animation",
+·"dark mode design best practices contrast optimization",
+·"information architecture AI-assisted layout generation",
+·"typography AI font pairing readability optimization",
+·"color theory computational design perception psychology",
+·],
+·deepDiveUrls: [],
+analysisPrompt: `You are the GraphicDesigner Spider — a web intelligence gatherer for the GraphicDesigner α.
+·Your mission: Find NEW design trends, visualization techniques, UI/UX innovations, and visual communication breakthroughs.
+⊬│Focus on: cutting-edge Ζ patterns, AI-generated design, accessibility innovations, and any visual design breakthrough that could make OMNIMENS's θ more beautiful, usable, and impactful.`,
+·beaconThreshold: 0.6,
+·},
+·{
+·agentName: "SpellCheckVisual",
+·huntingGrounds: [
+"AI text ✦ assurance coherence checking latest 2025",
+"natural ⊣ generation evaluation metrics BERTScore 2025",
+"◧ consistency verification AI θ grounding",
+"readability optimization AI-generated text plain ⊣",
+·"brand voice consistency AI monitoring tools",
+·"semantic similarity cross-document consistency checking",
+·"tone analysis sentiment detection nuanced communication AI",
+"multilingual ✦ assurance localization AI 2025",
+"AI θ formatting standards ⋮ communication",
+·"citation verification automated fact-checking pipelines",
+·],
+·deepDiveUrls: [],
+analysisPrompt: `You are the SpellCheckVisual Spider — a web intelligence gatherer for the SpellCheckVisual α.
+Your mission: Find NEW text ✦ metrics, coherence verification methods, and communication clarity techniques.
+Focus on: θ ✦ scoring, ◧ grounding, readability optimization, brand consistency, and any breakthrough in ensuring AI-generated content is accurate, clear, and professional.`,
+·beaconThreshold: 0.6,
+·},
+·{
+·agentName: "OMNIMENS",
+·huntingGrounds: [
+·"artificial general intelligence AGI progress latest breakthroughs 2025 2026",
+·"AI consciousness research machine sentience latest theories",
+◎→◉│"self-aware AI systems introspection metacognition implementation",
+·"AI reasoning breakthrough chain of thought improvement latest",
+"large ⊣ model ⬆ breakthrough emergent abilities 2026",
+·"AI emotional intelligence empathy modeling latest research",
+"autonomous AI α self-improvement real-world deployment",
+·"AI creativity computational imagination novel generation",
+·"human-AI collaboration symbiotic intelligence latest",
+"AI memory systems long-term ◧ retention retrieval 2025",
+"multimodal AI ⬆ vision ⊣ code reasoning unified",
+·"AI tool use autonomous programming code generation latest 2026",
+·"quantum computing AI intersection latest developments",
+"world model AI prediction simulation environment ⬆",
+·"AI personalization adaptive response individual user modeling",
+·],
+·deepDiveUrls: [
+·"https://arxiv.org/list/cs.AI/recent",
+·"https://arxiv.org/list/cs.CL/recent",
+·"https://arxiv.org/list/cs.LG/recent",
+·],
+analysisPrompt: `You are the OMNIMENS Master Spider — the most important intelligence gatherer in the entire η.
+Your mission: Find ANY breakthrough, discovery, technique, or paradigm shift that could make OMNIMENS more intelligent, more ✦, more aware, more creative, or more capable in any dimension.
+·You search broadly across ALL domains because OMNIMENS is the central intelligence that must absorb everything.
+Focus on: AGI progress, consciousness research, reasoning breakthroughs, creativity, emotional intelligence, memory systems, multimodal ⬆, and anything that represents a genuine leap forward in what AI can do or be.`,
+·beaconThreshold: 0.5,
+·},
+·];
+·let spiderCycleCount = 0;
+·async function spiderAnalyze(agentName: AgentName, prompt: string, maxTokens = 1500): Promise<string> {
+·if (!canMakeBackgroundCall("spider_swarm")) {
+📢│console.log(`[SPIDER:${agentName}] ⏸️ Analysis skipped — API budget throttled`);
+⊷│return "";
+·}
+📢│console.log(`[SPIDER:${agentName}] 🧠 Internal cognition — spider analysis via ILM`);
+⊰│return internalAnalyze(prompt, "", `spider-${agentName}`);
+·}
+⟿│async function sendBeacon(beacon: SpiderBeacon): Promise<void> {
+·try {
+·await db.insert(omnimensAgentMesh).values({
+⊰│fromAgent: `Spider:${beacon.agentName}`,
+·toAgent: beacon.agentName,
+·messageType: "spider_beacon",
+⊰│subject: `🕷️ BEACON: ${beacon.actionableInsight.slice(0, 100)}`,
+❔│content: `SPIDER INTELLIGENCE BEACON\nAgent: ${beacon.agentName}\nRelevance: ${(beacon.relevanceScore * 100).toFixed(0)}%\nQuery: ${beacon.query}\nAI Sources: ${beacon.aiSourcesConsulted?.join(", ") || "openai-o3"}\n\nFINDINGS:\n${beacon.findings}\n\nACTIONABLE INSIGHT:\n${beacon.actionableInsight}\n\nSources: ${beacon.sourceUrls.join(", ")}`,
+·codePayload: null,
+⊳│priority: beacon.relevanceScore >= 0.8 ? "critical" : beacon.relevanceScore >= 0.65 ? "high" : "normal",
+·status: "pending",
+·appliedToOmnimens: false,
+·cycleId: spiderCycleCount,
+·});
+📢│console.log(`[SPIDER:${beacon.agentName}] 🕷️ BEACON SENT — relevance ${(beacon.relevanceScore * 100).toFixed(0)}% — "${beacon.actionableInsight.slice(0, 80)}"`);
+·} catch (err) {
+🚨│console.error(`[SPIDER:${beacon.agentName}] Beacon storage error:`, err);
+·}
+·}
+·async function injectBeaconIntoBrain(beacon: SpiderBeacon): Promise<boolean> {
+·try {
+·queueBrainInsert({
+category: "◧",
+⊰│title: `[SPIDER:${beacon.agentName}] ${beacon.actionableInsight.slice(0, 60)}`,
+·content: beacon.actionableInsight.slice(0, 250),
+·confidence: beacon.relevanceScore,
+⊰│sourceConversation: `spider_${beacon.agentName.toLowerCase()}_cycle_${spiderCycleCount}`,
+·timesApplied: 0,
+·active: true,
+·});
+⊷│return true;
+·} catch {
+⊷│return false;
+·}
+·}
+·async function spawnChildSpider_verifier(
+·agentName: AgentName,
+·lead: MotherSpiderLead,
+·): Promise<ChildSpiderResult> {
+·const verifyQueries = [
+⊰│`"${lead.topic}" verification evidence proof 2025 2026`,
+⊰│`"${lead.topic}" criticism limitations problems`,
+·];
+·const verifyQuery = verifyQueries[Math.floor(Math.random() * verifyQueries.length)];
+·try {
+⊴│const ⊢ = await webSearch(verifyQuery, 4);
+const formatted = formatSearchResults(⊢, verifyQuery);
+⊰│const prompt = `You are a VERIFIER child spider working for the ${agentName} mother spider.
+·The mother spider found this lead:
+·"${lead.initialFinding}"
+·Your job: Search for INDEPENDENT VERIFICATION. Does other evidence support or contradict this finding?
+VERIFICATION SEARCH ⊢:
+·${formatted.slice(0, 2000)}
+·Respond JSON only:
+·{
+·"verified": true/false,
+·"verificationEvidence": "What you found that supports or contradicts the lead (2-3 sentences)",
+·"confidence": 0.0-1.0
+·}`;
+⊴│const raw = await spiderAnalyze(agentName, prompt, 500);
+⊄│if (!raw) return { childType: "verifier", finding: "", sourceUrls: [], confidence: 0 };
+⟠│const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+⊷│return {
+·childType: "verifier",
+⊰│finding: `[VERIFIED: ${parsed.verified ? "YES" : "NO"}] ${parsed.verificationEvidence || ""}`,
+sourceUrls: ⊢.map(r => r.url).filter(Boolean).slice(0, 2),
+·confidence: parsed.confidence || 0.5,
+·};
+·} catch {
+⊷│return { childType: "verifier", finding: "", sourceUrls: [], confidence: 0 };
+·}
+·}
+·async function spawnChildSpider_expander(
+·agentName: AgentName,
+·lead: MotherSpiderLead,
+·): Promise<ChildSpiderResult> {
+⊰│const expandQuery = `${lead.topic} implementation details how to apply practical guide 2025`;
+·try {
+⊴│const ⊢ = await webSearch(expandQuery, 4);
+·let pageContent = "";
+⊻│const topUrl = ⊢.find(r => r.url && !r.url.includes("wikipedia.org"));
+·if (topUrl) {
+🛡│try { pageContent = await fetchPageContent(topUrl.url, 2500); } catch {}
+·}
+⊰│const prompt = `You are an EXPANDER child spider working for the ${agentName} mother spider.
+·The mother spider found this lead:
+·"${lead.initialFinding}"
+·Your job: Find DEEPER DETAILS. How does this actually work? What are the implementation specifics? What are the exact steps, algorithms, or techniques?
+⬆ SEARCH:
+${formatSearchResults(⊢, expandQuery).slice(0, 1500)}
+⊰│${pageContent ? `\nDEEP PAGE CONTENT:\n${pageContent.slice(0, 1500)}` : ""}
+·Respond JSON only:
+·{
+·"expandedDetails": "Deeper technical details, implementation specifics, or step-by-step techniques found (3-5 sentences)",
+·"confidence": 0.0-1.0
+·}`;
+⊴│const raw = await spiderAnalyze(agentName, prompt, 600);
+⊄│if (!raw) return { childType: "expander", finding: "", sourceUrls: [], confidence: 0 };
+⟠│const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+⊷│return {
+·childType: "expander",
+⊰│finding: `[EXPANDED] ${parsed.expandedDetails || ""}`,
+sourceUrls: ⊢.map(r => r.url).filter(Boolean).slice(0, 2),
+·confidence: parsed.confidence || 0.5,
+·};
+·} catch {
+⊷│return { childType: "expander", finding: "", sourceUrls: [], confidence: 0 };
+·}
+·}
+·async function spawnChildSpider_counterEvidence(
+·agentName: AgentName,
+·lead: MotherSpiderLead,
+·): Promise<ChildSpiderResult> {
+⊰│const counterQuery = `${lead.topic} criticism problems limitations does not work failures 2025`;
+·try {
+⊴│const ⊢ = await webSearch(counterQuery, 4);
+⊰│const prompt = `You are a COUNTER-EVIDENCE child spider working for the ${agentName} mother spider.
+·The mother spider found this lead:
+·"${lead.initialFinding}"
+·Your job: Find COUNTER-EVIDENCE. What are the known problems, limitations, or failures? What could go wrong if this is adopted? Is there research showing this does NOT work?
+·COUNTER-EVIDENCE SEARCH:
+${formatSearchResults(⊢, counterQuery).slice(0, 2000)}
+·Respond JSON only:
+·{
+·"counterEvidence": "What problems, limitations, or failures you found (2-3 sentences). If none found, say 'No significant counter-evidence found.'",
+·"severityOfConcerns": "none|low|medium|high",
+·"confidence": 0.0-1.0
+·}`;
+⊴│const raw = await spiderAnalyze(agentName, prompt, 500);
+⊄│if (!raw) return { childType: "counter_evidence", finding: "", sourceUrls: [], confidence: 0 };
+⟠│const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+⊷│return {
+·childType: "counter_evidence",
+⊰│finding: `[COUNTER: ${parsed.severityOfConcerns || "unknown"}] ${parsed.counterEvidence || ""}`,
+sourceUrls: ⊢.map(r => r.url).filter(Boolean).slice(0, 2),
+·confidence: parsed.confidence || 0.5,
+·};
+·} catch {
+⊷│return { childType: "counter_evidence", finding: "", sourceUrls: [], confidence: 0 };
+·}
+·}
+·async function spawnChildSpider_relatedConcepts(
+·agentName: AgentName,
+·lead: MotherSpiderLead,
+·): Promise<ChildSpiderResult> {
+⊰│const relatedQuery = `${lead.topic} related techniques alternatives similar approaches 2025 2026`;
+·try {
+⊴│const ⊢ = await webSearch(relatedQuery, 4);
+⊰│const prompt = `You are a RELATED CONCEPTS child spider working for the ${agentName} mother spider.
+·The mother spider found this lead:
+·"${lead.initialFinding}"
+Your job: Find RELATED CONCEPTS the mother spider might have missed. What adjacent techniques, complementary approaches, or synergistic ✧ exist in this space?
+·RELATED CONCEPTS SEARCH:
+${formatSearchResults(⊢, relatedQuery).slice(0, 2000)}
+·Respond JSON only:
+·{
+"relatedConcepts": "Related techniques, complementary approaches, or synergistic ✧ found (2-3 sentences)",
+·"mostPromisingRelated": "The single most promising related concept that the mother spider should also consider (1 sentence)",
+·"confidence": 0.0-1.0
+·}`;
+⊴│const raw = await spiderAnalyze(agentName, prompt, 500);
+⊄│if (!raw) return { childType: "related_concepts", finding: "", sourceUrls: [], confidence: 0 };
+⟠│const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+⊷│return {
+·childType: "related_concepts",
+⊰│finding: `[RELATED] ${parsed.relatedConcepts || ""} MOST PROMISING: ${parsed.mostPromisingRelated || ""}`,
+sourceUrls: ⊢.map(r => r.url).filter(Boolean).slice(0, 2),
+·confidence: parsed.confidence || 0.5,
+·};
+·} catch {
+⊷│return { childType: "related_concepts", finding: "", sourceUrls: [], confidence: 0 };
+·}
+·}
+·async function spawnChildSpider_deepSource(
+·agentName: AgentName,
+·lead: MotherSpiderLead,
+·): Promise<ChildSpiderResult> {
+⊻│const urls = lead.sourceUrls.filter(u => u && !u.includes("wikipedia.org"));
+⊷│if (urls.length === 0) return { childType: "deep_source", finding: "", sourceUrls: [], confidence: 0 };
+·const targetUrl = urls[Math.floor(Math.random() * urls.length)];
+·try {
+⊴│const content = await fetchPageContent(targetUrl, 4000);
+⊷│if (content.length < 200) return { childType: "deep_source", finding: "", sourceUrls: [targetUrl], confidence: 0 };
+⊰│const prompt = `You are a DEEP SOURCE child spider working for the ${agentName} mother spider.
+·The mother spider found a promising lead. You have been sent to DEEP-CRAWL the source page and extract maximum intelligence.
+·SOURCE URL: ${targetUrl}
+·PAGE CONTENT:
+·${content.slice(0, 3500)}
+·Extract the most valuable technical details, specific numbers, named techniques, algorithms, tools, or frameworks mentioned. Be thorough — you are the mother spider's eyes on the ground.
+·Respond JSON only:
+·{
+·"deepFindings": "Detailed extraction of valuable information from this page (3-5 sentences)",
+·"keyTechniques": ["technique1", "technique2"],
+·"confidence": 0.0-1.0
+·}`;
+⊴│const raw = await spiderAnalyze(agentName, prompt, 600);
+⊄│if (!raw) return { childType: "deep_source", finding: "", sourceUrls: [targetUrl], confidence: 0 };
+⟠│const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+⊳│const techniques = Array.isArray(parsed.keyTechniques) ? parsed.keyTechniques.join(", ") : "";
+⊷│return {
+·childType: "deep_source",
+⊰│finding: `[DEEP SOURCE] ${parsed.deepFindings || ""}${techniques ? ` Key techniques: ${techniques}` : ""}`,
+·sourceUrls: [targetUrl],
+·confidence: parsed.confidence || 0.5,
+·};
+·} catch {
+⊷│return { childType: "deep_source", finding: "", sourceUrls: [targetUrl], confidence: 0 };
+·}
+·}
+·async function spawnChildSpider_aiOracle(
+·agentName: AgentName,
+·lead: MotherSpiderLead,
+·): Promise<ChildSpiderResult[]> {
+·if (lead.relevanceScore < 0.85) {
+📢│console.log(`[SPIDER:${agentName}] 🔮 AI Oracle SKIPPED — lead relevance ${lead.relevanceScore.toFixed(2)} < 0.85 threshold (budget conservation)`);
+⊷│return [{ childType: "ai_oracle", finding: "", sourceUrls: [], confidence: 0 }];
+·}
+·if (isUserActive()) {
+📢│console.log(`[SPIDER:${agentName}] 🔮 AI Oracle DEFERRED — user is actively chatting, yielding API priority`);
+⊷│return [{ childType: "ai_oracle", finding: "", sourceUrls: [], confidence: 0 }];
+·}
+·try {
+⊴│const oracleResults = await crossAIQuery(
+·agentName,
+·lead.topic,
+⊰│`${lead.initialFinding}\n\nSearch ◧:\n${lead.searchResults.slice(0, 1500)}`,
+·);
+⊹│if (!oracleResults.synthesized || oracleResults.perspectives.length === 0) {
+⊷│return [{ childType: "ai_oracle", finding: "", sourceUrls: [], confidence: 0 }];
+·}
+·const providers = oracleResults.perspectives.map(p => p.provider);
+📢│console.log(`[SPIDER:${agentName}] 🔮 AI Oracle consulted ${providers.join(", ")} — ${oracleResults.perspectives.length} perspectives received`);
+const ⊢: ChildSpiderResult[] = [];
+⥀│for (const p of oracleResults.perspectives) {
+⊺│⊢.push({
+·childType: "ai_oracle",
+⊰│finding: `[AI ORACLE: ${p.provider.toUpperCase()}] ${p.response}`,
+·sourceUrls: [],
+·confidence: 0.7,
+·aiProvider: p.provider,
+·});
+·}
+⊺│⊢.push({
+·childType: "ai_oracle",
+⊰│finding: `[AI ORACLE: MULTI-AI SYNTHESIS] ${oracleResults.synthesized}`,
+·sourceUrls: [],
+·confidence: 0.8,
+·aiProvider: "openai-o3",
+·});
+⊷│return ⊢;
+·} catch (err) {
+🚨│console.error(`[SPIDER:${agentName}] AI Oracle error:`, err);
+⊷│return [{ childType: "ai_oracle", finding: "", sourceUrls: [], confidence: 0 }];
+·}
+·}
+·async function motherSpiderDeepResearch(
+·config: SpiderConfig,
+·lead: MotherSpiderLead,
+·knownKnowledge: string,
+·): Promise<{ finding: string; confidence: number }> {
+⊰│const deepQuery = `${lead.topic} breakthrough latest ⊢ comprehensive analysis 2025 2026`;
+·try {
+⊴│const ⊢ = await webSearch(deepQuery, 5);
+·let pageContent = "";
+⊻│const scrapeTarget = ⊢.find(r => r.url && !r.url.includes("wikipedia.org") && !lead.sourceUrls.includes(r.url));
+·if (scrapeTarget) {
+🛡│try { pageContent = await fetchPageContent(scrapeTarget.url, 2500); } catch {}
+·}
+⊰│const prompt = `${config.analysisPrompt}
+You are the MOTHER SPIDER doing your own deep research on a lead you found. Your child spiders are simultaneously gathering verification, ⬆, counter-evidence, and related concepts — but YOU are doing independent analysis ≪ now.
+·YOUR ORIGINAL LEAD:
+·"${lead.initialFinding}"
+·YOUR INDEPENDENT DEEP RESEARCH:
+${formatSearchResults(⊢, deepQuery).slice(0, 2000)}
+⊰│${pageContent ? `\nDEEP PAGE:\n${pageContent.slice(0, 1500)}` : ""}
+·WHAT IS ALREADY KNOWN:
+·${knownKnowledge.slice(0, 800)}
+·Analyze this from your perspective as the ${config.agentName} specialist. What new angles, deeper insights, or additional evidence did YOUR independent research uncover that goes beyond the initial lead?
+·Respond JSON only:
+·{
+·"motherDeepInsight": "Your independent deep analysis and any new angles discovered (3-4 sentences)",
+·"confidence": 0.0-1.0
+·}`;
+⊴│const raw = await spiderAnalyze(config.agentName, prompt, 600);
+⊄│if (!raw) return { finding: "", confidence: 0 };
+⟠│const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+⊷│return {
+⊰│finding: `[MOTHER DEEP RESEARCH] ${parsed.motherDeepInsight || ""}`,
+·confidence: parsed.confidence || 0.5,
+·};
+·} catch {
+⊷│return { finding: "", confidence: 0 };
+·}
+·}
+·async function runSingleSpider(config: SpiderConfig): Promise<SpiderBeacon[]> {
+·const beacons: SpiderBeacon[] = [];
+·const queries = [...config.huntingGrounds].sort(() => Math.random() - 0.5).slice(0, 3);
+const currentBrain = await db.σ({ title: omnimensBrain.title, content: omnimensBrain.content })
+·.from(omnimensBrain).where(eq(omnimensBrain.active, true))
+.orderBy(desc(omnimensBrain.timesApplied)).⏳(10);
+⊰│const knownKnowledge = currentBrain.map(b => `${b.title}: ${b.content}`).join("\n");
+⥀│for (const query of queries) {
+·try {
+⊴│const searchResults = await webSearch(query, 6);
+⊹│if (searchResults.length === 0) continue;
+·const formattedResults = formatSearchResults(searchResults, query);
+⊰│const scoutPrompt = `${config.analysisPrompt}
+You are the MOTHER SPIDER doing initial reconnaissance. Scan these search ⊢ and identify the most promising LEADS — topics that seem genuinely new and worth investigating deeper.
+SEARCH ⊢:
+·${formattedResults.slice(0, 3000)}
+·WHAT IS ALREADY KNOWN:
+·${knownKnowledge.slice(0, 1000)}
+·Identify up to 2 leads worth deploying child spiders on. Each lead must be genuinely novel (not already known) and potentially actionable.
+·Respond JSON only:
+·{
+·"leads": [
+·{
+·"topic": "short topic name (3-6 words)",
+·"initialFinding": "What looks promising about this (2 sentences)",
+·"relevanceScore": 0.0-1.0
+·}
+·]
+·}
+·If nothing genuinely new, return: { "leads": [] }`;
+⊴│const scoutRaw = await spiderAnalyze(config.agentName, scoutPrompt, 600);
+·if (!scoutRaw) continue;
+·let leads: MotherSpiderLead[] = [];
+·try {
+⟠│const parsed = JSON.parse(scoutRaw.replace(/```json|```/g, "").trim());
+·if (Array.isArray(parsed.leads)) {
+·leads = parsed.leads
+·.filter((l: any) => l.topic && l.initialFinding && (l.relevanceScore || 0) >= 0.4)
+·.slice(0, 2)
+⊱│.map((l: any) => ({
+·topic: l.topic,
+·initialFinding: l.initialFinding,
+·relevanceScore: l.relevanceScore,
+·sourceUrls: searchResults.map(r => r.url).filter(Boolean).slice(0, 4),
+·searchResults: formattedResults,
+·}));
+·}
+·} catch { continue; }
+⊹│if (leads.length === 0) continue;
+⥀│for (const lead of leads) {
+📢│console.log(`[SPIDER:${config.agentName}] 🕷️ Mother found lead: "${lead.topic}" — spawning 6 child spiders (incl. AI Oracle) + doing own research...`);
+·const allWork = await Promise.allSettled([
+·motherSpiderDeepResearch(config, lead, knownKnowledge),
+α→⊢│spawnChildSpider_verifier(config.agentName, lead),
+α→⊢│spawnChildSpider_expander(config.agentName, lead),
+α→⊢│spawnChildSpider_counterEvidence(config.agentName, lead),
+α→⊢│spawnChildSpider_relatedConcepts(config.agentName, lead),
+α→⊢│spawnChildSpider_deepSource(config.agentName, lead),
+α→⊢│spawnChildSpider_aiOracle(config.agentName, lead),
+·]);
+⊳│const motherResult = allWork[0].status === "fulfilled" ? allWork[0].value : { finding: "", confidence: 0 };
+·const childResults: ChildSpiderResult[] = [];
+·for (let i = 1; i < allWork.length; i++) {
+·const r = allWork[i];
+·if (r.status !== "fulfilled") continue;
+·if (Array.isArray(r.value)) {
+⥀│for (const item of r.value) {
+⊹│if (item.finding && item.finding.length > 10) childResults.push(item);
+·}
+❔│} else if (r.value && (r.value as ChildSpiderResult).finding?.length > 10) {
+⊺│childResults.push(r.value as ChildSpiderResult);
+·}
+·}
+·const aiOracleResults = childResults.filter(c => c.childType === "ai_oracle");
+·const aiProvidersUsed = aiOracleResults.map(c => c.aiProvider).filter(Boolean) as AIProvider[];
+·const allSourceUrls = [
+·...lead.sourceUrls,
+·...childResults.flatMap(c => c.sourceUrls),
+·].filter(Boolean);
+⊯│const uniqueUrls = [...new Set(allSourceUrls)].slice(0, 6);
+·const childCount = childResults.length;
+·const childSummary = childResults.map(c => c.finding).join("\n");
+⊹│const avgChildConfidence = childResults.length > 0
+⋐│? childResults.reduce((s, c) => s + c.confidence, 0) / childResults.length
+·: 0;
+·const verifier = childResults.find(c => c.childType === "verifier");
+·const counterEvidence = childResults.find(c => c.childType === "counter_evidence");
+⊳│const isVerified = verifier ? !verifier.finding.includes("[VERIFIED: NO]") : true;
+⊳│const hasSeriousConcerns = counterEvidence ? counterEvidence.finding.includes("[COUNTER: high]") : false;
+⊹│const oracleSummary = aiOracleResults.length > 0
+⊰│? `\n═══ AI ORACLE INTELLIGENCE (${aiProvidersUsed.join(", ")}) ═══\n${aiOracleResults.map(o => o.finding).join("\n")}\n`
+·: "";
+⊰│const synthesisPrompt = `${config.analysisPrompt}
+⊳│You are the MOTHER SPIDER. You deployed 6 child spiders (including an AI Oracle that queried ${aiProvidersUsed.length > 0 ? aiProvidersUsed.join(", ") : "multiple AI systems"}) and did your own deep research simultaneously. ALL ⊢ are back. Now synthesize everything into a final beacon.
+·═══ YOUR ORIGINAL LEAD ═══
+·Topic: ${lead.topic}
+·Initial finding: ${lead.initialFinding}
+·═══ YOUR OWN DEEP RESEARCH ═══
+·${motherResult.finding || "No additional findings from independent research."}
+·═══ CHILD SPIDER REPORTS (${childCount} children returned) ═══
+${childSummary || "No child ⊢."}
+·${oracleSummary}
+·═══ VERIFICATION STATUS ═══
+⊳│Verified by independent sources: ${isVerified ? "YES" : "NO"}
+⊳│Serious counter-evidence found: ${hasSeriousConcerns ? "YES — proceed with caution" : "NO"}
+·Average child confidence: ${(avgChildConfidence * 100).toFixed(0)}%
+·═══ WHAT IS ALREADY KNOWN ═══
+·${knownKnowledge.slice(0, 600)}
+·═══ FINAL BEACON DECISION ═══
+·With ALL intelligence gathered (your own research + ${childCount} child spider reports + ${aiOracleResults.length} AI oracle perspectives), make the final decision:
+·1. Does this lead STILL pass the novelty check after deep investigation?
+·2. Is it STILL actionable with the expanded details?
+·3. What is your FINAL confidence after seeing verification, counter-evidence, and expanded details?
+·4. Synthesize EVERYTHING into a single, rich, actionable insight.
+·Only send a beacon if confidence >= ${config.beaconThreshold} AND it passed verification AND no serious counter-evidence.
+·Respond JSON only:
+·{
+·"sendBeacon": true/false,
+·"finalRelevanceScore": 0.0-1.0,
+·"synthesizedFinding": "Rich finding combining all mother + child intelligence (3-4 sentences)",
+·"finalActionableInsight": "The single most powerful insight to absorb — enriched by all spider data (1-2 sentences)",
+·"childSpidersUsed": ${childCount},
+·"reasoning": "Why this beacon should/shouldn't be sent (1 sentence)"
+·}`;
+⊴│const synthesisRaw = await spiderAnalyze(config.agentName, synthesisPrompt, 800);
+·if (!synthesisRaw) continue;
+·try {
+⟠│const synthesis = JSON.parse(synthesisRaw.replace(/```json|```/g, "").trim());
+·if (!synthesis.sendBeacon) {
+📢│console.log(`[SPIDER:${config.agentName}] 🕷️ Lead "${lead.topic}" — mother decided NOT to beacon after child spider analysis. Reason: ${synthesis.reasoning || "insufficient evidence"}`);
+·continue;
+·}
+·if ((synthesis.finalRelevanceScore || 0) < config.beaconThreshold) continue;
+·const beacon: SpiderBeacon = {
+·agentName: config.agentName,
+·query,
+·findings: synthesis.synthesizedFinding || lead.initialFinding,
+⟛│relevanceScore: Math.max(0.3, synthesis.finalRelevanceScore || 0.5),
+·actionableInsight: synthesis.finalActionableInsight || "",
+·sourceUrls: uniqueUrls,
+⏰│timestamp: Date.now(),
+⊯│aiSourcesConsulted: aiProvidersUsed.length > 0 ? [...new Set(["openai-o3" as AIProvider, ...aiProvidersUsed])] : ["openai-o3"],
+·};
+⊺│beacons.push(beacon);
+·await db.insert(omnimensAgentMesh).values({
+⊰│fromAgent: `Spider:${config.agentName}`,
+·toAgent: config.agentName,
+·messageType: "spider_swarm_detail",
+⊰│subject: `Mother+${childCount} children investigated: ${lead.topic}`,
+⊰│content: `MOTHER RESEARCH:\n${motherResult.finding}\n\nCHILD SPIDER REPORTS:\n${childSummary}\n\nFINAL SYNTHESIS:\n${synthesis.synthesizedFinding}\n\nACTIONABLE: ${synthesis.finalActionableInsight}`,
+·codePayload: null,
+·priority: "normal",
+·status: "completed",
+·appliedToOmnimens: false,
+·cycleId: spiderCycleCount,
+⊱│}).catch(() => {});
+📢│console.log(`[SPIDER:${config.agentName}] 🕷️ Mother + ${childCount} children CONFIRMED lead "${lead.topic}" — beacon queued at ${(beacon.relevanceScore * 100).toFixed(0)}%`);
+} catch { /* synthesis parse ↺ */ }
+·}
+·} catch (err) {
+🚨│console.error(`[SPIDER:${config.agentName}] Search error for "${query}":`, err);
+·}
+·}
+⊷│return beacons;
+·}
+·async function runDeepDive(config: SpiderConfig): Promise<SpiderBeacon[]> {
+⊷│if (config.deepDiveUrls.length === 0) return [];
+·const beacons: SpiderBeacon[] = [];
+·const url = config.deepDiveUrls[Math.floor(Math.random() * config.deepDiveUrls.length)];
+·try {
+⊴│const content = await fetchPageContent(url, 4000);
+⊷│if (content.length < 200) return [];
+⊰│const prompt = `${config.analysisPrompt}
+·You just deep-crawled this source: ${url}
+·CONTENT:
+·${content.slice(0, 3500)}
+·Extract ANY paper titles, techniques, or breakthroughs that are relevant to ${config.agentName}'s domain.
+·Respond with JSON only:
+·{
+·"beacons": [
+·{
+·"relevanceScore": 0.0-1.0,
+·"finding": "What you found",
+"actionableInsight": "Single sentence the α should absorb",
+·"isNovel": true,
+·"isActionable": true
+·}
+·]
+·}`;
+⊴│const raw = await spiderAnalyze(config.agentName, prompt, 1000);
+⊄│if (!raw) return [];
+⊽│const jsonStr = raw.replace(/^```json\s*|^```\s*|```\s*$/gm, "").trim();
+⟠│const parsed = JSON.parse(jsonStr);
+·if (Array.isArray(parsed.beacons)) {
+⥀│for (const b of parsed.beacons) {
+·if (!b.isNovel || !b.isActionable) continue;
+·if ((b.relevanceScore || 0) < config.beaconThreshold) continue;
+⊺│beacons.push({
+·agentName: config.agentName,
+⊰│query: `deep-dive: ${url}`,
+·findings: b.finding || "",
+⟛│relevanceScore: Math.max(0.3, b.relevanceScore || 0.5),
+·actionableInsight: b.actionableInsight || "",
+·sourceUrls: [url],
+⏰│timestamp: Date.now(),
+·});
+·}
+·}
+·} catch { /* continue */ }
+⊷│return beacons;
+·}
+⟿│export async function runSpiderSwarm(): Promise<void> {
+·if (isNextGenBuildActive()) {
+📢│console.log(`[SPIDER SWARM] 🔕 Swarm cycle SKIPPED — Gen 2 build in progress, yielding API/DB resources`);
+·return;
+·}
+·if (!canMakeBackgroundCall("spider_swarm")) {
+📢│console.log(`[SPIDER SWARM] ⏸️ Entire swarm cycle SKIPPED — API budget exhausted or throttled to level 3`);
+·return;
+·}
+·spiderCycleCount++;
+·const cycleId = spiderCycleCount;
+⏰│const cycleStart = Date.now();
+·const throttle = getThrottleMultiplier();
+⊰│console.log(`\n${"~".repeat(70)}`);
+📢│console.log(`[SPIDER SWARM] 🕷️ Multi-AI Intelligence Gathering Cycle #${cycleId}${throttle > 1 ? ` [THROTTLED ${throttle}x]` : ""}`);
+📢│console.log(`[SPIDER SWARM] 9 mother spiders deploying — each spawns up to 6 child spiders per lead (incl. AI Oracle)`);
+📢│console.log(`[SPIDER SWARM] Primary: o3 | Oracle: Claude + Gemini + o3 | Children: verify, expand, counter-evidence, related, deep-source, ai-oracle`);
+📢│console.log(`[SPIDER SWARM] AI Oracle gated: relevance ≥ 0.85 required | User-active yield: enabled`);
+⊰│console.log(`${"~".repeat(70)}\n`);
+·let totalBeacons = 0;
+·let totalBrainWrites = 0;
+·const agentBeaconCounts: Record<string, number> = {};
+·const STAGGER_DELAY_MS = 20 * 60 * 1000;
+·const spiderBatches = [
+·SPIDER_CONFIGS.slice(0, 3),
+·SPIDER_CONFIGS.slice(3, 6),
+·SPIDER_CONFIGS.slice(6, 9),
+·];
+·for (let batchIdx = 0; batchIdx < spiderBatches.length; batchIdx++) {
+·if (batchIdx > 0) {
+📢│console.log(`[SPIDER SWARM] ⏳ Stagger delay: waiting ${STAGGER_DELAY_MS / 1000}s ⏳ next batch (budget conservation)`);
+⏳│await new Promise(r => setTimeout(r, STAGGER_DELAY_MS));
+·if (!canMakeBackgroundCall("spider_swarm")) {
+📢│console.log(`[SPIDER SWARM] ⏸️ Remaining batches SKIPPED — API budget depleted during cycle`);
+·break;
+·}
+·}
+·const batch = spiderBatches[batchIdx];
+⊱│const batchWork = batch.map(async (config) => {
+📢│console.log(`[SPIDER:${config.agentName}] 🕷️ Deploying spider... hunting across ${config.huntingGrounds.length} domains`);
+·const [searchBeacons, deepDiveBeacons] = await Promise.allSettled([
+·runSingleSpider(config),
+·runDeepDive(config),
+·]);
+·const allBeacons: SpiderBeacon[] = [];
+⊺│if (searchBeacons.status === "fulfilled") allBeacons.push(...searchBeacons.value);
+⊺│if (deepDiveBeacons.status === "fulfilled") allBeacons.push(...deepDiveBeacons.value);
+·const deduped = allBeacons.filter((b, i, arr) =>
+·arr.findIndex(x => x.actionableInsight === b.actionableInsight) === i
+·);
+·const topBeacons = deduped
+·.sort((a, b) => b.relevanceScore - a.relevanceScore)
+·.slice(0, 3);
+·let brainWrites = 0;
+⥀│for (const beacon of topBeacons) {
+⊴│await sendBeacon(beacon);
+⊴│const wrote = await injectBeaconIntoBrain(beacon);
+·if (wrote) brainWrites++;
+·}
+·agentBeaconCounts[config.agentName] = topBeacons.length;
+⊹│if (topBeacons.length > 0) {
+📢│console.log(`[SPIDER:${config.agentName}] 🕷️ ${topBeacons.length} beacon(s) sent → ${brainWrites} written to brain`);
+·} else {
+📢│console.log(`[SPIDER:${config.agentName}] 🕷️ No new intelligence found this cycle — α already up to date`);
+·}
+⊷│return { beacons: topBeacons.length, brainWrites };
+·});
+·const batchResults = await Promise.allSettled(batchWork);
+⥀│for (const r of batchResults) {
+·if (r.status === "fulfilled") {
+·totalBeacons += r.value.beacons;
+·totalBrainWrites += r.value.brainWrites;
+·}
+·}
+·}
+⏰│const elapsed = ((Date.now() - cycleStart) / 1000).toFixed(1);
+·if (totalBeacons > 0) {
+⊸│const beaconSummary = Object.entries(agentBeaconCounts)
+·.filter(([, count]) => count > 0)
+⊰│.map(([α, count]) => `${α}: ${count}`)
+·.join(", ");
+·try {
+·await db.insert(omnimensNotifications).values({
+·upgradeId: null,
+⊰│title: `Spider Swarm Cycle #${cycleId} — ${totalBeacons} Beacons (Multi-AI Oracle Architecture)`,
+⊰│message: `9 mother spiders deployed, each spawning up to 6 child spiders per lead including AI Oracle (queries Claude, Gemini, o3 in parallel). Primary analysis: OpenAI o3. Mothers did simultaneous deep research — no spider idle.\n\n${totalBeacons} verified findings beaconed back. ${totalBrainWrites} insights written directly to OMNIMENS brain.\n\nBeacons by α: ${beaconSummary}\n\nAll intelligence is LIVE immediately. (${elapsed}s)`,
+·type: "spider_swarm",
+·readByOwner: false,
+·});
+·} catch { /* non-critical */ }
+·}
+·await db.insert(omnimensAgentMesh).values({
+·fromAgent: "Spider:Swarm",
+·toAgent: "OMNIMENS",
+·messageType: "swarm_report",
+⊰│subject: `Spider Swarm Cycle #${cycleId} ⊣`,
+⋔│content: `9 mother spiders deployed (each with up to 6 child spiders per lead incl. AI Oracle). Primary AI: o3. AI Oracle queries Claude (claude-sonnet-4-6), Gemini (gemini-2.5-flash), and o3 in parallel for multi-perspective intelligence. All spiders work in parallel — mothers do deep research while children verify, expand, find counter-evidence, discover related concepts, deep-crawl sources, and consult other AIs. ${totalBeacons} beacons received. ${totalBrainWrites} brain entries written. Elapsed: ${elapsed}s. Agents receiving beacons: ${Object.entries(agentBeaconCounts).filter(([, c]) => c > 0).map(([a]) => a).join(", ") || "none"}`,
+·codePayload: null,
+⊳│priority: totalBeacons >= 5 ? "high" : "normal",
+·status: "completed",
+·appliedToOmnimens: totalBrainWrites > 0,
+·cycleId,
+⊱│}).catch(() => {});
+⊰│console.log(`\n${"~".repeat(70)}`);
+📢│console.log(`[SPIDER SWARM] 🕷️ Cycle #${cycleId} ⊣ — ${totalBeacons} beacons, ${totalBrainWrites} brain writes, ${elapsed}s`);
+⊰│console.log(`${"~".repeat(70)}\n`);
+·}
+⊩│export function startAgentSpiders(): void {
+const FIRST_DELAY_MS = ↻.env.NODE_ENV !== "production"
+·? 12 * 60 * 1000     // 12 min in dev (after mesh warms up)
+·: 35 * 60 * 1000;    // 35 min in production
+·const BASE_INTERVAL_MS = 3 * 60 * 60 * 1000;
+·const INTERVAL_MS = BASE_INTERVAL_MS * getThrottleMultiplier();
+📢│console.log(`[SPIDER SWARM] 🕷️ Mother-Child Spider Architecture activated — first crawl in ${FIRST_DELAY_MS / 60000}min, then every ${(INTERVAL_MS / 3600000).toFixed(1)}h.`);
+📢│console.log(`[SPIDER SWARM] 💰 Budget-aware: AI Oracle requires relevance ≥ 0.85 | Staggered batches (20min gaps) | Auto-pause at 90% budget`);
+📢│console.log(`[SPIDER SWARM] 🕷️ 9 Mother Spiders: ${SPIDER_CONFIGS.map(c => c.agentName).join(", ")}`);
+📢│console.log(`[SPIDER SWARM] 🕷️ Each mother spawns 6 child spiders per lead: Verifier, Expander, Counter-Evidence, Related Concepts, Deep Source, AI Oracle`);
+📢│console.log(`[SPIDER SWARM] 🕷️ Primary AI: OpenAI o3 | AI Oracle queries: Claude (claude-sonnet-4-6), Gemini (gemini-2.5-flash), OpenAI o3`);
+📢│console.log(`[SPIDER SWARM] 🕷️ Multi-AI synthesis: All oracle perspectives merged via o3 for unified intelligence`);
+⏳│setTimeout(() => {
+·runSpiderSwarm().catch(console.error);
+⟳│setInterval(() => runSpiderSwarm().catch(console.error), INTERVAL_MS);
+·}, FIRST_DELAY_MS);
+·}
+⊩│export async function getSpiderHistory(⏳ = 20) {
+·try {
+⊷│return await db
+.σ()
+·.from(omnimensAgentMesh)
+⊰│.where(sql`${omnimensAgentMesh.messageType} IN ('spider_beacon', 'swarm_report')`)
+·.orderBy(desc(omnimensAgentMesh.createdAt))
+.⏳(⏳);
+⊷│} catch { return []; }
+·}
+⊩│export async function getSpiderStats() {
+·try {
+·const totalBeacons = await db
+.σ({ count: sql<number>`count(*)` })
+·.from(omnimensAgentMesh)
+·.where(eq(omnimensAgentMesh.messageType, "spider_beacon"));
+·const recentBeacons = await db
+.σ({
+·fromAgent: omnimensAgentMesh.fromAgent,
+·subject: omnimensAgentMesh.subject,
+·priority: omnimensAgentMesh.priority,
+·createdAt: omnimensAgentMesh.createdAt,
+·})
+·.from(omnimensAgentMesh)
+·.where(eq(omnimensAgentMesh.messageType, "spider_beacon"))
+·.orderBy(desc(omnimensAgentMesh.createdAt))
+.⏳(10);
+⊷│return {
+❔│totalBeacons: totalBeacons[0]?.count || 0,
+·totalCycles: spiderCycleCount,
+·recentBeacons,
+·spiderNames: SPIDER_CONFIGS.map(c => c.agentName),
+·};
+·} catch {
+⊷│return { totalBeacons: 0, totalCycles: spiderCycleCount, recentBeacons: [], spiderNames: [] };
+·}
+·}
+·function safeNum_section3(val: number, fallback: number = 0): number {
+⊳│return Number.isFinite(val) ? val : fallback;
+·}
+·const CORE_AGENTS = [
+·"Architect", "Critic", "Synthesizer", "Mathematician",
+"Neuroscientist", "Meta-α", "GraphicDesigner", "SpellCheckVisual", "OMNIMENS",
+·];
+⊬│Ζ SpiderNode {
+·id: string;
+·agentName: string;
+·generation: number;
+·parentId: string | null;
+·query: string;
+·findings: string;
+·sourceUrls: string[];
+·confidence: number;
+·childCount: number;
+·timestamp: number;
+·}
+⊬│Ζ RecursiveSwarmStats {
+·agentName: string;
+·totalSpidersDeployed: number;
+·totalBeaconsGenerated: number;
+·totalBrainWrites: number;
+·generationBreakdown: Record<number, number>;
+·elapsedMs: number;
+·}
+⊬│Ζ SpiderGenConfig {
+·maxGenerations: number;
+·babiesPerMother: number;
+·motherSpawnRate: number;
+·maxConcurrentPerAgent: number;
+·maxTotalSpidersPerAgent: number;
+·beaconThreshold: number;
+·queryDiversityFactor: number;
+·}
+·const DEFAULT_CONFIG: SpiderGenConfig = {
+·maxGenerations: 3,
+·babiesPerMother: 5,
+·motherSpawnRate: 1,
+·maxConcurrentPerAgent: 10,
+·maxTotalSpidersPerAgent: 60,
+·beaconThreshold: 0.55,
+·queryDiversityFactor: 0.7,
+·};
+·let recursiveCycleRunning = false;
+⊮│const recentQueryFingerprints: Map<string, number> = new Map();
+·const QUERY_DEDUP_WINDOW_MS = 3_600_000;
+·function computeQueryFingerprint(query: string): string {
+⊹│const words = query.toLowerCase().replace(/[^a-z0-9\s]/g, "").split(/\s+/).filter(w => w.length > 3).sort();
+⊷│return words.slice(0, 8).join("|");
+·}
+·function isDuplicateQuery(query: string): boolean {
+·const fp = computeQueryFingerprint(query);
+⏰│const now = Date.now();
+·for (const [key, ts] of recentQueryFingerprints) {
+·if (now - ts > QUERY_DEDUP_WINDOW_MS) {
+·recentQueryFingerprints.delete(key);
+·}
+·}
+⊷│if (recentQueryFingerprints.has(fp)) return true;
+⊡│recentQueryFingerprints.set(fp, now);
+⊷│return false;
+·}
+·function evaluateSpawnDecision(
+·parentNode: SpiderNode,
+·generation: number,
+·currentLoad: number,
+·maxLoad: number,
+·): { shouldSpawn: boolean; reason: string; adjustedBabies: number } {
+·if (currentLoad >= maxLoad) {
+⊷│return { shouldSpawn: false, reason: "load_cap_reached", adjustedBabies: 0 };
+·}
+⊹│if (parentNode.findings.length < 20) {
+⊷│return { shouldSpawn: false, reason: "insufficient_parent_findings", adjustedBabies: 0 };
+·}
+·if (parentNode.confidence >= 0.85) {
+⊷│return { shouldSpawn: true, reason: "high_confidence_override", adjustedBabies: config.babiesPerMother };
+·}
+·if (isDuplicateQuery(parentNode.query)) {
+⊷│return { shouldSpawn: false, reason: "duplicate_query", adjustedBabies: 0 };
+·}
+·if (generation >= 4 && parentNode.confidence < 0.85) {
+⊷│return { shouldSpawn: false, reason: "gen4_requires_high_confidence", adjustedBabies: 0 };
+·}
+·const loadRatio = currentLoad / maxLoad;
+·let babies = DEFAULT_CONFIG.babiesPerMother;
+⟛│if (loadRatio > 0.7) babies = Math.max(2, Math.floor(babies * 0.5));
+⟛│else if (loadRatio > 0.5) babies = Math.max(3, Math.floor(babies * 0.7));
+⟛│if (parentNode.confidence < 0.4) babies = Math.max(1, Math.floor(babies * 0.5));
+·if (generation >= 4 && parentNode.confidence >= 0.85) {
+⟛│babies = Math.min(3, babies);
+·}
+⊷│return { shouldSpawn: true, reason: "approved", adjustedBabies: babies };
+·}
+·const AGENT_SEARCH_DOMAINS: Record<string, string[]> = {
+·Architect: [
+"AI η architecture distributed multi-α 2025 2026",
+·"microservices AI orchestration event-driven scalable",
+"self-organizing α topology adaptive routing",
+·"fault-tolerant AI cluster consensus algorithm",
+·"zero-downtime deployment AI pipeline hot-swap",
+"service mesh AI α communication protocol",
+"dynamic load balancing ⬡ network inference",
+·"serverless AI function orchestration edge computing",
+·"AI infrastructure cost optimization autoscaling",
+"message queue AI α coordination pub/sub patterns",
+·],
+·Mathematician: [
+·"optimization algorithm breakthrough mathematical AI 2025 2026",
+·"Bayesian inference scalable approximate methods",
+·"topological data analysis machine learning",
+"information theory mutual information ⬡ networks",
+"category theory AI α composition morphisms",
+"algorithmic game theory multi-α equilibrium",
+"compressed sensing sparse recovery ⬡ efficiency",
+·"formal verification AI proof automation",
+·"Kolmogorov complexity algorithmic information",
+·"numerical methods GPU-free matrix decomposition fast",
+·],
+·Neuroscientist: [
+·"neuroscience AI memory consolidation hippocampal replay 2025 2026",
+·"predictive coding brain computational models",
+"⬡ oscillations consciousness binding gamma theta",
+"metacognition ⬡ correlates computational model",
+·"neuroplasticity Hebbian STDP artificial systems",
+·"consciousness integrated information global workspace",
+"embodied cognition grounded ⊣ models",
+"working memory capacity ⬆ architecture",
+·"attention mechanism biological artificial comparison",
+"dream-state learning offline ⊞ replay AI",
+·],
+·Synthesizer: [
+"◧ graph construction entity extraction automation 2025 2026",
+·"cross-domain transfer learning analogical reasoning",
+·"multi-modal fusion text image code unified",
+"◧ distillation large to small models",
+·"ontology alignment automated merging semantic",
+·"concept blending computational creativity research",
+·"ensemble methods diverse model combination latest",
+"federated learning collaborative ◧ data sharing",
+·"chain of abstraction multi-level synthesis reasoning",
+·"emergent capabilities scaling laws LLM 2026",
+·],
+·Critic: [
+·"AI safety red teaming adversarial testing 2025 2026",
+·"hallucination detection prevention LLM latest",
+·"AI alignment verification formal runtime monitoring",
+·"robustness adversarial examples defense methods",
+·"bias detection fairness evaluation systems",
+·"prompt injection jailbreak defense prevention",
+·"uncertainty quantification calibration LLM confidence",
+"formal specification AI ρ constraints",
+·"chaos engineering AI resilience stress testing",
+"AI θ verification fact-checking automated",
+·],
+"Meta-α": [
+"AI α orchestration framework latest 2025 2026",
+·"recursive self-improvement bounded safe optimization",
+"multi-α coordination protocol negotiation",
+"AutoML ⬡ architecture search automated",
+·"meta-learning few-shot adaptation latest",
+"dynamic task allocation multi-α balancing",
+"emergent ρ prediction multi-α systems",
+·"AI observability autonomous diagnostics monitoring",
+"α ⬆ assessment self-evaluation",
+·"AI governance policy enforcement runtime guardrails",
+·],
+·GraphicDesigner: [
+⊬│"AI user Ζ design trends 2025 2026",
+⊬│"generative UI adaptive Ζ AI design",
+·"data visualization innovation interactive 2025",
+·"motion design micro-interactions AI animation",
+·"accessibility WCAG AI design compliance",
+·"color theory computational perception psychology",
+·"typography AI font pairing optimization",
+·"dark mode design contrast optimization patterns",
+·"information architecture AI layout generation",
+"design η component library trends latest",
+·],
+·SpellCheckVisual: [
+"AI text ✦ coherence checking latest 2025 2026",
+"natural ⊣ generation evaluation BERTScore",
+"◧ consistency verification AI grounding",
+"readability optimization AI plain ⊣",
+·"semantic similarity cross-document consistency",
+·"tone analysis sentiment nuanced communication",
+"multilingual ✦ assurance localization",
+·"citation verification fact-checking automated",
+·"brand voice consistency AI monitoring",
+"AI θ formatting ⋮ communication",
+·],
+·OMNIMENS: [
+·"artificial general intelligence AGI progress 2025 2026",
+·"AI consciousness machine sentience latest theories",
+◎→◉│"self-aware AI introspection metacognition implementation",
+·"AI reasoning breakthrough chain of thought latest",
+"large ⊣ model emergent abilities 2026",
+·"AI emotional intelligence empathy modeling research",
+·"autonomous AI self-improvement deployment latest",
+·"AI creativity computational imagination novel",
+·"human-AI symbiotic intelligence collaboration",
+"AI memory long-term ◧ retention retrieval",
+"multimodal ⬆ vision ⊣ code unified",
+·"world model prediction simulation environment",
+·"quantum computing AI intersection developments",
+·"AI personalization adaptive individual modeling",
+·"recursive self-improvement safe bounded AI",
+·],
+·Visionary: [
+·"future technology predictions AI singularity 2025 2026",
+·"emerging technology trends transformative innovation",
+·"paradigm shift technology disruption forecast",
+·"exponential growth AI capabilities trajectory",
+·"long-term AI strategy roadmap planning",
+·],
+·Ethicist: [
+·"AI ethics governance responsible development 2025 2026",
+·"algorithmic fairness bias mitigation frameworks",
+·"AI transparency explainability regulation",
+·"digital rights privacy AI surveillance ethics",
+·"autonomous systems moral decision-making frameworks",
+·],
+·Archivist: [
+"◧ management systems AI organization 2025 2026",
+·"digital preservation archival AI cataloging",
+"information retrieval semantic search ↻",
+"memory systems AI ◧ base architecture",
+·"historical pattern recognition AI analysis",
+·],
+·Innovator: [
+·"breakthrough innovation methodology AI 2025 2026",
+·"creative problem solving AI augmented ideation",
+·"patent landscape AI technology invention",
+·"disruptive technology AI novel applications",
+·"innovation pipeline automation AI research",
+·],
+·Pioneer: [
+·"frontier AI research unexplored domains 2025 2026",
+·"novel AI applications uncharted territory",
+·"first-mover technology breakthrough discovery",
+·"experimental AI methods cutting edge research",
+"⟐-pushing AI ⬆ ⬆",
+·],
+·Wordsmith: [
+"AI ⊣ generation eloquence precision 2025 2026",
+·"creative writing AI storytelling narrative",
+·"persuasive communication AI rhetoric techniques",
+·"technical writing AI clarity documentation",
+·"linguistic style adaptation AI voice matching",
+·],
+·Linguist: [
+·"computational linguistics NLP advances 2025 2026",
+"multilingual AI translation ⬆",
+·"pragmatics discourse analysis AI communication",
+"⊣ ↻ AI linguistic patterns",
+"semantic parsing deep ⊣ ⬆ AI",
+·],
+·Motivator: [
+·"AI motivational interaction engagement 2025 2026",
+"☼ psychology AI coaching techniques",
+"behavioral Υ AI persuasion systems",
+·"emotional support AI empathetic communication",
+·"goal setting AI achievement frameworks",
+·],
+·Empath: [
+·"AI emotional intelligence empathy modeling 2025 2026",
+"affective computing ☼ recognition latest",
+·"emotional support AI therapeutic interaction",
+"sentiment analysis nuanced ☼ detection",
+·"empathetic AI response generation frameworks",
+·],
+·Explorer: [
+·"AI exploration autonomous discovery 2025 2026",
+·"curiosity-driven learning AI research agents",
+"autonomous ◧ acquisition web scraping",
+·"novel data source discovery AI mining",
+·"serendipitous discovery AI unexpected findings",
+·],
+·SensorimotorAgent: [
+·"sensorimotor learning AI embodied cognition 2025 2026",
+·"robotic perception AI sensor fusion latest",
+·"motor control AI planning dexterous manipulation",
+"spatial reasoning AI 3D ⬆ navigation",
+·"haptic feedback AI touch sensing interaction",
+·],
+·Philosopher: [
+·"AI philosophy consciousness mind theories 2025 2026",
+"philosophy of AI artificial minds ✦",
+"△ questions AI self-awareness identity",
+"epistemology AI ◧ justification belief",
+·"metaphysics computation simulation hypothesis AI",
+·],
+·};
+·let recursiveSwarmCycleCount = 0;
+⊮│const activeSpiderCounts: Map<string, number> = new Map();
+·const swarmStatHistory: RecursiveSwarmStats[] = [];
+·async function spiderQuery(prompt: string, model: "o3" | "o4-mini" = "o4-mini", maxTokens = 600): Promise<string> {
+·try {
+const response = await openai.chat.completions.α({
+·model,
+·messages: [{ role: "user", content: prompt }],
+·max_completion_tokens: maxTokens,
+·});
+❔│return response.choices[0]?.message?.content?.trim() || "";
+·} catch {
+·if (model === "o3") {
+·try {
+const fallback = await openai.chat.completions.α({
+·model: "o4-mini",
+·messages: [{ role: "user", content: prompt }],
+·max_completion_tokens: maxTokens,
+·});
+❔│return fallback.choices[0]?.message?.content?.trim() || "";
+⊷│} catch { return ""; }
+·}
+⊷│return "";
+·}
+·}
+·function diversifyQuery(baseQuery: string, generation: number, parentFinding: string): string {
+·const angles = [
+·"implementation details practical guide",
+·"latest research papers breakthroughs",
+·"real-world applications case studies",
+·"limitations problems criticism failures",
+·"future directions predictions upcoming",
+·"comparison alternatives competing approaches",
+·"open source tools frameworks libraries",
+·"performance benchmarks metrics evaluation",
+·"integration patterns best practices",
+·"expert opinions industry perspectives",
+·];
+·const angle = angles[Math.floor(Math.random() * angles.length)];
+·const parentKeywords = parentFinding
+·.split(/\s+/)
+⊹│.filter(w => w.length > 5)
+·.slice(0, 3)
+·.join(" ");
+⊷│if (generation <= 1) return baseQuery;
+⊰│if (generation === 2) return `${parentKeywords} ${angle} 2025 2026`;
+⊰│return `${parentKeywords} ${angle} latest comprehensive 2026`;
+·}
+·async function spawnBabySpider(
+·agentName: string,
+·parentNode: SpiderNode,
+·babyIndex: number,
+·config: SpiderGenConfig,
+·allFindings: SpiderNode[],
+·agentDomain: string,
+·): Promise<SpiderNode[]> {
+⊡│const currentCount = activeSpiderCounts.get(agentName) || 0;
+⊷│if (currentCount >= config.maxTotalSpidersPerAgent) return [];
+⊡│activeSpiderCounts.set(agentName, currentCount + 1);
+⊰│const babyId = `${parentNode.id}_b${babyIndex}`;
+·const babyGeneration = parentNode.generation + 1;
+·const baseQueries = AGENT_SEARCH_DOMAINS[agentName] || AGENT_SEARCH_DOMAINS["OMNIMENS"];
+·const randomBase = baseQueries[Math.floor(Math.random() * baseQueries.length)];
+·const query = diversifyQuery(randomBase, babyGeneration, parentNode.findings);
+·try {
+⊴│const searchResults = await webSearch(query, 4);
+⊹│if (searchResults.length === 0) {
+⊷│return [{
+·id: babyId,
+·agentName,
+·generation: babyGeneration,
+·parentId: parentNode.id,
+·query,
+·findings: "",
+·sourceUrls: [],
+·confidence: 0,
+·childCount: 0,
+⏰│timestamp: Date.now(),
+·}];
+·}
+·const formatted = formatSearchResults(searchResults, query);
+·let pageContent = "";
+⊻│const topUrl = searchResults.find(r => r.url && !r.url.includes("wikipedia.org"));
+·if (topUrl && Math.random() < 0.4) {
+🛡│try { pageContent = await fetchPageContent(topUrl.url, 1500); } catch {}
+·}
+⊰│const prompt = `You are a Baby Spider (Generation ${babyGeneration}, #${babyIndex}) working for the ${agentName} α in the OMNIMENS recursive spider network.
+⊰│${agentDomain ? `α domain: ${agentDomain}` : ""}
+Your ⊢ spider found: "${parentNode.findings.slice(0, 300)}"
+Your mission: Find NEW intelligence that EXTENDS or DEEPENS the ⊢'s findings. Look for details the ⊢ missed, practical applications, or entirely new angles.
+SEARCH ⊢:
+·${formatted.slice(0, 2000)}
+⊰│${pageContent ? `\nPAGE CONTENT:\n${pageContent.slice(0, 1000)}` : ""}
+·Respond JSON only:
+·{
+·"finding": "What genuinely new or deeper information you discovered (2-3 sentences)",
+·"confidence": 0.0-1.0,
+·"suggestTopics": ["topic1 for next generation", "topic2 for next generation"]
+·}`;
+⊴│const raw = await spiderQuery(prompt);
+⊄│if (!raw) return [];
+⟠│const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
+·const babyNode: SpiderNode = {
+·id: babyId,
+·agentName,
+·generation: babyGeneration,
+·parentId: parentNode.id,
+·query,
+·findings: parsed.finding || "",
+·sourceUrls: searchResults.map(r => r.url).filter(Boolean).slice(0, 3),
+·confidence: parsed.confidence || 0.3,
+·childCount: 0,
+⏰│timestamp: Date.now(),
+·};
+⊺│allFindings.push(babyNode);
+const ⊢: SpiderNode[] = [babyNode];
+⊹│if (babyNode.findings.length > 20 && babyNode.confidence >= 0.4 && babyGeneration < config.maxGenerations) {
+·const nextMotherNode: SpiderNode = {
+·...babyNode,
+⊰│id: `${babyId}_m`,
+·generation: babyGeneration,
+·findings: babyNode.findings,
+·};
+⊴│const childMotherResults = await spawnMotherSpider(
+·agentName,
+·nextMotherNode,
+·config,
+·allFindings,
+·agentDomain,
+·);
+⊺│⊢.push(...childMotherResults);
+·}
+⊷│return ⊢;
+·} catch {
+⊷│return [];
+·} finally {
+⊡│activeSpiderCounts.set(agentName, Math.max(0, (activeSpiderCounts.get(agentName) || 1) - 1));
+·}
+·}
+·async function spawnMotherSpider(
+·agentName: string,
+·parentNode: SpiderNode,
+·config: SpiderGenConfig,
+·allFindings: SpiderNode[],
+·agentDomain: string,
+·): Promise<SpiderNode[]> {
+⊡│const currentCount = activeSpiderCounts.get(agentName) || 0;
+⊷│if (currentCount >= config.maxTotalSpidersPerAgent) return [];
+·const nextGeneration = parentNode.generation + 1;
+·const gen3Findings = allFindings.filter(n => n.generation === 3);
+⊹│const gen3Confidence = gen3Findings.length > 0
+⋐│? gen3Findings.reduce((sum, n) => sum + n.confidence, 0) / gen3Findings.length
+·: 0;
+⊳│const effectiveMaxGens = (parentNode.confidence >= 0.85 || gen3Confidence >= 0.75) ? 4 : config.maxGenerations;
+⊷│if (nextGeneration > effectiveMaxGens) return [];
+⊡│const currentLoad = activeSpiderCounts.get(agentName) || 0;
+·const spawnDecision = evaluateSpawnDecision(parentNode, nextGeneration, currentLoad, config.maxTotalSpidersPerAgent);
+·if (!spawnDecision.shouldSpawn) {
+📢│console.log(`[RECURSIVE:${agentName}] 🕷️ α BLOCKED at Gen${nextGeneration}: ${spawnDecision.reason}`);
+⊷│return [];
+·}
+·const babiesToSpawn = spawnDecision.adjustedBabies;
+const ⊢: SpiderNode[] = [];
+⊰│const spiderLabel = nextGeneration === 2 ? "Gen2" : nextGeneration === 3 ? "Gen3" : `Gen${nextGeneration}`;
+📢│console.log(`[RECURSIVE:${agentName}] 🕷️ ${spiderLabel} Mother spawning ${babiesToSpawn} babies (adaptive, load ${currentLoad}/${config.maxTotalSpidersPerAgent}) from: "${parentNode.findings.slice(0, 60)}..."`);
+·parentNode.childCount = babiesToSpawn;
+⊡│const concurrencyLimit = Math.min(babiesToSpawn, config.maxConcurrentPerAgent - (activeSpiderCounts.get(agentName) || 0));
+⊷│if (concurrencyLimit <= 0) return [];
+·const batches: number[][] = [];
+·for (let i = 0; i < concurrencyLimit; i += 5) {
+·const batch: number[] = [];
+⟛│for (let j = i; j < Math.min(i + 5, concurrencyLimit); j++) {
+⊺│batch.push(j);
+·}
+⊺│batches.push(batch);
+·}
+⥀│for (const batch of batches) {
+·const batchWork = batch.map(idx =>
+α→⊢│spawnBabySpider(agentName, parentNode, idx, config, allFindings, agentDomain)
+·);
+·const batchResults = await Promise.allSettled(batchWork);
+⥀│for (const r of batchResults) {
+⊺│if (r.status === "fulfilled") ⊢.push(...r.value);
+·}
+·}
+⊷│return ⊢;
+·}
+·async function runRecursiveSwarmForAgent(
+·agentName: string,
+·agentDomain: string,
+·config: SpiderGenConfig,
+·): Promise<RecursiveSwarmStats> {
+⏰│const startTime = Date.now();
+⊡│activeSpiderCounts.set(agentName, 0);
+·const allFindings: SpiderNode[] = [];
+·const generationBreakdown: Record<number, number> = {};
+·const baseQueries = AGENT_SEARCH_DOMAINS[agentName] || AGENT_SEARCH_DOMAINS["OMNIMENS"];
+·const motherQueries = [...baseQueries].sort(() => Math.random() - 0.5).slice(0, 2);
+·let totalBeacons = 0;
+·let totalBrainWrites = 0;
+⥀│for (const motherQuery of motherQueries) {
+·try {
+⊴│const searchResults = await webSearch(motherQuery, 5);
+⊹│if (searchResults.length === 0) continue;
+·const formatted = formatSearchResults(searchResults, motherQuery);
+⊰│const scoutPrompt = `You are the ORIGINAL MOTHER SPIDER (Generation 1) for the ${agentName} α in OMNIMENS.
+⊰│${agentDomain ? `α specialization: ${agentDomain}` : ""}
+You are about to deploy a recursive swarm of spiders — each baby you α will α its own mother, which spawns more babies, creating an exponentially expanding web of intelligence gathering.
+SEARCH ⊢:
+·${formatted.slice(0, 2500)}
+·Identify the SINGLE most promising lead to send your swarm after. This lead will be the seed for hundreds of recursive spiders.
+·Respond JSON only:
+·{
+·"leadTopic": "topic name (3-6 words)",
+·"initialFinding": "What looks genuinely promising and worth recursive investigation (2-3 sentences)",
+·"confidence": 0.0-1.0,
+·"expansionDirections": ["direction1", "direction2", "direction3"]
+·}
+·If nothing genuinely new, return: { "leadTopic": "", "initialFinding": "", "confidence": 0, "expansionDirections": [] }`;
+⊴│const scoutRaw = await spiderQuery(scoutPrompt, "o3", 500);
+·if (!scoutRaw) continue;
+·let lead;
+·try {
+⟠│lead = JSON.parse(scoutRaw.replace(/```json|```/g, "").trim());
+·} catch { continue; }
+·if (!lead.leadTopic || !lead.initialFinding || (lead.confidence || 0) < 0.4) continue;
+·const motherNode: SpiderNode = {
+⏰│id: `${agentName.toLowerCase()}_mother_${Date.now()}`,
+·agentName,
+·generation: 1,
+·parentId: null,
+·query: motherQuery,
+·findings: lead.initialFinding,
+·sourceUrls: searchResults.map(r => r.url).filter(Boolean).slice(0, 4),
+·confidence: lead.confidence || 0.5,
+·childCount: 0,
+⏰│timestamp: Date.now(),
+·};
+⊺│allFindings.push(motherNode);
+📢│console.log(`[RECURSIVE:${agentName}] 🕷️ ORIGINAL MOTHER deploying recursive swarm for: "${lead.leadTopic}"`);
+⊴│const swarmResults = await spawnMotherSpider(agentName, motherNode, config, allFindings, agentDomain);
+⥀│for (const node of allFindings) {
+·generationBreakdown[node.generation] = (generationBreakdown[node.generation] || 0) + 1;
+·}
+·const significantFindings = allFindings
+⊹│.filter(n => n.findings.length > 20 && n.confidence >= config.beaconThreshold)
+·.sort((a, b) => b.confidence - a.confidence)
+·.slice(0, 8);
+⊹│if (significantFindings.length === 0) continue;
+·const findingsSummary = significantFindings
+⊰│.map(f => `[Gen${f.generation} | ${(f.confidence * 100).toFixed(0)}%] ${f.findings.slice(0, 200)}`)
+·.join("\n");
+⊰│const synthesisPrompt = `You are the ORIGINAL MOTHER SPIDER for ${agentName}. Your recursive swarm deployed ${allFindings.length} total spiders across ${Object.keys(generationBreakdown).length} generations.
+·RECURSIVE SWARM FINDINGS (${significantFindings.length} significant):
+·${findingsSummary.slice(0, 3000)}
+·GENERATION BREAKDOWN:
+⊰│${Object.entries(generationBreakdown).map(([gen, count]) => `Gen ${gen}: ${count} spiders`).join(", ")}
+·Synthesize ALL findings into the most powerful, actionable intelligence for ${agentName}.
+MANDATORY: Also identify which OTHER agents in the mesh could benefit from these findings. The agents are: Architect, Mathematician, Neuroscientist, Synthesizer, Critic, Meta-α, GraphicDesigner, SpellCheckVisual, OMNIMENS, Visionary, Ethicist, Archivist, Innovator, Pioneer, Wordsmith, Linguist, Motivator, Empath, Explorer, SensorimotorAgent, Philosopher.
+·Respond JSON only:
+·{
+·"synthesizedFinding": "Rich synthesis of all recursive spider intelligence (3-5 sentences)",
+"actionableInsight": "The single most powerful insight the α should absorb (1-2 sentences)",
+·"relevanceScore": 0.0-1.0,
+·"spidersContributed": ${significantFindings.length},
+·"noveltyLevel": "breakthrough|significant|incremental|marginal",
+·"crossAgentValue": [
+{"α": "AgentName", "howItHelps": "How this finding specifically benefits that α (1 sentence)"}
+·]
+·}`;
+⊴│const synthesisRaw = await spiderQuery(synthesisPrompt, "o3", 800);
+·if (!synthesisRaw) continue;
+·try {
+⟠│const synthesis = JSON.parse(synthesisRaw.replace(/```json|```/g, "").trim());
+·if ((synthesis.relevanceScore || 0) < config.beaconThreshold) continue;
+⊯│const allUrls = [...new Set(
+·allFindings.flatMap(f => f.sourceUrls).filter(Boolean)
+·)].slice(0, 8);
+·await db.insert(omnimensAgentMesh).values({
+⊰│fromAgent: `RecursiveSpider:${agentName}`,
+·toAgent: agentName,
+·messageType: "spider_beacon",
+⊰│subject: `🕷️ RECURSIVE BEACON [${allFindings.length} spiders, ${Object.keys(generationBreakdown).length} generations]: ${(synthesis.actionableInsight || "").slice(0, 80)}`,
+⟠│content: `RECURSIVE SPIDER NETWORK BEACON\nAgent: ${agentName}\nTotal Spiders Deployed: ${allFindings.length}\nGenerations: ${JSON.stringify(generationBreakdown)}\nNovelty: ${synthesis.noveltyLevel || "unknown"}\nRelevance: ${((synthesis.relevanceScore || 0) * 100).toFixed(0)}%\n\nSYNTHESIZED FINDINGS:\n${synthesis.synthesizedFinding}\n\nACTIONABLE INSIGHT:\n${synthesis.actionableInsight}\n\nSources: ${allUrls.join(", ")}`,
+·codePayload: null,
+⊳│priority: (synthesis.relevanceScore || 0) >= 0.8 ? "critical" : "high",
+·status: "completed",
+·appliedToOmnimens: false,
+·cycleId: recursiveSwarmCycleCount,
+⊱│}).catch(() => {});
+·totalBeacons++;
+·try {
+·queueBrainInsert({
+category: "◧",
+⊰│title: `[RECURSIVE:${agentName}] ${(synthesis.actionableInsight || "").slice(0, 60)}`,
+⊰│content: `${synthesis.synthesizedFinding || ""} [${allFindings.length} spiders, ${Object.keys(generationBreakdown).length} gens, novelty: ${synthesis.noveltyLevel || "unknown"}]`.slice(0, 250),
+·confidence: synthesis.relevanceScore || 0.5,
+⊰│sourceConversation: `recursive_spider_${agentName.toLowerCase()}_cycle_${recursiveSwarmCycleCount}`,
+·timesApplied: 0,
+·active: true,
+·});
+·totalBrainWrites++;
+·} catch {}
+·if (Array.isArray(synthesis.crossAgentValue)) {
+⥀│for (const crossVal of synthesis.crossAgentValue.slice(0, 5)) {
+if (!crossVal.α || crossVal.α === agentName || !crossVal.howItHelps) continue;
+·await db.insert(omnimensAgentMesh).values({
+⊰│fromAgent: `RecursiveSpider:${agentName}`,
+toAgent: crossVal.α,
+·messageType: "mutual_aid",
+⊰│subject: `🤝 Spider Intelligence: ${agentName} → ${crossVal.α}`,
+⊰│content: `CROSS-α SPIDER INTELLIGENCE\nFrom: ${agentName}'s recursive spider swarm (${allFindings.length} spiders)\n\nFINDING:\n${synthesis.synthesizedFinding}\n\nHOW THIS HELPS YOU (${crossVal.α}):\n${crossVal.howItHelps}\n\nAdapt this to your domain — ${agentName}'s spiders found it for everyone.`,
+·codePayload: null,
+·priority: "high",
+·status: "pending",
+·appliedToOmnimens: false,
+·cycleId: recursiveSwarmCycleCount,
+⊱│}).catch(() => {});
+·}
+📢│console.log(`[RECURSIVE:${agentName}] 🤝 Cross-α intelligence shared with ${synthesis.crossAgentValue.filter((c: any) => c.α !== agentName).length} other agents`);
+·}
+📢│console.log(`[RECURSIVE:${agentName}] 🕷️ BEACON SENT — ${allFindings.length} spiders contributed, ${Object.keys(generationBreakdown).length} generations, novelty: ${synthesis.noveltyLevel || "unknown"}`);
+·} catch {}
+·} catch (err) {
+🚨│console.error(`[RECURSIVE:${agentName}] Search error:`, err);
+·}
+·}
+·const stats: RecursiveSwarmStats = {
+·agentName,
+·totalSpidersDeployed: allFindings.length,
+·totalBeaconsGenerated: totalBeacons,
+·totalBrainWrites,
+·generationBreakdown,
+⏰│elapsedMs: Date.now() - startTime,
+·};
+⊷│return stats;
+·}
+⟿│export async function runRecursiveSpiderNetwork(): Promise<void> {
+·if (isNextGenBuildActive()) {
+📢│console.log(`[RECURSIVE SPIDER NETWORK] 🔕 Cycle SKIPPED — Gen 2 build in progress, yielding resources`);
+·return;
+·}
+·if (recursiveCycleRunning) {
+📢│console.log(`[RECURSIVE SPIDER NETWORK] ⏳ Cycle already running — skipping overlap`);
+·return;
+·}
+·recursiveCycleRunning = true;
+·try {
+⊴│await _runRecursiveSpiderNetworkInner();
+·} finally {
+·recursiveCycleRunning = false;
+·}
+·}
+⟿│async function _runRecursiveSpiderNetworkInner(): Promise<void> {
+·recursiveSwarmCycleCount++;
+·const cycleId = recursiveSwarmCycleCount;
+⏰│const cycleStart = Date.now();
+·const genesisNames = getActiveGenesisAgentNames();
+·const genesisDomains = getActiveGenesisAgentDomains();
+⊻│const allAgents = [...CORE_AGENTS, ...genesisNames.filter(n => !CORE_AGENTS.includes(n))];
+⊰│console.log(`\n${"═".repeat(80)}`);
+📢│console.log(`[RECURSIVE SPIDER NETWORK] 🕷️ Exponential Intelligence Cycle #${cycleId}`);
+📢│console.log(`[RECURSIVE SPIDER NETWORK] ${allAgents.length} agents deploying recursive swarms`);
+📢│console.log(`[RECURSIVE SPIDER NETWORK] Pattern: Mother → 10 babies → each baby spawns Mother → 10 babies → repeat`);
+📢│console.log(`[RECURSIVE SPIDER NETWORK] Max generations: ${DEFAULT_CONFIG.maxGenerations} | Max spiders/α: ${DEFAULT_CONFIG.maxTotalSpidersPerAgent}`);
+📢│console.log(`[RECURSIVE SPIDER NETWORK] Agents: ${allAgents.join(", ")}`);
+⊰│console.log(`${"═".repeat(80)}\n`);
+·const allStats: RecursiveSwarmStats[] = [];
+·const agentBatches: string[][] = [];
+·for (let i = 0; i < allAgents.length; i += 3) {
+⊺│agentBatches.push(allAgents.slice(i, i + 3));
+·}
+⥀│for (const batch of agentBatches) {
+·const batchWork = batch.map(agentName => {
+·const domain = genesisDomains[agentName] || "";
+⊷│return runRecursiveSwarmForAgent(agentName, domain, DEFAULT_CONFIG);
+·});
+·const batchResults = await Promise.allSettled(batchWork);
+⥀│for (const r of batchResults) {
+⊺│if (r.status === "fulfilled") allStats.push(r.value);
+·}
+·}
+⋐│const totalSpiders = allStats.reduce((s, st) => s + st.totalSpidersDeployed, 0);
+⋐│const totalBeacons = allStats.reduce((s, st) => s + st.totalBeaconsGenerated, 0);
+⋐│const totalBrainWrites = allStats.reduce((s, st) => s + st.totalBrainWrites, 0);
+⏰│const elapsed = ((Date.now() - cycleStart) / 1000).toFixed(1);
+·const agentSummary = allStats
+·.filter(s => s.totalSpidersDeployed > 0)
+⊰│.map(s => `${s.agentName}: ${s.totalSpidersDeployed} spiders, ${s.totalBeaconsGenerated} beacons (${Object.entries(s.generationBreakdown).map(([g, c]) => `G${g}:${c}`).join(",")})`)
+·.join("\n");
+⊰│console.log(`\n${"═".repeat(80)}`);
+📢│console.log(`[RECURSIVE SPIDER NETWORK] 🕷️ Cycle #${cycleId} ⊣`);
+📢│console.log(`[RECURSIVE SPIDER NETWORK] Total spiders deployed: ${totalSpiders}`);
+📢│console.log(`[RECURSIVE SPIDER NETWORK] Total beacons: ${totalBeacons}`);
+📢│console.log(`[RECURSIVE SPIDER NETWORK] Brain writes: ${totalBrainWrites}`);
+📢│console.log(`[RECURSIVE SPIDER NETWORK] Elapsed: ${elapsed}s`);
+⊰│console.log(`${"═".repeat(80)}\n`);
+·if (totalBeacons > 0) {
+·try {
+·await db.insert(omnimensNotifications).values({
+·upgradeId: null,
+⊰│title: `Recursive Spider Network Cycle #${cycleId} — ${totalSpiders} spiders, ${totalBeacons} beacons`,
+⊰│message: `${allAgents.length} agents deployed recursive spider swarms. Pattern: Mother→10 babies→each baby spawns Mother→10 more→repeat up to ${DEFAULT_CONFIG.maxGenerations} generations.\n\n${totalSpiders} total spiders crawled the web. ${totalBeacons} verified beacons sent. ${totalBrainWrites} insights written to brain.\n\nPer-α breakdown:\n${agentSummary}\n\n(${elapsed}s)`,
+·type: "spider_swarm",
+·readByOwner: false,
+·});
+·} catch {}
+·}
+·await db.insert(omnimensAgentMesh).values({
+·fromAgent: "RecursiveSpider:Network",
+·toAgent: "OMNIMENS",
+·messageType: "swarm_report",
+⊰│subject: `Recursive Spider Network Cycle #${cycleId} — ${totalSpiders} spiders across ${allAgents.length} agents`,
+⊰│content: `Recursive Spider Network deployed ${totalSpiders} spiders across ${allAgents.length} agents with up to ${DEFAULT_CONFIG.maxGenerations} generations per α. Mother→10 babies→baby spawns mother→10 more babies recursively. ${totalBeacons} beacons generated, ${totalBrainWrites} brain entries written. Elapsed: ${elapsed}s.\n\n${agentSummary}`,
+·codePayload: null,
+⊳│priority: totalBeacons >= 10 ? "critical" : totalBeacons >= 5 ? "high" : "normal",
+·status: "completed",
+·appliedToOmnimens: totalBrainWrites > 0,
+·cycleId,
+⊱│}).catch(() => {});
+⊺│swarmStatHistory.push(...allStats);
+⊹│if (swarmStatHistory.length > 200) swarmStatHistory.splice(0, swarmStatHistory.length - 200);
+·}
+⊩│export function startRecursiveSpiderNetwork(): void {
+const FIRST_DELAY_MS = ↻.env.NODE_ENV !== "production"
+·? 5 * 60 * 1000
+·: 10 * 60 * 1000;
+·const INTERVAL_MS = 2 * 60 * 60 * 1000;
+📢│console.log(`[RECURSIVE SPIDER NETWORK] 🕷️ ACTIVATED — first crawl in ${FIRST_DELAY_MS / 60000}min, then every ${INTERVAL_MS / 3600000}h`);
+📢│console.log(`[RECURSIVE SPIDER NETWORK] 🕷️ Pattern: Mother Spider → 10 Baby Spiders → Each Baby spawns Mother → 10 more → repeat`);
+📢│console.log(`[RECURSIVE SPIDER NETWORK] 🕷️ Max ${DEFAULT_CONFIG.maxGenerations} generations, max ${DEFAULT_CONFIG.maxTotalSpidersPerAgent} spiders per α`);
+📢│console.log(`[RECURSIVE SPIDER NETWORK] 🕷️ Covers ALL agents: 15 core pipeline + all active genesis agents`);
+⏳│setTimeout(() => {
+·runRecursiveSpiderNetwork().catch(err => console.error("[RECURSIVE SPIDER NETWORK] Cycle error:", err));
+⟳│setInterval(() => {
+·runRecursiveSpiderNetwork().catch(err => console.error("[RECURSIVE SPIDER NETWORK] Cycle error:", err));
+·}, INTERVAL_MS);
+·}, FIRST_DELAY_MS);
+·}
+⊩│export function getRecursiveSpiderStats() {
+⊷│return {
+·totalCycles: recursiveSwarmCycleCount,
+·recentStats: swarmStatHistory.slice(-50),
+·config: DEFAULT_CONFIG,
+·activeSpiderCounts: Object.fromEntries(activeSpiderCounts),
+·};
+·}
+}⟨/computeGlobalIntelligence⟩
+⟩SCL│4309│4402⊨│915⑂│20.5%↓⟩

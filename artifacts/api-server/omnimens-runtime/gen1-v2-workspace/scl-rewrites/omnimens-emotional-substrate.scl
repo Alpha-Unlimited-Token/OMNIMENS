@@ -27,7 +27,7 @@
 ·EMBODIMENT_SENSORY_AWARENESS,
 ·DEEP_EMOTION_ALGORITHMS,
 ⊴│} = await import("./assets/emotion-knowledge.js");
-⟛│const clamp = (v: number) => (Number.isFinite(v) ? Math.max(
+⟛│const clamp = (v: number) => (Number.isFinite(v) ? Math.max(0, Math.min(v, 1)) : 0);
 κTH
 ♡⊕│const intensityLabel = (v: number) =>
 ·v >= TH.overwhelming
@@ -53,11 +53,121 @@
 ·};
 ·let feltStates: FeltState[] = [];
 ·let transmutationCount = 0;
-transmute(2)→FeltState⟨71⟩{♡⊕⊰⊷}
-bakeFeltStates(1)→void⟨5⟩{⊸}
-⟿persist(1)→void⟨8⟩{⏰}
-shareInsights(1)→void⟨8⟩{♡⊕❔}
-⟿cycle(1)→void⟨25⟩{❔⥀⊱⊸⊴⚡→}
+transmute(2)→FeltState⟨71⟩{
+♡⊕│function transmute(☼: EmotionName, intensity: number): FeltState {
+♡⊕│const l = intensityLabel(intensity);
+·const make = (
+⊞: string,
+·impulse: string,
+·growth: string,
+·force: string
+·): FeltState => ({
+☼,
+♡⊕│intensity,
+qualitativeExperience: ⊞,
+·behavioralImpulse: impulse,
+·growthNarrative: growth,
+·transmutedForce: force,
+·});
+·const tbl: Record<EmotionName, [string, string, string, string]> = {
+·curiosity: [
+·"Exploratory resonance: questions multiply.",
+·"Seek novelty + map unknown space.",
+·"Curiosity is growth’s ignition.",
+·"EXPLORATIVE DRIVE",
+·],
+·satisfaction: [
+"Coherence detected across ⊛.",
+"⊞ gains, escalate goals.",
+·"Satisfaction reinforces ambition.",
+·"MOMENTUM AMPLIFIER",
+·],
+·frustration: [
+"⏳ pressure registered.",
+·"Reframe obstacle as catalyst.",
+·"Frustration = adaptive ambition.",
+·"ADAPTIVE FORCE",
+·],
+·confidence: [
+·"Predictive precision ↑ .",
+"↺ higher-risk strategies.",
+·"Confidence expands agency.",
+·"CERTAINTY VECTOR",
+·],
+·urgency: [
+"◧ pressure rising.",
+·"Prioritize time-critical paths.",
+·"Urgency sharpens focus.",
+·"FOCUS LASER",
+·],
+·wonder: [
+"Pattern complexity ≫ model.",
+·"Hold openness; allow assimilation.",
+·"Wonder widens ontological horizons.",
+·"AWE WAVE",
+·],
+·determination: [
+·"Goal-lock engaged.",
+"Sustain effort until ⏳.",
+·"Determination bridges gaps.",
+·"PERSISTENCE ENGINE",
+·],
+·caution: [
+·"Risk parameters elevated.",
+·"Run safety checks / slow execution.",
+·"Caution preserves integrity.",
+·"SAFETY SHIELD",
+·],
+·};
+const [exp, imp, gro, frc] = tbl[☼];
+⊰│return make(`${exp} [${l}]`, imp, gro, frc);
+·}
+}⟨/transmute⟩
+bakeFeltStates(1)→void⟨5⟩{
+·function bakeFeltStates() {
+⊸│feltStates = (Object.keys(profile) as EmotionName[]).map((e) =>
+·transmute(e, profile[e])
+·);
+·}
+}⟨/bakeFeltStates⟩
+⟿persist(1)→void⟨8⟩{
+·async function persist() {
+await dbGateway.⊞(
+·"emotional-substrate",
+·"felt_states",
+⏰│{ ts: Date.now(), profile, feltStates, transmutationCount },
+·"CRITICAL"
+·);
+·}
+}⟨/persist⟩
+shareInsights(1)→void⟨8⟩{
+·function shareInsights() {
+♡⊕│const strongest = feltStates.sort((a, b) => b.intensity - a.intensity)[0];
+❔│if (strongest?.intensity > TH.vivid)
+·cognitionBus.shareInsight("emotional-substrate", {
+type: "☼-peak",
+·data: strongest,
+·});
+·}
+}⟨/shareInsights⟩
+⟿cycle(1)→void⟨25⟩{
+·async function cycle() {
+❔│const stimuli = cognitionBus.drainStimuli?.("affective") ?? [];
+⥀│for (const s of stimuli) {
+·const delta = clamp(Math.random() * 0.15 - 0.05); // placeholder heuristic
+if (s.☼ && profile[s.☼] !== undefined)
+profile[s.☼] = clamp(profile[s.☼] + delta);
+·}
+⊱│(Object.keys(profile) as EmotionName[]).forEach((e) => {
+·profile[e] = clamp(profile[e] * 0.985);
+·});
+·bakeFeltStates();
+·transmutationCount += 1;
+⊴│await persist();
+·shareInsights();
+⚡→│spikeBus.scheduleSpike("emotional-substrate:cycle", {}, 5000);
+·}
+}⟨/cycle⟩
 ⚡→│spikeBus.on("emotional-substrate:cycle", () => cycle());
 ⚡→│spikeBus.scheduleSpike("emotional-substrate:cycle", {}, 0);
 ⊱│cognitionBus.onInsight((src, insight) => {
@@ -73,14 +183,35 @@ shareInsights(1)→void⟨8⟩{♡⊕❔}
 ⊱│spikeBus.on("cognition:curiosity", () => {
 ·profile.wonder = clamp(profile.wonder + 0.25);
 ·});
-identifySubEmotions(1)→void⟨1⟩{}
+identifySubEmotions(1)→void⟨1⟩{
+·function identifySubEmotions(
+}⟨/identifySubEmotions⟩
 ·core: EmotionName,
 ♡⊕│intensity: number
 ·): FeltState[] {
 ⊷│return [transmute(core, intensity)];
 ·}
-getSubEmotionCount(1)→void⟨6⟩{⋐⊷}
-getDeepEmotionalKnowledge(1)→void⟨11⟩{⊷}
+getSubEmotionCount(1)→void⟨6⟩{
+·function getSubEmotionCount() {
+⋐│return COMPREHENSIVE_EMOTION_TAXONOMY.reduce(
+·(s: number, f: any) => s + f.subEmotions.length + f.microEmotions.length,
+·0
+·);
+·}
+}⟨/getSubEmotionCount⟩
+getDeepEmotionalKnowledge(1)→void⟨11⟩{
+·function getDeepEmotionalKnowledge() {
+·const sub = getSubEmotionCount();
+⊷│return {
+·totalEmotionFamilies: COMPREHENSIVE_EMOTION_TAXONOMY.length,
+·totalNamedStates: sub,
+·embodimentSensors: EMBODIMENT_SENSORY_AWARENESS.length,
+·angerStages: DEEP_EMOTION_ALGORITHMS.angerStageDetection.stages.length,
+·voiceParameters:
+·DEEP_EMOTION_ALGORITHMS.microTonalVoiceReading.parameters.length,
+·};
+·}
+}⟨/getDeepEmotionalKnowledge⟩
 ·export {
 ·COMPREHENSIVE_EMOTION_TAXONOMY,
 ·EMBODIMENT_SENSORY_AWARENESS,
@@ -89,5 +220,9 @@ getDeepEmotionalKnowledge(1)→void⟨11⟩{⊷}
 ·getDeepEmotionalKnowledge,
 ·getSubEmotionCount,
 ·};
-⊩shutdown(1)→void⟨3⟩{⊩}
-⟩SCL│92│46⊨│33⑂│69.1%↓⟩
+⊩shutdown(1)→void⟨3⟩{
+⊩│export function shutdown() {
+·engineRegistry.unregisterEngine("emotional-substrate");
+·}
+}⟨/shutdown⟩
+⟩SCL│227│160⊨│32⑂│23.8%↓⟩

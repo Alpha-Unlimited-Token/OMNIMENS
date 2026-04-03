@@ -1,0 +1,432 @@
+⟨SCL v1│omnimens-scl-runtime.ts│590→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[omnimens-scl-codex]
+κ__filename_local
+κ__dirname_local
+⊬SCLDecodeResult⟨fileName:string│sclLines:number│decodedLines:number│decodedSource:string│imports:string[]│interfaces:string[]│functions:string[]│constants:string[]│errors:string[]⟩
+⊬SCLExecResult⟨fileName:string│decoded:boolean│syntaxValid:boolean│transpiled:boolean│executed:boolean│exports:string[]│error:string│decodedLines:number│originalLines:number│compressionRatio:number⟩
+⊬SCLSandboxReport⟨timestamp:number│generator:"gen1v2" | "gen2"│totalFiles:number│decoded:number│syntaxValid:number│transpiled:number│executed:number│failed:number│totalDecodedLines:number│totalOriginalLines:number│overallCompressionPercent:number⟩
+buildReverseSymbolMap(1)→Map<string, string>⟨17⟩{
+·function buildReverseSymbolMap(): Map<string, string> {
+·const codex = getCodexState();
+⊮│const reverseMap = new Map<string, string>();
+·const allSymbols = [...(codex.primitives || []), ...(codex.compounds || [])];
+⥀│for (const sym of allSymbols) {
+·if (sym.symbol && sym.name && sym.symbol !== sym.name) {
+⊡│reverseMap.set(sym.symbol, sym.name);
+·}
+·}
+⊸│for (const [sym, text] of Object.entries(codex.symbolToTextMap)) {
+·if (sym && text && sym !== text && !reverseMap.has(sym)) {
+⊽│const safe = text.replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_$]/g, "");
+⊡│if (safe.length <= 30) reverseMap.set(sym, safe);
+·}
+·}
+⊷│return reverseMap;
+·}
+}⟨/buildReverseSymbolMap⟩
+κPATTERN_GLYPHS
+isPatternGlyph(1)→boolean⟨6⟩{
+·function isPatternGlyph(text: string): boolean {
+⥀│for (const g of PATTERN_GLYPHS) {
+⊷│if (text.startsWith(g)) return true;
+·}
+⊷│return false;
+·}
+}⟨/isPatternGlyph⟩
+stripPatternPrefix(1)→string⟨9⟩{
+·function stripPatternPrefix(line: string): string {
+·const pipeIdx = line.indexOf("│");
+⊷│if (pipeIdx < 0) return line;
+·const prefix = line.slice(0, pipeIdx);
+·if (isPatternGlyph(prefix)) {
+⊷│return line.slice(pipeIdx + 1);
+·}
+⊷│return line;
+·}
+}⟨/stripPatternPrefix⟩
+reverseSymbolSubstitution(3)→string⟨149⟩{
+·function reverseSymbolSubstitution(line: string, reverseMap: Map<string, string>): string {
+·let result = line;
+·const sortedSymbols = [...reverseMap.keys()].sort((a, b) => b.length - a.length);
+⥀│for (const sym of sortedSymbols) {
+⊻│if (result.includes(sym)) {
+⊡│const text = reverseMap.get(sym)!;
+⊳│const safeText = /^[a-zA-Z_$][\w$]*$/.test(text) ? text : text.replace(/\s+/g, "_").replace(/[^a-zA-Z0-9_$]/g, "");
+·try {
+⊽│const escaped = sym.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+⊽│result = result.replace(new RegExp(escaped, "g"), safeText || "SCL_SYM");
+·} catch {}
+·}
+·}
+⊷│return result;
+·}
+⊩│export function decodeSCLFile(sclContent: string, fileName: string): SCLDecodeResult {
+·const reverseMap = buildReverseSymbolMap();
+·const sclLines = sclContent.split("\n");
+·const decodedLines: string[] = [];
+·const imports: string[] = [];
+·const interfaces: string[] = [];
+·const functions: string[] = [];
+·const constants: string[] = [];
+·const errors: string[] = [];
+·let inFunctionBody = false;
+·let currentFnName = "";
+·let skipFooterClose = false;
+·for (let idx = 0; idx < sclLines.length; idx++) {
+·const raw = sclLines[idx];
+·const trimmed = raw.trim();
+⊻│if (trimmed.startsWith("⟨SCL v1│")) continue;
+⊻│if (trimmed.startsWith("⟨CODEX│")) continue;
+⊻│if (trimmed.startsWith("⟩SCL│")) continue;
+·if (trimmed === "") continue;
+⊻│if (trimmed.startsWith("⊫[")) {
+·const modList = trimmed.slice(2, -1).split("│").filter(Boolean);
+⥀│for (const mod of modList) {
+⊰│const importLine = `import * as ${mod.replace(/[^a-zA-Z0-9_]/g, "_")} from "./${mod}.js";`;
+⊺│decodedLines.push(importLine);
+⊺│imports.push(mod);
+·}
+·continue;
+·}
+⊻│if (trimmed.startsWith("⊬")) {
+⊽│const nameMatch = trimmed.match(/^⊬(\w+)⟨(.+?)⟩$/);
+·if (nameMatch) {
+·const [, name, fieldsStr] = nameMatch;
+·const fields = fieldsStr.split("│").map(f => {
+·const [fname, ...ftypeArr] = f.split(":");
+·const ftype = reverseSymbolSubstitution(ftypeArr.join(":"), reverseMap);
+⊰│return `  ${fname}: ${ftype};`;
+·});
+⊰│decodedLines.push(`Ζ ${name} {`);
+⊺│decodedLines.push(...fields);
+⊺│decodedLines.push(`}`);
+⊺│interfaces.push(name);
+·} else {
+⊺│decodedLines.push(reverseSymbolSubstitution(trimmed.replace(/^⊬/, "// type: "), reverseMap));
+·}
+·continue;
+·}
+⊻│if (trimmed.startsWith("⊭│")) {
+⊺│decodedLines.push(reverseSymbolSubstitution(trimmed.slice(2), reverseMap));
+·continue;
+·}
+⊻│if (trimmed.startsWith("κ")) {
+·const rest = trimmed.slice(1);
+⊻│if (rest.startsWith("│")) {
+⊺│decodedLines.push(reverseSymbolSubstitution(rest.slice(1), reverseMap));
+·} else {
+·const constName = rest.trim();
+⊻│if (constName.includes("=")) {
+⊰│decodedLines.push(`const ${constName}`);
+·} else {
+⊰│decodedLines.push(`let ${constName} = undefined; /* SCL-const */`);
+·}
+⊺│constants.push(constName.split(/[\s=]/)[0]);
+·}
+·continue;
+·}
+⊻│if (trimmed.startsWith("⊪")) {
+·const rest = trimmed.slice(1);
+⊻│if (rest.startsWith("│")) {
+⊺│decodedLines.push(reverseSymbolSubstitution(rest.slice(1), reverseMap));
+·} else {
+·const constName = rest.trim();
+⊻│if (constName.includes("=")) {
+⊰│decodedLines.push(`export const ${constName}`);
+·} else {
+⊰│decodedLines.push(`export let ${constName} = undefined; /* SCL-export-const */`);
+·}
+⊺│constants.push(constName.split(/[\s=]/)[0]);
+·}
+·continue;
+·}
+⊽│const fnMatch = trimmed.match(/^(⊩?)(⟿?)(\w+)\((\d+)\)→(.+?)⟨(\d+)⟩\{$/);
+·if (fnMatch) {
+·const [, expMark, asyncMark, fnName, paramCount, retType] = fnMatch;
+⊺│functions.push(fnName);
+·inFunctionBody = true;
+·currentFnName = fnName;
+·const nextLine = (sclLines[idx + 1] || "").trim();
+·const stripped = stripPatternPrefix(nextLine);
+⊰│const bodyHasFnDecl = stripped.includes(`function ${fnName}(`) || stripped.includes(`function ${fnName} (`);
+·if (bodyHasFnDecl) {
+·skipFooterClose = true;
+·} else {
+·const isAsync = asyncMark === "⟿";
+⊰│const params = Array.from({ length: Number(paramCount) }, (_, j) => `arg${j}`).join(", ");
+⊳│const prefix = isAsync ? "async " : "";
+⊰│decodedLines.push(`${prefix}function ${fnName}(${params}) {`);
+·skipFooterClose = false;
+·}
+·continue;
+·}
+⊽│const oldFnMatch = trimmed.match(/^(⊩?)(⟿?)(\w+)\((\d+)\)→(.+?)⟨(\d+)⟩\{(.+)\}$/);
+·if (oldFnMatch) {
+·const [, expMark, asyncMark, fnName, paramCount, retType, patternBody] = oldFnMatch;
+·const isAsync = asyncMark === "⟿";
+⊳│const prefix = isAsync ? "async " : "";
+⊰│const params = Array.from({ length: Number(paramCount) }, (_, j) => `arg${j}`).join(", ");
+⊰│decodedLines.push(`${prefix}function ${fnName}(${params}) {`);
+⊰│decodedLines.push(`  /* SCL-v1-stub: ${patternBody} */`);
+⊺│decodedLines.push(`}`);
+⊺│functions.push(fnName);
+·continue;
+·}
+⊽│if (trimmed.match(/^\}⟨\/\w+⟩$/)) {
+·if (!skipFooterClose) {
+⊺│decodedLines.push(`}`);
+·}
+·inFunctionBody = false;
+·currentFnName = "";
+·skipFooterClose = false;
+·continue;
+·}
+}⟨/reverseSymbolSubstitution⟩
+⊻│if (trimmed.startsWith("·")) {
+κliteral
+⊺│decodedLines.push(reverseSymbolSubstitution(literal, reverseMap));
+·continue;
+·}
+⊻│if (isPatternGlyph(trimmed) || trimmed.includes("│")) {
+κstripped
+⊺│decodedLines.push("  " + reverseSymbolSubstitution(stripped, reverseMap));
+·continue;
+·}
+⊺│decodedLines.push(reverseSymbolSubstitution(trimmed, reverseMap));
+·}
+⊷│return {
+·fileName,
+·sclLines: sclLines.length,
+·decodedLines: decodedLines.length,
+·decodedSource: decodedLines.join("\n"),
+·imports,
+·interfaces,
+·functions,
+·constants,
+·errors,
+·};
+·}
+⊩transpileTStoJS(1)→η⟨1⟩{
+⊩│export function transpileTStoJS(tsSource: string): { success: boolean; jsSource: string; error?: string } {
+}⟨/transpileTStoJS⟩
+·try {
+·let js = tsSource;
+⊽│js = js.replace(/\binterface\s+\w+\s*\{[^}]*\}/gs, "/* interface */");
+⊽│js = js.replace(/\btype\s+\w+\s*=\s*[^;]+;/g, "/* type */");
+⊽│js = js.replace(/\bexport\s+default\s+/g, "var _default = ");
+⊽│js = js.replace(/\bexport\s+(async\s+)?function\s+/g, "$1function ");
+⊽│js = js.replace(/\bexport\s+(const|let|var|class)\s+/g, "$1 ");
+⊽│js = js.replace(/^export\s*\{[^}]*\};?\s*$/gm, "");
+⊽│js = js.replace(/\bexport\s+/g, "");
+⊽│js = js.replace(/^import\s+.*$/gm, "/* import */");
+⊽│js = js.replace(/\bimport\s*\(.*?\)/g, "Promise.resolve({})");
+⊽│js = js.replace(/\bimport\s+\{[^}]*\}\s+from\s+["'][^"']*["'];?/g, "/* import */");
+⊽│js = js.replace(/\bimport\s+\*\s+as\s+\w+\s+from\s+["'][^"']*["'];?/g, "/* import */");
+⊽│js = js.replace(/\bimport\b/g, "/* imp */");
+⊳│js = js.replace(/:\s*(?:string|number|boolean|void|any|never|unknown|null|undefined)(?:\[\])?\s*([;,)=\{])/g, " $1");
+⊳│js = js.replace(/:\s*(?:string|number|boolean|void|any|never|unknown|null|undefined)(?:\[\])?\s*$/gm, "");
+⊽│js = js.replace(/:\s*Record<[^>]+>\s*([;,)=\{])/g, " $1");
+⊽│js = js.replace(/:\s*Array<[^>]+>\s*([;,)=\{])/g, " $1");
+⊽│js = js.replace(/:\s*Map<[^>]+>\s*([;,)=\{])/g, " $1");
+⊽│js = js.replace(/:\s*Set<[^>]+>\s*([;,)=\{])/g, " $1");
+⊽│js = js.replace(/:\s*Promise<[^>]+>\s*([;,)=\{])/g, " $1");
+⊳│js = js.replace(/:\s*\w+(?:\[\])?\s*([;,)])/g, " $1");
+⊳│js = js.replace(/<[A-Z]\w*(?:\s*,\s*[A-Z]\w*)*>/g, "");
+⊽│js = js.replace(/\bas\s+\w+/g, "");
+κtruncLines
+κfixedLines
+⥀│for (const line of truncLines) {
+κtrimLine
+⊹│if (trimLine.length === 0) { fixedLines.push(line); continue; }
+⊺│if (/^\/\*/.test(trimLine)) { fixedLines.push(line); continue; }
+κopenParens
+κcloseParens
+κopenBraces
+κcloseBraces
+κopenBrackets
+κcloseBrackets
+⊻│if (openParens > closeParens && !trimLine.endsWith("{") && !trimLine.endsWith(",")) {
+⊺│fixedLines.push(line + ")".repeat(openParens - closeParens) + " {}");
+⊻│} else if (openBrackets > closeBrackets && !trimLine.endsWith(",")) {
+⊺│fixedLines.push(line + "]".repeat(openBrackets - closeBrackets));
+⊽│} else if (/function\s*\*?\s+\w+\([^)]*$/.test(trimLine)) {
+⊺│fixedLines.push(line + ") {}");
+·} else {
+⊺│fixedLines.push(line);
+·}
+·}
+·js = fixedLines.join("\n");
+⊱│js = js.replace(/[^\x00-\x7F\u00C0-\u024F]/g, (ch) => {
+❔│return `_u${ch.codePointAt(0)?.toString(16) || "0"}_`;
+·});
+⊽│js = js.replace(/function\s+\*\s+/g, "function ");
+⊽│js = js.replace(/\byield\s+/g, "/* yield */ ");
+⊽│js = js.replace(/\bfor\s+await\s*\(/g, "for (");
+⊽│js = js.replace(/\bawait\s+/g, "/* await */ ");
+κlines
+κcleanedLines
+·let braceDepth = 0;
+⥀│for (const line of lines) {
+κopens
+κcloses
+κnewDepth
+·if (newDepth < 0) {
+⊱│cleanedLines.push(line.replace(/\}/g, (m, offset) => {
+⊹│if (braceDepth + opens - (line.slice(0, offset).match(/\}/g) || []).length <= 0) {
+⊷│return "/* } */";
+·}
+⊷│return m;
+·}));
+·braceDepth = 0;
+·} else {
+⊺│cleanedLines.push(line);
+·braceDepth = newDepth;
+·}
+·}
+·while (braceDepth > 0) {
+⊺│cleanedLines.push("}");
+·braceDepth--;
+·}
+·js = cleanedLines.join("\n");
+⊷│return { success: true, jsSource: js };
+·} catch (err) {
+⊷│return { success: false, jsSource: "", error: String(err) };
+·}
+·}
+⊩validateSyntax(2)→{ valid: boolean; error?: string }⟨1⟩{
+⊩│export function validateSyntax(jsSource: string, fileName: string): { valid: boolean; error?: string } {
+}⟨/validateSyntax⟩
+·try {
+·new vm.Script(jsSource, { filename: fileName });
+⊷│return { valid: true };
+·} catch (err: any) {
+❔│return { valid: false, error: err.message?.slice(0, 200) };
+·}
+·}
+⊩executeSCLModule(2)→{ success: boolean; exports: string[]; error?: string }⟨1⟩{
+⊩│export function executeSCLModule(jsSource: string, fileName: string): { success: boolean; exports: string[]; error?: string } {
+}⟨/executeSCLModule⟩
+·try {
+κsandbox
+κcontext
+κwrappedSource
+κscript
+script.runInContext(◧, { timeout: 5000 });
+κmoduleExports
+κdirectExports
+κallExports
+⊷│return { success: true, exports: allExports };
+·} catch (err: any) {
+❔│return { success: false, exports: [], error: err.message?.slice(0, 300) };
+·}
+·}
+⊩runSCLSandboxTest(3)→⊢⟨125⟩{
+⊩│export function runSCLSandboxTest(sclDir: string, generator: "gen1v2" | "gen2", maxFiles = 200): SCLSandboxReport {
+⊳│const tag = generator === "gen1v2" ? "V2-REWRITE" : "NEXTGEN";
+📢│console.log(`[${tag}] 🔤 ═══════════════════════════════════════════════════════════════`);
+📢│console.log(`[${tag}] 🔤 SCL SANDBOX EXECUTION TEST — ${generator.toUpperCase()}`);
+📢│console.log(`[${tag}] 🔤 Testing if SCL files actually run...`);
+📢│console.log(`[${tag}] 🔤 ═══════════════════════════════════════════════════════════════`);
+·if (!fs.existsSync(sclDir)) {
+📢│console.log(`[${tag}] 🔤 ❌ SCL directory not found: ${sclDir}`);
+⊷│return {
+⏰│timestamp: Date.now(),
+·generator,
+totalFiles: 0, decoded: 0, syntaxValid: 0, transpiled: 0, executed: 0, ↺: 0,
+·errors: [{ file: "N/A", stage: "init", error: "SCL directory not found" }],
+·totalDecodedLines: 0, totalOriginalLines: 0, overallCompressionPercent: 0,
+·};
+·}
+·const sclFiles = fs.readdirSync(sclDir)
+⊻│.filter(f => f.endsWith(".scl") && !f.startsWith("_"))
+·.sort()
+·.slice(0, maxFiles);
+const ⊢: SCLSandboxReport = {
+⏰│timestamp: Date.now(),
+·generator,
+·totalFiles: sclFiles.length,
+·decoded: 0,
+·syntaxValid: 0,
+·transpiled: 0,
+·executed: 0,
+↺: 0,
+·errors: [],
+·totalDecodedLines: 0,
+·totalOriginalLines: 0,
+·overallCompressionPercent: 0,
+·};
+·let totalOrigLines = 0;
+·let totalDecodedLines = 0;
+⥀│for (const sclFile of sclFiles) {
+·const filePath = path.join(sclDir, sclFile);
+·try {
+📁│const sclContent = fs.readFileSync(filePath, "utf-8");
+⊽│const origMatch = sclContent.match(/⟨SCL v1│.+?│(\d+)→SCL⟩/);
+⊳│const origLines = origMatch ? Number(origMatch[1]) : 0;
+·totalOrigLines += origLines;
+⟨⇌⟩│const decoded = decodeSCLFile(sclContent, sclFile);
+⊹│if (decoded.errors.length > 0) {
+⊺│⊢.errors.push({ file: sclFile, stage: "decode", error: decoded.errors.join("; ") });
+⊢.↺++;
+·continue;
+·}
+⊢.decoded++;
+·totalDecodedLines += decoded.decodedLines;
+·const decodedOutDir = path.join(sclDir, "_decoded");
+·if (!fs.existsSync(decodedOutDir)) fs.mkdirSync(decodedOutDir, { recursive: true });
+⊽│const decodedFileName = sclFile.replace(".scl", ".decoded.ts");
+📁│fs.writeFileSync(path.join(decodedOutDir, decodedFileName), decoded.decodedSource, "utf-8");
+·const transpiled = transpileTStoJS(decoded.decodedSource);
+·if (!transpiled.success) {
+⊺│⊢.errors.push({ file: sclFile, stage: "transpile", error: transpiled.error || "unknown" });
+⊢.↺++;
+·continue;
+·}
+⊢.transpiled++;
+·const syntax = validateSyntax(transpiled.jsSource, sclFile);
+·if (!syntax.valid) {
+⊺│⊢.errors.push({ file: sclFile, stage: "syntax", error: syntax.error || "unknown" });
+⊢.↺++;
+·continue;
+·}
+⊢.syntaxValid++;
+·const exec = executeSCLModule(transpiled.jsSource, sclFile);
+·if (exec.success) {
+⊢.executed++;
+·} else {
+⊺│⊢.errors.push({ file: sclFile, stage: "execute", error: exec.error || "unknown" });
+⊢.↺++;
+·}
+·} catch (err) {
+⊺│⊢.errors.push({ file: sclFile, stage: "read", error: String(err).slice(0, 200) });
+⊢.↺++;
+·}
+·}
+⊢.totalOriginalLines = totalOrigLines;
+⊢.totalDecodedLines = totalDecodedLines;
+⊢.overallCompressionPercent = totalOrigLines > 0
+·? Number(((1 - totalDecodedLines / totalOrigLines) * 100).toFixed(1))
+·: 0;
+📢│console.log(`[${tag}] 🔤 ═══════════════════════════════════════════════════════════════`);
+📢│console.log(`[${tag}] 🔤 SCL SANDBOX EXECUTION ⊢ — ${generator.toUpperCase()}`);
+📢│console.log(`[${tag}] 🔤 Total files tested: ${⊢.totalFiles}`);
+📢│console.log(`[${tag}] 🔤 Decoded:      ${⊢.decoded}/${⊢.totalFiles}`);
+📢│console.log(`[${tag}] 🔤 Transpiled:   ${⊢.transpiled}/${⊢.totalFiles}`);
+📢│console.log(`[${tag}] 🔤 Syntax valid: ${⊢.syntaxValid}/${⊢.totalFiles}`);
+📢│console.log(`[${tag}] 🔤 Executed:     ${⊢.executed}/${⊢.totalFiles}`);
+📢│console.log(`[${tag}] 🔤 ↺:       ${⊢.↺}/${⊢.totalFiles}`);
+📢│console.log(`[${tag}] 🔤 Compression:  ${⊢.overallCompressionPercent}% (${totalOrigLines} → ${totalDecodedLines} lines)`);
+⊹│if (⊢.errors.length > 0) {
+📢│console.log(`[${tag}] 🔤 ── ERRORS (first 10) ──`);
+⥀│for (const err of ⊢.errors.slice(0, 10)) {
+📢│console.log(`[${tag}] 🔤   ${err.file} [${err.stage}]: ${err.error.slice(0, 100)}`);
+·}
+·}
+📢│console.log(`[${tag}] 🔤 ═══════════════════════════════════════════════════════════════`);
+const manifestPath = path.join(sclDir, "_SCL-SANDBOX-⊢.json");
+⟠│fs.writeFileSync(manifestPath, JSON.stringify(⊢, null, 2), "utf-8");
+⊷│return ⊢;
+·}
+}⟨/runSCLSandboxTest⟩
+⟩SCL│431│399⊨│171⑂│26.9%↓⟩

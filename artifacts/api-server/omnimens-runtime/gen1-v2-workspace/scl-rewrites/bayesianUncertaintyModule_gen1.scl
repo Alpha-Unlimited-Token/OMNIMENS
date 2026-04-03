@@ -5,11 +5,11 @@
 ·this.threshold = 0.7; // Default threshold for uncertainty calibration
 ·}
 ·calculateEntropy(probabilities) {
-⋐│return -probabilities.reduce((sum, p) => sum + (p > 0 ? p * 
+⋐│return -probabilities.reduce((sum, p) => sum + (p > 0 ? p * Math.log(p) : 0), 0);
 ·}
 ·assessUncertainty(probabilities) {
 κentropy
-⊳│return entropy < this.threshold ? 'High Confidence' : 'Low C
+⊳│return entropy < this.threshold ? 'High Confidence' : 'Low Confidence';
 ·}
 calibrateConfidence(θ, probabilities) {
 κuncertainty

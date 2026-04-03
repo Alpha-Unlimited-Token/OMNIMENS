@@ -48,7 +48,7 @@
 ⟛│Math.max(
 ·0,
 ·parseFloat(
-❔│txt.match(new RegExp(`${tag}:\\s*(0?\\.\\d+|1(?:\\.0+)?)`, "
+❔│txt.match(new RegExp(`${tag}:\\s*(0?\\.\\d+|1(?:\\.0+)?)`, "i"))?.[1] ||
 ·"0"
 ·) || 0
 ·);

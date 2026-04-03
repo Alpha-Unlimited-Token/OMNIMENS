@@ -15,7 +15,7 @@
 ·}
 ·}
 ·handleEscalation(task) {
-⊰│console.log(`Escalating task: ${task.id} with priority ${tas
+⊰│console.log(`Escalating task: ${task.id} with priority ${task.priority}`);
 ·}
 ·}
 ⟩SCL│20│3⊨│3⑂│35.5%↓⟩

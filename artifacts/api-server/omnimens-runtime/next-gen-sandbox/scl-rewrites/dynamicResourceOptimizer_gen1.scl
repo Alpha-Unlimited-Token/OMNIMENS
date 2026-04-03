@@ -1,4 +1,13 @@
 ⟨SCL v1│dynamicResourceOptimizer_gen1.mjs│17→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩dynamicResourceOptimizer(2)→void⟨8⟩{⊩⊰⊷}
-⟩SCL│3│4⊨│3⑂│82.4%↓⟩
+⊩dynamicResourceOptimizer(2)→void⟨8⟩{
+⊩│export function dynamicResourceOptimizer(taskComplexity, availableResources) {
+·const allocation = {};
+·const baseAllocation = Math.floor(availableResources / taskComplexity);
+·for (let i = 0; i < taskComplexity; i++) {
+⊰│allocation[`task_${i}`] = baseAllocation - (i * 0.1 * baseAllocation);
+·}
+⊷│return allocation;
+·}
+}⟨/dynamicResourceOptimizer⟩
+⟩SCL│12│11⊨│3⑂│29.4%↓⟩

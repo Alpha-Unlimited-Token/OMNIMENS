@@ -1,0 +1,41 @@
+  export function generateEmbeddings(text) {
+  if (typeof text !== 'string' || text.length === 0) {
+  throw new Error('Input text must be a non-empty string.');
+}
+const embeddingLength = 128; // Fixed length for embeddings
+const embedding = new Array(embeddingLength).fill(0);
+for (let i = 0; i < text.length; i++) {
+const charCode = text.charCodeAt(i);
+embedding[i % embeddingLength] += charCode;
+}
+  const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val ** 2, 0));
+  return embedding.map((val) => val / magnitude);
+}
+  export function compressContext(embeddings) {
+  if (!Array.isArray(embeddings) || embeddings.length === 0) {
+  throw new Error('Embeddings must be a non-empty array of numerical arrays.');
+}
+const embeddingLength = embeddings[0].length;
+  if (!embeddings.every((e) => Array.isArray(e) && e.length === embeddingLength)) {
+  throw new Error('All embeddings must be arrays of the same length.');
+}
+const summaryEmbedding = new Array(embeddingLength).fill(0);
+  embeddings.forEach((embedding) => {
+for (let i = 0; i < embeddingLength; i++) {
+summaryEmbedding[i] += embedding[i];
+}
+});
+  const magnitude = Math.sqrt(summaryEmbedding.reduce((sum, val) => sum + val ** 2, 0));
+  return summaryEmbedding.map((val) => val / magnitude);
+}
+function exampleUsage() {
+const conversation = [
+'Hello, how are you?',
+'I am fine, thank you! How about you?',
+'I am doing well, just working on some projects.',
+'That sounds interesting! What kind of projects?'
+];
+const embeddings = conversation.map((message) => generateEmbeddings(message));
+const summaryEmbedding = compressContext(embeddings);
+console.log('Summary Embedding:', summaryEmbedding);
+}

@@ -1,7 +1,65 @@
 ⟨SCL v1│wasmAcceleratedOps_gen1.mjs│135→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩⟿gpuMatrixMultiply(2)→void⟨26⟩{⊩⊷}
-validateMatrices(2)→void⟨16⟩{⊵⊹}
-flattenMatrix(1)→void⟨13⟩{⊷}
-unflattenMatrix(3)→void⟨13⟩{⊺⊷}
-⟩SCL│6│11⊨│7⑂│95.6%↓⟩
+⊩⟿gpuMatrixMultiply(2)→void⟨26⟩{
+⊩│export async function gpuMatrixMultiply(matrixA, matrixB) {
+·validateMatrices(matrixA, matrixB);
+·const flatMatrixA = flattenMatrix(matrixA);
+·const flatMatrixB = flattenMatrix(matrixB);
+·const rowsA = matrixA.length;
+·const colsA = matrixA[0].length;
+·const colsB = matrixB[0].length;
+·const result = new Float32Array(rowsA * colsB);
+·for (let i = 0; i < rowsA; i++) {
+·for (let j = 0; j < colsB; j++) {
+·let sum = 0;
+·for (let k = 0; k < colsA; k++) {
+·sum += flatMatrixA[i * colsA + k] * flatMatrixB[k * colsB + j];
+·}
+·result[i * colsB + j] = sum;
+·}
+·}
+⊷│return unflattenMatrix(result, rowsA, colsB);
+·}
+}⟨/gpuMatrixMultiply⟩
+validateMatrices(2)→void⟨16⟩{
+·function validateMatrices(matrixA, matrixB) {
+·if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
+⊵│throw new Error("Both inputs must be 2D arrays.");
+·}
+⊹│if (matrixA.length === 0 || matrixB.length === 0) {
+⊵│throw new Error("Matrices must not be empty.");
+·}
+·const colsA = matrixA[0].length;
+·const rowsB = matrixB.length;
+·if (colsA !== rowsB) {
+⊵│throw new Error("Number of columns in Matrix A must match the number of rows in Matrix B.");
+·}
+·}
+}⟨/validateMatrices⟩
+flattenMatrix(1)→void⟨13⟩{
+·function flattenMatrix(matrix) {
+·const rows = matrix.length;
+·const cols = matrix[0].length;
+·const flat = new Float32Array(rows * cols);
+·for (let i = 0; i < rows; i++) {
+·for (let j = 0; j < cols; j++) {
+·flat[i * cols + j] = matrix[i][j];
+·}
+·}
+⊷│return flat;
+·}
+}⟨/flattenMatrix⟩
+unflattenMatrix(3)→void⟨13⟩{
+·function unflattenMatrix(flat, rows, cols) {
+·const matrix = [];
+·for (let i = 0; i < rows; i++) {
+·const row = [];
+·for (let j = 0; j < cols; j++) {
+⊺│row.push(flat[i * cols + j]);
+·}
+⊺│matrix.push(row);
+·}
+⊷│return matrix;
+·}
+}⟨/unflattenMatrix⟩
+⟩SCL│64│61⊨│10⑂│52.6%↓⟩

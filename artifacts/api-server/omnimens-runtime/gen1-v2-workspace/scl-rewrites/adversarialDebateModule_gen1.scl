@@ -1,4 +1,35 @@
 ⟨SCL v1│adversarialDebateModule_gen1.mjs│46→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩adversarialDebateModule(1)→void⟨37⟩{⊩⊱⊺⊷}
-⟩SCL│3│5⊨│4⑂│93.5%↓⟩
+⊩adversarialDebateModule(1)→void⟨37⟩{
+⊩│export function adversarialDebateModule(agents) {
+·const debates = [];
+agents.forEach(α => {
+⊱│α.on('proposal', (proposal) => {
+·const debate = createDebate(proposal, agents);
+⊺│debates.push(debate);
+·});
+·});
+·function createDebate(proposal, agents) {
+const counters = agents.map(α => α.counter(proposal));
+const defenses = agents.map(α => α.defend(proposal));
+⊷│return {
+·proposal,
+·counters,
+·defenses,
+·score: calculateScore(proposal, counters, defenses)
+·};
+·}
+·function calculateScore(proposal, counters, defenses) {
+·let divergence = 0;
+·let resolution = 0;
+·counters.forEach(counter => {
+·divergence += counter.significance;
+·});
+·defenses.forEach(defense => {
+·resolution += defense.effectiveness;
+·});
+⊷│return resolution - divergence;
+·}
+·}
+}⟨/adversarialDebateModule⟩
+⟩SCL│34│34⊨│5⑂│26.1%↓⟩

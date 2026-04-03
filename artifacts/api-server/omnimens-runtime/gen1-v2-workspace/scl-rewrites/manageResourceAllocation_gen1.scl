@@ -1,4 +1,12 @@
 ⟨SCL v1│manageResourceAllocation_gen1.mjs│19→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩manageResourceAllocation(2)→void⟨9⟩{⊩⟛⊷}
-⟩SCL│3│4⊨│3⑂│84.2%↓⟩
+⊩manageResourceAllocation(2)→void⟨9⟩{
+⊩│export function manageResourceAllocation(taskComplexity, availableResources) {
+·const allocation = {};
+·const baseAllocation = availableResources / 2; // Reserve half for critical tasks
+⟛│allocation['reasoningDepth'] = Math.min(baseAllocation, taskComplexity * 0.6);
+·allocation['realTimePerformance'] = availableResources - allocation['reasoningDepth'];
+⊷│return allocation;
+·}
+}⟨/manageResourceAllocation⟩
+⟩SCL│11│10⊨│3⑂│42.1%↓⟩

@@ -1,14 +1,58 @@
 ⟨SCL v1│wasmComputationEngine_gen1.mjs│104→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩⟿loadWasmModule(1)→void⟨10⟩{⊩⊴⊷⊰⊵}
-⊩executeWasmFunction(3)→void⟨14⟩{⊩⊲⊰⊵⊷}
-⊩validateWasmModule(2)→void⟨5⟩{⊩⊲⊷}
-⊩⟿exampleUsage(1)→void⟨16⟩{⊩⊴⊵⊰}
+⊩⟿loadWasmModule(1)→void⟨10⟩{
+⊩│export async function loadWasmModule(filePath) {
+·try {
+⊴│const wasmBuffer = await readFile(filePath);
+·const wasmModule = await WebAssembly.compile(wasmBuffer);
+·const wasmInstance = await WebAssembly.instantiate(wasmModule);
+⊷│return { module: wasmModule, instance: wasmInstance };
+·} catch (error) {
+⊰│throw new Error(`↺ to load WebAssembly module: ${error.message}`);
+·}
+·}
+}⟨/loadWasmModule⟩
+⊩executeWasmFunction(3)→void⟨14⟩{
+⊩│export function executeWasmFunction(wasmModule, functionName, args) {
+⊲│const { instance } = wasmModule;
+·const wasmFunction = instance.exports[functionName];
+·if (typeof wasmFunction !== 'function') {
+⊰│throw new Error(`Function '${functionName}' not found in WebAssembly module.`);
+·}
+·try {
+⊷│return wasmFunction(...args);
+·} catch (error) {
+⊰│throw new Error(`↺ to execute WebAssembly function '${functionName}': ${error.message}`);
+·}
+·}
+}⟨/executeWasmFunction⟩
+⊩validateWasmModule(2)→void⟨5⟩{
+⊩│export function validateWasmModule(wasmModule, requiredFunctions) {
+⊲│const { instance } = wasmModule;
+⊷│return requiredFunctions.every((func) => typeof instance.exports[func] === 'function');
+·}
+}⟨/validateWasmModule⟩
+⊩⟿exampleUsage(1)→void⟨16⟩{
+⊩│export async function exampleUsage() {
+·try {
+·const wasmFilePath = join(__dirname, 'example.wasm');
+⊴│const wasmModule = await loadWasmModule(wasmFilePath);
+·const requiredFunctions = ['add', 'multiply'];
+·if (!validateWasmModule(wasmModule, requiredFunctions)) {
+⊵│throw new Error('WebAssembly module does not contain all required functions.');
+·}
+·const result = executeWasmFunction(wasmModule, 'add', [5, 3]);
+⊰│console.log(`Result of ∑: ${result}`);
+·} catch (error) {
+⊰│console.error(`Error in example usage: ${error.message}`);
+·}
+·}
+}⟨/exampleUsage⟩
 ·export default {
 ·loadWasmModule,
 ·executeWasmFunction,
 ·validateWasmModule,
 ·exampleUsage
 ·};
-⟩SCL│13│22⊨│17⑂│87.5%↓⟩
+⟩SCL│57│56⊨│17⑂│45.2%↓⟩

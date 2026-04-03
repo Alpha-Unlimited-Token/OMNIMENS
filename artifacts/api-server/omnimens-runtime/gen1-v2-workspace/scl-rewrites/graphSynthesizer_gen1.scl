@@ -1,4 +1,10 @@
 ⟨SCL v1│graphSynthesizer_gen1.mjs│14→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩graphSynthesizer(1)→void⟨5⟩{⊩⊷}
-⟩SCL│3│3⊨│2⑂│78.6%↓⟩
+⊩graphSynthesizer(1)→void⟨5⟩{
+⊩│export function graphSynthesizer(agentOutputs) {
+·const graph = buildKnowledgeGraph(agentOutputs);
+·refineGraph(graph, (node) => confidenceVoting(node));
+⊷│return graph;
+·}
+}⟨/graphSynthesizer⟩
+⟩SCL│9│7⊨│2⑂│35.7%↓⟩

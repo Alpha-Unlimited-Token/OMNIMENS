@@ -1,6 +1,26 @@
 ⟨SCL v1│counterfactualSimulationLayer_gen1.mjs│32→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩⟿simulateCounterfactuals(1)→void⟨11⟩{⊩⊷}
-generateAlternatives(1)→void⟨4⟩{⊷}
-evaluateAlternatives(1)→void⟨6⟩{⊷}
-⟩SCL│5│7⊨│4⑂│84.4%↓⟩
+⊩⟿simulateCounterfactuals(1)→void⟨11⟩{
+⊩│export async function simulateCounterfactuals(agentOutputs) {
+const simulations = agentOutputs.map(θ => {
+const alternatives = generateAlternatives(θ);
+⊷│return evaluateAlternatives(alternatives);
+·});
+·const rankedSimulations = simulations.sort((a, b) => b.score - a.score);
+⊷│return rankedSimulations;
+·}
+}⟨/simulateCounterfactuals⟩
+generateAlternatives(1)→void⟨4⟩{
+function generateAlternatives(θ) {
+⊷│return [θ, { ...θ, modified: true }];
+·}
+}⟨/generateAlternatives⟩
+evaluateAlternatives(1)→void⟨6⟩{
+·function evaluateAlternatives(alternatives) {
+⊷│return alternatives.map(alt => ({
+·alternative: alt,
+·score: Math.random() // Placeholder for Bayesian evaluation
+·}));
+·}
+}⟨/evaluateAlternatives⟩
+⟩SCL│25│21⊨│5⑂│21.9%↓⟩

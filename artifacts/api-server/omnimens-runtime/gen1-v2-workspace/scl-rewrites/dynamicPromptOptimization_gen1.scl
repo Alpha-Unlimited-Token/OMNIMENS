@@ -1,12 +1,60 @@
 ⟨SCL v1│dynamicPromptOptimization_gen1.mjs│167→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩generateInitialPopulation(2)→void⟨12⟩{⊩⊺⊨σ⊷}
-⊩evaluateFitness(2)→void⟨9⟩{⊩⊨σ⊷}
-⊩crossoverPrompts(2)→void⟨4⟩{⊩⊷}
-⊩mutatePrompt(2)→void⟨11⟩{⊩⊷}
-⊩selectPromptsByFitness(2)→void⟨5⟩{⊩⊷⊨σ}
-⊩optimizePrompts(1)→void⟨1⟩{⊩}
+⊩generateInitialPopulation(2)→void⟨12⟩{
+⊩│export function generateInitialPopulation(populationSize, baseTemplates) {
+const σ = [];
+·for (let i = 0; i < populationSize; i++) {
+·const template = baseTemplates[i % baseTemplates.length];
+⊺│σ.push({
+·id: randomUUID(),
+·prompt: template,
+⊨σ│fitness: 0,
+·});
+·}
+⊷│return σ;
+·}
+}⟨/generateInitialPopulation⟩
+⊩evaluateFitness(2)→void⟨9⟩{
+⊩│export function evaluateFitness(promptObj, fitnessFunction) {
+·try {
+⊨σ│const fitness = fitnessFunction(promptObj.prompt);
+⊷│return fitness;
+·} catch (error) {
+⊨σ│console.error("Error evaluating fitness:", error);
+⊷│return 0;
+·}
+·}
+}⟨/evaluateFitness⟩
+⊩crossoverPrompts(2)→void⟨4⟩{
+⊩│export function crossoverPrompts(promptA, promptB) {
+·const midpoint = Math.floor(promptA.length / 2);
+⊷│return promptA.slice(0, midpoint) + promptB.slice(midpoint);
+·}
+}⟨/crossoverPrompts⟩
+⊩mutatePrompt(2)→void⟨11⟩{
+⊩│export function mutatePrompt(prompt, mutationRate) {
+·const characters = prompt.split("");
+·for (let i = 0; i < characters.length; i++) {
+·if (Math.random() < mutationRate) {
+·characters[i] = String.fromCharCode(
+·32 + Math.floor(Math.random() * 95) // Random printable ASCII character
+·);
+·}
+·}
+⊷│return characters.join("");
+·}
+}⟨/mutatePrompt⟩
+⊩selectPromptsByFitness(2)→void⟨5⟩{
+⊩│export function selectPromptsByFitness(σ, selectionSize) {
+⊷│return σ
+⊨σ│.sort((a, b) => b.fitness - a.fitness)
+·.slice(0, selectionSize);
+·}
+}⟨/selectPromptsByFitness⟩
+⊩optimizePrompts(1)→void⟨1⟩{
+⊩│export function optimizePrompts(
+}⟨/optimizePrompts⟩
 ·baseTemplates,
 ⊨σ│fitnessFunction,
 ·populationSize,
@@ -36,8 +84,27 @@ let σ = generateInitialPopulation(populationSize, baseTemplates);
 ·}
 σ = newPopulation;
 ·}
-⊨σ│const bestPrompt = population.sort((a, b) => b.fitness - a.f
+⊨σ│const bestPrompt = population.sort((a, b) => b.fitness - a.fitness)[0];
 ⊷│return bestPrompt;
 ·}
-⊩generateOptimizedPrompt(1)→void⟨22⟩{⊩⊰⊱⊨σ⊷}
-⟩SCL│42│40⊨│27⑂│74.9%↓⟩
+⊩generateOptimizedPrompt(1)→void⟨22⟩{
+⊩│export function generateOptimizedPrompt(taskDescription) {
+·const baseTemplates = [
+⊰│`Solve the task: ${taskDescription}`,
+⊰│`Explain and address: ${taskDescription}`,
+⊰│`Provide a detailed solution for: ${taskDescription}`,
+·];
+⊱│const fitnessFunction = (prompt) => {
+⊷│return prompt.length;
+·};
+·const bestPrompt = optimizePrompts(
+·baseTemplates,
+⊨σ│fitnessFunction,
+·10,
+·5,
+·0.1
+·);
+⊷│return bestPrompt.prompt;
+·}
+}⟨/generateOptimizedPrompt⟩
+⟩SCL│109│93⊨│32⑂│34.7%↓⟩

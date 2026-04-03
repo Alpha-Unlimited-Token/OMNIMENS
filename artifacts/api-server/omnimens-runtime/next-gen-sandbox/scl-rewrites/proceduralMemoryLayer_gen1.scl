@@ -3,14 +3,14 @@
 ⊪proceduralMemoryLayer
 ⊷│return anomalies.map(anomaly => ({
 ·step: anomaly.step,
-⊰│suggestion: `Review step ${anomaly.step} for potential impro
+⊰│suggestion: `Review step ${anomaly.step} for potential improvements.`
 ·}));
 ·},
 ⊱│suggestModifications: (anomalies) => {
 ⊱│return anomalies.map(({ step, suggestion }) => {
 ⊷│return {
 ·step,
-⊰│modification: `Consider alternate logic or debugging step ${
+⊰│modification: `Consider alternate logic or debugging step ${step}.`
 ·};
 ·});
 ·}

@@ -12406,35 +12406,77 @@ export function rewriteModuleToSCL(
       const fnName = trimmed.match(/function\s+(\w+)/)?.[1] || "?";
       const params = trimmed.match(/\(([^)]*)\)/)?.[1] || "";
       const retType = trimmed.match(/\):\s*(.+?)\s*\{/)?.[1] || "void";
+      const isExport = trimmed.startsWith("export");
+      const isAsync = trimmed.includes("async");
+      const prefix = (isExport ? "⊩" : "") + (isAsync ? "⟿" : "");
+
       let depth = 0;
-      const bodyPatterns: string[] = [];
+      const bodyCompressed: string[] = [];
       const fnStart = i;
+      const usedPatterns = new Set<string>();
+
       do {
-        const l = lines[i]?.trim() || "";
-        if (l.includes("{")) depth++;
-        if (l.includes("}")) depth--;
+        const l = lines[i] || "";
+        const lt = l.trim();
+        if (lt.includes("{")) depth++;
+        if (lt.includes("}")) depth--;
+
+        if (lt === "" || lt.startsWith("//") || lt.startsWith("/*") || lt.startsWith("*")) {
+          i++;
+          continue;
+        }
+
+        let lineGlyph = "";
         for (const pr of patternRegexes) {
-          if (pr.regex.test(l)) {
-            if (!bodyPatterns.includes(pr.glyph)) {
-              bodyPatterns.push(pr.glyph);
-              patternsMatched++;
-            }
+          if (pr.regex.test(lt)) {
+            lineGlyph = pr.glyph;
+            usedPatterns.add(pr.glyph);
+            patternsMatched++;
+            break;
           }
         }
+
+        let compressed = lt;
+        const JS_RESERVED_IDENTS = new Set([
+          "value", "array", "input", "module", "delta", "index", "cycle",
+          "growth", "drive", "lesser", "greater", "epoch", "mutate", "sum",
+          "broadcast", "registry", "semantic", "deadline", "length", "push",
+          "slice", "split", "join", "filter", "reduce", "every", "some",
+          "find", "keys", "values", "entries", "next", "done", "then",
+          "catch", "resolve", "reject", "constructor", "prototype", "name",
+          "size", "type", "data", "result", "error", "message", "code",
+          "status", "state", "event", "target", "source", "query", "path",
+          "node", "item", "list", "hash", "test", "match", "parse",
+        ]);
+        for (const [word, sym] of symbolLookup) {
+          if (word.length >= 4 && !JS_RESERVED_IDENTS.has(word.toLowerCase())) {
+            try {
+              compressed = compressed.replace(new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "gi"), sym);
+            } catch {}
+          }
+        }
+
+        if (lineGlyph) {
+          bodyCompressed.push(`${lineGlyph}│${compressed}`);
+        } else if (compressed !== lt) {
+          bodyCompressed.push(compressed);
+        } else {
+          bodyCompressed.push(`·${lt}`);
+        }
+
         i++;
       } while (i < lines.length && depth > 0);
-      const fnLines = i - fnStart;
 
+      const fnLines = i - fnStart;
       let retSymbol = retType;
       for (const [word, sym] of symbolLookup) {
         if (retType.toLowerCase().includes(word)) { retSymbol = sym; break; }
       }
 
-      const isExport = trimmed.startsWith("export");
-      const isAsync = trimmed.includes("async");
-      const prefix = (isExport ? "⊩" : "") + (isAsync ? "⟿" : "");
-      sclLines.push(`${prefix}${fnName}(${params.split(",").length})→${retSymbol}⟨${fnLines}⟩{${bodyPatterns.join("")}}`);
-      symbolsUsed += bodyPatterns.length + 1;
+      sclLines.push(`${prefix}${fnName}(${params.split(",").length})→${retSymbol}⟨${fnLines}⟩{`);
+      sclLines.push(...bodyCompressed);
+      sclLines.push(`}⟨/${fnName}⟩`);
+      symbolsUsed += usedPatterns.size + bodyCompressed.length;
       continue;
     }
 
@@ -12456,7 +12498,7 @@ export function rewriteModuleToSCL(
     let patternMatched = false;
     for (const pr of patternRegexes) {
       if (pr.regex.test(trimmed)) {
-        sclLines.push(`${pr.glyph}│${trimmed.slice(0, 60)}`);
+        sclLines.push(`${pr.glyph}│${trimmed}`);
         symbolsUsed++;
         patternsMatched++;
         patternMatched = true;
@@ -12464,7 +12506,7 @@ export function rewriteModuleToSCL(
       }
     }
     if (!patternMatched) {
-      const compressed = trimmed.slice(0, 80);
+      const compressed = trimmed;
       let symbolized = compressed;
       for (const [word, sym] of symbolLookup) {
         if (word.length >= 4) {
@@ -12477,7 +12519,7 @@ export function rewriteModuleToSCL(
         sclLines.push(symbolized);
         symbolsUsed++;
       } else {
-        sclLines.push(`·${compressed}`);
+        sclLines.push(`·${trimmed}`);
       }
     }
     i++;

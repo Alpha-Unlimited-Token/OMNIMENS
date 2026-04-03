@@ -24,7 +24,7 @@
 ⊰│console.log(`Tool created: ${toolPrototype.name}`);
 ·agentCapabilities.addTool(toolPrototype);
 ·} else {
-⊰│console.warn(`Tool validation failed for: ${toolPrototype.na
+⊰│console.warn(`Tool validation failed for: ${toolPrototype.name}`);
 ·}
 ·});
 ·}

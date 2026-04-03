@@ -1,4 +1,17 @@
 ⟨SCL v1│sleepPhaseMemoryReplay_gen1.mjs│21→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩sleepPhaseMemoryReplay(1)→void⟨12⟩{⊩⊷}
-⟩SCL│3│3⊨│2⑂│85.7%↓⟩
+⊩sleepPhaseMemoryReplay(1)→void⟨12⟩{
+⊩│export function sleepPhaseMemoryReplay(memoryData) {
+·const replayedMemories = memoryData.filter(memory => memory.priority > 0.8);
+·replayedMemories.forEach(memory => {
+·memory.semanticLinks.forEach(link => {
+·link.strength += 0.1 * memory.importance;
+·});
+·memory.proceduralSteps.forEach(step => {
+·step.reinforce();
+·});
+·});
+⊷│return replayedMemories;
+·}
+}⟨/sleepPhaseMemoryReplay⟩
+⟩SCL│16│14⊨│2⑂│23.8%↓⟩

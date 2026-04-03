@@ -2,10 +2,10 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊶│export default class MetaLearningPrioritization {
 ·constructor() {
-·this.prioritizationModel = null; // Placeholder for a trained meta-learning mode
+·this.prioritizationModel = null; // Placeholder for a trained meta-learning model
 ·}
 ·prioritizeEmbeddings(embeddings, interactionContext) {
-⊷│return embeddings.sort((a, b) => this.evaluatePriority(b, in
+⊷│return embeddings.sort((a, b) => this.evaluatePriority(b, interactionContext) - this.evaluatePriority(a, interactionContext));
 ·}
 evaluatePriority(embedding, ◧) {
 ⊷│return Math.random(); // Temporary random scoring

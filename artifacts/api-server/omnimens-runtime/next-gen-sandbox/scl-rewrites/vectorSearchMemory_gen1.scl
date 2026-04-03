@@ -1,6 +1,13 @@
 ⟨SCL v1│vectorSearchMemory_gen1.mjs│141→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
+euclideanDistance(2)→void⟨6⟩{
+·function euclideanDistance(vectorA, vectorB) {
+⊹│if (vectorA.length !== vectorB.length) {
+⊵│throw new Error("Vectors must be of the same dimension.");
+·}
+⋐│return Math.sqrt(vectorA.reduce((sum, val, index) => sum + Math.pow(val - vectorB[index], 2), 0));
+·}
+}⟨/euclideanDistance⟩
 ⊶│class HNSW {
 ·constructor(maxLevel = 5, maxNeighbors = 10) {
 ·this.maxLevel = maxLevel;
@@ -61,11 +68,11 @@ euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
 ·}
 ⊡│closestNode.neighbors.get(level).push(newNode);
 ⊡│newNode.neighbors.get(level).push(closestNode);
-⊡│if (closestNode.neighbors.get(level).length > this.maxNeighb
-⊡│closestNode.neighbors.set(level, closestNode.neighbors.get(l
+⊡│if (closestNode.neighbors.get(level).length > this.maxNeighbors) {
+⊡│closestNode.neighbors.set(level, closestNode.neighbors.get(level).slice(0, this.maxNeighbors));
 ·}
 ·}
 ·}
 ·}
 ·export { HNSW, euclideanDistance };
-⟩SCL│70│20⊨│16⑂│50.4%↓⟩
+⟩SCL│77│24⊨│15⑂│45.4%↓⟩

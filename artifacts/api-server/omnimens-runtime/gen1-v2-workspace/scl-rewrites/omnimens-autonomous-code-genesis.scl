@@ -15,13 +15,13 @@
 ⊬CodePattern⟨⟩
 ⊬GeneratedModule⟨name:string│code:string│category:string│confidence:number│passed:boolean│error:string⟩
 κstate
-·const log = (...m: unknown[]) => console.log("[OMNIMENS-AUTONOMOUS-CODE-GENESIS]
-·const hash = (c: string) => crypto.createHash("sha256").update(c).digest("hex").
-⊱│const camel = (s: string) => s.replace(/[-_\s]+(.)?/g, (_, c
+·const log = (...m: unknown[]) => console.log("[OMNIMENS-AUTONOMOUS-CODE-GENESIS]", ...m);
+·const hash = (c: string) => crypto.createHash("sha256").update(c).digest("hex").slice(0, 10);
+⊱│const camel = (s: string) => s.replace(/[-_\s]+(.)?/g, (_, c) => (c ? c.toUpperCase() : ""));
 ·const extractPatterns = (): CodePattern[] => {
 ⊄│if (!fs.existsSync(MODULES_DIR)) return [];
 κpatterns
-⥀│for (const file of fs.readdirSync(MODULES_DIR).filter(f => f
+⥀│for (const file of fs.readdirSync(MODULES_DIR).filter(f => f.endsWith(".mjs")).slice(0, 80)) {
 κtext
 κmethods
 κcategory
@@ -29,21 +29,21 @@
 ⊳│/reasoning|bayesian/.test(file) ? "reasoning" :
 ⊳│/test|validate/.test(file) ? "testing" :
 ⊳│/vector|matrix|math/.test(file) ? "computation" : "utility";
-⊺│patterns.push({ name: file.replace(".mjs", ""), methods, cat
+⊺│patterns.push({ name: file.replace(".mjs", ""), methods, category });
 ·}
 ·state.patterns = patterns.length;
 ⊷│return patterns;
 ·};
-⊭│type Template = (n: string, ctx: { pat: CodePattern[]; kw: s
+⊭│type Template = (n: string, ctx: { pat: CodePattern[]; kw: string[] }) => string;
 κtemplates
-⊡│set(k,v){if(this.store.size>=this.max)this.store.delete(this
+⊡│set(k,v){if(this.store.size>=this.max)this.store.delete(this.store.keys().next().value);this.store.set(k,{v,t:Date.now()})}
 ⊡│get(k){const e=this.store.get(k);return e?e.v:null}
 metrics(){return{size:this.⊞.size,max:this.max}}
 ·}`,
 ⊰│patternDetector: (className) => `export class ${className}{
 ·win=10,h=[];patterns={};
-⊹│add(x){this.h.push(x);if(this.h.length>this.win*5)this.h.shi
-⊹│detect(){if(this.h.length<this.win)return;const seg=this.h.s
+⊹│add(x){this.h.push(x);if(this.h.length>this.win*5)this.h.shift();this.detect()}
+⊹│detect(){if(this.h.length<this.win)return;const seg=this.h.slice(-this.win);
 κtrend
 ·summary(){return{total:this.h.length,patterns:this.patterns}}
 ·}`,
@@ -56,7 +56,7 @@ metrics(){return{size:this.⊞.size,max:this.max}}
 κcode
 κcategory
 κconfidence
-⊰│return { name: `${nameSeed}.mjs`, code, category, confidence
+⊰│return { name: `${nameSeed}.mjs`, code, category, confidence, passed: false };
 ·};
 ·const sandboxTest = (mod: GeneratedModule): GeneratedModule => {
 ·try {
@@ -74,7 +74,7 @@ metrics(){return{size:this.⊞.size,max:this.max}}
 κtarget
 📁│fs.writeFileSync(target, mod.code, "utf-8");
 ⊱│await autoRegisterFromCode(mod.code).catch(() => {});
-⏰│await dbGateway.write(ENGINE_ID, "generated_modules", { ...m
+⏰│await dbGateway.write(ENGINE_ID, "generated_modules", { ...mod, hash: hash(mod.code), ts: Date.now() }, "NORMAL");
 ·state.written++;
 ·};
 ⊱│const doWork = async () => {
@@ -82,18 +82,18 @@ metrics(){return{size:this.⊞.size,max:this.max}}
 κmod
 ⊴│await persist(mod);
 ·state.totalGenerated++;
-⊳│state.avgPass = state.totalGenerated ? state.totalPassed / s
+⊳│state.avgPass = state.totalGenerated ? state.totalPassed / state.totalGenerated : 0;
 ·state.cycles++;
 ·cognitionBus.shareInsight(ENGINE_ID, { type: "genesis_result", data: mod });
-⏰│dbGateway.write(ENGINE_ID, "genesis_stats", { ...state, ts: 
-⊰│log(`Cycle #${state.cycles} → ${mod.name} ${mod.passed ? "✅"
+⏰│dbGateway.write(ENGINE_ID, "genesis_stats", { ...state, ts: Date.now() }, "LOW").catch(()=>{});
+⊰│log(`Cycle #${state.cycles} → ${mod.name} ${mod.passed ? "✅" : "❌"}`);
 ·};
-⊰│const schedule = () => spikeBus.scheduleSpike(`${ENGINE_ID}:
-⊰│spikeBus.on(`${ENGINE_ID}:cycle`, async () => { await doWork
+⊰│const schedule = () => spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, CYCLE_MS);
+⊰│spikeBus.on(`${ENGINE_ID}:cycle`, async () => { await doWork(); schedule(); });
 ⊱│cognitionBus.onInsight((src, insight) => {
 ·if (src === ENGINE_ID) return;
 ❔│if (insight?.type === "discovery") {
-❔│if (insight.data?.category && templates[insight.data.categor
+❔│if (insight.data?.category && templates[insight.data.category]) {
 ·log("Adopting pattern from", src, "→", insight.data.category);
 ·}
 ·}
@@ -103,6 +103,11 @@ metrics(){return{size:this.⊞.size,max:this.max}}
 ⚡→│schedule(); // first spike after CYCLE_MS
 ·log("Started.");
 ·};
-⊩shutdown(1)→void⟨4⟩{⊩}
-⊰│if (import.meta.url === `file://${process.argv[1]}`) start()
-⟩SCL│107│65⊨│40⑂│42.5%↓⟩
+⊩shutdown(1)→void⟨4⟩{
+⊩│export function shutdown() {
+·engineRegistry.unregisterEngine(ENGINE_ID);
+·log("Shutdown.");
+·}
+}⟨/shutdown⟩
+⊰│if (import.meta.url === `file://${process.argv[1]}`) start();
+⟩SCL│112│68⊨│40⑂│39.8%↓⟩

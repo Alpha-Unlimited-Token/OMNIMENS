@@ -4,13 +4,13 @@
 ⊬FocusState⟨⟩
 ⊶│export class AttentionSystem {
 ⊮│private targets = new Map<string, AttentionTarget>();
-·private focus: FocusState = { primary: null, secondary: [], attentionBudget: 100
+·private focus: FocusState = { primary: null, secondary: [], attentionBudget: 100, maxBudget: 100, narrowed: false };
 ·private interruptQueue: AttentionTarget[] = [];
 ·private processedCount = 0;
 ·private _initialized = false;
 ·initialize(): void { this._initialized = true; }
-registerTarget(id: string, η: string, salience: number, priority: number): 
-⊡│this.targets.set(id, { id, source, salience, priority, times
+registerTarget(id: string, η: string, salience: number, priority: number): void {
+⊡│this.targets.set(id, { id, source, salience, priority, timestamp: Date.now(), decayRate: 0.01 });
 ·if (priority <= 1 && salience > 0.8) {
 ⊡│this.interruptQueue.push(this.targets.get(id)!);
 ·}

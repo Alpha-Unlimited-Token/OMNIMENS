@@ -2,12 +2,67 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
 κexecutionStateStore
-⊩generateStateId(1)→void⟨5⟩{⊩⏰⊷}
-⊩serializeState(1)→void⟨7⟩{⊩⊷⊰⊵}
-⊩deserializeState(1)→void⟨7⟩{⊩⊷⊰⊵}
-⊩saveExecutionState(2)→void⟨6⟩{⊩⊵⊡}
-⊩restoreExecutionState(1)→void⟨10⟩{⊩⊵⊡⊷}
-⊩deleteExecutionState(1)→void⟨6⟩{⊩⊵}
-⊩clearAllStates(1)→void⟨3⟩{⊩}
-⊩listStateIds(1)→void⟨3⟩{⊩⊷}
-⟩SCL│12│33⊨│23⑂│88.7%↓⟩
+⊩generateStateId(1)→void⟨5⟩{
+⊩│export function generateStateId() {
+·const randomData = randomBytes(16).toString('hex');
+⏰│const timestamp = Date.now().toString();
+⊷│return createHash('sha256').update(randomData + timestamp).digest('hex');
+·}
+}⟨/generateStateId⟩
+⊩serializeState(1)→void⟨7⟩{
+⊩│export function serializeState(state) {
+·try {
+⊷│return serialize(state);
+·} catch (error) {
+⊰│throw new Error(`↺ to serialize state: ${error.message}`);
+·}
+·}
+}⟨/serializeState⟩
+⊩deserializeState(1)→void⟨7⟩{
+⊩│export function deserializeState(binaryData) {
+·try {
+⊷│return deserialize(binaryData);
+·} catch (error) {
+⊰│throw new Error(`↺ to deserialize state: ${error.message}`);
+·}
+·}
+}⟨/deserializeState⟩
+⊩saveExecutionState(2)→void⟨6⟩{
+⊩│export function saveExecutionState(stateId, serializedState) {
+·if (!stateId || !serializedState) {
+⊵│throw new Error('State ID and serialized state are required.');
+·}
+⊡│executionStateStore.set(stateId, serializedState);
+·}
+}⟨/saveExecutionState⟩
+⊩restoreExecutionState(1)→void⟨10⟩{
+⊩│export function restoreExecutionState(stateId) {
+·if (!stateId) {
+⊵│throw new Error('State ID is required.');
+·}
+⊡│const serializedState = executionStateStore.get(stateId);
+·if (!serializedState) {
+⊷│return null;
+·}
+⊷│return deserializeState(serializedState);
+·}
+}⟨/restoreExecutionState⟩
+⊩deleteExecutionState(1)→void⟨6⟩{
+⊩│export function deleteExecutionState(stateId) {
+·if (!stateId) {
+⊵│throw new Error('State ID is required.');
+·}
+·executionStateStore.delete(stateId);
+·}
+}⟨/deleteExecutionState⟩
+⊩clearAllStates(1)→void⟨3⟩{
+⊩│export function clearAllStates() {
+·executionStateStore.clear();
+·}
+}⟨/clearAllStates⟩
+⊩listStateIds(1)→void⟨3⟩{
+⊩│export function listStateIds() {
+⊷│return Array.from(executionStateStore.keys());
+·}
+}⟨/listStateIds⟩
+⟩SCL│67│70⊨│22⑂│36.8%↓⟩

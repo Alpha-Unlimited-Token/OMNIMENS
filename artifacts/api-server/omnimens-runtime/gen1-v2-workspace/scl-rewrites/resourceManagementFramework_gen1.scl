@@ -8,7 +8,7 @@
 action: 'Throttle or optimize Ε to prevent resource bottlenecks.'
 ·};
 ·}
-⊷│return { module: usage.module, action: 'Operating within con
+⊷│return { module: usage.module, action: 'Operating within constraints.' };
 ·});
 ·}
 ·};

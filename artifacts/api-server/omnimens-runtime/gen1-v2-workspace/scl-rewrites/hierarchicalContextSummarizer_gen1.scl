@@ -1,7 +1,61 @@
 ⟨SCL v1│hierarchicalContextSummarizer_gen1.mjs│109→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩summarizeContext(2)→void⟨19⟩{⊩⊹⊵⊷}
-clusterTextChunks(2)→void⟨19⟩{⥀⊹⊺⊷}
-combineSummaries(1)→void⟨12⟩{⋐⊷⊱⊰}
-exampleUsage(1)→void⟨14⟩{}
-⟩SCL│6│16⊨│12⑂│94.5%↓⟩
+⊩summarizeContext(2)→void⟨19⟩{
+⊩│export function summarizeContext(textChunks, maxClusterSize = 5) {
+⊹│if (!Array.isArray(textChunks) || textChunks.length === 0) {
+⊵│throw new Error("Input must be a non-empty array of strings.");
+·}
+⊹│if (textChunks.length <= maxClusterSize) {
+⊷│return textChunks.join(" ");
+·}
+·const clusters = clusterTextChunks(textChunks, maxClusterSize);
+·const clusterSummaries = clusters.map(cluster => summarizeContext(cluster, maxClusterSize));
+⊷│return combineSummaries(clusterSummaries);
+·}
+}⟨/summarizeContext⟩
+clusterTextChunks(2)→void⟨19⟩{
+·function clusterTextChunks(textChunks, maxClusterSize) {
+·const clusters = [];
+·let currentCluster = [];
+⥀│for (const chunk of textChunks) {
+⊹│if (currentCluster.length < maxClusterSize) {
+⊺│currentCluster.push(chunk);
+·} else {
+⊺│clusters.push(currentCluster);
+·currentCluster = [chunk];
+·}
+·}
+⊹│if (currentCluster.length > 0) {
+⊺│clusters.push(currentCluster);
+·}
+⊷│return clusters;
+·}
+}⟨/clusterTextChunks⟩
+combineSummaries(1)→void⟨12⟩{
+·function combineSummaries(summaries) {
+·const attentionWeights = summaries.map(summary => summary.length);
+⋐│const totalWeight = attentionWeights.reduce((sum, weight) => sum + weight, 0);
+⊷│return summaries
+⊱│.map((summary, index) => {
+·const weight = attentionWeights[index] / totalWeight;
+⊰│return `${summary} (weight: ${weight.toFixed(2)})`;
+·})
+·.join(" ");
+·}
+}⟨/combineSummaries⟩
+exampleUsage(1)→void⟨14⟩{
+·function exampleUsage() {
+const ◧ = [
+·"The quick brown fox jumps over the lazy dog.",
+·"A journey of a thousand miles begins with a single step.",
+·"To be or not to be, that is the question.",
+·"All that glitters is not gold.",
+·"The only thing we have to fear is fear itself.",
+·"I think, therefore I am.",
+·"In the middle of difficulty lies opportunity."
+·];
+const summary = summarizeContext(◧);
+·console.log("Summary:", summary);
+·}
+}⟨/exampleUsage⟩
+⟩SCL│60│62⊨│17⑂│45.0%↓⟩

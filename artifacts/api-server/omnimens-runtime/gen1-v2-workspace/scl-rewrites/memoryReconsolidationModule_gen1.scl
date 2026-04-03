@@ -1,5 +1,24 @@
 ⟨SCL v1│memoryReconsolidationModule_gen1.mjs│27→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩memoryReconsolidation(2)→void⟨10⟩{⊩⊷}
-⊩oscillatoryDynamics(1)→void⟨7⟩{⊩⊷}
-⟩SCL│4│6⊨│4⑂│85.2%↓⟩
+⊩memoryReconsolidation(2)→void⟨10⟩{
+⊩│export function memoryReconsolidation(memoryTraces, oscillatoryDynamics) {
+·const strengthenedTraces = memoryTraces.map(trace => {
+·if (oscillatoryDynamics.shouldStrengthen(trace)) {
+⊷│return { ...trace, weight: trace.weight * 1.1 };
+·} else {
+⊷│return { ...trace, weight: trace.weight * 0.9 };
+·}
+·});
+⊷│return strengthenedTraces;
+·}
+}⟨/memoryReconsolidation⟩
+⊩oscillatoryDynamics(1)→void⟨7⟩{
+⊩│export function oscillatoryDynamics(trace) {
+⊷│return {
+·shouldStrengthen(trace) {
+⊷│return Math.random() > 0.5; // Simulated oscillatory dynamics
+·}
+·};
+·}
+}⟨/oscillatoryDynamics⟩
+⟩SCL│23│21⊨│7⑂│14.8%↓⟩

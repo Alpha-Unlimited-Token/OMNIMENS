@@ -1,10 +1,82 @@
 ⟨SCL v1│graphContextSummarizer_gen1.mjs│127→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩computeSemanticSimilarity(2)→void⟨7⟩{⊩⊯⊷}
-⊩constructSemanticGraph(1)→void⟨18⟩{⊩⥀⊺⊷}
-⊩clusterGraph(1)→void⟨27⟩{⊩⊯⊺⥀⊷}
-⊩compressClusters(2)→void⟨17⟩{⊩⥀⊳⊷⊯⊺}
-⊩summarizeContexts(1)→void⟨5⟩{⊩⊷}
-⊩tokenizeText(1)→void⟨3⟩{⊩⊷⊽}
-⟩SCL│9│30⊨│23⑂│92.9%↓⟩
+⊩computeSemanticSimilarity(2)→void⟨7⟩{
+⊩│export function computeSemanticSimilarity(tokensA, tokensB) {
+⊯│const setA = new Set(tokensA);
+⊯│const setB = new Set(tokensB);
+⊯│const intersection = new Set([...setA].filter(token => setB.has(token)));
+⊯│const ∪ = new Set([...setA, ...setB]);
+⊷│return intersection.size / ∪.size;
+·}
+}⟨/computeSemanticSimilarity⟩
+⊩constructSemanticGraph(1)→void⟨18⟩{
+⊩│export function constructSemanticGraph(contexts) {
+·const graph = { nodes: [], edges: [] };
+⥀│for (const ◧ of contexts) {
+⊺│graph.nodes.push({ id: ◧.id, ⋮: ◧.⋮ });
+·}
+·for (let i = 0; i < contexts.length; i++) {
+·for (let j = i + 1; j < contexts.length; j++) {
+const similarity = computeSemanticSimilarity(contexts[i].⋮, contexts[j].⋮);
+·if (similarity > 0) {
+⊺│graph.edges.push({ source: contexts[i].id, target: contexts[j].id, weight: similarity });
+·}
+·}
+·}
+⊷│return graph;
+·}
+}⟨/constructSemanticGraph⟩
+⊩clusterGraph(1)→void⟨27⟩{
+⊩│export function clusterGraph(graph) {
+·const clusters = [];
+⊯│const visited = new Set();
+·function dfs(nodeId, cluster) {
+·visited.add(nodeId);
+⊺│cluster.push(nodeId);
+⥀│for (const edge of graph.edges) {
+·if (edge.source === nodeId && !visited.has(edge.target)) {
+·dfs(edge.target, cluster);
+·} else if (edge.target === nodeId && !visited.has(edge.source)) {
+·dfs(edge.source, cluster);
+·}
+·}
+·}
+⥀│for (const node of graph.nodes) {
+·if (!visited.has(node.id)) {
+·const cluster = [];
+·dfs(node.id, cluster);
+⊺│clusters.push(cluster);
+·}
+·}
+⊷│return clusters;
+·}
+}⟨/clusterGraph⟩
+⊩compressClusters(2)→void⟨17⟩{
+⊩│export function compressClusters(clusters, graph) {
+·const summaries = [];
+⥀│for (const cluster of clusters) {
+const ⋮ = cluster.flatMap(nodeId => {
+·const node = graph.nodes.find(n => n.id === nodeId);
+⊳│return node ? node.⋮ : [];
+·});
+⊯│const summary = Array.from(new Set(⋮)).join(' ');
+·const summaryId = createHash('sha256').update(summary).digest('hex');
+⊺│summaries.push({ id: summaryId, summary });
+·}
+⊷│return summaries;
+·}
+}⟨/compressClusters⟩
+⊩summarizeContexts(1)→void⟨5⟩{
+⊩│export function summarizeContexts(contexts) {
+·const graph = constructSemanticGraph(contexts);
+·const clusters = clusterGraph(graph);
+⊷│return compressClusters(clusters, graph);
+·}
+}⟨/summarizeContexts⟩
+⊩tokenizeText(1)→void⟨3⟩{
+⊩│export function tokenizeText(text) {
+⊷│return text.toLowerCase().match(/\w+/g) || [];
+·}
+}⟨/tokenizeText⟩
+⟩SCL│81│89⊨│28⑂│36.2%↓⟩

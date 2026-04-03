@@ -15,7 +15,7 @@
 ·}
 ·}
 ·getNodeData(nodeId) {
-⊡│return this.graph.has(nodeId) ? this.graph.get(nodeId).data 
+⊡│return this.graph.has(nodeId) ? this.graph.get(nodeId).data : null;
 ·}
 ·resolveConflicts() {
 ·console.log("Resolving conflicts across memory domains.");

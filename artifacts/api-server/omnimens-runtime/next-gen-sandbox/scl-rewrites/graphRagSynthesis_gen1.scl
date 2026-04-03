@@ -1,5 +1,33 @@
 ⟨SCL v1│graphRagSynthesis_gen1.mjs│36→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩graphRagSynthesis(1)→void⟨15⟩{⊩⊲⟛⊷}
-⊩resolveConflicts(1)→void⟨11⟩{⊩⊸⊷}
-⟩SCL│4│9⊨│7⑂│88.9%↓⟩
+⊩graphRagSynthesis(1)→void⟨15⟩{
+⊩│export function graphRagSynthesis(agentOutputs) {
+·const graph = {};
+agentOutputs.forEach(θ => {
+⊲│const { entity, relationships, confidence } = θ;
+·if (!graph[entity]) graph[entity] = { relationships: {}, confidence: 0 };
+⟛│graph[entity].confidence = Math.max(graph[entity].confidence, confidence);
+·relationships.forEach(rel => {
+·if (!graph[entity].relationships[rel.target]) {
+·graph[entity].relationships[rel.target] = { weight: 0 };
+·}
+·graph[entity].relationships[rel.target].weight += rel.weight;
+·});
+·});
+⊷│return graph;
+·}
+}⟨/graphRagSynthesis⟩
+⊩resolveConflicts(1)→void⟨11⟩{
+⊩│export function resolveConflicts(graph) {
+⊸│Object.keys(graph).forEach(entity => {
+·const relationships = graph[entity].relationships;
+⊸│Object.keys(relationships).forEach(target => {
+·if (relationships[target].weight < 0.5) {
+·delete relationships[target];
+·}
+·});
+·});
+⊷│return graph;
+·}
+}⟨/resolveConflicts⟩
+⟩SCL│32│33⊨│8⑂│11.1%↓⟩

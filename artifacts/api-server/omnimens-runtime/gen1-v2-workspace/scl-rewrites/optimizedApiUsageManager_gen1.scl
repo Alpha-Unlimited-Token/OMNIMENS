@@ -1,8 +1,19 @@
 ⟨SCL v1│optimizedApiUsageManager_gen1.mjs│99→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-computeHash(1)→void⟨3⟩{⊷}
-cosineSimilarity(2)→void⟨6⟩{⋐⊷}
+computeHash(1)→void⟨3⟩{
+·function computeHash(input) {
+⊷│return crypto.createHash('sha256').update(input).digest('hex');
+·}
+}⟨/computeHash⟩
+cosineSimilarity(2)→void⟨6⟩{
+·function cosineSimilarity(vecA, vecB) {
+⋐│const dotProduct = vecA.reduce((sum, val, idx) => sum + val * vecB[idx], 0);
+⋐│const magnitudeA = Math.sqrt(vecA.reduce((sum, val) => sum + val * val, 0));
+⋐│const magnitudeB = Math.sqrt(vecB.reduce((sum, val) => sum + val * val, 0));
+⊷│return dotProduct / (magnitudeA * magnitudeB);
+·}
+}⟨/cosineSimilarity⟩
 ⊶│export class LRUCache {
 ·constructor(maxSize) {
 ·this.maxSize = maxSize;
@@ -39,18 +50,26 @@ set(key, ≪) {
 κqueryEmbedding
 ·for (const [cachedKey, { embedding, result }] of this.cache.cache.entries()) {
 ·if (cosineSimilarity(queryEmbedding, embedding) >= this.similarityThreshold) {
-⊡│this.cache.set(queryHash, { embedding: queryEmbedding, resul
+⊡│this.cache.set(queryHash, { embedding: queryEmbedding, result });
 ⊷│return result;
 ·}
 ·}
 κresult
-⊡│this.cache.set(queryHash, { embedding: queryEmbedding, resul
+⊡│this.cache.set(queryHash, { embedding: queryEmbedding, result });
 ⊷│return result;
 ·}
 ·async simulateApiCall(query) {
 ⊰│return `Processed result for query: ${query}`;
 ·}
 ·}
-⊩⟿handleQuery(3)→void⟨3⟩{⊩⊷}
-⊩⟿exampleEmbeddingFunction(1)→void⟨3⟩{⊩⊷}
-⟩SCL│55│32⊨│20⑂│44.4%↓⟩
+⊩⟿handleQuery(3)→void⟨3⟩{
+⊩│export async function handleQuery(query, embeddingFunction, cacheManager) {
+⊷│return cacheManager.processQuery(query, embeddingFunction);
+·}
+}⟨/handleQuery⟩
+⊩⟿exampleEmbeddingFunction(1)→void⟨3⟩{
+⊩│export async function exampleEmbeddingFunction(query) {
+⊷│return Array.from(query).map((char) => char.charCodeAt(0) % 10);
+·}
+}⟨/exampleEmbeddingFunction⟩
+⟩SCL│74│43⊨│22⑂│25.3%↓⟩

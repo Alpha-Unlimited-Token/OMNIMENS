@@ -2,7 +2,7 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊶│export class FormalReasoningVerifier {
 ·static entropyScore(chain) {
-⋐│return chain.reduce((acc, step) => acc + (step.confidence ||
+⋐│return chain.reduce((acc, step) => acc + (step.confidence || 0.5), 0) / chain.length;
 ·}
 ·static verify(chain) {
 κentropy

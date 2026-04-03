@@ -1,12 +1,68 @@
 ⟨SCL v1│vectorStore_redis_gen1.mjs│125→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊲│const { createClient } = require('redis');
-⟿initializeRedisClient(1)→void⟨10⟩{⊱⊷}
-⟿storeVector(3)→void⟨8⟩{⊵⟠⊡}
-⟿getVector(2)→void⟨8⟩{⊡⊰⊵⟠⊷}
-cosineSimilarity(2)→void⟨15⟩{⊹⊵⋐⊷}
-⟿findNearestNeighbor(3)→void⟨16⟩{⥀⊴⊷}
-⟿closeRedisClient(1)→void⟨3⟩{}
+⟿initializeRedisClient(1)→void⟨10⟩{
+·async function initializeRedisClient() {
+·const client = createClient();
+⊱│client.on('error', (err) => {
+·console.error('Redis Client Error:', err);
+·});
+·await client.connect();
+⊷│return client;
+·}
+}⟨/initializeRedisClient⟩
+⟿storeVector(3)→void⟨8⟩{
+·async function storeVector(client, key, vector) {
+·if (!Array.isArray(vector) || vector.some(isNaN)) {
+⊵│throw new Error('Vector must be an array of numbers.');
+·}
+⟠│const vectorString = JSON.stringify(vector);
+⊡│await client.set(key, vectorString);
+·}
+}⟨/storeVector⟩
+⟿getVector(2)→void⟨8⟩{
+·async function getVector(client, key) {
+⊡│const vectorString = await client.get(key);
+·if (!vectorString) {
+⊰│throw new Error(`Vector with key '${key}' not found.`);
+·}
+⟠│return JSON.parse(vectorString);
+·}
+}⟨/getVector⟩
+cosineSimilarity(2)→void⟨15⟩{
+·function cosineSimilarity(vectorA, vectorB) {
+⊹│if (vectorA.length !== vectorB.length) {
+⊵│throw new Error('Vectors must be of the same length.');
+·}
+⋐│const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
+⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
+⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
+·if (magnitudeA === 0 || magnitudeB === 0) {
+⊵│throw new Error('Vectors must not be zero vectors.');
+·}
+⊷│return dotProduct / (magnitudeA * magnitudeB);
+·}
+}⟨/cosineSimilarity⟩
+⟿findNearestNeighbor(3)→void⟨16⟩{
+·async function findNearestNeighbor(client, queryVector, keys) {
+·let nearestNeighbor = null;
+·let highestSimilarity = -Infinity;
+⥀│for (const key of keys) {
+⊴│const storedVector = await getVector(client, key);
+·const similarity = cosineSimilarity(queryVector, storedVector);
+·if (similarity > highestSimilarity) {
+·highestSimilarity = similarity;
+·nearestNeighbor = key;
+·}
+·}
+⊷│return { key: nearestNeighbor, similarity: highestSimilarity };
+·}
+}⟨/findNearestNeighbor⟩
+⟿closeRedisClient(1)→void⟨3⟩{
+·async function closeRedisClient(client) {
+·await client.disconnect();
+·}
+}⟨/closeRedisClient⟩
 Ε.exports = {
 ·initializeRedisClient,
 ·storeVector,
@@ -15,4 +71,4 @@ cosineSimilarity(2)→void⟨15⟩{⊹⊵⋐⊷}
 ·findNearestNeighbor,
 ·closeRedisClient
 ·};
-⟩SCL│17│25⊨│18⑂│86.4%↓⟩
+⟩SCL│73│67⊨│19⑂│41.6%↓⟩

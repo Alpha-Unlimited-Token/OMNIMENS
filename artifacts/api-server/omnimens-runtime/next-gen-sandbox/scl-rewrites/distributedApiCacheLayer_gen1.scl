@@ -1,8 +1,19 @@
 ⟨SCL v1│distributedApiCacheLayer_gen1.mjs│101→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩hashContext(1)→void⟨3⟩{⊩⊷}
-⊩cosineSimilarity(2)→void⟨6⟩{⊩⋐⊷}
+⊩hashContext(1)→void⟨3⟩{
+⊩│export function hashContext(◧) {
+⊷│return createHash('sha256').update(◧).digest('hex');
+·}
+}⟨/hashContext⟩
+⊩cosineSimilarity(2)→void⟨6⟩{
+⊩│export function cosineSimilarity(vecA, vecB) {
+⋐│const dotProduct = vecA.reduce((sum, a, idx) => sum + a * vecB[idx], 0);
+⋐│const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a * a, 0));
+⋐│const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b * b, 0));
+⊷│return dotProduct / (magnitudeA * magnitudeB);
+·}
+}⟨/cosineSimilarity⟩
 ⊶│class SemanticCache {
 ·constructor(maxSize = 100) {
 ·this.maxSize = maxSize;
@@ -13,7 +24,7 @@
 ·if (this.cache.size >= this.maxSize) {
 ·this.evictLRU();
 ·}
-⊡│this.cache.set(contextHash, { vector, response, timestamp: D
+⊡│this.cache.set(contextHash, { vector, response, timestamp: Date.now() });
 ⊡│this.index.set(contextHash, vector);
 ·}
 ·evictLRU() {
@@ -45,7 +56,28 @@ oldestTimestamp = ≪.timestamp;
 ·}
 ·}
 ⊪distributedCache
-⊩cacheApiResponse(3)→void⟨4⟩{⊩}
-⊩getCachedResponse(3)→void⟨12⟩{⊩⊡⊷⊹}
-⊩normalizeVector(1)→void⟨4⟩{⊩⋐⊷}
-⟩SCL│50│33⊨│21⑂│50.5%↓⟩
+⊩cacheApiResponse(3)→void⟨4⟩{
+⊩│export function cacheApiResponse(◧, vector, response) {
+const contextHash = hashContext(◧);
+·distributedCache.add(contextHash, vector, response);
+·}
+}⟨/cacheApiResponse⟩
+⊩getCachedResponse(3)→void⟨12⟩{
+⊩│export function getCachedResponse(◧, vector, similarityThreshold = 0.8) {
+const contextHash = hashContext(◧);
+⊡│const exactMatch = distributedCache.get(contextHash);
+⊷│if (exactMatch) return exactMatch;
+·const similarEntries = distributedCache.findSimilar(vector, similarityThreshold);
+⊹│if (similarEntries.length > 0) {
+⊡│return distributedCache.get(similarEntries[0].key);
+·}
+⊷│return null;
+·}
+}⟨/getCachedResponse⟩
+⊩normalizeVector(1)→void⟨4⟩{
+⊩│export function normalizeVector(vector) {
+⋐│const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
+⊷│return vector.map(val => val / magnitude);
+·}
+}⟨/normalizeVector⟩
+⟩SCL│82│55⊨│25⑂│18.8%↓⟩

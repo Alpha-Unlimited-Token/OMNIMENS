@@ -1,7 +1,18 @@
 ⟨SCL v1│continuousWorkerManager_gen1.mjs│122→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩chunkArray(2)→void⟨10⟩{⊩⊵⊺⊷}
+⊩chunkArray(2)→void⟨10⟩{
+⊩│export function chunkArray(array, chunkSize) {
+·if (!Array.isArray(array) || chunkSize <= 0) {
+⊵│throw new Error('Invalid input: array must be an array and chunkSize must be greater than 0.');
+·}
+·const chunks = [];
+·for (let i = 0; i < array.length; i += chunkSize) {
+⊺│chunks.push(array.slice(i, i + chunkSize));
+·}
+⊷│return chunks;
+·}
+}⟨/chunkArray⟩
 ⊶│export class PriorityQueue {
 ·constructor() {
 ·this.queue = [];
@@ -82,4 +93,4 @@
 ·}
 ·});
 ·}
-⟩SCL│84│26⊨│21⑂│31.1%↓⟩
+⟩SCL│95│35⊨│21⑂│22.1%↓⟩

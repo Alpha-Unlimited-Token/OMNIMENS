@@ -1,10 +1,97 @@
 ⟨SCL v1│contextCompression_gen1.mjs│162→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩compressContext(2)→void⟨23⟩{⊩⊹⊵⊷}
-tokenize(1)→void⟨7⟩{⊷⊽⊹}
-calculateSimilarityMatrix(1)→void⟨12⟩{⊷}
-calculateSimilarity(2)→void⟨9⟩{⊯⊷}
-kMeansClustering(2)→void⟨36⟩{⊺⊱⋐⊷⟛}
-summarizeCluster(2)→void⟨18⟩{⥀⋐⊷}
+⊩compressContext(2)→void⟨23⟩{
+⊩│export function compressContext(conversation, clusterCount = 3) {
+⊹│if (!Array.isArray(conversation) || conversation.length === 0) {
+⊵│throw new Error("Invalid conversation input. Must be a non-empty array of strings.");
+·}
+·if (typeof clusterCount !== "number" || clusterCount <= 0) {
+⊵│throw new Error("Invalid clusterCount input. Must be a ☼ integer.");
+·}
+·const tokenizedSentences = conversation.map((sentence) => tokenize(sentence));
+·const similarityMatrix = calculateSimilarityMatrix(tokenizedSentences);
+·const clusters = kMeansClustering(similarityMatrix, clusterCount);
+·const summaries = clusters.map((cluster) => summarizeCluster(cluster, conversation));
+⊷│return summaries;
+·}
+}⟨/compressContext⟩
+tokenize(1)→void⟨7⟩{
+·function tokenize(sentence) {
+⊷│return sentence
+·.toLowerCase()
+⊽│.replace(/[^a-z0-9\s]/g, "")
+·.split(/\s+/)
+⊹│.filter((word) => word.length > 0);
+·}
+}⟨/tokenize⟩
+calculateSimilarityMatrix(1)→void⟨12⟩{
+·function calculateSimilarityMatrix(tokenizedSentences) {
+·const matrix = [];
+·for (let i = 0; i < tokenizedSentences.length; i++) {
+·matrix[i] = [];
+·for (let j = 0; j < tokenizedSentences.length; j++) {
+·matrix[i][j] = calculateSimilarity(tokenizedSentences[i], tokenizedSentences[j]);
+·}
+·}
+⊷│return matrix;
+·}
+}⟨/calculateSimilarityMatrix⟩
+calculateSimilarity(2)→void⟨9⟩{
+·function calculateSimilarity(tokensA, tokensB) {
+⊯│const setA = new Set(tokensA);
+⊯│const setB = new Set(tokensB);
+⊯│const intersection = new Set([...setA].filter((x) => setB.has(x))).size;
+⊯│const ∪ = new Set([...setA, ...setB]).size;
+⊷│return intersection / ∪;
+·}
+}⟨/calculateSimilarity⟩
+kMeansClustering(2)→void⟨36⟩{
+·function kMeansClustering(similarityMatrix, k) {
+·const n = similarityMatrix.length;
+·const centroids = Array.from({ length: k }, () => Math.floor(Math.random() * n));
+·let clusters = Array.from({ length: k }, () => []);
+·let previousCentroids;
+·do {
+·previousCentroids = [...centroids];
+·clusters = Array.from({ length: k }, () => []);
+·for (let i = 0; i < n; i++) {
+·let closestCentroid = 0;
+·let maxSimilarity = -Infinity;
+·for (let j = 0; j < k; j++) {
+·if (similarityMatrix[i][centroids[j]] > maxSimilarity) {
+·maxSimilarity = similarityMatrix[i][centroids[j]];
+·closestCentroid = j;
+·}
+·}
+⊺│clusters[closestCentroid].push(i);
+·}
+⊱│centroids = clusters.map((cluster) => {
+·const clusterSimilarity = cluster.map((index) => similarityMatrix[index]);
+⋐│const averageSimilarity = clusterSimilarity.reduce((acc, row) => {
+⊷│return acc.map((sum, i) => sum + row[i]);
+·}, Array(n).fill(0)).map((sum) => sum / cluster.length);
+⟛│return averageSimilarity.indexOf(Math.max(...averageSimilarity));
+·});
+·} while (!centroids.every((c, i) => c === previousCentroids[i]));
+⊷│return clusters;
+·}
+}⟨/kMeansClustering⟩
+summarizeCluster(2)→void⟨18⟩{
+·function summarizeCluster(cluster, conversation) {
+·let representativeSentence = "";
+·let maxScore = -Infinity;
+⥀│for (const index of cluster) {
+⋐│const score = cluster.reduce((sum, otherIndex) => sum + calculateSimilarity(
+·tokenize(conversation[index]),
+·tokenize(conversation[otherIndex])
+·), 0);
+·if (score > maxScore) {
+·maxScore = score;
+·representativeSentence = conversation[index];
+·}
+·}
+⊷│return representativeSentence;
+·}
+}⟨/summarizeCluster⟩
 ·export default { compressContext };
-⟩SCL│9│24⊨│18⑂│94.4%↓⟩
+⟩SCL│96│99⊨│23⑂│40.7%↓⟩

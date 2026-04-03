@@ -1,6 +1,13 @@
 ⟨SCL v1│embeddingCache_gen1.mjs│179→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
+euclideanDistance(2)→void⟨6⟩{
+·function euclideanDistance(vectorA, vectorB) {
+⊹│if (vectorA.length !== vectorB.length) {
+⊵│throw new Error("Vectors must be of the same dimension.");
+·}
+⋐│return Math.sqrt(vectorA.reduce((sum, val, i) => sum + (val - vectorB[i]) ** 2, 0));
+·}
+}⟨/euclideanDistance⟩
 ⊶│class HNSW {
 ·constructor(maxNeighbors = 5, maxLevels = 3) {
 ·this.maxNeighbors = maxNeighbors;
@@ -40,7 +47,7 @@ euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
 ⊹│while (candidates.length > 0) {
 ⊲│const { id } = candidates.pop();
 ·visited.add(id);
-⥀│for (const neighborId of this.nodes.get(id).neighbors.get(0)
+⥀│for (const neighborId of this.nodes.get(id).neighbors.get(0)) {
 ·if (!visited.has(neighborId)) {
 κdistance
 ⊺│candidates.push({ id: neighborId, distance });
@@ -55,11 +62,11 @@ euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
 ·}
 ·_searchLevel(vector, entryId, level) {
 ·let currentId = entryId;
-⊡│let closestDistance = euclideanDistance(vector, this.nodes.g
+⊡│let closestDistance = euclideanDistance(vector, this.nodes.get(currentId).vector);
 ·let improved = true;
 ·while (improved) {
 ·improved = false;
-⥀│for (const neighborId of this.nodes.get(currentId).neighbors
+⥀│for (const neighborId of this.nodes.get(currentId).neighbors.get(level)) {
 κdistance
 ·if (distance < closestDistance) {
 ·closestDistance = distance;
@@ -78,12 +85,12 @@ euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
 κdistB
 ⊷│return distA - distB;
 ·});
-⟛│neighbors.length = Math.min(neighbors.length, this.maxNeighb
+⟛│neighbors.length = Math.min(neighbors.length, this.maxNeighbors);
 ⊡│newNode.neighbors.get(level).add(...neighbors);
 ⥀│for (const neighborId of neighbors) {
-⊡│this.nodes.get(neighborId).neighbors.get(level).add(newNode.
+⊡│this.nodes.get(neighborId).neighbors.get(level).add(newNode.id);
 ·}
 ·}
 ·}
 ·export { HNSW, euclideanDistance };
-⟩SCL│88│36⊨│27⑂│50.8%↓⟩
+⟩SCL│95│40⊨│26⑂│46.9%↓⟩

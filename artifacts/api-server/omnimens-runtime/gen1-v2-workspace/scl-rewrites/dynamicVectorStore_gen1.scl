@@ -9,9 +9,61 @@ this.point = point; // The vector point ◧ in this node
 this.≪ = null; // ≪ child node
 ·}
 ·}
-buildKDTree(2)→void⟨13⟩{⊷⊹}
-nearestNeighbor(4)→void⟨42⟩{⊄⊷⊳⊲}
-euclideanDistance(2)→void⟨5⟩{⊷⋐}
+buildKDTree(2)→void⟨13⟩{
+·function buildKDTree(points, depth = 0) {
+⊷│if (points.length === 0) return null;
+·const axis = depth % points[0].length;
+·points.sort((a, b) => a[axis] - b[axis]);
+·const medianIndex = Math.floor(points.length / 2);
+·const node = new KDTreeNode(points[medianIndex], axis);
+·node.left = buildKDTree(points.slice(0, medianIndex), depth + 1);
+node.≪ = buildKDTree(points.slice(medianIndex + 1), depth + 1);
+⊷│return node;
+·}
+}⟨/buildKDTree⟩
+nearestNeighbor(4)→void⟨42⟩{
+·function nearestNeighbor(node, target, best = null, bestDistance = Infinity) {
+⊄│if (!node) return { best, bestDistance };
+·const distance = euclideanDistance(node.point, target);
+·let nextBest = best;
+·let nextBestDistance = bestDistance;
+·if (distance < bestDistance) {
+·nextBest = node;
+·nextBestDistance = distance;
+·}
+·const axis = node.axis;
+⊳│const direction = target[axis] < node.point[axis] ? 'left' : '≪';
+⊲│const { best: newBest, bestDistance: newBestDistance } = nearestNeighbor(
+·node[direction],
+·target,
+·nextBest,
+·nextBestDistance
+·);
+·nextBest = newBest;
+·nextBestDistance = newBestDistance;
+⊳│const otherDirection = direction === 'left' ? '≪' : 'left';
+·if (Math.abs(target[axis] - node.point[axis]) < nextBestDistance) {
+⊲│const { best: otherBest, bestDistance: otherBestDistance } = nearestNeighbor(
+·node[otherDirection],
+·target,
+·nextBest,
+·nextBestDistance
+·);
+·if (otherBestDistance < nextBestDistance) {
+·nextBest = otherBest;
+·nextBestDistance = otherBestDistance;
+·}
+·}
+⊷│return { best: nextBest, bestDistance: nextBestDistance };
+·}
+}⟨/nearestNeighbor⟩
+euclideanDistance(2)→void⟨5⟩{
+·function euclideanDistance(pointA, pointB) {
+⊷│return Math.sqrt(
+⋐│pointA.reduce((sum, value, index) => sum + (value - pointB[index]) ** 2, 0)
+·);
+·}
+}⟨/euclideanDistance⟩
 ⊶│class DynamicVectorStore {
 ·constructor() {
 ·this.points = [];
@@ -19,19 +71,19 @@ euclideanDistance(2)→void⟨5⟩{⊷⋐}
 ·}
 ·addVector(vector) {
 if (!ι.isArray(vector) || vector.some(isNaN)) {
-⊵│throw new Error('Invalid vector: must be an array of numbers
+⊵│throw new Error('Invalid vector: must be an array of numbers.');
 ·}
 ⊺│this.points.push(vector);
 ·this.tree = buildKDTree(this.points);
 ·}
 findNearest(θ) {
 ·if (!this.tree) {
-⊵│throw new Error('No vectors stored. Add vectors before query
+⊵│throw new Error('No vectors stored. Add vectors before querying.');
 ·}
 if (!ι.isArray(θ) || θ.some(isNaN)) {
-⊵│throw new Error('Invalid target: must be an array of numbers
+⊵│throw new Error('Invalid target: must be an array of numbers.');
 ·}
-⊲│const { best, bestDistance } = nearestNeighbor(this.tree, ta
+⊲│const { best, bestDistance } = nearestNeighbor(this.tree, target);
 ⊷│return { vector: best.point, distance: bestDistance };
 ·}
 ·}
@@ -41,4 +93,4 @@ if (!ι.isArray(θ) || θ.some(isNaN)) {
 ·nearestNeighbor,
 ·euclideanDistance
 ·};
-⟩SCL│43│26⊨│17⑂│73.8%↓⟩
+⟩SCL│95│71⊨│19⑂│42.1%↓⟩

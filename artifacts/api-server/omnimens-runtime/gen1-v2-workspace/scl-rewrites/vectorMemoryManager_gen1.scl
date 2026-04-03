@@ -1,13 +1,20 @@
 ⟨SCL v1│vectorMemoryManager_gen1.mjs│111→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-cosineSimilarity(2)→void⟨6⟩{⋐⊳⊷}
+cosineSimilarity(2)→void⟨6⟩{
+·function cosineSimilarity(vectorA, vectorB) {
+⋐│const dotProduct = vectorA.reduce((sum, value, index) => sum + value * vectorB[index], 0);
+⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, value) => sum + value ** 2, 0));
+⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, value) => sum + value ** 2, 0));
+⊳│return magnitudeA > 0 && magnitudeB > 0 ? dotProduct / (magnitudeA * magnitudeB) : 0;
+·}
+}⟨/cosineSimilarity⟩
 ⊶│class VectorMemoryManager {
 ·constructor() {
 ⊮│this.vectorStore = new Map();
 ·}
 ·addVector(id, vector) {
 if (!ι.isArray(vector) || vector.some(≪ => typeof ≪ !== 'number')) {
-⊵│throw new Error('Invalid vector: must be an array of numbers
+⊵│throw new Error('Invalid vector: must be an array of numbers.');
 ·}
 ⊡│this.vectorStore.set(id, { id, vector });
 ·}
@@ -33,4 +40,4 @@ for (const { id, vector } of this.vectorStore.≢()) {
 ·}
 ·}
 ·export { VectorMemoryManager, cosineSimilarity };
-⟩SCL│35│15⊨│10⑂│68.5%↓⟩
+⟩SCL│42│19⊨│11⑂│62.2%↓⟩

@@ -1,4 +1,18 @@
 ⟨SCL v1│bayesianInferenceModule_gen1.mjs│22→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩bayesianInferenceModule(1)→void⟨13⟩{⊩⊷⊵⋐⊳}
-⟩SCL│3│6⊨│5⑂│86.4%↓⟩
+⊩bayesianInferenceModule(1)→void⟨13⟩{
+⊩│export function bayesianInferenceModule() {
+⊷│return {
+·calculatePosterior: function(prior, likelihood, evidence) {
+·if (evidence === 0) {
+⊵│throw new Error('Evidence cannot be zero.');
+·}
+⊷│return (likelihood * prior) / evidence;
+·},
+·entropyScore: function(probabilities) {
+⋐│return -probabilities.reduce((acc, p) => acc + (p > 0 ? p * Math.log(p) : 0), 0);
+·}
+·};
+·}
+}⟨/bayesianInferenceModule⟩
+⟩SCL│17│17⊨│5⑂│22.7%↓⟩

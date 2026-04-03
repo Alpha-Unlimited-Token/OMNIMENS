@@ -1,7 +1,74 @@
 ⟨SCL v1│webglMatrixOps_gen1.mjs│127→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩initializeWebGLContext(1)→void⟨8⟩{⊩⊵⊷}
-⊩compileShader(3)→void⟨11⟩{⊩⊰⊵⊷}
-⊩createProgram(3)→void⟨12⟩{⊩⊰⊵⊷}
-⊩multiplyMatrices(6)→void⟨45⟩{⊩⊷}
-⟩SCL│6│17⊨│13⑂│95.3%↓⟩
+⊩initializeWebGLContext(1)→void⟨8⟩{
+⊩│export function initializeWebGLContext() {
+·const canvas = new OffscreenCanvas(1, 1); // OffscreenCanvas avoids UI dependencies
+·const gl = canvas.getContext('webgl');
+·if (!gl) {
+⊵│throw new Error('WebGL is not supported in this environment.');
+·}
+⊷│return gl;
+·}
+}⟨/initializeWebGLContext⟩
+⊩compileShader(3)→void⟨11⟩{
+⊩│export function compileShader(gl, source, type) {
+·const shader = gl.createShader(type);
+·gl.shaderSource(shader, source);
+·gl.compileShader(shader);
+·if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
+·const error = gl.getShaderInfoLog(shader);
+·gl.deleteShader(shader);
+⊰│throw new Error(`Shader compilation ↺: ${error}`);
+·}
+⊷│return shader;
+·}
+}⟨/compileShader⟩
+⊩createProgram(3)→void⟨12⟩{
+⊩│export function createProgram(gl, vertexShader, fragmentShader) {
+·const program = gl.createProgram();
+·gl.attachShader(program, vertexShader);
+·gl.attachShader(program, fragmentShader);
+·gl.linkProgram(program);
+·if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+·const error = gl.getProgramInfoLog(program);
+·gl.deleteProgram(program);
+⊰│throw new Error(`Program linking ↺: ${error}`);
+·}
+⊷│return program;
+·}
+}⟨/createProgram⟩
+⊩multiplyMatrices(6)→void⟨45⟩{
+⊩│export function multiplyMatrices(gl, matrixA, matrixB, rowsA, colsA, colsB) {
+·const vertexShaderSource = `
+·attribute vec2 position;
+·void main() {
+·gl_Position = vec4(position, 0.0, 1.0);
+·}
+·`;
+·const fragmentShaderSource = `
+·precision highp float;
+·uniform sampler2D matrixA;
+·uniform sampler2D matrixB;
+·uniform int rowsA;
+·uniform int colsA;
+·uniform int colsB;
+·void main() {
+·int row = int(gl_FragCoord.y);
+·int col = int(gl_FragCoord.x);
+·float result = 0.0;
+·for (int i = 0; i < colsA; i++) {
+·float a = texture2D(matrixA, vec2(float(i) / float(colsA), float(row) / float(rowsA))).r;
+·float b = texture2D(matrixB, vec2(float(col) / float(colsB), float(i) / float(colsA))).r;
+·result += a * b;
+·}
+·gl_FragColor = vec4(result, 0.0, 0.0, 1.0);
+·}
+·`;
+·const vertexShader = compileShader(gl, vertexShaderSource, gl.VERTEX_SHADER);
+·const fragmentShader = compileShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);
+·const program = createProgram(gl, vertexShader, fragmentShader);
+·gl.useProgram(program);
+⊷│return new Float32Array(rowsA * colsB);
+·}
+}⟨/multiplyMatrices⟩
+⟩SCL│73│74⊨│11⑂│42.5%↓⟩

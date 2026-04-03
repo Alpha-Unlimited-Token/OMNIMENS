@@ -33,16 +33,22 @@ engineRegistry.registerEngine("α-mesh", "NORMAL", { dbQuota: 10 });
 ·| "OMNIMENS";
 κMESH_AGENTS
 ·const callOpenAI = (cfg: any) =>
-apiManager.call("α-mesh", "openai", { endpoint: "chat/completions", ...cfg }
+apiManager.call("α-mesh", "openai", { endpoint: "chat/completions", ...cfg });
 κopenai
 κTABLE
 const ⊞ = (table: string, data: any, priority: any = "NORMAL") =>
 dbGateway.⊞("α-mesh", table, data, priority);
 ·const read = (table: string, query: any = {}) =>
 dbGateway.read("α-mesh", table, query);
-safeNum(2)→void⟨3⟩{⊳⊷⊼}
+safeNum(2)→void⟨3⟩{
+·function safeNum(val: number, fallback = 0) {
+⊳│return Number.isFinite(val) ? val : fallback;
+·}
+}⟨/safeNum⟩
 ·let meshCycleCount = 0;
-⟿storeAgentMessage(1)→void⟨1⟩{}
+⟿storeAgentMessage(1)→void⟨1⟩{
+·async function storeAgentMessage(
+}⟨/storeAgentMessage⟩
 ·from: MeshAgentName,
 ·to: MeshAgentName,
 ·type: string,
@@ -65,7 +71,9 @@ safeNum(2)→void⟨3⟩{⊳⊷⊼}
 ·cycleId,
 ·});
 ·}
-⟿sendOwnerNotification(1)→void⟨1⟩{}
+⟿sendOwnerNotification(1)→void⟨1⟩{
+·async function sendOwnerNotification(
+}⟨/sendOwnerNotification⟩
 ·title: string,
 ·message: string,
 ·type: string = "agent_mesh",
@@ -83,13 +91,15 @@ safeNum(2)→void⟨3⟩{⊳⊷⊼}
 ·upgradeId: null,
 ⊰│title: `🔴 ACTION REQUIRED: ${title}`,
 ·message:
-⊰│`${message}\n\n⚠️ This upgrade requires republishing. Click 
+⊰│`${message}\n\n⚠️ This upgrade requires republishing. Click Publish from your deployment dashboard.`,
 ·type: "republish_required",
 ·readByOwner: false,
 ·});
 ·}
 ·}
-⟿agentThink(1)→void⟨1⟩{}
+⟿agentThink(1)→void⟨1⟩{
+·async function agentThink(
+}⟨/agentThink⟩
 ·agentName: MeshAgentName,
 ·prompt: string,
 ·max = 1500,
@@ -103,12 +113,40 @@ console.error("[OMNIMENS-α-MESH] openai error:", e);
 ·}
 ·}
 κMESH_RESEARCH_TOPICS
-⟿phase1_research(1)→Promise<string>⟨14⟩{⥀⊴⊺⊷}
-⟿loadMeshEpisodicMemory(1)→void⟨11⟩{⊴⊷⊰}
+⟿phase1_research(1)→Promise<string>⟨14⟩{
+·async function phase1_research(): Promise<string> {
+·const qs = [...MESH_RESEARCH_TOPICS]
+·.sort(() => Math.random() - 0.5)
+·.slice(0, 3);
+·const blocks: string[] = [];
+⥀│for (const q of qs) {
+·try {
+⊴│blocks.push(formatSearchResults(await webSearch(q, 5), q));
+·} catch {
+·}
+·}
+⊷│return blocks.join("\n\n---\n\n").slice(0, 6000);
+·}
+}⟨/phase1_research⟩
+⟿loadMeshEpisodicMemory(1)→void⟨11⟩{
+·async function loadMeshEpisodicMemory() {
+⊴│const rows: any[] = await read(TABLE.mesh, {
+⏳: 12,
+·orderBy: { createdAt: "desc" },
+·});
+⊷│return rows
+·.map(
+·(m) =>
+⊰│`[Cycle ${m.cycleId}] ${m.fromAgent} → ${m.messageType}: ${m.subject} | ${
+·(m.content || "").slice(0, 120)
+·}`,
+}⟨/loadMeshEpisodicMemory⟩
 ·)
 ·.join("\n");
 ·}
-⟿phase2_agentDiscoveries(1)→void⟨1⟩{}
+⟿phase2_agentDiscoveries(1)→void⟨1⟩{
+·async function phase2_agentDiscoveries(
+}⟨/phase2_agentDiscoveries⟩
 ·cycleId: number,
 ·researchContext: string,
 ·) {
@@ -117,10 +155,10 @@ console.error("[OMNIMENS-α-MESH] openai error:", e);
 ⊰│.map((b) => `[${b.category}] ${b.title}: ${b.content}`)
 ·.join("\n");
 κprevious
-⋔│const work = MESH_AGENTS.filter((a) => a !== "OMNIMENS").map
+⋔│const work = MESH_AGENTS.filter((a) => a !== "OMNIMENS").map(async (agent) =>
 ·agentThink(
 α,
-⊰│`You are ${agent}. Latest research:\n${researchContext.slice
+⊰│`You are ${agent}. Latest research:\n${researchContext.slice(
 ·0,
 ·2500,
 ·)}\n\nOMNIMENS brain:\n${brainSummary.slice(
@@ -133,4 +171,4 @@ console.error("[OMNIMENS-α-MESH] openai error:", e);
 κparsed
 ⊪_v2RewriteModule
 ·export {};
-⟩SCL│135│58⊨│26⑂│41.6%↓⟩
+⟩SCL│173│79⊨│23⑂│25.1%↓⟩

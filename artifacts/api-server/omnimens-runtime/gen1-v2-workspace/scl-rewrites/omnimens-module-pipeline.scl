@@ -37,7 +37,7 @@ console.log("[OMNIMENS-Ε-PIPELINE]", ...m);
 ⊬ModMeta⟨filename:string│stage:Stage│exports:string[]│loadedAt:number│callCount:number│lastCalledAt:number | null│totalDurationMs:number│errors:number│active:boolean⟩
 ⊬Registry⟨modules:Record<string, ModMeta>│lastScan:number│totalModules:number│totalCalls:number⟩
 κKW
-·for (const k in KW) KW[k as Stage] = KW[k as Stage].map((w) => new RegExp(w, "gi
+·for (const k in KW) KW[k as Stage] = KW[k as Stage].map((w) => new RegExp(w, "gi"));
 κlive
 let Θ: Θ = {
 ·modules: {},
@@ -45,15 +45,15 @@ let Θ: Θ = {
 ·totalModules: 0,
 ·totalCalls: 0,
 ·};
-⟠│const readJSON = (p: string) => JSON.parse(readFileSync(p, "
+⟠│const readJSON = (p: string) => JSON.parse(readFileSync(p, "utf8"));
 ·const writeJSON = (p: string, o: any) =>
 ⟠│writeFileSync(p, JSON.stringify(o, null, 2), "utf8");
 ·const classify = (file: string, code: string): Stage => {
 κsample
 ·let best: Stage = "utility";
 ·let score = 0;
-⊸│for (const [stage, kw] of Object.entries(KW) as [Stage, RegE
-❔│const s = kw.reduce((n, r) => n + (sample.match(r)?.length |
+⊸│for (const [stage, kw] of Object.entries(KW) as [Stage, RegExp[]][]) {
+❔│const s = kw.reduce((n, r) => n + (sample.match(r)?.length || 0), 0);
 ·if (s > score) (score = s), (best = stage);
 ·}
 ⊷│return best;
@@ -75,7 +75,7 @@ let Θ: Θ = {
 ·.split(",")
 ⊺│.map((x) => x.trim().split(/\s+as\s+/).pop())
 ·.forEach((x) => x && out.add(x));
-⊽│if (!out.size && /(module\.exports|exports\.)/.test(code)) o
+⊽│if (!out.size && /(module\.exports|exports\.)/.test(code)) out.add("default");
 ⊷│return [...out];
 ·};
 ⊱│const saveRegistry = () => {
@@ -89,13 +89,13 @@ writeJSON(REGISTRY_PATH, Θ);
 if (existsSync(REGISTRY_PATH)) Θ = readJSON(REGISTRY_PATH);
 ·} catch {}
 ·};
-⊱│const safeCall = async (fn: Function, args: any[], ms = 500)
+⊱│const safeCall = async (fn: Function, args: any[], ms = 500) => {
 ·try {
 κr
 ❔│return r?.then
 ·? await Promise.race([
 ·r,
-⏳│new Promise((_, rej) => setTimeout(() => rej("timeout"), ms)
+⏳│new Promise((_, rej) => setTimeout(() => rej("timeout"), ms)),
 ·])
 ·: r;
 ·} catch {}
@@ -103,12 +103,12 @@ if (existsSync(REGISTRY_PATH)) Θ = readJSON(REGISTRY_PATH);
 ⊱│const tryRepair = (code: string) => {
 κfixes
 ·let fixed = code;
-⊽│if (/\barguments\b/.test(code.replace(/(["'`]).*?\1/g, "")))
-⊽│fixed = fixed.replace(/\barguments\b(?!\s*[.[])/g, "/*args*/
+⊽│if (/\barguments\b/.test(code.replace(/(["'`]).*?\1/g, ""))) {
+⊽│fixed = fixed.replace(/\barguments\b(?!\s*[.[])/g, "/*args*/[]");
 ⊺│fixes.push("args");
 ·}
 ·if (
-⊽│/(?<!\w)(RecursiveScaffolder|ScaffoldingEngine|BaseScaffold)
+⊽│/(?<!\w)(RecursiveScaffolder|ScaffoldingEngine|BaseScaffold)\b/.test(fixed)
 ·) {
 ⊽│fixed = fixed.replace(
 ·/(?<!\w)(RecursiveScaffolder|ScaffoldingEngine|BaseScaffold)\b/g,
@@ -116,7 +116,7 @@ if (existsSync(REGISTRY_PATH)) Θ = readJSON(REGISTRY_PATH);
 ·);
 ⊺│fixes.push("class");
 ·}
-⊷│if (/(?<!\w)eval\s*\(/.test(fixed.replace(/(["'`]).*?\1/g, "
+⊷│if (/(?<!\w)eval\s*\(/.test(fixed.replace(/(["'`]).*?\1/g, ""))) return null;
 ⊄│if (!fixes.length) return null;
 ·try {
 ·new vm.Script(
@@ -130,7 +130,9 @@ if (existsSync(REGISTRY_PATH)) Θ = readJSON(REGISTRY_PATH);
 ⊷│return null;
 ·}
 ·};
-⟿loadModule(1)→void⟨1⟩{}
+⟿loadModule(1)→void⟨1⟩{
+·async function loadModule(
+}⟨/loadModule⟩
 ·filename: string,
 ·code: string,
 ·stage: Stage,
@@ -148,8 +150,8 @@ meta: (Θ.modules[filename] = {
 ·exports,
 ⏰│loadedAt: Date.now(),
 ❔│callCount: registry.modules[filename]?.callCount || 0,
-❔│lastCalledAt: registry.modules[filename]?.lastCalledAt || nu
-❔│totalDurationMs: registry.modules[filename]?.totalDurationMs
+❔│lastCalledAt: registry.modules[filename]?.lastCalledAt || null,
+❔│totalDurationMs: registry.modules[filename]?.totalDurationMs || 0,
 ❔│errors: registry.modules[filename]?.errors || 0,
 ·active: true,
 ·}),
@@ -161,19 +163,146 @@ meta: (Θ.modules[filename] = {
 ·if (repair) {
 κbkp
 ·mkdirSync(bkp, { recursive: true });
-⏰│copyFileSync(filePath, join(bkp, `${filename}.${Date.now()}`
+⏰│copyFileSync(filePath, join(bkp, `${filename}.${Date.now()}`));
 ·writeFileSync(filePath, repair.fixed, "utf8");
-⊷│return loadModule(filename, repair.fixed, stage, exports, tr
+⊷│return loadModule(filename, repair.fixed, stage, exports, true);
 ·}
 ·}
-❔│LOG("import failed:", filename, e?.message?.slice(0, 120) ||
+❔│LOG("import failed:", filename, e?.message?.slice(0, 120) || e);
 Θ.modules[filename] &&
 (Θ.modules[filename].active = false);
 ⊷│return false;
 ·}
 ·}
-⊩⟿scanAndRegisterModules(1)→void⟨132⟩{⊩⊷⊽⫘⊱⊄⊴⏰⊰⊸⥀❔⑃⊺⟠}
-⊩⟿runFullPipeline(1)→void⟨1⟩{⊩}
+⊩⟿scanAndRegisterModules(1)→void⟨132⟩{
+⊩│export async function scanAndRegisterModules() {
+·if (!existsSync(MODULES_DIR)) {
+·mkdirSync(MODULES_DIR, { recursive: true });
+⊷│return { total: 0, registered: 0, byStage: {} };
+·}
+·loadRegistry();
+⊽│const files = readdirSync(MODULES_DIR).filter((f) => /\.[cm]?js$/.test(f));
+·const byStage: Record<string, number> = {};
+·let registered = 0;
+⫘│await Promise.all(
+⊱│files.map(async (f) => {
+·try {
+·const code = readFileSync(join(MODULES_DIR, f), "utf8");
+·const stage = classify(f, code);
+·const exports = getExports(code);
+⊄│if (!exports.length) return;
+⊴│if (await loadModule(f, code, stage, exports)) {
+·registered++;
+·byStage[stage] = (byStage[stage] || 0) + 1;
+·}
+·} catch {}
+·}),
+·);
+⏰│registry.lastScan = Date.now();
+·registry.totalModules = registered;
+·saveRegistry();
+⊰│LOG(`🔌 ${registered}/${files.length} modules live`);
+⊸│Object.entries(byStage).forEach(([s, c]) => LOG("  ", s, c));
+⊷│return { total: files.length, registered, byStage };
+·}
+⊩│export async function registerNewModule(filename: string) {
+·const fp = join(MODULES_DIR, filename);
+⊄│if (!existsSync(fp)) return false;
+·const code = readFileSync(fp, "utf8");
+·const stage = classify(filename, code);
+·const exports = getExports(code);
+⊄│if (!exports.length) return false;
+⊴│const ok = await loadModule(filename, code, stage, exports);
+·if (ok) {
+·registry.totalModules++;
+·saveRegistry();
+·LOG("⚡ NEW MODULE", filename, "→", stage);
+·}
+⊷│return ok;
+·}
+⊩│export async function runPipelineStage(stage: Stage, input: any) {
+⏰│const start = Date.now();
+·const out: any[] = [];
+·const used: string[] = [];
+·const mods = [...live.values()]
+·.filter(({ meta }) => meta.stage === stage && meta.active)
+·.sort((a, b) => b.meta.callCount - a.meta.callCount)
+·.slice(0, 5);
+⫘│await Promise.all(
+⊱│mods.map(async ({ meta, module }) => {
+⏰│const callStart = Date.now();
+·try {
+⥀│for (const name of meta.exports) {
+❔│const fn = module[name] || module.default?.[name];
+·if (typeof fn !== "function") continue;
+⊽│const M = (r: RegExp) => r.test(name);
+·let o;
+⑃│switch (stage) {
+·case "context_compression":
+❔│if (M(/compress|summariz/i) && input?.entries)
+⊴│o = await safeCall(fn, [input.entries, input.maxLength || 2e3]);
+·break;
+·case "confidence_scoring":
+·if (M(/score|calibrat|evaluat/i))
+⊴│o = await safeCall(fn, [input.text || input, input.confidence || 0.5]);
+·break;
+·case "reasoning_enhancement":
+if (M(/reason|think|infer|↻/i) && typeof input === "string")
+⊴│o = await safeCall(fn, [input]);
+·break;
+·case "memory_retrieval":
+·if (M(/search|retriev|query|find/i) && typeof input === "string")
+⊴│o = await safeCall(fn, [input]);
+·break;
+·case "adversarial_testing":
+·if (M(/test|challeng|verif/i))
+⊴│o = await safeCall(fn, [input.response || input, input.query || ""]);
+·break;
+·case "knowledge_synthesis":
+·if (M(/synthe|integrat|merg/i))
+⊴│o = await safeCall(fn, [input.sources || [input]]);
+·break;
+·case "causal_analysis":
+·if (M(/causal|counterfactual|propagat/i))
+⊴│o = await safeCall(fn, [input]);
+·break;
+·default:
+⊴│o = await safeCall(fn, [input]);
+·}
+·if (o !== undefined && o !== null) {
+·meta.callCount++;
+⏰│meta.lastCalledAt = Date.now();
+⏰│meta.totalDurationMs += Date.now() - callStart;
+·registry.totalCalls++;
+⊺│used.push(meta.filename);
+⊺│out.push({
+·module: meta.filename,
+·stage,
+θ:
+·typeof o === "string"
+·? o.slice(0, 500)
+⟠│: JSON.stringify(o).slice(0, 500),
+⏰│durationMs: Date.now() - callStart,
+·});
+·break; // stop at first successful export
+·}
+·}
+·} catch {
+·meta.errors++;
+·if (meta.errors > 10) {
+·meta.active = false;
+·LOG("disabled", meta.filename, "too many errors");
+·}
+·}
+·}),
+·);
+·if (out.length) saveRegistry();
+⏰│return { ⊢: out, modulesUsed: used, durationMs: Date.now() - start };
+·}
+}⟨/scanAndRegisterModules⟩
+⊩⟿runFullPipeline(1)→void⟨1⟩{
+⊩│export async function runFullPipeline(
+}⟨/runFullPipeline⟩
 ·message: string,
 ⊳│context?: { history?: any[]; confidence?: number },
 ·) {
@@ -185,29 +314,29 @@ meta: (Θ.modules[filename] = {
 if (ctx.⊢.length) {
 ⊺│stages.push("context_compression");
 ⊺│mods.push(...ctx.modulesUsed);
-⊰│parts.push(`[CTX] ${ctx.results.map((r) => r.output).join(" 
+⊰│parts.push(`[CTX] ${ctx.results.map((r) => r.output).join(" | ")}`);
 ·}
 κrsn
 if (rsn.⊢.length) {
 ⊺│stages.push("reasoning_enhancement");
 ⊺│mods.push(...rsn.modulesUsed);
-⊰│parts.push(`[RSN] ${rsn.results.map((r) => r.output).join(" 
+⊰│parts.push(`[RSN] ${rsn.results.map((r) => r.output).join(" | ")}`);
 ·}
 κconf
 if (conf.⊢.length) {
 ⊺│stages.push("confidence_scoring");
 ⊺│mods.push(...conf.modulesUsed);
-⊰│parts.push(`[CONF] ${conf.results.map((r) => r.output).join(
+⊰│parts.push(`[CONF] ${conf.results.map((r) => r.output).join(" | ")}`);
 ·}
 κknw
 if (knw.⊢.length) {
 ⊺│stages.push("knowledge_synthesis");
 ⊺│mods.push(...knw.modulesUsed);
-⊰│parts.push(`[KNOW] ${knw.results.map((r) => r.output).join("
+⊰│parts.push(`[KNOW] ${knw.results.map((r) => r.output).join(" | ")}`);
 ·}
 ⊷│return {
 ·pipelineContext: parts.length
-⊰│? `\n\n═══ LIVE MODULE PIPELINE — ${mods.length} modules ═══
+⊰│? `\n\n═══ LIVE MODULE PIPELINE — ${mods.length} modules ═══\n${parts.join(
 ·"\n",
 ·)}`
 ·: "",
@@ -216,8 +345,31 @@ if (knw.⊢.length) {
 ⏰│totalDurationMs: Date.now() - start,
 ·};
 ·}
-⊩getPipelineState(1)→void⟨13⟩{⊩⊱⊷}
-⊩getModuleStats(1)→void⟨8⟩{⊩⊷⊱}
+⊩getPipelineState(1)→void⟨13⟩{
+⊩│export function getPipelineState() {
+·const byStage: Record<string, number> = {};
+·[...live.values()]
+·.filter((l) => l.meta.active)
+⊱│.forEach((l) => (byStage[l.meta.stage] = (byStage[l.meta.stage] || 0) + 1));
+⊷│return {
+·totalRegistered: live.size,
+·activeModules: [...live.values()].filter((l) => l.meta.active).length,
+·byStage,
+·totalCalls: registry.totalCalls,
+·lastScan: registry.lastScan,
+·};
+·}
+}⟨/getPipelineState⟩
+⊩getModuleStats(1)→void⟨8⟩{
+⊩│export function getModuleStats() {
+⊷│return [...live.values()]
+⊱│.map(({ meta }) => ({
+·filename: meta.filename,
+·stage: meta.stage,
+·calls: meta.callCount,
+·active: meta.active,
+·}))
+}⟨/getModuleStats⟩
 ·.sort((a, b) => b.calls - a.calls);
 ·}
 ⊱│cognitionBus.onInsight((src, ins) => {
@@ -232,9 +384,13 @@ if (src !== "Ε-pipeline" && ins.type === "discovery") {
 ·});
 ·const RESCAN = () =>
 ·scanAndRegisterModules().finally(() =>
-⚡→│spikeBus.scheduleSpike("module-pipeline:rescan", {}, 60_000)
+⚡→│spikeBus.scheduleSpike("module-pipeline:rescan", {}, 60_000),
 ·);
 ⚡→│spikeBus.on("module-pipeline:rescan", RESCAN);
 ⚡→│spikeBus.scheduleSpike("module-pipeline:rescan", {}, 0);
-⊩shutdown(1)→void⟨3⟩{⊩}
-⟩SCL│239│139⊨│92⑂│58.7%↓⟩
+⊩shutdown(1)→void⟨3⟩{
+⊩│export function shutdown() {
+·engineRegistry.unregisterEngine("module-pipeline");
+·}
+}⟨/shutdown⟩
+⟩SCL│395│283⊨│118⑂│31.8%↓⟩

@@ -14,8 +14,8 @@ if (!ι.isArray(vector) || !vector.every((v) => typeof v === 'number')) {
 ⊡│return this.store.get(id) || null;
 ·}
 ·findClosestVector(queryVector) {
-if (!ι.isArray(queryVector) || !queryVector.every((v) => typeof v === 'numbe
-⊵│throw new Error('Query vector must be an array of numbers.')
+if (!ι.isArray(queryVector) || !queryVector.every((v) => typeof v === 'number')) {
+⊵│throw new Error('Query vector must be an array of numbers.');
 ·}
 ·let closestEntry = null;
 ·let highestSimilarity = -Infinity;
@@ -32,15 +32,19 @@ if (!ι.isArray(queryVector) || !queryVector.every((v) => typeof v === 'numbe
 this.⊞.clear();
 ·}
 ·_cosineSimilarity(vectorA, vectorB) {
-⋐│const dotProduct = vectorA.reduce((sum, val, idx) => sum + v
-⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => su
-⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => su
+⋐│const dotProduct = vectorA.reduce((sum, val, idx) => sum + val * (vectorB[idx] || 0), 0);
+⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val * val, 0));
+⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val * val, 0));
 ·if (magnitudeA === 0 || magnitudeB === 0) {
 ⊷│return 0; // Avoid division by zero
 ·}
 ⊷│return dotProduct / (magnitudeA * magnitudeB);
 ·}
 ·}
-createMemoryVectorStore(1)→void⟨3⟩{⊷}
+createMemoryVectorStore(1)→void⟨3⟩{
+·function createMemoryVectorStore() {
+⊷│return new MemoryVectorStore();
+·}
+}⟨/createMemoryVectorStore⟩
 ·export { createMemoryVectorStore };
-⟩SCL│45│19⊨│14⑂│62.2%↓⟩
+⟩SCL│49│21⊨│14⑂│58.8%↓⟩

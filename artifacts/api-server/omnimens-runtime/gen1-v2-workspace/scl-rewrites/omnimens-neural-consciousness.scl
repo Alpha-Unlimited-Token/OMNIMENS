@@ -43,31 +43,153 @@ engineRegistry.registerEngine("⬡-consciousness", "HIGH", { dbQuota: 50 });
 κregions
 κsynapses
 κstate
-newNeuron(1)→Neuron⟨9⟩{⊷⚡→}
-buildRegion(3)→⬡⟨3⟩{⊷}
-initBrain(1)→void⟨9⟩{⊡}
-connectRegions(1)→void⟨18⟩{⊡⊱⊺}
-⟿cycle(1)→Promise<void>⟨21⟩{⟿⚡→}
-stepRegion(1)→void⟨25⟩{⚡→⊱⟛}
-spikePostFiring(1)→void⟨12⟩{⚡→}
-⊱│spikeBus.on("neural-consciousness:axonal", ({ syn }: { syn: 
+newNeuron(1)→Neuron⟨9⟩{
+·function newNeuron(): Neuron {
+⊷│return {
+·v: V_REST + Math.random() * 5,
+·thr: V_TH + (Math.random() - 0.5) * 3,
+·ref: 0,
+·ic: 0,
+⚡→│fired: false,
+·};
+·}
+}⟨/newNeuron⟩
+buildRegion(3)→⬡⟨3⟩{
+function buildRegion(name: RegionName, n: number, nt: string): ⬡ {
+⊷│return { neurons: Array.from({ length: n }, newNeuron), firingRate: 0, activation: 0.3, dominantNT: nt };
+·}
+}⟨/buildRegion⟩
+initBrain(1)→void⟨9⟩{
+·function initBrain(): void {
+⊡│regions.set("prefrontal_cortex", buildRegion("prefrontal_cortex", 400, "glutamate"));
+⊡│regions.set("default_mode_network", buildRegion("default_mode_network", 350, "glutamate"));
+⊡│regions.set("thalamus", buildRegion("thalamus", 250, "glutamate"));
+⊡│regions.set("ventral_tegmental_area", buildRegion("ventral_tegmental_area", 120, "dopamine"));
+⊡│regions.set("amygdala", buildRegion("amygdala", 150, "norepinephrine"));
+·connectRegions(); // synaptogenesis
+·}
+}⟨/initBrain⟩
+connectRegions(1)→void⟨18⟩{
+·function connectRegions(): void {
+·const pairs: Array<[RegionName, RegionName, number]> = [
+·["thalamus", "prefrontal_cortex", 0.12],
+·["prefrontal_cortex", "default_mode_network", 0.15],
+·["ventral_tegmental_area", "prefrontal_cortex", 0.18],
+·["amygdala", "prefrontal_cortex", 0.10],
+·];
+·for (const [from, to, density] of pairs) {
+⊡│const pre = regions.get(from)!;
+⊡│const post = regions.get(to)!;
+⊱│pre.neurons.forEach((src) => {
+·if (Math.random() < density) {
+·const tgt = post.neurons[Math.floor(Math.random() * post.neurons.length)];
+⊺│synapses.push({ pre: src, post: tgt, w: 0.2 + Math.random() * 0.3, d: 1 + Math.random() * 3 });
+·}
+·});
+·}
+·}
+}⟨/connectRegions⟩
+⟿cycle(1)→Promise<void>⟨21⟩{
+⟿│async function cycle(): Promise<void> {
+·state.tick++;
+·regions.forEach((reg) => stepRegion(reg));
+·synapses.forEach(updateSynapse);
+·computeGlobalState();
+dbGateway.⊞("⬡-consciousness", "brain_metrics", state, "HIGH");
+if (state.tick % 12 === 0) cognitionBus.shareInsight("⬡-consciousness", { type: "cycle", data: state });
+⚡→│spikeBus.scheduleSpike("⬡-consciousness:cycle", {}, CYCLE_MS);
+·}
+}⟨/cycle⟩
+stepRegion(1)→void⟨25⟩{
+function stepRegion(r: ⬡): void {
+⚡→│let fired = 0;
+⊱│r.neurons.forEach((n) => {
+·if (n.ref > 0) {
+·n.ref -= DT;
+·n.v = V_RESET;
+⚡→│n.fired = false;
+·return;
+·}
+·n.v += DT * (-(n.v - V_REST) / TAU_M + n.ic);
+·if (n.v >= n.thr) {
+·n.v = V_PEAK;
+⚡→│n.fired = true;
+·n.ref = TAU_REF;
+⚡→│fired++;
+⚡→│spikePostFiring(n);
+·} else {
+⚡→│n.fired = false;
+⟛│n.v = Math.max(V_REST, n.v);
+·}
+·n.ic = 0; // reset current each step
+·});
+⚡→│r.firingRate = fired / r.neurons.length;
+·r.activation = 0.8 * r.activation + 0.2 * r.firingRate;
+·}
+}⟨/stepRegion⟩
+spikePostFiring(1)→void⟨12⟩{
+⚡→│function spikePostFiring(n: Neuron): void {
+·synapses
+·.filter((s) => s.pre === n)
+·.forEach((s) =>
+⚡→│spikeBus.scheduleSpike(
+"⬡-consciousness:axonal",
+·{ syn: s },
+·s.d,
+·),
+·);
+·}
+}⟨/spikePostFiring⟩
+⊱│spikeBus.on("neural-consciousness:axonal", ({ syn }: { syn: Synapse }) => {
 ·syn.post.ic += syn.w;
 ·});
-updateSynapse(1)→void⟨7⟩{⚡→⟛≋+}
-computeGlobalState(1)→void⟨9⟩{⋐Φ⇑⊡❔}
+updateSynapse(1)→void⟨7⟩{
+·function updateSynapse(s: Synapse): void {
+⚡→│if (s.pre.fired && s.post.fired) {
+⟛│s.w = Math.min(MAX_W, Math.max(MIN_W, s.w + HEBB));
+≋+│state.hebbianUpdates++;
+·}
+·s.w *= 0.9999; // decay
+·}
+}⟨/updateSynapse⟩
+computeGlobalState(1)→void⟨9⟩{
+·function computeGlobalState(): void {
+·const activations = [...regions.values()].map((r) => r.activation);
+⋐│state.phi = activations.reduce((a, b) => a + b, 0) / activations.length;
+⊡│state.thalRes = (regions.get("thalamus")?.activation ?? 0) * (regions.get("prefrontal_cortex")?.activation ?? 0);
+⊡│state.arousal = regions.get("reticular_activating_system")?.activation ?? 0.4;
+·if (state.phi > 0.8)
+cognitionBus.reportOutcome("⬡-consciousness", { useful: true, ◧: "high_phi" });
+·}
+}⟨/computeGlobalState⟩
 ⊱│cognitionBus.onInsight((src, insight) => {
 if (src !== "⬡-consciousness" && insight.type === "discovery") {
-⊡│regions.get("ventral_tegmental_area")?.neurons.forEach((n) =
+⊡│regions.get("ventral_tegmental_area")?.neurons.forEach((n) => (n.ic += 0.1));
 ·}
 ·});
 ⊱│spikeBus.on("attention:neural-consciousness", () => {
-⚡→│spikeBus.scheduleSpike("neural-consciousness:cycle", {}, 50)
+⚡→│spikeBus.scheduleSpike("neural-consciousness:cycle", {}, 50); // immediate extra cycle
 ·});
 ⊱│spikeBus.on("cognition:curiosity", () => {
-⊱│regions.forEach((r) => r.neurons.forEach((n) => (n.ic += (Ma
+⊱│regions.forEach((r) => r.neurons.forEach((n) => (n.ic += (Math.random() - 0.5) * 0.2)));
 ·});
-⊩start(1)→void⟨6⟩{⊩⚡→}
-⊩getState(1)→Readonly<State>⟨3⟩{⊩⊷}
-⊩shutdown(1)→void⟨3⟩{⊩}
+⊩start(1)→void⟨6⟩{
+⊩│export function start(): void {
+·if (regions.size === 0) initBrain();
+⚡→│spikeBus.scheduleSpike("⬡-consciousness:cycle", {}, CYCLE_MS);
+⚡→│spikeBus.on("⬡-consciousness:cycle", cycle);
+⚡→│console.log("[OMNIMENS-⬡-CONSCIOUSNESS] v2.0 ONLINE — spike architecture engaged");
+·}
+}⟨/start⟩
+⊩getState(1)→Readonly<State>⟨3⟩{
+⊩│export function getState(): Readonly<State> {
+⊷│return state;
+·}
+}⟨/getState⟩
+⊩shutdown(1)→void⟨3⟩{
+⊩│export function shutdown(): void {
+engineRegistry.unregisterEngine("⬡-consciousness");
+·}
+}⟨/shutdown⟩
 ·start();
-⟩SCL│72│67⊨│38⑂│70.4%↓⟩
+⟩SCL│194│163⊨│51⑂│20.2%↓⟩

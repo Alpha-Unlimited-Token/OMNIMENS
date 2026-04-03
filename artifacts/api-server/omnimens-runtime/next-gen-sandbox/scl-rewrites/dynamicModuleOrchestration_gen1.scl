@@ -8,7 +8,7 @@
 ·if (taskComplexity <= 5) {
 ⊷│return this.hierarchicalController.lowComplexityHandler();
 ·} else if (taskComplexity <= 10) {
-⊷│return this.hierarchicalController.mediumComplexityHandler()
+⊷│return this.hierarchicalController.mediumComplexityHandler();
 ·} else {
 ⊷│return this.hierarchicalController.highComplexityHandler();
 ·}

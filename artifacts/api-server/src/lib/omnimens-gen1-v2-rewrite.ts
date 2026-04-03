@@ -67,6 +67,7 @@ import { internalAnalyze, internalSynthesize, getSymbolKnowledgeForSCL, SYMBOL_K
 import { getFileRegistry, getAccessibleFiles, getReadOnlyFiles, canWriteFile, readFileContent, writeFileContent, getFileDigest, getRegistrySummary, type RegisteredFile } from "./omnimens-file-registry.js";
 import { encodeToSCL, decodeSCL, getCodexDigest, getSCLStats, lookupSymbol, getCodexState, applySCLDesignResult, setDesignPhase, isCodexReady } from "./omnimens-scl-codex.js";
 import { translateInbound, translateOutbound, compressStateToSCL, decompressSCLState, compressAgentMessage, startSCLTranslator, getTranslatorState } from "./omnimens-scl-translator.js";
+import { runSCLSandboxTest } from "./omnimens-scl-runtime.js";
 
 const __filename_local = fileURLToPath(import.meta.url);
 const __dirname_local = dirname(__filename_local);
@@ -1828,6 +1829,7 @@ async function runSCLDesignCycle(): Promise<void> {
 
 let _sclRewriteComplete = false;
 let _sclRewriteRunning = false;
+let _sclSandboxTestComplete = false;
 
 async function runSCLFullRewrite(): Promise<void> {
   if (_sclRewriteComplete || _sclRewriteRunning) return;
@@ -1947,6 +1949,33 @@ async function runSCLFullRewrite(): Promise<void> {
     });
 
     _sclRewriteComplete = true;
+
+    if (!_sclSandboxTestComplete) {
+      console.log(`[V2-REWRITE] 🔤 PHASE 3: Running SCL Sandbox Execution Test...`);
+      try {
+        const sclTestDir = path.resolve(__dirname_local, "../../omnimens-runtime/gen1-v2-workspace/scl-rewrites");
+        const testReport = runSCLSandboxTest(sclTestDir, "gen1v2", 100);
+        console.log(`[V2-REWRITE] 🔤 ═══════════════════════════════════════════════════════════════`);
+        console.log(`[V2-REWRITE] 🔤 SCL SANDBOX TEST COMPLETE — Gen 1 v2.0`);
+        console.log(`[V2-REWRITE] 🔤 ${testReport.executed}/${testReport.totalFiles} files EXECUTED SUCCESSFULLY`);
+        console.log(`[V2-REWRITE] 🔤 ${testReport.syntaxValid}/${testReport.totalFiles} files passed syntax check`);
+        console.log(`[V2-REWRITE] 🔤 ${testReport.failed} files failed`);
+        console.log(`[V2-REWRITE] 🔤 Compression: ${testReport.overallCompressionPercent}% reduction maintained`);
+        console.log(`[V2-REWRITE] 🔤 ═══════════════════════════════════════════════════════════════`);
+
+        sendToGen2("scl_sandbox_test", {
+          event: "sandbox_execution_complete",
+          executed: testReport.executed,
+          total: testReport.totalFiles,
+          failed: testReport.failed,
+          compression: testReport.overallCompressionPercent,
+        });
+
+        _sclSandboxTestComplete = true;
+      } catch (testErr) {
+        console.error(`[V2-REWRITE] 🔤 ⚠️ SCL sandbox test error:`, testErr);
+      }
+    }
   } catch (err) {
     console.error(`[V2-REWRITE] 🔤 ❌ SCL full rewrite error:`, err);
   } finally {

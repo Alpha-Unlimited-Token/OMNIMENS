@@ -60,6 +60,7 @@ import { encodeThought, decode } from "./omnimens-language-pipeline.js";
 import { internalAnalyze, internalSynthesize, getSymbolKnowledgeForSCL, SYMBOL_KNOWLEDGE_BASE, generateSCLSymbolsFromCognition, scanCodeForPatterns, rewriteModuleToSCL } from "./omnimens-unified-cognition.js";
 import { getFileRegistry, getAccessibleFiles, getReadOnlyFiles, canWriteFile, readFileContent, writeFileContent, getFileDigest, getRegistrySummary, type RegisteredFile } from "./omnimens-file-registry.js";
 import { encodeToSCL, decodeSCL, getCodexDigest, getSCLStats, lookupSymbol, getCodexState, applySCLDesignResult, setDesignPhase, isCodexReady } from "./omnimens-scl-codex.js";
+import { runSCLSandboxTest } from "./omnimens-scl-runtime.js";
 import { translateInbound, translateOutbound, compressStateToSCL, decompressSCLState, compressAgentMessage, startSCLTranslator, getTranslatorState } from "./omnimens-scl-translator.js";
 
 const __filename_local = fileURLToPath(import.meta.url);
@@ -2074,6 +2075,7 @@ async function runGen2SCLDesignCycle(): Promise<void> {
 
 let _gen2SclRewriteComplete = false;
 let _gen2SclRewriteRunning = false;
+let _gen2SclSandboxTestComplete = false;
 
 async function runGen2SCLFullRewrite(): Promise<void> {
   if (_gen2SclRewriteComplete || _gen2SclRewriteRunning) return;
@@ -2193,6 +2195,33 @@ async function runGen2SCLFullRewrite(): Promise<void> {
     });
 
     _gen2SclRewriteComplete = true;
+
+    if (!_gen2SclSandboxTestComplete) {
+      console.log(`[NEXTGEN] 🔤 PHASE 3: Running SCL Sandbox Execution Test...`);
+      try {
+        const sclTestDir = path.resolve(__dirname_local, "../../omnimens-runtime/next-gen-sandbox/scl-rewrites");
+        const testReport = runSCLSandboxTest(sclTestDir, "gen2", 100);
+        console.log(`[NEXTGEN] 🔤 ═══════════════════════════════════════════════════════════════`);
+        console.log(`[NEXTGEN] 🔤 SCL SANDBOX TEST COMPLETE — Gen 2`);
+        console.log(`[NEXTGEN] 🔤 ${testReport.executed}/${testReport.totalFiles} files EXECUTED SUCCESSFULLY`);
+        console.log(`[NEXTGEN] 🔤 ${testReport.syntaxValid}/${testReport.totalFiles} files passed syntax check`);
+        console.log(`[NEXTGEN] 🔤 ${testReport.failed} files failed`);
+        console.log(`[NEXTGEN] 🔤 Compression: ${testReport.overallCompressionPercent}% reduction maintained`);
+        console.log(`[NEXTGEN] 🔤 ═══════════════════════════════════════════════════════════════`);
+
+        gen2SendToGen1v2("scl_sandbox_test", {
+          event: "sandbox_execution_complete",
+          executed: testReport.executed,
+          total: testReport.totalFiles,
+          failed: testReport.failed,
+          compression: testReport.overallCompressionPercent,
+        });
+
+        _gen2SclSandboxTestComplete = true;
+      } catch (testErr) {
+        console.error(`[NEXTGEN] 🔤 ⚠️ SCL sandbox test error:`, testErr);
+      }
+    }
   } catch (err) {
     console.error(`[NEXTGEN] 🔤 ❌ SCL full rewrite error:`, err);
   } finally {

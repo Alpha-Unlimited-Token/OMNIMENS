@@ -1,8 +1,39 @@
 ⟨SCL v1│wasmParallelOps_gen1.mjs│81→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 κwasmBinary
-⟿initializeWasmModule(1)→void⟨4⟩{⊷}
-⟿multiplyMatrices(2)→void⟨23⟩{⊹⊵⊴⊺⊷}
-validateMatrix(1)→void⟨5⟩{⊄⊷⊹}
+⟿initializeWasmModule(1)→void⟨4⟩{
+·async function initializeWasmModule() {
+·const wasmModule = await WebAssembly.instantiate(wasmBinary);
+⊷│return wasmModule.instance;
+·}
+}⟨/initializeWasmModule⟩
+⟿multiplyMatrices(2)→void⟨23⟩{
+·async function multiplyMatrices(matrixA, matrixB) {
+⊹│if (matrixA[0].length !== matrixB.length) {
+⊵│throw new Error("Matrix dimensions are incompatible for multiplication.");
+·}
+⊴│const wasmInstance = await initializeWasmModule();
+·const resultMatrix = [];
+·for (let i = 0; i < matrixA.length; i++) {
+·const row = [];
+·for (let j = 0; j < matrixB[0].length; j++) {
+·let sum = 0;
+·for (let k = 0; k < matrixB.length; k++) {
+·sum += matrixA[i][k] * matrixB[k][j];
+·}
+⊺│row.push(sum);
+·}
+⊺│resultMatrix.push(row);
+·}
+⊷│return resultMatrix;
+·}
+}⟨/multiplyMatrices⟩
+validateMatrix(1)→void⟨5⟩{
+·function validateMatrix(matrix) {
+⊄│if (!Array.isArray(matrix) || matrix.length === 0) return false;
+·const rowLength = matrix[0].length;
+⊷│return matrix.every(row => Array.isArray(row) && row.length === rowLength);
+·}
+}⟨/validateMatrix⟩
 ·export { multiplyMatrices, validateMatrix };
-⟩SCL│7│13⊨│9⑂│91.4%↓⟩
+⟩SCL│38│37⊨│9⑂│53.1%↓⟩

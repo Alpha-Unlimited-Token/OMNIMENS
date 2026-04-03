@@ -1,6 +1,13 @@
 ⟨SCL v1│memoryEfficientVectorStore_gen1.mjs│110→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
+euclideanDistance(2)→void⟨6⟩{
+·function euclideanDistance(vectorA, vectorB) {
+⊹│if (vectorA.length !== vectorB.length) {
+⊵│throw new Error("Vectors must have the same length.");
+·}
+⋐│return Math.sqrt(vectorA.reduce((sum, val, index) => sum + Math.pow(val - vectorB[index], 2), 0));
+·}
+}⟨/euclideanDistance⟩
 ⊶│class HNSWVectorStore {
 ·constructor(maxLayers = 3, maxNeighbors = 5) {
 ·this.maxLayers = maxLayers;
@@ -32,10 +39,10 @@ euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
 ·}
 ·_connectNode(node, layer) {
 κcandidates
-·candidates.sort((a, b) => euclideanDistance(node.vector, a.vector) - euclideanDi
-·const neighbors = candidates.slice(0, this.maxNeighbors).map(candidate => candid
+·candidates.sort((a, b) => euclideanDistance(node.vector, a.vector) - euclideanDistance(node.vector, b.vector));
+·const neighbors = candidates.slice(0, this.maxNeighbors).map(candidate => candidate.id);
 ⊡│node.neighbors.set(layer, neighbors);
 ·}
 ·}
 ·export { HNSWVectorStore, euclideanDistance };
-⟩SCL│40│16⊨│12⑂│63.6%↓⟩
+⟩SCL│47│20⊨│11⑂│57.3%↓⟩

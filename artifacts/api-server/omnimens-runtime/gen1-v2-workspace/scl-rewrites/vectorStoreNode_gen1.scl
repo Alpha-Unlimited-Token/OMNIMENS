@@ -7,7 +7,14 @@
 ·this.neighbors = []; // Neighbors in the graph
 ·}
 ·}
-euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
+euclideanDistance(2)→void⟨6⟩{
+·function euclideanDistance(vec1, vec2) {
+⊹│if (vec1.length !== vec2.length) {
+⊵│throw new Error("Vectors must have the same dimensionality.");
+·}
+⋐│return Math.sqrt(vec1.reduce((sum, val, i) => sum + Math.pow(val - vec2[i], 2), 0));
+·}
+}⟨/euclideanDistance⟩
 ⊶│class HNSW {
 ·constructor() {
 ·this.nodes = []; // All nodes in the graph
@@ -33,9 +40,13 @@ euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
 κdistance
 ⊺│results.push({ id: node.id, distance });
 ·});
-⊷│return results.sort((a, b) => a.distance - b.distance).slice
+⊷│return results.sort((a, b) => a.distance - b.distance).slice(0, k);
 ·}
 ·}
-⊩createHNSW(1)→void⟨3⟩{⊩⊷}
+⊩createHNSW(1)→void⟨3⟩{
+⊩│export function createHNSW() {
+⊷│return new HNSW();
+·}
+}⟨/createHNSW⟩
 ·export { euclideanDistance };
-⟩SCL│40│24⊨│17⑂│65.2%↓⟩
+⟩SCL│51│30⊨│16⑂│55.7%↓⟩

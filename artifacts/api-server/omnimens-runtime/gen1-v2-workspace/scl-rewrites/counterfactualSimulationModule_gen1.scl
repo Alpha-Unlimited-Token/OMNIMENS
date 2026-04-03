@@ -10,7 +10,7 @@
 ⊷│return tree.map(path => ({ ...path, isAlternative: true }));
 ·}
 ·evaluateAlternatives(alternatives) {
-⊷│return alternatives.map(alt => ({ ...alt, score: Math.random
+⊷│return alternatives.map(alt => ({ ...alt, score: Math.random() }));
 ·}
 ·}
 ⟩SCL│15│5⊨│4⑂│44.4%↓⟩

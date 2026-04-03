@@ -7,7 +7,14 @@
 ⊮│this.neighbors = new Map(); // Neighbors in different layers
 ·}
 ·}
-euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
+euclideanDistance(2)→void⟨6⟩{
+·function euclideanDistance(vectorA, vectorB) {
+⊹│if (vectorA.length !== vectorB.length) {
+⊵│throw new Error("Vectors must be of the same dimension.");
+·}
+⋐│return Math.sqrt(vectorA.reduce((sum, val, i) => sum + (val - vectorB[i]) ** 2, 0));
+·}
+}⟨/euclideanDistance⟩
 ⊶│class EmbeddingVectorStore {
 ·constructor(maxNeighbors = 16, efConstruction = 200) {
 ·this.maxNeighbors = maxNeighbors; // Maximum neighbors per node
@@ -31,7 +38,7 @@ euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
 ·}
 ·search(queryVector, k = 1) {
 κcandidates
-⊷│return candidates.map(node => ({ id: node.id, distance: eucl
+⊷│return candidates.map(node => ({ id: node.id, distance: euclideanDistance(queryVector, node.vector) }));
 ·}
 ·_search(queryVector, ef) {
 ⊷│if (this.nodes.length === 0) return [];
@@ -44,12 +51,12 @@ let ⊢ = [];
 ·visited.add(current.id);
 ⊺│results.push(current);
 κneighbors
-·neighbors.sort((a, b) => euclideanDistance(queryVector, a.vector) - euclideanDis
+·neighbors.sort((a, b) => euclideanDistance(queryVector, a.vector) - euclideanDistance(queryVector, b.vector));
 ⊺│candidates.push(...neighbors);
 ·}
-⊢.sort((a, b) => euclideanDistance(queryVector, a.vector) - euclideanDista
+⊢.sort((a, b) => euclideanDistance(queryVector, a.vector) - euclideanDistance(queryVector, b.vector));
 ⊷│return results.slice(0, ef);
 ·}
 ·}
 ·export { EmbeddingVectorStore, euclideanDistance };
-⟩SCL│54│28⊨│19⑂│53.4%↓⟩
+⟩SCL│61│32⊨│18⑂│47.4%↓⟩

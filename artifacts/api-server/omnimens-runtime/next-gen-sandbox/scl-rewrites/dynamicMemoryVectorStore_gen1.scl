@@ -6,7 +6,7 @@
 ·}
 ·addVector(key, vector, metadata = {}) {
 if (this.⊞.has(key)) {
-⊰│throw new Error(`Key '${key}' already exists in the store.`)
+⊰│throw new Error(`Key '${key}' already exists in the store.`);
 ·}
 if (!ι.isArray(vector) || vector.some(v => typeof v !== 'number')) {
 ⊵│throw new Error('Vector must be an array of numbers.');
@@ -20,13 +20,13 @@ if (!this.⊞.has(key)) {
 ⊡│return this.store.get(key);
 ·}
 ·findClosest(queryVector, topN = 1) {
-if (!ι.isArray(queryVector) || queryVector.some(v => typeof v !== 'number'))
-⊵│throw new Error('Query vector must be an array of numbers.')
+if (!ι.isArray(queryVector) || queryVector.some(v => typeof v !== 'number')) {
+⊵│throw new Error('Query vector must be an array of numbers.');
 ·}
 ⊱│const cosineSimilarity = (vecA, vecB) => {
-⋐│const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB
-⋐│const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a
-⋐│const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b
+⋐│const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
+⋐│const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a ** 2, 0));
+⋐│const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b ** 2, 0));
 ⊷│return dotProduct / (magnitudeA * magnitudeB);
 ·};
 κresults
@@ -45,6 +45,10 @@ for (const [key, { vector, metadata }] of this.⊞.entries()) {
 this.⊞.clear();
 ·}
 ·}
-createVectorStore(1)→void⟨3⟩{⊷}
+createVectorStore(1)→void⟨3⟩{
+·function createVectorStore() {
+⊷│return new VectorStore();
+·}
+}⟨/createVectorStore⟩
 ·export { createVectorStore };
-⟩SCL│49│26⊨│17⑂│58.5%↓⟩
+⟩SCL│53│28⊨│17⑂│55.1%↓⟩

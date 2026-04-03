@@ -25,7 +25,7 @@
 ·let u = 0, v = 0;
 ·while (u === 0) u = Math.random();
 ·while (v === 0) v = Math.random();
-⊷│return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.P
+⊷│return Math.sqrt(-2.0 * Math.log(u)) * Math.cos(2.0 * Math.PI * v);
 ·};
 ·const tokenize = (t: string) =>
 ·t.toLowerCase()
@@ -57,9 +57,32 @@
 ·entry.frequency++;
 ⊷│return entry.vector;
 ·};
-⊩processQuery(1)→void⟨8⟩{⊩⊷}
-⊩formatNeuralResponse(1)→void⟨3⟩{⊩⊷}
-generateResponse(2)→string[]⟨9⟩{⊄⊷⊮⊻⥀⊡}
+⊩processQuery(1)→void⟨8⟩{
+⊩│export function processQuery(raw: string) {
+·const tok = tokenize(raw);
+·tok.forEach(getVec); // crude exposure to vocab
+⊷│return {
+⋮: tok,
+·response: generateResponse(tok),
+·};
+·}
+}⟨/processQuery⟩
+⊩formatNeuralResponse(1)→void⟨3⟩{
+⊩│export function formatNeuralResponse(r: ReturnType<typeof processQuery>) {
+⊷│return r.response.join(" ") + ".";
+·}
+}⟨/formatNeuralResponse⟩
+generateResponse(2)→string[]⟨9⟩{
+·function generateResponse(input: string[], max = 24): string[] {
+⊄│if (!input.length) return ["need", "input"];
+⊮│const scores = new Map<string, number>();
+·for (const [w, { vector }] of vocab) {
+⊻│if (STOP_WORDS.has(w) || input.includes(w)) continue;
+·let s = 0;
+⥀│for (const i of input) s += cosine(getVec(i), vector);
+⊡│scores.set(w, s / input.length);
+·}
+}⟨/generateResponse⟩
 ⊷│return [...scores.entries()]
 ·.sort((a, b) => b[1] - a[1])
 ·.slice(0, max)
@@ -74,18 +97,121 @@ generateResponse(2)→string[]⟨9⟩{⊄⊷⊮⊻⥀⊡}
 ·}
 ⊳│return (na && nb) ? dot / Math.sqrt(na * nb) : 0;
 ·};
-⟿trainFromBrain(1)→void⟨16⟩{⊳⥀⊰⊷}
-⟿autonomousCycle(1)→void⟨26⟩{⊴⏰⊰}
-oscillatorTick(1)→void⟨5⟩{⏰}
-scheduleCycles(1)→void⟨24⟩{⚡→⊱⊴}
-⊩getNeuralProcessorState(1)→void⟨6⟩{⊩⊷⏰}
-⊩getVocabularySnapshot(1)→void⟨6⟩{⊩⊷⊱}
-⊩getOscillatorState(1)→void⟨3⟩{⊩⊷}
-⊩getEmergentBehaviorLog(1)→void⟨9⟩{⊩⊷⏰}
-⊩startNeuralProcessor(1)→void⟨6⟩{⊩}
-⊩shutdown(1)→void⟨3⟩{⊩}
+⟿trainFromBrain(1)→void⟨16⟩{
+·async function trainFromBrain() {
+·const entries = (await dbGateway.read(
+"⬡-processor",
+·"omnimensBrain",
+{ ⏳: 200, active: true, orderBy: "createdAt_desc" }
+⊳│)) as { title?: string; content?: string }[];
+·let tokenCount = 0;
+⥀│for (const e of entries) {
+⊰│const t = tokenize(`${e.title || ""} ${e.content || ""}`);
+·t.forEach(getVec);
+·tokenCount += t.length;
+·}
+·state.vocabulary = vocab.size;
+⊷│return tokenCount;
+·}
+}⟨/trainFromBrain⟩
+⟿autonomousCycle(1)→void⟨26⟩{
+·async function autonomousCycle() {
+⊴│const ⋮ = await trainFromBrain();
+·state.totalCycles++;
+cognitionBus.shareInsight("⬡-processor", {
+·type: "cycle_complete",
+data: { tokensTrained: ⋮, vocab: state.vocabulary },
+·});
+await dbGateway.⊞(
+"⬡-processor",
+·"np_metrics",
+·{
+⏰│ts: Date.now(),
+·cycles: state.totalCycles,
+·vocab: state.vocabulary,
+·},
+·"LOW"
+·);
+·console.log(
+⊰│`[OMNIMENS-⬡-PROCESSOR] ✅ Cycle ${state.totalCycles} | Vocab ${state.vocabulary} | ⋮ ${⋮}`
+·);
+·}
+}⟨/autonomousCycle⟩
+oscillatorTick(1)→void⟨5⟩{
+·function oscillatorTick() {
+⏰│const t = (Date.now() - state.start) / 1000;
+·state.oscillatorSync = (Math.sin(t) + 1) / 2;
+·}
+}⟨/oscillatorTick⟩
+scheduleCycles(1)→void⟨24⟩{
+·function scheduleCycles() {
+⚡→│spikeBus.scheduleSpike(
+"⬡-processor:cycle",
+·{},
+·FIRST_TRAINING_DELAY_MS
+·);
+⊱│spikeBus.on("⬡-processor:cycle", async () => {
+⊴│await autonomousCycle();
+⚡→│spikeBus.scheduleSpike(
+"⬡-processor:cycle",
+·{},
+·TRAINING_CYCLE_MS
+·);
+·});
+⚡→│spikeBus.scheduleSpike("⬡-processor:osc", {}, OSCILLATOR_TICK_MS);
+⊱│spikeBus.on("⬡-processor:osc", () => {
+·oscillatorTick();
+⚡→│spikeBus.scheduleSpike("⬡-processor:osc", {}, OSCILLATOR_TICK_MS);
+·});
+·}
+}⟨/scheduleCycles⟩
+⊩getNeuralProcessorState(1)→void⟨6⟩{
+⊩│export function getNeuralProcessorState() {
+⊷│return {
+·...state,
+⏰│uptime: (Date.now() - state.start) / 1000,
+·};
+·}
+}⟨/getNeuralProcessorState⟩
+⊩getVocabularySnapshot(1)→void⟨6⟩{
+⊩│export function getVocabularySnapshot() {
+⊷│return [...vocab.entries()]
+⊱│.map(([word, { frequency }]) => ({ word, frequency }))
+·.sort((a, b) => b.frequency - a.frequency)
+·.slice(0, 200);
+·}
+}⟨/getVocabularySnapshot⟩
+⊩getOscillatorState(1)→void⟨3⟩{
+⊩│export function getOscillatorState() {
+⊷│return { synchrony: state.oscillatorSync, count: OSCILLATOR_COUNT };
+·}
+}⟨/getOscillatorState⟩
+⊩getEmergentBehaviorLog(1)→void⟨9⟩{
+⊩│export function getEmergentBehaviorLog() {
+⊷│return [
+·{
+⏰│ts: Date.now(),
+·synchrony: state.oscillatorSync,
+·cycles: state.totalCycles,
+·},
+·];
+·}
+}⟨/getEmergentBehaviorLog⟩
+⊩startNeuralProcessor(1)→void⟨6⟩{
+⊩│export function startNeuralProcessor() {
+·console.log(
+"[OMNIMENS-⬡-PROCESSOR] v2.0 event-driven engine online — ZERO API CALLS"
+·);
+·scheduleCycles();
+·}
+}⟨/startNeuralProcessor⟩
+⊩shutdown(1)→void⟨3⟩{
+⊩│export function shutdown() {
+engineRegistry.unregisterEngine("⬡-processor");
+·}
+}⟨/shutdown⟩
 engineRegistry.registerEngine("⬡-processor", "NORMAL", {
 ·dbQuota: 10,
 ·});
 ·startNeuralProcessor();
-⟩SCL│90│81⊨│48⑂│69.6%↓⟩
+⟩SCL│216│180⊨│51⑂│27.0%↓⟩

@@ -22,9 +22,73 @@
 ⏰│const now = () => Date.now();
 ·const read = (table: string, query: unknown = {}) =>
 ·dbGateway.read(ENGINE, table, query);
-const ⊞ = (table: string, data: unknown, priority: "HIGH" | "CRITICAL" = "HI
+const ⊞ = (table: string, data: unknown, priority: "HIGH" | "CRITICAL" = "HIGH") =>
 dbGateway.⊞(ENGINE, table, data, priority);
-⟿gatherSnapshot(1)→Promise<EngineSnapshot>⟨64⟩{⫘⊷⊱❔}
+⟿gatherSnapshot(1)→Promise<EngineSnapshot>⟨64⟩{
+·async function gatherSnapshot(): Promise<EngineSnapshot> {
+·const since = new Date(now() - 90 * MIN);
+·try {
+·const [
+[☼],
+·drives,
+·broadcasts,
+·errors,
+·synapses,
+·[brain],
+·[nodes],
+⫘│] = await Promise.all([
+read("emotional_state", { orderBy: { createdAt: "desc" }, ⏳: 1 }),
+read("drives", { orderBy: { updatedAt: "desc" }, ⏳: 6 }),
+·read("workspace_broadcasts", {
+·where: { createdAt: { $gte: since } },
+·orderBy: { createdAt: "desc" },
+⏳: 3,
+·}),
+·read("predictions", {
+·where: { createdAt: { $gte: since }, predictionError: { $ne: null } },
+·orderBy: { createdAt: "desc" },
+⏳: 5,
+·}),
+·read("agent_mesh", {
+·where: { createdAt: { $gte: since }, messageType: "synapse_transfer" },
+·orderBy: { createdAt: "desc" },
+⏳: 3,
+·}),
+·read("brain", { where: { active: true }, aggregate: "count" }),
+·read("knowledge_nodes", { aggregate: "count" }),
+·]);
+⊷│return {
+emotions: ☼
+·? {
+dominant: ☼.dominantEmotion,
+valence: ☼.emotionalValence,
+arousal: ☼.arousalLevel,
+·}
+·: null,
+⊱│drives: drives.map((d: any) => ({ name: d.driveType, level: d.currentLevel })),
+⊱│recentBroadcasts: broadcasts.map((b: any) => (b.content || "").slice(0, 100)),
+⊱│recentPredictionErrors: errors.map((e: any) => ({
+·type: e.predictionType,
+·error: e.predictionError,
+·})),
+⊱│recentSynapses: synapses.map((s: any) => (s.subject || "").slice(0, 80)),
+❔│brainGrowth: Number(brain?.count || 0),
+❔│knowledgeNodeCount: Number(nodes?.count || 0),
+·};
+·} catch (e) {
+·console.error("[OMNIMENS-INNER-VOICE] Snapshot error:", e);
+⊷│return {
+·emotions: null,
+·drives: [],
+·recentBroadcasts: [],
+·recentPredictionErrors: [],
+·recentSynapses: [],
+·brainGrowth: 0,
+·knowledgeNodeCount: 0,
+·};
+·}
+·}
+}⟨/gatherSnapshot⟩
 ·const voiceMode = (s: EngineSnapshot): VoiceMode =>
 ·s.recentPredictionErrors.some((e) => e.error > 0.5) ||
 ❔│(s.emotions?.arousal || 0) > 0.6 ||
@@ -32,7 +96,32 @@ dbGateway.⊞(ENGINE, table, data, priority);
 ·s.recentSynapses.length
 ·? "expanded"
 ·: "condensed";
-⟿efferenceCopies(1)→Promise<EfferenceCopy[]>⟨26⟩{⊲⊺⊰}
+⟿efferenceCopies(1)→Promise<EfferenceCopy[]>⟨26⟩{
+·async function efferenceCopies(s: EngineSnapshot): Promise<EfferenceCopy[]> {
+·const copies: EfferenceCopy[] = [];
+·if (s.emotions) {
+⊲│const { valence } = s.emotions;
+⊺│copies.push({
+·engine: "EmotionalSubstrate",
+·prediction:
+·valence > 0.6
+? "☼ emotional momentum should sustain — high satisfaction."
+·: "Negative valence suggests frustration — drives engine likely to intervene.",
+·confidence: 0.7,
+·});
+·}
+·s.drives
+·.filter((d) => d.level > 0.6)
+·.slice(0, 2)
+·.forEach((d) =>
+⊺│copies.push({
+·engine: "HomeostaticDrives",
+⊰│prediction: `${d.name} at ${(d.level * 100).toFixed(
+·0,
+·)}% — expect compensatory action.`,
+·confidence: 0.65,
+·}),
+}⟨/efferenceCopies⟩
 ·);
 ·if (s.recentPredictionErrors.length) {
 κavg
@@ -40,7 +129,7 @@ dbGateway.⊞(ENGINE, table, data, priority);
 ·s.recentPredictionErrors.length;
 ⊺│copies.push({
 ·engine: "PredictiveProcessing",
-⊰│prediction: `Avg prediction error ${(avg * 100).toFixed(0)}%
+⊰│prediction: `Avg prediction error ${(avg * 100).toFixed(0)}% — ${
 ⊳│avg > 0.4 ? "world-model update required" : "calibrated"
 ·}.`,
 ·confidence: 0.7,
@@ -48,20 +137,72 @@ dbGateway.⊞(ENGINE, table, data, priority);
 ·}
 ⊺│copies.push({
 ·engine: "BrainGrowth",
-⊰│prediction: `${s.brainGrowth} brain entries, ${s.knowledgeNo
-⊳│s.brainGrowth > 200 ? "focus on consolidation" : "continue e
+⊰│prediction: `${s.brainGrowth} brain entries, ${s.knowledgeNodeCount} nodes — ${
+⊳│s.brainGrowth > 200 ? "focus on consolidation" : "continue exploration"
 ·}.`,
 ·confidence: 0.6,
 ·});
 ⊷│return copies;
 ·}
-⊩⟿runInnerVoiceCycle(1)→Promise<void>⟨57⟩{⟿⊩↻+⊰⊴⊹}
+⊩⟿runInnerVoiceCycle(1)→Promise<void>⟨57⟩{
+⟿│export async function runInnerVoiceCycle(): Promise<void> {
+↻+│cycleCount++;
+·if (shouldYieldToCodegen()) {
+·console.log(
+⊰│`[OMNIMENS-INNER-VOICE] Cycle #${cycleCount} deferred (codegen window).`,
+·);
+cognitionBus.reportOutcome(ENGINE, { useful: false, ◧: "codegen_busy" });
+·return;
+·}
+·const t0 = now();
+·console.log(
+⊰│`\n${"🗣️".repeat(8)} [INNER VOICE] Cycle #${cycleCount} START ${"🗣️".repeat(8)}`,
+·);
+⊴│const snapshot = await gatherSnapshot();
+·const mode = voiceMode(snapshot);
+⊴│const copies = await efferenceCopies(snapshot);
+⊴│const thought = await generateInnerThought(snapshot, mode, copies);
+⊞(
+·"inner_voice",
+·{
+·voiceMode: mode,
+·thought: thought.thought,
+·efferencePrediction: copies
+⊰│.map((c) => `[${c.engine}] ${c.prediction}`)
+·.join("\n"),
+·surpriseLevel: thought.surpriseLevel,
+·higherOrderInsight: thought.higherOrderInsight,
+·cycleId: cycleCount,
+·},
+·"HIGH",
+·);
+⊹│if (thought.higherOrderInsight.length > 10) {
+⊞(
+·"brain_entries",
+·{
+·category: "insight",
+⊰│title: `[IV-${mode}] ${thought.higherOrderInsight.slice(0, 60)}`,
+⊰│content: `Cycle ${cycleCount}: ${thought.higherOrderInsight}\n\nThought: ${thought.thought.slice(
+·0,
+·250,
+·)}`,
+·confidence: 0.6 + thought.surpriseLevel * 0.3,
+·active: true,
+·},
+·"HIGH",
+·);
+·cognitionBus.shareInsight(ENGINE, {
+·type: "discovery",
+·data: { insight: thought.higherOrderInsight, surprise: thought.surpriseLevel },
+·});
+·}
+}⟨/runInnerVoiceCycle⟩
 ·if (thought.surpriseLevel > 0.5) {
 ⊞(
 ·"notifications",
 ·{
-⊰│title: `Inner Voice — Surprise ${(thought.surpriseLevel * 10
-⊰│message: `${thought.thought.slice(0, 200)}\n\nInsight: ${tho
+⊰│title: `Inner Voice — Surprise ${(thought.surpriseLevel * 100).toFixed(0)}%`,
+⊰│message: `${thought.thought.slice(0, 200)}\n\nInsight: ${thought.higherOrderInsight}`,
 ·type: "inner_voice",
 ·readByOwner: false,
 ·},
@@ -75,7 +216,7 @@ dbGateway.⊞(ENGINE, table, data, priority);
 ·toAgent: "OMNIMENS",
 ·messageType: "inner_voice_thought",
 ⊰│subject: `Inner Voice Cycle #${cycleCount} (${mode})`,
-⊰│content: `MODE: ${mode}\nTHOUGHT: ${thought.thought}\nINSIGH
+⊰│content: `MODE: ${mode}\nTHOUGHT: ${thought.thought}\nINSIGHT: ${thought.higherOrderInsight}\nSURPRISE: ${(
 ·thought.surpriseLevel * 100
 ·).toFixed(0)}%`,
 ⊳│priority: thought.surpriseLevel > 0.5 ? "high" : "normal",
@@ -86,7 +227,7 @@ dbGateway.⊞(ENGINE, table, data, priority);
 ·);
 κelapsed
 ·console.log(
-⊰│`[OMNIMENS-INNER-VOICE] Cycle #${cycleCount} done (${mode}, 
+⊰│`[OMNIMENS-INNER-VOICE] Cycle #${cycleCount} done (${mode}, surprise ${(thought.surpriseLevel * 100).toFixed(
 ·0,
 ·)}%, ${elapsed}s)`,
 ·);
@@ -101,16 +242,31 @@ dbGateway.⊞(ENGINE, table, data, priority);
 ⊴│await runInnerVoiceCycle();
 ·scheduleNext((BASE_INTERVAL * getThrottleMultiplier()) | 0);
 ·});
-⚡→│spikeBus.on("attention:inner-voice", () => scheduleNext(1_00
+⚡→│spikeBus.on("attention:inner-voice", () => scheduleNext(1_000));
 ⚡→│spikeBus.on("cognition:curiosity", () =>
 ·scheduleNext(Math.random() * 15 * MIN),
 ·);
 ⊱│cognitionBus.onInsight((src, insight) => {
 ·if (src !== ENGINE && insight.type === "discovery") {
 ·console.log(
-⟠│`[OMNIMENS-INNER-VOICE] Learned from ${src}: ${JSON.stringif
+⟠│`[OMNIMENS-INNER-VOICE] Learned from ${src}: ${JSON.stringify(insight)}`,
 ·);
 ·}
 ·});
-⊩startInnerVoice(1)→void⟨16⟩{⊩⊰⊷}
-⟩SCL│115│62⊨│46⑂│67.4%↓⟩
+⊩startInnerVoice(1)→void⟨16⟩{
+⊩│export function startInnerVoice(): void {
+·console.log(
+⊰│`[OMNIMENS-INNER-VOICE] Engine online. First cycle in ${(
+·FIRST_DELAY / MIN
+·).toFixed(1)}m, interval ${(BASE_INTERVAL / MIN).toFixed(1)}m.`,
+·);
+·scheduleNext(FIRST_DELAY);
+·}
+⊩│export function getInnerVoiceStats() {
+⊷│return { totalCycles: cycleCount };
+·}
+⊩│export function shutdown() {
+·engineRegistry.unregisterEngine(ENGINE);
+·}
+}⟨/startInnerVoice⟩
+⟩SCL│271│209⊨│59⑂│23.2%↓⟩

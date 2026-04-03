@@ -18,7 +18,7 @@
 ·});
 ·}
 ·generateFeedback(cluster) {
-⊷│return cluster.agents.map(agent => agent.provideFeedback(clu
+⊷│return cluster.agents.map(agent => agent.provideFeedback(cluster.task));
 ·}
 ·shouldEscalate(cluster) {
 κfeedbackScores

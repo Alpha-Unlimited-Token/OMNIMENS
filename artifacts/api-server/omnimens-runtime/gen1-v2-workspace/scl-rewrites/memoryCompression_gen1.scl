@@ -1,7 +1,40 @@
 ⟨SCL v1│memoryCompression_gen1.mjs│90→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩summarizeContext(2)→void⟨14⟩{⊩⊹⊷}
-⊩encodeToVector(1)→void⟨12⟩{⊩⊷}
-⊩compressMemory(2)→void⟨6⟩{⊩⊷}
-⊩validateContext(1)→void⟨3⟩{⊩⊷⊹}
-⟩SCL│6│14⊨│10⑂│93.3%↓⟩
+⊩summarizeContext(2)→void⟨14⟩{
+⊩│export function summarizeContext(◧, maxSummaryLength = 256) {
+⊹│if (!Array.isArray(◧) || ◧.length === 0) {
+⊷│return "";
+·}
+let summary = ◧.join(" ");
+⊹│while (summary.length > maxSummaryLength) {
+·const sentences = summary.split(/(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|\!)\s+/);
+·summary = sentences.slice(0, Math.ceil(sentences.length / 2)).join(" ");
+·}
+⊷│return summary;
+·}
+}⟨/summarizeContext⟩
+⊩encodeToVector(1)→void⟨12⟩{
+⊩│export function encodeToVector(input) {
+·const vectorLength = 128; // Fixed length of the dense vector
+·const hash = crypto.createHash("sha256").update(input).digest("hex");
+·const vector = new Array(vectorLength).fill(0);
+·for (let i = 0; i < hash.length; i++) {
+·const charCode = hash.charCodeAt(i);
+·vector[i % vectorLength] += charCode;
+·}
+⊷│return vector.map((value) => value % 256); // Normalize values to fit within a byte range
+·}
+}⟨/encodeToVector⟩
+⊩compressMemory(2)→void⟨6⟩{
+⊩│export function compressMemory(◧, maxSummaryLength = 256) {
+const summary = summarizeContext(◧, maxSummaryLength);
+·const vector = encodeToVector(summary);
+⊷│return { summary, vector };
+·}
+}⟨/compressMemory⟩
+⊩validateContext(1)→void⟨3⟩{
+⊩│export function validateContext(◧) {
+⊷│return Array.isArray(◧) && ◧.every((item) => typeof item === "string" && item.trim().length > 0);
+·}
+}⟨/validateContext⟩
+⟩SCL│39│38⊨│11⑂│56.7%↓⟩

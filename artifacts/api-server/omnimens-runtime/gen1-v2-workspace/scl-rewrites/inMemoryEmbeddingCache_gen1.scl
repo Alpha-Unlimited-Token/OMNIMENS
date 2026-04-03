@@ -26,10 +26,32 @@ set(key, ≪) {
 ⊷│return Array.from(this.cache.entries());
 ·}
 ·}
-startCacheSync(3)→void⟨6⟩{⟳⊱}
-generateEmbeddingHash(1)→void⟨5⟩{⟠⊷}
-addEmbeddingToCache(2)→void⟨4⟩{⊡}
-getEmbeddingFromCache(2)→void⟨3⟩{⊡⊷}
+startCacheSync(3)→void⟨6⟩{
+·function startCacheSync(cache, intervalMs, syncFunction) {
+⟳│setInterval(() => {
+·const dataToSync = cache.entries();
+·syncFunction(dataToSync);
+·}, intervalMs);
+·}
+}⟨/startCacheSync⟩
+generateEmbeddingHash(1)→void⟨5⟩{
+·function generateEmbeddingHash(embedding) {
+·const hash = crypto.createHash('sha256');
+⟠│hash.update(JSON.stringify(embedding));
+⊷│return hash.digest('hex');
+·}
+}⟨/generateEmbeddingHash⟩
+addEmbeddingToCache(2)→void⟨4⟩{
+·function addEmbeddingToCache(cache, embedding) {
+·const hash = generateEmbeddingHash(embedding);
+⊡│cache.set(hash, embedding);
+·}
+}⟨/addEmbeddingToCache⟩
+getEmbeddingFromCache(2)→void⟨3⟩{
+·function getEmbeddingFromCache(cache, hash) {
+⊡│return cache.get(hash);
+·}
+}⟨/getEmbeddingFromCache⟩
 Ε.exports = {
 ·LRUCache,
 ·startCacheSync,
@@ -37,4 +59,4 @@ getEmbeddingFromCache(2)→void⟨3⟩{⊡⊷}
 ·addEmbeddingToCache,
 ·getEmbeddingFromCache
 ·};
-⟩SCL│39│23⊨│14⑂│67.2%↓⟩
+⟩SCL│61│35⊨│12⑂│48.7%↓⟩

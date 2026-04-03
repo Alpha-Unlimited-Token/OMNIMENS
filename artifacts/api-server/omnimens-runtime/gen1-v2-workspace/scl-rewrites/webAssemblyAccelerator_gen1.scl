@@ -1,7 +1,63 @@
 ⟨SCL v1│webAssemblyAccelerator_gen1.mjs│107→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩⟿initializeWasmModule(1)→void⟨10⟩{⊩⊷}
-⊩wasmMatrixMultiply(5)→void⟨19⟩{⊩⊹⊵⊷}
-⊩isSimdSupported(1)→void⟨14⟩{⊩⊷}
-⊩simdMatrixAdd(2)→void⟨19⟩{⊩⊹⊵⊷}
-⟩SCL│6│16⊨│12⑂│94.4%↓⟩
+⊩⟿initializeWasmModule(1)→void⟨10⟩{
+⊩│export async function initializeWasmModule() {
+·const wasmCode = new Uint8Array([
+·0x00, 0x61, 0x73, 0x6d, // WASM binary magic number
+·0x01, 0x00, 0x00, 0x00, // WASM version 1
+·]);
+·const wasmModule = await WebAssembly.compile(wasmCode);
+⊷│return WebAssembly.instantiate(wasmModule);
+·}
+}⟨/initializeWasmModule⟩
+⊩wasmMatrixMultiply(5)→void⟨19⟩{
+⊩│export function wasmMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
+⊹│if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
+⊵│throw new Error("Invalid matrix dimensions.");
+·}
+·const result = new Float32Array(rowsA * colsB);
+·for (let i = 0; i < rowsA; i++) {
+·for (let j = 0; j < colsB; j++) {
+·let sum = 0;
+·for (let k = 0; k < colsA; k++) {
+·sum += matrixA[i * colsA + k] * matrixB[k * colsB + j];
+·}
+·result[i * colsB + j] = sum;
+·}
+·}
+⊷│return result;
+·}
+}⟨/wasmMatrixMultiply⟩
+⊩isSimdSupported(1)→void⟨14⟩{
+⊩│export function isSimdSupported() {
+·try {
+·const simdTestCode = new Uint8Array([
+·0x00, 0x61, 0x73, 0x6d, // WASM binary magic number
+·0x01, 0x00, 0x00, 0x00, // WASM version 1
+·]);
+·WebAssembly.compile(simdTestCode);
+⊷│return true;
+·} catch (e) {
+⊷│return false;
+·}
+·}
+}⟨/isSimdSupported⟩
+⊩simdMatrixAdd(2)→void⟨19⟩{
+⊩│export function simdMatrixAdd(matrixA, matrixB) {
+⊹│if (matrixA.length !== matrixB.length) {
+⊵│throw new Error("Matrix dimensions must match for ∑.");
+·}
+·const result = new Float32Array(matrixA.length);
+·if (isSimdSupported()) {
+·for (let i = 0; i < matrixA.length; i++) {
+·result[i] = matrixA[i] + matrixB[i];
+·}
+·} else {
+·for (let i = 0; i < matrixA.length; i++) {
+·result[i] = matrixA[i] + matrixB[i];
+·}
+·}
+⊷│return result;
+·}
+}⟨/simdMatrixAdd⟩
+⟩SCL│62│64⊨│13⑂│42.1%↓⟩

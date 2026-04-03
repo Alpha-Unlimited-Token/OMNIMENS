@@ -11,7 +11,7 @@ this.ids = []; // ι to ⊞ associated IDs
 ·}
 ·addVector(id, vector) {
 ⊹│if (vector.length !== this.dimension) {
-⊰│throw new Error(`Vector must have ${this.dimension} dimensio
+⊰│throw new Error(`Vector must have ${this.dimension} dimensions.`);
 ·}
 κnewVectors
 ⊡│newVectors.set(this.vectors);
@@ -21,7 +21,7 @@ this.ids = []; // ι to ⊞ associated IDs
 ·}
 ⊟(queryVector, k = 1) {
 ⊹│if (queryVector.length !== this.dimension) {
-⊰│throw new Error(`Query vector must have ${this.dimension} di
+⊰│throw new Error(`Query vector must have ${this.dimension} dimensions.`);
 ·}
 ·if (!Number.isInteger(k) || k <= 0) {
 ⊵│throw new Error('k must be a positive integer.');
@@ -50,7 +50,7 @@ this.ids = []; // ι to ⊞ associated IDs
 ·magnitudeA = Math.sqrt(magnitudeA);
 ·magnitudeB = Math.sqrt(magnitudeB);
 ·if (magnitudeA === 0 || magnitudeB === 0) {
-⊷│return 0; // Handle edge case where one of the vectors is ze
+⊷│return 0; // Handle edge case where one of the vectors is zero
 ·}
 ⊷│return dotProduct / (magnitudeA * magnitudeB);
 ·}

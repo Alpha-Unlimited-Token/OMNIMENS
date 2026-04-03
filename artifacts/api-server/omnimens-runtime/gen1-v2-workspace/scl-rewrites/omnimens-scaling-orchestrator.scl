@@ -17,20 +17,26 @@
 ⊬QueueMsg⟨id:string│from:string│to:string│type:"data" | "command" | "event" | "query" | "response"│payload:unknown│ts:number│ttl:number│done:boolean│priority:number⟩
 ⊬ScalingState⟨enginesRegistered:number│enginesStarted:number│enginesHealthy:number│totalMessages:number│messagesProcessed:number│messagesDropped:number│totalHealthChecks:number│totalRecoveries:number│uptimeMs:number│startTime:number│memoryUsageMB:number│cpuLoadEstimate:number│messageQueueDepth:number│averageMessageLatencyMs:number⟩
 κengines
-⊮│const handlers = new Map<string, Array<(m: QueueMsg) => void
+⊮│const handlers = new Map<string, Array<(m: QueueMsg) => void>>();
 κqueue
 κlatencies
 ·let msgId = 0;
 ·let started = false;
 κstate
-·engineRegistry.registerEngine("scaling-orchestrator", "NORMAL", { dbQuota: 10 })
+·engineRegistry.registerEngine("scaling-orchestrator", "NORMAL", { dbQuota: 10 });
 ·const log = (...a: unknown[]) => console.log(PREFIX, ...a);
-avg(1)→number⟨3⟩{⋐⊳⊷}
-⊩registerEngine(1)→void⟨1⟩{⊩}
+avg(1)→number⟨3⟩{
+·function avg(arr: number[]): number {
+⋐│return arr.length ? arr.reduce((s, v) => s + v, 0) / arr.length : 0;
+·}
+}⟨/avg⟩
+⊩registerEngine(1)→void⟨1⟩{
+⊩│export function registerEngine(
+}⟨/registerEngine⟩
 ·name: string,
 ·category: EngineReg["category"],
 ·startFn: () => void | Promise<void>,
-⊱│healthFn?: () => { healthy: boolean; details: Record<string,
+⊱│healthFn?: () => { healthy: boolean; details: Record<string, unknown> },
 ·priority = 5,
 ·): void {
 ⊡│engines.set(name, {
@@ -48,7 +54,9 @@ avg(1)→number⟨3⟩{⋐⊳⊷}
 ·});
 ·state.enginesRegistered = engines.size;
 ·}
-⊩publishMessage(1)→void⟨1⟩{⊩}
+⊩publishMessage(1)→void⟨1⟩{
+⊩│export function publishMessage(
+}⟨/publishMessage⟩
 ·from: string,
 ·to: string,
 ·type: QueueMsg["type"],
@@ -67,7 +75,7 @@ avg(1)→number⟨3⟩{⋐⊳⊷}
 ⊺│queue.push(msg);
 ·state.totalMessages++;
 ·state.messageQueueDepth = queue.filter((m) => !m.done).length;
-⊡│(handlers.get(to) || handlers.get("*") || []).forEach((h) =>
+⊡│(handlers.get(to) || handlers.get("*") || []).forEach((h) => {
 ·try {
 ·h(msg);
 ·msg.done = true;
@@ -78,22 +86,140 @@ avg(1)→number⟨3⟩{⋐⊳⊷}
 ·});
 ⊷│return id;
 ·}
-⊩subscribe(2)→void⟨4⟩{⊩⊡⊺}
-⊩⟿startScalingOrchestrator(1)→Promise<void>⟨27⟩{⟿⊩⊷⏰⊰⥀⚡→}
-⟿runHealthChecks(1)→Promise<void>⟨49⟩{⟿⏰⊳⊰⊺⊹}
-cleanupQueue(1)→void⟨12⟩{⏰⊺}
+⊩subscribe(2)→void⟨4⟩{
+⊩│export function subscribe(engine: string, h: (m: QueueMsg) => void): void {
+⊡│if (!handlers.has(engine)) handlers.set(engine, []);
+⊡│handlers.get(engine)!.push(h);
+·}
+}⟨/subscribe⟩
+⊩⟿startScalingOrchestrator(1)→Promise<void>⟨27⟩{
+⟿│export async function startScalingOrchestrator(): Promise<void> {
+⊷│if (started) return log("Already running");
+·started = true;
+⏰│state.startTime = Date.now();
+·log("Horizontal Scaling Orchestrator activated");
+⊰│log(`${engines.size} engines registered | Queue cap: ${MAX_QUEUE}`);
+⊰│log(`Health every ${HEALTH_MS / 1_000}s | ${MAX_RESTARTS} recovery attempts`);
+·const sorted = [...engines.values()].sort((a, b) => a.priority - b.priority);
+⥀│for (const e of sorted) {
+·try {
+⏰│const t0 = Date.now();
+·await e.startFn();
+⏰│Object.assign(e, { started: true, healthy: true, startTimeMs: Date.now() - t0 });
+·state.enginesStarted++;
+·state.enginesHealthy++;
+·} catch (err) {
+⊰│log(`↺ to start "${e.name}"`, err);
+·}
+·}
+⊰│log(`${state.enginesStarted}/${engines.size} engines started`);
+·runHealthChecks(); // immediate check
+⚡→│spikeBus.scheduleSpike("scaling-orchestrator:health", {}, HEALTH_MS);
+⚡→│spikeBus.scheduleSpike("scaling-orchestrator:health-init", {}, INIT_HEALTH_DELAY_MS);
+·}
+}⟨/startScalingOrchestrator⟩
+⟿runHealthChecks(1)→Promise<void>⟨49⟩{
+⟿│async function runHealthChecks(): Promise<void> {
+·state.totalHealthChecks++;
+·let healthy = 0;
+·const bad: string[] = [];
+·for (const [n, e] of engines) {
+⏰│e.lastHealth = Date.now();
+·try {
+⊳│e.healthy = e.healthFn ? e.healthFn().healthy : e.started;
+·} catch {
+·e.healthy = false;
+·}
+·if (e.healthy) {
+·healthy++;
+·} else if (e.started && e.restart < MAX_RESTARTS) {
+⊰│log(`Engine "${n}" unhealthy — recovery ${e.restart + 1}/${MAX_RESTARTS}`);
+·try {
+·await e.startFn();
+·Object.assign(e, { healthy: true, restart: e.restart + 1 });
+·healthy++;
+·state.totalRecoveries++;
+⊰│log(`Engine "${n}" recovered`);
+·} catch (err) {
+·e.restart++;
+⊺│bad.push(n);
+⊰│log(`Recovery ↺ for "${n}"`, err);
+·}
+⊺│} else if (!e.healthy) bad.push(n);
+·}
+·state.enginesHealthy = healthy;
+const mem = ↻.memoryUsage();
+·state.memoryUsageMB = Math.round(mem.heapUsed / 1_024 / 1_024);
+⏰│state.uptimeMs = Date.now() - state.startTime;
+·state.averageMessageLatencyMs = avg(latencies);
+const cpu = ↻.cpuUsage();
+state.cpuLoadEstimate = (cpu.user + cpu.η) / (state.uptimeMs * 1_000);
+·cleanupQueue();
+·cognitionBus.shareInsight("scaling-orchestrator", {
+·type: "health-snapshot",
+·data: { bad, queueDepth: state.messageQueueDepth },
+·});
+⊹│cognitionBus.reportOutcome("scaling-orchestrator", { useful: bad.length === 0, ◧: "health-check" });
+·}
+}⟨/runHealthChecks⟩
+cleanupQueue(1)→void⟨12⟩{
+·function cleanupQueue(): void {
+⏰│const now = Date.now();
+·let removed = 0;
+·for (let i = queue.length - 1; i >= 0; i--) {
+·const m = queue[i];
+·if (m.done || now - m.ts > m.ttl) {
+⊺│queue.splice(i, 1);
+·removed++;
+·}
+·}
+·if (removed) state.messageQueueDepth = queue.filter((m) => !m.done).length;
+·}
+}⟨/cleanupQueue⟩
 ⊱│spikeBus.on("scaling-orchestrator:health", async () => {
 ⊴│await runHealthChecks();
-⚡→│spikeBus.scheduleSpike("scaling-orchestrator:health", {}, HE
+⚡→│spikeBus.scheduleSpike("scaling-orchestrator:health", {}, HEALTH_MS);
 ·});
-⊱│spikeBus.on("scaling-orchestrator:health-init", async () => 
+⊱│spikeBus.on("scaling-orchestrator:health-init", async () => {
 ⊴│await runHealthChecks();
 ·});
-⚡→│spikeBus.on("attention:scaling-orchestrator", () => runHealt
+⚡→│spikeBus.on("attention:scaling-orchestrator", () => runHealthChecks());
 ⚡→│spikeBus.on("cognition:curiosity", () => runHealthChecks());
 ⊱│cognitionBus.onInsight((_src, insight) => {
-❔│if (insight.type === "resource" && insight.data?.queueHigh) 
+❔│if (insight.type === "resource" && insight.data?.queueHigh) runHealthChecks();
 ·});
-⊩getScalingState(1)→ScalingState &⟨26⟩{⊩⊷⏰⊱}
-⊩shutdown(1)→void⟨4⟩{⊩}
-⟩SCL│98│73⊨│51⑂│69.9%↓⟩
+⊩getScalingState(1)→ScalingState &⟨26⟩{
+⊩│export function getScalingState(): ScalingState & {
+·engines: Array<{
+·name: string;
+·category: string;
+·healthy: boolean;
+·started: boolean;
+·restartCount: number;
+·startTimeMs: number;
+·priority: number;
+·}>;
+·} {
+⊷│return {
+·...state,
+⏰│uptimeMs: Date.now() - state.startTime,
+·messageQueueDepth: queue.filter((m) => !m.done).length,
+⊱│engines: [...engines.values()].map((e) => ({
+·name: e.name,
+·category: e.category,
+·healthy: e.healthy,
+·started: e.started,
+·restartCount: e.restart,
+·startTimeMs: e.startTimeMs,
+·priority: e.priority,
+·})),
+·};
+·}
+}⟨/getScalingState⟩
+⊩shutdown(1)→void⟨4⟩{
+⊩│export function shutdown(): void {
+·engineRegistry.unregisterEngine("scaling-orchestrator");
+·log("Graceful shutdown");
+·}
+}⟨/shutdown⟩
+⟩SCL│224│177⊨│58⑂│31.3%↓⟩

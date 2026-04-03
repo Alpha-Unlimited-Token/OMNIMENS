@@ -26,11 +26,11 @@ console.warn('No suitable α found for task:', task);
 ·}
 ·findSuitableAgent(task) {
 ⊷│return Object.entries(this.agentRegistry)
-⊻│.filter(([_, agent]) => agent.capabilities.includes(task.typ
+⊻│.filter(([_, agent]) => agent.capabilities.includes(task.type))
 ❔│.sort((a, b) => a[1].workload - b[1].workload)[0]?.[1];
 ·}
 executeTask(α, task) {
-⊰│console.log(`Executing task ${task.id} with agent ${agent}`)
+⊰│console.log(`Executing task ${task.id} with agent ${agent}`);
 ⏳│setTimeout(() => {
 α.workload -= 1;
 ·}, 1000);

@@ -1,12 +1,66 @@
 ⟨SCL v1│matrixOpsSimulator_gen1.mjs│118→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-validateMatrix(1)→void⟨8⟩{⊹⊵}
-multiplyMatrices(2)→void⟨24⟩{⊵⊷}
-addMatrices(2)→void⟨16⟩{⊵⊷}
-transposeMatrix(1)→void⟨11⟩{⊷}
+validateMatrix(1)→void⟨8⟩{
+·function validateMatrix(matrix) {
+⊹│if (!Array.isArray(matrix.data) || matrix.data.length !== matrix.rows) {
+⊵│throw new Error("Invalid matrix: rows mismatch.");
+·}
+⊹│if (matrix.data.some(row => row.length !== matrix.cols)) {
+⊵│throw new Error("Invalid matrix: columns mismatch.");
+·}
+·}
+}⟨/validateMatrix⟩
+multiplyMatrices(2)→void⟨24⟩{
+·function multiplyMatrices(matrixA, matrixB) {
+·validateMatrix(matrixA);
+·validateMatrix(matrixB);
+·if (matrixA.cols !== matrixB.rows) {
+⊵│throw new Error("Matrix dimensions incompatible for multiplication.");
+·}
+·const resultData = Array.from({ length: matrixA.rows }, () => Array(matrixB.cols).fill(0));
+·for (let i = 0; i < matrixA.rows; i++) {
+·for (let j = 0; j < matrixB.cols; j++) {
+·for (let k = 0; k < matrixA.cols; k++) {
+·resultData[i][j] += matrixA.data[i][k] * matrixB.data[k][j];
+·}
+·}
+·}
+⊷│return {
+·data: resultData,
+·rows: matrixA.rows,
+·cols: matrixB.cols
+·};
+·}
+}⟨/multiplyMatrices⟩
+addMatrices(2)→void⟨16⟩{
+·function addMatrices(matrixA, matrixB) {
+·validateMatrix(matrixA);
+·validateMatrix(matrixB);
+·if (matrixA.rows !== matrixB.rows || matrixA.cols !== matrixB.cols) {
+⊵│throw new Error("Matrix dimensions incompatible for ∑.");
+·}
+·const resultData = matrixA.data.map((row, i) => row.map((value, j) => value + matrixB.data[i][j]));
+⊷│return {
+·data: resultData,
+·rows: matrixA.rows,
+·cols: matrixA.cols
+·};
+·}
+}⟨/addMatrices⟩
+transposeMatrix(1)→void⟨11⟩{
+·function transposeMatrix(matrix) {
+·validateMatrix(matrix);
+·const resultData = Array.from({ length: matrix.cols }, (_, i) => matrix.data.map(row => row[i]));
+⊷│return {
+·data: resultData,
+·rows: matrix.cols,
+·cols: matrix.rows
+·};
+·}
+}⟨/transposeMatrix⟩
 ·export {
 ·multiplyMatrices,
 ·addMatrices,
 ·transposeMatrix
 ·};
-⟩SCL│11│11⊨│7⑂│90.7%↓⟩
+⟩SCL│65│57⊨│9⑂│44.9%↓⟩

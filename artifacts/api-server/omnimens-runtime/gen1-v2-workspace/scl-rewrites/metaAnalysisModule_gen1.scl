@@ -1,4 +1,13 @@
 ⟨SCL v1│metaAnalysisModule_gen1.mjs│18→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩detectGroupthink(1)→void⟨9⟩{⊩⊯⊷}
-⟩SCL│3│4⊨│3⑂│83.3%↓⟩
+⊩detectGroupthink(1)→void⟨9⟩{
+⊩│export function detectGroupthink(agentProposals) {
+⊯│const uniqueProposals = new Set(agentProposals.map(p => p.title));
+·const redundancyScore = (agentProposals.length - uniqueProposals.size) / agentProposals.length;
+⊷│return {
+·redundancyScore,
+·hasGroupthink: redundancyScore > 0.3 // Example threshold for groupthink
+·};
+·}
+}⟨/detectGroupthink⟩
+⟩SCL│12│11⊨│3⑂│33.3%↓⟩

@@ -12,11 +12,11 @@
 ·}
 ·publish(event, data) {
 ·if (this.subscribers.has(event)) {
-⊡│this.subscribers.get(event).forEach(callback => callback(dat
+⊡│this.subscribers.get(event).forEach(callback => callback(data));
 ·}
 ·}
 ·escalateToMetaAgent(event, data) {
-⊰│console.log(`Escalating ${event} to meta-agent with data:`, 
+⊰│console.log(`Escalating ${event} to meta-agent with data:`, data);
 ·}
 ·}
 ⟩SCL│21│6⊨│6⑂│36.4%↓⟩

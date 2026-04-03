@@ -8,14 +8,14 @@
 ⊺│this.eventTriggers.push(trigger);
 ·}
 ·simulateCounterfactuals(currentState, alternatives) {
-⊷│return alternatives.map(alt => this.evaluateAlternative(curr
+⊷│return alternatives.map(alt => this.evaluateAlternative(currentState, alt));
 ·}
 ·evaluateAlternative(currentState, alternative) {
 κscore
 ⊷│return { alternative, score };
 ·}
 adjustStrategies(⊢) {
-⋐│const bestAlternative = results.reduce((best, result) => res
+⋐│const bestAlternative = results.reduce((best, result) => result.score > best.score ? result : best, { score: -Infinity });
 ⊷│return bestAlternative;
 ·}
 ·}

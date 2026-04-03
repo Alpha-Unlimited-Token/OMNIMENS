@@ -1,13 +1,92 @@
 ⟨SCL v1│persistentTaskScheduler_gen1.mjs│105→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩generateTaskId(2)→void⟨5⟩{⊩⊰⊷}
-⊩serializeTaskState(1)→void⟨3⟩{⊩⟠⊷}
-⊩deserializeTaskState(1)→void⟨7⟩{⊩⟠⊷⊵}
-⊩calculateNextExecutionTime(2)→void⟨4⟩{⏰⊩⟛⊷}
-⊩scheduleTask(3)→void⟨13⟩{⊩⏰⊷}
-⊩checkpointTask(2)→void⟨8⟩{⊩⊷⏰}
-⊩resumeTask(1)→void⟨12⟩{⊩⊲⊷}
-⊩reprioritizeTask(2)→void⟨9⟩{⊩⊷}
-⊩executeTask(2)→void⟨14⟩{⊩⊲⏰⊰⊷}
-⟩SCL│12│40⊨│30⑂│88.6%↓⟩
+⊩generateTaskId(2)→void⟨5⟩{
+⊩│export function generateTaskId(taskName, timestamp) {
+·const hash = createHash('sha256');
+⊰│hash.update(`${taskName}-${timestamp}`);
+⊷│return hash.digest('hex');
+·}
+}⟨/generateTaskId⟩
+⊩serializeTaskState(1)→void⟨3⟩{
+⊩│export function serializeTaskState(taskState) {
+⟠│return JSON.stringify(taskState);
+·}
+}⟨/serializeTaskState⟩
+⊩deserializeTaskState(1)→void⟨7⟩{
+⊩│export function deserializeTaskState(serializedState) {
+·try {
+⟠│return JSON.parse(serializedState);
+·} catch (error) {
+⊵│throw new Error('↺ to deserialize task state: ' + error.message);
+·}
+·}
+}⟨/deserializeTaskState⟩
+⊩calculateNextExecutionTime(2)→void⟨4⟩{
+⏰│export function calculateNextExecutionTime(priorityLevel, currentTime = Date.now()) {
+⟛│const delay = Math.max(1000, 1000 * (10 - priorityLevel)); // Higher priority -> shorter delay
+⊷│return currentTime + delay;
+·}
+}⟨/calculateNextExecutionTime⟩
+⊩scheduleTask(3)→void⟨13⟩{
+⊩│export function scheduleTask(taskName, taskState, priorityLevel) {
+⏰│const timestamp = Date.now();
+·const taskId = generateTaskId(taskName, timestamp);
+·const nextExecutionTime = calculateNextExecutionTime(priorityLevel, timestamp);
+⊷│return {
+·taskId,
+·taskName,
+·taskState: serializeTaskState(taskState),
+·priorityLevel,
+·nextExecutionTime
+·};
+·}
+}⟨/scheduleTask⟩
+⊩checkpointTask(2)→void⟨8⟩{
+⊩│export function checkpointTask(taskId, updatedState) {
+·const serializedState = serializeTaskState(updatedState);
+⊷│return {
+·taskId,
+·updatedState: serializedState,
+⏰│checkpointTime: Date.now()
+·};
+·}
+}⟨/checkpointTask⟩
+⊩resumeTask(1)→void⟨12⟩{
+⊩│export function resumeTask(serializedTask) {
+⊲│const { taskId, taskName, taskState, priorityLevel, nextExecutionTime } = serializedTask;
+·const deserializedState = deserializeTaskState(taskState);
+⊷│return {
+·taskId,
+·taskName,
+·taskState: deserializedState,
+·priorityLevel,
+·nextExecutionTime
+·};
+·}
+}⟨/resumeTask⟩
+⊩reprioritizeTask(2)→void⟨9⟩{
+⊩│export function reprioritizeTask(task, newPriorityLevel) {
+·const updatedExecutionTime = calculateNextExecutionTime(newPriorityLevel);
+⊷│return {
+·...task,
+·priorityLevel: newPriorityLevel,
+·nextExecutionTime: updatedExecutionTime
+·};
+·}
+}⟨/reprioritizeTask⟩
+⊩executeTask(2)→void⟨14⟩{
+⊩│export function executeTask(task, runtimeEvent) {
+⊲│const { taskId, taskName, taskState, priorityLevel } = task;
+·const executionResult = {
+·taskId,
+·taskName,
+·runtimeEvent,
+⏰│executedAt: Date.now(),
+·priorityLevel,
+⊰│θ: `Task '${taskName}' executed successfully.`
+·};
+⊷│return executionResult;
+·}
+}⟨/executeTask⟩
+⟩SCL│91│98⊨│27⑂│13.3%↓⟩

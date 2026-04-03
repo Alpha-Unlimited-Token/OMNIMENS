@@ -1,6 +1,24 @@
 ⟨SCL v1│counterfactualAnalysis_gen1.mjs│28→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩counterfactualAnalysis(2)→void⟨11⟩{⊩⊺⊷}
-generateCounterfactual(2)→void⟨3⟩{⊷}
-evaluate(1)→void⟨3⟩{⟠⊰⊷}
-⟩SCL│5│10⊨│7⑂│82.1%↓⟩
+⊩counterfactualAnalysis(2)→void⟨11⟩{
+⊩│export function counterfactualAnalysis(inputData, testCases) {
+·const counterfactuals = [];
+·testCases.forEach(testCase => {
+·const modifiedData = generateCounterfactual(inputData, testCase);
+const result = ⊨(modifiedData);
+⊺│counterfactuals.push({ testCase, result });
+·});
+⊷│return counterfactuals;
+·}
+}⟨/counterfactualAnalysis⟩
+generateCounterfactual(2)→void⟨3⟩{
+·function generateCounterfactual(data, testCase) {
+⊷│return { ...data, ...testCase };
+·}
+}⟨/generateCounterfactual⟩
+evaluate(1)→void⟨3⟩{
+function ⊨(data) {
+⟠│return `Evaluation result for ${JSON.stringify(data)}`;
+·}
+}⟨/evaluate⟩
+⟩SCL│23│20⊨│5⑂│17.9%↓⟩

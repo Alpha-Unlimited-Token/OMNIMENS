@@ -1,7 +1,37 @@
 ⟨SCL v1│adaptiveRoleAllocator_gen1.mjs│41→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩adaptiveRoleAllocator(1)→void⟨11⟩{⊩⊷}
-evaluatePerformance(1)→void⟨4⟩{⊳⊷}
-calculateMetaLearningRate(1)→void⟨4⟩{⊷}
-assignRole(2)→void⟨10⟩{⊷}
-⟩SCL│6│10⊨│6⑂│85.4%↓⟩
+⊩adaptiveRoleAllocator(1)→void⟨11⟩{
+⊩│export function adaptiveRoleAllocator(agentData) {
+const roles = agentData.map(α => {
+const performance = evaluatePerformance(α);
+const metaLearningRate = calculateMetaLearningRate(α);
+⊷│return {
+agentId: α.agentId,
+·role: assignRole(performance, metaLearningRate)
+·};
+·});
+⊷│return roles;
+·}
+}⟨/adaptiveRoleAllocator⟩
+evaluatePerformance(1)→void⟨4⟩{
+function evaluatePerformance(α) {
+⊳│return α.successRate > 0.85 ? 'high' : 'medium';
+·}
+}⟨/evaluatePerformance⟩
+calculateMetaLearningRate(1)→void⟨4⟩{
+function calculateMetaLearningRate(α) {
+⊷│return α.adjustmentRate * 0.1;
+·}
+}⟨/calculateMetaLearningRate⟩
+assignRole(2)→void⟨10⟩{
+·function assignRole(performance, metaLearningRate) {
+·if (performance === 'high' && metaLearningRate > 0.05) {
+⊷│return 'leader';
+·} else if (performance === 'medium') {
+⊷│return 'support';
+·} else {
+⊷│return 'observer';
+·}
+·}
+}⟨/assignRole⟩
+⟩SCL│36│31⊨│8⑂│12.2%↓⟩

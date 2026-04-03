@@ -15,7 +15,7 @@
 ·this.topics[topic].forEach(listener => listener(data));
 ·}
 ·escalate(topic, priority = 0) {
-⊰│console.log(`Escalating topic: ${topic} with priority: ${pri
+⊰│console.log(`Escalating topic: ${topic} with priority: ${priority}`);
 ·}
 ·}
 ⟩SCL│20│4⊨│4⑂│44.4%↓⟩

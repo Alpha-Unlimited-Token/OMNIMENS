@@ -12,14 +12,14 @@ runTests(θ, ◧) {
 ·}
 runCounterfactualTest(θ, ◧) {
 κmodifiedContext
-⊷│return { test: 'counterfactual', passed: this.simulate(outpu
+⊷│return { test: 'counterfactual', passed: this.simulate(output, modifiedContext) };
 ·}
 runAdversarialTest(θ, ◧) {
 κadversarialContext
-⊷│return { test: 'adversarial', passed: this.simulate(output, 
+⊷│return { test: 'adversarial', passed: this.simulate(output, adversarialContext) };
 ·}
 simulate(θ, ◧) {
-⊷│return Math.random() > 0.2; // Example: 80% chance of passin
+⊷│return Math.random() > 0.2; // Example: 80% chance of passing
 ·}
 analyzeResults(⊢) {
 const flagged = ⊢.filter(r => !r.passed);

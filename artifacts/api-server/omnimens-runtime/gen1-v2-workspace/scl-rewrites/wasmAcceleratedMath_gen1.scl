@@ -1,9 +1,75 @@
 ⟨SCL v1│wasmAcceleratedMath_gen1.mjs│133→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-validateMatrix(1)→void⟨8⟩{⊵⊹}
-multiplyMatrices(2)→void⟨24⟩{⊵⊷}
-transposeMatrix(1)→void⟨17⟩{⊷}
-addMatrices(2)→void⟨16⟩{⊵⊷}
-dotProduct(2)→void⟨7⟩{⊹⊵⋐⊷}
+validateMatrix(1)→void⟨8⟩{
+·function validateMatrix(matrix) {
+·if (!matrix || !Array.isArray(matrix.data) || matrix.rows <= 0 || matrix.cols <= 0) {
+⊵│throw new Error("Invalid matrix: Ensure it has 'data', 'rows', and 'cols' properties.");
+·}
+⊹│if (matrix.data.length !== matrix.rows || matrix.data.some(row => row.length !== matrix.cols)) {
+⊵│throw new Error("Matrix dimensions mismatch: Check 'rows' and 'cols' definitions.");
+·}
+·}
+}⟨/validateMatrix⟩
+multiplyMatrices(2)→void⟨24⟩{
+·function multiplyMatrices(matrixA, matrixB) {
+·validateMatrix(matrixA);
+·validateMatrix(matrixB);
+·if (matrixA.cols !== matrixB.rows) {
+⊵│throw new Error("Matrix multiplication error: Columns of matrixA must match rows of matrixB.");
+·}
+·const resultData = Array.from({ length: matrixA.rows }, () => Array(matrixB.cols).fill(0));
+·for (let i = 0; i < matrixA.rows; i++) {
+·for (let j = 0; j < matrixB.cols; j++) {
+·for (let k = 0; k < matrixA.cols; k++) {
+·resultData[i][j] += matrixA.data[i][k] * matrixB.data[k][j];
+·}
+·}
+·}
+⊷│return {
+·data: resultData,
+·rows: matrixA.rows,
+·cols: matrixB.cols
+·};
+·}
+}⟨/multiplyMatrices⟩
+transposeMatrix(1)→void⟨17⟩{
+·function transposeMatrix(matrix) {
+·validateMatrix(matrix);
+·const resultData = Array.from({ length: matrix.cols }, () => Array(matrix.rows).fill(0));
+·for (let i = 0; i < matrix.rows; i++) {
+·for (let j = 0; j < matrix.cols; j++) {
+·resultData[j][i] = matrix.data[i][j];
+·}
+·}
+⊷│return {
+·data: resultData,
+·rows: matrix.cols,
+·cols: matrix.rows
+·};
+·}
+}⟨/transposeMatrix⟩
+addMatrices(2)→void⟨16⟩{
+·function addMatrices(matrixA, matrixB) {
+·validateMatrix(matrixA);
+·validateMatrix(matrixB);
+·if (matrixA.rows !== matrixB.rows || matrixA.cols !== matrixB.cols) {
+⊵│throw new Error("Matrix ∑ error: Both matrices must have the same dimensions.");
+·}
+·const resultData = matrixA.data.map((row, i) => row.map((val, j) => val + matrixB.data[i][j]));
+⊷│return {
+·data: resultData,
+·rows: matrixA.rows,
+·cols: matrixA.cols
+·};
+·}
+}⟨/addMatrices⟩
+dotProduct(2)→void⟨7⟩{
+·function dotProduct(vectorA, vectorB) {
+⊹│if (vectorA.length !== vectorB.length) {
+⊵│throw new Error("Dot product error: Vectors must have the same length.");
+·}
+⋐│return vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
+·}
+}⟨/dotProduct⟩
 ·export { multiplyMatrices, transposeMatrix, addMatrices, dotProduct };
-⟩SCL│8│16⊨│11⑂│94.0%↓⟩
+⟩SCL│74│71⊨│11⑂│44.4%↓⟩

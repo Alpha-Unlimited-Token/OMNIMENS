@@ -6,7 +6,7 @@
 ·}
 ·storeWorkflow(workflowName, workflowObject) {
 ·if (!workflowName || !workflowObject) {
-⊵│throw new Error('Invalid arguments: workflowName and workflo
+⊵│throw new Error('Invalid arguments: workflowName and workflowObject are required');
 ·}
 ⊡│this.memory.set(workflowName, workflowObject);
 ·}

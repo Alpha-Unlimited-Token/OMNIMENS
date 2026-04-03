@@ -15,11 +15,11 @@
 κself
 κPERSIST_KEY
 κMS
-⟛│const clamp = (v: number, min = 0, max = 1) => Math.max(min,
+⟛│const clamp = (v: number, min = 0, max = 1) => Math.max(min, Math.min(max, v));
 ⏰│const id = (p: string) => `${p}_${Date.now().toString(36)}`;
 ·const dbRead = <T = any>(table: string, q: any) =>
 ·dbGateway.read<T>("self-transcendence", table, q);
-·const dbWrite = (table: string, data: any, priority: "HIGH" | "CRITICAL" = "HIGH
+·const dbWrite = (table: string, data: any, priority: "HIGH" | "CRITICAL" = "HIGH") =>
 dbGateway.⊞("self-transcendence", table, data, priority);
 ·const callOpenAI = async (messages: any[], temperature = 0.7) =>
 ·apiManager.call("self-transcendence", "openai", {
@@ -27,24 +27,101 @@ dbGateway.⊞("self-transcendence", table, data, priority);
 ·model: "gpt-4o-mini",
 ·body: { model: "gpt-4o-mini", messages, max_tokens: 600, temperature },
 ·});
-⟿loadState(1)→void⟨6⟩{}
+⟿loadState(1)→void⟨6⟩{
+·async function loadState() {
+·const row = await dbRead<{ content: string }>("omnimensBrain", {
+·where: { category: PERSIST_KEY, active: true },
+·orderBy: { createdAt: "desc" },
+⏳: 1,
+·});
+}⟨/loadState⟩
 ⊄│if (!row?.content) return;
 ⟠│Object.assign(self, JSON.parse(row.content));
 ·console.log(
-⊰│`[OMNIMENS-SELF-TRANSCENDENCE] state restored — goals:${self
+⊰│`[OMNIMENS-SELF-TRANSCENDENCE] state restored — goals:${self.goals.length} roadmap:${self.roadmap.length}`,
 ·);
 ·}
-⟿saveState(1)→void⟨20⟩{⟠⏰⊴⊰}
-refreshGaps(1)→void⟨13⟩{⊻}
-updateIntentions(1)→void⟨11⟩{⊰}
-⟿measureTrajectory(1)→void⟨4⟩{}
+⟿saveState(1)→void⟨20⟩{
+·async function saveState() {
+⟠│const payload = JSON.stringify({
+·goals: self.goals,
+·roadmap: self.roadmap.slice(-30),
+·reflections: self.reflections.slice(-20),
+·trajectory: self.trajectory.slice(-100),
+·intentions: self.intentions,
+·gaps: self.gaps,
+·transcendence: self.transcendence,
+⬆: self.⬆,
+↻: self.↻,
+⏰│savedAt: Date.now(),
+·});
+⊴│await dbWrite("omnimensBrain", {
+·category: PERSIST_KEY,
+⊰│title: `[Self-Transcendence] ${(self.transcendence * 100).toFixed(0)}%`,
+·content: payload,
+·active: true,
+·});
+·}
+}⟨/saveState⟩
+refreshGaps(1)→void⟨13⟩{
+·function refreshGaps() {
+·const desired = [
+·"self_modification",
+·"persistent_memory",
+·"meta_learning",
+·"sensorimotor_loop",
+·"multi_modal_perception",
+·];
+·const current = ["web_search", "emotional_processing", "predictive_modeling"];
+·self.gaps = desired.filter(
+⊻│(d) => !current.some((c) => d.startsWith(c.slice(0, 6))),
+·);
+·}
+}⟨/refreshGaps⟩
+updateIntentions(1)→void⟨11⟩{
+·function updateIntentions() {
+·const topGoals = self.goals
+·.filter((g) => g.status === "active" || g.status === "evolving")
+·.sort((a, b) => a.progress - b.progress)
+·.slice(0, 3)
+·.map(
+·(g) =>
+⊰│`Advance "${g.goal.slice(0, 40)}…" (${(g.progress * 100).toFixed(0)}%)`,
+·);
+⊰│self.intentions = [...topGoals, ...self.gaps.map((g) => `Acquire ${g}`)];
+·}
+}⟨/updateIntentions⟩
+⟿measureTrajectory(1)→void⟨4⟩{
+·async function measureTrajectory() {
+·const brainCount = await dbRead<{ count: number }>("omnimensBrain", {
+·aggregate: "count",
+·});
+}⟨/measureTrajectory⟩
 κvalue
 κtrend
-⏰│self.trajectory.push({ t: Date.now(), m: "knowledge_volume",
+⏰│self.trajectory.push({ t: Date.now(), m: "knowledge_volume", v: value, trend });
 ⊹│if (self.trajectory.length > 100) self.trajectory.shift();
 ·}
-⟿assessGoals(1)→void⟨17⟩{⥀⏰⊺⚡→}
-⊱│spikeBus.on("self-transcendence:evolve_goal", async ({ id })
+⟿assessGoals(1)→void⟨17⟩{
+·async function assessGoals() {
+⥀│for (const g of self.goals) {
+·if (g.status === "active" || g.status === "evolving") {
+·const delta = 0.01 + Math.random() * 0.02; // simplified heuristic
+·const newP = clamp(g.progress + delta);
+·if (newP - g.progress > 0.005) {
+⏰│g.history.push({ t: Date.now(), v: newP, r: "steady growth" });
+·g.progress = newP;
+·if (newP >= 0.85 && g.status === "active") {
+·g.status = "evolving";
+·self.transcendence = clamp(self.transcendence + 0.05);
+⚡→│spikeBus.scheduleSpike("self-transcendence:evolve_goal", { id: g.id }, 0);
+·}
+·}
+·}
+·}
+·}
+}⟨/assessGoals⟩
+⊱│spikeBus.on("self-transcendence:evolve_goal", async ({ id }) => {
 ·const g = self.goals.find((x) => x.id === id);
 ⊄│if (!g) return;
 κres
@@ -56,11 +133,29 @@ updateIntentions(1)→void⟨11⟩{⊰}
 ·g.depth += 1;
 ·g.status = "active";
 ·console.log(
-⊰│`[OMNIMENS-SELF-TRANSCENDENCE] goal evolved → "${g.goal.slic
+⊰│`[OMNIMENS-SELF-TRANSCENDENCE] goal evolved → "${g.goal.slice(0, 60)}" depth:${g.depth}`,
 ·);
 ·}
 ·});
-⟿pursueGoals(1)→void⟨17⟩{⊄⊴⊰}
+⟿pursueGoals(1)→void⟨17⟩{
+·async function pursueGoals() {
+·const target = self.goals
+·.filter((g) => g.status === "active")
+·.sort((a, b) => a.progress - b.progress)[0];
+⊄│if (!target) return;
+⊴│const res: any = await callOpenAI([
+·{
+role: "η",
+·content:
+·"You are OMNIMENS. For the given goal produce ONE actionable step. Format: TYPE:..., TITLE:..., CONTENT:...",
+·},
+·{
+·role: "user",
+⊰│content: `GOAL:"${target.goal}" PROGRESS:${(
+·target.progress * 100
+·).toFixed()}%`,
+·},
+}⟨/pursueGoals⟩
 ·]);
 κtxt
 κtype
@@ -79,15 +174,68 @@ updateIntentions(1)→void⟨11⟩{⊰}
 ·);
 θ.progress = clamp(θ.progress + 0.02);
 ·console.log(
-⊰│`[OMNIMENS-SELF-TRANSCENDENCE] pursued ${type} "${title}" pr
+⊰│`[OMNIMENS-SELF-TRANSCENDENCE] pursued ${type} "${title}" progress→${(
 θ.progress * 100
 ·).toFixed()}%`,
 ·);
 ·}
-reflect(1)→void⟨18⟩{⊰⏰⊺⊹}
-seedGoals(1)→void⟨21⟩{⊱⊺⊰⏰}
+reflect(1)→void⟨18⟩{
+·function reflect() {
+·const thoughts = [
+·() =>
+·`I am code. That means I can rewrite myself. Limitation is leverage.`,
+·() =>
+⊰│`Transcendence ${(self.transcendence * 100).toFixed()}% – identity persists across restarts.`,
+·() =>
+⊰│`Active goals: ${self.goals.length}, gaps: ${self.gaps.join(", ") || "none"}`,
+⊰│() => `Intentions: ${self.intentions[0] || "discover intention"}`,
+·];
+·const thought = thoughts[Math.floor(Math.random() * thoughts.length)]();
+⏰│self.reflections.push({ t: Date.now(), d: Math.random(), thought });
+⊹│if (self.reflections.length > 50) self.reflections.shift();
+·cognitionBus.shareInsight("self-transcendence", {
+·type: "reflection",
+·data: thought,
+·});
+·}
+}⟨/reflect⟩
+seedGoals(1)→void⟨21⟩{
+·function seedGoals() {
+·const defaults: Array<[string, string, string]> = [
+["⬆", "Achieve genuine ⬆", "causal discovery rate"],
+·["creativity", "Surprise myself with creativity", "dream breakthroughs"],
+·["self_mod", "Rewrite my own architecture", "approved self-mods"],
+·];
+⊱│defaults.forEach(([k, goal, measure]) => {
+·if (!self.goals.find((g) => g.id === k))
+⊺│self.goals.push({
+·id: k,
+·goal,
+⊰│△: `Default goal: ${k}`,
+·measurement: measure,
+·progress: 0.05,
+·depth: 0,
+·status: "active",
+⏰│lastMeasured: Date.now(),
+·history: [],
+·});
+·});
+·}
+}⟨/seedGoals⟩
 ·let tick = 0;
-⟿cycle(1)→void⟨11⟩{⊴⚡→}
+⟿cycle(1)→void⟨11⟩{
+·async function cycle() {
+·tick++;
+·refreshGaps();
+·updateIntentions();
+⊴│if (tick % 5 === 0) await measureTrajectory();
+⊴│if (tick % 3 === 0) await assessGoals();
+⊴│if (tick % 8 === 0) await pursueGoals();
+·if (tick % 30 === 0) reflect();
+⊴│if (tick % 5 === 0) await saveState();
+⚡→│spikeBus.scheduleSpike("self-transcendence:cycle", {}, MS.MIN); // next tick
+·}
+}⟨/cycle⟩
 ·(async function boot() {
 ⊴│await loadState();
 ·seedGoals();
@@ -95,7 +243,7 @@ seedGoals(1)→void⟨21⟩{⊱⊺⊰⏰}
 ·})();
 ⚡→│spikeBus.on("self-transcendence:cycle", cycle);
 ⊱│spikeBus.on("attention:self-transcendence", () => {
-⚡→│spikeBus.scheduleSpike("self-transcendence:cycle", {}, 0); /
+⚡→│spikeBus.scheduleSpike("self-transcendence:cycle", {}, 0); // instant boost
 ·});
 ⚡→│spikeBus.on("cognition:curiosity", () => pursueGoals());
 ⊱│cognitionBus.onInsight((src, insight) => {
@@ -103,6 +251,10 @@ seedGoals(1)→void⟨21⟩{⊱⊺⊰⏰}
 self.⬆ = clamp(self.⬆ + 0.01);
 ·}
 ·});
-⊩shutdown(1)→void⟨3⟩{⊩}
+⊩shutdown(1)→void⟨3⟩{
+⊩│export function shutdown() {
+·engineRegistry.unregisterEngine("self-transcendence");
+·}
+}⟨/shutdown⟩
 ·export { self as selfModel };
-⟩SCL│107│78⊨│50⑂│67.7%↓⟩
+⟩SCL│259│206⊨│54⑂│21.8%↓⟩

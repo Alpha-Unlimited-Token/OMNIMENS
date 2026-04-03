@@ -5,13 +5,13 @@
 ·this.testCases = [];
 ·}
 ·generateEdgeCases(moduleName) {
-⊰│console.log(`Generating edge cases for module: ${moduleName}
+⊰│console.log(`Generating edge cases for module: ${moduleName}`);
 κedgeCases
 ⊺│this.testCases.push({ moduleName, edgeCases });
 ⊷│return edgeCases;
 ·}
 ·testModuleInteractions(modules) {
-⊰│console.log(`Testing interactions between modules: ${modules
+⊰│console.log(`Testing interactions between modules: ${modules.join(', ')}`);
 ⥀│for (const module of modules) {
 ⊰│console.log(`Testing module: ${module}`);
 ·}

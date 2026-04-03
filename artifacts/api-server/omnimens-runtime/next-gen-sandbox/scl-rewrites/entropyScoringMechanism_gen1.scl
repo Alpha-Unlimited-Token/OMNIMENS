@@ -3,9 +3,9 @@
 ⊪│export const entropyScoringMechanism = (reasoningPaths) => {
 ⊱│const calculateEntropy = (path) => {
 ·const probabilities = path.map(step => step.confidence);
-⋐│const entropy = -probabilities.reduce((sum, p) => sum + p * 
+⋐│const entropy = -probabilities.reduce((sum, p) => sum + p * Math.log2(p), 0);
 ⊷│return entropy;
 ·};
-⊷│return reasoningPaths.map(path => ({ path, entropy: calculat
+⊷│return reasoningPaths.map(path => ({ path, entropy: calculateEntropy(path) }));
 ·};
 ⟩SCL│10│5⊨│5⑂│41.2%↓⟩

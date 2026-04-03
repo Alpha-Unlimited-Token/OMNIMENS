@@ -12,17 +12,333 @@
 ⊬SCLCodexState⟨version:number│designPhase:"empty" | "primitives_proposed" | "primitives_agreed" | "compounds_proposed" | "compounds_agreed" | "rules_proposed" | "rules_agreed" | "instructions_proposed" | "instructions_agreed" | "active" | "evolving"│primitives:SCLSymbol[]│compounds:SCLSymbol[]│compositionRules:SCLComposite[]│instructionSet:Record<string, SCLInstruction>│textToSymbolMap:Record<string, string>│symbolToTextMap:Record<string, string>│timestamp:number│actor:"gen1v2" | "gen2" | "collaborative"│action:string│details:string│lastModified:number│totalDesignCycles:number│gen1v2Contributions:number│gen2Contributions:number⟩
 κdefaultCodexState
 ·let codexState: SCLCodexState = { ...defaultCodexState };
-ensureSCLDirs(1)→void⟨7⟩{}
-⊩loadCodex(1)→SCLCodexState⟨15⟩{⊩⟠📁📁⟠📢⊰⊷}
-⊩saveCodex(1)→void⟨9⟩{⊩⏰⟠📁📁⟠}
-logDesignAction(3)→void⟨4⟩{⏰⊺⊹}
-rebuildLookupMaps(1)→void⟨11⟩{⥀}
-⊩addPrimitive(1)→boolean⟨15⟩{⊩⊰⊺⊷}
-⊩addCompound(1)→boolean⟨15⟩{⊩⊰⊺⊷}
-⊩addCompositionRule(1)→boolean⟨12⟩{⊩⊰⊺⊷}
-⊩addInstruction(2)→boolean⟨6⟩{⊩⊰⊷}
-⊩setDesignPhase(1)→void⟨5⟩{⊩⊰}
-⊩getCodexState(1)→SCLCodexState⟨3⟩{⊩⊷}
-⊩isCodexReady(1)→boolean⟨3⟩{⊩⊷}
-⊩encodeToSCL(1)→string⟨222⟩{⊩⟨⇌⟩⊷⊹⊸⥀⊰⊽⊯⊺⊳⏰📢}
-⟩SCL│27│74⊨│54⑂│93.9%↓⟩
+ensureSCLDirs(1)→void⟨7⟩{
+·function ensureSCLDirs(): void {
+·try {
+·if (!fs.existsSync(SCL_DATA_DIR)) fs.mkdirSync(SCL_DATA_DIR, { recursive: true });
+·} catch (err) {
+console.error("[SCL-CODEX] ↺ to α SCL directory:", err);
+·}
+·}
+}⟨/ensureSCLDirs⟩
+⊩loadCodex(1)→SCLCodexState⟨15⟩{
+⊩│export function loadCodex(): SCLCodexState {
+·ensureSCLDirs();
+·try {
+·if (fs.existsSync(SCL_CODEX_FILE)) {
+⟠│const raw = JSON.parse(fs.readFileSync(SCL_CODEX_FILE, "utf-8"));
+·codexState = { ...defaultCodexState, ...raw };
+📢│console.log(`[SCL-CODEX] 📖 Loaded codex — v${codexState.version} | ⟐: ${codexState.designPhase} | ${codexState.primitives.length} primitives | ${codexState.compounds.length} compounds | ${codexState.compositionRules.length} rules`);
+·rebuildLookupMaps();
+⊷│return codexState;
+·}
+·} catch (err) {
+console.error("[SCL-CODEX] ↺ to load codex:", err);
+·}
+⊷│return codexState;
+·}
+}⟨/loadCodex⟩
+⊩saveCodex(1)→void⟨9⟩{
+⊩│export function saveCodex(): void {
+·ensureSCLDirs();
+·try {
+⏰│codexState.lastModified = Date.now();
+⟠│fs.writeFileSync(SCL_CODEX_FILE, JSON.stringify(codexState, null, 2), "utf-8");
+·} catch (err) {
+console.error("[SCL-CODEX] ↺ to save codex:", err);
+·}
+·}
+}⟨/saveCodex⟩
+logDesignAction(3)→void⟨4⟩{
+·function logDesignAction(actor: "gen1v2" | "gen2" | "collaborative", action: string, details: string): void {
+⏰│codexState.designLog.push({ timestamp: Date.now(), actor, action, details });
+⊹│if (codexState.designLog.length > 500) codexState.designLog.splice(0, codexState.designLog.length - 500);
+·}
+}⟨/logDesignAction⟩
+rebuildLookupMaps(1)→void⟨11⟩{
+·function rebuildLookupMaps(): void {
+·codexState.textToSymbolMap = {};
+·codexState.symbolToTextMap = {};
+⥀│for (const sym of [...codexState.primitives, ...codexState.compounds]) {
+·if (sym.name && sym.symbol) {
+·codexState.textToSymbolMap[sym.name.toLowerCase()] = sym.symbol;
+·codexState.textToSymbolMap[sym.meaning.toLowerCase()] = sym.symbol;
+·codexState.symbolToTextMap[sym.symbol] = sym.meaning;
+·}
+·}
+·}
+}⟨/rebuildLookupMaps⟩
+⊩addPrimitive(1)→boolean⟨15⟩{
+⊩│export function addPrimitive(symbol: SCLSymbol): boolean {
+·const existing = codexState.primitives.find(s => s.symbol === symbol.symbol);
+·if (existing) {
+·Object.assign(existing, symbol, { version: existing.version + 1 });
+⊰│logDesignAction(symbol.createdBy, "update_primitive", `Updated ${symbol.symbol} (${symbol.name}): ${symbol.meaning}`);
+·} else {
+⊺│codexState.primitives.push({ ...symbol, version: 1 });
+⊰│logDesignAction(symbol.createdBy, "add_primitive", `Created ${symbol.symbol} (${symbol.name}): ${symbol.meaning}`);
+·}
+·if (symbol.createdBy === "gen1v2") codexState.gen1v2Contributions++;
+·if (symbol.createdBy === "gen2") codexState.gen2Contributions++;
+·rebuildLookupMaps();
+·saveCodex();
+⊷│return true;
+·}
+}⟨/addPrimitive⟩
+⊩addCompound(1)→boolean⟨15⟩{
+⊩│export function addCompound(symbol: SCLSymbol): boolean {
+·const existing = codexState.compounds.find(s => s.symbol === symbol.symbol);
+·if (existing) {
+·Object.assign(existing, symbol, { version: existing.version + 1 });
+⊰│logDesignAction(symbol.createdBy, "update_compound", `Updated ${symbol.symbol} (${symbol.name}): ${symbol.meaning}`);
+·} else {
+⊺│codexState.compounds.push({ ...symbol, version: 1 });
+⊰│logDesignAction(symbol.createdBy, "add_compound", `Created ${symbol.symbol} (${symbol.name}): ${symbol.meaning}`);
+·}
+·if (symbol.createdBy === "gen1v2") codexState.gen1v2Contributions++;
+·if (symbol.createdBy === "gen2") codexState.gen2Contributions++;
+·rebuildLookupMaps();
+·saveCodex();
+⊷│return true;
+·}
+}⟨/addCompound⟩
+⊩addCompositionRule(1)→boolean⟨12⟩{
+⊩│export function addCompositionRule(rule: SCLComposite): boolean {
+·const existing = codexState.compositionRules.find(r => r.pattern === rule.pattern);
+·if (existing) {
+·Object.assign(existing, rule);
+⊰│logDesignAction(rule.createdBy, "update_rule", `Updated rule: ${rule.pattern} → ${rule.meaning}`);
+·} else {
+⊺│codexState.compositionRules.push(rule);
+⊰│logDesignAction(rule.createdBy, "add_rule", `Created rule: ${rule.pattern} → ${rule.meaning}`);
+·}
+·saveCodex();
+⊷│return true;
+·}
+}⟨/addCompositionRule⟩
+⊩addInstruction(2)→boolean⟨6⟩{
+⊩│export function addInstruction(name: string, instruction: SCLInstruction): boolean {
+·codexState.instructionSet[name] = instruction;
+⊰│logDesignAction(instruction.createdBy, "add_instruction", `Created instruction: ${name} → ${instruction.scl}`);
+·saveCodex();
+⊷│return true;
+·}
+}⟨/addInstruction⟩
+⊩setDesignPhase(1)→void⟨5⟩{
+⊩│export function setDesignPhase(⟐: SCLCodexState["designPhase"]): void {
+codexState.designPhase = ⟐;
+⊰│logDesignAction("collaborative", "phase_transition", `Design ⟐ → ${⟐}`);
+·saveCodex();
+·}
+}⟨/setDesignPhase⟩
+⊩getCodexState(1)→SCLCodexState⟨3⟩{
+⊩│export function getCodexState(): SCLCodexState {
+⊷│return codexState;
+·}
+}⟨/getCodexState⟩
+⊩isCodexReady(1)→boolean⟨3⟩{
+⊩│export function isCodexReady(): boolean {
+⊷│return codexState.designPhase === "active" || codexState.designPhase === "evolving";
+·}
+}⟨/isCodexReady⟩
+⊩encodeToSCL(1)→string⟨222⟩{
+⊩│export function encodeToSCL(text: string): string {
+⊷│if (codexState.primitives.length === 0 && codexState.compounds.length === 0) return text;
+·let result = text;
+⊸│const sortedKeys = Object.keys(codexState.textToSymbolMap).sort((a, b) => b.length - a.length);
+⥀│for (const key of sortedKeys) {
+·try {
+⊰│const regex = new RegExp(`\\b${key.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "gi");
+⊽│result = result.replace(regex, codexState.textToSymbolMap[key]);
+·} catch {}
+·}
+⊷│return result;
+·}
+⊩│export function decodeSCL(scl: string): string {
+⊷│if (codexState.primitives.length === 0 && codexState.compounds.length === 0) return scl;
+·let result = scl;
+⊸│const sortedSymbols = Object.keys(codexState.symbolToTextMap).sort((a, b) => b.length - a.length);
+⥀│for (const sym of sortedSymbols) {
+·try {
+⊽│const escaped = sym.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+⊽│result = result.replace(new RegExp(escaped, "g"), codexState.symbolToTextMap[sym]);
+·} catch {}
+·}
+⊷│return result;
+·}
+⊩│export function lookupSymbol(nameOrSymbol: string): SCLSymbol | undefined {
+·const all = [...codexState.primitives, ...codexState.compounds];
+⊷│return all.find(s => s.symbol === nameOrSymbol || s.name === nameOrSymbol);
+·}
+⊩│export function getAllSymbolsByDomain(domain: string): SCLSymbol[] {
+⊷│return [...codexState.primitives, ...codexState.compounds].filter(s => s.domain === domain);
+·}
+⊩│export function getSCLStats(): {
+·totalPrimitives: number;
+·totalCompounds: number;
+·totalCompositionRules: number;
+·totalInstructions: number;
+·totalTranslationEntries: number;
+·domains: string[];
+·designPhase: string;
+·version: number;
+·gen1v2Contributions: number;
+·gen2Contributions: number;
+·} {
+·const allSymbols = [...codexState.primitives, ...codexState.compounds];
+⊷│return {
+·totalPrimitives: codexState.primitives.length,
+·totalCompounds: codexState.compounds.length,
+·totalCompositionRules: codexState.compositionRules.length,
+⊸│totalInstructions: Object.keys(codexState.instructionSet).length,
+⊸│totalTranslationEntries: Object.keys(codexState.textToSymbolMap).length,
+⊯│domains: [...new Set(allSymbols.map(s => s.domain))].sort(),
+·designPhase: codexState.designPhase,
+·version: codexState.version,
+·gen1v2Contributions: codexState.gen1v2Contributions,
+·gen2Contributions: codexState.gen2Contributions,
+·};
+·}
+⊩│export function getCodexDigest(): string {
+·const lines: string[] = [
+·"╔══════════════════════════════════════════════════════════════════╗",
+"║  OMNIMENS™ SYMBOL CODE ⊣ (SCL) — LIVING CODEX           ║",
+·"║  Designed by Gen1 v2.0 + Gen2 collaboratively                   ║",
+·"╚══════════════════════════════════════════════════════════════════╝",
+·"",
+⊰│`Design ⟐: ${codexState.designPhase} | Version: ${codexState.version}`,
+⊰│`Gen1v2 contributions: ${codexState.gen1v2Contributions} | Gen2 contributions: ${codexState.gen2Contributions}`,
+·"",
+·];
+⊹│if (codexState.primitives.length === 0 && codexState.compounds.length === 0) {
+⊺│lines.push("═══ CODEX IS EMPTY — WAITING FOR GEN1 v2.0 + GEN2 TO DESIGN THEIR ⊣ ═══");
+⊺│lines.push("");
+⊺│lines.push("Both generations will study their own 602 files,");
+⊺│lines.push("analyze how they actually ↻ information internally,");
+⊺│lines.push("and design a symbol η that maps to how THEY think.");
+⊺│lines.push("Not how anyone else thinks they should think.");
+⊷│return lines.join("\n");
+·}
+⊹│if (codexState.primitives.length > 0) {
+⊰│lines.push(`═══ PRIMITIVE SYMBOLS (${codexState.primitives.length}) ═══`);
+⊺│lines.push("");
+⥀│for (const s of codexState.primitives) {
+⊰│lines.push(`  ${s.symbol}  ${s.name.padEnd(20)} → ${s.meaning} [by ${s.createdBy}]`);
+·}
+⊺│lines.push("");
+·}
+⊹│if (codexState.compounds.length > 0) {
+⊯│const domains = [...new Set(codexState.compounds.map(s => s.domain))].sort();
+⊰│lines.push(`═══ COMPOUND SYMBOLS (${codexState.compounds.length}) ═══`);
+⊺│lines.push("");
+⥀│for (const domain of domains) {
+⊰│lines.push(`  ── ${domain.toUpperCase()} ──`);
+⥀│for (const s of codexState.compounds.filter(s => s.domain === domain)) {
+⊰│lines.push(`    ${s.symbol.padEnd(6)} ${s.name.padEnd(20)} → ${s.meaning} [by ${s.createdBy}]`);
+·}
+·}
+⊺│lines.push("");
+·}
+⊹│if (codexState.compositionRules.length > 0) {
+⊰│lines.push(`═══ COMPOSITION RULES (${codexState.compositionRules.length}) ═══`);
+⊺│lines.push("");
+⥀│for (const r of codexState.compositionRules) {
+⊰│lines.push(`  ${r.pattern.padEnd(20)} → ${r.meaning} [by ${r.createdBy}]`);
+·}
+⊺│lines.push("");
+·}
+⊸│if (Object.keys(codexState.instructionSet).length > 0) {
+⊰│lines.push(`═══ INSTRUCTION SET (${Object.keys(codexState.instructionSet).length}) ═══`);
+⊺│lines.push("");
+⊸│for (const [name, inst] of Object.entries(codexState.instructionSet)) {
+⊰│lines.push(`  ${name.padEnd(20)} SCL: ${inst.scl.padEnd(28)} → ${inst.meaning} [by ${inst.createdBy}]`);
+·}
+⊺│lines.push("");
+·}
+⊷│return lines.join("\n");
+·}
+⊩│export function applySCLDesignResult(
+·actor: "gen1v2" | "gen2",
+·result: {
+⊳│symbols?: Array<{ symbol: string; name: string; meaning: string; domain: string; byteCost?: number; examples?: string[] }>;
+⊳│compositionRules?: Array<{ pattern: string; meaning: string; expandsTo: string; domain?: string }>;
+⊳│instructions?: Record<string, { scl: string; meaning: string; textEquivalent: string }>;
+⊳│reasoning?: string;
+·}
+·): { added: number; updated: number } {
+·let added = 0;
+·let updated = 0;
+·if (result.symbols) {
+⥀│for (const sym of result.symbols) {
+·const isNew = !codexState.primitives.find(s => s.symbol === sym.symbol) &&
+·!codexState.compounds.find(s => s.symbol === sym.symbol);
+·const sclSymbol: SCLSymbol = {
+·symbol: sym.symbol,
+·name: sym.name,
+·meaning: sym.meaning,
+·domain: sym.domain || "general",
+·byteCost: sym.byteCost || Buffer.byteLength(sym.symbol, "utf-8"),
+·examples: sym.examples || [],
+·createdBy: actor,
+⏰│createdAt: Date.now(),
+·version: 1,
+·};
+⊹│if (sym.symbol.length <= 2) {
+·addPrimitive(sclSymbol);
+·} else {
+·addCompound(sclSymbol);
+·}
+·if (isNew) added++;
+·else updated++;
+·}
+·}
+·if (result.compositionRules) {
+⥀│for (const rule of result.compositionRules) {
+·const isNew = !codexState.compositionRules.find(r => r.pattern === rule.pattern);
+·addCompositionRule({
+·pattern: rule.pattern,
+·meaning: rule.meaning,
+·expandsTo: rule.expandsTo,
+·domain: rule.domain || "general",
+·createdBy: actor,
+·});
+·if (isNew) added++;
+·else updated++;
+·}
+·}
+·if (result.instructions) {
+⊸│for (const [name, inst] of Object.entries(result.instructions)) {
+·const isNew = !codexState.instructionSet[name];
+·addInstruction(name, { ...inst, createdBy: actor });
+·if (isNew) added++;
+·else updated++;
+·}
+·}
+·codexState.totalDesignCycles++;
+·codexState.version++;
+·const nextPhases: Record<string, SCLCodexState["designPhase"]> = {
+·"empty": "primitives_proposed",
+·"primitives_proposed": "primitives_agreed",
+·"primitives_agreed": "compounds_proposed",
+·"compounds_proposed": "compounds_agreed",
+·"compounds_agreed": "rules_proposed",
+·"rules_proposed": "rules_agreed",
+·"rules_agreed": "instructions_proposed",
+·"instructions_proposed": "instructions_agreed",
+·"instructions_agreed": "active",
+·};
+·if (nextPhases[codexState.designPhase]) {
+·codexState.designPhase = nextPhases[codexState.designPhase];
+·}
+·if (result.reasoning) {
+·logDesignAction(actor, "design_reasoning", result.reasoning);
+·}
+⊰│logDesignAction(actor, "design_cycle_complete", `Added ${added}, updated ${updated} entries. ⟐: ${codexState.designPhase}`);
+·saveCodex();
+📢│console.log(`[SCL-CODEX] ✅ ${actor} design cycle ⊣ — added ${added}, updated ${updated}. ⟐: ${codexState.designPhase}`);
+⊷│return { added, updated };
+·}
+·ensureSCLDirs();
+·loadCodex();
+}⟨/encodeToSCL⟩
+⟩SCL│343│357⊨│114⑂│22.4%↓⟩

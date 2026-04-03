@@ -47,9 +47,9 @@
 ·let ruleId = 0;
 κstate
 ·const log = (msg: string, ...args: unknown[]) =>
-📢│console.log(`[OMNIMENS-INDEPENDENT-REASONING] ${msg}`, ...ar
+📢│console.log(`[OMNIMENS-INDEPENDENT-REASONING] ${msg}`, ...args);
 κSTOP
-·"the and for are but not you all can has her was one our out its his how may who
+"the and for are but not you all can has her was one our out its his how may who did get had him let say she too use way than them then this that with have from they been said each which their will other about many more some very when what your also into just could would should these those ✧ does using make like".split(
 ·" ",
 ·),
 ·);
@@ -85,13 +85,32 @@
 ·}
 ⊳│return ma && mb ? dot / Math.sqrt(ma * mb) : 0;
 ·};
-addWM(2)→void⟨18⟩{⊺⏰⊳⊹⊱}
+addWM(2)→void⟨18⟩{
+·function addWM(item: Omit<WorkingMemoryItem, "activatedAt" | "decayRate">) {
+⊺│wm.push({
+·...item,
+⏰│activatedAt: Date.now(),
+⊳│decayRate: item.type === "fact" ? 0.001 : item.type === "rule" ? 0.0005 : 0.002,
+·});
+⊹│while (wm.length > WORKING_MEMORY_CAPACITY) {
+·let drop = 0,
+·worst = Infinity,
+⏰│now = Date.now();
+⊱│wm.forEach((it, i) => {
+·const score = it.confidence - ((now - it.activatedAt) / 1000) * it.decayRate;
+·if (score < worst) (worst = score), (drop = i);
+·});
+⊺│wm.splice(drop, 1);
+·}
+·state.workingMemoryUsage = wm.length;
+·}
+}⟨/addWM⟩
 ⊱│const activeWM = () => {
 κnow
 ⊷│return wm
 ⊱│.map((it) => ({
 ·...it,
-⟛│confidence: Math.max(0, it.confidence - ((now - it.activated
+⟛│confidence: Math.max(0, it.confidence - ((now - it.activatedAt) / 1000) * it.decayRate),
 ·}))
 ·.filter((it) => it.confidence > MIN_CONFIDENCE)
 ·.sort((a, b) => b.confidence - a.confidence);
@@ -99,7 +118,7 @@ addWM(2)→void⟨18⟩{⊺⏰⊳⊹⊱}
 ⊱│const decayWM = () => {
 κnow
 ·for (let i = wm.length - 1; i >= 0; --i) {
-⊺│if (wm[i].confidence - ((now - wm[i].activatedAt) / 1000) * 
+⊺│if (wm[i].confidence - ((now - wm[i].activatedAt) / 1000) * wm[i].decayRate <= 0) wm.splice(i, 1);
 ·}
 ·state.workingMemoryUsage = wm.length;
 ·};
@@ -108,13 +127,155 @@ addWM(2)→void⟨18⟩{⊺⏰⊳⊹⊱}
 ·dbGateway.read("independent-reasoning", "brain_entries", filters) as Promise<
 ·BrainEntry[]
 ·>;
-deductive(1)→InferenceStep[]⟨24⟩{⥀⊺⊰⏰⊷}
-inductive(2)→InferenceStep[]⟨29⟩{⊷⊹⊮⊡⊱⊺⊰}
-abductive(2)→InferenceStep[]⟨21⟩{⊄⊷⊱⊰}
+deductive(1)→InferenceStep[]⟨24⟩{
+·function deductive(premises: string[]): InferenceStep[] {
+·const steps: InferenceStep[] = [];
+·const premKw = premises.map(extractKw);
+⥀│for (const r of rules) {
+·if (!r.antecedent.every((a) => premKw.some((p) => jaccard(extractKw(a), p) > 0.3))) continue;
+·if (
+·steps.some(
+·(s) => jaccard(extractKw(s.conclusion), extractKw(r.consequent)) > 0.5,
+·)
+·)
+·continue;
+⊺│steps.push({
+·type: "deduction",
+·premise: r.antecedent.join(" ∧ "),
+·conclusion: r.consequent,
+·confidence: r.confidence * 0.9,
+⊰│rule: `Rule ${r.id}: IF [${r.antecedent.join(", ")}] THEN [${r.consequent}]`,
+·});
+·r.timesApplied++;
+⏰│r.lastApplied = Date.now();
+·state.totalDeductions++;
 ·}
-analogical(1)→InferenceStep[]⟨33⟩{⊱⊺⊰⊻⊷}
-causal(1)→InferenceStep[]⟨35⟩{⊺⊰❔⊳⊷}
-contradictions(1)→string[]⟨1⟩{}
+⊷│return steps;
+·}
+}⟨/deductive⟩
+inductive(2)→InferenceStep[]⟨29⟩{
+·function inductive(facts: Pick<BrainEntry, "content" | "category" | "confidence">[]): InferenceStep[] {
+·const steps: InferenceStep[] = [];
+⊷│if (facts.length < 3) return steps;
+⊮│const byCat = new Map<string, typeof facts>();
+⊡│facts.forEach((f) => (byCat.get(f.category) || byCat.set(f.category, []), byCat.get(f.category)!.push(f)));
+·for (const [cat, arr] of byCat) {
+⊹│if (arr.length < 2) continue;
+·const kw = arr.flatMap((f) => extractKw(f.content));
+⊮│const freq = new Map<string, number>();
+⊡│kw.forEach((w) => freq.set(w, (freq.get(w) || 0) + 1));
+const ↻ = [...freq.entries()]
+·.filter(([, c]) => c >= Math.ceil(arr.length * 0.5))
+·.sort((a, b) => b[1] - a[1])
+·.slice(0, 5)
+·.map(([w]) => w);
+⊹│if (↻.length >= 2) {
+⊺│steps.push({
+·type: "induction",
+⊰│premise: `${arr.length} "${cat}" items share themes`,
+⊰│conclusion: `Pattern in ${cat}: [${↻.join(", ")}]`,
+·confidence: 0.3 + arr.length * 0.05,
+·});
+·state.totalInductions++;
+·}
+·}
+⊷│return steps;
+·}
+}⟨/inductive⟩
+abductive(2)→InferenceStep[]⟨21⟩{
+function abductive(obs: string, ◧: BrainEntry[]): InferenceStep[] {
+·const obsKw = extractKw(obs);
+⊄│if (!obsKw.length) return [];
+const cands = ◧
+⊱│.map((e) => ({
+·e,
+⊰│score: cosine(obsKw, extractKw(`${e.title} ${e.content}`)) * e.confidence,
+·}))
+·.filter((c) => c.score > 0.15)
+·.sort((a, b) => b.score - a.score)
+·.slice(0, 3);
+⊱│return cands.map(({ e, score }) => {
+·state.totalAbductions++;
+⊷│return {
+·type: "abduction",
+⊰│premise: `Observation: "${obs.slice(0, 120)}"`,
+⊰│conclusion: `Explained by "${e.title}" — ${e.content.slice(0, 180)}`,
+·confidence: score,
+·};
+·});
+}⟨/abductive⟩
+·}
+analogical(1)→InferenceStep[]⟨33⟩{
+·function analogical(concept: string): InferenceStep[] {
+·const steps: InferenceStep[] = [];
+⊱│findAnalogy(concept).forEach((a) => {
+⊺│steps.push({
+·type: "analogy",
+⊰│premise: `"${a.source}" ↔ "${a.target}"`,
+⊰│conclusion: `Analogical mapping: ${a.mapping}`,
+·confidence: a.strength,
+·});
+·state.totalAnalogies++;
+·});
+·const cKw = extractKw(concept);
+·activeWM()
+·.filter((i) => i.type === "fact" || i.type === "conclusion")
+⊱│.forEach((i) => {
+·const iKw = extractKw(i.content);
+·const sim = jaccard(cKw, iKw);
+·if (sim > 0.15 && sim < 0.7) {
+⊻│const shared = cKw.filter((w) => iKw.includes(w));
+⊻│const uniq = iKw.filter((w) => !cKw.includes(w)).slice(0, 3);
+·if (uniq.length)
+⊺│steps.push({
+·type: "analogy",
+⊰│premise: `"${concept}" shares [${shared.join(", ")}]`,
+⊰│conclusion: `Transfer: [${uniq.join(", ")}] may apply to "${concept}"`,
+·confidence: sim * i.confidence,
+·});
+·}
+·});
+·state.totalAnalogies += steps.length;
+⊷│return steps;
+·}
+}⟨/analogical⟩
+causal(1)→InferenceStep[]⟨35⟩{
+·function causal(query: string): InferenceStep[] {
+·const steps: InferenceStep[] = [];
+·predictEffect(query).forEach((e) =>
+⊺│steps.push({
+·type: "causal",
+⊰│premise: `"${e.cause}"`,
+⊰│conclusion: `→ "${e.effect}" (${(e.probability * 100).toFixed(0)}%)`,
+·confidence: e.probability,
+·}),
+·);
+·queryPhysics(query).forEach((r) =>
+⊺│steps.push({
+·type: "world_model",
+⊰│premise: `Physics ${r.id}`,
+·conclusion: r.rule,
+·confidence: r.confidence,
+·}),
+·);
+·try {
+·const p = predictOutcome(query);
+❔│p.predictions?.slice(0, 3).forEach((x: string) =>
+⊺│steps.push({
+·type: "causal",
+⊰│premise: `Action: "${query}"`,
+·conclusion: x,
+·confidence: p.confidence ?? 0.4,
+·}),
+·);
+·} catch {
+·}
+⊷│return steps;
+·}
+}⟨/causal⟩
+contradictions(1)→string[]⟨1⟩{
+·function contradictions(items: Array<{ content: string; confidence: number }>): string[] {
+}⟨/contradictions⟩
 κnegPairs
 κcons
 ·for (let i = 0; i < items.length; ++i)
@@ -140,34 +301,194 @@ contradictions(1)→string[]⟨1⟩{}
 ·}
 ⊷│return cons;
 ·}
-extractRules(1)→void⟨58⟩{⊳⊱⊰⊹⊽⊄⊺⏰}
-⊩⟿reason(1)→Promise<ReasoningResult>⟨122⟩{⊩⏰⊴⊰⊱⊄⊺⟛⊳⊹⊯⥀⋐⊷}
-⊪│export const formatReasoningForContext = (r: ReasoningResult
-⊄│if (!r.conclusions.length && !r.inferenceChain.length) retur
+extractRules(1)→void⟨58⟩{
+·function extractRules(entries: BrainEntry[]) {
+·const patterns = [
+⊳│/(?:when|if|whenever)\s+(.+?)(?:,\s*|\s+then\s+)(.+)/i,
+⊳│/(.+?)\s+(?:leads?\s+to|causes?|⊢?\s+in|produces?|enables?)\s+(.+)/i,
+⊳│/(.+?)\s+(?:because|since|due\s+to)\s+(.+)/i,
+⊳│/(?:by|through)\s+(.+?)(?:,\s*|\s+)(?:we\s+can|one\s+can|it\s+is\s+possible\s+to)\s+(.+)/i,
+·];
+⊱│entries.forEach((e) => {
+⊰│const text = `${e.title} ${e.content}`.slice(0, 500);
+·text
+·.split(/[.!?]+/)
+⊹│.filter((s) => s.trim().length > 10)
+·.forEach((s) =>
+⊱│patterns.forEach((p) => {
+⊽│const m = s.match(p);
+⊄│if (!m) return;
+·const ant = m[1].trim().slice(0, 150);
+·const con = m[2].trim().slice(0, 150);
+⊹│if (ant.length < 5 || con.length < 5) return;
+·const existing = rules.find(
+·(r) =>
+·jaccard(extractKw(r.antecedent[0]), extractKw(ant)) > 0.6 &&
+·jaccard(extractKw(r.consequent), extractKw(con)) > 0.6,
+·);
+·if (existing) {
+·existing.support++;
+·existing.confidence += 0.02;
+·} else {
+⊺│rules.push({
+⊰│id: `R${++ruleId}`,
+·antecedent: [ant],
+·consequent: con,
+·confidence: e.confidence * 0.7,
+·support: 1,
+·extractedFrom: e.category,
+⏰│createdAt: Date.now(),
+·timesApplied: 0,
+·lastApplied: 0,
+·});
+·state.totalRulesExtracted++;
+·}
+·}),
+·);
+·});
+⊹│if (rules.length > 200) {
+·rules
+·.sort(
+·(a, b) =>
+·b.confidence * (1 + b.support * 0.1 + b.timesApplied * 0.2) -
+·a.confidence * (1 + a.support * 0.1 + a.timesApplied * 0.2),
+·)
+⊺│.splice(150);
+·}
+·state.rulesInMemory = rules.length;
+·}
+}⟨/extractRules⟩
+⊩⟿reason(1)→Promise<ReasoningResult>⟨122⟩{
+⊩│export async function reason(query: string): Promise<ReasoningResult> {
+⏰│const t0 = Date.now();
+·const chain: InferenceStep[] = [];
+·const conclusions: ReasoningResult["conclusions"] = [];
+·const analogies: string[] = [];
+·const appliedRules: string[] = [];
+·let depth = 0;
+·const kw = extractKw(query);
+⊴│const ◧ = await brainRead({ active: true, keywords: kw.slice(0, 5), ⏳: 20 });
+◧.slice(0, 5).forEach((e) =>
+·addWM({
+⊰│content: `${e.title}: ${e.content.slice(0, 200)}`,
+·type: "fact",
+·confidence: e.confidence,
+⊰│source: `brain:${e.category}`,
+·}),
+·);
+⊱│const pushSteps = (steps: InferenceStep[], d: number) => {
+⊄│if (!steps.length) return;
+⊺│chain.push(...steps);
+⟛│depth = Math.max(depth, d);
+⊱│steps.forEach((s) => {
+·addWM({
+·content: s.conclusion,
+⊳│type: s.type === "deduction" || s.type === "causal" ? "conclusion" : "hypothesis",
+·confidence: s.confidence,
+·source: s.type,
+·});
+⊺│if (s.type === "deduction" && s.rule) appliedRules.push(s.rule);
+·});
+·};
+pushSteps(deductive([query, ...◧.slice(0, 5).map((k) => k.content)]), 1);
+pushSteps(inductive(◧), 2);
+pushSteps(abductive(query, ◧), 3);
+⊱│kw.slice(0, 3).forEach((k) => {
+·const st = analogical(k);
+⊺│analogies.push(...st.map((s) => s.premise));
+·pushSteps(st, 4);
+·});
+·pushSteps(causal(query), 5);
+⊹│if (chain.length > 2 && depth < MAX_INFERENCE_DEPTH) {
+·pushSteps(deductive(chain.slice(-5).map((s) => s.conclusion)), depth + 1);
+·}
+·const contras = contradictions([
+⊱│...◧.map((k) => ({ content: k.content, confidence: k.confidence })),
+⊱│...chain.map((s) => ({ content: s.conclusion, confidence: s.confidence })),
+·]);
+·contras.forEach((c) =>
+·addWM({ content: c, type: "contradiction", confidence: 0.8, source: "contradiction" }),
+·);
+·const wmNow = activeWM();
+·const cand = wmNow
+·.filter((i) => i.type === "conclusion" || i.type === "hypothesis")
+·.sort((a, b) => b.confidence - a.confidence);
+⊯│const seen = new Set<string>();
+⥀│for (const c of cand) {
+·const key = extractKw(c.content).slice(0, 5).sort().join("|");
+·if (seen.has(key)) continue;
+·seen.add(key);
+·const sup = chain.filter(
+·(s) => jaccard(extractKw(s.conclusion), extractKw(c.content)) > 0.3,
+·);
+⊺│conclusions.push({
+·statement: c.content,
+·confidence: c.confidence,
+·reasoning:
+⊹│sup.length > 0
+⊰│? sup.map((s) => `[${s.type}] ${s.premise} → ${s.conclusion}`).join(" | ")
+⊰│: `[${c.source}]`,
+·});
+⊹│if (conclusions.length >= 8) break;
+·}
+·const conf =
+⋐│conclusions.reduce((sum, c) => sum + c.confidence, 0) /
+·(conclusions.length || 1);
+·state.totalReasoned++;
+⏰│state.lastReasoningTime = Date.now() - t0;
+⟛│state.longestChain = Math.max(state.longestChain, chain.length);
+·state.averageConfidence =
+⊳│state.totalReasoned === 1 ? conf : state.averageConfidence * 0.95 + conf * 0.05;
+·if (conf > 0.4)
+·cognitionBus.shareInsight("independent-reasoning", {
+·type: "discovery",
+·data: { query, conclusions: conclusions.slice(0, 3) },
+·});
+·cognitionBus.reportOutcome("independent-reasoning", {
+·useful: conf > 0.3,
+◧: query,
+·});
+⊷│return {
+·conclusions,
+·inferenceChain: chain,
+·workingMemorySnapshot: wmNow.map(
+⊰│(i) => `[${i.type}|${i.confidence.toFixed(2)}] ${i.content.slice(0, 90)}`,
+·),
+·contradictions: contras,
+·analogiesUsed: analogies,
+⊯│rulesApplied: [...new Set(appliedRules)],
+·totalSteps: chain.length,
+·reasoningDepth: depth,
+·confidence: conf,
+·};
+·}
+}⟨/reason⟩
+⊪│export const formatReasoningForContext = (r: ReasoningResult): string => {
+⊄│if (!r.conclusions.length && !r.inferenceChain.length) return "";
 κL
 ⊺│L.push(
 ·"═══ INDEPENDENT REASONING (PURE LOCAL LOGIC) ═══",
-⊰│`Depth ${r.reasoningDepth} | Steps ${r.totalSteps} | Confide
+⊰│`Depth ${r.reasoningDepth} | Steps ${r.totalSteps} | Confidence ${(r.confidence * 100).toFixed(0)}%`,
 ·);
 ·if (r.conclusions.length) {
 ⊺│L.push("\nCONCLUSIONS:");
 ·r.conclusions.slice(0, 5).forEach((c) =>
-⊰│L.push(`  [${(c.confidence * 100).toFixed(0)}%] ${c.statemen
+⊰│L.push(`  [${(c.confidence * 100).toFixed(0)}%] ${c.statement.slice(0, 200)}`),
 ·);
 ·}
 ·if (r.inferenceChain.length) {
 ⊺│L.push("\nREASONING:");
 κbyT
-⊡│r.inferenceChain.forEach((s) => byT.set(s.type, (byT.get(s.t
+⊡│r.inferenceChain.forEach((s) => byT.set(s.type, (byT.get(s.type) || 0) + 1));
 ⊺│L.push(
-⊰│`  Types: ${[...byT].map(([t, c]) => `${t}(${c})`).join(", "
+⊰│`  Types: ${[...byT].map(([t, c]) => `${t}(${c})`).join(", ")}`,
 ·...r.inferenceChain.slice(0, 6).map(
-⊰│(s) => `  [${s.type}] ${s.premise.slice(0, 80)} → ${s.conclu
+⊰│(s) => `  [${s.type}] ${s.premise.slice(0, 80)} → ${s.conclusion.slice(0, 90)}`,
 ·),
 ·);
 ·}
-⊰│r.contradictions.slice(0, 3).forEach((c) => L.push(`\n⚠ ${c.
-⊰│r.rulesApplied.slice(0, 3).forEach((rul) => L.push(`\n📐 ${r
+⊰│r.contradictions.slice(0, 3).forEach((c) => L.push(`\n⚠ ${c.slice(0, 150)}`));
+⊰│r.rulesApplied.slice(0, 3).forEach((rul) => L.push(`\n📐 ${rul.slice(0, 150)}`));
 ⊺│L.push("═══ END ═══");
 ⊷│return L.join("\n");
 ·};
@@ -194,7 +515,7 @@ extractRules(1)→void⟨58⟩{⊳⊱⊰⊹⊽⊄⊺⏰}
 ·}
 ·});
 ·contradictions(
-⊱│hi.map((e) => ({ content: e.content.slice(0, 200), confidenc
+⊱│hi.map((e) => ({ content: e.content.slice(0, 200), confidence: e.confidence })),
 ·).forEach((c) =>
 ·addWM({
 ·content: c,
@@ -212,24 +533,24 @@ log("Background ↻ error", e);
 ⊪│export const startIndependentReasoning = async () => {
 ⊷│if (started) return log("Already started");
 ·started = true;
-·engineRegistry.registerEngine("independent-reasoning", "NORMAL", { dbQuota: 10 }
+·engineRegistry.registerEngine("independent-reasoning", "NORMAL", { dbQuota: 10 });
 log("🧠 Engine activated — no η AI calls.");
 ·try {
 κseed
 ·extractRules(seed);
-⊰│log(`Bootstrapped ${rules.length} rules from ${seed.length} 
+⊰│log(`Bootstrapped ${rules.length} rules from ${seed.length} brain entries`);
 ·} catch (e) {
 ·log("Bootstrap error", e);
 ·}
 ·const scheduleDecay = () =>
-⚡→│spikeBus.scheduleSpike("independent-reasoning:decay", {}, DE
+⚡→│spikeBus.scheduleSpike("independent-reasoning:decay", {}, DECAY_INTERVAL_MS);
 ⊱│spikeBus.on("independent-reasoning:decay", () => {
 ·decayWM();
 ·scheduleDecay();
 ·});
 ·scheduleDecay();
 ·const scheduleBg = (delay = BACKGROUND_INTERVAL_MS) =>
-⚡→│spikeBus.scheduleSpike("independent-reasoning:bg", {}, delay
+⚡→│spikeBus.scheduleSpike("independent-reasoning:bg", {}, delay);
 ⊱│spikeBus.on("independent-reasoning:bg", async () => {
 ⊴│await backgroundCycle();
 ·scheduleBg();
@@ -265,10 +586,14 @@ log("🧠 Engine activated — no η AI calls.");
 ·.slice(0, 10)
 ·.map(
 ·(r) =>
-⊰│`${r.id}: IF [${r.antecedent.join(", ")}] THEN [${r.conseque
+⊰│`${r.id}: IF [${r.antecedent.join(", ")}] THEN [${r.consequent}] (c:${r.confidence.toFixed(
 ·2,
 ·)}, s:${r.support}, a:${r.timesApplied})`,
 ·),
 ·});
-⊩shutdown(1)→void⟨3⟩{⊩}
-⟩SCL│273│163⊨│121⑂│65.9%↓⟩
+⊩shutdown(1)→void⟨3⟩{
+⊩│export function shutdown() {
+·engineRegistry.unregisterEngine("independent-reasoning");
+·}
+}⟨/shutdown⟩
+⟩SCL│598│467⊨│165⑂│25.2%↓⟩

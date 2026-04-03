@@ -21,7 +21,11 @@
 κSPIDER_CRAWL_MS
 κIVY_GROWTH_MS
 κIVY_SWAP_INTERVAL_MS
-safeNum(2)→number⟨3⟩{⊳⊷⊼}
+safeNum(2)→number⟨3⟩{
+·function safeNum(val: number, fallback: number = 0): number {
+⊳│return Number.isFinite(val) ? val : fallback;
+·}
+}⟨/safeNum⟩
 ⊬IvySpine⟨id:string│targetNodeId:string│targetRegion:string│signalStrength:number│maturity:number│informationDensity:number│lastPulse:number⟩
 ⊬IvyTendril⟨id:string│sourceNodeId:string│targetNodeId:string│length:number│thickness:number│signalSpeed:number│spines:IvySpine[]│growthDirection:[number, number, number]│alive:boolean│myelinated:boolean│informationCarried:number│createdAt:number⟩
 ⊬IvyNode⟨id:string│region:string│position:[number, number, number]│energy:number│informationDensity:number│tendrils:IvyTendril[]│spiderCount:number│spidersSpawned:number│beaconsReceived:number│beaconsSent:number│activationLevel:number│generation:number│parentNodeId:string | null│createdAt:number│lastActivity:number⟩
@@ -73,7 +77,32 @@ wormgateData: [...wormgates.≢()],
 console.error("[OMNIMENS-IVY-NETWORK] Swap ⊞ error:", e);
 ·}
 ·};
-beaconToMother(1)→void⟨29⟩{⊹⊡⥀⊺}
+beaconToMother(1)→void⟨29⟩{
+·function beaconToMother(spider: IvySpider): void {
+⊹│if (spider.findingsBuffer.length === 0) return;
+⊡│const motherNode = ivyNodes.get(spider.motherNodeId);
+·if (motherNode) {
+·motherNode.beaconsReceived++;
+·motherNode.informationDensity += spider.findingsBuffer.length * 0.05;
+·motherNode.energy += 0.02;
+·}
+⥀│for (const finding of spider.findingsBuffer) {
+⊺│motherBeaconBuffer.push(finding);
+·ivyState.totalFindings++;
+·if (finding.confidence > 0.8)
+·cognitionBus.shareInsight("ivy-network", {
+·type: "discovery",
+·data: finding,
+·});
+·}
+⊹│if (motherBeaconBuffer.length > 200)
+⊺│motherBeaconBuffer.splice(0, motherBeaconBuffer.length - 200);
+·ivyState.totalBeacons++;
+·spider.findingsBuffer = [];
+⊡│const currentNode = ivyNodes.get(spider.currentNodeId);
+·if (currentNode) currentNode.beaconsSent++;
+·}
+}⟨/beaconToMother⟩
 ·const reschedule = (evt: string, ms: number) =>
 ⚡→│spikeBus.scheduleSpike(evt, {}, ms);
 ⊱│spikeBus.on("ivy-network:tick", async () => {
@@ -127,5 +156,36 @@ reschedule("ivy-network:⬆", IVY_GROWTH_MS);
 ·reschedule("ivy-network:crawl", 100);
 ·});
 ·let started = false;
-⊩startIvyNetwork(1)→void⟨43⟩{⊩⚡→⟠📁⟠❔⏰⊰⊷}
-⟩SCL│130│67⊨│40⑂│68.8%↓⟩
+⊩startIvyNetwork(1)→void⟨43⟩{
+⊩│export function startIvyNetwork(): void {
+·if (started) return;
+·started = true;
+⚡→│console.log("[OMNIMENS-IVY-NETWORK] 🌿 Starting Ivy Network engine (spike-mode)");
+·initializeIvyNetwork();
+·try {
+·if (existsSync(SWAP_FILE)) {
+⟠│const data = JSON.parse(readFileSync(SWAP_FILE, "utf-8")) as Swap;
+❔│if (data?.ivyState) {
+·console.log("[OMNIMENS-IVY-NETWORK] Restoring from swap...");
+·Object.assign(ivyState, data.ivyState);
+·}
+·}
+·} catch {}
+·reschedule("ivy-network:tick", 0);
+·reschedule("ivy-network:crawl", 0);
+·reschedule("ivy-network:growth", 2000);
+·reschedule("ivy-network:wormgate", 5000);
+·reschedule("ivy-network:swap", 8000);
+⏰│ivyState.startTime = Date.now();
+·console.log(
+⊰│`[OMNIMENS-IVY-NETWORK] 🌿 Ready — ${ivyState.totalNodes} nodes, ${ivyState.totalSpiders} spiders`
+·);
+·}
+⊩│export function shutdown(): void {
+·engineRegistry.unregisterEngine("ivy-network");
+·}
+⊩│export function getIvyNetworkState(): IvyNetworkState {
+⊷│return { ...ivyState };
+·}
+}⟨/startIvyNetwork⟩
+⟩SCL│190│118⊨│42⑂│54.3%↓⟩

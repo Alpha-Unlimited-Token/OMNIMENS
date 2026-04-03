@@ -1,23 +1,23 @@
 ⟨SCL v1│memory-system.ts│207→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 η: https
-⊭│type MemoryType = "short_term" | "long_term" | "episodic" | 
+⊭│type MemoryType = "short_term" | "long_term" | "episodic" | "semantic" | "procedural";
 ⊬Memory⟨id:string│type:MemoryType│content:string│embedding:number[]│importance:number│accessCount:number│createdAt:number│lastAccessed:number│associations:Set<string>│emotionalTag:string│compressed:boolean⟩
 ⊬MemoryIndex⟨byType:Map<MemoryType, Set<string>>│byImportance:string[]│byRecency:string[]│byEmotion:Map<string, Set<string>>⟩
 ⊶│export class MemorySystem {
 ⊮│private memories = new Map<string, Memory>();
-⊮│private index: MemoryIndex = { byType: new Map(), byImportan
+⊮│private index: MemoryIndex = { byType: new Map(), byImportance: [], byRecency: [], byEmotion: new Map() };
 ·private idCounter = 0;
 ·private _initialized = false;
 ·private shortTermCapacity = 50;
 ·private longTermCapacity = 5000;
 ·initialize(): void {
 ·this._initialized = true;
-⥀│for (const type of ["short_term", "long_term", "episodic", "
+⥀│for (const type of ["short_term", "long_term", "episodic", "semantic", "procedural"] as MemoryType[]) {
 ⊡│this.index.byType.set(type, new Set());
 ·}
 ·}
-⊳│store(content: string, type: MemoryType, importance: number,
+⊳│store(content: string, type: MemoryType, importance: number, emotionalTag?: string): string {
 κid
 κembedding
 κmemory
@@ -38,7 +38,7 @@
 ·}
 ·scored.sort((a, b) => b.score - a.score);
 const ⊢ = scored.slice(0, ⏳).map(s => s.memory);
-⥀│for (const m of results) { m.accessCount++; m.lastAccessed =
+⥀│for (const m of results) { m.accessCount++; m.lastAccessed = Date.now(); }
 ⊷│return results;
 ·}
 ·associate(idA: string, idB: string): void {
@@ -58,7 +58,7 @@ const ⊢ = scored.slice(0, ⏳).map(s => s.memory);
 ·if (memory) {
 ⊺│results.push(memory);
 ⥀│for (const assoc of memory.associations) {
-⊺│if (!visited.has(assoc)) queue.push({ memId: assoc, d: d + 1
+⊺│if (!visited.has(assoc)) queue.push({ memId: assoc, d: d + 1 });
 ·}
 ·}
 ·}
@@ -75,14 +75,14 @@ const ⊢ = scored.slice(0, ⏳).map(s => s.memory);
 ·shortTerm.delete(id);
 ⊡│this.index.byType.get("long_term")!.add(id);
 ·promoted++;
-⏰│} else if (Date.now() - mem.createdAt > 300_000 && mem.acces
+⏰│} else if (Date.now() - mem.createdAt > 300_000 && mem.accessCount === 0) {
 ·this.memories.delete(id);
 ·shortTerm.delete(id);
 ·forgotten++;
 ·}
 ·}
 ·for (const [id, mem] of this.memories) {
-⏰│if (!mem.compressed && mem.content.length > 500 && Date.now(
+⏰│if (!mem.compressed && mem.content.length > 500 && Date.now() - mem.lastAccessed > 3_600_000) {
 ·mem.content = mem.content.slice(0, 200) + "... [compressed]";
 ·mem.compressed = true;
 ·compressed++;
@@ -99,7 +99,7 @@ const ⊢ = scored.slice(0, ⏳).map(s => s.memory);
 ·embedding[(j + i) % 64] += word.charCodeAt(j) * 0.01;
 ·}
 ·}
-⋐│const magnitude = Math.sqrt(embedding.reduce((sum, v) => sum
+⋐│const magnitude = Math.sqrt(embedding.reduce((sum, v) => sum + v * v, 0)) || 1;
 ⊷│return embedding.map(v => v / magnitude);
 ·}
 ·private cosineSimilarity(a: number[], b: number[]): number {
@@ -113,29 +113,29 @@ const ⊢ = scored.slice(0, ⏳).map(s => s.memory);
 ⊡│this.index.byType.get(memory.type)?.add(memory.id);
 ⊺│this.index.byRecency.push(memory.id);
 ·if (memory.emotionalTag) {
-⊡│if (!this.index.byEmotion.has(memory.emotionalTag)) this.ind
-⊡│this.index.byEmotion.get(memory.emotionalTag)!.add(memory.id
+⊡│if (!this.index.byEmotion.has(memory.emotionalTag)) this.index.byEmotion.set(memory.emotionalTag, new Set());
+⊡│this.index.byEmotion.get(memory.emotionalTag)!.add(memory.id);
 ·}
 ·}
 ·private enforceCapacity(type: MemoryType): void {
 κtypeSet
 κcapacity
 ·if (typeSet.size > capacity) {
-⊡│const sorted = [...typeSet].map(id => this.memories.get(id)!
+⊡│const sorted = [...typeSet].map(id => this.memories.get(id)!).filter(Boolean)
 ·.sort((a, b) => a.accessCount - b.accessCount || a.importance - b.importance);
 κtoRemove
-⥀│for (const mem of toRemove) { this.memories.delete(mem.id); 
+⥀│for (const mem of toRemove) { this.memories.delete(mem.id); typeSet.delete(mem.id); }
 ·}
 ·}
-·getStats(): { total: number; byType: Record<string, number>; associations: numbe
+·getStats(): { total: number; byType: Record<string, number>; associations: number } {
 κbyType
 ·for (const [type, set] of this.index.byType) byType[type] = set.size;
 ·let associations = 0;
-⥀│for (const mem of this.memories.values()) associations += me
-⊷│return { total: this.memories.size, byType, associations: as
+⥀│for (const mem of this.memories.values()) associations += mem.associations.size;
+⊷│return { total: this.memories.size, byType, associations: associations / 2 };
 ·}
 ·getState(): Record<string, unknown> {
-⊷│return { initialized: this._initialized, ...this.getStats() 
+⊷│return { initialized: this._initialized, ...this.getStats() };
 ·}
 ·shutdown(): void { this._initialized = false; }
 ·}

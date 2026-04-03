@@ -5,8 +5,8 @@
 ·this.systemMetrics = systemMetrics;
 ·}
 ·evaluateCapabilityGaps() {
-·const gaps = this.systemMetrics.filter(metric => metric.score < metric.threshold
-⊷│return gaps.map(gap => ({ capability: gap.name, priority: ga
+·const gaps = this.systemMetrics.filter(metric => metric.score < metric.threshold);
+⊷│return gaps.map(gap => ({ capability: gap.name, priority: gap.threshold - gap.score }));
 ·}
 ·rankUpgrades(upgrades) {
 ⊷│return upgrades.sort((a, b) => b.priority - a.priority);

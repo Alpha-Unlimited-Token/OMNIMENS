@@ -1,7 +1,46 @@
 ⟨SCL v1│wasmParallelMatrixOps_gen1.mjs│89→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⟿loadWasmModule(1)→void⟨11⟩{⊷}
-⟿multiplyMatrices(2)→void⟨26⟩{⊹⊵⊴⊺⊷}
-⟿addVectors(2)→void⟨14⟩{⊹⊵⊴⊷}
+⟿loadWasmModule(1)→void⟨11⟩{
+·async function loadWasmModule() {
+·const wasmCode = new Uint8Array([
+·0x00, 0x61, 0x73, 0x6d, // Magic number
+·0x01, 0x00, 0x00, 0x00, // WASM version
+·]);
+·const wasmModule = await WebAssembly.instantiate(wasmCode, {});
+⊷│return wasmModule.instance;
+·}
+}⟨/loadWasmModule⟩
+⟿multiplyMatrices(2)→void⟨26⟩{
+·async function multiplyMatrices(matrixA, matrixB) {
+⊹│if (matrixA[0].length !== matrixB.length) {
+⊵│throw new Error("Matrix dimensions are incompatible for multiplication.");
+·}
+⊴│const wasmInstance = await loadWasmModule();
+·const rowsA = matrixA.length;
+·const colsA = matrixA[0].length;
+·const colsB = matrixB[0].length;
+·const flatA = matrixA.flat();
+·const flatB = matrixB.flat();
+·const result = new Float32Array(rowsA * colsB);
+·wasmInstance.exports.multiply(flatA, flatB, result, rowsA, colsA, colsB);
+·const outputMatrix = [];
+·for (let i = 0; i < rowsA; i++) {
+⊺│outputMatrix.push(result.slice(i * colsB, (i + 1) * colsB));
+·}
+⊷│return outputMatrix;
+·}
+}⟨/multiplyMatrices⟩
+⟿addVectors(2)→void⟨14⟩{
+·async function addVectors(vectorA, vectorB) {
+⊹│if (vectorA.length !== vectorB.length) {
+⊵│throw new Error("Vectors must be of the same length.");
+·}
+⊴│const wasmInstance = await loadWasmModule();
+·const length = vectorA.length;
+·const result = new Float32Array(length);
+·wasmInstance.exports.add(vectorA, vectorB, result, length);
+⊷│return Array.from(result);
+·}
+}⟨/addVectors⟩
 ·export { multiplyMatrices, addVectors };
-⟩SCL│6│13⊨│10⑂│93.3%↓⟩
+⟩SCL│45│46⊨│10⑂│49.4%↓⟩

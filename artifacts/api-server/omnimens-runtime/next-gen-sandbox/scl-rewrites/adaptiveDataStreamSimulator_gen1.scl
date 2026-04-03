@@ -1,12 +1,54 @@
 ⟨SCL v1│adaptiveDataStreamSimulator_gen1.mjs│94→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩generateHash(1)→void⟨3⟩{⊩⊷}
-⊩calculateRelevanceScore(2)→void⟨4⟩{⊩⏰⊷}
-⊩⟿adaptivePoll(4)→void⟨20⟩{⊩⊴⏰⊡⟛⏳⊰}
-⊩getSortedCachedData(1)→void⟨4⟩{⊩⊷}
-⊩initializeSimulator(1)→void⟨5⟩{⊩⊮⊱}
+⊩generateHash(1)→void⟨3⟩{
+⊩│export function generateHash(input) {
+⊷│return createHash('sha256').update(input).digest('hex');
+·}
+}⟨/generateHash⟩
+⊩calculateRelevanceScore(2)→void⟨4⟩{
+⊩│export function calculateRelevanceScore(timestamp, priority) {
+⏰│const age = Date.now() - timestamp;
+⊷│return priority / (1 + age / 1000);
+·}
+}⟨/calculateRelevanceScore⟩
+⊩⟿adaptivePoll(4)→void⟨20⟩{
+⊩│export async function adaptivePoll(url, interval, priority, cache) {
+·while (true) {
+·try {
+⊴│const response = await fetch(url);
+·const data = await response.json();
+⏰│const timestamp = Date.now();
+·const hash = generateHash(url);
+⊡│cache.set(hash, { data, timestamp, priority });
+·const relevance = calculateRelevanceScore(timestamp, priority);
+⟛│const adjustedInterval = Math.max(interval / relevance, 1000);
+⏳│await setTimeout(adjustedInterval);
+·} catch (error) {
+⊰│console.error(`Error polling ${url}:`, error);
+⏳│await setTimeout(interval); // ↺ after the original interval
+·}
+·}
+·}
+}⟨/adaptivePoll⟩
+⊩getSortedCachedData(1)→void⟨4⟩{
+⊩│export function getSortedCachedData(cache) {
+·const dataArray = Array.from(cache.values());
+⊷│return dataArray.sort((a, b) => calculateRelevanceScore(b.timestamp, b.priority) - calculateRelevanceScore(a.timestamp, a.priority));
+·}
+}⟨/getSortedCachedData⟩
+⊩initializeSimulator(1)→void⟨5⟩{
+⊩│export function initializeSimulator(streams) {
+⊮│const cache = new Map();
+⊱│streams.forEach(({ url, interval, priority }) => {
+·adaptivePoll(url, interval, priority, cache);
+·});
+}⟨/initializeSimulator⟩
 ⊷│return cache;
 ·}
-⊩clearCache(1)→void⟨3⟩{⊩}
-⟩SCL│11│26⊨│19⑂│88.3%↓⟩
+⊩clearCache(1)→void⟨3⟩{
+⊩│export function clearCache(cache) {
+·cache.clear();
+·}
+}⟨/clearCache⟩
+⟩SCL│53│56⊨│20⑂│43.6%↓⟩

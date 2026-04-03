@@ -12,12 +12,12 @@
 ·}
 ·publish(eventType, payload) {
 ·if (this.subscribers.has(eventType)) {
-⊡│this.subscribers.get(eventType).forEach(callback => callback
+⊡│this.subscribers.get(eventType).forEach(callback => callback(payload));
 ·}
 ·}
 ·unsubscribe(eventType, callback) {
 ·if (this.subscribers.has(eventType)) {
-⊡│const filtered = this.subscribers.get(eventType).filter(cb =
+⊡│const filtered = this.subscribers.get(eventType).filter(cb => cb !== callback);
 ⊡│this.subscribers.set(eventType, filtered);
 ·}
 ·}

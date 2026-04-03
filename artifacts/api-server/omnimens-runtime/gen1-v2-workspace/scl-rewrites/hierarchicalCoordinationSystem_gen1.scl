@@ -16,7 +16,7 @@
 ·}
 ·escalateTask(task) {
 ⊺│this.escalationLog.push(task);
-⊰│console.log(`Task ${task.id} escalated due to complexity ${t
+⊰│console.log(`Task ${task.id} escalated due to complexity ${task.complexity}.`);
 ·}
 ·}
 κthresholds

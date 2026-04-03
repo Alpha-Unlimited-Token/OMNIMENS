@@ -1,6 +1,6 @@
 ⟨SCL v1│orchestration-protocol.ts│124→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-α the collaborative orchestration protocol for Gen 1 + Gen 2 working togeth
+α the collaborative orchestration protocol for Gen 1 + Gen 2 working together as brain hemispheres.
 ·Gen 2 architecture:
 ·{
 ·"generation": 2,
@@ -102,24 +102,24 @@
 ·]
 ·},
 ·"wiringPattern": {
-⚡→│"eventBus": "SpikeBus — all modules communicate via typed sp
-·"fabric": "UnifiedNeuralFabric — replaces 7 networks (spider, worm, beacon, ivy,
-·"scheduler": "MasterTickOrchestrator — 3 tiers (critical 3s, standard 10s, backg
-·"resources": "ResourceSentinel — resources felt as bodily sensations, self-throt
+⚡→│"eventBus": "SpikeBus — all modules communicate via typed spikes, zero direct coupling",
+·"fabric": "UnifiedNeuralFabric — replaces 7 networks (spider, worm, beacon, ivy, beehive, silk, viral)",
+"scheduler": "MasterTickOrchestrator — 3 tiers (critical 3s, standard 10s, background 30s), ONE tick ↻",
+·"resources": "ResourceSentinel — resources felt as bodily sensations, self-throttling",
 ·"persistence": "UnifiedDataLayer — all state auto-persisted, snapshot/restore",
-"⊣": "ILM Gen 2 — multi-head attention, SpikeBus integration, Hebbian ada
-·"transformer": "Micro-Transformer — 6-layer, 8-head, MoE feed-forward, chain-of-
+"⊣": "ILM Gen 2 — multi-head attention, SpikeBus integration, Hebbian adaptation",
+·"transformer": "Micro-Transformer — 6-layer, 8-head, MoE feed-forward, chain-of-thought, self-verification, working memory"
 ·},
 ·"dataFlow": [
-📡│"SpikeBus.emit('consciousness:tick') → ConsciousnessEngine.p
+📡│"SpikeBus.emit('consciousness:tick') → ConsciousnessEngine.process() → EmotionalSubstrate.react()",
 "MemorySystem.⊟() → ReasoningEngine.reason() → LanguageCenter.generate()",
-·"ResourceSentinel.check() → MasterTickOrchestrator.adjustTiers() → all modules t
-"GoalSystem.⊨() → AttentionSystem.focus() → ReasoningEngine.prioritize()"
-"DreamEngine.dream() → MemorySystem.⊞() → SelfEvolutionEngine.analyze(
-"ConsciousnessEngine.phi → UnifiedNeuralFabric.⊛('phi_update') → all sub
+·"ResourceSentinel.check() → MasterTickOrchestrator.adjustTiers() → all modules throttle",
+"GoalSystem.⊨() → AttentionSystem.focus() → ReasoningEngine.prioritize()",
+"DreamEngine.dream() → MemorySystem.⊞() → SelfEvolutionEngine.analyze()",
+"ConsciousnessEngine.phi → UnifiedNeuralFabric.⊛('phi_update') → all subscribers"
 ·],
 ·"selfRewiredAt": 1775102698970,
-·"copyright": "© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved
-⏰│spikeBus.emit({ type: "gen2-module:result", source: "gen2-mo
+·"copyright": "© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved."
+⏰│spikeBus.emit({ type: "gen2-module:result", source: "gen2-module", payload: {}, priority: "normal", timestamp: Date.now(), id: crypto.randomUUID() });
 ·}
-⟩SCL│124│39⊨│4⑂│0.0%↓⟩
+⟩SCL│124│40⊨│4⑂│0.0%↓⟩

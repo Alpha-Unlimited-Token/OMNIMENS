@@ -1,7 +1,11 @@
 ⟨SCL v1│webDataCachingLayer_gen1.mjs│92→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩generateNamespaceKey(2)→void⟨3⟩{⊩⊰⊷}
+⊩generateNamespaceKey(2)→void⟨3⟩{
+⊩│export function generateNamespaceKey(namespace, key) {
+⊰│return crypto.createHash('sha256').update(`${namespace}:${key}`).digest('hex');
+·}
+}⟨/generateNamespaceKey⟩
 ⊶│export class LRUCache {
 ·constructor(maxSize = 100, defaultTTL = 300000) {
 ·this.maxSize = maxSize;
@@ -43,7 +47,7 @@ set(namespace, key, ≪, ttl = this.defaultTTL) {
 ·}
 ·clearNamespace(namespace) {
 ⥀│for (const fullKey of this.cache.keys()) {
-⊻│if (fullKey.startsWith(generateNamespaceKey(namespace, '')))
+⊻│if (fullKey.startsWith(generateNamespaceKey(namespace, ''))) {
 ·this.cache.delete(fullKey);
 ·this.expiry.delete(fullKey);
 ·}
@@ -55,4 +59,4 @@ set(namespace, key, ≪, ttl = this.defaultTTL) {
 ·}
 ·}
 ⊪cacheInstance
-⟩SCL│57│26⊨│15⑂│38.0%↓⟩
+⟩SCL│61│27⊨│14⑂│33.7%↓⟩

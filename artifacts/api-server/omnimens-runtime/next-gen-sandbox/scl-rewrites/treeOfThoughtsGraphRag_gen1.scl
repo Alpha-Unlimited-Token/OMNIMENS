@@ -1,12 +1,12 @@
 ⟨SCL v1│treeOfThoughtsGraphRag_gen1.mjs│19→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊪│export const treeOfThoughtsGraphRag = (reasoningTree, graphD
+⊪│export const treeOfThoughtsGraphRag = (reasoningTree, graphData) => {
 ⊱│const synthesizeKnowledge = (tree, graph) => {
 κmergedData
 ⊷│return mergedData;
 ·};
 ⊱│const evaluateBranches = (tree) => {
-⊷│return tree.branches.map(branch => ({ branch, score: Math.ra
+⊷│return tree.branches.map(branch => ({ branch, score: Math.random() }));
 ·};
 ⊷│return synthesizeKnowledge(reasoningTree, graphData);
 ·};

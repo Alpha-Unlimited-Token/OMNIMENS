@@ -1,9 +1,48 @@
 ⟨SCL v1│semanticMemoryCache_gen1.mjs│92→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 κcache
-cosineSimilarity(2)→void⟨7⟩{⋐⊷}
-⊩addEmbedding(2)→void⟨6⟩{⊩⊹⊵⊡}
-⊩getMostSimilar(1)→void⟨18⟩{⊩⊹⊵⊷}
-⊩clearCache(1)→void⟨3⟩{⊩}
-⊩getCacheSize(1)→void⟨3⟩{⊩⊷}
-⟩SCL│8│19⊨│13⑂│91.3%↓⟩
+cosineSimilarity(2)→void⟨7⟩{
+·function cosineSimilarity(vectorA, vectorB) {
+⋐│const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
+⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a * a, 0));
+⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b * b, 0));
+⊷│if (magnitudeA === 0 || magnitudeB === 0) return 0;
+⊷│return dotProduct / (magnitudeA * magnitudeB);
+·}
+}⟨/cosineSimilarity⟩
+⊩addEmbedding(2)→void⟨6⟩{
+⊩│export function addEmbedding(id, vector) {
+⊹│if (!id || !Array.isArray(vector) || vector.length === 0) {
+⊵│throw new Error("Invalid embedding: id must be a string and vector must be a non-empty array.");
+·}
+⊡│cache.set(id, vector);
+·}
+}⟨/addEmbedding⟩
+⊩getMostSimilar(1)→void⟨18⟩{
+⊩│export function getMostSimilar(queryVector) {
+⊹│if (!Array.isArray(queryVector) || queryVector.length === 0) {
+⊵│throw new Error("Invalid query vector: must be a non-empty array.");
+·}
+·let bestMatch = null;
+·let highestSimilarity = -Infinity;
+·for (const [id, vector] of cache.entries()) {
+·const similarity = cosineSimilarity(queryVector, vector);
+·if (similarity > highestSimilarity) {
+·highestSimilarity = similarity;
+·bestMatch = { id, similarity };
+·}
+·}
+⊷│return bestMatch;
+·}
+}⟨/getMostSimilar⟩
+⊩clearCache(1)→void⟨3⟩{
+⊩│export function clearCache() {
+·cache.clear();
+·}
+}⟨/clearCache⟩
+⊩getCacheSize(1)→void⟨3⟩{
+⊩│export function getCacheSize() {
+⊷│return cache.size;
+·}
+}⟨/getCacheSize⟩
+⟩SCL│47│48⊨│16⑂│48.9%↓⟩

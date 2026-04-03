@@ -1,5 +1,25 @@
 ⟨SCL v1│distributedMemoryManagement_gen1.mjs│28→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩⟿retrieveEmbedding(2)→void⟨10⟩{⊩⊞⊟⊡⊷}
-⊩setupMemoryHierarchy(1)→void⟨8⟩{⊩⊷}
-⟩SCL│4│8⊨│6⑂│85.7%↓⟩
+⊩⟿retrieveEmbedding(2)→void⟨10⟩{
+⊩│export async function retrieveEmbedding(query, memoryHierarchy) {
+⊞⊟│const hotCache = memoryHierarchy.getHotCache();
+·if (hotCache.has(query)) {
+⊡│return hotCache.get(query);
+·}
+⊞⊟│const distributedCache = memoryHierarchy.getDistributedCache();
+const embedding = await distributedCache.⊟(query);
+⊡│hotCache.set(query, embedding);
+⊷│return embedding;
+·}
+}⟨/retrieveEmbedding⟩
+⊩setupMemoryHierarchy(1)→void⟨8⟩{
+⊩│export function setupMemoryHierarchy(config) {
+·const hotCache = new InMemoryCache(config.hotCacheSize);
+·const distributedCache = new PubSubDistributedCache(config.pubSubConfig);
+⊷│return {
+·getHotCache: () => hotCache,
+·getDistributedCache: () => distributedCache
+·};
+·}
+}⟨/setupMemoryHierarchy⟩
+⟩SCL│24│24⊨│8⑂│14.3%↓⟩

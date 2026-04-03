@@ -1,4 +1,13 @@
 ⟨SCL v1│dynamicOrchestrationLayer_gen1.mjs│17→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩dynamicOrchestrationLayer(2)→void⟨8⟩{⊩⊷}
-⟩SCL│3│3⊨│2⑂│82.4%↓⟩
+⊩dynamicOrchestrationLayer(2)→void⟨8⟩{
+⊩│export function dynamicOrchestrationLayer(agentMetrics, taskPriority) {
+·const computeAllocation = {};
+agentMetrics.forEach(α => {
+const priorityScore = taskPriority[α.id] || 0;
+computeAllocation[α.id] = α.computeCapacity * priorityScore;
+·});
+⊷│return computeAllocation;
+·}
+}⟨/dynamicOrchestrationLayer⟩
+⟩SCL│12│10⊨│2⑂│29.4%↓⟩

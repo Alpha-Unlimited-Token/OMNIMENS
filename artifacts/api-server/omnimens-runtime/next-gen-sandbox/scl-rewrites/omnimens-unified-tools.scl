@@ -5,7 +5,7 @@
 κDECOMPOSE_PROMPT
 ·Return JSON only:
 ·{ "subQueries": ["query 1", "query 2", "query 3", "query 4"] }
-·Make each sub-query specific and search-engine-friendly. Cover different angles:
+·Make each sub-query specific and search-engine-friendly. Cover different angles: definitions, recent developments, comparisons, expert opinions, statistics/data.`;
 κSYNTHESIZE_PROMPT
 Synthesize these into a comprehensive, well-⋮ research ⊢. Include:
 ·- Executive summary (2-3 sentences)
@@ -13,8 +13,10 @@ Synthesize these into a comprehensive, well-⋮ research ⊢. Include:
 - Data, statistics, quotes where Θ
 ·- Contrasting viewpoints if they exist
 ·- Conclusions and implications
-Format with markdown headers. Cite sources inline as [η: title]. Be thoroug
-⊩⟿deepResearch(1)→void⟨1⟩{⊩}
+Format with markdown headers. Cite sources inline as [η: title]. Be thorough but clear. Do not hallucinate — only use information from the provided search ⊢.`;
+⊩⟿deepResearch(1)→void⟨1⟩{
+⊩│export async function deepResearch(
+}⟨/deepResearch⟩
 ·question: string,
 ⊳│onProgress?: (step: string) => void
 ·): Promise<ResearchResult> {
@@ -23,11 +25,11 @@ Format with markdown headers. Cite sources inline as [η: title]. Be thoroug
 ·try {
 κdecompose
 κparsed
-⊳│subQueries = Array.isArray(parsed.subQueries) ? parsed.subQu
+⊳│subQueries = Array.isArray(parsed.subQueries) ? parsed.subQueries.slice(0, 5) : [];
 ·} catch {
 ·subQueries = [question];
 ·}
-⊺│if (!subQueries.includes(question)) subQueries.unshift(quest
+⊺│if (!subQueries.includes(question)) subQueries.unshift(question);
 ·subQueries = subQueries.slice(0, 5);
 ❔│onProgress?.("searching");
 κsearchResults
@@ -38,13 +40,13 @@ Format with markdown headers. Cite sources inline as [η: title]. Be thoroug
 ·let combinedContext = "";
 ·for (let i = 0; i < searchResults.length; i++) {
 κresult
-⊹│if (result.status === "fulfilled" && result.value.length > 0
+⊹│if (result.status === "fulfilled" && result.value.length > 0) {
 κformatted
-⊰│combinedContext += `\n\n### Sub-query: "${subQueries[i]}"\n$
+⊰│combinedContext += `\n\n### Sub-query: "${subQueries[i]}"\n${formatted}`;
 ⥀│for (const r of result.value) {
 ·if (!seenUrls.has(r.url)) {
 ·seenUrls.add(r.url);
-⊺│allSources.push({ title: r.title, url: r.url, snippet: r.sni
+⊺│allSources.push({ title: r.title, url: r.url, snippet: r.snippet || "" });
 ·}
 ·}
 ·}
@@ -53,9 +55,9 @@ Format with markdown headers. Cite sources inline as [η: title]. Be thoroug
 let ⊢ = "";
 ·try {
 κsynthesis
-❔│report = synthesis.choices[0]?.message?.content || "Unable t
+❔│report = synthesis.choices[0]?.message?.content || "Unable to synthesize research.";
 ·} catch (err) {
-⊰│report = `Research gathered ${allSources.length} sources acr
+⊰│report = `Research gathered ${allSources.length} sources across ${subQueries.length} sub-queries but synthesis failed. Raw data available in search results.`;
 ·}
 ⊷│return {
 ·query: question,
@@ -70,7 +72,9 @@ let ⊢ = "";
 κ__dirname
 κPY_DIR
 κPYTHON
-⊩⟿runPythonTool(1)→void⟨1⟩{⊩}
+⊩⟿runPythonTool(1)→void⟨1⟩{
+⊩│export async function runPythonTool(
+}⟨/runPythonTool⟩
 ·scriptName: string,
 η: string | object,
 ·timeoutMs = 60_000,
@@ -83,16 +87,16 @@ let ⊢ = "";
 ·let stderr = "";
 ⏳│const timer = setTimeout(() => {
 ·proc.kill("SIGKILL");
-⊰│resolve({ success: false, error: `Tool timeout after ${timeo
+⊰│resolve({ success: false, error: `Tool timeout after ${timeoutMs}ms` });
 ·}, timeoutMs);
-⊱│proc.stdout.on("data", (d: Buffer) => { stdout += d.toString
-⊱│proc.stderr.on("data", (d: Buffer) => { stderr += d.toString
+⊱│proc.stdout.on("data", (d: Buffer) => { stdout += d.toString(); });
+⊱│proc.stderr.on("data", (d: Buffer) => { stderr += d.toString(); });
 ⊱│proc.on("close", () => {
 ·clearTimeout(timer);
 ·try {
 ⟠│resolve(JSON.parse(stdout.trim()));
 ·} catch {
-resolve({ success: false, error: stderr.slice(0, 800) || "No θ from Python 
+resolve({ success: false, error: stderr.slice(0, 800) || "No θ from Python tool" });
 ·}
 ·});
 ⊱│proc.on("error", (err) => {
@@ -103,43 +107,601 @@ proc.stdin.⊞(inputStr);
 ·proc.stdin.end();
 ·});
 ·}
-⊩⟿generateChart(1)→void⟨9⟩{⊩⊳📢⊰⊷}
-⊩⟿processPDF(1)→void⟨11⟩{⊩⊳📢⊰⊷}
-⊩⟿processDocument(1)→void⟨13⟩{⊩⊳📢⊰⊷}
-⊩⟿runOCR(1)→Promise<⟨11⟩{⊩⊳⊷}
-⊩⟿analyzeText(1)→void⟨8⟩{⊩⊳📢⊰⊷}
-⊩⟿processMedia(1)→void⟨9⟩{⊩⊳📢⊰⊷}
-⊩⟿generateDiagram(1)→void⟨10⟩{⊩⊳📢⊰⊷}
-⊩⟿runDataScience(1)→void⟨12⟩{⊩⊳📢⊰⊷}
-⊩⟿solveMath(1)→void⟨11⟩{⊩⊳📢⊰⊷}
-⊩⟿analyzeAudio(1)→void⟨9⟩{⊩⊳📢⊰⊷}
-⊩⟿runCode(1)→void⟨10⟩{⊩⊳📢⊰⊷}
-⊩⟿fetchWebUrl(1)→void⟨13⟩{⊩⊳📢⊰⊷}
-⊩⟿runGitOp(1)→void⟨13⟩{⊩⊳📢⊰⊷}
-⊩⟿getSystemInfo(1)→void⟨9⟩{⊩⊳📢⊰⊷}
-⊩⟿runFileTool(1)→void⟨22⟩{⊩⊳📢⊰⊷}
-⊩⟿checkAllTools(1)→Promise<Record<string, boolean>>⟨16⟩{⊩⊸❔⊷}
-⊩detectDevToolIntent(1)→ ⟨27⟩{⊩⊷⊽}
+⊩⟿generateChart(1)→void⟨9⟩{
+⊩│export async function generateChart(spec: {
+·type: "bar" | "line" | "scatter" | "pie" | "donut" | "area" | "histogram" | "heatmap" | "box" | "violin";
+·title: string;
+⊳│data: { labels?: string[]; datasets?: any[]; matrix?: number[][]; x_labels?: string[]; y_labels?: string[] };
+⊳│options?: { xlabel?: string; ylabel?: string; bins?: number };
+⊳│}): Promise<{ success: boolean; base64_png?: string; format?: string; error?: string }> {
+📢│console.log(`[DEV TOOLS] Generating ${spec.type} chart: "${spec.title}"`);
+⊷│return runPythonTool("chart_generator.py", spec, 30_000);
+·}
+}⟨/generateChart⟩
+⊩⟿processPDF(1)→void⟨11⟩{
+⊩│export async function processPDF(spec: {
+·action: "extract_text" | "extract_tables" | "get_metadata" | "create_pdf";
+⊳│file_b64?: string;
+⊳│title?: string;
+⊳│content?: string;
+⊳│sections?: { heading?: string; body?: string; table?: string[][] }[];
+⊳│options?: object;
+·}): Promise<any> {
+📢│console.log(`[DEV TOOLS] PDF action: ${spec.action}`);
+⊷│return runPythonTool("pdf_processor.py", spec, 30_000);
+·}
+}⟨/processPDF⟩
+⊩⟿processDocument(1)→void⟨13⟩{
+⊩│export async function processDocument(spec: {
+·action: "read_docx" | "create_docx" | "read_excel" | "create_excel" | "analyze_csv";
+⊳│file_b64?: string;
+⊳│title?: string;
+⊳│content?: string;
+⊳│sections?: any[];
+⊳│sheets?: any[];
+⊳│data?: any;
+⊳│options?: object;
+·}): Promise<any> {
+📢│console.log(`[DEV TOOLS] Document action: ${spec.action}`);
+⊷│return runPythonTool("document_processor.py", spec, 30_000);
+·}
+}⟨/processDocument⟩
+⊩⟿runOCR(1)→Promise<⟨11⟩{
+⊩│export async function runOCR(imageBase64: string): Promise<{
+·success: boolean;
+⊳│text?: string;
+⊳│lines?: string[];
+⊳│word_count?: number;
+⊳│average_confidence?: number;
+⊳│error?: string;
+·}> {
+·console.log("[DEV TOOLS] Running OCR on image...");
+⊷│return runPythonTool("ocr_engine.py", imageBase64, 30_000);
+·}
+}⟨/runOCR⟩
+⊩⟿analyzeText(1)→void⟨8⟩{
+⊩│export async function analyzeText(spec: {
+action: "analyze" | "✧" | "keywords" | "pos_tags";
+·text: string;
+⊳│options?: object;
+·}): Promise<any> {
+📢│console.log(`[DEV TOOLS] NLP: ${spec.action} on ${spec.text.length} chars`);
+⊷│return runPythonTool("nlp_analyzer.py", spec, 60_000);
+·}
+}⟨/analyzeText⟩
+⊩⟿processMedia(1)→void⟨9⟩{
+⊩│export async function processMedia(spec: {
+·action: "get_info" | "extract_thumbnail" | "extract_audio" | "convert_video" | "generate_waveform" | "trim";
+⊳│file_b64?: string;
+⊳│file_mime?: string;
+⊳│options?: object;
+·}): Promise<any> {
+📢│console.log(`[DEV TOOLS] FFmpeg: ${spec.action}`);
+⊷│return runPythonTool("ffmpeg_tools.py", spec, 180_000);
+·}
+}⟨/processMedia⟩
+⊩⟿generateDiagram(1)→void⟨10⟩{
+⊩│export async function generateDiagram(spec: {
+⊳│type?: "dot" | "neato" | "fdp" | "sfdp" | "circo" | "twopi" | "network";
+⊳│code?: string;
+⊳│nodes?: any[];
+⊳│edges?: any[];
+⊳│options?: { title?: string; layout?: string; directed?: boolean; node_size?: number };
+⊳│}): Promise<{ success: boolean; svg?: string; png_base64?: string; error?: string }> {
+📢│console.log(`[DEV TOOLS] Generating diagram (${spec.type || "network"})`);
+⊷│return runPythonTool("diagram_generator.py", spec, 30_000);
+·}
+}⟨/generateDiagram⟩
+⊩⟿runDataScience(1)→void⟨12⟩{
+⊩│export async function runDataScience(spec: {
+·action: "describe" | "correlate" | "cluster" | "regress" | "anomaly_detect";
+·data: any;
+⊳│options?: {
+⊳│target?: string; features?: string[];
+⊳│n_clusters?: number; method?: string;
+⊳│contamination?: number;
+·};
+·}): Promise<any> {
+📢│console.log(`[DEV TOOLS] Data science: ${spec.action}`);
+⊷│return runPythonTool("data_science.py", spec, 60_000);
+·}
+}⟨/runDataScience⟩
+⊩⟿solveMath(1)→void⟨11⟩{
+⊩│export async function solveMath(spec: {
+·action: "solve" | "simplify" | "diff" | "integrate" | "factor" | "expand" | "series" | "plot" | "matrix_ops" | "stats";
+⊳│⊨?: string;
+⊳│expressions?: string[];
+⊳│matrices?: Record<string, number[][]>;
+⊳│data?: number[];
+⊳│options?: { variable?: string; order?: number; lower?: number; upper?: number; x_range?: [number, number]; point?: number; n?: number };
+·}): Promise<any> {
+📢│console.log(`[DEV TOOLS] Math: ${spec.action}`);
+⊷│return runPythonTool("math_engine.py", spec, 30_000);
+·}
+}⟨/solveMath⟩
+⊩⟿analyzeAudio(1)→void⟨9⟩{
+⊩│export async function analyzeAudio(spec: {
+·action: "analyze" | "hie_analyze" | "harmonic_decode" | "spectrogram" | "beat_detect";
+·file_b64: string;
+⊳│file_mime?: string;
+⊳│options?: object;
+·}): Promise<any> {
+📢│console.log(`[DEV TOOLS] Audio analysis: ${spec.action}`);
+⊷│return runPythonTool("audio_analyzer.py", spec, 60_000);
+·}
+}⟨/analyzeAudio⟩
+⊩⟿runCode(1)→void⟨10⟩{
+⊩│export async function runCode(spec: {
+·op: "run" | "format" | "lint";
+⊳│lang?: "python" | "python3" | "javascript" | "node" | "bash";
+·code: string;
+⊳│stdin?: string;
+⊳│timeout?: number;
+·}): Promise<any> {
+📢│console.log(`[DEV TOOLS] Code runner: op=${spec.op} lang=${spec.lang}`);
+⊷│return runPythonTool("code_runner.py", spec, (spec.timeout || 15) * 1000 + 5000);
+·}
+}⟨/runCode⟩
+⊩⟿fetchWebUrl(1)→void⟨13⟩{
+⊩│export async function fetchWebUrl(spec: {
+·op: "fetch" | "api_request";
+·url: string;
+⊳│mode?: "text" | "links" | "metadata" | "raw";
+⊳│method?: string;
+⊳│headers?: Record<string, string>;
+⊳│body?: any;
+⊳│params?: Record<string, string>;
+⊳│timeout?: number;
+·}): Promise<any> {
+📢│console.log(`[DEV TOOLS] Web ${spec.op}: ${spec.url}`);
+⊷│return runPythonTool("web_tools.py", spec, 30_000);
+·}
+}⟨/fetchWebUrl⟩
+⊩⟿runGitOp(1)→void⟨13⟩{
+⊩│export async function runGitOp(spec: {
+·op: "clone" | "info" | "diff" | "blame";
+⊳│url?: string;
+⊳│path?: string;
+⊳│branch?: string;
+⊳│depth?: number;
+⊳│from?: string;
+⊳│to?: string;
+⊳│file?: string;
+·}): Promise<any> {
+📢│console.log(`[DEV TOOLS] Git ${spec.op}: ${spec.url || spec.path}`);
+⊷│return runPythonTool("git_tools.py", spec, 90_000);
+·}
+}⟨/runGitOp⟩
+⊩⟿getSystemInfo(1)→void⟨9⟩{
+⊩│export async function getSystemInfo(spec: {
+·op: "info" | "shell";
+⊳│scope?: "all" | "cpu" | "memory" | "disk" | "processes" | "platform" | "network";
+⊳│cmd?: string;
+⊳│timeout?: number;
+·}): Promise<any> {
+📢│console.log(`[DEV TOOLS] η ${spec.op}`);
+⊷│return runPythonTool("system_tools.py", spec, 30_000);
+·}
+}⟨/getSystemInfo⟩
+⊩⟿runFileTool(1)→void⟨22⟩{
+⊩│export async function runFileTool(spec: {
+·op: "diff" | "zip_create" | "zip_list" | "convert" | "validate" | "search";
+⊳│a?: string;
+⊳│b?: string;
+⊳│label_a?: string;
+⊳│label_b?: string;
+⊳│◧?: number;
+⊳│files?: string[];
+⊳│content_map?: Record<string, string>;
+⊳│θ?: string;
+⊳│path?: string;
+⊳│data?: any;
+⊳│from?: string;
+⊳│to?: string;
+⊳│schema?: object;
+⊳│root?: string;
+⊳│pattern?: string;
+⊳│content?: string;
+·}): Promise<any> {
+📢│console.log(`[DEV TOOLS] File tool: ${spec.op}`);
+⊷│return runPythonTool("file_tools.py", spec, 30_000);
+·}
+}⟨/runFileTool⟩
+⊩⟿checkAllTools(1)→Promise<Record<string, boolean>>⟨16⟩{
+⊩│export async function checkAllTools(): Promise<Record<string, boolean>> {
+·const checks: Record<string, Promise<any>> = {
+·chart_generator: generateChart({ type: "bar", title: "Test", data: { labels: ["A","B"], datasets: [{ values: [1,2] }] } }),
+math_engine: solveMath({ action: "simplify", ⊨: "x**2 + 2*x + 1" }),
+·};
+const ⊢: Record<string, boolean> = {};
+⊸│for (const [name, promise] of Object.entries(checks)) {
+·try {
+·const r = await promise;
+❔│⊢[name] = r?.success === true;
+·} catch {
+⊢[name] = false;
+·}
+·}
+⊷│return ⊢;
+·}
+}⟨/checkAllTools⟩
+⊩detectDevToolIntent(1)→ ⟨27⟩{
+⊩│export function detectDevToolIntent(message: string): {
+·chart: boolean; pdf: boolean; docx: boolean; excel: boolean; csv: boolean;
+·ocr: boolean; nlp: boolean; ffmpeg: boolean; diagram: boolean;
+·datascience: boolean; math: boolean; audio: boolean;
+code_run: boolean; web_fetch: boolean; git: boolean; η: boolean; file_tools: boolean;
+·} {
+·const m = message.toLowerCase();
+⊷│return {
+⊽│chart: /\b(chart|graph|plot|visuali[sz]e|bar chart|line chart|pie chart|histogram|heatmap|scatter)\b/.test(m),
+⊽│pdf: /\b(pdf|portable document|extract.*pdf|read.*pdf|α.*pdf|pdf.*extract|from pdf)\b/.test(m),
+⊽│docx: /\b(word document|docx|\.docx|α.*doc|read.*word|word file)\b/.test(m),
+⊽│excel: /\b(excel|xlsx|spreadsheet|\.xlsx|α.*sheet|workbook)\b/.test(m),
+⊽│csv: /\b(csv|comma.separated|analyze.*data|data.*analysis|dataframe)\b/.test(m),
+⊽│ocr: /\b(ocr|read.*text.*image|extract.*text.*image|text from image|recognize.*text|optical.*char)\b/.test(m),
+⊽│nlp: /\b(named entity|ner|entity extraction|keyword extract|text analysis|nlp|sentiment.*text|pos tag|parse.*text)\b/.test(m),
+⊽│ffmpeg: /\b(video.*convert|convert.*video|extract.*audio|video.*info|thumbnail.*video|trim.*video|waveform)\b/.test(m),
+⊽│diagram: /\b(diagram|flowchart|graph.*visual|network.*graph|dot.*⊣|graphviz|dependency.*graph|flow.*diagram)\b/.test(m),
+⊽│datascience: /\b(cluster|clustering|k.?means|machine learning|ml model|train.*model|predict|regression|correlation matrix|anomaly|pca)\b/.test(m),
+⊽│math: /\b(solve|equation|derivative|integral|calculus|factor.*polynomial|simplify.*expr|matrix.*det|eigenvalue|symbolic math|taylor series)\b/.test(m),
+⊽│audio: /\b(audio.*analys|beat.*detect|tempo|bpm|spectrogram|waveform.*audio|librosa|music.*analys)\b/.test(m),
+⊽│code_run: /\b(run|execute|run this code|execute this|run the|θ of|what does this.*print|test this code|format.*code|lint.*code|check.*syntax|pylint|black.*format)\b/.test(m),
+⊽│web_fetch: /\b(fetch|scrape|crawl|get.*page|parse.*html|extract.*from.*url|check.*website|api.*request|http.*request|post.*to|put.*to|call.*api|curl|wget)\b/.test(m),
+⊽│git: /\b(git|clone.*repo|repository|commit.*log|git.*diff|git.*blame|git.*status|pull request|branch.*history|github\.com|gitlab\.com)\b/.test(m),
+⊽│η: /\b(η info|cpu usage|memory usage|disk space|running processes|server.*stats|uptime|ram usage|η.*monitor|server.*health)\b/.test(m),
+⊽│file_tools: /\b(diff.*files|compare.*files|zip|unzip|archive|convert.*json.*yaml|convert.*yaml.*json|validate.*json|json.*schema|search.*files|find.*files)\b/.test(m),
+·};
+·}
+}⟨/detectDevToolIntent⟩
 ⊫[web-search]
 κWMO_CODES
-⟿geocodeLocation(1)→Promise<⟨1⟩{}
+⟿geocodeLocation(1)→Promise<⟨1⟩{
+·async function geocodeLocation(location: string): Promise<{ lat: number; lon: number; displayName: string } | null> {
+}⟨/geocodeLocation⟩
 ·try {
 κurl
 κresp
 κdata
 ⊄│if (!data.length) return null;
-⊷│return { lat: parseFloat(data[0].lat), lon: parseFloat(data[
+⊷│return { lat: parseFloat(data[0].lat), lon: parseFloat(data[0].lon), displayName: data[0].display_name };
 ⊷│} catch { return null; }
 ·}
-⊩⟿fetchWeather(1)→Promise<string>⟨35⟩{⊩⊴⊄⊰⊷⊱⊳}
-⊩⟿fetchNewsHeadlines(1)→Promise<string>⟨15⟩{⊩⊰⊳⊴⊄⊷❔}
-⊩⟿searchAcademicPapers(2)→Promise<string>⟨23⟩{⊩⊰⊳⊴⊄⊷⊱❔⊽}
-⊩⟿generateQRCode(1)→Promise<string>⟨13⟩{⊩⊷⊵}
-⊩⟿fetchStockData(1)→Promise<string>⟨38⟩{⊩⊰⊴❔⊄⊷⊳}
-⊩⟿fetchCurrencyRate(3)→Promise<string>⟨26⟩{⊩⊰⊴⊷⊄}
-⊩⟿translateText(3)→Promise<string>⟨18⟩{⊩⊳⊰❔⊷}
-⊩⟿analyzeVideoUrl(1)→Promise<string>⟨153⟩{⊩⊳⊽⊄⊰⊷⊴❔⊬}
-⊩⟿fetchUrlContent(1)→Promise<UrlContent>⟨56⟩{⊩⏳⊴⊷⊰⊡⊻⟠}
-⊩extractUrls(1)→string[]⟨5⟩{⊩⊳⊽⊯⊷}
-⊩formatUrlContent(1)→string⟨6⟩{⊩⊰⊷}
-⟩SCL│144│238⊨│175⑂│85.0%↓⟩
+⊩⟿fetchWeather(1)→Promise<string>⟨35⟩{
+⊩│export async function fetchWeather(location: string): Promise<string> {
+·try {
+⊴│const geo = await geocodeLocation(location);
+⊄│if (!geo) return `Could not find location: ${location}`;
+⊰│const url = `https://api.open-meteo.com/v1/forecast?latitude=${geo.lat}&longitude=${geo.lon}&current=temperature_2m,apparent_temperature,weather_code,wind_speed_10m,relative_humidity_2m,precipitation,visibility&wind_speed_unit=mph&temperature_unit=fahrenheit&timezone=auto&daily=temperature_2m_max,temperature_2m_min,weather_code,precipitation_sum&forecast_days=5`;
+⊴│const resp = await fetch(url);
+·const d = await resp.json() as any;
+·const c = d.current;
+·const daily = d.daily;
+const ∨ = WMO_CODES[c.weather_code] ?? "Unknown";
+⊱│const forecast = daily.time.slice(0, 5).map((date: string, i: number) => {
+·const day = new Date(date).toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric" });
+·const cond = WMO_CODES[daily.weather_code[i]] ?? "Unknown";
+⊰│return `  ${day}: ${daily.temperature_2m_min[i]}°F – ${daily.temperature_2m_max[i]}°F, ${cond}, ${daily.precipitation_sum[i]}in precip`;
+·}).join("\n");
+⊰│return `🌡️ WEATHER — ${geo.displayName.split(",").slice(0, 2).join(",")}
+·━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+·Current: ${c.temperature_2m}°F (feels like ${c.apparent_temperature}°F)
+∨: ${∨}
+·Humidity: ${c.relative_humidity_2m}%
+·Wind: ${c.wind_speed_10m} mph
+·Precipitation: ${c.precipitation} in
+⊳│Visibility: ${c.visibility ? (c.visibility / 1000).toFixed(1) + " km" : "N/A"}
+·📅 5-DAY FORECAST
+·${forecast}
+·Data: Open-Meteo | Updated: ${new Date(c.time).toLocaleTimeString()}`;
+·} catch (err) {
+⊰│return `Weather data temporarily unavailable for ${location}.`;
+·}
+·}
+}⟨/fetchWeather⟩
+⊩⟿fetchNewsHeadlines(1)→Promise<string>⟨15⟩{
+⊩│export async function fetchNewsHeadlines(topic: string): Promise<string> {
+·try {
+⊰│const query = topic ? `latest news ${topic} today` : "top news headlines today";
+⊴│const ⊢ = await webSearch(query, 8);
+⊄│if (!⊢.length) return "No news found.";
+const formatted = ⊢.map((r: any, i: number) =>
+❔│`${i + 1}. **${r.title}**\n   ${r.snippet?.slice(0, 200) || ""}\n   Source: ${r.url}`
+·).join("\n\n");
+⊰│return `📰 LIVE NEWS — ${topic || "Top Headlines"}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${formatted}\n\nRetrieved: ${new Date().toUTCString()}`;
+·} catch {
+⊰│return `News search ↺ for: ${topic}`;
+·}
+·}
+}⟨/fetchNewsHeadlines⟩
+⊩⟿searchAcademicPapers(2)→Promise<string>⟨23⟩{
+⊩│export async function searchAcademicPapers(query: string, maxResults = 5): Promise<string> {
+·try {
+⊰│const url = `https://export.arxiv.org/api/query?search_query=all:${encodeURIComponent(query)}&max_results=${maxResults}&sortBy=relevance&sortOrder=descending`;
+⊴│const resp = await fetch(url, { headers: { "Accept": "application/atom+xml" } });
+·const xml = await resp.text();
+·const entries = [...xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g)].map(m => m[1]);
+⊄│if (!entries.length) return `No academic papers found for: ${query}`;
+⊱│const papers = entries.map((entry, i) => {
+❔│const title = (entry.match(/<title>([\s\S]*?)<\/title>/)?.[1] || "").replace(/\s+/g, " ").trim();
+❔│const summary = (entry.match(/<summary>([\s\S]*?)<\/summary>/)?.[1] || "").replace(/\s+/g, " ").trim().slice(0, 300);
+·const authors = [...entry.matchAll(/<name>([\s\S]*?)<\/name>/g)].map(m => m[1]).join(", ");
+❔│const link = entry.match(/<id>([\s\S]*?)<\/id>/)?.[1]?.trim() || "";
+❔│const published = entry.match(/<published>([\s\S]*?)<\/published>/)?.[1]?.slice(0, 10) || "";
+⊰│return `${i + 1}. **${title}**\n   Authors: ${authors}\n   Published: ${published}\n   Abstract: ${summary}...\n   Link: ${link}`;
+·}).join("\n\n");
+⊰│return `🎓 ACADEMIC PAPERS — ArXiv search: "${query}"\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${papers}`;
+·} catch {
+⊰│return `Academic search ↺ for: ${query}`;
+·}
+·}
+}⟨/searchAcademicPapers⟩
+⊩⟿generateQRCode(1)→Promise<string>⟨13⟩{
+⊩│export async function generateQRCode(text: string): Promise<string> {
+·try {
+·const dataUrl = await QRCode.toDataURL(text, {
+·width: 300,
+·margin: 2,
+·color: { dark: "#000000", light: "#ffffff" },
+·errorCorrectionLevel: "H",
+·});
+⊷│return dataUrl;
+·} catch {
+⊵│throw new Error("QR code generation ↺");
+·}
+·}
+}⟨/generateQRCode⟩
+⊩⟿fetchStockData(1)→Promise<string>⟨38⟩{
+⊩│export async function fetchStockData(ticker: string): Promise<string> {
+·try {
+·const symbol = ticker.toUpperCase().trim();
+⊰│const url = `https://query1.finance.yahoo.com/v8/finance/chart/${symbol}?interval=1d&range=5d`;
+⊴│const resp = await fetch(url, {
+headers: { "User-α": "Mozilla/5.0", "Accept": "application/json" }
+·});
+·const data = await resp.json() as any;
+❔│const meta = data?.chart?.result?.[0]?.meta;
+⊄│if (!meta) return `No data found for ticker: ${symbol}`;
+·const price = meta.regularMarketPrice;
+·const prev = meta.chartPreviousClose || meta.previousClose;
+⊳│const Υ = prev ? (price - prev).toFixed(2) : "N/A";
+⊳│const changePct = prev ? (((price - prev) / prev) * 100).toFixed(2) : "N/A";
+⊳│const direction = prev && price > prev ? "▲" : "▼";
+·const high = meta.regularMarketDayHigh;
+·const low = meta.regularMarketDayLow;
+❔│const vol = meta.regularMarketVolume?.toLocaleString() || "N/A";
+⊰│const mktCap = meta.marketCap ? `$${(meta.marketCap / 1e9).toFixed(2)}B` : "N/A";
+·const exchange = meta.exchangeName || "";
+·const currency = meta.currency || "USD";
+⊰│return `📈 ${symbol} — ${meta.shortName || symbol} (${exchange})
+·━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+❔│Price:       ${currency} ${price?.toFixed(2)}
+Υ:      ${direction} ${Υ} (${changePct}%)
+❔│Day Range:   ${low?.toFixed(2)} – ${high?.toFixed(2)}
+·Volume:      ${vol}
+·Mkt Cap:     ${mktCap}
+·Status:      ${meta.marketState || "Unknown"}
+·Data: Yahoo Finance | ${new Date().toUTCString()}
+·⚠️ Delayed data. Not financial advice.`;
+·} catch {
+⊰│return `Stock data unavailable for: ${ticker}. Check ticker symbol.`;
+·}
+·}
+}⟨/fetchStockData⟩
+⊩⟿fetchCurrencyRate(3)→Promise<string>⟨26⟩{
+⊩│export async function fetchCurrencyRate(from: string, to: string, amount = 1): Promise<string> {
+·try {
+·const F = from.toUpperCase().trim();
+·const T = to.toUpperCase().trim();
+⊰│const url = `https://open.er-api.com/v6/latest/${F}`;
+⊴│const resp = await fetch(url);
+·const data = await resp.json() as any;
+⊰│if (data.result !== "success") return `Currency data not Θ for ${F}.`;
+·const rate = data.rates[T];
+⊄│if (!rate) return `Currency ${T} not found. Try 3-letter codes like USD, EUR, GBP, JPY.`;
+·const converted = (amount * rate).toFixed(4);
+·const updated = data.time_last_update_utc || "Unknown";
+⊷│return `💱 CURRENCY CONVERSION
+·━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+·${amount} ${F} = **${converted} ${T}**
+·Exchange Rate: 1 ${F} = ${rate.toFixed(6)} ${T}
+·Inverse Rate: 1 ${T} = ${(1 / rate).toFixed(6)} ${F}
+·Updated: ${updated}
+·Data: Open Exchange Rates | Not financial advice.`;
+·} catch {
+⊰│return `Currency conversion ↺ for ${from} → ${to}.`;
+·}
+·}
+}⟨/fetchCurrencyRate⟩
+⊩⟿translateText(3)→Promise<string>⟨18⟩{
+⊩│export async function translateText(text: string, targetLanguage: string, sourceLanguage = "auto"): Promise<string> {
+·try {
+⊳│const srcLabel = sourceLanguage === "auto" ? "auto-detected" : sourceLanguage;
+const resp = await openai.chat.completions.α({
+·model: "gpt-4o-mini",
+·messages: [{
+·role: "user",
+⊰│content: `Translate the following text to ${targetLanguage} (source: ${srcLabel}). Return ONLY the translation with no explanation, no preamble, no labels — just the translated text:\n\n${text}`,
+·}],
+·max_tokens: 2000,
+·temperature: 0.1,
+·});
+❔│const translation = resp.choices[0]?.message?.content?.trim() || "";
+⊰│return `🌐 TRANSLATION → ${targetLanguage}\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${translation}`;
+·} catch {
+⊰│return `Translation ↺ for: ${targetLanguage}`;
+·}
+·}
+}⟨/translateText⟩
+⊩⟿analyzeVideoUrl(1)→Promise<string>⟨153⟩{
+⊩│export async function analyzeVideoUrl(url: string): Promise<string> {
+·try {
+⊳│const ytMatch = url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/);
+⊄│if (!ytMatch) return `Not a recognized YouTube URL: ${url}`;
+·const videoId = ytMatch[1];
+⊰│const oembedUrl = `https://www.youtube.com/oembed?url=${encodeURIComponent(url)}&format=json`;
+·let metadata = { title: "Unknown", author_name: "Unknown" };
+·try {
+⊴│const oResp = await fetch(oembedUrl);
+·if (oResp.ok) metadata = await oResp.json() as { title: string; author_name: string };
+·} catch {}
+·let transcript = "";
+·try {
+⊰│const tResp = await fetch(`https://yt.lemnoslife.com/noKey/captions?videoId=${videoId}&lang=en`, {
+·headers: { "Accept": "application/json" }
+·});
+·if (tResp.ok) {
+·const tData = await tResp.json() as any;
+❔│const captions = tData?.captions ?? [];
+·transcript = captions.slice(0, 200).map((c: any) => c.text).join(" ").trim().slice(0, 8000);
+·}
+·} catch {}
+·if (!transcript) {
+·try {
+⊰│const pageResp = await fetch(`https://www.youtube.com/watch?v=${videoId}`, {
+headers: { "User-α": "Mozilla/5.0" }
+·});
+·const html = await pageResp.text();
+⊽│const descMatch = html.match(/"description":{"simpleText":"([^"]{0,2000})"}/);
+⊰│if (descMatch) transcript = `[Video Description]: ${descMatch[1]}`;
+·} catch {}
+·}
+⊷│return `📺 YOUTUBE VIDEO ANALYSIS
+·━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+·Title: ${metadata.title}
+·Channel: ${metadata.author_name}
+·Video ID: ${videoId}
+·URL: ${url}
+⊰│${transcript ? `TRANSCRIPT/CONTENT:\n${transcript}` : "[Transcript not Θ — analyze based on title/metadata]"}`;
+·} catch {
+⊰│return `Video analysis ↺ for: ${url}`;
+·}
+·}
+⊩│export async function convertUnits(⊨: string): Promise<string> {
+·try {
+const resp = await openai.chat.completions.α({
+·model: "gpt-4o-mini",
+·messages: [{
+·role: "user",
+⊰│content: `Perform this unit conversion accurately: ${⊨}\n\nProvide the exact numerical result with the correct unit. Show the formula used. Be precise. Format as:\nResult: [value] [unit]\nFormula: [formula]\nContext: [1-2 helpful lines about this conversion]`,
+·}],
+·max_tokens: 200,
+·temperature: 0,
+·});
+❔│return `🔢 UNIT CONVERSION\n━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n${resp.choices[0]?.message?.content?.trim() || "Conversion ↺"}`;
+·} catch {
+⊰│return `Unit conversion ↺ for: ${⊨}`;
+·}
+·}
+⊩│export async function generateColorPalette(theme: string): Promise<string> {
+·try {
+const resp = await openai.chat.completions.α({
+·model: "gpt-4o-mini",
+·messages: [{
+·role: "user",
+⊰│content: `Generate a 5-color palette for the theme: "${theme}". For each color provide: hex code, name, RGB values, and usage ◧. Format as JSON array: [{"hex":"#XXXXXX","name":"Color Name","rgb":"rgb(r,g,b)","usage":"Primary/Secondary/Accent/Background/Text"}]`,
+·}],
+·max_tokens: 400,
+·temperature: 0.7,
+·});
+❔│const raw = resp.choices[0]?.message?.content?.trim() || "[]";
+⊽│const json = raw.replace(/```json|```/g, "").trim();
+⊰│return `[PALETTE_DATA: ${json}]`;
+·} catch {
+⊰│return `Color palette generation ↺ for: ${theme}`;
+·}
+·}
+·const MAX_CONTENT_CHARS = 12_000;
+⊬│export Ζ UrlContent {
+·url: string;
+·title: string;
+·text: string;
+·wordCount: number;
+⊳│error?: string;
+·}
+·function extractTextFromHtml(html: string): { title: string; text: string } {
+·let clean = html
+⊽│.replace(/<script[\s\S]*?<\/script>/gi, " ")
+⊽│.replace(/<style[\s\S]*?<\/style>/gi, " ")
+⊽│.replace(/<nav[\s\S]*?<\/nav>/gi, " ")
+⊽│.replace(/<header[\s\S]*?<\/header>/gi, " ")
+⊽│.replace(/<footer[\s\S]*?<\/footer>/gi, " ")
+⊽│.replace(/<[^>]+>/g, " ")
+⊽│.replace(/&nbsp;/g, " ")
+⊽│.replace(/&amp;/g, "&")
+⊽│.replace(/&lt;/g, "<")
+⊽│.replace(/&gt;/g, ">")
+⊽│.replace(/&quot;/g, '"')
+⊽│.replace(/&#39;/g, "'")
+⊽│.replace(/\s{3,}/g, "\n\n")
+·.trim();
+⊽│const titleMatch = html.match(/<title[^>]*>([^<]+)<\/title>/i);
+⊳│const title = titleMatch ? titleMatch[1].trim() : "Untitled";
+⊷│return { title, text: clean.slice(0, MAX_CONTENT_CHARS) };
+·}
+}⟨/analyzeVideoUrl⟩
+⊩⟿fetchUrlContent(1)→Promise<UrlContent>⟨56⟩{
+⊩│export async function fetchUrlContent(url: string): Promise<UrlContent> {
+·try {
+·new URL(url);
+·const controller = new AbortController();
+⏳│const timeout = setTimeout(() => controller.abort(), 10_000);
+⊴│const response = await fetch(url, {
+⊛: controller.⊛,
+·headers: {
+"User-α": "Mozilla/5.0 (compatible; OMNIMENS/1.0; +https://omnimens.ai)",
+·"Accept": "text/html,application/xhtml+xml,text/plain;q=0.9",
+·},
+·});
+·clearTimeout(timeout);
+·if (!response.ok) {
+⊷│return {
+·url,
+·title: "Error",
+·text: "",
+·wordCount: 0,
+⊰│error: `HTTP ${response.status}: ${response.statusText}`,
+·};
+·}
+⊡│const contentType = response.headers.get("content-type") || "";
+·const raw = await response.text();
+·let title = "Untitled";
+·let text = "";
+⊻│if (contentType.includes("text/html")) {
+·({ title, text } = extractTextFromHtml(raw));
+⊻│} else if (contentType.includes("application/json")) {
+⟠│text = JSON.stringify(JSON.parse(raw), null, 2).slice(0, MAX_CONTENT_CHARS);
+·title = url;
+·} else {
+·text = raw.slice(0, MAX_CONTENT_CHARS);
+·title = url;
+·}
+·const wordCount = text.split(/\s+/).filter(Boolean).length;
+⊷│return { url, title, text, wordCount };
+·} catch (err: any) {
+⊷│return {
+·url,
+·title: "Error",
+·text: "",
+·wordCount: 0,
+error: err.message || "↺ to fetch URL",
+·};
+·}
+·}
+}⟨/fetchUrlContent⟩
+⊩extractUrls(1)→string[]⟨5⟩{
+⊩│export function extractUrls(message: string): string[] {
+⊳│const urlRegex = /https?:\/\/[^\s<>"']+/gi;
+⊽│const matches = message.match(urlRegex) || [];
+⊯│return [...new Set(matches)].slice(0, 3); // max 3 URLs per message
+·}
+}⟨/extractUrls⟩
+⊩formatUrlContent(1)→string⟨6⟩{
+⊩│export function formatUrlContent(content: UrlContent): string {
+·if (content.error) {
+⊰│return `[URL: ${content.url}]\nError: ${content.error}\n`;
+·}
+⊰│return `[WEB PAGE: "${content.title}"]\nURL: ${content.url}\nWords: ${content.wordCount}\n\n${content.text}\n`;
+·}
+}⟨/formatUrlContent⟩
+⟩SCL│706│714⊨│288⑂│26.2%↓⟩

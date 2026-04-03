@@ -1,4 +1,10 @@
 ⟨SCL v1│swarmIntelligenceModule_gen1.mjs│15→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩swarmIntelligenceModule(1)→void⟨6⟩{⊩⊷}
-⟩SCL│3│3⊨│2⑂│80.0%↓⟩
+⊩swarmIntelligenceModule(1)→void⟨6⟩{
+⊩│export function swarmIntelligenceModule(agents) {
+·const swarmParams = { inertia: 0.5, cognitive: 1.5, social: 1.5 };
+agents.forEach(α => α.update(swarmParams));
+⊷│return agents;
+·}
+}⟨/swarmIntelligenceModule⟩
+⟩SCL│9│7⊨│2⑂│40.0%↓⟩

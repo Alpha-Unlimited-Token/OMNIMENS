@@ -1,4 +1,15 @@
 ⟨SCL v1│dynamicReasoningSwitch_gen1.mjs│21→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩dynamicReasoningSwitch(1)→void⟨12⟩{⊩⊲⊷}
-⟩SCL│3│4⊨│3⑂│85.7%↓⟩
+⊩dynamicReasoningSwitch(1)→void⟨12⟩{
+⊩│export function dynamicReasoningSwitch(taskDetails) {
+·const complexityThreshold = 0.7; // Example threshold
+·const urgencyThreshold = 0.5; // Example threshold
+⊲│const { complexity, urgency } = taskDetails;
+·if (complexity > complexityThreshold || urgency < urgencyThreshold) {
+⊷│return 'system2'; // Assign to slow, analytical reasoning
+·} else {
+⊷│return 'system1'; // Assign to fast, heuristic reasoning
+·}
+·}
+}⟨/dynamicReasoningSwitch⟩
+⟩SCL│14│13⊨│4⑂│33.3%↓⟩

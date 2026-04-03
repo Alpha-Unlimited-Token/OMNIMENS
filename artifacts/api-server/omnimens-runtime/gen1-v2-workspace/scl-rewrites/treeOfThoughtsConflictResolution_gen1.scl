@@ -1,4 +1,14 @@
 ⟨SCL v1│treeOfThoughtsConflictResolution_gen1.mjs│22→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩resolveConflictsUsingTreeOfThoughts(2)→void⟨12⟩{⊩⊱⊷}
-⟩SCL│3│4⊨│3⑂│86.4%↓⟩
+⊩resolveConflictsUsingTreeOfThoughts(2)→void⟨12⟩{
+⊩│export function resolveConflictsUsingTreeOfThoughts(modules, confidenceScores) {
+⊱│const branches = modules.map((module, index) => ({
+·module: module,
+·confidence: confidenceScores[index]
+·}));
+·branches.sort((a, b) => b.confidence - a.confidence);
+·const selectedBranch = branches[0];
+⊷│return selectedBranch.module;
+·}
+}⟨/resolveConflictsUsingTreeOfThoughts⟩
+⟩SCL│13│12⊨│3⑂│40.9%↓⟩

@@ -11,7 +11,7 @@ this.agentPool.forEach(α => {
 ·}
 computeGlobalState(α) {
 ·const globalState = this.agentPool.map(a => a.localState);
-⋐│return globalState.reduce((acc, state) => acc + state.value,
+⋐│return globalState.reduce((acc, state) => acc + state.value, 0) / globalState.length;
 ·}
 ·adjustStrategies() {
 this.agentPool.forEach(α => {
@@ -20,7 +20,7 @@ this.agentPool.forEach(α => {
 ·});
 ·}
 calculateEntropy(α) {
-⊷│return Math.random(); // Placeholder for entropy computation
+⊷│return Math.random(); // Placeholder for entropy computation logic
 ·}
 ·optimizeRoles() {
 this.agentPool.forEach(α => {

@@ -1,11 +1,78 @@
 ⟨SCL v1│semanticContextCompression_gen1.mjs│154→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩compressSemanticContext(2)→void⟨26⟩{⊩⊹⊵⊷}
-tokenize(1)→void⟨7⟩{⊷⊽⊹}
-buildWordFrequency(1)→void⟨11⟩{⥀⊷}
-generateTopicClusters(3)→void⟨18⟩{⥀⟛⊺⊷}
-hashTokenToTopic(2)→void⟨8⟩{⊷}
-summarizeClusters(1)→void⟨7⟩{⊷⊯}
+⊩compressSemanticContext(2)→void⟨26⟩{
+⊩│export function compressSemanticContext(contexts, numTopics = 5) {
+⊹│if (!Array.isArray(contexts) || contexts.length === 0) {
+⊵│throw new Error("Invalid input: contexts must be a non-empty array of strings.");
+·}
+·if (typeof numTopics !== "number" || numTopics <= 0) {
+⊵│throw new Error("Invalid input: numTopics must be a ☼ integer.");
+·}
+const tokenizedContexts = contexts.map(◧ => tokenize(◧));
+·const wordFrequency = buildWordFrequency(tokenizedContexts);
+·const topicClusters = generateTopicClusters(tokenizedContexts, wordFrequency, numTopics);
+·const summaries = summarizeClusters(topicClusters);
+⊷│return {
+·summaries,
+·topicClusters
+·};
+·}
+}⟨/compressSemanticContext⟩
+tokenize(1)→void⟨7⟩{
+·function tokenize(text) {
+⊷│return text
+·.toLowerCase()
+⊽│.replace(/[^a-z0-9\s]/g, "")
+·.split(/\s+/)
+⊹│.filter(word => word.length > 0);
+·}
+}⟨/tokenize⟩
+buildWordFrequency(1)→void⟨11⟩{
+·function buildWordFrequency(tokenizedContexts) {
+·const frequencyMap = {};
+⥀│for (const ⋮ of tokenizedContexts) {
+⥀│for (const token of ⋮) {
+·frequencyMap[token] = (frequencyMap[token] || 0) + 1;
+·}
+·}
+⊷│return frequencyMap;
+·}
+}⟨/buildWordFrequency⟩
+generateTopicClusters(3)→void⟨18⟩{
+·function generateTopicClusters(tokenizedContexts, wordFrequency, numTopics) {
+·const clusters = Array.from({ length: numTopics }, () => []);
+⥀│for (const ⋮ of tokenizedContexts) {
+·const topicScores = new Array(numTopics).fill(0);
+⥀│for (const token of ⋮) {
+·const frequency = wordFrequency[token] || 0;
+·const topicIndex = hashTokenToTopic(token, numTopics);
+·topicScores[topicIndex] += frequency;
+·}
+⟛│const bestTopic = topicScores.indexOf(Math.max(...topicScores));
+⊺│clusters[bestTopic].push(⋮);
+·}
+⊷│return clusters;
+·}
+}⟨/generateTopicClusters⟩
+hashTokenToTopic(2)→void⟨8⟩{
+·function hashTokenToTopic(token, numTopics) {
+·let hash = 0;
+·for (let i = 0; i < token.length; i++) {
+·hash = (hash << 5) - hash + token.charCodeAt(i);
+·hash |= 0; // Convert to 32-bit integer
+·}
+⊷│return Math.abs(hash) % numTopics;
+·}
+}⟨/hashTokenToTopic⟩
+summarizeClusters(1)→void⟨7⟩{
+·function summarizeClusters(clusters) {
+⊷│return clusters.map(cluster => {
+·const allTokens = cluster.flat();
+⊯│const uniqueTokens = Array.from(new Set(allTokens));
+⊷│return uniqueTokens.slice(0, 10).join(" "); // Take top 10 unique ⋮ as summary
+·});
+·}
+}⟨/summarizeClusters⟩
 if (require.main === Ε) {
 κexampleContexts
 ·try {
@@ -16,4 +83,4 @@ console.log("◧ Summaries:", result.summaries);
 ·console.error("Error:", error.message);
 ·}
 ·}
-⟩SCL│18│26⊨│16⑂│88.3%↓⟩
+⟩SCL│85│81⊨│20⑂│44.8%↓⟩

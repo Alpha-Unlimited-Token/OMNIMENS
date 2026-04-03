@@ -1,0 +1,180 @@
+{
+  "timestamp": 1775237388623,
+  "generator": "gen1v2",
+  "totalFiles": 100,
+  "decoded": 100,
+  "syntaxValid": 78,
+  "transpiled": 100,
+  "executed": 67,
+  "failed": 33,
+  "errors": [
+    {
+      "file": "adaptiveApiCache_gen1.scl",
+      "stage": "syntax",
+      "error": "Unexpected token ';'"
+    },
+    {
+      "file": "adaptiveApiCachingProxy_gen1.scl",
+      "stage": "syntax",
+      "error": "Unexpected token ';'"
+    },
+    {
+      "file": "adaptiveLearningModule_gen1.scl",
+      "stage": "syntax",
+      "error": "Unexpected token ';'"
+    },
+    {
+      "file": "adaptiveRateLimitedCaching_gen1.scl",
+      "stage": "syntax",
+      "error": "Unexpected token '{'"
+    },
+    {
+      "file": "adversarialCounterfactualGenerator_gen1.scl",
+      "stage": "syntax",
+      "error": "Rest parameter must be last formal parameter"
+    },
+    {
+      "file": "adversarialDefenseMechanism_gen1.scl",
+      "stage": "syntax",
+      "error": "Illegal return statement"
+    },
+    {
+      "file": "adversarialEdgeCaseTester_gen1.scl",
+      "stage": "syntax",
+      "error": "Unexpected token 'case'"
+    },
+    {
+      "file": "adversarialSelfTest_gen1.scl",
+      "stage": "syntax",
+      "error": "Unexpected token ':'"
+    },
+    {
+      "file": "adversarialStressTester_gen1.scl",
+      "stage": "execute",
+      "error": "Cannot read properties of undefined (reading 'addTestCase')"
+    },
+    {
+      "file": "adversarialToolTester_gen1.scl",
+      "stage": "execute",
+      "error": "Cannot read properties of undefined (reading 'addTestCase')"
+    },
+    {
+      "file": "adversarialToolTesting_gen1.scl",
+      "stage": "execute",
+      "error": "Cannot read properties of undefined (reading 'addTestCase')"
+    },
+    {
+      "file": "alphaEvolve_gen1.scl",
+      "stage": "execute",
+      "error": "Cannot read properties of undefined (reading 'initializePopulation')"
+    },
+    {
+      "file": "apiBatchingOptimizer_gen1.scl",
+      "stage": "syntax",
+      "error": "Unexpected token ';'"
+    },
+    {
+      "file": "attention-system.scl",
+      "stage": "syntax",
+      "error": "Unexpected identifier 'targets'"
+    },
+    {
+      "file": "bayesianConfidenceModule_gen1.scl",
+      "stage": "execute",
+      "error": "Cannot read properties of undefined (reading 'setPrior')"
+    },
+    {
+      "file": "bayesianEvaluator_gen1.scl",
+      "stage": "syntax",
+      "error": "Unexpected token ')'"
+    },
+    {
+      "file": "bayesianInferenceModule_gen1.scl",
+      "stage": "syntax",
+      "error": "Unexpected token ')'"
+    },
+    {
+      "file": "bayesianUncertaintyEvaluator_gen1.scl",
+      "stage": "syntax",
+      "error": "Unexpected token ')'"
+    },
+    {
+      "file": "bayesianUncertaintyModule_gen1.scl",
+      "stage": "syntax",
+      "error": "Unexpected token ')'"
+    },
+    {
+      "file": "bayesianUncertaintyQuantification_gen1.scl",
+      "stage": "syntax",
+      "error": "Unexpected token ','"
+    },
+    {
+      "file": "bayesianUncertaintyTransfer_gen1.scl",
+      "stage": "execute",
+      "error": "Cannot read properties of undefined (reading 'transferKnowledge')"
+    },
+    {
+      "file": "boundedAutonomyModule_gen1.scl",
+      "stage": "syntax",
+      "error": "Unexpected token ','"
+    },
+    {
+      "file": "branchEvaluator_gen1.scl",
+      "stage": "execute",
+      "error": "Cannot read properties of undefined (reading 'addBranch')"
+    },
+    {
+      "file": "checkpointedComputationManager_gen1.scl",
+      "stage": "syntax",
+      "error": "Unexpected token ')'"
+    },
+    {
+      "file": "coalaMemoryConsolidation_gen1.scl",
+      "stage": "execute",
+      "error": "Cannot read properties of undefined (reading 'categorizeMemory')"
+    },
+    {
+      "file": "communication-hub.scl",
+      "stage": "syntax",
+      "error": "Unexpected identifier 'subscriptions'"
+    },
+    {
+      "file": "computationalTradeoffEvaluator_gen1.scl",
+      "stage": "execute",
+      "error": "Cannot read properties of undefined (reading 'registerModule')"
+    },
+    {
+      "file": "confidenceCalibratedCompute_gen1.scl",
+      "stage": "execute",
+      "error": "Cannot read properties of undefined (reading 'subscribe')"
+    },
+    {
+      "file": "consciousness-engine.scl",
+      "stage": "syntax",
+      "error": "Unexpected identifier 'state'"
+    },
+    {
+      "file": "contextCompression_gen1.scl",
+      "stage": "syntax",
+      "error": "Unexpected token '{'"
+    },
+    {
+      "file": "contextSummarization_gen1.scl",
+      "stage": "syntax",
+      "error": "Unexpected token ']'"
+    },
+    {
+      "file": "continuousWorkerManager_gen1.scl",
+      "stage": "execute",
+      "error": "isMainThread is not defined"
+    },
+    {
+      "file": "conversationContextCompressor_gen1.scl",
+      "stage": "syntax",
+      "error": "Unexpected token ';'"
+    }
+  ],
+  "totalDecodedLines": 3070,
+  "totalOriginalLines": 5660,
+  "overallCompressionPercent": 45.8
+}

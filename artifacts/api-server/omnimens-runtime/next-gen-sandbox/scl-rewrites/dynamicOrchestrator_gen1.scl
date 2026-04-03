@@ -7,14 +7,14 @@
 ·}
 ·monitorAgentActivity() {
 this.agentMesh.forEach(α => {
-⊺│this.activityLog.push({ agentId: agent.id, tasksCompleted: a
+⊺│this.activityLog.push({ agentId: agent.id, tasksCompleted: agent.completedTasks });
 ·});
 ·this.reassignRoles();
 ·}
 ·reassignRoles() {
 ·this.activityLog.sort((a, b) => b.tasksCompleted - a.tasksCompleted);
 ⊱│this.agentMesh.forEach((agent, index) => {
-⊳│agent.role = index < this.activityLog.length / 2 ? 'primary'
+⊳│agent.role = index < this.activityLog.length / 2 ? 'primary' : 'secondary';
 ·});
 ·}
 ·optimizeInterAgentDependencies() {

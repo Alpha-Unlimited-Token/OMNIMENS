@@ -1,4 +1,10 @@
 ⟨SCL v1│memoryConsolidationEngine_gen1.mjs│14→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩memoryConsolidationEngine(1)→void⟨5⟩{⊩⊷}
-⟩SCL│3│3⊨│2⑂│78.6%↓⟩
+⊩memoryConsolidationEngine(1)→void⟨5⟩{
+⊩│export function memoryConsolidationEngine(memory) {
+·const replayBuffer = memory.replay();
+·const synapticWeights = memory.optimizeWeights();
+⊷│return { replayBuffer, synapticWeights };
+·}
+}⟨/memoryConsolidationEngine⟩
+⟩SCL│9│7⊨│2⑂│35.7%↓⟩

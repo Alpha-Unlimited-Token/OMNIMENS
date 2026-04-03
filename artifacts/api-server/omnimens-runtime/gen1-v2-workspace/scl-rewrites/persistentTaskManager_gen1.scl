@@ -2,10 +2,67 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
 κtaskStateStore
-⊩generateTaskId(2)→void⟨5⟩{⊩⟠⊷}
-⊩addTask(3)→void⟨11⟩{⊩⊵⊡}
-⊩executeTaskChunk(2)→void⟨21⟩{⊩⊡⊵⊲⟛}
-⊩getTaskState(1)→void⟨10⟩{⊩⊡⊵⊷}
-⊩removeTask(1)→void⟨6⟩{⊩⊵}
-⊩listTasks(1)→void⟨3⟩{⊩⊷}
-⟩SCL│10│27⊨│19⑂│90.7%↓⟩
+⊩generateTaskId(2)→void⟨5⟩{
+⊩│export function generateTaskId(taskName, taskData) {
+·const hash = createHash('sha256');
+⟠│hash.update(taskName + JSON.stringify(taskData));
+⊷│return hash.digest('hex');
+·}
+}⟨/generateTaskId⟩
+⊩addTask(3)→void⟨11⟩{
+⊩│export function addTask(taskId, taskData, taskFunction) {
+·if (taskStateStore.has(taskId)) {
+⊵│throw new Error('Task with this ID already exists.');
+·}
+⊡│taskStateStore.set(taskId, {
+·taskData,
+·taskFunction,
+·progress: 0,
+·completed: false
+·});
+·}
+}⟨/addTask⟩
+⊩executeTaskChunk(2)→void⟨21⟩{
+⊩│export function executeTaskChunk(taskId, chunkSize) {
+⊡│const taskState = taskStateStore.get(taskId);
+·if (!taskState) {
+⊵│throw new Error('Task not found.');
+·}
+·if (taskState.completed) {
+⊵│throw new Error('Task already completed.');
+·}
+⊲│const { taskData, taskFunction, progress } = taskState;
+⟛│const newProgress = Math.min(progress + chunkSize, 100);
+·taskFunction(taskData, progress, newProgress);
+·taskState.progress = newProgress;
+·if (newProgress === 100) {
+·taskState.completed = true;
+·}
+·}
+}⟨/executeTaskChunk⟩
+⊩getTaskState(1)→void⟨10⟩{
+⊩│export function getTaskState(taskId) {
+⊡│const taskState = taskStateStore.get(taskId);
+·if (!taskState) {
+⊵│throw new Error('Task not found.');
+·}
+⊷│return {
+·progress: taskState.progress,
+·completed: taskState.completed
+·};
+·}
+}⟨/getTaskState⟩
+⊩removeTask(1)→void⟨6⟩{
+⊩│export function removeTask(taskId) {
+·if (!taskStateStore.has(taskId)) {
+⊵│throw new Error('Task not found.');
+·}
+·taskStateStore.delete(taskId);
+·}
+}⟨/removeTask⟩
+⊩listTasks(1)→void⟨3⟩{
+⊩│export function listTasks() {
+⊷│return Array.from(taskStateStore.keys());
+·}
+}⟨/listTasks⟩
+⟩SCL│67│72⊨│20⑂│38.0%↓⟩

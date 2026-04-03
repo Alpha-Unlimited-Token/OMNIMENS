@@ -1,11 +1,72 @@
 ⟨SCL v1│localSymbolicReasoner_gen1.mjs│117→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 κruleDatabase
-⊩addRule(3)→void⟨6⟩{⊩⊵⊺}
-⊩forwardChaining(1)→void⟨20⟩{⊩⊵⊯⥀⊷}
-⊩backwardChaining(2)→void⟨19⟩{⊩⊵⊷⥀}
-⊩listRules(1)→void⟨3⟩{⊩⊷}
-⊩clearRules(1)→void⟨3⟩{⊩⊹}
-⊩factsToString(1)→void⟨6⟩{⊩⊵⊷}
-⊩ruleExists(1)→void⟨3⟩{⊩⊷}
-⟩SCL│10│29⊨│21⑂│91.5%↓⟩
+⊩addRule(3)→void⟨6⟩{
+⊩│export function addRule(ruleName, conditions, conclusion) {
+·if (!ruleName || !Array.isArray(conditions) || !conclusion) {
+⊵│throw new Error("Invalid rule definition. Ensure ruleName, conditions, and conclusion are provided.");
+·}
+⊺│ruleDatabase.push({ ruleName, conditions, conclusion });
+·}
+}⟨/addRule⟩
+⊩forwardChaining(1)→void⟨20⟩{
+⊩│export function forwardChaining(knownFacts) {
+·if (!(knownFacts instanceof Set)) {
+⊵│throw new Error("knownFacts must be a Set.");
+·}
+⊯│let newFacts = new Set([...knownFacts]);
+·let inferred;
+·do {
+·inferred = false;
+⥀│for (const rule of ruleDatabase) {
+if (rule.conditions.every(∨ => newFacts.has(∨)) && !newFacts.has(rule.conclusion)) {
+·newFacts.add(rule.conclusion);
+·inferred = true;
+·}
+·}
+·} while (inferred);
+⊷│return newFacts;
+·}
+}⟨/forwardChaining⟩
+⊩backwardChaining(2)→void⟨19⟩{
+⊩│export function backwardChaining(goal, knownFacts) {
+·if (!goal || !(knownFacts instanceof Set)) {
+⊵│throw new Error("Invalid arguments. Ensure goal is a string and knownFacts is a Set.");
+·}
+·if (knownFacts.has(goal)) {
+⊷│return true;
+·}
+⥀│for (const rule of ruleDatabase) {
+·if (rule.conclusion === goal) {
+if (rule.conditions.every(∨ => backwardChaining(∨, knownFacts))) {
+⊷│return true;
+·}
+·}
+·}
+⊷│return false;
+·}
+}⟨/backwardChaining⟩
+⊩listRules(1)→void⟨3⟩{
+⊩│export function listRules() {
+⊷│return [...ruleDatabase];
+·}
+}⟨/listRules⟩
+⊩clearRules(1)→void⟨3⟩{
+⊩│export function clearRules() {
+⊹│ruleDatabase.length = 0;
+·}
+}⟨/clearRules⟩
+⊩factsToString(1)→void⟨6⟩{
+⊩│export function factsToString(facts) {
+·if (!(facts instanceof Set)) {
+⊵│throw new Error("facts must be a Set.");
+·}
+⊷│return Array.from(facts).join(", ");
+·}
+}⟨/factsToString⟩
+⊩ruleExists(1)→void⟨3⟩{
+⊩│export function ruleExists(ruleName) {
+⊷│return ruleDatabase.some(rule => rule.ruleName === ruleName);
+·}
+}⟨/ruleExists⟩
+⟩SCL│71│76⊨│23⑂│39.3%↓⟩

@@ -3,7 +3,7 @@
 ⊫[]
 ⊶│export class CircularBuffer {
 ·constructor(size) {
-⊵│if (size <= 0) throw new Error('Buffer size must be greater 
+⊵│if (size <= 0) throw new Error('Buffer size must be greater than 0');
 ·this.size = size;
 this.buffer = new ι(size);
 ·this.start = 0;
@@ -21,7 +21,7 @@ this.buffer = new ι(size);
 ·getAll() {
 ⊄│if (!this.isFull && this.end === this.start) return [];
 ·if (this.isFull) {
-⊷│return [...this.buffer.slice(this.start), ...this.buffer.sli
+⊷│return [...this.buffer.slice(this.start), ...this.buffer.slice(0, this.start)];
 ·}
 ⊷│return this.buffer.slice(this.start, this.end);
 ·}
@@ -68,10 +68,24 @@ this.buffer = new ι(size);
 ·} catch (error) {
 📡│this.eventEmitter.emit('error', error);
 ·}
-⏳│await new Promise((resolve) => setTimeout(resolve, this.poll
+⏳│await new Promise((resolve) => setTimeout(resolve, this.pollIntervalMs));
 ·}
 ·}
 ·}
-⊩createApiPollFunction(2)→void⟨10⟩{⊩⊵⊷⊴}
-⊩delay(1)→void⟨3⟩{⊩⏳⊷}
-⟩SCL│76│25⊨│20⑂│32.1%↓⟩
+⊩createApiPollFunction(2)→void⟨10⟩{
+⊩│export function createApiPollFunction(fetchFunction, transformFunction = (data) => data) {
+·if (typeof fetchFunction !== 'function') {
+⊵│throw new Error('fetchFunction must be a function');
+·}
+⊷│return async function() {
+⊴│const rawData = await fetchFunction();
+⊷│return transformFunction(rawData);
+·};
+·}
+}⟨/createApiPollFunction⟩
+⊩delay(1)→void⟨3⟩{
+⊩│export function delay(ms) {
+⏳│return new Promise((resolve) => setTimeout(resolve, ms));
+·}
+}⟨/delay⟩
+⟩SCL│90│34⊨│20⑂│19.6%↓⟩

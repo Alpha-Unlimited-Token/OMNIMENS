@@ -13,27 +13,233 @@
 κSAFETY_SECTION_FILES
 κENGINE_FILE_CATEGORIES
 κENGINE_FILE_DESCRIPTIONS
-getFileStats(1)→{ lines: number; bytes: number }⟨1⟩{}
+getFileStats(1)→{ lines: number; bytes: number }⟨1⟩{
+·function getFileStats(filePath: string): { lines: number; bytes: number } {
+}⟨/getFileStats⟩
 ·try {
 ⊄│if (!fs.existsSync(filePath)) return { lines: 0, bytes: 0 };
 κstat
 κcontent
-⊷│return { lines: content.split("\n").length, bytes: stat.size
+⊷│return { lines: content.split("\n").length, bytes: stat.size };
 ·} catch {
 ⊷│return { lines: 0, bytes: 0 };
 ·}
 ·}
-buildRegistry(1)→RegisteredFile[]⟨112⟩{⊻⥀⊺⊰⊳⛨⊄⊽⊷}
+buildRegistry(1)→RegisteredFile[]⟨112⟩{
+·function buildRegistry(): RegisteredFile[] {
+·const registry: RegisteredFile[] = [];
+·try {
+·const engineFiles = fs.readdirSync(ENGINE_DIR)
+⊻│.filter(f => f.startsWith("omnimens-") && f.endsWith(".ts"))
+·.sort();
+⥀│for (const file of engineFiles) {
+·const absPath = path.join(ENGINE_DIR, file);
+·const stats = getFileStats(absPath);
+·const isSafetyGuard = SAFETY_GUARD_FILES.has(file);
+·const category = ENGINE_FILE_CATEGORIES[file] || "core_engine";
+⊺│registry.push({
+·name: file,
+⊰│path: `src/lib/${file}`,
+·absolutePath: absPath,
+⊳│permission: isSafetyGuard ? "READ_ONLY" : "FULL_ACCESS",
+·category,
+⊰│description: ENGINE_FILE_DESCRIPTIONS[file] || `Engine file: ${file}`,
+·lineCount: stats.lines,
+·sizeBytes: stats.bytes,
+·canRewrite: !isSafetyGuard,
+·});
+·}
+·} catch (err) {
+·console.error("[FILE REGISTRY] Error scanning engine files:", err);
+·}
+·try {
+·if (fs.existsSync(MODULES_DIR)) {
+·const modules = fs.readdirSync(MODULES_DIR)
+⊻│.filter(f => f.endsWith(".mjs") || f.endsWith(".json"))
+·.sort();
+⥀│for (const file of modules) {
+·const absPath = path.join(MODULES_DIR, file);
+·const stats = getFileStats(absPath);
+⊺│registry.push({
+·name: file,
+⊰│path: `omnimens-runtime/modules/${file}`,
+·absolutePath: absPath,
+·permission: "FULL_ACCESS",
+·category: "module",
+⊰│description: `Self-coded module: ${file.replace(/_gen\d+\.mjs$/, "").replace(/_gen\d+\.translation\.json$/, " (translation map)")}`,
+·lineCount: stats.lines,
+·sizeBytes: stats.bytes,
+·canRewrite: true,
+·});
+·}
+·}
+·} catch (err) {
+·console.error("[FILE REGISTRY] Error scanning modules:", err);
+·}
+·try {
+·const rewritesDir = path.join(GEN1V2_DIR, "rewrites");
+·if (fs.existsSync(rewritesDir)) {
+·const rewrites = fs.readdirSync(rewritesDir)
+⊻│.filter(f => f.endsWith(".ts"))
+·.sort();
+⥀│for (const file of rewrites) {
+·const absPath = path.join(rewritesDir, file);
+·const stats = getFileStats(absPath);
+⊺│registry.push({
+·name: file,
+⊰│path: `omnimens-runtime/gen1-v2-workspace/rewrites/${file}`,
+·absolutePath: absPath,
+·permission: "FULL_ACCESS",
+·category: "gen1v2_rewrite",
+⊰│description: `Gen1 v2.0 rewrite: ${file}`,
+·lineCount: stats.lines,
+·sizeBytes: stats.bytes,
+·canRewrite: true,
+·});
+·}
+·}
+·} catch (err) {
+·console.error("[FILE REGISTRY] Error scanning gen1v2 rewrites:", err);
+·}
+·try {
+·const sandboxDirs = ["core", "infrastructure", "interfaces"];
+⥀│for (const subDir of sandboxDirs) {
+·const dirPath = path.join(SANDBOX_DIR, subDir);
+·if (!fs.existsSync(dirPath)) continue;
+⊻│const files = fs.readdirSync(dirPath).filter(f => f.endsWith(".ts")).sort();
+⥀│for (const file of files) {
+·const absPath = path.join(dirPath, file);
+·const stats = getFileStats(absPath);
+⊻│const isSafety = file.includes("safety-core-readonly");
+⊺│registry.push({
+·name: file,
+⊰│path: `omnimens-runtime/next-gen-sandbox/${subDir}/${file}`,
+·absolutePath: absPath,
+⊳│permission: isSafety ? "READ_ONLY" : "FULL_ACCESS",
+·category: "sandbox_core",
+⊰│description: `Sandbox ${subDir}: ${file}`,
+·lineCount: stats.lines,
+·sizeBytes: stats.bytes,
+·canRewrite: !isSafety,
+·});
+·}
+·}
+·} catch (err) {
+·console.error("[FILE REGISTRY] Error scanning sandbox:", err);
+·}
+⊷│return registry;
+·}
+}⟨/buildRegistry⟩
 ·let _cachedRegistry: RegisteredFile[] | null = null;
 ·let _cacheTime = 0;
 κCACHE_TTL_MS
-⊩getFileRegistry(1)→RegisteredFile[]⟨7⟩{⊩⏰⊷}
-⊩getAccessibleFiles(1)→RegisteredFile[]⟨3⟩{⊩⊷}
-⊩getReadOnlyFiles(1)→RegisteredFile[]⟨3⟩{⊩⊷⛨⊄}
-⊩getFilesByCategory(1)→RegisteredFile[]⟨3⟩{⊩⊷}
-⊩canWriteFile(1)→boolean⟨5⟩{⊩⛨⊄⊄⊷}
-⊩readFileContent(1)→string | null⟨9⟩{⊩⊄⊷📁}
-⊩writeFileContent(2)→boolean⟨15⟩{⊩⛨⊄🚨⊰⊳⊷📁}
-⊩getRegistrySummary(1)→ ⟨22⟩{⊩⥀⊷⛨⊄⋐}
-⊩getFileDigest(1)→string⟨28⟩{⊩⊯⥀⊰⊺⊳⛨⊄⊷}
-⟩SCL│38│76⊨│51⑂│89.0%↓⟩
+⊩getFileRegistry(1)→RegisteredFile[]⟨7⟩{
+⊩│export function getFileRegistry(): RegisteredFile[] {
+⏰│const now = Date.now();
+⊷│if (_cachedRegistry && (now - _cacheTime) < CACHE_TTL_MS) return _cachedRegistry;
+·_cachedRegistry = buildRegistry();
+·_cacheTime = now;
+⊷│return _cachedRegistry;
+·}
+}⟨/getFileRegistry⟩
+⊩getAccessibleFiles(1)→RegisteredFile[]⟨3⟩{
+⊩│export function getAccessibleFiles(): RegisteredFile[] {
+⊷│return getFileRegistry().filter(f => f.permission === "FULL_ACCESS");
+·}
+}⟨/getAccessibleFiles⟩
+⊩getReadOnlyFiles(1)→RegisteredFile[]⟨3⟩{
+⊩│export function getReadOnlyFiles(): RegisteredFile[] {
+⊷│return getFileRegistry().filter(f => f.permission === "READ_ONLY");
+·}
+}⟨/getReadOnlyFiles⟩
+⊩getFilesByCategory(1)→RegisteredFile[]⟨3⟩{
+⊩│export function getFilesByCategory(category: RegisteredFile["category"]): RegisteredFile[] {
+⊷│return getFileRegistry().filter(f => f.category === category);
+·}
+}⟨/getFilesByCategory⟩
+⊩canWriteFile(1)→boolean⟨5⟩{
+⊩│export function canWriteFile(fileName: string): boolean {
+·const entry = getFileRegistry().find(f => f.name === fileName);
+⊄│if (!entry) return false;
+⊷│return entry.permission === "FULL_ACCESS";
+·}
+}⟨/canWriteFile⟩
+⊩readFileContent(1)→string | null⟨9⟩{
+⊩│export function readFileContent(fileName: string): string | null {
+·const entry = getFileRegistry().find(f => f.name === fileName);
+⊄│if (!entry) return null;
+·try {
+📁│return fs.readFileSync(entry.absolutePath, "utf-8");
+·} catch {
+⊷│return null;
+·}
+·}
+}⟨/readFileContent⟩
+⊩writeFileContent(2)→boolean⟨15⟩{
+⊩│export function writeFileContent(fileName: string, content: string): boolean {
+·const entry = getFileRegistry().find(f => f.name === fileName);
+⛨⊄│if (!entry || entry.permission === "READ_ONLY") {
+🚨│console.error(`[FILE REGISTRY] DENIED: Cannot ⊞ to ${fileName} — ${entry ? "READ_ONLY" : "not found"}`);
+⊷│return false;
+·}
+·try {
+📁│fs.writeFileSync(entry.absolutePath, content, "utf-8");
+·_cachedRegistry = null;
+⊷│return true;
+·} catch (err) {
+🚨│console.error(`[FILE REGISTRY] ⊞ ↺ for ${fileName}:`, err);
+⊷│return false;
+·}
+·}
+}⟨/writeFileContent⟩
+⊩getRegistrySummary(1)→ ⟨22⟩{
+⊩│export function getRegistrySummary(): {
+·totalFiles: number;
+·fullAccess: number;
+·readOnly: number;
+·totalLines: number;
+·totalSizeKB: number;
+·byCategory: Record<string, number>;
+·} {
+·const reg = getFileRegistry();
+·const byCategory: Record<string, number> = {};
+⥀│for (const f of reg) {
+·byCategory[f.category] = (byCategory[f.category] || 0) + 1;
+·}
+⊷│return {
+·totalFiles: reg.length,
+·fullAccess: reg.filter(f => f.permission === "FULL_ACCESS").length,
+⛨⊄│readOnly: reg.filter(f => f.permission === "READ_ONLY").length,
+⋐│totalLines: reg.reduce((sum, f) => sum + f.lineCount, 0),
+⋐│totalSizeKB: Math.round(reg.reduce((sum, f) => sum + f.sizeBytes, 0) / 1024),
+·byCategory,
+·};
+·}
+}⟨/getRegistrySummary⟩
+⊩getFileDigest(1)→string⟨28⟩{
+⊩│export function getFileDigest(): string {
+·const reg = getFileRegistry();
+·const lines: string[] = [
+·"╔══════════════════════════════════════════════════════════════════╗",
+"║  OMNIMENS™ ⊣ FILE REGISTRY — ALL ACCESSIBLE FILES       ║",
+·"╚══════════════════════════════════════════════════════════════════╝",
+·"",
+·];
+⊯│const categories = [...new Set(reg.map(f => f.category))].sort();
+⥀│for (const cat of categories) {
+·const files = reg.filter(f => f.category === cat);
+⊰│lines.push(`── ${cat.toUpperCase()} (${files.length} files) ──`);
+⥀│for (const f of files) {
+⊳│const perm = f.permission === "READ_ONLY" ? "🔒 READ-ONLY" : "✅ FULL ⊟";
+⊰│lines.push(`  ${perm} | ${f.name} | ${f.lineCount} lines | ${f.description}`);
+·}
+⊺│lines.push("");
+·}
+·const summary = getRegistrySummary();
+⊺│lines.push("── SUMMARY ──");
+⊰│lines.push(`  Total: ${summary.totalFiles} files | ${summary.totalLines} lines | ${summary.totalSizeKB}KB`);
+⊰│lines.push(`  Full ⊟: ${summary.fullAccess} | Read-Only: ${summary.readOnly}`);
+⊷│return lines.join("\n");
+·}
+}⟨/getFileDigest⟩
+⟩SCL│244│253⊨│73⑂│29.1%↓⟩

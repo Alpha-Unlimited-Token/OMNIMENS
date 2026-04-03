@@ -1,5 +1,25 @@
 ⟨SCL v1│stdpLearningModule_gen1.mjs│32→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩applySTDP(3)→void⟨12⟩{⊩⊷}
-⊩consolidateMemory(2)→void⟨10⟩{⊩⚡→}
-⟩SCL│4│6⊨│4⑂│87.5%↓⟩
+⊩applySTDP(3)→void⟨12⟩{
+⊩│export function applySTDP(preSynapticSpike, postSynapticSpike, weight) {
+·const deltaT = postSynapticSpike.time - preSynapticSpike.time;
+·const learningRate = 0.01;
+·if (deltaT > 0) {
+⊷│return weight + learningRate * Math.exp(-deltaT);
+·} else {
+⊷│return weight - learningRate * Math.exp(deltaT);
+·}
+·}
+}⟨/applySTDP⟩
+⊩consolidateMemory(2)→void⟨10⟩{
+⊩│export function consolidateMemory(synapticConnections, spikeHistory) {
+·synapticConnections.forEach(connection => {
+⚡→│const preSpike = spikeHistory.find(spike => spike.id === connection.preSynaptic);
+⚡→│const postSpike = spikeHistory.find(spike => spike.id === connection.postSynaptic);
+·if (preSpike && postSpike) {
+·connection.weight = applySTDP(preSpike, postSpike, connection.weight);
+·}
+·});
+·}
+}⟨/consolidateMemory⟩
+⟩SCL│24│22⊨│6⑂│25.0%↓⟩

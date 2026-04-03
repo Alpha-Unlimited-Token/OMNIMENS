@@ -1,7 +1,13 @@
 ⟨SCL v1│apiResponseCache_gen1.mjs│111→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩generateHashKey(1)→void⟨5⟩{⊩⟠⊷}
+⊩generateHashKey(1)→void⟨5⟩{
+⊩│export function generateHashKey(input) {
+·const hash = createHash('sha256');
+⟠│hash.update(JSON.stringify(input));
+⊷│return hash.digest('hex');
+·}
+}⟨/generateHashKey⟩
 ⊶│export class LRUCache {
 ·constructor(maxSize = 100) {
 ·this.maxSize = maxSize;
@@ -11,7 +17,7 @@
 ·if (this.cache.has(key)) {
 κvalue
 ·this.cache.delete(key);
-⊡│this.cache.set(key, value); // Move to the end (most recentl
+⊡│this.cache.set(key, value); // Move to the end (most recently used)
 ⊷│return value;
 ·}
 ⊷│return null;
@@ -29,7 +35,14 @@ set(key, ≪) {
 ·this.cache.clear();
 ·}
 ·}
-⊩cosineSimilarity(2)→void⟨6⟩{⊩⋐⊷}
+⊩cosineSimilarity(2)→void⟨6⟩{
+⊩│export function cosineSimilarity(vecA, vecB) {
+⋐│const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
+⋐│const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a ** 2, 0));
+⋐│const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b ** 2, 0));
+⊷│return dotProduct / (magnitudeA * magnitudeB);
+·}
+}⟨/cosineSimilarity⟩
 ⊶│export class NamespaceCacheManager {
 ·constructor(maxSizePerNamespace = 100) {
 ⊮│this.namespaces = new Map();
@@ -41,7 +54,7 @@ set(key, ≪) {
 ·}
 set(namespace, key, ≪) {
 ·if (!this.namespaces.has(namespace)) {
-⊡│this.namespaces.set(namespace, new LRUCache(this.maxSizePerN
+⊡│this.namespaces.set(namespace, new LRUCache(this.maxSizePerNamespace));
 ·}
 ⊡│this.namespaces.get(namespace).set(key, value);
 ·}
@@ -54,5 +67,18 @@ set(namespace, key, ≪) {
 ·this.namespaces.clear();
 ·}
 ·}
-⊩findClosestEmbedding(3)→void⟨14⟩{⊩⊸⊷}
-⟩SCL│57│30⊨│22⑂│48.6%↓⟩
+⊩findClosestEmbedding(3)→void⟨14⟩{
+⊩│export function findClosestEmbedding(targetEmbedding, embeddings, threshold = 0.8) {
+·let closestMatch = null;
+·let highestSimilarity = -Infinity;
+⊸│for (const [key, embedding] of Object.entries(embeddings)) {
+·const similarity = cosineSimilarity(targetEmbedding, embedding);
+·if (similarity > highestSimilarity && similarity >= threshold) {
+·highestSimilarity = similarity;
+·closestMatch = key;
+·}
+·}
+⊷│return closestMatch;
+·}
+}⟨/findClosestEmbedding⟩
+⟩SCL│83│50⊨│24⑂│25.2%↓⟩

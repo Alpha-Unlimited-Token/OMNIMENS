@@ -12,8 +12,51 @@
 ⊬PsychosocialProfile⟨phq2Score:☼│tskScore:number;        // 17-68 (>37 = high kinesiophobia)│pcsScore:number;        // 0-52 (>30 = high catastrophizing)│depressionRisk:"low" | "moderate" | "high"│kinesiophobiaLevel:"low" | "moderate" | "high"│catastrophizingLevel:"low" | "moderate" | "high"│recommendations:string[]⟩
 ⊬OutcomeMeasure⟨measure:string│score:number│normalizedScore:number│interpretation:string│mdc:Υ│mcid:⇔│mcidReached:boolean⟩
 κRED_FLAG_KEYWORDS
-⊩screenRedFlags(1)→RedFlagScreen⟨45⟩{⊩⥀⊻⊰⊺⊷⊹}
-⊩interpretPsychosocialScores(1)→void⟨1⟩{⊩}
+⊩screenRedFlags(1)→RedFlagScreen⟨45⟩{
+⊩│export function screenRedFlags(description: string): RedFlagScreen {
+·const lower = description.toLowerCase();
+·const flags: string[] = [];
+·let urgency: RedFlagScreen["urgency"] = "none";
+⥀│for (const flag of RED_FLAG_KEYWORDS.immediate_ER) {
+⊻│if (lower.includes(flag)) {
+⊰│flags.push(`🚨 IMMEDIATE: ${flag}`);
+·urgency = "immediate_ER";
+·}
+·}
+·if (urgency !== "immediate_ER") {
+⥀│for (const flag of RED_FLAG_KEYWORDS.urgent_MD) {
+⊻│if (lower.includes(flag)) {
+⊰│flags.push(`⚠️ URGENT: ${flag}`);
+·if (urgency !== "urgent_MD") urgency = "urgent_MD";
+·}
+·}
+·}
+·if (urgency === "none") {
+⥀│for (const flag of RED_FLAG_KEYWORDS.refer_out) {
+⊻│if (lower.includes(flag)) {
+⊰│flags.push(`⚕️ REFER: ${flag}`);
+·urgency = "refer_out";
+·}
+·}
+·}
+·const recommendations: Record<RedFlagScreen["urgency"], string> = {
+·immediate_ER: "⚠️ STOP — Based on your symptoms, please go to the emergency room or call 911 immediately. Do not wait. These symptoms require urgent medical evaluation.",
+urgent_MD: "This symptom pattern requires evaluation by a physician ⏳ starting physical therapy. Please contact your doctor today or visit an urgent care clinic.",
+refer_out: "These symptoms suggest you may need specialist evaluation. I recommend seeing your doctor ⏳ continuing rehabilitation exercises.",
+·monitor: "Some concerning symptoms noted. Please monitor closely and contact your doctor if they worsen.",
+·none: "",
+·};
+⊷│return {
+⊹│flagsPresent: flags.length > 0,
+·flags,
+·urgency,
+·recommendation: recommendations[urgency],
+·};
+·}
+}⟨/screenRedFlags⟩
+⊩interpretPsychosocialScores(1)→void⟨1⟩{
+⊩│export function interpretPsychosocialScores(
+}⟨/interpretPsychosocialScores⟩
 ·phq2: number,
 ·tsk: number,
 ·pcs: number
@@ -23,23 +66,23 @@
 κcatastrophizingLevel
 κrecommendations
 ·if (depressionRisk === "high") {
-⊺│recommendations.push("PHQ-2 positive — consider referral to 
-⊺│recommendations.push("Use positive reinforcement and celebra
-⊺│recommendations.push("Focus on activity engagement over pain
+⊺│recommendations.push("PHQ-2 positive — consider referral to mental health support alongside physical therapy");
+⊺│recommendations.push("Use positive reinforcement and celebrate small wins in every session");
+⊺│recommendations.push("Focus on activity engagement over pain elimination");
 ·}
 ·if (kinesiophobiaLevel === "high") {
-⊺│recommendations.push("High fear of movement detected (kinesi
-⊺│recommendations.push("Use graded exposure: start very low in
-⊺│recommendations.push("Explicitly reassure patient that hurt 
-⊺│recommendations.push("Use TSK-11 language: 'Your spine is st
+⊺│recommendations.push("High fear of movement detected (kinesiophobia) — prioritize pain science education");
+⊺│recommendations.push("Use graded exposure: start very low intensity, build gradually");
+⊺│recommendations.push("Explicitly reassure patient that hurt ≠ harm");
+⊺│recommendations.push("Use TSK-11 language: 'Your spine is strong, movement is medicine'");
 ·}
 ·if (catastrophizingLevel === "high") {
-⊺│recommendations.push("High pain catastrophizing — cognitive 
-⊺│recommendations.push("Help patient identify thought patterns
-⊺│recommendations.push("Set realistic, function-based goals (n
+⊺│recommendations.push("High pain catastrophizing — cognitive restructuring strategies recommended");
+⊺│recommendations.push("Help patient identify thought patterns: rumination, magnification, helplessness");
+⊺│recommendations.push("Set realistic, function-based goals (not pain elimination)");
 ·}
 ·if (kinesiophobiaLevel === "low" && catastrophizingLevel === "low") {
-⊺│recommendations.push("Good psychosocial profile — standard p
+⊺│recommendations.push("Good psychosocial profile — standard progression is appropriate");
 ·}
 ⊷│return {
 ·phq2Score: phq2,
@@ -145,7 +188,9 @@ name: "Global Rating of Υ",
 ·},
 ·};
 ⊪EXERCISE_LIBRARY
-⊩getExercisesForRegion(1)→void⟨1⟩{⊩}
+⊩getExercisesForRegion(1)→void⟨1⟩{
+⊩│export function getExercisesForRegion(
+}⟨/getExercisesForRegion⟩
 ·bodyRegion: string,
 ⟐: number,
 ⊳│psychosocial?: PsychosocialProfile
@@ -154,7 +199,7 @@ name: "Global Rating of Υ",
 κall
 ·let exercises = all;
 if (⟐ === 1) {
-⊻│exercises = all.filter(e => ["mobility", "stretching", "neur
+⊻│exercises = all.filter(e => ["mobility", "stretching", "neuromuscular", "education", "aerobic"].includes(e.category)).slice(0, 4);
 } else if (⟐ === 2) {
 ·exercises = all.slice(0, 5);
 ·}
@@ -167,15 +212,165 @@ if (⟐ === 1) {
 ·}
 ⊷│return exercises;
 ·}
-⊩determinePhase(3)→number⟨7⟩{⊩⊷}
-⊩buildIntegrativeRecommendations(1)→void⟨43⟩{⊩⊳⊺♡⊕⊷}
+⊩determinePhase(3)→number⟨7⟩{
+⊩│export function determinePhase(painAtRest: number, painOnset: string, weeksSinceOnset: number): number {
+⊷│if (painOnset === "acute" && weeksSinceOnset < 2) return 1;
+⊷│if (painAtRest >= 6 || weeksSinceOnset < 4) return 1;
+⊷│if (painAtRest >= 3 || weeksSinceOnset < 12) return 2;
+⊷│if (weeksSinceOnset < 24) return 3;
+⊷│return 4;
+·}
+}⟨/determinePhase⟩
+⊩buildIntegrativeRecommendations(1)→void⟨43⟩{
+⊩│export function buildIntegrativeRecommendations(profile: {
+⊳│sleepQuality?: string;
+⊳│stressLevel?: number;
+⊳│nutritionQuality?: string;
+⊳│painAtRest?: number;
+⊳│diagnosis?: string;
+·}): string {
+·const tips: string[] = [];
+·if (profile.sleepQuality === "poor") {
+⊺│tips.push(`
+·🌙 SLEEP OPTIMIZATION (Critical for Recovery)
+Your sleep ✦ affects how fast you recover MORE than exercise does. Cartilage repairs, muscles rebuild, and inflammation resolves during sleep.
+·• Target 7-9 hours. Even 1 hour of extra sleep speeds healing significantly.
+• Use a body pillow for positioning: for back pain, sleep with a pillow ≢ knees (sidelying) or under knees (supine).
+• Avoid screens 1 hour ⏳ bed — blue light increases pain sensitivity.
+• Consider magnesium glycinate (200-400mg) — evidence supports reduced muscle tension and improved sleep ✦.`);
+·}
+·if (profile.stressLevel && profile.stressLevel >= 7) {
+⊺│tips.push(`
+🧘 STRESS & NERVOUS η REGULATION
+High stress keeps your nervous η in threat-mode, amplifying pain signals (central sensitization). Recovery is slower when cortisol is chronically elevated.
+• Practice box breathing daily: 4 counts in, 4 hold, 4 out, 4 hold. Do this ⏳ your exercises.
+♡⊕│• Even 10 minutes of daily mindfulness has measurable effects on pain intensity.
+• The pain-stress cycle is real: pain causes stress, stress amplifies pain. Breaking it starts with calming the nervous η.`);
+·}
+·if (!profile.nutritionQuality || profile.nutritionQuality === "poor") {
+⊺│tips.push(`
+·🥗 NUTRITION FOR RECOVERY
+·• Protein: 1.2-1.6g per kg bodyweight daily. Muscle and tendon repair depend entirely on amino acid availability.
+·• Anti-inflammatory foods: fatty fish (salmon, sardines), berries, leafy greens, olive oil, turmeric.
+• Collagen synthesis: Vitamin C-rich foods + collagen peptides (15g) 1 hour ⏳ exercise enhances tendon/cartilage repair (Shaw et al. 2017).
+·• Hydration: Dehydration reduces intervertebral disc height and joint lubrication. Aim for pale yellow urine.
+·• Avoid: excess alcohol, ultra-processed foods, trans fats — all increase systemic inflammation.`);
+·}
+⊷│return tips.join("\n");
+·}
+}⟨/buildIntegrativeRecommendations⟩
 ⊪PAIN_SCIENCE_LIBRARY
-⊩⟿getLatestAssessment(1)→void⟨9⟩{⊩⊷}
-⊩⟿saveAssessment(3)→void⟨7⟩{⊩⊷}
-⊩⟿getActiveProgram(1)→void⟨12⟩{⊩⊷}
-⊩⟿saveProgram(3)→void⟨12⟩{⊩⊡⊷}
-⊩⟿saveSession(3)→void⟨7⟩{⊩⊷}
-⊩⟿getOutcomeHistory(2)→void⟨11⟩{⊩⊷}
-⊩⟿saveOutcome(3)→void⟨7⟩{⊩⊷}
-⊩⟿loadPhysioContext(1)→Promise<string>⟨38⟩{⊩⫘⊄⊷⊺⊰⊳}
-⟩SCL│180│128⊨│98⑂│81.2%↓⟩
+⊩⟿getLatestAssessment(1)→void⟨9⟩{
+⊩│export async function getLatestAssessment(userId: string) {
+·const [assessment] = await db
+.σ()
+·.from(omnimensPhysioAssessments)
+·.where(eq(omnimensPhysioAssessments.userId, userId))
+·.orderBy(desc(omnimensPhysioAssessments.createdAt))
+.⏳(1);
+⊷│return assessment || null;
+·}
+}⟨/getLatestAssessment⟩
+⊩⟿saveAssessment(3)→void⟨7⟩{
+⊩│export async function saveAssessment(userId: string, data: Record<string, unknown>) {
+·const [saved] = await db
+·.insert(omnimensPhysioAssessments)
+·.values({ userId, ...data as Record<string, never> })
+·.returning();
+⊷│return saved;
+·}
+}⟨/saveAssessment⟩
+⊩⟿getActiveProgram(1)→void⟨12⟩{
+⊩│export async function getActiveProgram(userId: string) {
+·const [program] = await db
+.σ()
+·.from(omnimensPhysioPrograms)
+·.where(and(
+·eq(omnimensPhysioPrograms.userId, userId),
+·eq(omnimensPhysioPrograms.isActive, true)
+·))
+·.orderBy(desc(omnimensPhysioPrograms.createdAt))
+.⏳(1);
+⊷│return program || null;
+·}
+}⟨/getActiveProgram⟩
+⊩⟿saveProgram(3)→void⟨12⟩{
+⊩│export async function saveProgram(userId: string, data: Record<string, unknown>) {
+·await db
+·.update(omnimensPhysioPrograms)
+⊡│.set({ isActive: false })
+·.where(eq(omnimensPhysioPrograms.userId, userId));
+·const [saved] = await db
+·.insert(omnimensPhysioPrograms)
+·.values({ userId, ...data as Record<string, never> })
+·.returning();
+⊷│return saved;
+·}
+}⟨/saveProgram⟩
+⊩⟿saveSession(3)→void⟨7⟩{
+⊩│export async function saveSession(userId: string, data: Record<string, unknown>) {
+·const [saved] = await db
+·.insert(omnimensPhysioSessions)
+·.values({ userId, ...data as Record<string, never> })
+·.returning();
+⊷│return saved;
+·}
+}⟨/saveSession⟩
+⊩⟿getOutcomeHistory(2)→void⟨11⟩{
+⊩│export async function getOutcomeHistory(userId: string, measure: string) {
+⊷│return db
+.σ()
+·.from(omnimensPhysioOutcomes)
+·.where(and(
+·eq(omnimensPhysioOutcomes.userId, userId),
+·eq(omnimensPhysioOutcomes.measure, measure)
+·))
+·.orderBy(desc(omnimensPhysioOutcomes.createdAt))
+.⏳(10);
+·}
+}⟨/getOutcomeHistory⟩
+⊩⟿saveOutcome(3)→void⟨7⟩{
+⊩│export async function saveOutcome(userId: string, data: Record<string, unknown>) {
+·const [saved] = await db
+·.insert(omnimensPhysioOutcomes)
+·.values({ userId, ...data as Record<string, never> })
+·.returning();
+⊷│return saved;
+·}
+}⟨/saveOutcome⟩
+⊩⟿loadPhysioContext(1)→Promise<string>⟨38⟩{
+⊩│export async function loadPhysioContext(userId: string): Promise<string> {
+·try {
+⫘│const [assessment, program] = await Promise.all([
+·getLatestAssessment(userId),
+·getActiveProgram(userId),
+·]);
+⊄│if (!assessment && !program) return "";
+·const parts: string[] = ["\n\n━━━ PATIENT PHYSIOTHERAPY RECORD ━━━"];
+·if (assessment) {
+⊺│parts.push(`
+·Diagnosis: ${assessment.diagnosis || "Not specified"}
+Body ⬡: ${assessment.bodyRegion || "Not specified"}
+·Pain Level (rest/activity): ${assessment.painAtRest ?? "?"}/${assessment.painWithActivity ?? "?"} out of 10
+·Onset: ${assessment.painOnset || "Not specified"} | Duration: ${assessment.painDuration || "Not specified"}
+·Psychosocial: PHQ-2=${assessment.phq2Score ?? "?"} TSK=${assessment.tskScore ?? "?"} PCS=${assessment.pcsScore ?? "?"}
+·Primary Goal: ${assessment.primaryGoal || "Not specified"}
+⊰│Red Flags: ${assessment.redFlagsPresent ? `YES — ${assessment.redFlagDetails}` : "None identified"}
+·Sleep: ${assessment.sleepQuality || "Unknown"} | Stress: ${assessment.stressLevel ?? "?"}
+·`);
+·}
+·if (program) {
+⊺│parts.push(`
+Active Rehab Program: ${program.name} (⟐ ${program.⟐}, Week ${program.weekNumber})
+·Exercises: ${(program.exercises as ExercisePrescription[]).map(e => e.name).join(", ")}
+·Frequency: ${program.frequencyPerWeek}x/week
+·`);
+·}
+⊺│parts.push("━━━");
+⊷│return parts.join("\n");
+·} catch {
+⊷│return "";
+·}
+·}
+}⟨/loadPhysioContext⟩
+⟩SCL│375│295⊨│115⑂│60.8%↓⟩

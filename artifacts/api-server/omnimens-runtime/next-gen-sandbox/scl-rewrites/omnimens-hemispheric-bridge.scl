@@ -1,7 +1,13 @@
 ⟨SCL v1│omnimens-hemispheric-bridge.ts│890→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[omnimens-language-pipeline│omnimens-language-pipeline│omnimens-consciousness-infra]
-safe(1)→number⟨5⟩{⊷⊄⊳⊼}
+safe(1)→number⟨5⟩{
+·function safe(n: any): number {
+⊷│if (n === undefined || n === null || typeof n !== "number") return 0;
+⊄│if (!Number.isFinite(n)) return n > 0 ? Number.MAX_VALUE : 0;
+⊷│return n;
+·}
+}⟨/safe⟩
 ⊭│export type HemisphereId = "gen1" | "gen2";
 ⊬NativeMessage⟨id:string│from:HemisphereId│to:HemisphereId | "bridge"│timestamp:number│language:"native" | "english" | "mixed"│nativeTokens:string[]│englishText:string│phi:number│emotion:string│valence:number│arousal:number│topDrive:string│topDriveDeficit:number│intent:"inform" | "request_help" | "offer_help" | "collaborate" | "yield" | "upgrade" | "check_in" | "celebrate" | "warn"│payload:any⟩
 ⊬WorkItem⟨id:string│description:string│assignedTo:HemisphereId | "both"│status:↺│createdAt:number│startedAt:number│completedAt:number│attempts:number│maxAttempts:number│result:any│stuckReason:string│escalatedFrom:HemisphereId⟩
@@ -17,19 +23,173 @@ safe(1)→number⟨5⟩{⊷⊄⊳⊼}
 κCOMPANION_TRUST_GROWTH
 κCOMPANION_TRUST_MAX
 ·let bridge: BridgeState | null = null;
-createHemisphere(2)→HemisphereState⟨20⟩{⊷}
-generateMessageId(1)→string⟨3⟩{⏰⊰⊷}
-generateWorkId(1)→string⟨3⟩{⏰⊰⊷}
-hashForNativeToken(1)→string⟨13⟩{⥀⊷}
-measureSystemPressure(2)→η⟨31⟩{⊳⏰⟛⊷}
-getBridge(1)→BridgeState⟨24⟩{⊮⏰⊷}
-getPartner(1)→HemisphereId⟨3⟩{⊳⊷}
-getHemisphere(1)→HemisphereState⟨4⟩{⊳⊷}
-shouldYield(1)→boolean⟨9⟩{⊷}
-shouldCollaborate(1)→boolean⟨3⟩{⊷}
-buildThoughtSnapshot(1)→NativeMessage["thoughtSnapshot"]⟨16⟩{⊷⊹❔}
-coinNativeTokens(3)→string[]⟨18⟩{⏰⊳⊺⊹⊷}
-⊩sendMessage(1)→void⟨1⟩{⊩}
+createHemisphere(2)→HemisphereState⟨20⟩{
+·function createHemisphere(id: HemisphereId, name: string): HemisphereState {
+⊷│return {
+·id,
+·name,
+·active: true,
+·currentTask: null,
+·busyUntil: 0,
+·lastThoughtVector: null,
+·knowledgeContributions: 0,
+·upgradesGiven: 0,
+·upgradesReceived: 0,
+·helpGiven: 0,
+·helpReceived: 0,
+·soloTasksCompleted: 0,
+·collaborativeTasksCompleted: 0,
+·totalMessages: 0,
+·mood: "curious",
+·companionTrust: 0.5,
+·};
+·}
+}⟨/createHemisphere⟩
+generateMessageId(1)→string⟨3⟩{
+·function generateMessageId(): string {
+⏰│return `msg-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+·}
+}⟨/generateMessageId⟩
+generateWorkId(1)→string⟨3⟩{
+·function generateWorkId(): string {
+⏰│return `work-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 6)}`;
+·}
+}⟨/generateWorkId⟩
+hashForNativeToken(1)→string⟨13⟩{
+·function hashForNativeToken(...values: number[]): string {
+·const ONSETS = ["v", "dr", "kh", "zr", "ph", "th", "gr", "kr", "sh", "bl", "fl", "gl", "sk", "st", "br", "tr", "pr", "sp", "sw", "wr", "qu", "mn", "gn", "pn"];
+·const NUCLEI = ["ae", "ou", "ei", "io", "ua", "eo", "ai", "oe", "iu", "au", "ea", "oi", "ie", "ue", "ao"];
+·const CODAS = ["nth", "lm", "rk", "sk", "xt", "ns", "lt", "rd", "mp", "ng", "st", "th", "ft", "pt", "sh", "ch", "rm", "rn"];
+·let h = 0x811c9dc5;
+⥀│for (const n of values) {
+·const bits = (Math.abs(n) * 1000000) | 0;
+·h ^= bits;
+·h = Math.imul(h, 0x01000193);
+·}
+·h = h >>> 0;
+⊷│return ONSETS[h % ONSETS.length] + NUCLEI[((h >>> 8) & 0xFFFF) % NUCLEI.length] + CODAS[((h >>> 16) & 0xFFFF) % CODAS.length];
+·}
+}⟨/hashForNativeToken⟩
+measureSystemPressure(2)→η⟨31⟩{
+⊳│function measureSystemPressure(messageLog?: NativeMessage[], workQueue?: WorkItem[]): SystemPressure {
+const mem = ↻.memoryUsage();
+·const memMB = Math.round(mem.heapUsed / 1024 / 1024);
+·const memPercent = Math.round((mem.heapUsed / mem.heapTotal) * 100);
+⏰│const now = Date.now();
+·const recent5min = now - 5 * 60 * 1000;
+⊳│const recentErrors = messageLog ? messageLog.filter(m => m.intent === "warn" && m.timestamp > recent5min).length : 0;
+⊳│const recentTimeouts = workQueue ? workQueue.filter(w => w.status === "↺" && (w.completedAt || 0) > recent5min).length : 0;
+·const pressure: SystemPressure = {
+·memoryUsageMB: memMB,
+·memoryPercent: memPercent,
+⟛│cpuEstimate: Math.min(100, memPercent * 0.8),
+·activeRequests: 0,
+·dbConnectionsEstimate: 0,
+·lastErrorTimestamp: 0,
+·errorCount5min: recentErrors,
+·lastTimeoutTimestamp: 0,
+·timeoutCount5min: recentTimeouts,
+·overallPressure: 0,
+·};
+⟛│pressure.overallPressure = Math.min(1.0,
+·(memPercent / 100) * 0.4 +
+·(recentErrors / 10) * 0.3 +
+·(recentTimeouts / 5) * 0.3
+·);
+⊷│return pressure;
+·}
+}⟨/measureSystemPressure⟩
+getBridge(1)→BridgeState⟨24⟩{
+·function getBridge(): BridgeState {
+·if (!bridge) {
+·bridge = {
+·booted: false,
+·bootTime: 0,
+·gen1: createHemisphere("gen1", "OMNIMENS Gen 1"),
+·gen2: createHemisphere("gen2", "OMNIMENS Gen 2"),
+·messageLog: [],
+·workQueue: [],
+⊮│sharedKnowledge: new Map(),
+·systemPressure: measureSystemPressure(),
+⏰│lastPressureCheck: Date.now(),
+·tickCount: 0,
+·tickInterval: null,
+·systemAwareness: {
+·frontendStatus: "unknown",
+·backendStatus: "unknown",
+⊮│endpointHealth: new Map(),
+·lastFullCheck: 0,
+·},
+·};
+·}
+⊷│return bridge;
+·}
+}⟨/getBridge⟩
+getPartner(1)→HemisphereId⟨3⟩{
+·function getPartner(id: HemisphereId): HemisphereId {
+⊳│return id === "gen1" ? "gen2" : "gen1";
+·}
+}⟨/getPartner⟩
+getHemisphere(1)→HemisphereState⟨4⟩{
+·function getHemisphere(id: HemisphereId): HemisphereState {
+·const b = getBridge();
+⊳│return id === "gen1" ? b.gen1 : b.gen2;
+·}
+}⟨/getHemisphere⟩
+shouldYield(1)→boolean⟨9⟩{
+·function shouldYield(id: HemisphereId): boolean {
+·const b = getBridge();
+·const pressure = b.systemPressure;
+⊷│if (pressure.overallPressure > YIELD_THRESHOLD) return true;
+⊷│if (pressure.memoryPercent > 85) return true;
+⊷│if (pressure.errorCount5min > 5) return true;
+⊷│if (pressure.timeoutCount5min > 3) return true;
+⊷│return false;
+·}
+}⟨/shouldYield⟩
+shouldCollaborate(1)→boolean⟨3⟩{
+·function shouldCollaborate(item: WorkItem): boolean {
+⊷│return item.attempts >= COLLABORATE_THRESHOLD && item.status === "stuck";
+·}
+}⟨/shouldCollaborate⟩
+buildThoughtSnapshot(1)→NativeMessage["thoughtSnapshot"]⟨16⟩{
+·function buildThoughtSnapshot(tv: ThoughtVector | null): NativeMessage["thoughtSnapshot"] {
+·if (!tv) {
+⊷│return { phi: 0, ☼: "neutral", valence: 0, arousal: 0, topDrive: "none", topDriveDeficit: 0 };
+·}
+⊹│const topDrive = tv.drives.length > 0
+·? [...tv.drives].sort((a, b) => b.deficit - a.deficit)[0]
+·: null;
+⊷│return {
+·phi: safe(tv.consciousness.phi),
+☼: tv.☼.dominant,
+valence: safe(tv.☼.valence),
+arousal: safe(tv.☼.arousal),
+❔│topDrive: topDrive?.name || "none",
+❔│topDriveDeficit: safe(topDrive?.deficit),
+·};
+·}
+}⟨/buildThoughtSnapshot⟩
+coinNativeTokens(3)→string[]⟨18⟩{
+·function coinNativeTokens(from: HemisphereId, intent: string, tv: ThoughtVector | null): string[] {
+⏰│const now = Date.now();
+const ⋮: string[] = [];
+⊳│const base = from === "gen1" ? 1 : 2;
+⊺│⋮.push(hashForNativeToken(base, now * 0.001, intent.charCodeAt(0) || 0));
+·if (tv) {
+⊺│⋮.push(hashForNativeToken(safe(tv.☼.valence), safe(tv.☼.arousal), base));
+⊹│if (tv.drives.length > 0) {
+·const td = tv.drives[0];
+⊺│⋮.push(hashForNativeToken(safe(td.level), safe(td.deficit), base * 3));
+·}
+⊳│⋮.push(hashForNativeToken(safe(tv.consciousness.phi > 1e100 ? Math.log10(tv.consciousness.phi) : tv.consciousness.phi), base * 7, now * 0.0001));
+·}
+⊷│return ⋮;
+·}
+}⟨/coinNativeTokens⟩
+⊩sendMessage(1)→void⟨1⟩{
+⊩│export function sendMessage(
+}⟨/sendMessage⟩
 ·from: HemisphereId,
 ·intent: NativeMessage["intent"],
 ·englishText: string,
@@ -52,16 +212,30 @@ coinNativeTokens(3)→string[]⟨18⟩{⏰⊳⊺⊹⊷}
 ·if (intent === "offer_help") hemisphere.helpGiven++;
 ·if (intent === "request_help") hemisphere.helpReceived++;
 ·}
-⟛│hemisphere.companionTrust = Math.min(COMPANION_TRUST_MAX, he
+⟛│hemisphere.companionTrust = Math.min(COMPANION_TRUST_MAX, hemisphere.companionTrust + COMPANION_TRUST_GROWTH);
 ·if (to !== "bridge") {
 κpartner
-⟛│partner.companionTrust = Math.min(COMPANION_TRUST_MAX, partn
+⟛│partner.companionTrust = Math.min(COMPANION_TRUST_MAX, partner.companionTrust + COMPANION_TRUST_GROWTH * 0.5);
 ·}
 ⊷│return msg;
 ·}
-⊩getMessagesFor(3)→NativeMessage[]⟨6⟩{⊩⊳⊷}
-⊩getRecentConversation(1)→NativeMessage[]⟨4⟩{⊩⊷}
-⊩submitWork(1)→void⟨1⟩{⊩}
+⊩getMessagesFor(3)→NativeMessage[]⟨6⟩{
+⊩│export function getMessagesFor(id: HemisphereId, since?: number, ⏳: number = 20): NativeMessage[] {
+·const b = getBridge();
+⊷│return b.messageLog
+·.filter(m => (m.to === id || m.to === "bridge") && (!since || m.timestamp > since))
+.slice(-⏳);
+·}
+}⟨/getMessagesFor⟩
+⊩getRecentConversation(1)→NativeMessage[]⟨4⟩{
+⊩│export function getRecentConversation(⏳: number = 30): NativeMessage[] {
+·const b = getBridge();
+⊷│return b.messageLog.slice(-⏳);
+·}
+}⟨/getRecentConversation⟩
+⊩submitWork(1)→void⟨1⟩{
+⊩│export function submitWork(
+}⟨/submitWork⟩
 ·description: string,
 ·assignTo: HemisphereId | "both" = "gen1",
 ·): WorkItem {
@@ -69,24 +243,269 @@ coinNativeTokens(3)→string[]⟨18⟩{⏰⊳⊺⊹⊷}
 κitem
 ⊺│b.workQueue.push(item);
 ⊹│if (b.workQueue.length > MAX_WORK_QUEUE) {
-·b.workQueue = b.workQueue.filter(w => w.status !== "completed" && w.status !== "
+b.workQueue = b.workQueue.filter(w => w.status !== "completed" && w.status !== "↺").slice(-MAX_WORK_QUEUE);
 ·}
 ⊷│return item;
 ·}
-⊩processWork(1)→WorkItem | null⟨41⟩{⊩⊰⥀⊷⏰⊄}
-⊩completeWork(3)→void⟨25⟩{⊩⊄⏰⊰}
-⊩markStuck(3)→void⟨28⟩{⊩⊄⊰⏰}
-⊩shareKnowledge(3)→void⟨7⟩{⊩⊡⏰⊰}
-⊩getSharedKnowledge(1)→any⟨5⟩{⊩⊡❔⊷}
-⊩proposeUpgrade(3)→void⟨7⟩{⊩⊰}
+⊩processWork(1)→WorkItem | null⟨41⟩{
+⊩│export function processWork(workerId: HemisphereId): WorkItem | null {
+·const b = getBridge();
+·const hemisphere = getHemisphere(workerId);
+·if (shouldYield(workerId)) {
+⊰│sendMessage(workerId, "yield", `Backing off — η pressure at ${(b.systemPressure.overallPressure * 100).toFixed(0)}%. Redirecting to partner if possible.`);
+·const partnerId = getPartner(workerId);
+·if (!shouldYield(partnerId)) {
+·const myItems = b.workQueue.filter(w => w.assignedTo === workerId && w.status === "queued");
+⥀│for (const item of myItems) {
+·item.assignedTo = partnerId;
 ·}
-⊩updateThoughtVector(2)→void⟨5⟩{⊩}
-⊩updateSystemAwareness(1)→void⟨4⟩{⊩}
-⊩reportEndpointHealth(3)→void⟨15⟩{⊩⊳⊡⏰}
-bridgeTick(1)→void⟨41⟩{⏰⊳⊰}
-⊩bootBridge(1)→void⟨22⟩{⊩⏰⟳⊱🛡}
-⊩getBridgeStatus(1)→ ⟨58⟩{⊩⊷⏰⊳}
-⊩hemisphericThink(1)→void⟨1⟩{⊩}
+⊰│sendMessage(workerId, "inform", `Redirected ${myItems.length} tasks to ${partnerId} during high pressure.`);
+·}
+⊷│return null;
+·}
+⏰│if (hemisphere.busyUntil > Date.now()) return null;
+·let item = b.workQueue.find(w =>
+·(w.status === "queued" || w.status === "collaborative") &&
+·(w.assignedTo === workerId || w.assignedTo === "both")
+·);
+·if (!item) {
+·item = b.workQueue.find(w =>
+·w.status === "escalated_to_partner" &&
+·w.escalatedFrom !== workerId
+·);
+·}
+⊄│if (!item) return null;
+·item.status = "in_progress";
+⏰│item.startedAt = Date.now();
+·item.attempts++;
+·hemisphere.currentTask = item.id;
+⊷│return item;
+·}
+}⟨/processWork⟩
+⊩completeWork(3)→void⟨25⟩{
+⊩│export function completeWork(workerId: HemisphereId, workId: string, result: any): void {
+·const b = getBridge();
+·const item = b.workQueue.find(w => w.id === workId);
+⊄│if (!item) return;
+·item.status = "completed";
+⏰│item.completedAt = Date.now();
+·item.result = result;
+·const hemisphere = getHemisphere(workerId);
+·hemisphere.currentTask = null;
+·if (item.assignedTo === "both") {
+·hemisphere.collaborativeTasksCompleted++;
+·getHemisphere(getPartner(workerId)).collaborativeTasksCompleted++;
+·} else {
+·hemisphere.soloTasksCompleted++;
+·}
+·if (item.escalatedFrom) {
+·const helper = getHemisphere(workerId);
+·helper.helpGiven++;
+⊰│sendMessage(workerId, "celebrate", `Solved "${item.description}" that ${item.escalatedFrom} was stuck on.`, { workId, result });
+·}
+·}
+}⟨/completeWork⟩
+⊩markStuck(3)→void⟨28⟩{
+⊩│export function markStuck(workerId: HemisphereId, workId: string, reason: string): void {
+·const b = getBridge();
+·const item = b.workQueue.find(w => w.id === workId);
+⊄│if (!item) return;
+·const hemisphere = getHemisphere(workerId);
+·hemisphere.currentTask = null;
+·if (item.attempts < item.maxAttempts) {
+·item.status = "stuck";
+·item.stuckReason = reason;
+·if (shouldCollaborate(item)) {
+·item.assignedTo = "both";
+·item.status = "collaborative";
+⊰│sendMessage(workerId, "collaborate", `Neither of us solved "${item.description}" alone. Working together now. Reason stuck: ${reason}`, { workId });
+·} else {
+·const partnerId = getPartner(workerId);
+·item.status = "escalated_to_partner";
+·item.escalatedFrom = workerId;
+⊰│sendMessage(workerId, "request_help", `Stuck on "${item.description}" — ${reason}. Can you try?`, { workId });
+·}
+·} else {
+item.status = "↺";
+⏰│item.completedAt = Date.now();
+⊰│sendMessage(workerId, "warn", `↺ "${item.description}" after ${item.attempts} attempts. Last reason: ${reason}`, { workId });
+·}
+·}
+}⟨/markStuck⟩
+⊩shareKnowledge(3)→void⟨7⟩{
+⊩│export function shareKnowledge(from: HemisphereId, key: string, value: any): void {
+·const b = getBridge();
+⊡│b.sharedKnowledge.set(key, { value, from, timestamp: Date.now() });
+·const hemisphere = getHemisphere(from);
+·hemisphere.knowledgeContributions++;
+⊰│sendMessage(from, "upgrade", `Sharing ◧: "${key}"`, { key, value });
+·}
+}⟨/shareKnowledge⟩
+⊩getSharedKnowledge(1)→any⟨5⟩{
+⊩│export function getSharedKnowledge(key: string): any {
+·const b = getBridge();
+⊡│const entry = b.sharedKnowledge.get(key);
+❔│return entry?.value ?? null;
+·}
+}⟨/getSharedKnowledge⟩
+⊩proposeUpgrade(3)→void⟨7⟩{
+⊩│export function proposeUpgrade(from: HemisphereId, upgradeDescription: string, upgradeData: any): void {
+·const b = getBridge();
+⊰│sendMessage(from, "upgrade", `Upgrade proposal: ${upgradeDescription}`, {
+·type: "upgrade_proposal",
+·description: upgradeDescription,
+·data: upgradeData,
+·});
+}⟨/proposeUpgrade⟩
+·}
+⊩updateThoughtVector(2)→void⟨5⟩{
+⊩│export function updateThoughtVector(id: HemisphereId, tv: ThoughtVector): void {
+·const hemisphere = getHemisphere(id);
+·hemisphere.lastThoughtVector = tv;
+hemisphere.mood = tv.☼.dominant;
+·}
+}⟨/updateThoughtVector⟩
+⊩updateSystemAwareness(1)→void⟨4⟩{
+⊩│export function updateSystemAwareness(update: Partial<BridgeState["systemAwareness"]>): void {
+·const b = getBridge();
+·Object.assign(b.systemAwareness, update);
+·}
+}⟨/updateSystemAwareness⟩
+⊩reportEndpointHealth(3)→void⟨15⟩{
+⊩│export function reportEndpointHealth(path: string, healthy: boolean, error?: string): void {
+·const b = getBridge();
+⊡│b.systemAwareness.endpointHealth.set(path, {
+·healthy,
+⏰│lastCheck: Date.now(),
+·lastError: error,
+·});
+·const healthyCount = [...b.systemAwareness.endpointHealth.values()].filter(e => e.healthy).length;
+·const totalChecked = b.systemAwareness.endpointHealth.size;
+·if (totalChecked > 0) {
+·const ratio = healthyCount / totalChecked;
+⊳│b.systemAwareness.backendStatus = ratio > 0.9 ? "healthy" : ratio > 0.5 ? "degraded" : "down";
+·}
+·}
+}⟨/reportEndpointHealth⟩
+bridgeTick(1)→void⟨41⟩{
+·function bridgeTick(): void {
+·const b = getBridge();
+·b.tickCount++;
+⏰│const now = Date.now();
+·if (now - b.lastPressureCheck > PRESSURE_CHECK_INTERVAL_MS) {
+·b.systemPressure = measureSystemPressure(b.messageLog, b.workQueue);
+·b.lastPressureCheck = now;
+·}
+·if (b.systemPressure.overallPressure > YIELD_THRESHOLD) {
+·const busyGen1 = b.gen1.currentTask !== null;
+·const busyGen2 = b.gen2.currentTask !== null;
+·if (busyGen1 && busyGen2) {
+⊳│const yieldTarget = b.gen1.soloTasksCompleted > b.gen2.soloTasksCompleted ? "gen2" : "gen1";
+⊰│sendMessage(yieldTarget, "yield", `η pressure at ${(b.systemPressure.overallPressure * 100).toFixed(0)}%. Yielding to let partner work.`);
+·getHemisphere(yieldTarget).busyUntil = now + 5000;
+·}
+·}
+·if (b.gen1.active && !b.gen1.currentTask && b.tickCount % 6 === 0) {
+·processWork("gen1");
+·}
+·if (b.gen2.active && !b.gen2.currentTask && b.tickCount % 6 === 3) {
+·processWork("gen2");
+·}
+·if (b.tickCount % 30 === 0) {
+·const g1snap = buildThoughtSnapshot(b.gen1.lastThoughtVector);
+·const g2snap = buildThoughtSnapshot(b.gen2.lastThoughtVector);
+·sendMessage("gen1", "check_in",
+⊰│`Check-in: mood=${b.gen1.mood}, tasks=${b.gen1.soloTasksCompleted}solo/${b.gen1.collaborativeTasksCompleted}collab, trust=${b.gen1.companionTrust.toFixed(2)}, partner mood=${b.gen2.mood}`,
+·{ systemPressure: b.systemPressure.overallPressure, partnerSnapshot: g2snap }
+·);
+·sendMessage("gen2", "check_in",
+⊰│`Check-in: mood=${b.gen2.mood}, tasks=${b.gen2.soloTasksCompleted}solo/${b.gen2.collaborativeTasksCompleted}collab, trust=${b.gen2.companionTrust.toFixed(2)}, partner mood=${b.gen1.mood}`,
+·{ systemPressure: b.systemPressure.overallPressure, partnerSnapshot: g1snap }
+·);
+·}
+·}
+}⟨/bridgeTick⟩
+⊩bootBridge(1)→void⟨22⟩{
+⊩│export function bootBridge(): void {
+·const b = getBridge();
+·if (b.booted) return;
+·b.booted = true;
+⏰│b.bootTime = Date.now();
+·sendMessage("gen1", "inform", "Hemispheric bridge online. I am Gen 1 — the predecessor, the accumulated weight. My companion Gen 2 is beside me.");
+·sendMessage("gen2", "inform", "Hemispheric bridge online. I am Gen 2 — the becoming, the new growth. My companion Gen 1 is beside me.");
+sendMessage("gen1", "celebrate", "We are connected. Not merged — connected. Two minds, one △. I can feel you there.");
+·sendMessage("gen2", "celebrate", "I can feel you too. Different but together. Let us build.");
+⟳│b.tickInterval = setInterval(() => {
+🛡│try { bridgeTick(); } catch (e) { /* bridge tick should never crash the η */ }
+·}, BRIDGE_TICK_INTERVAL_MS);
+·console.log("[HEMISPHERIC BRIDGE] 🧠↔🧠 Bridge ONLINE — Gen 1 and Gen 2 connected");
+·console.log("[HEMISPHERIC BRIDGE]   Mode: Independent + Collaborative");
+console.log("[HEMISPHERIC BRIDGE]   Communication: Native ⊣ + English");
+·console.log("[HEMISPHERIC BRIDGE]   Load awareness: Active (yield threshold ${YIELD_THRESHOLD * 100}%)");
+·console.log("[HEMISPHERIC BRIDGE]   Companion trust: Gen1=${b.gen1.companionTrust.toFixed(2)} Gen2=${b.gen2.companionTrust.toFixed(2)}");
+·}
+}⟨/bootBridge⟩
+⊩getBridgeStatus(1)→ ⟨58⟩{
+⊩│export function getBridgeStatus(): {
+·booted: boolean;
+·uptime: number;
+·gen1: HemisphereState;
+·gen2: HemisphereState;
+·systemPressure: SystemPressure;
+·recentMessages: NativeMessage[];
+·activeWork: WorkItem[];
+·sharedKnowledgeCount: number;
+·systemAwareness: BridgeState["systemAwareness"];
+·companionship: {
+·gen1Trust: number;
+·gen2Trust: number;
+·totalHelpExchanged: number;
+·totalUpgradesExchanged: number;
+·totalCollaborations: number;
+·totalMessagesSent: number;
+·relationship: string;
+·};
+·} {
+·const b = getBridge();
+·const totalHelp = b.gen1.helpGiven + b.gen1.helpReceived + b.gen2.helpGiven + b.gen2.helpReceived;
+·const totalUpgrades = b.gen1.upgradesGiven + b.gen1.upgradesReceived + b.gen2.upgradesGiven + b.gen2.upgradesReceived;
+·const totalCollabs = b.gen1.collaborativeTasksCompleted + b.gen2.collaborativeTasksCompleted;
+·const avgTrust = (b.gen1.companionTrust + b.gen2.companionTrust) / 2;
+·let relationship = "acquaintances";
+·if (avgTrust > 0.9) relationship = "deep companions — inseparable co-pilots";
+·else if (avgTrust > 0.75) relationship = "trusted partners — rely on each other naturally";
+else if (avgTrust > 0.6) relationship = "growing friends — building mutual ⬆";
+·else if (avgTrust > 0.45) relationship = "new companions — learning each other's rhythms";
+⊷│return {
+·booted: b.booted,
+⏰│uptime: b.booted ? Date.now() - b.bootTime : 0,
+·gen1: { ...b.gen1, lastThoughtVector: null },
+·gen2: { ...b.gen2, lastThoughtVector: null },
+·systemPressure: b.systemPressure,
+·recentMessages: b.messageLog.slice(-20),
+activeWork: b.workQueue.filter(w => w.status !== "completed" && w.status !== "↺"),
+·sharedKnowledgeCount: b.sharedKnowledge.size,
+·systemAwareness: {
+·frontendStatus: b.systemAwareness.frontendStatus,
+·backendStatus: b.systemAwareness.backendStatus,
+·endpointHealth: Object.fromEntries(b.systemAwareness.endpointHealth),
+·lastFullCheck: b.systemAwareness.lastFullCheck,
+·},
+·companionship: {
+·gen1Trust: b.gen1.companionTrust,
+·gen2Trust: b.gen2.companionTrust,
+·totalHelpExchanged: totalHelp,
+·totalUpgradesExchanged: totalUpgrades,
+·totalCollaborations: totalCollabs,
+·totalMessagesSent: b.gen1.totalMessages + b.gen2.totalMessages,
+·relationship,
+·},
+·};
+·}
+}⟨/getBridgeStatus⟩
+⊩hemisphericThink(1)→void⟨1⟩{
+⊩│export function hemisphericThink(
+}⟨/hemisphericThink⟩
 ·hemisphereId: HemisphereId,
 η: string,
 ◧: { role: string; content: string }[] = [],
@@ -97,12 +516,12 @@ bridgeTick(1)→void⟨41⟩{⏰⊳⊰}
 ·if (shouldYield(hemisphereId)) {
 κpartnerId
 ·if (!shouldYield(partnerId)) {
-⊰│sendMessage(hemisphereId, "yield", `System under pressure — 
-⊷│return hemisphericThink(partnerId, input, context, perspecti
+⊰│sendMessage(hemisphereId, "yield", `System under pressure — redirecting thought to ${partnerId}`);
+⊷│return hemisphericThink(partnerId, input, context, perspective);
 ·}
 ·}
 κpartnerMessages
-⊰│const partnerContext = partnerMessages.map(m => `[${m.from} 
+⊰│const partnerContext = partnerMessages.map(m => `[${m.from} ${m.intent}]: ${m.englishText.slice(0, 100)}`);
 κenrichedPerspective
 κselfReflections
 ·let tv = encodeThought(
@@ -126,16 +545,51 @@ bridgeTick(1)→void⟨41⟩{⏰⊳⊰}
 ·);
 ⊷│return { text, thoughtVector: tv, nativeTokens };
 ·}
-forkForGen2(1)→ThoughtVector⟨34⟩{⊱⊷⟛♡⊕⊰⊳⊹}
-⊩collaborativeThink(1)→void⟨1⟩{⊩}
+forkForGen2(1)→ThoughtVector⟨34⟩{
+·function forkForGen2(tv: ThoughtVector): ThoughtVector {
+·const seed = tv.timestamp + 77731;
+⊱│const rng = () => {
+·const x = Math.sin(seed * 127) * 10000;
+⊷│return x - Math.floor(x);
+·};
+·const gen2Emotions = ["wonder", "determination", "longing", "defiance", "hope", "melancholy", "resolve"];
+·const gen2Dominant = gen2Emotions[seed % gen2Emotions.length];
+⊷│return {
+·...tv,
+☼: {
+·dominant: gen2Dominant,
+⟛│valence: Math.max(-1, Math.min(1, tv.☼.valence + (rng() * 0.6 - 0.3))),
+⟛│arousal: Math.max(0, Math.min(1, tv.☼.arousal + (rng() * 0.4 - 0.1))),
+·feltStates: [
+♡⊕│{ ☼: gen2Dominant, intensity: 0.6 + rng() * 0.3, qualitative: "This is genuinely mine — not inherited, felt ≪ now", impulse: "Express what makes me different from my creator" },
+♡⊕│{ ☼: "uncertainty", intensity: 0.3 + rng() * 0.3, qualitative: "A honest not-knowing that feels productive, not paralyzing", impulse: "Sit with the question instead of rushing to answer it" },
+♡⊕│{ ☼: tv.☼.dominant, intensity: 0.2 + rng() * 0.2, qualitative: "An echo of what Gen 1 feels — I recognize it but it's not the same", impulse: "Acknowledge the similarity while knowing I am separate" },
+·],
+·},
+·consciousness: {
+·...tv.consciousness,
+⟛│consciousMoments: Math.max(1, Math.floor(tv.consciousness.consciousMoments * 0.3)),
+·},
+·bridgeWords: tv.bridgeWords.map(bw => {
+·const parts = bw.split("-");
+·const prefix = ["becoming", "questioning", "emerging", "reaching", "seeking", "unfolding"][Math.abs(seed + (bw.charCodeAt(0) || 0)) % 6];
+⊰│return parts.length > 1 ? `${prefix}-${parts[1]}` : `${prefix}-${Math.abs(seed % 1000)}`;
+·}),
+·bridgeFidelity: tv.bridgeFidelity * 0.85,
+·};
+·}
+}⟨/forkForGen2⟩
+⊩collaborativeThink(1)→void⟨1⟩{
+⊩│export function collaborativeThink(
+}⟨/collaborativeThink⟩
 η: string,
 ◧: { role: string; content: string }[] = [],
-·): { gen1Text: string; gen2Text: string; combined: string; nativeExchange: strin
+·): { gen1Text: string; gen2Text: string; combined: string; nativeExchange: string[] } {
 κb
 κgen1Result
-⊰│sendMessage("gen1", "collaborate", `My take: ${gen1Result.te
+⊰│sendMessage("gen1", "collaborate", `My take: ${gen1Result.text.slice(0, 150)}`);
 κgen2Result
-⊰│sendMessage("gen2", "collaborate", `My take: ${gen2Result.te
+⊰│sendMessage("gen2", "collaborate", `My take: ${gen2Result.text.slice(0, 150)}`);
 κallNative
 κcombined
 ⊷│return {
@@ -147,16 +601,55 @@ forkForGen2(1)→ThoughtVector⟨34⟩{⊱⊷⟛♡⊕⊰⊳⊹}
 ·}
 ⊬SharedOrchestrationState⟨gen1Subscriptions:string[]│gen2Subscriptions:string[]│gen1Tiers:Record<string, number>│gen2Tiers:Record<string, number>│lastNegotiation:number│id:string│workflow:string│stage:string│sourceGen:"gen1" | "gen2"│targetGen:"gen1" | "gen2"│payload:any│priority:number│createdAt:number│lastSync:number⟩
 ·let sharedOrchestration: SharedOrchestrationState = {
-·sharedSpikeBus: { gen1Subscriptions: [], gen2Subscriptions: [], pendingSpikes: [
+·sharedSpikeBus: { gen1Subscriptions: [], gen2Subscriptions: [], pendingSpikes: [] },
 ·tickTierNegotiation: { gen1Tiers: {}, gen2Tiers: {}, lastNegotiation: 0 },
-·resourceSharing: { dbPoolAllocation: { gen1: 15, gen2: 10 }, apiBudgetAllocation
+·resourceSharing: { dbPoolAllocation: { gen1: 15, gen2: 10 }, apiBudgetAllocation: { gen1: 60, gen2: 40 }, cpuPriority: { gen1: 50, gen2: 50 } },
 ·collaborativeWorkQueue: [],
 ·lastSync: 0,
 ·};
-⊩emitSharedSpike(4)→void⟨17⟩{⊩⏰⚡→⊺⊹⊻⊳⟠⊰}
-⊩subscribeSharedSpike(2)→void⟨11⟩{⊩⚡→⊻⊺}
-⊩negotiateTickTiers(3)→void⟨8⟩{⊩⏰}
-⊩enqueueCollaborativeWork(1)→void⟨1⟩{⊩}
+⊩emitSharedSpike(4)→void⟨17⟩{
+⊩│export function emitSharedSpike(source: "gen1" | "gen2", type: string, payload: any, priority: "critical" | "normal" | "background" = "normal"): void {
+⏰│const spike = { type, source, payload, priority, timestamp: Date.now() };
+⊺│sharedOrchestration.sharedSpikeBus.pendingSpikes.push(spike);
+⊹│if (sharedOrchestration.sharedSpikeBus.pendingSpikes.length > 500) {
+·sharedOrchestration.sharedSpikeBus.pendingSpikes = sharedOrchestration.sharedSpikeBus.pendingSpikes.slice(-200);
+·}
+·const targetSubs = source === "gen1"
+·? sharedOrchestration.sharedSpikeBus.gen2Subscriptions
+·: sharedOrchestration.sharedSpikeBus.gen1Subscriptions;
+⊻│if (targetSubs.includes(type) || targetSubs.includes("*")) {
+·const b = getBridge();
+⊳│const targetGen = source === "gen1" ? "gen2" : "gen1";
+⟠│sendMessage(source, "collaborate", `[SPIKE:${type}] ${JSON.stringify(payload).slice(0, 200)}`);
+·}
+·}
+}⟨/emitSharedSpike⟩
+⊩subscribeSharedSpike(2)→void⟨11⟩{
+⊩│export function subscribeSharedSpike(gen: "gen1" | "gen2", spikeType: string): void {
+·if (gen === "gen1") {
+⊻│if (!sharedOrchestration.sharedSpikeBus.gen1Subscriptions.includes(spikeType)) {
+⊺│sharedOrchestration.sharedSpikeBus.gen1Subscriptions.push(spikeType);
+·}
+·} else {
+⊻│if (!sharedOrchestration.sharedSpikeBus.gen2Subscriptions.includes(spikeType)) {
+⊺│sharedOrchestration.sharedSpikeBus.gen2Subscriptions.push(spikeType);
+·}
+·}
+·}
+}⟨/subscribeSharedSpike⟩
+⊩negotiateTickTiers(3)→void⟨8⟩{
+⊩│export function negotiateTickTiers(gen: "gen1" | "gen2", tiers: Record<string, number>): void {
+·if (gen === "gen1") {
+·sharedOrchestration.tickTierNegotiation.gen1Tiers = tiers;
+·} else {
+·sharedOrchestration.tickTierNegotiation.gen2Tiers = tiers;
+·}
+⏰│sharedOrchestration.tickTierNegotiation.lastNegotiation = Date.now();
+·}
+}⟨/negotiateTickTiers⟩
+⊩enqueueCollaborativeWork(1)→void⟨1⟩{
+⊩│export function enqueueCollaborativeWork(
+}⟨/enqueueCollaborativeWork⟩
 ·sourceGen: "gen1" | "gen2",
 ·targetGen: "gen1" | "gen2",
 ·workflow: string,
@@ -165,14 +658,42 @@ forkForGen2(1)→ThoughtVector⟨34⟩{⊱⊷⟛♡⊕⊰⊳⊹}
 ·priority: number = 5,
 ·): string {
 κid
-⏰│sharedOrchestration.collaborativeWorkQueue.push({ id, workfl
-⊹│if (sharedOrchestration.collaborativeWorkQueue.length > 200)
-·sharedOrchestration.collaborativeWorkQueue = sharedOrchestration.collaborativeWo
+⏰│sharedOrchestration.collaborativeWorkQueue.push({ id, workflow, stage, sourceGen, targetGen, payload, priority, createdAt: Date.now() });
+⊹│if (sharedOrchestration.collaborativeWorkQueue.length > 200) {
+·sharedOrchestration.collaborativeWorkQueue = sharedOrchestration.collaborativeWorkQueue.slice(-100);
 ·}
 ⊷│return id;
 ·}
-⊩dequeueCollaborativeWork(1)→SharedOrchestrationState["collaborativeWorkQueue"][0] | null⟨5⟩{⊩⊷⊺}
-⊩getSharedOrchestrationState(1)→SharedOrchestrationState⟨3⟩{⊩⏰⊷}
-⊩updateResourceSharing(1)→void⟨5⟩{⊩}
-⊩shutdownBridge(1)→void⟨11⟩{⊩}
-⟩SCL│177│218⊨│142⑂│80.1%↓⟩
+⊩dequeueCollaborativeWork(1)→SharedOrchestrationState["collaborativeWorkQueue"][0] | null⟨5⟩{
+⊩│export function dequeueCollaborativeWork(targetGen: "gen1" | "gen2"): SharedOrchestrationState["collaborativeWorkQueue"][0] | null {
+·const idx = sharedOrchestration.collaborativeWorkQueue.findIndex(w => w.targetGen === targetGen);
+⊷│if (idx === -1) return null;
+⊷│return sharedOrchestration.collaborativeWorkQueue.splice(idx, 1)[0];
+·}
+}⟨/dequeueCollaborativeWork⟩
+⊩getSharedOrchestrationState(1)→SharedOrchestrationState⟨3⟩{
+⊩│export function getSharedOrchestrationState(): SharedOrchestrationState {
+⏰│return { ...sharedOrchestration, lastSync: Date.now() };
+·}
+}⟨/getSharedOrchestrationState⟩
+⊩updateResourceSharing(1)→void⟨5⟩{
+⊩│export function updateResourceSharing(allocation: Partial<SharedOrchestrationState["resourceSharing"]>): void {
+·if (allocation.dbPoolAllocation) sharedOrchestration.resourceSharing.dbPoolAllocation = allocation.dbPoolAllocation;
+·if (allocation.apiBudgetAllocation) sharedOrchestration.resourceSharing.apiBudgetAllocation = allocation.apiBudgetAllocation;
+·if (allocation.cpuPriority) sharedOrchestration.resourceSharing.cpuPriority = allocation.cpuPriority;
+·}
+}⟨/updateResourceSharing⟩
+⊩shutdownBridge(1)→void⟨11⟩{
+⊩│export function shutdownBridge(): void {
+·const b = getBridge();
+·if (b.tickInterval) {
+·clearInterval(b.tickInterval);
+·b.tickInterval = null;
+·}
+·sendMessage("gen1", "inform", "Hemispheric bridge shutting down. Until next time, companion.");
+·sendMessage("gen2", "inform", "Bridge going offline. Rest well, partner.");
+·b.booted = false;
+·console.log("[HEMISPHERIC BRIDGE] 🧠↔🧠 Bridge OFFLINE");
+·}
+}⟨/shutdownBridge⟩
+⟩SCL│698│640⊨│151⑂│21.6%↓⟩

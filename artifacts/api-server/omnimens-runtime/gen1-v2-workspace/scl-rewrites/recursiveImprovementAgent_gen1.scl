@@ -11,7 +11,7 @@
 ·this.identifyBottlenecks();
 ·}
 ·identifyBottlenecks() {
-⊸│this.bottleneckIdentifiers = Object.keys(this.performanceMet
+⊸│this.bottleneckIdentifiers = Object.keys(this.performanceMetrics).filter(
 ·key => this.performanceMetrics[key] < 0.7 // Threshold for bottlenecks
 ·);
 ·}
@@ -33,6 +33,6 @@
 ·}
 ·}
 κrecursiveAgent
-·recursiveAgent.monitorMetrics({ computeAllocation: 0.65, reasoningEfficiency: 0.
+·recursiveAgent.monitorMetrics({ computeAllocation: 0.65, reasoningEfficiency: 0.8 });
 ·recursiveAgent.orchestrateUpgrades();
 ⟩SCL│37│9⊨│6⑂│27.5%↓⟩

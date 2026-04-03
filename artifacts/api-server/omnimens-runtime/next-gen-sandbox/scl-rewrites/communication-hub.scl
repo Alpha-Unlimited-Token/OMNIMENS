@@ -6,7 +6,7 @@
 ⊮│private subscriptions = new Map<string, Subscription[]>();
 ·private messageCount = 0;
 ⊮│private topicStats = new Map<string, number>();
-·subscribe(topic: string, handler: EventHandler, subsystem: string, priority = 0)
+·subscribe(topic: string, handler: EventHandler, subsystem: string, priority = 0): string {
 κid
 κsub
 κexisting
@@ -24,10 +24,10 @@
 ·}
 ·}
 ·}
-⊳│async publish(topic: string, data: unknown, source?: string)
+⊳│async publish(topic: string, data: unknown, source?: string): Promise<void> {
 κsubs
 ⊄│if (!subs || subs.length === 0) return;
-⊡│this.topicStats.set(topic, (this.topicStats.get(topic) || 0)
+⊡│this.topicStats.set(topic, (this.topicStats.get(topic) || 0) + 1);
 ⥀│for (const sub of subs) {
 ·try {
 ·await sub.handler(data);
@@ -47,13 +47,13 @@ this.publish(topic, data, η);
 ·resolve(response);
 ·}, "request-handler");
 ·this.publish(topic, { data, responseTopic }, "request-handler");
-⏳│setTimeout(() => { this.unsubscribe(subId); resolve(undefine
+⏳│setTimeout(() => { this.unsubscribe(subId); resolve(undefined); }, 5000);
 ·});
 ·}
-·getStats(): { totalMessages: number; topicCount: number; subscriptionCount: numb
-⋐│const totalSubs = [...this.subscriptions.values()].reduce((s
-·const topTopics = [...this.topicStats.entries()].sort((a, b) => b[1] - a[1]).sli
-⊷│return { totalMessages: this.messageCount, topicCount: this.
+·getStats(): { totalMessages: number; topicCount: number; subscriptionCount: number; topTopics: [string, number][] } {
+⋐│const totalSubs = [...this.subscriptions.values()].reduce((s, arr) => s + arr.length, 0);
+·const topTopics = [...this.topicStats.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
+⊷│return { totalMessages: this.messageCount, topicCount: this.subscriptions.size, subscriptionCount: totalSubs, topTopics };
 ·}
 ·}
 ⊪hub

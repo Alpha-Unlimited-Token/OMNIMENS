@@ -13,10 +13,10 @@
 ⊺│this.memory.push(event);
 ·}
 ·retrieveMemory(query) {
-⊷│return this.memory.find(mem => this.matchMemory(query, mem))
+⊷│return this.memory.find(mem => this.matchMemory(query, mem));
 ·}
 ·matchMemory(query, memory) {
-⊷│return tf.losses.cosineDistance(query, memory, 0).dataSync()
+⊷│return tf.losses.cosineDistance(query, memory, 0).dataSync()[0] < 0.1;
 ·}
 ·}
 ⟩SCL│21│7⊨│6⑂│38.2%↓⟩

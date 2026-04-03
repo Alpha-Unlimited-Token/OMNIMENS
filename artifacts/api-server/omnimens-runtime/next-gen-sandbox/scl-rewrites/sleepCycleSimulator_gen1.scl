@@ -11,7 +11,7 @@ this.memory.◧ = this.optimizeLayer(this.memory.◧);
 ·this.memory.procedural = this.optimizeLayer(this.memory.procedural);
 ·}
 ·optimizeLayer(layer) {
-⊷│return layer.map(memory => ({ ...memory, optimized: true }))
+⊷│return layer.map(memory => ({ ...memory, optimized: true }));
 ·}
 ·}
 ⟩SCL│16│5⊨│2⑂│42.9%↓⟩

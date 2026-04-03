@@ -1,11 +1,79 @@
 ⟨SCL v1│localNeuralNetworkTrainer_gen1.mjs│131→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩generateRandomMatrix(2)→void⟨11⟩{⊩⊺⊷}
-⊩addMatrices(2)→void⟨6⟩{⊩⊹⊵⊷}
-⊩multiplyMatrices(2)→void⟨18⟩{⊩⊹⊵⊺⊷}
-⊩applyActivation(2)→void⟨3⟩{⊩⊷}
-⊩sigmoid(1)→void⟨3⟩{⊩⊷}
-⊩trainNeuralNetwork(4)→void⟨24⟩{⊩⊷}
-⊩infer(2)→void⟨4⟩{⊩⊷}
-⟩SCL│10│28⊨│20⑂│92.4%↓⟩
+⊩generateRandomMatrix(2)→void⟨11⟩{
+⊩│export function generateRandomMatrix(rows, cols) {
+·const matrix = [];
+·for (let i = 0; i < rows; i++) {
+·const row = [];
+·for (let j = 0; j < cols; j++) {
+⊺│row.push((randomBytes(4).readUInt32BE() / 0xFFFFFFFF) * 2 - 1); // Random values ≢ -1 and 1
+·}
+⊺│matrix.push(row);
+·}
+⊷│return matrix;
+·}
+}⟨/generateRandomMatrix⟩
+⊩addMatrices(2)→void⟨6⟩{
+⊩│export function addMatrices(matrixA, matrixB) {
+⊹│if (matrixA.length !== matrixB.length || matrixA[0].length !== matrixB[0].length) {
+⊵│throw new Error('Matrix dimensions must match for ∑.');
+·}
+⊷│return matrixA.map((row, i) => row.map((val, j) => val + matrixB[i][j]));
+·}
+}⟨/addMatrices⟩
+⊩multiplyMatrices(2)→void⟨18⟩{
+⊩│export function multiplyMatrices(matrixA, matrixB) {
+⊹│if (matrixA[0].length !== matrixB.length) {
+⊵│throw new Error('Matrix dimensions must align for multiplication.');
+·}
+·const result = [];
+·for (let i = 0; i < matrixA.length; i++) {
+·const row = [];
+·for (let j = 0; j < matrixB[0].length; j++) {
+·let sum = 0;
+·for (let k = 0; k < matrixA[0].length; k++) {
+·sum += matrixA[i][k] * matrixB[k][j];
+·}
+⊺│row.push(sum);
+·}
+⊺│result.push(row);
+·}
+⊷│return result;
+·}
+}⟨/multiplyMatrices⟩
+⊩applyActivation(2)→void⟨3⟩{
+⊩│export function applyActivation(matrix, activationFunction) {
+⊷│return matrix.map(row => row.map(val => activationFunction(val)));
+·}
+}⟨/applyActivation⟩
+⊩sigmoid(1)→void⟨3⟩{
+⊩│export function sigmoid(x) {
+⊷│return 1 / (1 + Math.exp(-x));
+·}
+}⟨/sigmoid⟩
+⊩trainNeuralNetwork(4)→void⟨24⟩{
+⊩│export function trainNeuralNetwork(inputs, targets, learningRate, epochs) {
+·const inputSize = inputs[0].length;
+·const outputSize = targets[0].length;
+·let weights = generateRandomMatrix(inputSize, outputSize);
+·let biases = generateRandomMatrix(1, outputSize);
+·for (let epoch = 0; epoch < epochs; epoch++) {
+·const weightedInputs = addMatrices(multiplyMatrices(inputs, weights), biases);
+·const activations = applyActivation(weightedInputs, sigmoid);
+·const errors = addMatrices(targets, activations.map(row => row.map(val => -val)));
+·const gradients = applyActivation(weightedInputs, x => x * (1 - x));
+·const weightDeltas = multiplyMatrices(inputs.map(row => row.map(val => val * learningRate)), gradients);
+·weights = addMatrices(weights, weightDeltas);
+·biases = addMatrices(biases, gradients.map(row => row.map(val => val * learningRate)));
+·}
+⊷│return { weights, biases };
+·}
+}⟨/trainNeuralNetwork⟩
+⊩infer(2)→void⟨4⟩{
+⊩│export function infer(inputs, model) {
+·const weightedInputs = addMatrices(multiplyMatrices(inputs, model.weights), model.biases);
+⊷│return applyActivation(weightedInputs, sigmoid);
+·}
+}⟨/infer⟩
+⟩SCL│78│82⊨│22⑂│40.5%↓⟩

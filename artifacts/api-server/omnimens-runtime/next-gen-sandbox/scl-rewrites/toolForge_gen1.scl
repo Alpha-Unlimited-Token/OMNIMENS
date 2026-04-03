@@ -15,7 +15,7 @@ createTool(name, Ε) {
 ·if (testResult) {
 ⊰│console.log(`Tool ${tool.name} passed testing.`);
 ·} else {
-⊰│console.error(`Tool ${tool.name} failed testing, needs revis
+⊰│console.error(`Tool ${tool.name} failed testing, needs revision.`);
 ·}
 ·}
 ·deployTool(toolName) {

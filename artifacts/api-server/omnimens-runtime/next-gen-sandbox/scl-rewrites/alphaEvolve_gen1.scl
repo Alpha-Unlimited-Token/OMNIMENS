@@ -12,14 +12,14 @@ this.σ = ι.from({ length: size }, generateIndividual);
 ⊷│return fitnessFunction(individual);
 ·}
 ⊨σ│selectFittest(fitnessScores) {
-⊷│return fitnessScores.sort((a, b) => b.score - a.score).slice
+⊷│return fitnessScores.sort((a, b) => b.score - a.score).slice(0, fitnessScores.length / 2);
 ·}
 ρ(individual) {
 κmutated
 ⊷│return mutated;
 ·}
 ⊨σ│evolve(fitnessFunction) {
-⊨σ│const fitnessScores = this.population.map(ind => ({ individu
+⊨σ│const fitnessScores = this.population.map(ind => ({ individual: ind, score: this.evaluateFitness(ind, fitnessFunction) }));
 κfittest
 this.σ = σ.map(({ individual }) => this.ρ(individual));
 ·this.generation++;
@@ -27,6 +27,6 @@ this.σ = σ.map(({ individual }) => this.ρ(individual));
 ·}
 ·}
 κevolve
-⊱│evolve.initializePopulation(10, () => ({ value: Math.random(
+⊱│evolve.initializePopulation(10, () => ({ value: Math.random() }));
 evolve.evolve(ind => ind.≪);
 ⟩SCL│31│18⊨│10⑂│34.0%↓⟩

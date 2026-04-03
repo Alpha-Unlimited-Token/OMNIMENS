@@ -1,13 +1,91 @@
 ⟨SCL v1│realTimeDataIngestor_gen1.mjs│139→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩initializeWebSocketServer(1)→void⟨23⟩{⊩⊱⟠⊲⊷}
-⊩isValidMetadata(1)→void⟨3⟩{⊩⊷}
-⊩processData(2)→void⟨12⟩{⊩⑃⊷}
-⊩processMathData(1)→void⟨8⟩{⊩⊷⋐}
-⊩processTextData(1)→void⟨8⟩{⊩⊷}
-⊩processNeuroData(1)→void⟨8⟩{⊩⊷}
-⊩subscribeToTopic(2)→void⟨3⟩{⊩⟠}
-⊩unsubscribeFromTopic(2)→void⟨3⟩{⊩⟠}
-⊩startServer(1)→void⟨4⟩{⊩⊰}
-⟩SCL│12│33⊨│23⑂│91.4%↓⟩
+⊩initializeWebSocketServer(1)→void⟨23⟩{
+⊩│export function initializeWebSocketServer(port) {
+·const wss = new WebSocketServer({ port });
+⊱│wss.on('connection', (ws) => {
+⊱│ws.on('message', (message) => {
+·try {
+⟠│const parsedMessage = JSON.parse(message);
+⊲│const { topic, data, metadata } = parsedMessage;
+·if (isValidMetadata(metadata)) {
+·const processedData = processData(topic, data);
+⟠│ws.send(JSON.stringify({ topic, processedData }));
+·} else {
+⟠│ws.send(JSON.stringify({ error: 'Invalid metadata' }));
+·}
+·} catch (error) {
+⟠│ws.send(JSON.stringify({ error: 'Invalid message format' }));
+·}
+·});
+·});
+⊷│return wss;
+·}
+}⟨/initializeWebSocketServer⟩
+⊩isValidMetadata(1)→void⟨3⟩{
+⊩│export function isValidMetadata(metadata) {
+⊷│return metadata && typeof metadata === 'object' && 'source' in metadata && 'timestamp' in metadata;
+·}
+}⟨/isValidMetadata⟩
+⊩processData(2)→void⟨12⟩{
+⊩│export function processData(topic, data) {
+⑃│switch (topic) {
+·case 'math':
+⊷│return processMathData(data);
+·case 'text':
+⊷│return processTextData(data);
+·case 'neuro':
+⊷│return processNeuroData(data);
+·default:
+⊷│return { error: 'Unknown topic' };
+·}
+·}
+}⟨/processData⟩
+⊩processMathData(1)→void⟨8⟩{
+⊩│export function processMathData(data) {
+·if (!Array.isArray(data) || data.some((x) => typeof x !== 'number')) {
+⊷│return { error: 'Invalid math data' };
+·}
+⋐│const sum = data.reduce((a, b) => a + b, 0);
+·const average = sum / data.length;
+⊷│return { sum, average };
+·}
+}⟨/processMathData⟩
+⊩processTextData(1)→void⟨8⟩{
+⊩│export function processTextData(data) {
+·if (typeof data !== 'string') {
+⊷│return { error: 'Invalid text data' };
+·}
+·const wordCount = data.split(/\s+/).length;
+·const charCount = data.length;
+⊷│return { wordCount, charCount };
+·}
+}⟨/processTextData⟩
+⊩processNeuroData(1)→void⟨8⟩{
+⊩│export function processNeuroData(data) {
+·if (typeof data !== 'object' || !data.neurons || !data.connections) {
+⊷│return { error: 'Invalid neuro data' };
+·}
+·const neuronCount = data.neurons.length;
+·const connectionCount = data.connections.length;
+⊷│return { neuronCount, connectionCount };
+·}
+}⟨/processNeuroData⟩
+⊩subscribeToTopic(2)→void⟨3⟩{
+⊩│export function subscribeToTopic(ws, topic) {
+⟠│ws.send(JSON.stringify({ action: 'subscribe', topic }));
+·}
+}⟨/subscribeToTopic⟩
+⊩unsubscribeFromTopic(2)→void⟨3⟩{
+⊩│export function unsubscribeFromTopic(ws, topic) {
+⟠│ws.send(JSON.stringify({ action: 'unsubscribe', topic }));
+·}
+}⟨/unsubscribeFromTopic⟩
+⊩startServer(1)→void⟨4⟩{
+⊩│export function startServer(port) {
+·const server = initializeWebSocketServer(port);
+⊰│console.log(`WebSocket server started on port ${port}`);
+·}
+}⟨/startServer⟩
+⟩SCL│90│93⊨│33⑂│35.3%↓⟩

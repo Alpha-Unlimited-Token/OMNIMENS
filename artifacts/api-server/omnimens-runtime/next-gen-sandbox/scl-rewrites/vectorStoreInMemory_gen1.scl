@@ -1,14 +1,61 @@
 ⟨SCL v1│vectorStoreInMemory_gen1.mjs│107→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 κvectorStore
-⊩addVector(3)→void⟨6⟩{⊩⊵⊡}
-⊩cosineSimilarity(2)→void⟨9⟩{⊩⊹⊵⋐⊷}
-⊩findNearestNeighbors(2)→void⟨12⟩{⊩⊵⊷⊺}
-·similarities.sort((a, b) => b.similarity - a.similarity); // Sort by descending 
+⊩addVector(3)→void⟨6⟩{
+⊩│export function addVector(id, vector, metadata = null) {
+·if (!Array.isArray(vector) || !vector.every((num) => typeof num === 'number')) {
+⊵│throw new Error('Vector must be an array of numbers.');
+·}
+⊡│vectorStore.set(id, { vector, metadata });
+·}
+}⟨/addVector⟩
+⊩cosineSimilarity(2)→void⟨9⟩{
+⊩│export function cosineSimilarity(vecA, vecB) {
+⊹│if (vecA.length !== vecB.length) {
+⊵│throw new Error('Vectors must be of the same length.');
+·}
+⋐│const dotProduct = vecA.reduce((sum, val, idx) => sum + val * vecB[idx], 0);
+⋐│const magnitudeA = Math.sqrt(vecA.reduce((sum, val) => sum + val ** 2, 0));
+⋐│const magnitudeB = Math.sqrt(vecB.reduce((sum, val) => sum + val ** 2, 0));
+⊷│return dotProduct / (magnitudeA * magnitudeB || 1); // Avoid division by zero
+·}
+}⟨/cosineSimilarity⟩
+⊩findNearestNeighbors(2)→void⟨12⟩{
+⊩│export function findNearestNeighbors(queryVector, k) {
+·if (!Array.isArray(queryVector) || !queryVector.every((num) => typeof num === 'number')) {
+⊵│throw new Error('Query vector must be an array of numbers.');
+·}
+·if (k <= 0) {
+⊷│return [];
+·}
+·const similarities = [];
+·for (const [id, { vector, metadata }] of vectorStore.entries()) {
+·const similarity = cosineSimilarity(queryVector, vector);
+⊺│similarities.push({ id, similarity, metadata });
+·}
+}⟨/findNearestNeighbors⟩
+·similarities.sort((a, b) => b.similarity - a.similarity); // Sort by descending similarity
 ⊷│return similarities.slice(0, k);
 ·}
-⊩removeVector(1)→void⟨3⟩{⊩⊷}
-⊩clearStore(1)→void⟨3⟩{⊩}
-⊩getMetadata(1)→void⟨4⟩{⊩⊡⊳⊷}
-⊩getVectorCount(1)→void⟨3⟩{⊩⊷}
-⟩SCL│13│30⊨│22⑂│87.9%↓⟩
+⊩removeVector(1)→void⟨3⟩{
+⊩│export function removeVector(id) {
+⊷│return vectorStore.delete(id);
+·}
+}⟨/removeVector⟩
+⊩clearStore(1)→void⟨3⟩{
+⊩│export function clearStore() {
+·vectorStore.clear();
+·}
+}⟨/clearStore⟩
+⊩getMetadata(1)→void⟨4⟩{
+⊩│export function getMetadata(id) {
+⊡│const entry = vectorStore.get(id);
+⊳│return entry ? entry.metadata : null;
+·}
+}⟨/getMetadata⟩
+⊩getVectorCount(1)→void⟨3⟩{
+⊩│export function getVectorCount() {
+⊷│return vectorStore.size;
+·}
+}⟨/getVectorCount⟩
+⟩SCL│60│62⊨│23⑂│43.9%↓⟩

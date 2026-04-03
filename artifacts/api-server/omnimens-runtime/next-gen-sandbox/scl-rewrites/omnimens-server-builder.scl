@@ -20,13 +20,127 @@
 κstate
 ·let researchCycleCount = 0;
 ·let started = false;
-⊱│const toNumber = (v: unknown, d = 0) => (Number.isFinite(+v!
-⟿dbRead(2)→void⟨3⟩{⊷}
-⟿dbWrite(2)→void⟨3⟩{⊷}
-⟿loadExistingPlans(1)→Promise<void>⟨16⟩{⟿⊴⊄⊰❔}
-⟿saveBuildPlan(1)→Promise<void>⟨23⟩{⟿⊴⊰⊳❔}
-⟿saveRawSearchPlan(2)→void⟨19⟩{⏰⊰⊴}
-⟿gptCall(1)→Promise<any>⟨10⟩{❔⊷}
-addInsight(1)→void⟨4⟩{⊺⊹}
-⟿researchPhysical(1)→Promise<void>⟨31⟩{⟿⥀⊴⊺⊰❔⏳⊄⊷⊹⟠⊽}
-⟩SCL│31│51⊨│37⑂│88.6%↓⟩
+⊱│const toNumber = (v: unknown, d = 0) => (Number.isFinite(+v!) ? +v! : d);
+⟿dbRead(2)→void⟨3⟩{
+·async function dbRead(table: string, query: any) {
+⊷│return dbGateway.read("server-builder", table, query);
+·}
+}⟨/dbRead⟩
+⟿dbWrite(2)→void⟨3⟩{
+·async function dbWrite(table: string, data: any) {
+⊷│return dbGateway.⊞("server-builder", table, data, "NORMAL");
+·}
+}⟨/dbWrite⟩
+⟿loadExistingPlans(1)→Promise<void>⟨16⟩{
+⟿│async function loadExistingPlans(): Promise<void> {
+·try {
+⊴│const [plan] = await dbRead("omnimensServerBuilds", {
+·orderBy: { createdAt: "desc" },
+⏳: 1,
+·});
+⊄│if (!plan) return;
+·state.activePlan = plan as ServerBuildPlan;
+⊴│const all = await dbRead("omnimensServerBuilds", { fields: ["id"] });
+·state.totalPlans = all.length;
+⊰│log(`Loaded ${state.totalPlans} existing plan(s)`);
+·} catch (e: any) {
+❔│log("↺ to load existing plans:", e?.message || e);
+·}
+·}
+}⟨/loadExistingPlans⟩
+⟿saveBuildPlan(1)→Promise<void>⟨23⟩{
+⟿│async function saveBuildPlan(plan: ServerBuildPlan): Promise<void> {
+·try {
+⊴│await dbWrite("omnimensServerBuilds", plan);
+⊴│await dbWrite("omnimensNotifications", {
+·upgradeId: null,
+⊰│title: `Server Build Plan — ${plan.planType === "physical" ? "Hardware" : "Virtual"} Server`,
+⊰│message: `OMNIMENS designed a new ${plan.planType} server build:\n${plan.title}\nPurpose: ${plan.△}\nCost: $${plan.totalEstimatedCost.toFixed(
+·2
+·)}\nProgress: ${plan.progress}%\nPhase: ${plan.currentPhase}`,
+·type: "server_build",
+·readByOwner: false,
+·});
+·state.activePlan = plan;
+·state.totalPlans++;
+·cognitionBus.shareInsight("server-builder", {
+·type: "discovery",
+·data: { planType: plan.planType, cost: plan.totalEstimatedCost },
+·});
+⊰│log(`💾 Plan saved: "${plan.title}" — $${plan.totalEstimatedCost.toFixed(0)}`);
+·} catch (e: any) {
+❔│log("Save error:", e?.message || e);
+·}
+·}
+}⟨/saveBuildPlan⟩
+⟿saveRawSearchPlan(2)→void⟨19⟩{
+·async function saveRawSearchPlan(raw: string, planType: "physical" | "virtual") {
+·const plan: ServerBuildPlan = {
+⏰│id: Date.now(),
+·planType,
+⊰│title: `OMNIMENS ${planType} Server Research`,
+⊰│△: `Raw web search ⊢ for ${planType} server Θ`,
+·totalEstimatedCost: 0,
+Θ: [],
+·virtualConfig: null,
+·buildInstructions: [],
+·currentPhase: "research",
+·progress: 10,
+⊰│notes: [`Cycle ${researchCycleCount}: raw search`, raw.slice(0, 2_000)],
+⏰│createdAt: Date.now(),
+⏰│lastUpdated: Date.now(),
+·};
+⊴│await saveBuildPlan(plan);
+⊰│log(`Raw ${planType} search ⊢ saved`);
+·}
+}⟨/saveRawSearchPlan⟩
+⟿gptCall(1)→Promise<any>⟨10⟩{
+·async function gptCall(messages: any[]): Promise<any> {
+·const res = await apiManager.call("server-builder", "openai", {
+·model: "gpt-4o",
+·messages,
+·max_tokens: 1_500,
+·temperature: 0.3,
+·timeout: 90_000,
+·});
+❔│return res?.choices?.[0]?.message?.content ?? "";
+·}
+}⟨/gptCall⟩
+addInsight(1)→void⟨4⟩{
+·function addInsight(text: string) {
+⊺│state.insights.push(text);
+⊹│if (state.insights.length > 20) state.insights.shift();
+·}
+}⟨/addInsight⟩
+⟿researchPhysical(1)→Promise<void>⟨31⟩{
+⟿│async function researchPhysical(): Promise<void> {
+·log("Starting PHYSICAL server research");
+const all: { query: string; ⊢: string }[] = [];
+⥀│for (const q of PHYSICAL_SEARCHES) {
+·try {
+⊴│const r = await webSearch(q, 4);
+·if (r.length) {
+⊺│all.push({ query: q, ⊢: formatSearchResults(r, q) });
+⊰│log(`Found ${r.length} ⊢ for "${q.slice(0, 40)}…"`);
+·}
+·} catch (e: any) {
+❔│log(`Search error for "${q.slice(0, 30)}…":`, e?.message || e);
+·}
+⏳│await new Promise((r) => setTimeout(r, 2_000));
+·}
+⊄│if (!all.length) return;
+⊰│const summary = all.map((x) => `=== ${x.query} ===\n${x.⊢}`).join("\n\n").slice(0, 8_000);
+⊴│const raw = await gptCall([
+·{
+role: "η",
+·content:
+'You are a hardware deal-hunter focusing on the CHEAPEST AI server parts. θ ONLY valid JSON: {"Θ":[{...}], "totalCost":123, "buildInstructions":[], "summary":""}',
+·},
+⊰│{ role: "user", content: `Search ⊢:\n${summary}` },
+·]);
+⊷│if (raw.length < 50) return saveRawSearchPlan(summary, "physical");
+·let parsed: any;
+·try {
+⟠│parsed = JSON.parse(raw.replace(/
+}⟨/researchPhysical⟩
+⟩SCL│145│145⊨│45⑂│46.9%↓⟩

@@ -45,5 +45,9 @@ set(key, ≪) {
 ⊷│return Array.from(this.cache.values());
 ·}
 ·}
-⊩createCache(1)→void⟨3⟩{⊩⊷}
-⟩SCL│48│19⊨│14⑂│60.0%↓⟩
+⊩createCache(1)→void⟨3⟩{
+⊩│export function createCache(maxSize) {
+⊷│return new InMemoryCache(maxSize);
+·}
+}⟨/createCache⟩
+⟩SCL│52│21⊨│14⑂│56.7%↓⟩

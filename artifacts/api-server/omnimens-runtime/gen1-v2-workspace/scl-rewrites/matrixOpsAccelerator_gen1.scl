@@ -1,7 +1,70 @@
 ⟨SCL v1│matrixOpsAccelerator_gen1.mjs│111→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⟿initializeWasmModule(1)→void⟨12⟩{⊷}
-⟿addMatrices(2)→void⟨28⟩{⊵❔⊴⊺⊷}
-⟿multiplyMatrices(2)→void⟨32⟩{⊵❔⊴⊺⊷}
+⟿initializeWasmModule(1)→void⟨12⟩{
+·async function initializeWasmModule() {
+·const wasmCode = new Uint8Array([
+·0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, 0x01, 0x04, 0x01, 0x60,
+·0x02, 0x7f, 0x7f, 0x01, 0x7f, 0x03, 0x02, 0x01, 0x00, 0x07, 0x07, 0x01,
+·0x03, 0x61, 0x64, 0x64, 0x00, 0x00, 0x0a, 0x09, 0x01, 0x07, 0x00, 0x20,
+·0x00, 0x20, 0x01, 0x6a, 0x0b
+·]);
+·const wasmModule = await WebAssembly.compile(wasmCode);
+⊷│return WebAssembly.instantiate(wasmModule);
+·}
+}⟨/initializeWasmModule⟩
+⟿addMatrices(2)→void⟨28⟩{
+·async function addMatrices(matrixA, matrixB) {
+·if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
+⊵│throw new Error("Both inputs must be arrays.");
+·}
+·const rowsA = matrixA.length;
+❔│const colsA = matrixA[0]?.length || 0;
+·const rowsB = matrixB.length;
+❔│const colsB = matrixB[0]?.length || 0;
+·if (rowsA !== rowsB || colsA !== colsB) {
+⊵│throw new Error("Matrices must have the same dimensions.");
+·}
+⊴│const wasmInstance = await initializeWasmModule();
+·const addFunction = wasmInstance.exports.add;
+·const result = [];
+·for (let i = 0; i < rowsA; i++) {
+·const row = [];
+·for (let j = 0; j < colsA; j++) {
+⊺│row.push(addFunction(matrixA[i][j], matrixB[i][j]));
+·}
+⊺│result.push(row);
+·}
+⊷│return result;
+·}
+}⟨/addMatrices⟩
+⟿multiplyMatrices(2)→void⟨32⟩{
+·async function multiplyMatrices(matrixA, matrixB) {
+·if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
+⊵│throw new Error("Both inputs must be arrays.");
+·}
+·const rowsA = matrixA.length;
+❔│const colsA = matrixA[0]?.length || 0;
+·const rowsB = matrixB.length;
+❔│const colsB = matrixB[0]?.length || 0;
+·if (colsA !== rowsB) {
+⊵│throw new Error("Number of columns in matrix A must equal number of rows in matrix B.");
+·}
+⊴│const wasmInstance = await initializeWasmModule();
+·const multiplyFunction = wasmInstance.exports.multiply;
+·const result = [];
+·for (let i = 0; i < rowsA; i++) {
+·const row = [];
+·for (let j = 0; j < colsB; j++) {
+·let sum = 0;
+·for (let k = 0; k < colsA; k++) {
+·sum += multiplyFunction(matrixA[i][k], matrixB[k][j]);
+·}
+⊺│row.push(sum);
+·}
+⊺│result.push(row);
+·}
+⊷│return result;
+·}
+}⟨/multiplyMatrices⟩
 ·export { addMatrices, multiplyMatrices };
-⟩SCL│6│14⊨│11⑂│94.6%↓⟩
+⟩SCL│69│71⊨│17⑂│37.8%↓⟩

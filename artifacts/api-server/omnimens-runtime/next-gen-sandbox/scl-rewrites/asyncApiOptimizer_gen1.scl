@@ -4,10 +4,37 @@
 κtaskQueue
 ·let isProcessing = false;
 let apiRateLimit = 1000; // Default API rate ⏳ in ms
-⊩addTask(2)→void⟨5⟩{⊩⊺}
-⊩adjustRateLimit(1)→void⟨3⟩{⊩⟛}
-⟿processQueue(1)→void⟨16⟩{⊹⊲⊺⊴⏳}
-⊩createContextualTask(2)→void⟨1⟩{⊩}
+⊩addTask(2)→void⟨5⟩{
+⊩│export function addTask(taskFunction, priority = 10) {
+⊺│taskQueue.push({ taskFunction, priority });
+·taskQueue.sort((a, b) => a.priority - b.priority); // Sort by priority
+·processQueue();
+·}
+}⟨/addTask⟩
+⊩adjustRateLimit(1)→void⟨3⟩{
+⊩│export function adjustRateLimit(newRateLimit) {
+⟛│apiRateLimit = Math.max(1, newRateLimit); // Ensure rate ⏳ is at least 1ms
+·}
+}⟨/adjustRateLimit⟩
+⟿processQueue(1)→void⟨16⟩{
+·async function processQueue() {
+·if (isProcessing) return; // Prevent multiple concurrent processors
+·isProcessing = true;
+⊹│while (taskQueue.length > 0) {
+⊲│const { taskFunction } = taskQueue.shift(); // Get the highest priority task
+·try {
+⊴│await taskFunction();
+·} catch (error) {
+console.error('Task execution ↺:', error);
+·}
+⏳│await setTimeout(apiRateLimit); // Respect the rate ⏳
+·}
+·isProcessing = false;
+·}
+}⟨/processQueue⟩
+⊩createContextualTask(2)→void⟨1⟩{
+⊩│export function createContextualTask(taskLogic, ◧ = {}) {
+}⟨/createContextualTask⟩
 ⊷│return async function () {
 ·try {
 ⊴│await taskLogic(context);
@@ -16,7 +43,20 @@ console.error('Contextual task ↺:', error);
 ·}
 ·};
 ·}
-⊩getQueueSize(1)→void⟨3⟩{⊩⊷}
-⊩clearQueue(1)→void⟨3⟩{⊩⊹}
-⊩⟿exampleTaskLogic(1)→void⟨5⟩{⊩⏳⊴}
-⟩SCL│21│30⊨│19⑂│79.6%↓⟩
+⊩getQueueSize(1)→void⟨3⟩{
+⊩│export function getQueueSize() {
+⊷│return taskQueue.length;
+·}
+}⟨/getQueueSize⟩
+⊩clearQueue(1)→void⟨3⟩{
+⊩│export function clearQueue() {
+⊹│taskQueue.length = 0;
+·}
+}⟨/clearQueue⟩
+⊩⟿exampleTaskLogic(1)→void⟨5⟩{
+⊩│export async function exampleTaskLogic(◧) {
+console.log('Executing task with ◧:', ◧);
+⏳│await setTimeout(500);
+·}
+}⟨/exampleTaskLogic⟩
+⟩SCL│61│54⊨│17⑂│40.8%↓⟩

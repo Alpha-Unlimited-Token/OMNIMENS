@@ -1,4 +1,9 @@
 ⟨SCL v1│entropyBasedConfidenceAdjustment_gen1.mjs│13→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩entropyBasedConfidenceAdjustment(1)→void⟨4⟩{⊩⋐⊷}
-⟩SCL│3│4⊨│3⑂│76.9%↓⟩
+⊩entropyBasedConfidenceAdjustment(1)→void⟨4⟩{
+⊩│export function entropyBasedConfidenceAdjustment(confidenceScores) {
+⋐│const entropy = confidenceScores.reduce((sum, score) => sum - score * Math.log(score), 0);
+⊷│return confidenceScores.map(score => score * (1 - entropy));
+·}
+}⟨/entropyBasedConfidenceAdjustment⟩
+⟩SCL│8│7⊨│3⑂│38.5%↓⟩

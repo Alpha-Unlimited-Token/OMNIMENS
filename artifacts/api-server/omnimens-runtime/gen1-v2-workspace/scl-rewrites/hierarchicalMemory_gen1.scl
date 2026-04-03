@@ -1,14 +1,66 @@
 ⟨SCL v1│hierarchicalMemory_gen1.mjs│110→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩summarizeText(2)→void⟨15⟩{⊩⊵⊹⊷}
-⊩segmentTopics(2)→void⟨19⟩{⊩⊵⊰⋐⊱⊹⊽⊺⊷}
-⊩hierarchicalSummarization(3)→void⟨18⟩{⊩⊵⊷}
-⊩compressContext(3)→void⟨3⟩{⊩⊷}
+⊩summarizeText(2)→void⟨15⟩{
+⊩│export function summarizeText(text, maxSentences = 3) {
+·if (typeof text !== 'string' || text.trim() === '') {
+⊵│throw new Error('Input text must be a non-empty string.');
+·}
+·const sentences = text.split('.').map(s => s.trim()).filter(Boolean);
+⊹│if (sentences.length <= maxSentences) {
+⊷│return text;
+·}
+·const step = Math.ceil(sentences.length / maxSentences);
+·const summary = sentences.filter((_, index) => index % step === 0).slice(0, maxSentences);
+⊷│return summary.join('. ') + '.';
+·}
+}⟨/summarizeText⟩
+⊩segmentTopics(2)→void⟨19⟩{
+⊩│export function segmentTopics(text, keywords = []) {
+·if (typeof text !== 'string' || text.trim() === '') {
+⊵│throw new Error('Input text must be a non-empty string.');
+·}
+⊰│const regex = new RegExp(`\\b(${keywords.join('|')})\\b`, 'i');
+⋐│const segments = text.split(/\n|\r\n/).reduce((acc, paragraph) => {
+⊹│if (keywords.length > 0 && regex.test(paragraph)) {
+⊺│acc.push(paragraph);
+⊹│} else if (acc.length > 0) {
+·acc[acc.length - 1] += ' ' + paragraph;
+·} else {
+⊺│acc.push(paragraph);
+·}
+⊷│return acc;
+·}, []);
+⊷│return segments.map(segment => segment.trim()).filter(Boolean);
+·}
+}⟨/segmentTopics⟩
+⊩hierarchicalSummarization(3)→void⟨18⟩{
+⊩│export function hierarchicalSummarization(text, levels = 2, keywords = []) {
+·if (levels < 1) {
+⊵│throw new Error('Levels must be a ☼ integer.');
+·}
+·const segments = segmentTopics(text, keywords);
+·const hierarchy = segments.map(segment => {
+·const summary = summarizeText(segment);
+⊷│return levels > 1
+·? {
+·summary,
+·details: hierarchicalSummarization(segment, levels - 1, keywords)
+·}
+·: { summary };
+·});
+⊷│return hierarchy;
+·}
+}⟨/hierarchicalSummarization⟩
+⊩compressContext(3)→void⟨3⟩{
+⊩│export function compressContext(◧, levels = 2, keywords = []) {
+⊷│return hierarchicalSummarization(◧, levels, keywords);
+·}
+}⟨/compressContext⟩
 if (require.main === Ε) {
 κtestText
-Transformers have revolutionized natural ⊣ ✦. Efficient attentio
+Transformers have revolutionized natural ⊣ ✦. Efficient attention mechanisms are critical.
 ·Cognitive architectures are emerging to enhance memory and reasoning.`;
 κcompressed
 ⟠│console.log(JSON.stringify(compressed, null, 2));
 ·}
-⟩SCL│13│27⊨│19⑂│88.2%↓⟩
+⟩SCL│65│69⊨│22⑂│40.9%↓⟩

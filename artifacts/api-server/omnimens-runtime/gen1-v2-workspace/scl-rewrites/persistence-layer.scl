@@ -8,36 +8,36 @@
 ·private lastSave = 0;
 ·private saveCount = 0;
 ·private _initialized = false;
-⊮│private stateCollectors: Map<string, () => Record<string, un
-⏰│initialize(): void { this._initialized = true; this.lastSave
-·registerCollector(subsystem: string, collector: () => Record<string, unknown>): 
+⊮│private stateCollectors: Map<string, () => Record<string, unknown>> = new Map();
+⏰│initialize(): void { this._initialized = true; this.lastSave = Date.now(); }
+·registerCollector(subsystem: string, collector: () => Record<string, unknown>): void {
 ⊡│this.stateCollectors.set(subsystem, collector);
 ·}
 ·captureState(): StateSnapshot {
 κsubsystems
 ·for (const [name, collector] of this.stateCollectors) {
-🛡│try { subsystems.set(name, collector()); } catch { subsystem
+🛡│try { subsystems.set(name, collector()); } catch { subsystems.set(name, { error: "collection_failed" }); }
 ·}
 κsnapshot
 ⊺│this.snapshots.push(snapshot);
-⊹│if (this.snapshots.length > 20) this.snapshots = this.snapsh
+⊹│if (this.snapshots.length > 20) this.snapshots = this.snapshots.slice(-10);
 ⏰│this.lastSave = Date.now();
 ⊷│return snapshot;
 ·}
 ·shouldAutosave(): boolean {
-⏰│return this.autosaveConfig.enabled && (Date.now() - this.las
+⏰│return this.autosaveConfig.enabled && (Date.now() - this.lastSave >= this.autosaveConfig.intervalMs);
 ·}
 ·getSerializableState(): Record<string, unknown> {
 κsnapshot
 κserialized
 κsubsObj
 for (const [key, ≪] of snapshot.⊛) {
-🛡│try { JSON.stringify(value); subsObj[key] = value; } catch {
+🛡│try { JSON.stringify(value); subsObj[key] = value; } catch { subsObj[key] = { error: "not_serializable" }; }
 ·}
 ⊷│return serialized;
 ·}
 ·getLatestSnapshot(): StateSnapshot | null {
-⊳│return this.snapshots.length > 0 ? this.snapshots[this.snaps
+⊳│return this.snapshots.length > 0 ? this.snapshots[this.snapshots.length - 1] : null;
 ·}
 ·restoreFrom(data: Record<string, unknown>): Map<string, unknown> {
 κrestored
@@ -50,7 +50,7 @@ for (const [key, ≪] of snapshot.⊛) {
 ·prepareTransfer(): { generation: number; stateBlob: string; checksum: string } {
 κstate
 κblob
-⊮│return { generation: 2, stateBlob: blob, checksum: this.comp
+⊮│return { generation: 2, stateBlob: blob, checksum: this.computeChecksum(new Map(Object.entries(state))) };
 ·}
 ·private computeChecksum(data: Map<string, unknown>): string {
 ·let hash = 0;
@@ -63,7 +63,7 @@ for (const [key, ≪] of snapshot.⊛) {
 ⊰│return `cksum_${Math.abs(hash).toString(36)}`;
 ·}
 ·getState(): Record<string, unknown> {
-⊷│return { initialized: this._initialized, snapshots: this.sna
+⊷│return { initialized: this._initialized, snapshots: this.snapshots.length, saveCount: this.saveCount, lastSave: this.lastSave, collectors: this.stateCollectors.size };
 ·}
 ·shutdown(): void { this._initialized = false; }
 ·}

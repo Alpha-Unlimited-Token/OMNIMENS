@@ -2,11 +2,58 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 κredisCache
 κpostgresStorage
-cosineSimilarity(2)→void⟨6⟩{⋐⊷}
-retrieveMemory(2)→void⟨24⟩{⊺⊹⊷}
-addMemory(4)→void⟨11⟩{⏰⊡}
-removeMemory(1)→void⟨4⟩{}
-clearCache(1)→void⟨3⟩{}
-clearStorage(1)→void⟨3⟩{}
+cosineSimilarity(2)→void⟨6⟩{
+·function cosineSimilarity(vectorA, vectorB) {
+⋐│const dotProduct = vectorA.reduce((sum, a, idx) => sum + a * vectorB[idx], 0);
+⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a ** 2, 0));
+⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b ** 2, 0));
+⊷│return dotProduct / (magnitudeA * magnitudeB);
+·}
+}⟨/cosineSimilarity⟩
+retrieveMemory(2)→void⟨24⟩{
+·function retrieveMemory(queryEmbedding, similarityThreshold = 0.8) {
+const ⊢ = [];
+·for (const [key, entry] of redisCache.entries()) {
+·const similarity = cosineSimilarity(queryEmbedding, entry.embedding);
+·if (similarity >= similarityThreshold) {
+⊺│⊢.push({ key, data: entry.data, similarity });
+·}
+·}
+⊹│if (⊢.length === 0) {
+·for (const [key, entry] of postgresStorage.entries()) {
+·const similarity = cosineSimilarity(queryEmbedding, entry.embedding);
+·if (similarity >= similarityThreshold) {
+⊺│⊢.push({ key, data: entry.data, similarity });
+·}
+·}
+·}
+⊷│return ⊢.sort((a, b) => b.similarity - a.similarity);
+·}
+}⟨/retrieveMemory⟩
+addMemory(4)→void⟨11⟩{
+·function addMemory(key, embedding, data, cache = true) {
+⏰│const entry = { key, embedding, data, timestamp: Date.now() };
+⊡│postgresStorage.set(key, { key, embedding, data });
+·if (cache) {
+⊡│redisCache.set(key, entry);
+·}
+·}
+}⟨/addMemory⟩
+removeMemory(1)→void⟨4⟩{
+·function removeMemory(key) {
+·redisCache.delete(key);
+·postgresStorage.delete(key);
+·}
+}⟨/removeMemory⟩
+clearCache(1)→void⟨3⟩{
+·function clearCache() {
+·redisCache.clear();
+·}
+}⟨/clearCache⟩
+clearStorage(1)→void⟨3⟩{
+·function clearStorage() {
+·postgresStorage.clear();
+·}
+}⟨/clearStorage⟩
 ·export { retrieveMemory, addMemory, removeMemory, clearCache, clearStorage };
-⟩SCL│11│15⊨│7⑂│91.6%↓⟩
+⟩SCL│58│50⊨│11⑂│55.7%↓⟩

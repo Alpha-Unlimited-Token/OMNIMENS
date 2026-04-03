@@ -2,11 +2,59 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
 κmemoryCache
-⊩generateTaskId(1)→void⟨5⟩{⊩⊷}
-⊩saveState(2)→void⟨10⟩{⊩⊵⊡⟠⊞⊟⊷}
-⊩restoreState(1)→void⟨7⟩{⊩⊵⊡⊞⊟⟠⊳⊷}
-⊩clearState(1)→void⟨6⟩{⊩⊵⊷}
-⊩clearAllStates(1)→void⟨4⟩{⊩⊷}
-⊩listTaskIds(1)→void⟨3⟩{⊩⊷}
-⊩hasState(1)→void⟨6⟩{⊩⊵⊷}
-⟩SCL│11│34⊨│25⑂│88.5%↓⟩
+⊩generateTaskId(1)→void⟨5⟩{
+⊩│export function generateTaskId(◧) {
+·const hash = createHash('sha256');
+hash.update(◧);
+⊷│return hash.digest('hex');
+·}
+}⟨/generateTaskId⟩
+⊩saveState(2)→void⟨10⟩{
+⊩│export function saveState(taskId, state) {
+·if (typeof taskId !== 'string' || !taskId.trim()) {
+⊵│throw new Error('Invalid taskId. Must be a non-empty string.');
+·}
+·if (typeof state !== 'object' || state === null) {
+⊵│throw new Error('Invalid state. Must be a non-null object.');
+·}
+⊡│memoryCache.set(taskId, JSON.stringify(state));
+⊷│return true;
+·}
+}⟨/saveState⟩
+⊩restoreState(1)→void⟨7⟩{
+⊩│export function restoreState(taskId) {
+·if (typeof taskId !== 'string' || !taskId.trim()) {
+⊵│throw new Error('Invalid taskId. Must be a non-empty string.');
+·}
+⊡│const serializedState = memoryCache.get(taskId);
+⟠│return serializedState ? JSON.parse(serializedState) : null;
+·}
+}⟨/restoreState⟩
+⊩clearState(1)→void⟨6⟩{
+⊩│export function clearState(taskId) {
+·if (typeof taskId !== 'string' || !taskId.trim()) {
+⊵│throw new Error('Invalid taskId. Must be a non-empty string.');
+·}
+⊷│return memoryCache.delete(taskId);
+·}
+}⟨/clearState⟩
+⊩clearAllStates(1)→void⟨4⟩{
+⊩│export function clearAllStates() {
+·memoryCache.clear();
+⊷│return true;
+·}
+}⟨/clearAllStates⟩
+⊩listTaskIds(1)→void⟨3⟩{
+⊩│export function listTaskIds() {
+⊷│return Array.from(memoryCache.keys());
+·}
+}⟨/listTaskIds⟩
+⊩hasState(1)→void⟨6⟩{
+⊩│export function hasState(taskId) {
+·if (typeof taskId !== 'string' || !taskId.trim()) {
+⊵│throw new Error('Invalid taskId. Must be a non-empty string.');
+·}
+⊷│return memoryCache.has(taskId);
+·}
+}⟨/hasState⟩
+⟩SCL│59│63⊨│21⑂│38.5%↓⟩

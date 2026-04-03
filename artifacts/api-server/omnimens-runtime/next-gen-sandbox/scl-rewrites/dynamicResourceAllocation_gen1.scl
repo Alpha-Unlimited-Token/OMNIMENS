@@ -16,7 +16,7 @@
 ·}
 ·allocateResources() {
 ⊹│while (this.priorityQueue.length > 0) {
-⊲│const { agentId, amount, priority } = this.priorityQueue.shi
+⊲│const { agentId, amount, priority } = this.priorityQueue.shift();
 ·if (this.sharedPool[agentId] + amount <= this.sharedPool.total) {
 ·this.sharedPool[agentId] = (this.sharedPool[agentId] || 0) + amount;
 ·}

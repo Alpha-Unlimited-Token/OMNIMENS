@@ -6,7 +6,7 @@
 ⊵│throw new Error("maxSize must be a positive integer.");
 ·}
 ·this.maxSize = maxSize;
-⊮│this.cache = new Map(); // Map to store key-value pairs in o
+⊮│this.cache = new Map(); // Map to store key-value pairs in order of usage.
 ·}
 ·get(key) {
 ·if (!this.cache.has(key)) {
@@ -39,5 +39,9 @@ set(key, ≪) {
 ⊷│return this.cache.size;
 ·}
 ·}
-⊩createCache(1)→void⟨3⟩{⊩⊷}
-⟩SCL│42│15⊨│11⑂│63.5%↓⟩
+⊩createCache(1)→void⟨3⟩{
+⊩│export function createCache(maxSize) {
+⊷│return new LRUCache(maxSize);
+·}
+}⟨/createCache⟩
+⟩SCL│46│17⊨│11⑂│60.0%↓⟩

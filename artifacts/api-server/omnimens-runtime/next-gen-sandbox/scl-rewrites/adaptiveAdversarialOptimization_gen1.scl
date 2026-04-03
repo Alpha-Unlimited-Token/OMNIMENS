@@ -1,4 +1,15 @@
 ⟨SCL v1│adaptiveAdversarialOptimization_gen1.mjs│19→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩adaptiveAdversarialOptimization(2)→void⟨10⟩{⊩⊱⊷}
-⟩SCL│3│4⊨│3⑂│84.2%↓⟩
+⊩adaptiveAdversarialOptimization(2)→void⟨10⟩{
+⊩│export function adaptiveAdversarialOptimization(agentList, metrics) {
+⊱│const optimize = (agents) => {
+agents.forEach(α => {
+α.testEdgeCases(metrics);
+α.refineAlgorithm();
+·});
+⊷│return agents;
+·};
+⊷│return optimize(agentList);
+·}
+}⟨/adaptiveAdversarialOptimization⟩
+⟩SCL│14│13⊨│4⑂│26.3%↓⟩

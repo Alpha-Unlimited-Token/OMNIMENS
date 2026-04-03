@@ -1,6 +1,19 @@
 ⟨SCL v1│semanticMemory_gen1.mjs│100→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-cosineSimilarity(2)→void⟨15⟩{⊹⊵⋐⊷}
+cosineSimilarity(2)→void⟨15⟩{
+·function cosineSimilarity(vectorA, vectorB) {
+⊹│if (vectorA.length !== vectorB.length) {
+⊵│throw new Error("Vectors must be of the same length.");
+·}
+⋐│const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
+⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a * a, 0));
+⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b * b, 0));
+·if (magnitudeA === 0 || magnitudeB === 0) {
+⊷│return 0; // Avoid division by zero; return zero similarity for zero vectors.
+·}
+⊷│return dotProduct / (magnitudeA * magnitudeB);
+·}
+}⟨/cosineSimilarity⟩
 ⊶│class SemanticMemory {
 ·constructor() {
 ⊮│this.memory = new Map();
@@ -31,4 +44,4 @@ cosineSimilarity(2)→void⟨15⟩{⊹⊵⋐⊷}
 ·}
 ·}
 ·export { SemanticMemory, cosineSimilarity };
-⟩SCL│33│12⊨│10⑂│67.0%↓⟩
+⟩SCL│46│23⊨│13⑂│54.0%↓⟩

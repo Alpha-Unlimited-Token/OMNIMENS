@@ -8,7 +8,7 @@
 ⊺│this.testCases.push(testCase);
 ·}
 ·runTests(tool) {
-⊰│console.log(`Running adversarial tests on tool: ${tool.name}
+⊰│console.log(`Running adversarial tests on tool: ${tool.name}`);
 ·let passed = true;
 ⥀│for (const test of this.testCases) {
 ·try {

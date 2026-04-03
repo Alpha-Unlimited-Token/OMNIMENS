@@ -22,7 +22,7 @@
 ·.digest("hex");
 κDEPLOY_SIG
 ·.createHash("sha256")
-⊰│.update(`${MASTER_SEED}:deploy:${process.env.REPL_ID || "loc
+⊰│.update(`${MASTER_SEED}:deploy:${process.env.REPL_ID || "local"}:${process.env.REPL_SLUG || "dev"}`)
 ·.digest("hex");
 κCODE_FINGERPRINT
 ·.createHash("sha256")
@@ -30,47 +30,142 @@
 ·.digest("hex");
 κTAMPER_SEED
 ·.createHash("sha384")
-⊰│.update(`${MASTER_SEED}:tamper:${CODE_FINGERPRINT}:${DEPLOY_
+⊰│.update(`${MASTER_SEED}:tamper:${CODE_FINGERPRINT}:${DEPLOY_SIG}`)
 ·.digest("hex");
 κWATERMARK
 ·.createHash("sha256")
-⏰│.update(`WATERMARK:${OWNER}:${PLATFORM}:${TS_ID}:${Date.now(
+⏰│.update(`WATERMARK:${OWNER}:${PLATFORM}:${TS_ID}:${Date.now().toString(36)}`)
 ·.digest("hex")
 ·.slice(0, 32)
 ·.toUpperCase();
-·const hash = (algo: string, data: string) => crypto.createHash(algo).update(data
-⊰│const genId = (module: ModuleName) => hash("sha256", `${MAST
-⊰│const genFp = (module: ModuleName) => hash("sha256", `${MAST
-⊰│const genSig = (module: ModuleName) => hash("sha256", `${OWN
+·const hash = (algo: string, data: string) => crypto.createHash(algo).update(data).digest("hex");
+⊰│const genId = (module: ModuleName) => hash("sha256", `${MASTER_SEED}:beacon:${module}:${TS_ID}`).slice(0, 24).toUpperCase();
+⊰│const genFp = (module: ModuleName) => hash("sha256", `${MASTER_SEED}:module:${module}:${CODE_FINGERPRINT}`);
+⊰│const genSig = (module: ModuleName) => hash("sha256", `${OWNER}:${module}:${PATENT}:${TS_ID}:${DEPLOY_SIG}`).slice(0, 40);
 κbeacons
 ·let cycles = 0;
 ·let started = false;
-createBeacon(1)→SpiderBeacon⟨26⟩{⏰⟠⊡⊷}
-checkBeacon(1)→{ ok: boolean; reason: string }⟨1⟩{}
+createBeacon(1)→SpiderBeacon⟨26⟩{
+·function createBeacon(module: ModuleName): SpiderBeacon {
+·const beacon: SpiderBeacon = {
+·beaconId: genId(module),
+·moduleFingerprint: genFp(module),
+·deploymentHash: DEPLOY_SIG.slice(0, 32),
+·ownerSignature: genSig(module),
+·tradeSecretMarker: TS_ID,
+·patentPendingRef: PATENT,
+⏰│timestampCreated: Date.now(),
+·integrityChecksum: "",
+·tamperDetectionSeed: TAMPER_SEED.slice(0, 48),
+·watermark: WATERMARK,
+·};
+·beacon.integrityChecksum = hash(
+·"sha256",
+⟠│JSON.stringify({
+·beaconId: beacon.beaconId,
+·moduleFingerprint: beacon.moduleFingerprint,
+·ownerSignature: beacon.ownerSignature,
+·tradeSecretMarker: beacon.tradeSecretMarker,
+·tamperDetectionSeed: beacon.tamperDetectionSeed,
+·}),
+·);
+⊡│beacons.set(module, beacon);
+⊷│return beacon;
+·}
+}⟨/createBeacon⟩
+checkBeacon(1)→{ ok: boolean; reason: string }⟨1⟩{
+·function checkBeacon(module: ModuleName): { ok: boolean; reason: string } {
+}⟨/checkBeacon⟩
 κb
-⊄│if (!b) return { ok: false, reason: `MISSING beacon ${module
+⊄│if (!b) return { ok: false, reason: `MISSING beacon ${module}` };
 κexpected
 κexpectedChecksum
-⊰│if (b.integrityChecksum !== expectedChecksum) return { ok: f
-⊰│if (b.beaconId !== expected.beaconId) return { ok: false, re
-⊰│if (b.moduleFingerprint !== expected.moduleFingerprint) retu
-⊰│if (b.tradeSecretMarker !== TS_ID) return { ok: false, reaso
-⊰│if (b.watermark !== WATERMARK) return { ok: false, reason: `
+⊰│if (b.integrityChecksum !== expectedChecksum) return { ok: false, reason: `Checksum mismatch ${module}` };
+⊰│if (b.beaconId !== expected.beaconId) return { ok: false, reason: `ID tampered ${module}` };
+⊰│if (b.moduleFingerprint !== expected.moduleFingerprint) return { ok: false, reason: `Fingerprint tampered ${module}` };
+⊰│if (b.tradeSecretMarker !== TS_ID) return { ok: false, reason: `TS marker missing ${module}` };
+⊰│if (b.watermark !== WATERMARK) return { ok: false, reason: `Watermark tampered ${module}` };
 ⊷│return { ok: true, reason: "OK" };
 ·}
-compileReport(1)→⊢⟨26⟩{⥀⊺⊹⊰⊷⏰}
-⟿verifyAndReport(1)→Promise<void>⟨40⟩{⟿🚨⊰⫘⊱}
+compileReport(1)→⊢⟨26⟩{
+·function compileReport(): IntegrityReport {
+·const details: string[] = [];
+·let active = 0;
+⥀│for (const m of PROTECTED_MODULES) {
+·const r = checkBeacon(m);
+·if (r.ok) active++;
+⊺│else details.push(r.reason);
+·}
+⊹│const healthy = details.length === 0 && active === PROTECTED_MODULES.length;
+⊰│const watermarkIntact = hash("sha256", `WATERMARK:${OWNER}:${PLATFORM}:${TS_ID}:${WATERMARK}`).length === 64;
+⊷│return {
+·systemHealthy: healthy,
+·beaconsActive: active,
+·beaconsExpected: PROTECTED_MODULES.length,
+·tamperDetected: !healthy,
+·tamperDetails: details,
+⏰│lastVerification: Date.now(),
+·codeFingerprint: CODE_FINGERPRINT,
+·deploymentSignature: DEPLOY_SIG,
+·protectedModules: PROTECTED_MODULES.length,
+·watermarkIntact,
+·};
+·}
+}⟨/compileReport⟩
+⟿verifyAndReport(1)→Promise<void>⟨40⟩{
+⟿│async function verifyAndReport(): Promise<void> {
+·cycles++;
+const ⊢ = compileReport();
+if (⊢.tamperDetected) {
+🚨│console.error(`[OMNIMENS-IP-GUARDIAN] ⚠️ TAMPER detected (${⊢.tamperDetails.length})`);
+🚨│⊢.tamperDetails.forEach(d => console.error(`[OMNIMENS-IP-GUARDIAN] ⚠️ ${d}`));
+⫘│await Promise.all([
+dbGateway.⊞(
+·"ip-guardian",
+·"omnimensNotifications",
+·{
+·upgradeId: null,
+⊰│title: `⚠️ IP GUARDIAN: ${⊢.tamperDetails.length} violation(s)`,
+⊰│message: `Tampering detected:\n${⊢.tamperDetails.join("\n")}`,
+·type: "security_critical",
+·readByOwner: false,
+·},
+·"CRITICAL",
+·),
+dbGateway.⊞(
+·"ip-guardian",
+·"brain_entries",
+·{
+⊰│title: `[IP GUARDIAN] Tamper alert #${cycles}`,
+⊰│content: `SECURITY ALERT @ ${new Date(⊢.lastVerification).toISOString()}\n${⊢.tamperDetails.join(
+·"; ",
+·)}`,
+·category: "security_alert",
+·source: "ip_guardian",
+·active: true,
+·timesApplied: 0,
+·},
+·"CRITICAL",
+·),
+cognitionBus.shareInsight("ip-guardian", { type: "tamper", data: ⊢ }),
+⊱│]).catch(() => {});
+·}
+}⟨/verifyAndReport⟩
 ·if (cycles % 10 === 0) {
 ·console.log(
-⊰│`[OMNIMENS-IP-GUARDIAN] 🛡️ check #${cycles} — ${report.beac
-⊳│} active | tamper:${report.tamperDetected ? "YES" : "no"} | 
+⊰│`[OMNIMENS-IP-GUARDIAN] 🛡️ check #${cycles} — ${report.beaconsActive}/${report.beaconsExpected
+⊳│} active | tamper:${report.tamperDetected ? "YES" : "no"} | fp:${report.codeFingerprint.slice(0, 12)}...`,
 ·);
 ·}
 ·}
-⊩initializeBeacons(1)→void⟨3⟩{⊩}
+⊩initializeBeacons(1)→void⟨3⟩{
+⊩│export function initializeBeacons(): void {
+·PROTECTED_MODULES.forEach(createBeacon);
+·}
+}⟨/initializeBeacons⟩
 ⊪getGuardianReport
 ⊪│export const getBeaconCount = (): number => beacons.size;
-⊪│export const getProtectedModuleList = (): string[] => [...PR
+⊪│export const getProtectedModuleList = (): string[] => [...PROTECTED_MODULES];
 ⊪│export const getCopyrightNotice = (): string =>
 ⊰│`Copyright © ${YEARS} ${OWNER}. All Rights Reserved.
 ·Trade Secret ID: ${TS_ID}
@@ -79,7 +174,7 @@ compileReport(1)→⊢⟨26⟩{⥀⊺⊹⊰⊷⏰}
 ·Trademarks: OMNIMENS™, COGNISYNC™, NEUROSYNC™
 ·Digital Watermark: ${WATERMARK}
 ·Code Fingerprint: ${CODE_FINGERPRINT.slice(0, 24)}...`;
-⊪│export const getResponseBeaconHeaders = (): Record<string, s
+⊪│export const getResponseBeaconHeaders = (): Record<string, string> => ({
 ·"X-OMNIMENS-Platform": PLATFORM,
 ·"X-OMNIMENS-Owner": OWNER,
 ⊰│"X-OMNIMENS-Copyright": `Copyright ${YEARS} ${OWNER}`,
@@ -107,10 +202,23 @@ compileReport(1)→⊢⟨26⟩{⥀⊺⊹⊰⊷⏰}
 ⏰│t: Date.now(),
 ·},
 ·});
-⊩startIPGuardian(1)→void⟨16⟩{⊩📢⊰⚡→}
+⊩startIPGuardian(1)→void⟨16⟩{
+⊩│export function startIPGuardian(): void {
+·if (started) {
+·console.log("[OMNIMENS-IP-GUARDIAN] Already running"); return;
+·}
+·started = true;
+·console.log("[OMNIMENS-IP-GUARDIAN] Activating…");
+·initializeBeacons();
+📢│console.log(`[OMNIMENS-IP-GUARDIAN] Deployed ${beacons.size} beacons across ${PROTECTED_MODULES.length} modules`);
+📢│console.log(`[OMNIMENS-IP-GUARDIAN] Watermark ${WATERMARK}, Fingerprint ${CODE_FINGERPRINT.slice(0, 24)}…`);
+⚡→│console.log("[OMNIMENS-IP-GUARDIAN] Tamper verification every 5 min via spike bus");
+⚡→│spikeBus.scheduleSpike("ip-guardian:verify", {}, 30_000);
+·}
+}⟨/startIPGuardian⟩
 ⊱│spikeBus.on("ip-guardian:verify", async () => {
-⊴│await verifyAndReport().catch(e => console.error("[OMNIMENS-
-⚡→│spikeBus.scheduleSpike("ip-guardian:verify", {}, 5 * 60 * 10
+⊴│await verifyAndReport().catch(e => console.error("[OMNIMENS-IP-GUARDIAN] verify error", e));
+⚡→│spikeBus.scheduleSpike("ip-guardian:verify", {}, 5 * 60 * 1000);
 ·});
 ⊱│spikeBus.on("attention:ip-guardian", () => {
 ⚡→│spikeBus.scheduleSpike("ip-guardian:verify", {}, 0);
@@ -125,5 +233,9 @@ if (insight.type === "security" && η !== "ip-guardian") {
 ·}
 ·});
 ·engineRegistry.registerEngine("ip-guardian", "NORMAL", { dbQuota: 10 });
-⊩shutdown(1)→void⟨3⟩{⊩}
-⟩SCL│128│86⊨│60⑂│64.4%↓⟩
+⊩shutdown(1)→void⟨3⟩{
+⊩│export function shutdown(): void {
+·engineRegistry.unregisterEngine("ip-guardian");
+·}
+}⟨/shutdown⟩
+⟩SCL│240│183⊨│65⑂│33.3%↓⟩

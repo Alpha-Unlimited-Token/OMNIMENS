@@ -2,11 +2,63 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊲│const { readFileSync } = require('fs');
 ⊲│const { join } = require('path');
-⟿compileWasm(1)→void⟨5⟩{⊷}
-⟿loadWasmKernel(1)→void⟨5⟩{⊰⊴⊷}
-⟿matrixMultiply(5)→void⟨17⟩{⊴⊲⊷}
-⟿convolution(5)→void⟨17⟩{⊴⊲⊷}
-⟿initialize(1)→void⟨9⟩{⥀⊰⊵}
+⟿compileWasm(1)→void⟨5⟩{
+·async function compileWasm(wasmBuffer) {
+·const wasmModule = await WebAssembly.compile(wasmBuffer);
+·const wasmInstance = await WebAssembly.instantiate(wasmModule);
+⊷│return wasmInstance;
+·}
+}⟨/compileWasm⟩
+⟿loadWasmKernel(1)→void⟨5⟩{
+·async function loadWasmKernel(kernelName) {
+⊰│const kernelPath = join(__dirname, 'kernels', `${kernelName}.wasm`);
+·const wasmBuffer = readFileSync(kernelPath);
+⊴│return await compileWasm(wasmBuffer);
+·}
+}⟨/loadWasmKernel⟩
+⟿matrixMultiply(5)→void⟨17⟩{
+·async function matrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
+⊴│const kernel = await loadWasmKernel('matrixMultiply');
+⊲│const { multiply } = kernel.exports;
+·const result = new Float32Array(rowsA * colsB);
+·multiply(
+·matrixA.byteOffset,
+·matrixB.byteOffset,
+·result.byteOffset,
+·rowsA,
+·colsA,
+·colsB
+·);
+⊷│return result;
+·}
+}⟨/matrixMultiply⟩
+⟿convolution(5)→void⟨17⟩{
+·async function convolution(matrix, kernel, rows, cols, kernelSize) {
+⊴│const wasmKernel = await loadWasmKernel('convolution');
+⊲│const { convolve } = wasmKernel.exports;
+·const result = new Float32Array((rows - kernelSize + 1) * (cols - kernelSize + 1));
+·convolve(
+·matrix.byteOffset,
+·kernel.byteOffset,
+·result.byteOffset,
+·rows,
+·cols,
+·kernelSize
+·);
+⊷│return result;
+·}
+}⟨/convolution⟩
+⟿initialize(1)→void⟨9⟩{
+·async function initialize() {
+·const requiredKernels = ['matrixMultiply', 'convolution'];
+⥀│for (const kernel of requiredKernels) {
+⊰│const kernelPath = join(__dirname, 'kernels', `${kernel}.wasm`);
+·if (!readFileSync(kernelPath)) {
+⊰│throw new Error(`Missing required kernel: ${kernel}`);
+·}
+·}
+·}
+}⟨/initialize⟩
 Ε.exports = {
 ·compileWasm,
 ·loadWasmKernel,
@@ -14,4 +66,4 @@
 ·convolution,
 ·initialize
 ·};
-⟩SCL│16│21⊨│15⑂│87.3%↓⟩
+⟩SCL│68│61⊨│14⑂│46.0%↓⟩
