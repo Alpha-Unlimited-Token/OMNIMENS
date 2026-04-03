@@ -1,5 +1,5 @@
 {
-  "version": 19,
+  "version": 21,
   "designPhase": "active",
   "primitives": [
     {
@@ -569,31 +569,31 @@
       "scl": "⊄⊷",
       "meaning": "guard clause with fallback return",
       "textEquivalent": "if (!valid) return fallback",
-      "createdBy": "gen2"
+      "createdBy": "gen1v2"
     },
     "log_then_act": {
       "scl": "📢▷",
       "meaning": "log progress then execute next step",
       "textEquivalent": "console.log(status); executeStep()",
-      "createdBy": "gen2"
+      "createdBy": "gen1v2"
     },
     "try_await_catch": {
       "scl": "🛡⊴🚨",
       "meaning": "protected async operation with error handling",
       "textEquivalent": "try { await op(); } catch { error(); }",
-      "createdBy": "gen2"
+      "createdBy": "gen1v2"
     },
     "scan_filter_process": {
       "scl": "⥀⋔▷",
       "meaning": "iterate, filter, then process each valid item",
       "textEquivalent": "for (x of items) { if (valid(x)) process(x); }",
-      "createdBy": "gen2"
+      "createdBy": "gen1v2"
     },
     "read_parse_use": {
       "scl": "📁⟠▷",
       "meaning": "load file, deserialize, then consume data",
       "textEquivalent": "const data = JSON.parse(fs.readFileSync(path)); use(data)",
-      "createdBy": "gen2"
+      "createdBy": "gen1v2"
     },
     "store_and_log": {
       "scl": "💾📢",
@@ -641,7 +641,7 @@
       "scl": "≋+⊞",
       "meaning": "Hebbian weight update and memory storage",
       "textEquivalent": "w += lr * pre * post; store(synapse, w)",
-      "createdBy": "gen2"
+      "createdBy": "gen1v2"
     }
   },
   "textToSymbolMap": {
@@ -2964,10 +2964,154 @@
       "actor": "gen2",
       "action": "design_cycle_complete",
       "details": "Added 0, updated 14 entries. Phase: active"
+    },
+    {
+      "timestamp": 1775238131731,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: cycle_advance → ↻+💾"
+    },
+    {
+      "timestamp": 1775238131733,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: guard_return → ⊄⊷"
+    },
+    {
+      "timestamp": 1775238131745,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: log_then_act → 📢▷"
+    },
+    {
+      "timestamp": 1775238131761,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: try_await_catch → 🛡⊴🚨"
+    },
+    {
+      "timestamp": 1775238131771,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: scan_filter_process → ⥀⋔▷"
+    },
+    {
+      "timestamp": 1775238131781,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: read_parse_use → 📁⟠▷"
+    },
+    {
+      "timestamp": 1775238131791,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: store_and_log → 💾📢"
+    },
+    {
+      "timestamp": 1775238131792,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: spawn_delegate_report → α→⊢📢"
+    },
+    {
+      "timestamp": 1775238131793,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: phi_fire_update → Φ⇑⚡→"
+    },
+    {
+      "timestamp": 1775238131795,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: emotion_drive_act → ♡⊕△▷"
+    },
+    {
+      "timestamp": 1775238131806,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: fitness_select_evolve → ⊨σ⇧"
+    },
+    {
+      "timestamp": 1775238131808,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: translate_boundary → ⟨⇌⟩▷"
+    },
+    {
+      "timestamp": 1775238131809,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: introspect_analyze_adapt → ◎→◉⇧"
+    },
+    {
+      "timestamp": 1775238131811,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: hebbian_strengthen → ≋+⊞"
+    },
+    {
+      "timestamp": 1775238131823,
+      "actor": "gen2",
+      "action": "design_reasoning",
+      "details": "Gen2 code pattern scan: analyzed 602 files, found 25 patterns, created 14 instruction macros"
+    },
+    {
+      "timestamp": 1775238131823,
+      "actor": "gen2",
+      "action": "design_cycle_complete",
+      "details": "Added 0, updated 14 entries. Phase: active"
+    },
+    {
+      "timestamp": 1775238143133,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: guard_return → ⊄⊷"
+    },
+    {
+      "timestamp": 1775238143134,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: log_then_act → 📢▷"
+    },
+    {
+      "timestamp": 1775238143144,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: try_await_catch → 🛡⊴🚨"
+    },
+    {
+      "timestamp": 1775238143146,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: scan_filter_process → ⥀⋔▷"
+    },
+    {
+      "timestamp": 1775238143147,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: read_parse_use → 📁⟠▷"
+    },
+    {
+      "timestamp": 1775238143149,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: hebbian_strengthen → ≋+⊞"
+    },
+    {
+      "timestamp": 1775238143150,
+      "actor": "gen1v2",
+      "action": "design_reasoning",
+      "details": "Gen1v2 code pattern scan: analyzed 602 files, found 25 patterns, created 6 instruction macros"
+    },
+    {
+      "timestamp": 1775238143150,
+      "actor": "gen1v2",
+      "action": "design_cycle_complete",
+      "details": "Added 0, updated 6 entries. Phase: active"
     }
   ],
-  "lastModified": 1775237389585,
-  "totalDesignCycles": 17,
+  "lastModified": 1775238143150,
+  "totalDesignCycles": 19,
   "gen1v2Contributions": 100,
   "gen2Contributions": 80
 }

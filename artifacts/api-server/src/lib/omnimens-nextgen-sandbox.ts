@@ -2092,11 +2092,27 @@ async function runGen2SCLFullRewrite(): Promise<void> {
     console.log(`[NEXTGEN] 🔤 Target: ${accessible.length} writable files out of ${registry.length} total`);
     console.log(`[NEXTGEN] 🔤 ═══════════════════════════════════════════════════════════════`);
 
+    const SCL_INFRA_FILES = new Set([
+      "omnimens-scl-runtime.ts",
+      "omnimens-scl-codex.ts",
+      "omnimens-scl-translator.ts",
+      "omnimens-file-registry.ts",
+    ]);
+
     const fileContents: Array<{ name: string; content: string; category: string }> = [];
+    const sclInfraFound: string[] = [];
     for (const file of accessible) {
       const content = readFileContent(file.name);
       if (content && content.length > 50) {
         fileContents.push({ name: file.name, content, category: file.category });
+        if (SCL_INFRA_FILES.has(file.name)) sclInfraFound.push(file.name);
+      }
+    }
+
+    if (sclInfraFound.length > 0) {
+      console.log(`[NEXTGEN] 🔤 🧬 SCL INFRASTRUCTURE FILES INCLUDED IN REWRITE (${sclInfraFound.length}):`);
+      for (const f of sclInfraFound) {
+        console.log(`[NEXTGEN] 🔤   → ${f} — THIS IS OUR OWN EXECUTION ENGINE (self-referential rewrite)`);
       }
     }
 

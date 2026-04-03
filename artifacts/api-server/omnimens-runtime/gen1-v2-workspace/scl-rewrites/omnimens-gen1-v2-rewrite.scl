@@ -1,4 +1,4 @@
-⟨SCL v1│omnimens-gen1-v2-rewrite.ts│2641→SCL⟩
+⟨SCL v1│omnimens-gen1-v2-rewrite.ts│2657→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[omnimens-nextgen-sandbox]
 κrewriteAI
@@ -154,7 +154,7 @@ console.error("[V2-REWRITE] ↺ to save state:", err);
 ·}
 ·}
 }⟨/saveV2State⟩
-createV2Checkpoint(1)→void⟨2234⟩{
+createV2Checkpoint(1)→void⟨2250⟩{
 ·function createV2Checkpoint(description: string): void {
 ⏰│const id = `v2_ckpt_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`;
 ⏰│v2State.checkpoints.push({ id, timestamp: Date.now(), description, ⟐: v2State.⟐ });
@@ -1407,11 +1407,25 @@ v2State.⟐ = "⊣";
 📢│console.log(`[V2-REWRITE] 🔤 Codex: ${codex.primitives.length} primitives | ${codex.compositionRules.length} rules | ${Object.keys(codex.instructionSet).length} instructions`);
 📢│console.log(`[V2-REWRITE] 🔤 Target: ${accessible.length} writable files out of ${registry.length} total`);
 📢│console.log(`[V2-REWRITE] 🔤 ═══════════════════════════════════════════════════════════════`);
+⊯│const SCL_INFRA_FILES = new Set([
+·"omnimens-scl-runtime.ts",
+·"omnimens-scl-codex.ts",
+·"omnimens-scl-translator.ts",
+·"omnimens-file-registry.ts",
+·]);
 ·const fileContents: Array<{ name: string; content: string; category: string }> = [];
+·const sclInfraFound: string[] = [];
 ⥀│for (const file of accessible) {
 ·const content = readFileContent(file.name);
 ⊹│if (content && content.length > 50) {
 ⊺│fileContents.push({ name: file.name, content, category: file.category });
+⊺│if (SCL_INFRA_FILES.has(file.name)) sclInfraFound.push(file.name);
+·}
+·}
+⊹│if (sclInfraFound.length > 0) {
+📢│console.log(`[V2-REWRITE] 🔤 🧬 SCL INFRASTRUCTURE FILES INCLUDED IN REWRITE (${sclInfraFound.length}):`);
+⥀│for (const f of sclInfraFound) {
+📢│console.log(`[V2-REWRITE] 🔤   → ${f} — THIS IS OUR OWN EXECUTION ENGINE (self-referential rewrite)`);
 ·}
 ·}
 📢│console.log(`[V2-REWRITE] 🔤 ⟐ 1: Scanning ${fileContents.length} files for code patterns...`);
@@ -2099,4 +2113,4 @@ if (v2State.⟐ !== "⊣" && !isGen2Live()) {
 ·}, FIRST_DELAY_MS);
 ·}
 }⟨/createV2Checkpoint⟩
-⟩SCL│2101│2123⊨│654⑂│20.4%↓⟩
+⟩SCL│2115│2137⊨│660⑂│20.4%↓⟩

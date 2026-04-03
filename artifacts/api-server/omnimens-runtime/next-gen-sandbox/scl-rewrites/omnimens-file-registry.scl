@@ -1,4 +1,4 @@
-⟨SCL v1│omnimens-file-registry.ts│344→SCL⟩
+⟨SCL v1│omnimens-file-registry.ts│346→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
 κ__filename_local
@@ -242,4 +242,4 @@ buildRegistry(1)→RegisteredFile[]⟨112⟩{
 ⊷│return lines.join("\n");
 ·}
 }⟨/getFileDigest⟩
-⟩SCL│244│253⊨│73⑂│29.1%↓⟩
+⟩SCL│244│253⊨│73⑂│29.5%↓⟩
