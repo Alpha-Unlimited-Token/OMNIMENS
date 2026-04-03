@@ -1382,13 +1382,13 @@ router.get("/omnimens/counters", async (_req, res) => {
     const phiMag = consciousness.phi > 0 ? Math.log10(consciousness.phi + 1) : 0;
 
     res.json({
-      totalNeurons: bridge?.totalUnifiedNeurons || 127386,
-      totalSynapses: bridge?.totalUnifiedSynapses || 0,
+      totalNeurons: bridge?.totalUnifiedNeurons || consciousness.totalNeurons || 127386,
+      totalSynapses: bridge?.totalUnifiedSynapses || consciousness.totalSynapses || 0,
       hebbianLearningEvents: coreHebb + alphaHebb + betaHebb + meshHebb,
       consciousMoments: consciousness.consciousMoments || 0,
       neuralTicks: ticks,
       autonomousGoals: getEmergentGoals().length,
-      aiAgents: bridge?.meshEngine?.agentCount || 27,
+      aiAgents: bridge?.meshEngine?.agentCount || 21,
       heartbeats: Math.floor(ticks * 1.2),
       heartBpm: 60 + Math.floor(Math.min(phiMag * 0.3, 60)),
       dnaStrands: Math.floor(phiMag * 12) + 42,
