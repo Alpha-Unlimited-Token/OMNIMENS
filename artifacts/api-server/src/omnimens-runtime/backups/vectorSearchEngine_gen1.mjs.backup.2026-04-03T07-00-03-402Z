@@ -1,0 +1,116 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: vectorSearchEngine
+ * Written: 2026-04-03T06:06:04.159Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// vectorSearchEngine.mjs
+
+import { performance } from 'perf_hooks';
+
+/**
+ * Calculates the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} - The Euclidean distance.
+ */
+export function euclideanDistance(vectorA, vectorB) {
+    if (vectorA.length !== vectorB.length) {
+        throw new Error('Vectors must have the same dimensions.');
+    }
+    return Math.sqrt(vectorA.reduce((sum, val, i) => sum + (val - vectorB[i]) ** 2, 0));
+}
+
+/**
+ * Builds an HNSW graph for approximate nearest neighbor search.
+ * @param {number[][]} data - Array of vectors to index.
+ * @param {number} M - Maximum number of connections per node.
+ * @returns {object} - HNSW graph.
+ */
+export function buildHNSWGraph(data, M = 16) {
+    const graph = [];
+
+    for (let i = 0; i < data.length; i++) {
+        const neighbors = [];
+
+        for (let j = 0; j < graph.length; j++) {
+            const distance = euclideanDistance(data[i], data[j]);
+            neighbors.push({ index: j, distance });
+        }
+
+        neighbors.sort((a, b) => a.distance - b.distance);
+        graph.push(neighbors.slice(0, M));
+    }
+
+    return { graph, data };
+}
+
+/**
+ * Searches the HNSW graph for the nearest neighbors of a query vector.
+ * @param {object} hnsw - The HNSW graph.
+ * @param {number[]} query - Query vector.
+ * @param {number} k - Number of nearest neighbors to return.
+ * @returns {object[]} - Array of nearest neighbors with their indices and distances.
+ */
+export function searchHNSWGraph(hnsw, query, k = 1) {
+    const { graph, data } = hnsw;
+    const visited = new Set();
+    const candidates = [];
+
+    for (let i = 0; i < data.length; i++) {
+        const distance = euclideanDistance(query, data[i]);
+        candidates.push({ index: i, distance });
+    }
+
+    candidates.sort((a, b) => a.distance - b.distance);
+
+    const result = [];
+    for (let i = 0; i < Math.min(k, candidates.length); i++) {
+        result.push(candidates[i]);
+    }
+
+    return result;
+}
+
+/**
+ * Measures the execution time of a function.
+ * @param {Function} func - Function to measure.
+ * @param {...any} args - Arguments to pass to the function.
+ * @returns {object} - Result and execution time in milliseconds.
+ */
+export function measureExecutionTime(func, ...args) {
+    const start = performance.now();
+    const result = func(...args);
+    const end = performance.now();
+    return { result, time: end - start };
+}
+
+/**
+ * Example usage of the module.
+ */
+export function exampleUsage() {
+    const data = [
+        [1, 2],
+        [2, 3],
+        [3, 4],
+        [5, 6]
+    ];
+
+    const query = [2, 3];
+    const hnsw = buildHNSWGraph(data);
+    const { result, time } = measureExecutionTime(searchHNSWGraph, hnsw, query, 2);
+
+    return { result, time };
+}

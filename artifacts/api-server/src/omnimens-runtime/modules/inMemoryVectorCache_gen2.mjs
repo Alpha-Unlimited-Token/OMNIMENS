@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorCache
- * Written: 2026-04-02T15:12:41.639Z
+ * Written: 2026-04-03T09:44:06.724Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,96 +16,95 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Complete ES module code here
+// inMemoryVectorCache.mjs
 
-import { performance } from 'node:perf_hooks';
+import { createHash } from 'crypto';
 
 /**
- * inMemoryVectorCache: A fast, in-memory vector store with LRU eviction for caching embeddings.
+ * Generates a unique hash for a given vector to use as a key in the cache.
+ * @param {number[]} vector - The input vector.
+ * @returns {string} - A unique hash representing the vector.
  */
+export function generateVectorHash(vector) {
+  const hash = createHash('sha256');
+  hash.update(vector.join(','));
+  return hash.digest('hex');
+}
 
-// Helper function to calculate cosine similarity between two vectors
-export function cosineSimilarity(vectorA, vectorB) {
+/**
+ * Calculates the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - The first vector.
+ * @param {number[]} vectorB - The second vector.
+ * @returns {number} - The Euclidean distance between the two vectors.
+ */
+export function calculateEuclideanDistance(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must be of the same length.');
+    throw new Error('Vectors must have the same dimensions.');
   }
-
-  const dotProduct = vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
-  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
-  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
-
-  if (magnitudeA === 0 || magnitudeB === 0) {
-    return 0; // Avoid division by zero
-  }
-
-  return dotProduct / (magnitudeA * magnitudeB);
+  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
 }
 
-// LRU Cache Implementation
-export class InMemoryVectorCache {
-  constructor(maxSize = 100) {
-    this.maxSize = maxSize;
-    this.cache = new Map(); // JavaScript Map to store embeddings
-  }
+/**
+ * In-memory vector cache for storing and retrieving embeddings.
+ * Supports approximate nearest neighbor searches using a simple linear scan.
+ */
+export const inMemoryVectorCache = {
+  _cache: new Map(),
 
-  // Add a vector to the cache
-  add(key, vector) {
-    if (this.cache.has(key)) {
-      this.cache.delete(key); // Remove existing entry to update its position
+  /**
+   * Stores a vector in the cache with an optional associated value.
+   * @param {number[]} vector - The vector to store.
+   * @param {*} value - Optional value associated with the vector.
+   */
+  store(vector, value = null) {
+    const key = generateVectorHash(vector);
+    this._cache.set(key, { vector, value });
+  },
+
+  /**
+   * Retrieves the value associated with a vector from the cache.
+   * @param {number[]} vector - The vector to retrieve.
+   * @returns {*} - The associated value, or undefined if not found.
+   */
+  retrieve(vector) {
+    const key = generateVectorHash(vector);
+    return this._cache.get(key)?.value;
+  },
+
+  /**
+   * Finds the nearest neighbor to a given vector in the cache.
+   * @param {number[]} queryVector - The vector to search for.
+   * @param {number} [k=1] - The number of nearest neighbors to return.
+   * @returns {Array<{ vector, value: *, distance}>} - The nearest neighbors.
+   */
+  findNearestNeighbors(queryVector, k = 1) {
+    if (k < 1) {
+      throw new Error('k must be at least 1.');
     }
 
-    this.cache.set(key, vector);
+    const neighbors = [];
 
-    if (this.cache.size > this.maxSize) {
-      const oldestKey = this.cache.keys().next().value; // Get the oldest key
-      this.cache.delete(oldestKey); // Evict the least recently used item
-    }
-  }
-
-  // Retrieve a vector from the cache
-  get(key) {
-    if (!this.cache.has(key)) {
-      return null; // Key not found
+    for (const { vector, value } of this._cache.values()) {
+      const distance = calculateEuclideanDistance(queryVector, vector);
+      neighbors.push({ vector, value, distance });
     }
 
-    const value = this.cache.get(key);
-    this.cache.delete(key); // Remove and re-add to update its position
-    this.cache.set(key, value);
-    return value;
-  }
+    neighbors.sort((a, b) => a.distance - b.distance);
+    return neighbors.slice(0, k);
+  },
 
-  // Check if a key exists in the cache
-  has(key) {
-    return this.cache.has(key);
-  }
-
-  // Remove a specific key from the cache
-  remove(key) {
-    this.cache.delete(key);
-  }
-
-  // Clear the entire cache
+  /**
+   * Clears the entire cache.
+   */
   clear() {
-    this.cache.clear();
+    this._cache.clear();
+  },
+
+  /**
+   * Returns the current size of the cache.
+   * @returns {number} - The number of items in the cache.
+   */
+  size() {
+    return this._cache.size;
   }
-
-  // Get all keys currently in the cache
-  keys() {
-    return Array.from(this.cache.keys());
-  }
-}
-
-// Utility function to measure execution time of a callback
-export function measureExecutionTime(callback) {
-  const start = performance.now();
-  const result = callback();
-  const end = performance.now();
-  return { result, timeTaken: end - start };
-}
-
-// Example usage:
-// const cache = new InMemoryVectorCache(3);
-// cache.add('key1', [0.1, 0.2, 0.3]);
-// cache.add('key2', [0.4, 0.5, 0.6]);
-// console.log(cache.get('key1')); // [0.1, 0.2, 0.3]
-// console.log(cosineSimilarity([1, 0, 0], [0, 1, 0])); // 0
+};

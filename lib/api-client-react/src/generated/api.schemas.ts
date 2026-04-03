@@ -55,7 +55,7 @@ export interface GetCurrentAuthUserResponse {
   user?: AuthUser;
 }
 
-export interface GodflesUserStatus {
+export interface OmnimensUserStatus {
   messagesUsedToday: number;
   dailyLimit: number;
   isPro: boolean;
@@ -63,21 +63,21 @@ export interface GodflesUserStatus {
   stripeSubscriptionId?: string;
 }
 
-export interface GodfleshPricing {
+export interface OmnimensPricing {
   priceId: string;
   amount: number;
   currency: string;
   interval: string;
 }
 
-export interface GodfleshCheckoutSession {
+export interface OmnimensCheckoutSession {
   url: string;
 }
 
-export interface GodfleshPortalSession {
+export interface OmnimensPortalSession {
   url: string;
 }
 
-export type CreateGodfleshCheckoutBody = {
+export type CreateOmnimensCheckoutBody = {
   priceId: string;
 };

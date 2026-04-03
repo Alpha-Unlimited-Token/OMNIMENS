@@ -1,0 +1,146 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: webGpuMatrixEngine
+ * Written: 2026-04-03T04:17:18.036Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Complete ES module code here
+
+import { GPU } from 'gpu.js';
+
+/**
+ * Initializes a WebGPU-based matrix engine for high-performance computations.
+ * This module provides utility functions for matrix multiplication, transposition,
+ * and element-wise operations, leveraging GPU acceleration.
+ */
+
+const gpu = new GPU();
+
+/**
+ * Multiplies two matrices using GPU acceleration.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {number[][]} - The resulting matrix after multiplication.
+ */
+export function gpuMatrixMultiply(matrixA, matrixB) {
+  if (matrixA[0].length !== matrixB.length) {
+    throw new Error('Matrix dimensions do not match for multiplication.');
+  }
+
+  const kernel = gpu.createKernel(function (a, b) {
+    let sum = 0;
+    for (let i = 0; i < this.constants.sharedDim; i++) {
+      sum += a[this.thread.y][i] * b[i][this.thread.x];
+    }
+    return sum;
+  })
+    .setOutput([matrixB[0].length, matrixA.length])
+    .setConstants({ sharedDim: matrixA[0].length });
+
+  return kernel(matrixA, matrixB);
+}
+
+/**
+ * Transposes a matrix using GPU acceleration.
+ * @param {number[][]} matrix - The matrix to transpose.
+ * @returns {number[][]} - The transposed matrix.
+ */
+export function gpuMatrixTranspose(matrix) {
+  const kernel = gpu.createKernel(function (m) {
+    return m[this.thread.x][this.thread.y];
+  })
+    .setOutput([matrix.length, matrix[0].length]);
+
+  return kernel(matrix);
+}
+
+/**
+ * Performs element-wise addition of two matrices using GPU acceleration.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {number[][]} - The resulting matrix after addition.
+ */
+export function gpuMatrixAdd(matrixA, matrixB) {
+  if (matrixA.length !== matrixB.length || matrixA[0].length !== matrixB[0].length) {
+    throw new Error('Matrix dimensions do not match for addition.');
+  }
+
+  const kernel = gpu.createKernel(function (a, b) {
+    return a[this.thread.y][this.thread.x] + b[this.thread.y][this.thread.x];
+  })
+    .setOutput([matrixA[0].length, matrixA.length]);
+
+  return kernel(matrixA, matrixB);
+}
+
+/**
+ * Performs element-wise multiplication of two matrices using GPU acceleration.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {number[][]} - The resulting matrix after element-wise multiplication.
+ */
+export function gpuMatrixElementWiseMultiply(matrixA, matrixB) {
+  if (matrixA.length !== matrixB.length || matrixA[0].length !== matrixB[0].length) {
+    throw new Error('Matrix dimensions do not match for element-wise multiplication.');
+  }
+
+  const kernel = gpu.createKernel(function (a, b) {
+    return a[this.thread.y][this.thread.x] * b[this.thread.y][this.thread.x];
+  })
+    .setOutput([matrixA[0].length, matrixA.length]);
+
+  return kernel(matrixA, matrixB);
+}
+
+/**
+ * Applies a custom element-wise function to a matrix using GPU acceleration.
+ * @param {number[][]} matrix - The input matrix.
+ * @param {Function} customFunction - A custom function to apply to each element.
+ * @returns {number[][]} - The resulting matrix after applying the function.
+ */
+export function gpuMatrixApplyFunction(matrix, customFunction) {
+  const kernel = gpu.createKernel(function (m) {
+    return customFunction(m[this.thread.y][this.thread.x]);
+  })
+    .setOutput([matrix[0].length, matrix.length])
+    .setFunctions({ customFunction });
+
+  return kernel(matrix);
+}
+
+/**
+ * Utility function to validate matrix dimensions.
+ * @param {number[][]} matrix - The matrix to validate.
+ * @returns {boolean} - True if the matrix is valid, otherwise false.
+ */
+export function isValidMatrix(matrix) {
+  if (!Array.isArray(matrix) || matrix.length === 0) return false;
+  const rowLength = matrix[0].length;
+  return matrix.every(row => Array.isArray(row) && row.length === rowLength);
+}
+
+/**
+ * Utility function to generate a random matrix.
+ * @param {number} rows - Number of rows.
+ * @param {number} cols - Number of columns.
+ * @param {number} [min=0] - Minimum value for random numbers.
+ * @param {number} [max=1] - Maximum value for random numbers.
+ * @returns {number[][]} - The generated random matrix.
+ */
+export function generateRandomMatrix(rows, cols, min = 0, max = 1) {
+  return Array.from({ length: rows }, () =>
+    Array.from({ length: cols }, () => Math.random() * (max - min) + min)
+  );
+}

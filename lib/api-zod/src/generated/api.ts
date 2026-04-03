@@ -26,7 +26,7 @@ export const GetCurrentAuthUserResponse = zod.object({
 /**
  * @summary Get user's message usage and subscription status
  */
-export const GetGodfleshStatusResponse = zod.object({
+export const GetOmnimensStatusResponse = zod.object({
   messagesUsedToday: zod.number(),
   dailyLimit: zod.number(),
   isPro: zod.boolean(),
@@ -37,32 +37,32 @@ export const GetGodfleshStatusResponse = zod.object({
 /**
  * @summary Create Stripe checkout session for Pro subscription
  */
-export const CreateGodfleshCheckoutBody = zod.object({
+export const CreateOmnimensCheckoutBody = zod.object({
   priceId: zod.string(),
 });
 
-export const CreateGodfleshCheckoutResponse = zod.object({
+export const CreateOmnimensCheckoutResponse = zod.object({
   url: zod.string(),
 });
 
 /**
  * @summary Create Stripe customer portal session
  */
-export const CreateGodfleshPortalResponse = zod.object({
+export const CreateOmnimensPortalResponse = zod.object({
   url: zod.string(),
 });
 
 /**
  * @summary Get available pricing plans
  */
-export const GetGodfleshPricingResponseItem = zod.object({
+export const GetOmnimensPricingResponseItem = zod.object({
   priceId: zod.string(),
   amount: zod.number(),
   currency: zod.string(),
   interval: zod.string(),
 });
-export const GetGodfleshPricingResponse = zod.array(
-  GetGodfleshPricingResponseItem,
+export const GetOmnimensPricingResponse = zod.array(
+  GetOmnimensPricingResponseItem,
 );
 
 /**

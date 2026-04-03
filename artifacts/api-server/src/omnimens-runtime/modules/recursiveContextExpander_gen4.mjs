@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: recursiveContextExpander
- * Written: 2026-04-02T20:58:38.283Z
+ * Written: 2026-04-03T09:45:59.936Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,89 +16,100 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// recursiveContextExpander.mjs
+// Complete ES module code here
 
-import crypto from 'crypto';
+import { createHash } from 'crypto';
 
 /**
- * Utility function to generate a unique hash for a given input string.
- * Useful for tracking dependencies or summaries.
+ * Utility function to create a hash for a given string. Useful for creating unique identifiers for context chunks.
  * @param {string} input - The input string to hash.
- * @returns {string} - A unique hash of the input.
+ * @returns {string} - A SHA-256 hash of the input string.
  */
-export function generateHash(input) {
-  return crypto.createHash('sha256').update(input).digest('hex');
+export function createHashId(input) {
+  const hash = createHash('sha256');
+  hash.update(input);
+  return hash.digest('hex');
 }
 
 /**
- * Compresses a given context into a summary by extracting key tokens.
- * @param {string} context - The full context string.
- * @param {number} tokenLimit - Maximum number of tokens in the summary.
- * @returns {string} - A compressed summary.
+ * Splits a large context into smaller chunks of a specified size.
+ * @param {string} context - The input context to split.
+ * @param {number} chunkSize - Maximum size of each chunk.
+ * @returns {string[]} - An array of context chunks.
  */
-export function compressContext(context, tokenLimit = 50) {
-  const tokens = context.split(/\s+/);
-  return tokens.slice(0, tokenLimit).join(' ');
+export function splitContext(context, chunkSize) {
+  if (chunkSize <= 0) throw new Error('Chunk size must be greater than zero.');
+  const chunks = [];
+  for (let i = 0; i < context.length; i += chunkSize) {
+    chunks.push(context.slice(i, i + chunkSize));
+  }
+  return chunks;
 }
 
 /**
- * Recursively reconstructs dependencies from compressed summaries.
- * @param {string[]} summaries - Array of hierarchical summaries.
- * @param {number} depth - Maximum recursion depth.
- * @returns {string[]} - Reconstructed dependencies.
+ * Summarizes a single chunk of context. This is a placeholder for more advanced summarization logic.
+ * @param {string} chunk - The input chunk to summarize.
+ * @returns {string} - A summarized version of the chunk.
  */
-export function reconstructDependencies(summaries, depth = 3) {
-  if (depth === 0 || summaries.length === 0) return summaries;
-
-  const expanded = summaries.map(summary => {
-    const tokens = summary.split(/\s+/);
-    return tokens.map((token, index) => `${token}_${index}`).join(' ');
-  });
-
-  return reconstructDependencies(expanded, depth - 1).concat(expanded);
+export function summarizeChunk(chunk) {
+  // Placeholder: For now, just return the first 100 characters or the full chunk if smaller.
+  return chunk.length > 100 ? chunk.slice(0, 100) + '...' : chunk;
 }
 
 /**
- * Main function to expand token windows using hierarchical summaries.
- * @param {string} context - The original context to process.
- * @param {number} tokenLimit - Maximum tokens per summary.
- * @param {number} recursionDepth - Depth of recursive expansion.
- * @returns {string[]} - Fully expanded dependencies.
+ * Recursively processes and summarizes a large context using a tree-based approach.
+ * @param {string[]} chunks - Array of context chunks to process.
+ * @returns {string} - A single summarized string representing the entire context.
  */
-export function expandContext(context, tokenLimit = 50, recursionDepth = 3) {
-  const summary = compressContext(context, tokenLimit);
-  const summaries = [summary];
-  return reconstructDependencies(summaries, recursionDepth);
-}
+export function recursiveSummarize(chunks) {
+  if (chunks.length === 1) return summarizeChunk(chunks[0]);
 
-/**
- * Utility function to validate input context and parameters.
- * @param {string} context - The original context string.
- * @param {number} tokenLimit - Maximum tokens per summary.
- * @param {number} recursionDepth - Depth of recursive expansion.
- * @returns {boolean} - True if inputs are valid, otherwise false.
- */
-export function validateInputs(context, tokenLimit, recursionDepth) {
-  if (typeof context !== 'string' || context.trim() === '') return false;
-  if (typeof tokenLimit !== 'number' || tokenLimit <= 0) return false;
-  if (typeof recursionDepth !== 'number' || recursionDepth < 0) return false;
-  return true;
-}
-
-/**
- * Example usage function for testing the module.
- * @returns {void}
- */
-export function exampleUsage() {
-  const context = "SEARCH RESULTS FOR: \"new JavaScript algorithms open source library 2025 GitHub\"";
-  const tokenLimit = 10;
-  const recursionDepth = 2;
-
-  if (!validateInputs(context, tokenLimit, recursionDepth)) {
-    console.error('Invalid inputs');
-    return;
+  const summaries = [];
+  for (let i = 0; i < chunks.length; i += 2) {
+    const chunkA = chunks[i];
+    const chunkB = chunks[i + 1] || ''; // Handle odd number of chunks.
+    const combined = chunkA + ' ' + chunkB;
+    summaries.push(summarizeChunk(combined));
   }
 
-  const expandedContext = expandContext(context, tokenLimit, recursionDepth);
-  console.log('Expanded Context:', expandedContext);
+  return recursiveSummarize(summaries);
+}
+
+/**
+ * Main function to process a massive context by splitting, summarizing, and refining it.
+ * @param {string} context - The massive input context to process.
+ * @param {number} chunkSize - Maximum size of each initial chunk.
+ * @returns {string} - A final summarized representation of the context.
+ */
+export function processMassiveContext(context, chunkSize = 1000) {
+  const chunks = splitContext(context, chunkSize);
+  return recursiveSummarize(chunks);
+}
+
+/**
+ * Generates a hierarchical representation of the context for debugging or visualization purposes.
+ * @param {string} context - The massive input context to process.
+ * @param {number} chunkSize - Maximum size of each initial chunk.
+ * @returns {object} - A tree-like structure representing the hierarchical summarization.
+ */
+export function generateContextTree(context, chunkSize = 1000) {
+  const chunks = splitContext(context, chunkSize);
+
+  function buildTree(chunks, level = 0) {
+    if (chunks.length === 1) {
+      return { level, summary: summarizeChunk(chunks[0]) };
+    }
+
+    const children = [];
+    for (let i = 0; i < chunks.length; i += 2) {
+      const chunkA = chunks[i];
+      const chunkB = chunks[i + 1] || '';
+      const combined = chunkA + ' ' + chunkB;
+      children.push(buildTree([combined], level + 1));
+    }
+
+    return { level, children };
+  }
+
+  return buildTree(chunks);
 }

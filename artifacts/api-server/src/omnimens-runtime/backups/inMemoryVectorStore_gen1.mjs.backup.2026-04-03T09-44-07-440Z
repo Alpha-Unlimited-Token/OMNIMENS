@@ -1,0 +1,121 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-04-03T09:09:41.607Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Complete ES module code here
+
+import { createHash } from 'crypto';
+
+/**
+ * Computes cosine similarity between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} - Cosine similarity score (-1 to 1).
+ */
+export function cosineSimilarity(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same length.');
+  }
+
+  const dotProduct = vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
+
+  if (magnitudeA === 0 || magnitudeB === 0) {
+    throw new Error('Vector magnitude cannot be zero.');
+  }
+
+  return dotProduct / (magnitudeA * magnitudeB);
+}
+
+/**
+ * Generates a unique hash key for a vector.
+ * @param {number[]} vector - Input vector.
+ * @returns {string} - Hash string.
+ */
+export function generateVectorHash(vector) {
+  const hash = createHash('sha256');
+  hash.update(JSON.stringify(vector));
+  return hash.digest('hex');
+}
+
+/**
+ * In-memory vector store for fast retrieval and similarity search.
+ */
+export const inMemoryVectorStore = {
+  _store: new Map(),
+
+  /**
+   * Adds a vector to the store.
+   * @param {number[]} vector - Vector to store.
+   * @param {any} metadata - Associated metadata.
+   */
+  addVector(vector, metadata) {
+    const key = generateVectorHash(vector);
+    this._store.set(key, { vector, metadata });
+  },
+
+  /**
+   * Finds the most similar vector in the store.
+   * @param {number[]} queryVector - Query vector.
+   * @returns {{vector, metadata, similarity} | null} - Most similar vector or null if store is empty.
+   */
+  findMostSimilar(queryVector) {
+    let bestMatch = null;
+    let highestSimilarity = -Infinity;
+
+    for (const { vector, metadata } of this._store.values()) {
+      const similarity = cosineSimilarity(queryVector, vector);
+      if (similarity > highestSimilarity) {
+        highestSimilarity = similarity;
+        bestMatch = { vector, metadata, similarity };
+      }
+    }
+
+    return bestMatch;
+  },
+
+  /**
+   * Clears the vector store.
+   */
+  clearStore() {
+    this._store.clear();
+  }
+};
+
+/**
+ * Approximate Nearest Neighbor (ANN) search using brute force.
+ * @param {number[]} queryVector - Query vector.
+ * @param {Array<{vector, metadata}>} dataset - Dataset of vectors.
+ * @param {number} topK - Number of top matches to return.
+ * @returns {Array<{vector, metadata, similarity}>} - Top K matches.
+ */
+export function annSearch(queryVector, dataset, topK = 1) {
+  if (topK <= 0) {
+    throw new Error('topK must be greater than 0.');
+  }
+
+  const similarities = dataset.map(({ vector, metadata }) => ({
+    vector,
+    metadata,
+    similarity: cosineSimilarity(queryVector, vector)
+  }));
+
+  return similarities
+    .sort((a, b) => b.similarity - a.similarity)
+    .slice(0, topK);
+}

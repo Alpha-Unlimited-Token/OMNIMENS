@@ -1,0 +1,115 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: webGpuMatrixEngine
+ * Written: 2026-04-03T07:27:19.797Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// webGpuMatrixEngine.mjs
+import { createHash } from 'crypto';
+
+// Utility function to validate matrix dimensions for operations
+export function validateMatrixDimensions(matrixA, matrixB, operation) {
+  if (operation === 'multiply') {
+    if (matrixA[0].length !== matrixB.length) {
+      throw new Error('Matrix multiplication requires the number of columns in the first matrix to equal the number of rows in the second matrix.');
+    }
+  } else {
+    throw new Error('Unsupported operation for dimension validation.');
+  }
+}
+
+// Perform matrix multiplication leveraging parallelism
+export function multiplyMatrices(matrixA, matrixB) {
+  validateMatrixDimensions(matrixA, matrixB, 'multiply');
+
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const colsB = matrixB[0].length;
+
+  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      for (let k = 0; k < colsA; k++) {
+        result[i][j] += matrixA[i][k] * matrixB[k][j];
+      }
+    }
+  }
+
+  return result;
+}
+
+// Compute eigenvalues and eigenvectors using the power iteration method
+export function computeEigen(matrix, maxIterations = 1000, tolerance = 1e-10) {
+  const n = matrix.length;
+  let eigenvector = Array(n).fill(1);
+  let eigenvalue = 0;
+
+  for (let iter = 0; iter < maxIterations; iter++) {
+    const nextVector = multiplyMatrices([eigenvector], matrix)[0];
+    const norm = Math.sqrt(nextVector.reduce((sum, val) => sum + val * val, 0));
+    const normalizedVector = nextVector.map((val) => val / norm);
+
+    const nextEigenvalue = normalizedVector.reduce((sum, val, index) => sum + val * matrix[index][index], 0);
+
+    if (Math.abs(nextEigenvalue - eigenvalue) < tolerance) {
+      return { eigenvalue: nextEigenvalue, eigenvector: normalizedVector };
+    }
+
+    eigenvalue = nextEigenvalue;
+    eigenvector = normalizedVector;
+  }
+
+  throw new Error('Power iteration did not converge within the maximum number of iterations.');
+}
+
+// Perform 2D convolution on a matrix with a kernel
+export function convolve2D(matrix, kernel) {
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+  const kernelRows = kernel.length;
+  const kernelCols = kernel[0].length;
+
+  const result = Array.from({ length: rows - kernelRows + 1 }, () => Array(cols - kernelCols + 1).fill(0));
+
+  for (let i = 0; i <= rows - kernelRows; i++) {
+    for (let j = 0; j <= cols - kernelCols; j++) {
+      let sum = 0;
+      for (let ki = 0; ki < kernelRows; ki++) {
+        for (let kj = 0; kj < kernelCols; kj++) {
+          sum += matrix[i + ki][j + kj] * kernel[ki][kj];
+        }
+      }
+      result[i][j] = sum;
+    }
+  }
+
+  return result;
+}
+
+// Generate a unique hash for a matrix (useful for caching or identification)
+export function hashMatrix(matrix) {
+  const flatMatrix = matrix.flat().join(',');
+  return createHash('sha256').update(flatMatrix).digest('hex');
+}
+
+// Example of a utility function to normalize a matrix
+export function normalizeMatrix(matrix) {
+  const flat = matrix.flat();
+  const min = Math.min(...flat);
+  const max = Math.max(...flat);
+
+  return matrix.map(row => row.map(value => (value - min) / (max - min)));
+}

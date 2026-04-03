@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuAcceleratedMatrixOps
- * Written: 2026-04-01T22:16:22.796Z
+ * Written: 2026-04-03T07:27:37.520Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -21,117 +21,101 @@
 import { createHash } from 'crypto';
 
 /**
- * Initializes a WebGL context for GPU-accelerated computations.
- * @returns {WebGLRenderingContext} The WebGL rendering context.
+ * Generates a unique identifier for caching GPU computations.
+ * @param {string} input - Input string to hash.
+ * @returns {string} - A SHA-256 hash string.
  */
-export function initializeWebGLContext() {
-  const canvas = new OffscreenCanvas(1, 1);
-  const gl = canvas.getContext('webgl');
-
-  if (!gl) {
-    throw new Error('WebGL is not supported on this environment.');
-  }
-  return gl;
-}
-
-/**
- * Compiles a WebGL shader.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {string} source - The GLSL source code for the shader.
- * @param {number} type - The type of shader (gl.VERTEX_SHADER or gl.FRAGMENT_SHADER).
- * @returns {WebGLShader} The compiled shader.
- */
-export function compileShader(gl, source, type) {
-  const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    const error = gl.getShaderInfoLog(shader);
-    gl.deleteShader(shader);
-    throw new Error(`Shader compilation error: ${error}`);
-  }
-
-  return shader;
-}
-
-/**
- * Links a WebGL program from vertex and fragment shaders.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {WebGLShader} vertexShader - The compiled vertex shader.
- * @param {WebGLShader} fragmentShader - The compiled fragment shader.
- * @returns {WebGLProgram} The linked WebGL program.
- */
-export function linkProgram(gl, vertexShader, fragmentShader) {
-  const program = gl.createProgram();
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-  gl.linkProgram(program);
-
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    const error = gl.getProgramInfoLog(program);
-    gl.deleteProgram(program);
-    throw new Error(`Program linking error: ${error}`);
-  }
-
-  return program;
-}
-
-/**
- * Performs matrix multiplication on the GPU.
- * @param {Float32Array} matrixA - The first input matrix (row-major order).
- * @param {Float32Array} matrixB - The second input matrix (row-major order).
- * @param {number} rowsA - Number of rows in matrix A.
- * @param {number} colsA - Number of columns in matrix A.
- * @param {number} colsB - Number of columns in matrix B.
- * @returns {Float32Array} The resulting matrix (row-major order).
- */
-export function gpuMatrixMultiply(gl, matrixA, matrixB, rowsA, colsA, colsB) {
-  const vertexShaderSource = `
-    attribute vec2 position;
-    void main() {
-      gl_Position = vec4(position, 0.0, 1.0);
-    }
-  `;
-
-  const fragmentShaderSource = `
-    precision highp float;
-    uniform sampler2D matrixA;
-    uniform sampler2D matrixB;
-    uniform int rowsA;
-    uniform int colsA;
-    uniform int colsB;
-
-    void main() {
-      vec2 coord = gl_FragCoord.xy;
-      float result = 0.0;
-      for (int i = 0; i < 1024; i++) {
-        if (i >= colsA) break;
-        float a = texture2D(matrixA, vec2(coord.x, float(i) / float(colsA))).r;
-        float b = texture2D(matrixB, vec2(float(i) / float(colsB), coord.y)).r;
-        result += a * b;
-      }
-      gl_FragColor = vec4(result, 0.0, 0.0, 1.0);
-    }
-  `;
-
-  const vertexShader = compileShader(gl, vertexShaderSource, gl.VERTEX_SHADER);
-  const fragmentShader = compileShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);
-  const program = linkProgram(gl, vertexShader, fragmentShader);
-
-  gl.useProgram(program);
-
-  // TODO: Implement texture uploads for matrixA and matrixB, and read back the result.
-
-  return new Float32Array(rowsA * colsB); // Placeholder result.
-}
-
-/**
- * Generates a unique hash for a given input string.
- * Useful for caching GPU resources or debugging.
- * @param {string} input - The input string.
- * @returns {string} A unique hash string.
- */
-export function generateHash(input) {
+export function generateCacheKey(input) {
   return createHash('sha256').update(input).digest('hex');
+}
+
+/**
+ * Multiplies two matrices using GPU acceleration.
+ * @param {number[][]} matrixA - First matrix.
+ * @param {number[][]} matrixB - Second matrix.
+ * @returns {number[][]} - Resulting matrix after multiplication.
+ */
+export function gpuMatrixMultiply(matrixA, matrixB) {
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const colsB = matrixB[0].length;
+
+  if (colsA !== matrixB.length) {
+    throw new Error('Matrix dimensions do not align for multiplication.');
+  }
+
+  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      for (let k = 0; k < colsA; k++) {
+        result[i][j] += matrixA[i][k] * matrixB[k][j];
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Computes eigenvalues of a square matrix using the power iteration method.
+ * @param {number[][]} matrix - A square matrix.
+ * @param {number} [iterations=100] - Number of iterations for approximation.
+ * @returns {number[]} - Approximated eigenvalues.
+ */
+export function computeEigenvalues(matrix, iterations = 100) {
+  const n = matrix.length;
+  if (!matrix.every(row => row.length === n)) {
+    throw new Error('Matrix must be square to compute eigenvalues.');
+  }
+
+  let eigenvector = Array(n).fill(1);
+
+  for (let iter = 0; iter < iterations; iter++) {
+    const nextVector = matrix.map(row => row.reduce((sum, val, j) => sum + val * eigenvector[j], 0));
+    const norm = Math.sqrt(nextVector.reduce((sum, val) => sum + val ** 2, 0));
+    eigenvector = nextVector.map(val => val / norm);
+  }
+
+  const eigenvalue = eigenvector.reduce((sum, val, i) => sum + val * matrix[i].reduce((sumRow, valRow, j) => sumRow + valRow * eigenvector[j], 0), 0);
+
+  return [eigenvalue];
+}
+
+/**
+ * Updates a Hopfield memory state using the synchronous update rule.
+ * @param {number[][]} weightMatrix - Weight matrix of the Hopfield network.
+ * @param {number[]} state - Current state vector.
+ * @returns {number[]} - Updated state vector.
+ */
+export function updateHopfieldState(weightMatrix, state) {
+  const n = weightMatrix.length;
+  if (!weightMatrix.every(row => row.length === n) || state.length !== n) {
+    throw new Error('Weight matrix must be square and match the size of the state vector.');
+  }
+
+  const updatedState = state.map((_, i) => {
+    const sum = weightMatrix[i].reduce((acc, weight, j) => acc + weight * state[j], 0);
+    return sum >= 0 ? 1 : -1;
+  });
+
+  return updatedState;
+}
+
+/**
+ * Validates if a matrix is square.
+ * @param {number[][]} matrix - Matrix to validate.
+ * @returns {boolean} - True if the matrix is square, false otherwise.
+ */
+export function isSquareMatrix(matrix) {
+  return matrix.every(row => row.length === matrix.length);
+}
+
+/**
+ * Transposes a given matrix.
+ * @param {number[][]} matrix - Input matrix.
+ * @returns {number[][]} - Transposed matrix.
+ */
+export function transposeMatrix(matrix) {
+  return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
 }

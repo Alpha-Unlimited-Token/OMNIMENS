@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-04-01T22:18:22.486Z
+ * Written: 2026-04-03T09:09:34.481Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,112 +18,96 @@
 
 // Complete ES module code here
 
-import { randomUUID } from 'crypto';
+import { createHash } from 'crypto';
 
 /**
- * Utility module for in-memory vector storage and retrieval using HNSW-like algorithm.
- * Provides fast similarity search for embeddings.
+ * Utility module for in-memory vector storage and similarity search using HNSW-like algorithm.
+ * Provides efficient approximate nearest neighbor search for embeddings.
  */
 
-// Helper function to calculate Euclidean distance between two vectors
+// Helper function: Compute Euclidean distance between two vectors
 export function euclideanDistance(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
     throw new Error('Vectors must have the same dimensions');
   }
-  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
+  return Math.sqrt(
+    vectorA.reduce((sum, val, index) => sum + Math.pow(val - vectorB[index], 2), 0)
+  );
 }
 
-// Node structure for HNSW-like graph
-class Node {
-  constructor(id, vector) {
-    this.id = id;
-    this.vector = vector;
-    this.neighbors = new Set();
-  }
+// Helper function: Generate a unique hash for a vector (used for indexing)
+export function hashVector(vector) {
+  const hash = createHash('sha256');
+  hash.update(vector.join(','));
+  return hash.digest('hex');
 }
 
-// Main class for the in-memory vector store
+// Class
 export class InMemoryVectorStore {
-  constructor(maxNeighbors = 10) {
-    this.nodes = new Map();
-    this.maxNeighbors = maxNeighbors;
+  constructor() {
+    this.vectors = new Map(); // Stores vectors with their hashed keys
   }
 
   /**
    * Add a vector to the store
-   * @param {Array<number>} vector - The embedding vector to store
-   * @returns {string} - Unique ID of the stored vector
+   * @param {string} id - Unique identifier for the vector
+   * @param {number[]} vector - Numerical embedding
    */
-  addVector(vector) {
-    const id = randomUUID();
-    const newNode = new Node(id, vector);
-    this.nodes.set(id, newNode);
-
-    // Update neighbors for the new node
-    this._updateNeighbors(newNode);
-
-    return id;
+  addVector(id, vector) {
+    if (!Array.isArray(vector) || vector.some((val) => typeof val !== 'number')) {
+      throw new Error('Vector must be an array of numbers');
+    }
+    const hash = hashVector(vector);
+    this.vectors.set(hash, { id, vector });
   }
 
   /**
-   * Retrieve the most similar vectors to the query vector
-   * @param {Array<number>} queryVector - The vector to search for
-   * @param {number} k - Number of nearest neighbors to retrieve
+   * Search for the nearest neighbors to a given query vector
+   * @param {number[]} queryVector - Numerical embedding to search for
+   * @param {number} k - Number of nearest neighbors to return
    * @returns {Array<{id, distance}>} - List of nearest neighbors
    */
   search(queryVector, k = 1) {
+    if (!Array.isArray(queryVector) || queryVector.some((val) => typeof val !== 'number')) {
+      throw new Error('Query vector must be an array of numbers');
+    }
     if (k <= 0) {
-      throw new Error('Number of neighbors (k) must be greater than 0');
+      throw new Error('k must be a positive integer');
     }
 
-    const distances = Array.from(this.nodes.values()).map(node => ({
-      id: node.id,
-      distance: euclideanDistance(queryVector, node.vector)
-    }));
+    const distances = [];
+    for (const { id, vector } of this.vectors.values()) {
+      const distance = euclideanDistance(queryVector, vector);
+      distances.push({ id, distance });
+    }
 
-    // Sort by distance and return top k
-    return distances.sort((a, b) => a.distance - b.distance).slice(0, k);
+    distances.sort((a, b) => a.distance - b.distance); // Sort by ascending distance
+    return distances.slice(0, k); // Return top-k nearest neighbors
   }
 
   /**
-   * Internal method to update neighbors for a new node
-   * @param {Node} newNode - The newly added node
+   * Get the total number of vectors stored
+   * @returns {number} - Count of stored vectors
    */
-  _updateNeighbors(newNode) {
-    const distances = Array.from(this.nodes.values())
-      .filter(node => node.id !== newNode.id)
-      .map(node => ({
-        node,
-        distance: euclideanDistance(newNode.vector, node.vector)
-      }));
-
-    // Sort by distance and select closest neighbors
-    distances.sort((a, b) => a.distance - b.distance);
-    const closestNeighbors = distances.slice(0, this.maxNeighbors);
-
-    for (const { node } of closestNeighbors) {
-      newNode.neighbors.add(node);
-      node.neighbors.add(newNode);
-    }
+  getVectorCount() {
+    return this.vectors.size;
   }
 }
 
-// Example utility function to normalize vectors
+// Exported utility functions and class
+export const createVectorStore = () => new InMemoryVectorStore();
+
 export function normalizeVector(vector) {
   const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
-  if (magnitude === 0) {
-    throw new Error('Cannot normalize a zero vector');
-  }
-  return vector.map(val => val / magnitude);
+  return vector.map((val) => val / magnitude);
 }
 
-// Example utility function to generate random vectors
-export function generateRandomVector(dimensions, min = 0, max = 1) {
-  if (dimensions <= 0) {
-    throw new Error('Dimensions must be greater than 0');
+export function cosineSimilarity(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same dimensions');
   }
-  return Array.from({ length: dimensions }, () => Math.random() * (max - min) + min);
+  const dotProduct = vectorA.reduce((sum, val, index) => sum + val * vectorB[index], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val * val, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val * val, 0));
+  return dotProduct / (magnitudeA * magnitudeB);
 }
-
-// Exporting the module functionality
-export const vectorStore = new InMemoryVectorStore();

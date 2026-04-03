@@ -1,0 +1,126 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: gpuAcceleratedMatrixOps
+ * Written: 2026-04-03T07:00:06.572Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// gpuAcceleratedMatrixOps.mjs
+
+import { performance } from 'perf_hooks';
+
+/**
+ * Performs matrix multiplication using a pure algorithm, optimized for speed.
+ * Falls back to CPU-based computation, but structured for future GPU acceleration.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @returns {number[][]} - The resulting matrix after multiplication.
+ */
+export function multiplyMatrices(matrixA, matrixB) {
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
+
+  if (colsA !== rowsB) {
+    throw new Error('Matrix dimensions do not match for multiplication.');
+  }
+
+  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      for (let k = 0; k < colsA; k++) {
+        result[i][j] += matrixA[i][k] * matrixB[k][j];
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Measures the execution time of a given function.
+ * @param {Function} func - The function to measure.
+ * @param {...any} args - Arguments to pass to the function.
+ * @returns {{ result, time}} - The function result and execution time in milliseconds.
+ */
+export function measureExecutionTime(func, ...args) {
+  const start = performance.now();
+  const result = func(...args);
+  const end = performance.now();
+  return { result, time: end - start };
+}
+
+/**
+ * Validates that a given input is a valid 2D matrix.
+ * @param {any} matrix - The input to validate.
+ * @returns {boolean} - True if the input is a valid matrix, false otherwise.
+ */
+export function isValidMatrix(matrix) {
+  if (!Array.isArray(matrix) || matrix.length === 0) return false;
+  const rowLength = matrix[0].length;
+  return matrix.every(row => Array.isArray(row) && row.length === rowLength && row.every(Number.isFinite));
+}
+
+/**
+ * Transposes a matrix (flips rows and columns).
+ * @param {number[][]} matrix - The matrix to transpose.
+ * @returns {number[][]} - The transposed matrix.
+ */
+export function transposeMatrix(matrix) {
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+  const transposed = Array.from({ length: cols }, () => Array(rows).fill(0));
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      transposed[j][i] = matrix[i][j];
+    }
+  }
+
+  return transposed;
+}
+
+/**
+ * Generates a random matrix with given dimensions and value range.
+ * @param {number} rows - Number of rows.
+ * @param {number} cols - Number of columns.
+ * @param {number} [min=0] - Minimum value for random numbers.
+ * @param {number} [max=1] - Maximum value for random numbers.
+ * @returns {number[][]} - The generated random matrix.
+ */
+export function generateRandomMatrix(rows, cols, min = 0, max = 1) {
+  return Array.from({ length: rows }, () =>
+    Array.from({ length: cols }, () => Math.random() * (max - min) + min)
+  );
+}
+
+/**
+ * Applies an element-wise operation to two matrices of the same dimensions.
+ * @param {number[][]} matrixA - The first matrix.
+ * @param {number[][]} matrixB - The second matrix.
+ * @param {Function} operation - The operation to apply (e.g., addition, subtraction).
+ * @returns {number[][]} - The resulting matrix after applying the operation.
+ */
+export function elementWiseOperation(matrixA, matrixB, operation) {
+  const rows = matrixA.length;
+  const cols = matrixA[0].length;
+
+  if (rows !== matrixB.length || cols !== matrixB[0].length) {
+    throw new Error('Matrix dimensions must match for element-wise operations.');
+  }
+
+  return matrixA.map((row, i) => row.map((val, j) => operation(val, matrixB[i][j])));
+}

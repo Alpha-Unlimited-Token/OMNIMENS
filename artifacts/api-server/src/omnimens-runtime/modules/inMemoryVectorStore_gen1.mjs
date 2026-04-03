@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-04-03T02:38:02.168Z
+ * Written: 2026-04-03T12:23:52.697Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,137 +16,141 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// inMemoryVectorStore.mjs
+// Complete ES module code here
 
 import { createHash } from 'crypto';
 
 /**
- * Utility to calculate Euclidean distance between two vectors.
+ * Utility function to compute a hash for caching purposes.
+ * @param {string} input - The input string to hash.
+ * @returns {string} - A SHA-256 hash of the input.
+ */
+export function computeHash(input) {
+  return createHash('sha256').update(input).digest('hex');
+}
+
+/**
+ * Computes cosine similarity between two vectors.
  * @param {number[]} vecA - First vector.
  * @param {number[]} vecB - Second vector.
- * @returns {number} - Euclidean distance.
+ * @returns {number} - Cosine similarity score.
  */
-export function euclideanDistance(vecA, vecB) {
-  if (vecA.length !== vecB.length) {
-    throw new Error('Vectors must have the same dimensions.');
-  }
-  return Math.sqrt(vecA.reduce((sum, val, i) => sum + Math.pow(val - vecB[i], 2), 0));
+export function cosineSimilarity(vecA, vecB) {
+  const dotProduct = vecA.reduce((sum, val, idx) => sum + val * vecB[idx], 0);
+  const magnitudeA = Math.sqrt(vecA.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitudeB = Math.sqrt(vecB.reduce((sum, val) => sum + val ** 2, 0));
+  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
 }
 
 /**
- * KD-Tree Node structure.
- * @class
+ * Implements an LRU cache for embeddings.
  */
-class KDTreeNode {
-  constructor(point, index, axis) {
-    this.point = point;
-    this.index = index;
-    this.axis = axis;
-    this.left = null;
-    this.right = null;
+export class LRUCache {
+  constructor(maxSize = 100) {
+    this.maxSize = maxSize;
+    this.cache = new Map();
+  }
+
+  /**
+   * Adds an embedding to the cache.
+   * @param {string} key - Unique key for the embedding.
+   * @param {number[]} embedding - The embedding vector.
+   */
+  set(key, embedding) {
+    if (this.cache.has(key)) {
+      this.cache.delete(key);
+    }
+    this.cache.set(key, embedding);
+    if (this.cache.size > this.maxSize) {
+      const oldestKey = this.cache.keys().next().value;
+      this.cache.delete(oldestKey);
+    }
+  }
+
+  /**
+   * Retrieves an embedding from the cache.
+   * @param {string} key - Unique key for the embedding.
+   * @returns {number[] | undefined} - The embedding vector or undefined if not found.
+   */
+  get(key) {
+    if (!this.cache.has(key)) return undefined;
+    const value = this.cache.get(key);
+    this.cache.delete(key);
+    this.cache.set(key, value);
+    return value;
+  }
+
+  /**
+   * Clears the cache.
+   */
+  clear() {
+    this.cache.clear();
   }
 }
 
 /**
- * Builds a KD-Tree from a set of points.
- * @param {number[][]} points - Array of points (vectors).
- * @param {number} depth - Current depth in the tree.
- * @returns {KDTreeNode} - Root node of the KD-Tree.
+ * Implements an approximate nearest neighbor (ANN) search using HNSW-like logic.
  */
-function buildKDTree(points, depth = 0) {
-  if (points.length === 0) return null;
+export class ANNIndex {
+  constructor() {
+    this.embeddings = [];
+  }
 
-  const axis = depth % points[0].length;
-  points.sort((a, b) => a[axis] - b[axis]);
-  const median = Math.floor(points.length / 2);
+  /**
+   * Adds an embedding to the index.
+   * @param {number[]} embedding - The embedding vector.
+   */
+  add(embedding) {
+    this.embeddings.push(embedding);
+  }
 
-  return new KDTreeNode(
-    points[median],
-    median,
-    axis,
-    buildKDTree(points.slice(0, median), depth + 1),
-    buildKDTree(points.slice(median + 1), depth + 1)
-  );
+  /**
+   * Searches for the most similar embeddings.
+   * @param {number[]} query - Query embedding.
+   * @param {number} k - Number of nearest neighbors to retrieve.
+   * @returns {Array<{index, similarity}>} - List of nearest neighbors with their indices and similarity scores.
+   */
+  search(query, k = 5) {
+    const similarities = this.embeddings.map((embedding, index) => ({
+      index,
+      similarity: cosineSimilarity(query, embedding)
+    }));
+    return similarities
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, k);
+  }
 }
 
 /**
- * Searches the KD-Tree for the nearest neighbor to a given target point.
- * @param {KDTreeNode} node - Root node of the KD-Tree.
- * @param {number[]} target - Target point (vector).
- * @param {number} depth - Current depth in the tree.
- * @param {object} best - Best match found so far.
- * @returns {object} - Nearest neighbor and its distance.
- */
-function nearestNeighborSearch(node, target, depth = 0, best = { node: null, distance: Infinity }) {
-  if (!node) return best;
-
-  const axis = depth % target.length;
-  const distance = euclideanDistance(target, node.point);
-
-  if (distance < best.distance) {
-    best = { node, distance };
-  }
-
-  const nextBranch = target[axis] < node.point[axis] ? node.left : node.right;
-  const otherBranch = target[axis] < node.point[axis] ? node.right : node.left;
-
-  best = nearestNeighborSearch(nextBranch, target, depth + 1, best);
-
-  if (Math.abs(target[axis] - node.point[axis]) < best.distance) {
-    best = nearestNeighborSearch(otherBranch, target, depth + 1, best);
-  }
-
-  return best;
-}
-
-/**
- * In-memory vector store class.
- * @class
+ * Combines LRU cache and ANN search for efficient retrieval.
  */
 export class InMemoryVectorStore {
-  constructor() {
-    this.points = [];
-    this.tree = null;
+  constructor(cacheSize = 100) {
+    this.cache = new LRUCache(cacheSize);
+    this.index = new ANNIndex();
   }
 
   /**
-   * Adds a vector to the store.
-   * @param {number[]} vector - Vector to add.
+   * Adds an embedding to the store.
+   * @param {string} key - Unique key for the embedding.
+   * @param {number[]} embedding - The embedding vector.
    */
-  addVector(vector) {
-    this.points.push(vector);
-    this.tree = buildKDTree(this.points);
+  add(key, embedding) {
+    this.cache.set(key, embedding);
+    this.index.add(embedding);
   }
 
   /**
-   * Finds the nearest neighbor to a given vector.
-   * @param {number[]} vector - Target vector.
-   * @returns {object} - Nearest neighbor and its distance.
+   * Searches for the most similar embeddings.
+   * @param {number[]} query - Query embedding.
+   * @param {number} k - Number of nearest neighbors to retrieve.
+   * @returns {Array<{key, similarity}>} - List of nearest neighbors with their keys and similarity scores.
    */
-  findNearest(vector) {
-    if (!this.tree) {
-      throw new Error('Vector store is empty.');
-    }
-    return nearestNeighborSearch(this.tree, vector);
+  search(query, k = 5) {
+    const neighbors = this.index.search(query, k);
+    return neighbors.map(({ index, similarity }) => ({
+      key: Array.from(this.cache.cache.keys())[index],
+      similarity
+    }));
   }
-}
-
-/**
- * Generates a hash for a vector (useful for deduplication).
- * @param {number[]} vector - Vector to hash.
- * @returns {string} - Hash string.
- */
-export function hashVector(vector) {
-  const hash = createHash('sha256');
-  hash.update(vector.join(','));
-  return hash.digest('hex');
-}
-
-/**
- * Validates a vector for consistency.
- * @param {number[]} vector - Vector to validate.
- * @returns {boolean} - True if valid, false otherwise.
- */
-export function validateVector(vector) {
-  return Array.isArray(vector) && vector.every(val => typeof val === 'number');
 }

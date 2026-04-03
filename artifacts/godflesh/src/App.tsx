@@ -169,7 +169,6 @@ function ProtectedRoute({ children, layout = "ws" }: { children: ReactNode; layo
 
 function HomePage() {
   const { isAuthenticated, isLoading } = useAuth();
-  if (isLoading) return <PageFallback />;
   if (isAuthenticated) return <WS><Dashboard /></WS>;
   return <Home />;
 }

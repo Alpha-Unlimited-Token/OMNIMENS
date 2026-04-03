@@ -1,109 +1,130 @@
 /**
- * @module vectorStoreManager
- * @description Manages in-memory vector embeddings for efficient retrieval and contextual augmentation using HNSW algorithm.
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: vectorStoreManager
+ * Written: 2026-04-03T12:16:57.190Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
  */
+
+// vectorStoreManager.mjs
+
+import { createHash } from 'crypto';
 
 /**
- * A class to manage vector embeddings and perform approximate nearest neighbor (ANN) searches using Hierarchical Navigable Small World (HNSW).
+ * Generate a unique hash key for an embedding vector.
+ * @param {Float32Array} vector - The input vector.
+ * @returns {string} - A unique hash for the vector.
  */
-class VectorStoreManager {
-  constructor() {
-    /**
-     * @type {Map<string, number[]>} A map to store vectors with their associated keys.
-     */
-    this.vectorStore = new Map();
-
-    /**
-     * @type {Array<string>} A list of keys for efficient traversal.
-     */
-    this.keys = [];
+export function generateVectorHash(vector) {
+  const hash = createHash('sha256');
+  for (const value of vector) {
+    hash.update(value.toString());
   }
-
-  /**
-   * Adds a vector to the store.
-   * @param {string} key - The unique identifier for the vector.
-   * @param {number[]} vector - The vector to store.
-   * @throws {Error} Throws an error if the vector is not an array of numbers.
-   */
-  addVector(key, vector) {
-    if (!Array.isArray(vector) || !vector.every((val) => typeof val === 'number')) {
-      throw new Error('Vector must be an array of numbers.');
-    }
-    this.vectorStore.set(key, vector);
-    this.keys.push(key);
-  }
-
-  /**
-   * Computes the Euclidean distance between two vectors.
-   * @* @param {number[]} vectorA - The first vector.
-   * @param {number[]} vectorB - The second vector.
-   * @returns {number} The Euclidean distance between the two vectors.
-   */
-  _euclideanDistance(vectorA, vectorB) {
-    if (vectorA.length !== vectorB.length) {
-      throw new Error('Vectors must have the same dimensions.');
-    }
-    return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
-  }
-
-  /**
-   * Finds the nearest neighbors to a given vector using a simplified HNSW approach.
-   * @param {number[]} queryVector - The vector to search for neighbors.
-   * @param {number} k - The number of nearest neighbors to retrieve.
-   * @returns {Array<{key, distance}>} An array of nearest neighbors with their keys and distances.
-   */
-  findNearestNeighbors(queryVector, k) {
-    if (!Array.isArray(queryVector) || !queryVector.every((val) => typeof val === 'number')) {
-      throw new Error('Query vector must be an array of numbers.');
-    }
-
-    const distances = this.keys.map((key) => {
-      const vector = this.vectorStore.get(key);
-      const distance = this._euclideanDistance(queryVector, vector);
-      return { key, distance };
-    });
-
-    distances.sort((a, b) => a.distance - b.distance);
-    return distances.slice(0, k);
-  }
-
-  /**
-   * Removes a vector from the store.
-   * @param {string} key - The unique identifier for the vector to remove.
-   * @returns {boolean} True if the vector was removed, false otherwise.
-   */
-  removeVector(key) {
-    if (this.vectorStore.has(key)) {
-      this.vectorStore.delete(key);
-      this.keys = this.keys.filter((k) => k !== key);
-      return true;
-    }
-    return false;
-  }
-
-  /**
-   * Clears all vectors from the store.
-   */
-  clearStore() {
-    this.vectorStore.clear();
-    this.keys = [];
-  }
+  return hash.digest('hex');
 }
 
 /**
- * Creates a new instance of the VectorStoreManager.
- * @returns {VectorStoreManager} A new instance of the vector store manager.
+ * Calculate the Euclidean distance between two vectors.
+ * @param {Float32Array} vectorA - The first vector.
+ * @param {Float32Array} vectorB - The second vector.
+ * @returns {number} - The Euclidean distance.
  */
-export function createVectorStoreManager() {
-  return new VectorStoreManager();
+export function calculateDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same dimensions.');
+  }
+  let sum = 0;
+  for (let i = 0; i < vectorA.length; i++) {
+    const diff = vectorA[i] - vectorB[i];
+    sum += diff * diff;
+  }
+  return Math.sqrt(sum);
 }
 
 /**
- * Example usage of the VectorStoreManager.
- * @example
- * const manager = createVectorStoreManager();
- * manager.addVector('vector1', [1, 2, 3]);
- * manager.addVector('vector2', [4, 5, 6]);
- * const neighbors = manager.findNearestNeighbors([1, 2, 3], 1);
- * console.log(neighbors);
+ * Insert an embedding into the in-memory store.
+ * @param {Map} store - The in-memory vector store.
+ * @param {string} id - The unique identifier for the embedding.
+ * @param {Float32Array} vector - The embedding vector.
  */
+export function insertEmbedding(store, id, vector) {
+  if (store.has(id)) {
+    throw new Error(`Embedding with ID '${id}' already exists.`);
+  }
+  store.set(id, vector);
+}
+
+/**
+ * Perform an approximate nearest neighbor (ANN) search.
+ * @param {Map} store - The in-memory vector store.
+ * @param {Float32Array} queryVector - The query vector.
+ * @param {number} k - The number of nearest neighbors to retrieve.
+ * @returns {Array} - An array of the k nearest neighbors as { id, distance }.
+ */
+export function searchNearestNeighbors(store, queryVector, k) {
+  const results = [];
+
+  for (const [id, vector] of store.entries()) {
+    const distance = calculateDistance(queryVector, vector);
+    results.push({ id, distance });
+  }
+
+  results.sort((a, b) => a.distance - b.distance);
+  return results.slice(0, k);
+}
+
+/**
+ * Update an existing embedding in the store.
+ * @param {Map} store - The in-memory vector store.
+ * @param {string} id - The unique identifier for the embedding.
+ * @param {Float32Array} newVector - The updated embedding vector.
+ */
+export function updateEmbedding(store, id, newVector) {
+  if (!store.has(id)) {
+    throw new Error(`Embedding with ID '${id}' does not exist.`);
+  }
+  store.set(id, newVector);
+}
+
+/**
+ * Delete an embedding from the store.
+ * @param {Map} store - The in-memory vector store.
+ * @param {string} id - The unique identifier for the embedding.
+ */
+export function deleteEmbedding(store, id) {
+  if (!store.has(id)) {
+    throw new Error(`Embedding with ID '${id}' does not exist.`);
+  }
+  store.delete(id);
+}
+
+/**
+ * Initialize a new in-memory vector store.
+ * @returns {Map} - An empty Map to store embeddings.
+ */
+export function createVectorStore() {
+  return new Map();
+}
+
+/**
+ * Normalize a vector to unit length.
+ * @param {Float32Array} vector - The input vector.
+ * @returns {Float32Array} - The normalized vector.
+ */
+export function normalizeVector(vector) {
+  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
+  if (magnitude === 0) {
+    throw new Error('Cannot normalize a zero vector.');
+  }
+  return new Float32Array(vector.map(val => val / magnitude));
+}

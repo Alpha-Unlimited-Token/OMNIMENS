@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: iterativeComputationManager
- * Written: 2026-04-03T00:29:36.079Z
+ * Written: 2026-04-03T05:32:56.334Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,104 +18,99 @@
 
 // iterativeComputationManager.mjs
 
-import { performance } from 'node:perf_hooks';
-import { createHash } from 'node:crypto';
+import { createHash } from 'crypto';
 
-// Utility to serialize and hash state for checkpointing
+/**
+ * Generates a unique hash for a given state object.
+ * @param {object} state - The state to hash.
+ * @returns {string} - A unique hash string.
+ */
+export function generateStateHash(state) {
+  const stateString = JSON.stringify(state);
+  return createHash('sha256').update(stateString).digest('hex');
+}
+
+/**
+ * Segments a long-running task into smaller chunks.
+ * @param {Function} taskFunction - The task function to execute in segments.
+ * @param {object} initialState - The starting state for the task.
+ * @param {number} maxIterations - The maximum number of iterations to run.
+ * @param {Function} checkpointCallback - Callback to handle intermediate states.
+ * @returns {object} - The final state after all iterations.
+ */
+export async function runSegmentedTask(taskFunction, initialState, maxIterations, checkpointCallback) {
+  let currentState = { ...initialState };
+
+  for (let i = 0; i < maxIterations; i++) {
+    const result = taskFunction(currentState);
+
+    if (result.done) {
+      return result.state;
+    }
+
+    currentState = result.state;
+
+    if (checkpointCallback) {
+      await checkpointCallback(currentState, i);
+    }
+  }
+
+  return currentState;
+}
+
+/**
+ * Serializes a state object into a JSON string.
+ * @param {object} state - The state to serialize.
+ * @returns {string} - A JSON string representation of the state.
+ */
 export function serializeState(state) {
-  const serialized = JSON.stringify(state);
-  const hash = createHash('sha256').update(serialized).digest('hex');
-  return { serialized, hash };
+  return JSON.stringify(state);
 }
 
-// Utility to deserialize state
-export function deserializeState(serializedState) {
-  return JSON.parse(serializedState);
+/**
+ * Deserializes a JSON string into a state object.
+ * @param {string} stateString - The JSON string to deserialize.
+ * @returns {object} - The deserialized state object.
+ */
+export function deserializeState(stateString) {
+  return JSON.parse(stateString);
 }
 
-// Priority Queue implementation for task scheduling
-export class PriorityQueue {
-  constructor() {
-    this.queue = [];
-  }
-
-  enqueue(task, priority) {
-    this.queue.push({ task, priority });
-    this.queue.sort((a, b) => a.priority - b.priority);
-  }
-
-  dequeue() {
-    return this.queue.shift()?.task || null;
-  }
-
-  isEmpty() {
-    return this.queue.length === 0;
-  }
-}
-
-// Core function to manage iterative computations
-export async function manageIterativeComputation({
-  initialState,
-  computationFunction,
-  timeoutMs,
-  maxIterations
-}) {
-  let state = initialState;
-  let iteration = 0;
-  const startTime = performance.now();
-
-  while (iteration < maxIterations) {
-    const currentTime = performance.now();
-    if (currentTime - startTime > timeoutMs) {
-      return {
-        status: 'timeout',
-        state,
-        iteration
-      };
-    }
-
-    const { serialized, hash } = serializeState(state);
-    const checkpoint = { serialized, hash, iteration };
-
-    try {
-      state = await computationFunction(state);
-    } catch (error) {
-      return {
-        status: 'error',
-        error,
-        checkpoint
-      };
-    }
-
-    iteration++;
-  }
+/**
+ * Example task function to demonstrate usage.
+ * @param {object} state - The current state of the task.
+ * @returns {object} - The updated state and completion status.
+ */
+export function exampleTaskFunction(state) {
+  const { counter = 0 } = state;
+  const newCounter = counter + 1;
 
   return {
-    status: 'completed',
-    state,
-    iteration
+    state: { counter: newCounter },
+    done: newCounter >= 10
   };
 }
 
-// Example computation function (generic utility for testing)
-export function exampleComputationFunction(state) {
-  return {
-    ...state,
-    value: (state.value || 0) + 1
-  };
+/**
+ * Example checkpoint callback to demonstrate usage.
+ * @param {object} state - The current state of the task.
+ * @param {number} iteration - The current iteration number.
+ */
+export async function exampleCheckpointCallback(state, iteration) {
+  console.log(`Checkpoint at iteration ${iteration}:`, state);
 }
 
-// Example usage of PriorityQueue
-export function examplePriorityQueueUsage() {
-  const pq = new PriorityQueue();
-  pq.enqueue('Task A', 2);
-  pq.enqueue('Task B', 1);
-  pq.enqueue('Task C', 3);
-
-  const tasks = [];
-  while (!pq.isEmpty()) {
-    tasks.push(pq.dequeue());
-  }
-
-  return tasks;
-}
+/**
+ * Example usage of the module.
+ * Uncomment the following lines to test the module.
+ */
+// (async () => {
+//   const initialState = { counter: 0 };
+//   const finalState = await runSegmentedTask(
+//     exampleTaskFunction,
+//     initialState,
+//     20,
+//     exampleCheckpointCallback
+//   );
+//   console.log('Final state:', finalState);
+// })();

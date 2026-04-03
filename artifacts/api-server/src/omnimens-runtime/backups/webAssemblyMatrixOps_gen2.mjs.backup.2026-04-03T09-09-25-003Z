@@ -1,0 +1,143 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: webAssemblyMatrixOps
+ * Written: 2026-04-03T06:05:47.497Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// webAssemblyMatrixOps.mjs
+
+import { readFile } from 'fs/promises';
+import { join } from 'path';
+
+const wasmFilePath = join(__dirname, 'matrix_ops.wasm');
+
+let wasmInstance = null;
+
+async function initializeWasm() {
+  if (!wasmInstance) {
+    const wasmBuffer = await readFile(wasmFilePath);
+    const wasmModule = await WebAssembly.compile(wasmBuffer);
+    wasmInstance = await WebAssembly.instantiate(wasmModule);
+  }
+}
+
+export async function multiplyMatrices(matrixA, matrixB) {
+  await initializeWasm();
+
+  const { multiply_matrices } = wasmInstance.exports;
+
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
+
+  if (colsA !== rowsB) {
+    throw new Error('Matrix dimensions do not align for multiplication');
+  }
+
+  const flatMatrixA = matrixA.flat();
+  const flatMatrixB = matrixB.flat();
+
+  const resultPointer = multiply_matrices(flatMatrixA, rowsA, colsA, flatMatrixB, rowsB, colsB);
+
+  const resultRows = rowsA;
+  const resultCols = colsB;
+  const resultMatrix = [];
+
+  for (let i = 0; i < resultRows; i++) {
+    const row = [];
+    for (let j = 0; j < resultCols; j++) {
+      row.push(wasmInstance.exports.memory[resultPointer + i * resultCols + j]);
+    }
+    resultMatrix.push(row);
+  }
+
+  return resultMatrix;
+}
+
+export async function transposeMatrix(matrix) {
+  await initializeWasm();
+
+  const { transpose_matrix } = wasmInstance.exports;
+
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+
+  const flatMatrix = matrix.flat();
+
+  const resultPointer = transpose_matrix(flatMatrix, rows, cols);
+
+  const resultRows = cols;
+  const resultCols = rows;
+  const resultMatrix = [];
+
+  for (let i = 0; i < resultRows; i++) {
+    const row = [];
+    for (let j = 0; j < resultCols; j++) {
+      row.push(wasmInstance.exports.memory[resultPointer + i * resultCols + j]);
+    }
+    resultMatrix.push(row);
+  }
+
+  return resultMatrix;
+}
+
+export async function invertMatrix(matrix) {
+  await initializeWasm();
+
+  const { invert_matrix } = wasmInstance.exports;
+
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+
+  if (rows !== cols) {
+    throw new Error('Matrix must be square for inversion');
+  }
+
+  const flatMatrix = matrix.flat();
+
+  const resultPointer = invert_matrix(flatMatrix, rows);
+
+  const resultMatrix = [];
+
+  for (let i = 0; i < rows; i++) {
+    const row = [];
+    for (let j = 0; j < cols; j++) {
+      row.push(wasmInstance.exports.memory[resultPointer + i * cols + j]);
+    }
+    resultMatrix.push(row);
+  }
+
+  return resultMatrix;
+}
+
+export async function calculateDeterminant(matrix) {
+  await initializeWasm();
+
+  const { calculate_determinant } = wasmInstance.exports;
+
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+
+  if (rows !== cols) {
+    throw new Error('Matrix must be square to calculate determinant');
+  }
+
+  const flatMatrix = matrix.flat();
+
+  const determinant = calculate_determinant(flatMatrix, rows);
+
+  return determinant;
+}

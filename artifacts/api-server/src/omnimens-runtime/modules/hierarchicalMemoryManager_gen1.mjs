@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: hierarchicalMemoryManager
- * Written: 2026-04-03T00:29:04.879Z
+ * Written: 2026-04-03T09:44:29.648Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,114 +18,95 @@
 
 // hierarchicalMemoryManager.mjs
 
-import crypto from 'crypto';
+import { createHash } from 'crypto';
 
 /**
- * Generates a unique identifier for memory chunks.
- * @returns {string} A unique identifier.
+ * Hashes a string to create a unique, fixed-length identifier.
+ * Useful for creating keys for memory segments.
+ * @param {string} input - The input string to hash.
+ * @returns {string} - A SHA-256 hash of the input string.
  */
-export function generateMemoryId() {
-  return crypto.randomUUID();
+export function hashString(input) {
+  return createHash('sha256').update(input).digest('hex');
 }
 
 /**
- * Summarizes a given text by chunking it and reducing each chunk to its key points.
- * @param {string} text - The text to summarize.
- * @param {number} chunkSize - The size of each chunk in characters.
- * @returns {Array<{id, summary}>} Array of summarized chunks with unique IDs.
+ * Clusters memory entries based on thematic similarity using vector similarity.
+ * @param {Array<{ id, vector, data}>} memoryEntries - Array of memory entries with vectors.
+ * @param {Array<number>} queryVector - The vector to compare against.
+ * @param {number} threshold - Minimum similarity score to consider relevant.
+ * @returns {Array<{ id, similarity, data}>} - Sorted array of relevant entries.
  */
-export function summarizeText(text, chunkSize = 500) {
-  if (typeof text !== 'string' || text.length === 0) {
-    throw new Error('Text must be a non-empty string.');
-  }
-  if (chunkSize <= 0) {
-    throw new Error('Chunk size must be a positive integer.');
+export function retrieveRelevantMemory(memoryEntries, queryVector, threshold = 0.7) {
+  if (!Array.isArray(memoryEntries) || !Array.isArray(queryVector)) {
+    throw new TypeError('Both memoryEntries and queryVector must be arrays.');
   }
 
-  const chunks = [];
-  for (let i = 0; i < text.length; i += chunkSize) {
-    const chunk = text.slice(i, i + chunkSize);
-    const summary = chunk.split('. ').slice(0, 2).join('. ') + (chunk.length > chunkSize ? '...' : '');
-    chunks.push({ id: generateMemoryId(), summary });
-  }
-  return chunks;
-}
+  // Normalize a vector to unit length
+  const normalize = (vector) => {
+    const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
+    return vector.map((val) => val / magnitude);
+  };
 
-/**
- * Retrieves the most relevant memory chunk based on a query using simple keyword matching.
- * @param {Array<{id, summary}>} memoryChunks - Array of memory chunks.
- * @param {string} query - The search query.
- * @returns {{id, summary} | null} The most relevant memory chunk or null if none found.
- */
-export function retrieveMemory(memoryChunks, query) {
-  if (!Array.isArray(memoryChunks) || memoryChunks.length === 0) {
-    throw new Error('Memory chunks must be a non-empty array.');
-  }
-  if (typeof query !== 'string' || query.length === 0) {
-    throw new Error('Query must be a non-empty string.');
-  }
-
-  const queryWords = query.toLowerCase().split(' ');
-  let bestMatch = null;
-  let highestScore = 0;
-
-  for (const chunk of memoryChunks) {
-    const chunkWords = chunk.summary.toLowerCase().split(' ');
-    const score = queryWords.reduce((acc, word) => acc + (chunkWords.includes(word) ? 1 : 0), 0);
-
-    if (score > highestScore) {
-      highestScore = score;
-      bestMatch = chunk;
+  // Compute cosine similarity between two vectors
+  const cosineSimilarity = (vecA, vecB) => {
+    if (vecA.length !== vecB.length) {
+      throw new Error('Vectors must be of the same length.');
     }
-  }
+    const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
+    const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a ** 2, 0));
+    const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b ** 2, 0));
+    return dotProduct / (magnitudeA * magnitudeB);
+  };
 
-  return bestMatch;
+  const normalizedQuery = normalize(queryVector);
+
+  return memoryEntries
+    .map((entry) => {
+      const similarity = cosineSimilarity(normalize(entry.vector), normalizedQuery);
+      return { id: entry.id, similarity, data: entry.data };
+    })
+    .filter((entry) => entry.similarity >= threshold)
+    .sort((a, b) => b.similarity - a.similarity);
 }
 
 /**
- * Replays a sequence of memory chunks in order.
- * @param {Array<{id, summary}>} memoryChunks - Array of memory chunks.
- * @returns {string} Concatenated summaries of all memory chunks.
+ * Segments long-term memory into thematic clusters based on hashed keys.
+ * @param {Array<{ id, data}>} rawMemory - Array of raw memory entries.
+ * @param {function(string): Array<number>} vectorizer - Function to convert data into a vector representation.
+ * @returns {Array<{ id, vector, data}>} - Segmented memory entries with vectors.
  */
-export function replayMemory(memoryChunks) {
-  if (!Array.isArray(memoryChunks)) {
-    throw new Error('Memory chunks must be an array.');
+export function segmentMemory(rawMemory, vectorizer) {
+  if (!Array.isArray(rawMemory)) {
+    throw new TypeError('rawMemory must be an array.');
+  }
+  if (typeof vectorizer !== 'function') {
+    throw new TypeError('vectorizer must be a function.');
   }
 
-  return memoryChunks.map(chunk => chunk.summary).join(' ');
+  return rawMemory.map((entry) => {
+    const vector = vectorizer(entry.data);
+    if (!Array.isArray(vector)) {
+      throw new Error('Vectorizer function must return an array.');
+    }
+    return {
+      id: hashString(entry.id),
+      vector,
+      data: entry.data
+    };
+  });
 }
 
 /**
- * Combines multiple summaries into a higher-level summary.
- * @param {Array<{id, summary}>} memoryChunks - Array of memory chunks.
- * @returns {string} A single higher-level summary.
+ * Utility to dynamically manage hierarchical memory retrieval.
+ * Combines segmentation and retrieval for dynamic context management.
+ * @param {Array<{ id, data}>} rawMemory - Raw memory entries.
+ * @param {function(string): Array<number>} vectorizer - Function to vectorize memory data.
+ * @param {Array<number>} queryVector - Query vector for relevance search.
+ * @param {number} threshold - Minimum similarity score for relevance.
+ * @returns {Array<{ id, similarity, data}>} - Relevant memory entries.
  */
-export function summarizeMemory(memoryChunks) {
-  if (!Array.isArray(memoryChunks) || memoryChunks.length === 0) {
-    throw new Error('Memory chunks must be a non-empty array.');
-  }
-
-  const combinedText = memoryChunks.map(chunk => chunk.summary).join(' ');
-  return combinedText.split('. ').slice(0, 5).join('. ') + '...';
-}
-
-/**
- * Updates a specific memory chunk by its ID.
- * @param {Array<{id, summary}>} memoryChunks - Array of memory chunks.
- * @param {string} id - The ID of the memory chunk to update.
- * @param {string} newSummary - The new summary to replace the old one.
- * @returns {Array<{id, summary}>} Updated array of memory chunks.
- */
-export function updateMemoryChunk(memoryChunks, id, newSummary) {
-  if (!Array.isArray(memoryChunks)) {
-    throw new Error('Memory chunks must be an array.');
-  }
-  if (typeof id !== 'string' || id.length === 0) {
-    throw new Error('ID must be a non-empty string.');
-  }
-  if (typeof newSummary !== 'string' || newSummary.length === 0) {
-    throw new Error('New summary must be a non-empty string.');
-  }
-
-  return memoryChunks.map(chunk => (chunk.id === id ? { ...chunk, summary: newSummary } : chunk));
+export function manageMemory(rawMemory, vectorizer, queryVector, threshold = 0.7) {
+  const segmentedMemory = segmentMemory(rawMemory, vectorizer);
+  return retrieveRelevantMemory(segmentedMemory, queryVector, threshold);
 }

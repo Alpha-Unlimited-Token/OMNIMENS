@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: memoryMappedVectorStore
- * Written: 2026-04-02T21:44:54.174Z
+ * Written: 2026-04-03T07:27:00.862Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,121 +18,106 @@
 
 // memoryMappedVectorStore.mjs
 
-import { createHash } from 'crypto';
+import { openSync, readSync, writeSync, ftruncateSync, closeSync } from 'fs';
+import { resolve } from 'path';
+
+const VECTOR_DIM = 128; // Fixed dimension for vectors
+const VECTOR_SIZE = VECTOR_DIM * Float32Array.BYTES_PER_ELEMENT;
+const MAX_VECTORS = 100000; // Maximum number of vectors in the store
+const FILE_SIZE = VECTOR_SIZE * MAX_VECTORS;
 
 /**
- * Generate a unique hash for a vector to use as a key.
- * @param {number[]} vector - The input vector.
- * @returns {string} - A unique hash representing the vector.
+ * Creates or opens a memory-mapped file for storing vectors.
+ * @param {string} filePath - Path to the memory-mapped file.
+ * @returns {object} - File descriptor and buffer object.
  */
-export function generateVectorKey(vector) {
-  const hash = createHash('sha256');
-  hash.update(vector.join(','));
-  return hash.digest('hex');
+export function createMemoryMappedFile(filePath) {
+  const resolvedPath = resolve(filePath);
+  const fd = openSync(resolvedPath, 'w+');
+  ftruncateSync(fd, FILE_SIZE);
+  const buffer = Buffer.alloc(FILE_SIZE);
+  return { fd, buffer };
 }
 
 /**
- * Compute the Euclidean distance between two vectors.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {number} - The Euclidean distance.
+ * Writes a vector to the memory-mapped file.
+ * @param {object} file - File descriptor and buffer object.
+ * @param {number} index - Index to write the vector at.
+ * @param {Float32Array} vector - Vector to write.
  */
-export function euclideanDistance(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must have the same dimensionality');
+export function writeVector(file, index, vector) {
+  if (vector.length !== VECTOR_DIM) {
+    throw new Error(`Vector must have dimension ${VECTOR_DIM}`);
   }
-  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
+  const offset = index * VECTOR_SIZE;
+  if (offset >= FILE_SIZE) {
+    throw new Error('Index exceeds maximum capacity');
+  }
+  const floatBuffer = Buffer.from(vector.buffer);
+  floatBuffer.copy(file.buffer, offset);
+  writeSync(file.fd, file.buffer, 0, FILE_SIZE, 0);
 }
 
 /**
- * HNSW Node class representing a single node in the graph.
+ * Reads a vector from the memory-mapped file.
+ * @param {object} file - File descriptor and buffer object.
+ * @param {number} index - Index to read the vector from.
+ * @returns {Float32Array} - Retrieved vector.
  */
-class HNSWNode {
-  constructor(vector, id) {
-    this.vector = vector;
-    this.id = id;
-    this.neighbors = new Map(); // Map of neighbor ID to distance
+export function readVector(file, index) {
+  const offset = index * VECTOR_SIZE;
+  if (offset >= FILE_SIZE) {
+    throw new Error('Index exceeds maximum capacity');
   }
-
-  addNeighbor(node, distance) {
-    this.neighbors.set(node.id, distance);
-  }
+  const floatBuffer = file.buffer.slice(offset, offset + VECTOR_SIZE);
+  return new Float32Array(floatBuffer.buffer);
 }
 
 /**
- * HNSW Graph class for managing the vector store.
+ * Calculates the Euclidean distance between two vectors.
+ * @param {Float32Array} vec1 - First vector.
+ * @param {Float32Array} vec2 - Second vector.
+ * @returns {number} - Euclidean distance.
  */
-class HNSWGraph {
-  constructor() {
-    this.nodes = new Map(); // Map of node ID to HNSWNode
+export function euclideanDistance(vec1, vec2) {
+  if (vec1.length !== vec2.length) {
+    throw new Error('Vectors must have the same dimension');
   }
+  let sum = 0;
+  for (let i = 0; i < vec1.length; i++) {
+    const diff = vec1[i] - vec2[i];
+    sum += diff * diff;
+  }
+  return Math.sqrt(sum);
+}
 
-  /**
-   * Add a vector to the graph.
-   * @param {number[]} vector - The vector to add.
-   */
-  addVector(vector) {
-    const id = generateVectorKey(vector);
-    if (this.nodes.has(id)) return; // Avoid duplicates
+/**
+ * Finds the nearest neighbor of a given vector in the memory-mapped file.
+ * @param {object} file - File descriptor and buffer object.
+ * @param {Float32Array} queryVector - Query vector.
+ * @param {number} count - Number of vectors stored.
+ * @returns {object} - Nearest neighbor index and distance.
+ */
+export function findNearestNeighbor(file, queryVector, count) {
+  let nearestIndex = -1;
+  let nearestDistance = Infinity;
 
-    const newNode = new HNSWNode(vector, id);
-
-    // Connect to existing nodes
-    for (const node of this.nodes.values()) {
-      const distance = euclideanDistance(vector, node.vector);
-      newNode.addNeighbor(node, distance);
-      node.addNeighbor(newNode, distance);
+  for (let i = 0; i < count; i++) {
+    const candidateVector = readVector(file, i);
+    const distance = euclideanDistance(queryVector, candidateVector);
+    if (distance < nearestDistance) {
+      nearestDistance = distance;
+      nearestIndex = i;
     }
-
-    this.nodes.set(id, newNode);
   }
 
-  /**
-   * Search for the nearest vector.
-   * @param {number[]} queryVector - The query vector.
-   * @param {number} k - Number of nearest neighbors to return.
-   * @returns {Array<{vector, distance}>} - Array of nearest vectors and distances.
-   */
-  search(queryVector, k) {
-    const distances = [];
-
-    for (const node of this.nodes.values()) {
-      const distance = euclideanDistance(queryVector, node.vector);
-      distances.push({ vector: node.vector, distance });
-    }
-
-    return distances.sort((a, b) => a.distance - b.distance).slice(0, k);
-  }
+  return { index: nearestIndex, distance: nearestDistance };
 }
 
 /**
- * Create a new instance of HNSWGraph.
- * @returns {HNSWGraph} - A new HNSWGraph instance.
+ * Closes the memory-mapped file.
+ * @param {object} file - File descriptor and buffer object.
  */
-export function createHNSWGraph() {
-  return new HNSWGraph();
-}
-
-/**
- * Utility function to normalize a vector.
- * @param {number[]} vector - The input vector.
- * @returns {number[]} - The normalized vector.
- */
-export function normalizeVector(vector) {
-  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
-  if (magnitude === 0) {
-    throw new Error('Cannot normalize a zero vector');
-  }
-  return vector.map(val => val / magnitude);
-}
-
-/**
- * Utility function to check if two vectors are identical.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {boolean} - True if vectors are identical, false otherwise.
- */
-export function areVectorsEqual(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) return false;
-  return vectorA.every((val, i) => val === vectorB[i]);
+export function closeMemoryMappedFile(file) {
+  closeSync(file.fd);
 }

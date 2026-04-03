@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: wasmComputeEngine
- * Written: 2026-04-02T14:10:01.019Z
+ * Written: 2026-04-03T08:03:36.031Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -19,19 +19,21 @@
 // wasmComputeEngine.mjs
 
 import { readFile } from 'fs/promises';
-import { resolve } from 'path';
+import { join } from 'path';
 
 // Utility to load and compile WebAssembly modules
 export async function loadWasmModule(filePath) {
-  const absolutePath = resolve(filePath);
-  const wasmBuffer = await readFile(absolutePath);
+  const wasmPath = join(process.cwd(), filePath);
+  const wasmBuffer = await readFile(wasmPath);
   const wasmModule = await WebAssembly.compile(wasmBuffer);
   return WebAssembly.instantiate(wasmModule);
 }
 
 // Matrix multiplication using WebAssembly
-export async function wasmMatrixMultiply(wasmInstance, matrixA, matrixB) {
-  const { memory, multiplyMatrices } = wasmInstance.exports;
+export async function wasmMatrixMultiply(matrixA, matrixB, wasmFilePath) {
+  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
+    throw new Error('Both inputs must be 2D arrays.');
+  }
 
   const rowsA = matrixA.length;
   const colsA = matrixA[0].length;
@@ -39,83 +41,49 @@ export async function wasmMatrixMultiply(wasmInstance, matrixA, matrixB) {
   const colsB = matrixB[0].length;
 
   if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions do not allow multiplication');
+    throw new Error('Matrix dimensions do not align for multiplication.');
   }
 
-  const resultRows = rowsA;
-  const resultCols = colsB;
+  const wasmInstance = await loadWasmModule(wasmFilePath);
+  const { memory, multiply_matrices } = wasmInstance.instance.exports;
 
-  // Flatten matrices into 1D arrays
-  const flatA = matrixA.flat();
-  const flatB = matrixB.flat();
-  const result = new Float64Array(resultRows * resultCols);
+  const inputBufferA = new Float64Array(memory.buffer, 0, rowsA * colsA);
+  const inputBufferB = new Float64Array(memory.buffer, rowsA * colsA * 8, rowsB * colsB);
+  const outputBuffer = new Float64Array(memory.buffer, rowsA * colsA * 8 + rowsB * colsB * 8, rowsA * colsB);
 
-  // Allocate memory in WASM
-  const offsetA = 0;
-  const offsetB = offsetA + flatA.length * Float64Array.BYTES_PER_ELEMENT;
-  const offsetResult = offsetB + flatB.length * Float64Array.BYTES_PER_ELEMENT;
+  // Flatten and copy matrix data into WASM memory
+  matrixA.flat().forEach((val, i) => inputBufferA[i] = val);
+  matrixB.flat().forEach((val, i) => inputBufferB[i] = val);
 
-  const wasmMemory = new Float64Array(memory.buffer);
-  wasmMemory.set(flatA, offsetA / Float64Array.BYTES_PER_ELEMENT);
-  wasmMemory.set(flatB, offsetB / Float64Array.BYTES_PER_ELEMENT);
-
-  // Call WASM function
-  multiplyMatrices(
-    offsetA,
-    rowsA,
-    colsA,
-    offsetB,
-    rowsB,
-    colsB,
-    offsetResult
-  );
+  // Perform multiplication
+  multiply_matrices(rowsA, colsA, colsB);
 
   // Extract result from WASM memory
-  for (let i = 0; i < result.length; i++) {
-    result[i] = wasmMemory[offsetResult / Float64Array.BYTES_PER_ELEMENT + i];
+  const result = [];
+  for (let i = 0; i < rowsA; i++) {
+    result.push(Array.from(outputBuffer.slice(i * colsB, (i + 1) * colsB)));
   }
 
-  // Convert result back to 2D array
-  const resultMatrix = [];
-  for (let i = 0; i < resultRows; i++) {
-    resultMatrix.push(result.slice(i * resultCols, (i + 1) * resultCols));
-  }
-
-  return resultMatrix;
+  return result;
 }
 
-// Example utility to validate matrix dimensions
+// Utility to validate matrix dimensions
 export function validateMatrix(matrix) {
   if (!Array.isArray(matrix) || matrix.length === 0 || !Array.isArray(matrix[0])) {
-    throw new Error('Invalid matrix format');
+    throw new Error('Input must be a 2D array.');
   }
-  const cols = matrix[0].length;
-  for (const row of matrix) {
-    if (row.length !== cols) {
-      throw new Error('Matrix rows must have the same number of columns');
-    }
+
+  const rowLength = matrix[0].length;
+  if (!matrix.every(row => Array.isArray(row) && row.length === rowLength)) {
+    throw new Error('All rows in the matrix must have the same length.');
   }
+
+  return true;
 }
 
-// Example: Load WASM and perform matrix multiplication
-export async function exampleUsage() {
-  const wasmPath = './linear_algebra.wasm'; // Replace with actual file path
-  const wasmInstance = await loadWasmModule(wasmPath);
-
-  const matrixA = [
-    [1, 2, 3],
-    [4, 5, 6]
-  ];
-
-  const matrixB = [
-    [7, 8],
-    [9, 10],
-    [11, 12]
-  ];
-
-  validateMatrix(matrixA);
-  validateMatrix(matrixB);
-
-  const result = await wasmMatrixMultiply(wasmInstance, matrixA, matrixB);
-  console.log('Matrix Multiplication Result:', result);
+// Example function to demonstrate SVD integration (stub for future expansion)
+export function singularValueDecomposition(matrix) {
+  validateMatrix(matrix);
+  // Placeholder for future WebAssembly-based SVD implementation
+  throw new Error('SVD computation is not yet implemented.');
 }

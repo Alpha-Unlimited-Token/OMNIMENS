@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: iterativeComputationManager
- * Written: 2026-04-02T22:19:02.923Z
+ * Written: 2026-04-03T04:59:24.049Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,83 +18,125 @@
 
 // iterativeComputationManager.mjs
 
-import { createHash } from 'crypto';
+import { serialize, deserialize } from 'v8';
 
-/** Utility function to create unique checkpoints */
-export function createCheckpoint(state) {
-  const stateString = JSON.stringify(state);
-  const hash = createHash('sha256');
-  hash.update(stateString);
-  return {
-    id: hash.digest('hex'),
-    state: state
-  };
+/**
+ * Breaks a long-running task into modular subprocesses with state persistence.
+ * State is checkpointed using in-memory serialization.
+ */
+
+/**
+ * Serializes a given state object for persistence.
+ * @param {object} state - The state object to serialize.
+ * @returns {Buffer} - Serialized state as a buffer.
+ */
+export function saveState(state) {
+  if (typeof state !== 'object' || state === null) {
+    throw new TypeError('State must be a non-null object.');
+  }
+  return serialize(state);
 }
 
-/** Function to split a large task into smaller chunks */
-export function segmentTask(taskFunction, initialState, iterations, chunkSize) {
-  const checkpoints = [];
-  let currentState = initialState;
+/**
+ * Deserializes a buffer back into a state object.
+ * @param {Buffer} buffer - The buffer containing the serialized state.
+ * @returns {object} - Deserialized state object.
+ */
+export function loadState(buffer) {
+  if (!Buffer.isBuffer(buffer)) {
+    throw new TypeError('Input must be a Buffer.');
+  }
+  return deserialize(buffer);
+}
+
+/**
+ * Executes an iterative computation with state persistence.
+ * @param {function} taskFunction - The function to execute on each iteration.
+ * @param {object} initialState - The initial state for the computation.
+ * @param {number} iterations - Number of iterations to perform.
+ * @returns {object} - Final state after all iterations.
+ */
+export function iterativeComputation(taskFunction, initialState, iterations) {
+  if (typeof taskFunction !== 'function') {
+    throw new TypeError('taskFunction must be a function.');
+  }
+  if (typeof initialState !== 'object' || initialState === null) {
+    throw new TypeError('initialState must be a non-null object.');
+  }
+  if (typeof iterations !== 'number' || iterations <= 0 || !Number.isInteger(iterations)) {
+    throw new TypeError('iterations must be a positive integer.');
+  }
+
+  let state = { ...initialState };
 
   for (let i = 0; i < iterations; i++) {
-    if (i % chunkSize === 0) {
-      checkpoints.push(createCheckpoint(currentState));
+    try {
+      state = taskFunction(state, i);
+      if (typeof state !== 'object' || state === null) {
+        throw new Error('taskFunction must return a non-null object as state.');
+      }
+    } catch (error) {
+      console.error(`Error during iteration ${i}:`, error);
+      break;
     }
-    currentState = taskFunction(currentState, i);
   }
 
-  checkpoints.push(createCheckpoint(currentState));
-  return checkpoints;
+  return state;
 }
 
-/** Function to restore state from a checkpoint */
-export function restoreStateFromCheckpoint(checkpoints, checkpointId) {
-  const checkpoint = checkpoints.find(cp => cp.id === checkpointId);
-  if (!checkpoint) {
-    throw new Error('Checkpoint not found');
+/**
+ * Chains multiple task functions to execute sequentially, passing state between them.
+ * @param {Array<function>} taskFunctions - Array of task functions to chain.
+ * @param {object} initialState - The initial state for the computation.
+ * @returns {object} - Final state after all tasks are executed.
+ */
+export function chainTasks(taskFunctions, initialState) {
+  if (!Array.isArray(taskFunctions) || !taskFunctions.every(fn => typeof fn === 'function')) {
+    throw new TypeError('taskFunctions must be an array of functions.');
   }
-  return checkpoint.state;
+  if (typeof initialState !== 'object' || initialState === null) {
+    throw new TypeError('initialState must be a non-null object.');
+  }
+
+  let state = { ...initialState };
+
+  for (const taskFunction of taskFunctions) {
+    try {
+      state = taskFunction(state);
+      if (typeof state !== 'object' || state === null) {
+        throw new Error('Each taskFunction must return a non-null object as state.');
+      }
+    } catch (error) {
+      console.error('Error during task execution:', error);
+      break;
+    }
+  }
+
+  return state;
 }
 
-/** Dependency tracking utility */
-export function trackDependencies(tasks, dependencies) {
-  const dependencyMap = new Map();
-
-  tasks.forEach((task, index) => {
-    dependencyMap.set(task, dependencies[index]);
-  });
-
-  return dependencyMap;
+/**
+ * Example utility function for testing purposes.
+ * Simulates a simple computation by incrementing a counter in the state.
+ * @param {object} state - Current state.
+ * @param {number} iteration - Current iteration index.
+ * @returns {object} - Updated state.
+ */
+export function exampleTask(state, iteration) {
+  return { ...state, counter: (state.counter || 0) + 1, iteration };
 }
 
-/** Example of iterative computation */
-export function exampleComputation(initialValue, iterations, chunkSize) {
-  const taskFunction = (state, iteration) => state + iteration;
-  return segmentTask(taskFunction, initialValue, iterations, chunkSize);
-}
+/**
+ * Example of chaining multiple tasks.
+ * @param {object} state - Initial state.
+ * @returns {object} - Final state.
+ */
+export function exampleChainedTasks(state) {
+  const tasks = [
+    (s) => ({ ...s, step1: true }),
+    (s) => ({ ...s, step2: s.step1 ? 'completed' : 'skipped' }),
+    (s) => ({ ...s, final: s.step2 === 'completed' ? 'success' : 'failure' })
+  ];
 
-/** Generic utility for multi-agent use */
-export function computeSum(array) {
-  return array.reduce((sum, num) => sum + num, 0);
+  return chainTasks(tasks, state);
 }
-
-export function computeAverage(array) {
-  if (array.length === 0) return 0;
-  return computeSum(array) / array.length;
-}
-
-export function computeVariance(array) {
-  const avg = computeAverage(array);
-  return computeAverage(array.map(num => Math.pow(num - avg, 2)));
-}
-
-export const iterativeComputationManager = {
-  createCheckpoint,
-  segmentTask,
-  restoreStateFromCheckpoint,
-  trackDependencies,
-  exampleComputation,
-  computeSum,
-  computeAverage,
-  computeVariance
-};

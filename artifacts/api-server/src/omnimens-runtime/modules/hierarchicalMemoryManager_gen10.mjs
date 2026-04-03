@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: hierarchicalMemoryManager
- * Written: 2026-04-01T22:19:19.245Z
+ * Written: 2026-04-03T05:40:20.236Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -21,92 +21,110 @@
 import crypto from 'crypto';
 
 /**
- * Generates a semantic hash for a given text using SHA256.
- * This ensures unique identification of similar semantic clusters.
- * @param {string} text - The input text to hash.
- * @returns {string} - A fixed-length hash string.
+ * Generate a unique ID for memory segments.
+ * @returns {string} A unique identifier.
  */
-export function generateSemanticHash(text) {
-  return crypto.createHash('sha256').update(text).digest('hex');
+export function generateSegmentId() {
+  return crypto.randomUUID();
 }
 
 /**
- * Summarizes an array of text entries into a single summary.
- * Uses a simplistic approach by concatenating the first N characters of each entry.
- * @param {string[]} entries - Array of text entries to summarize.
- * @param {number} maxLength - Maximum length of the summary.
- * @returns {string} - A summarized version of the input entries.
+ * Summarizes a text segment by truncating or extracting key points.
+ * @param {string} text - The text to summarize.
+ * @param {number} maxLength - The maximum length of the summary.
+ * @returns {string} A summarized version of the text.
  */
-export function summarizeEntries(entries, maxLength = 200) {
-  const combinedText = entries.join(' ');
-  return combinedText.length > maxLength ? combinedText.slice(0, maxLength) + '...' : combinedText;
+export function summarizeText(text, maxLength = 200) {
+  if (text.length <= maxLength) return text;
+  const sentences = text.split('. ');
+  let summary = '';
+
+  for (const sentence of sentences) {
+    if ((summary + sentence).length > maxLength) break;
+    summary += sentence + '. ';
+  }
+
+  return summary.trim();
 }
 
 /**
- * Clusters text entries based on semantic similarity using a naive hashing approach.
- * Groups entries with the same hash into clusters.
- * @param {string[]} entries - Array of text entries to cluster.
- * @returns {Object} - An object where keys are hashes and values are arrays of clustered entries.
+ * Scores segments based on their importance (e.g., recency, length, keywords).
+ * @param {Array<{ id, content, timestamp}>} segments - Memory segments.
+ * @param {Array<string>} keywords - Keywords to prioritize.
+ * @returns {Array<{ id, score}>} Scored segments.
  */
-export function clusterBySemanticHash(entries) {
-  const clusters = {};
-  for (const entry of entries) {
-    const hash = generateSemanticHash(entry);
-    if (!clusters[hash]) {
-      clusters[hash] = [];
+export function scoreSegments(segments, keywords = []) {
+  return segments.map(({ id, content, timestamp }) => {
+    let score = 0;
+
+    // Prioritize recent segments
+    const age = Date.now() - timestamp;
+    score += Math.max(0, 10000 - age / 1000); // Decay over time
+
+    // Prioritize segments containing keywords
+    for (const keyword of keywords) {
+      if (content.includes(keyword)) score += 50;
     }
-    clusters[hash].push(entry);
-  }
-  return clusters;
+
+    // Prioritize longer content (but not excessively)
+    score += Math.min(content.length, 500) / 10;
+
+    return { id, score };
+  });
 }
 
 /**
- * Recursively compresses and summarizes text entries into a hierarchical memory structure.
- * Each level of the hierarchy represents a summarized version of the previous level.
- * @param {string[]} entries - Array of text entries to compress.
- * @param {number} maxDepth - Maximum depth of the hierarchy.
- * @param {number} maxLength - Maximum length of each summary.
- * @returns {Object} - A hierarchical memory structure.
+ * Compress memory by summarizing and retaining high-priority segments.
+ * @param {Array<{ id, content, timestamp}>} segments - Memory segments.
+ * @param {number} maxSegments - Maximum number of segments to retain.
+ * @param {Array<string>} keywords - Keywords to prioritize.
+ * @returns {Array<{ id, content, timestamp}>} Compressed memory.
  */
-export function buildHierarchicalMemory(entries, maxDepth = 3, maxLength = 200) {
-  if (maxDepth <= 0 || entries.length === 0) {
-    return { summary: summarizeEntries(entries, maxLength), clusters: {} };
-  }
+export function compressMemory(segments, maxSegments = 10, keywords = []) {
+  const scoredSegments = scoreSegments(segments, keywords);
 
-  const clusters = clusterBySemanticHash(entries);
-  const summaries = [];
+  // Sort by score descending
+  scoredSegments.sort((a, b) => b.score - a.score);
 
-  for (const [hash, clusterEntries] of Object.entries(clusters)) {
-    const subHierarchy = buildHierarchicalMemory(clusterEntries, maxDepth - 1, maxLength);
-    summaries.push(subHierarchy.summary);
-    clusters[hash] = subHierarchy;
-  }
+  // Retain top segments and summarize if necessary
+  const retained = scoredSegments.slice(0, maxSegments).map(({ id }) => {
+    const segment = segments.find(s => s.id === id);
+    return {
+      id: segment.id,
+      content: summarizeText(segment.content),
+      timestamp: segment.timestamp
+    };
+  });
 
-  return {
-    summary: summarizeEntries(summaries, maxLength),
-    clusters
-  };
+  return retained;
 }
 
 /**
- * Flattens a hierarchical memory structure into a single-level array of summaries.
- * Useful for exporting or analyzing the hierarchy at a glance.
- * @param {Object} hierarchy - The hierarchical memory structure.
- * @returns {string[]} - A flat array of summaries.
+ * Recursive summarization for deep memory compression.
+ * @param {Array<{ id, content, timestamp}>} segments - Memory segments.
+ * @param {number} depth - Number of recursive summarization layers.
+ * @returns {Array<{ id, content, timestamp}>} Compressed memory.
  */
-export function flattenHierarchy(hierarchy) {
-  const summaries = [hierarchy.summary];
-  for (const cluster of Object.values(hierarchy.clusters)) {
-    summaries.push(...flattenHierarchy(cluster));
+export function recursiveSummarization(segments, depth = 2) {
+  let compressed = segments;
+
+  for (let i = 0; i < depth; i++) {
+    compressed = compressMemory(compressed, Math.ceil(compressed.length / 2));
   }
-  return summaries;
+
+  return compressed;
 }
 
 /**
- * Example usage function to demonstrate the module functionality.
- * @param {string[]} entries - Array of text entries to process.
- * @returns {Object} - The resulting hierarchical memory structure.
+ * Example usage: Initialize memory and demonstrate compression.
  */
-export function processTextEntries(entries) {
-  return buildHierarchicalMemory(entries);
+export function exampleUsage() {
+  const memory = [
+    { id: generateSegmentId(), content: 'This is a very important memory.', timestamp: Date.now() - 1000 },
+    { id: generateSegmentId(), content: 'This is another memory that is slightly less important.', timestamp: Date.now() - 5000 },
+    { id: generateSegmentId(), content: 'A trivial memory.', timestamp: Date.now() - 10000 }
+  ];
+
+  const compressed = recursiveSummarization(memory, 2);
+  return compressed;
 }

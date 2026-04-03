@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: webGpuMatrixEngine
- * Written: 2026-04-03T02:41:50.437Z
+ * Written: 2026-04-03T09:44:47.239Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,123 +18,120 @@
 
 // webGpuMatrixEngine.mjs
 
-import { GPU } from 'gpu.js';
-
-// Initialize GPU.js instance
-const gpu = new GPU();
+import { createHash } from 'crypto';
 
 /**
- * Multiply two matrices using WebGPU acceleration.
- * @param {number[][]} matrixA - First matrix.
- * @param {number[][]} matrixB - Second matrix.
- * @returns {number[][]} - Resultant matrix after multiplication.
+ * Generates a unique identifier for GPU buffers to avoid conflicts.
+ * @param {string} input - A string to hash.
+ * @returns {string} - A unique hash identifier.
  */
-export function matrixMultiply(matrixA, matrixB) {
-  if (matrixA[0].length !== matrixB.length) {
-    throw new Error('Matrix dimensions do not align for multiplication.');
+export function generateBufferId(input) {
+  return createHash('sha256').update(input).digest('hex').slice(0, 16);
+}
+
+/**
+ * Creates a WebGPU-compatible matrix buffer.
+ * @param {Array<number>} data - The 1D array representing the matrix.
+ * @param {number} rows - Number of rows in the matrix.
+ * @param {number} cols - Number of columns in the matrix.
+ * @returns {Object} - An object representing the buffer metadata.
+ */
+export function createMatrixBuffer(data, rows, cols) {
+  if (data.length !== rows * cols) {
+    throw new Error('Data size does not match matrix dimensions.');
+  }
+  return {
+    id: generateBufferId(JSON.stringify(data)),
+    rows,
+    cols,
+    data
+  };
+}
+
+/**
+ * Performs matrix multiplication using a pure algorithm (no GPU execution).
+ * @param {Object} matrixA - First matrix buffer.
+ * @param {Object} matrixB - Second matrix buffer.
+ * @returns {Object} - Resultant matrix buffer.
+ */
+export function multiplyMatrices(matrixA, matrixB) {
+  if (matrixA.cols !== matrixB.rows) {
+    throw new Error('Matrix dimensions are incompatible for multiplication.');
   }
 
-  const multiplyKernel = gpu.createKernel(function (a, b) {
-    let sum = 0;
-    for (let i = 0; i < this.constants.sharedDim; i++) {
-      sum += a[this.thread.y][i] * b[i][this.thread.x];
+  const result = [];
+  for (let i = 0; i < matrixA.rows; i++) {
+    for (let j = 0; j < matrixB.cols; j++) {
+      let sum = 0;
+      for (let k = 0; k < matrixA.cols; k++) {
+        sum += matrixA.data[i * matrixA.cols + k] * matrixB.data[k * matrixB.cols + j];
+      }
+      result.push(sum);
     }
-    return sum;
-  })
-    .setOutput([matrixB[0].length, matrixA.length])
-    .setConstants({ sharedDim: matrixA[0].length });
+  }
 
-  return multiplyKernel(matrixA, matrixB);
+  return createMatrixBuffer(result, matrixA.rows, matrixB.cols);
 }
 
 /**
- * Compute the transpose of a matrix.
- * @param {number[][]} matrix - Input matrix.
- * @returns {number[][]} - Transposed matrix.
+ * Computes the eigenvalues of a 2x2 matrix using a closed-form solution.
+ * @param {Object} matrix - A 2x2 matrix buffer.
+ * @returns {Array<number>} - Array of eigenvalues.
  */
-export function matrixTranspose(matrix) {
-  const transposeKernel = gpu.createKernel(function (m) {
-    return m[this.thread.x][this.thread.y];
-  })
-    .setOutput([matrix.length, matrix[0].length]);
+export function computeEigenvalues(matrix) {
+  if (matrix.rows !== 2 || matrix.cols !== 2) {
+    throw new Error('Eigenvalue computation is only supported for 2x2 matrices.');
+  }
 
-  return transposeKernel(matrix);
+  const [a, b, c, d] = matrix.data;
+  const trace = a + d;
+  const determinant = a * d - b * c;
+  const discriminant = Math.sqrt(trace * trace - 4 * determinant);
+
+  return [(trace + discriminant) / 2, (trace - discriminant) / 2];
 }
 
 /**
- * Compute element-wise addition of two matrices.
- * @param {number[][]} matrixA - First matrix.
- * @param {number[][]} matrixB - Second matrix.
- * @returns {number[][]} - Resultant matrix after addition.
+ * Applies a simple 2D convolution to a matrix using a kernel.
+ * @param {Object} matrix - Input matrix buffer.
+ * @param {Object} kernel - Kernel matrix buffer.
+ * @returns {Object} - Resultant matrix buffer after convolution.
  */
-export function matrixAdd(matrixA, matrixB) {
-  if (
-    matrixA.length !== matrixB.length ||
-    matrixA[0].length !== matrixB[0].length
-  ) {
-    throw new Error('Matrix dimensions do not match for addition.');
+export function applyConvolution(matrix, kernel) {
+  const outputRows = matrix.rows - kernel.rows + 1;
+  const outputCols = matrix.cols - kernel.cols + 1;
+
+  if (outputRows <= 0 || outputCols <= 0) {
+    throw new Error('Kernel size is larger than the input matrix.');
   }
 
-  const addKernel = gpu.createKernel(function (a, b) {
-    return a[this.thread.y][this.thread.x] + b[this.thread.y][this.thread.x];
-  })
-    .setOutput([matrixA[0].length, matrixA.length]);
+  const result = [];
+  for (let i = 0; i < outputRows; i++) {
+    for (let j = 0; j < outputCols; j++) {
+      let sum = 0;
+      for (let ki = 0; ki < kernel.rows; ki++) {
+        for (let kj = 0; kj < kernel.cols; kj++) {
+          const matrixValue = matrix.data[(i + ki) * matrix.cols + (j + kj)];
+          const kernelValue = kernel.data[ki * kernel.cols + kj];
+          sum += matrixValue * kernelValue;
+        }
+      }
+      result.push(sum);
+    }
+  }
 
-  return addKernel(matrixA, matrixB);
+  return createMatrixBuffer(result, outputRows, outputCols);
 }
 
 /**
- * Compute the element-wise Hadamard product of two matrices.
- * @param {number[][]} matrixA - First matrix.
- * @param {number[][]} matrixB - Second matrix.
- * @returns {number[][]} - Resultant matrix after Hadamard product.
+ * Utility function to pretty-print a matrix buffer.
+ * @param {Object} matrix - Matrix buffer to print.
+ * @returns {string} - Formatted string representation of the matrix.
  */
-export function matrixHadamard(matrixA, matrixB) {
-  if (
-    matrixA.length !== matrixB.length ||
-    matrixA[0].length !== matrixB[0].length
-  ) {
-    throw new Error('Matrix dimensions do not match for Hadamard product.');
+export function printMatrix(matrix) {
+  let output = '';
+  for (let i = 0; i < matrix.rows; i++) {
+    output += matrix.data.slice(i * matrix.cols, (i + 1) * matrix.cols).join(' ') + '\n';
   }
-
-  const hadamardKernel = gpu.createKernel(function (a, b) {
-    return a[this.thread.y][this.thread.x] * b[this.thread.y][this.thread.x];
-  })
-    .setOutput([matrixA[0].length, matrixA.length]);
-
-  return hadamardKernel(matrixA, matrixB);
-}
-
-/**
- * Compute the trace of a square matrix.
- * @param {number[][]} matrix - Input square matrix.
- * @returns {number} - Trace of the matrix.
- */
-export function matrixTrace(matrix) {
-  if (matrix.length !== matrix[0].length) {
-    throw new Error('Matrix is not square. Trace can only be computed for square matrices.');
-  }
-
-  let trace = 0;
-  for (let i = 0; i < matrix.length; i++) {
-    trace += matrix[i][i];
-  }
-  return trace;
-}
-
-/**
- * Compute the identity matrix of a given size.
- * @param {number} size - Size of the identity matrix.
- * @returns {number[][]} - Identity matrix.
- */
-export function identityMatrix(size) {
-  if (size <= 0) {
-    throw new Error('Size must be a positive integer.');
-  }
-
-  const identity = Array.from({ length: size }, (_, i) =>
-    Array.from({ length: size }, (_, j) => (i === j ? 1 : 0))
-  );
-
-  return identity;
+  return output.trim();
 }

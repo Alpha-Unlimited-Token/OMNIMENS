@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: subprocessCheckpointManager
- * Written: 2026-04-03T02:45:23.713Z
+ * Written: 2026-04-03T09:44:47.247Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,86 +18,93 @@
 
 // subprocessCheckpointManager.mjs
 
-import { serialize, deserialize } from 'v8';
+import { writeFileSync, readFileSync, existsSync } from 'fs';
+import { join } from 'path';
+import { performance } from 'perf_hooks';
 
-/**
- * Creates a checkpoint of the current computation state.
- * @param {Object} state - The state object to be serialized.
- * @returns {Buffer} - Serialized state as a buffer.
- */
-export function createCheckpoint(state) {
-  if (typeof state !== 'object' || state === null) {
-    throw new TypeError('State must be a non-null object.');
-  }
-  return serialize(state);
+// Utility function to serialize state and save it to disk
+export function saveCheckpoint(state, filePath) {
+  const serializedState = JSON.stringify(state);
+  writeFileSync(filePath, serializedState, 'utf8');
 }
 
-/**
- * Restores a checkpoint to resume computation.
- * @param {Buffer} checkpoint - Serialized state buffer.
- * @returns {Object} - Deserialized state object.
- */
-export function restoreCheckpoint(checkpoint) {
-  if (!Buffer.isBuffer(checkpoint)) {
-    throw new TypeError('Checkpoint must be a Buffer.');
+// Utility function to load state from disk
+export function loadCheckpoint(filePath) {
+  if (!existsSync(filePath)) {
+    throw new Error(`Checkpoint file not found: ${filePath}`);
   }
-  return deserialize(checkpoint);
+  const serializedState = readFileSync(filePath, 'utf8');
+  return JSON.parse(serializedState);
 }
 
-/**
- * Iteratively processes a computation by checkpointing at intervals.
- * @param {Function} computeStep - Function that performs one computation step and returns updated state.
- * @param {Object} initialState - Initial state object for the computation.
- * @param {number} maxSteps - Maximum number of steps to compute.
- * @returns {Object} - Final state after computation.
- */
-export function iterativeComputation(computeStep, initialState, maxSteps) {
-  if (typeof computeStep !== 'function') {
-    throw new TypeError('computeStep must be a function.');
-  }
-  if (typeof initialState !== 'object' || initialState === null) {
-    throw new TypeError('Initial state must be a non-null object.');
-  }
-  if (typeof maxSteps !== 'number' || maxSteps <= 0) {
-    throw new RangeError('maxSteps must be a positive integer.');
-  }
-
+// Utility function to execute a long-running computation with checkpointing
+export async function runWithCheckpoint(
+  computationFunction,
+  checkpointFilePath,
+  intervalMs,
+  initialState = {}
+) {
   let state = initialState;
-  for (let step = 0; step < maxSteps; step++) {
-    state = computeStep(state);
-    const checkpoint = createCheckpoint(state);
-    state = restoreCheckpoint(checkpoint); // Simulate checkpoint restoration
+
+  // Attempt to load previous checkpoint if it exists
+  if (existsSync(checkpointFilePath)) {
+    try {
+      state = loadCheckpoint(checkpointFilePath);
+    } catch (error) {
+      console.error('Failed to load checkpoint:', error);
+    }
   }
+
+  const startTime = performance.now();
+
+  while (true) {
+    try {
+      // Run the computation function, passing in the current state
+      state = await computationFunction(state);
+
+      // Save checkpoint periodically
+      if (performance.now() - startTime >= intervalMs) {
+        saveCheckpoint(state, checkpointFilePath);
+      }
+
+      // Check if the computation is complete
+      if (state.done) {
+        break;
+      }
+    } catch (error) {
+      console.error('Computation interrupted:', error);
+      saveCheckpoint(state, checkpointFilePath);
+      throw error;
+    }
+  }
+
+  // Final checkpoint save
+  saveCheckpoint(state, checkpointFilePath);
   return state;
 }
 
-/**
- * Example utility function for generic state mutation.
- * @param {Object} state - Current state object.
- * @returns {Object} - Updated state object.
- */
-export function exampleComputeStep(state) {
-  if (typeof state.counter !== 'number') {
-    throw new TypeError('State must have a numeric counter property.');
+// Example computation function for testing purposes
+export async function exampleComputationFunction(state) {
+  if (!state.counter) {
+    state.counter = 0;
   }
-  return { ...state, counter: state.counter + 1 };
+
+  state.counter++;
+  console.log(`Counter: ${state.counter}`);
+
+  // Simulate work
+  await new Promise((resolve) => setTimeout(resolve, 100));
+
+  // Mark as done after 10 iterations
+  if (state.counter >= 10) {
+    state.done = true;
+  }
+
+  return state;
 }
 
-/**
- * Validates the integrity of a state object.
- * @param {Object} state - State object to validate.
- * @returns {boolean} - True if valid, false otherwise.
- */
-export function validateState(state) {
-  return typeof state === 'object' && state !== null && 'counter' in state && typeof state.counter === 'number';
-}
-
-/**
- * Demonstrates usage of the module.
- */
-export function demo() {
-  const initialState = { counter: 0 };
-  const maxSteps = 5;
-  const finalState = iterativeComputation(exampleComputeStep, initialState, maxSteps);
-  console.log('Final State:', finalState);
-}
+// Example usage (commented out to avoid execution in module context)
+// (async () => {
+//   const checkpointPath = join(__dirname, 'checkpoint.json');
+//   await runWithCheckpoint(exampleComputationFunction, checkpointPath, 5000);
+// })();

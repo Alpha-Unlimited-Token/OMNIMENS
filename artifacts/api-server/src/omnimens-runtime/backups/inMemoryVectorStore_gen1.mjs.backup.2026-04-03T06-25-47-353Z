@@ -1,0 +1,114 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-04-03T04:58:46.910Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// inMemoryVectorStore.mjs
+
+import { createHash } from 'crypto';
+
+/**
+ * Computes the Euclidean distance between two vectors.
+ * @param {number[]} vec1 - First vector.
+ * @param {number[]} vec2 - Second vector.
+ * @returns {number} - Euclidean distance.
+ */
+export function euclideanDistance(vec1, vec2) {
+  if (vec1.length !== vec2.length) {
+    throw new Error('Vectors must have the same dimensions.');
+  }
+  return Math.sqrt(vec1.reduce((sum, val, i) => sum + Math.pow(val - vec2[i], 2), 0));
+}
+
+/**
+ * Generates a unique hash for a vector to ensure uniqueness in the store.
+ * @param {number[]} vector - Vector to hash.
+ * @returns {string} - Hash string.
+ */
+export function hashVector(vector) {
+  const hash = createHash('sha256');
+  hash.update(vector.join(','));
+  return hash.digest('hex');
+}
+
+/**
+ * Class representing an in-memory vector store using HNSW.
+ */
+export class InMemoryVectorStore {
+  constructor() {
+    this.store = new Map();
+    this.graph = new Map();
+  }
+
+  /**
+   * Adds a vector to the store and updates the HNSW graph.
+   * @param {number[]} vector - Vector to add.
+   */
+  addVector(vector) {
+    const id = hashVector(vector);
+    if (this.store.has(id)) {
+      throw new Error('Vector already exists in the store.');
+    }
+    this.store.set(id, vector);
+    this._updateGraph(id, vector);
+  }
+
+  /**
+   * Retrieves the nearest neighbors for a given query vector.
+   * @param {number[]} queryVector - Query vector.
+   * @param {number} k - Number of nearest neighbors to retrieve.
+   * @returns {Array<{id, distance}>} - Nearest neighbors.
+   */
+  getNearestNeighbors(queryVector, k = 1) {
+    const distances = [];
+    for (const [id, vector] of this.store.entries()) {
+      const distance = euclideanDistance(queryVector, vector);
+      distances.push({ id, distance });
+    }
+    distances.sort((a, b) => a.distance - b.distance);
+    return distances.slice(0, k);
+  }
+
+  /**
+   * Updates the HNSW graph with a new vector.
+   * @param {string} id - ID of the vector.
+   * @param {number[]} vector - Vector to add to the graph.
+   */
+  _updateGraph(id, vector) {
+    const neighbors = this.getNearestNeighbors(vector, 5);
+    this.graph.set(id, neighbors.map(n => n.id));
+  }
+
+  /**
+   * Retrieves the graph connections for a given vector ID.
+   * @param {string} id - Vector ID.
+   * @returns {string[]} - Connected vector IDs.
+   */
+  getGraphConnections(id) {
+    if (!this.graph.has(id)) {
+      throw new Error('Vector ID not found in the graph.');
+    }
+    return this.graph.get(id);
+  }
+}
+
+/**
+ * Creates a new instance of the vector store.
+ * @returns {InMemoryVectorStore} - New vector store instance.
+ */
+export function createVectorStore() {
+  return new InMemoryVectorStore();
+}

@@ -1,0 +1,111 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-04-03T06:25:47.351Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Complete ES module code here
+
+import { createHash } from 'crypto';
+
+/**
+ * Utility function to calculate cosine similarity between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} - Cosine similarity score (-1 to 1).
+ */
+export function cosineSimilarity(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same length');
+  }
+
+  const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
+
+  if (magnitudeA === 0 || magnitudeB === 0) {
+    return 0; // Avoid division by zero
+  }
+
+  return dotProduct / (magnitudeA * magnitudeB);
+}
+
+/**
+ * In-memory vector store for fast embedding storage and retrieval.
+ */
+export const inMemoryVectorStore = {
+  _store: new Map(),
+
+  /**
+   * Adds a vector to the store.
+   * @param {string} key - Unique identifier for the vector.
+   * @param {number[]} vector - The vector to store.
+   */
+  addVector(key, vector) {
+    if (!Array.isArray(vector) || vector.some(isNaN)) {
+      throw new Error('Vector must be an array of numbers');
+    }
+
+    const hash = createHash('sha256').update(key).digest('hex');
+    this._store.set(hash, vector);
+  },
+
+  /**
+   * Retrieves the vector associated with a key.
+   * @param {string} key - Unique identifier for the vector.
+   * @returns {number[] | null} - The vector, or null if not found.
+   */
+  getVector(key) {
+    const hash = createHash('sha256').update(key).digest('hex');
+    return this._store.get(hash) || null;
+  },
+
+  /**
+   * Finds the top N most similar vectors to a given query vector.
+   * @param {number[]} queryVector - The query vector.
+   * @param {number} topN - Number of top similar vectors to retrieve.
+   * @returns {Array<{ key, similarity}>} - Array of top N similar vectors with their keys and similarity scores.
+   */
+  findNearest(queryVector, topN = 1) {
+    if (!Array.isArray(queryVector) || queryVector.some(isNaN)) {
+      throw new Error('Query vector must be an array of numbers');
+    }
+
+    const results = [];
+
+    for (const [hash, vector] of this._store.entries()) {
+      const similarity = cosineSimilarity(queryVector, vector);
+      results.push({ key: hash, similarity });
+    }
+
+    results.sort((a, b) => b.similarity - a.similarity);
+    return results.slice(0, topN);
+  }
+};
+
+/**
+ * Clears all stored vectors.
+ */
+export function clearStore() {
+  inMemoryVectorStore._store.clear();
+}
+
+/**
+ * Returns the total number of vectors in the store.
+ * @returns {number} - Count of vectors in the store.
+ */
+export function vectorCount() {
+  return inMemoryVectorStore._store.size;
+}

@@ -1,131 +1,105 @@
 /**
- * OMNIMENS Self-Authored Module (Migrated from DB)
- * Original Source: evolution_cycle_14
- * Name: recursiveTaskScheduler
- * Purpose: Manages iterative computations by breaking tasks into smaller subprocesses with checkpointing and state restoration.
- * Description: Manages recursive task execution with checkpointing, state restoration, and timeout handling for iterative computations.
- * Migrated: 2026-04-02T14:21:19.473Z
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: recursiveTaskScheduler
+ * Written: 2026-04-03T06:25:54.205Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
  */
 
 // recursiveTaskScheduler.mjs
 
-import { performance } from 'node:perf_hooks';
+import { setTimeout } from 'timers/promises';
+import { randomUUID } from 'crypto';
+
+// In-memory task queue (replace with DB persistence if needed)
+const taskQueue = new Map();
 
 /**
- * Splits a task into smaller recursive chunks, processes them, and supports checkpointing and state restoration.
- * @param {function} taskFunction - The main task function to execute.
- * @param {object} initialState - The initial state for the task.
- * @param {number} timeout - Maximum execution time in milliseconds before checkpointing.
- * @param {function} checkpointCallback - Function to save checkpoints (state).
- * @param {function} restoreCallback - Function to restore state from a checkpoint.
- * @returns {Promise<object>} - Final state after task completion.
+ * Adds a task to the queue with state persistence.
+ * @param {string} taskId - Unique identifier for the task.
+ * @param {function} taskFunction - The async function to execute.
+ * @param {object} initialState - Initial state of the task.
  */
-export async function recursiveTaskScheduler(taskFunction, initialState, timeout, checkpointCallback, restoreCallback) {
-  let state = initialState;
-  let lastCheckpoint = null;
-
-  // Attempt to restore from a checkpoint
-  if (restoreCallback) {
-    const restoredState = await restoreCallback();
-    if (restoredState) {
-      state = restoredState;
-    }
+export function addTask(taskId, taskFunction, initialState = {}) {
+  if (taskQueue.has(taskId)) {
+    throw new Error(`Task with ID ${taskId} already exists.`);
   }
-
-  async function processTask(currentState) {
-    const startTime = performance.now();
-
-    while (true) {
-      // Check if timeout has been exceeded
-      if (performance.now() - startTime > timeout) {
-        if (checkpointCallback) {
-          await checkpointCallback(currentState); // Save current state as checkpoint
-        }
-        return currentState; // Return checkpointed state
-      }
-
-      // Process the task function
-      const result = await taskFunction(currentState);
-
-      // If task is complete, return the final state
-      if (result.done) {
-        return result.state;
-      }
-
-      // Update state for the next iteration
-      currentState = result.state;
-    }
-  }
-
-  // Start processing the task
-  return await processTask(state);
+  taskQueue.set(taskId, { taskFunction, state: initialState, completed: false });
 }
 
 /**
- * Example task function: Splits a range into smaller chunks and sums numbers.
- * @param {object} state - Current state of the task.
- * @returns {Promise<{done: boolean, state: object}>} - Task progress.
+ * Executes a task recursively, breaking it into smaller steps.
+ * @param {string} taskId - Unique identifier for the task.
+ */
+export async function executeTask(taskId) {
+  const task = taskQueue.get(taskId);
+  if (!task) {
+    throw new Error(`Task with ID ${taskId} not found.`);
+  }
+
+  const { taskFunction, state, completed } = task;
+  if (completed) {
+    console.log(`Task ${taskId} is already completed.`);
+    return;
+  }
+
+  try {
+    const isDone = await taskFunction(state);
+    if (isDone) {
+      task.completed = true;
+      console.log(`Task ${taskId} completed successfully.`);
+    } else {
+      console.log(`Task ${taskId} paused. Resuming shortly...`);
+      await setTimeout(100); // Simulate asynchronous delay
+      await executeTask(taskId); // Recursive continuation
+    }
+  } catch (error) {
+    console.error(`Task ${taskId} encountered an error:`, error);
+  }
+}
+
+/**
+ * Generates a unique task ID.
+ * @returns {string} A unique task identifier.
+ */
+export function generateTaskId() {
+  return randomUUID();
+}
+
+/**
+ * Lists all tasks with their current state.
+ * @returns {Array} Array of task summaries.
+ */
+export function listTasks() {
+  return Array.from(taskQueue.entries()).map(([taskId, { state, completed }]) => ({
+    taskId,
+    state,
+    completed
+  }));
+}
+
+/**
+ * Example task function for demonstration purposes.
+ * @param {object} state - The current state of the task.
+ * @returns {Promise<boolean>} Resolves to true if task is complete, false otherwise.
  */
 export async function exampleTaskFunction(state) {
-  const { range, sum } = state;
-
-  if (range.length === 0) {
-    return { done: true, state: { range, sum } }; // Task complete
-  }
-
-  // Process the next number in the range
-  const nextNumber = range.shift();
-  const newSum = sum + nextNumber;
-
-  return { done: false, state: { range, sum: newSum } }; // Task not yet complete
+  state.progress = (state.progress || 0) + 1;
+  console.log(`Task progress: ${state.progress}`);
+  return state.progress >= 5; // Task completes after 5 iterations
 }
 
-/**
- * Utility function to create a checkpointing callback.
- * @param {Map} storage - A Map to store checkpoints.
- * @param {string} key - Key to identify the task.
- * @returns {function} - Checkpoint callback function.
- */
-export function createCheckpointCallback(storage, key) {
-  return async function (state) {
-    storage.set(key, JSON.stringify(state));
-  };
-}
-
-/**
- * Utility function to create a state restoration callback.
- * @param {Map} storage - A Map to retrieve checkpoints.
- * @param {string} key - Key to identify the task.
- * @returns {function} - Restore callback function.
- */
-export function createRestoreCallback(storage, key) {
-  return async function () {
-    const serializedState = storage.get(key);
-    return serializedState ? JSON.parse(serializedState) : null;
-  };
-}
-
-// Example usage
-export async function exampleUsage() {
-  const storage = new Map();
-  const taskKey = 'exampleTask';
-
-  const checkpointCallback = createCheckpointCallback(storage, taskKey);
-  const restoreCallback = createRestoreCallback(storage, taskKey);
-
-  const initialState = { range: [1, 2, 3, 4, 5], sum: 0 };
-  const timeout = 50; // 50 ms timeout
-
-  const finalState = await recursiveTaskScheduler(
-    exampleTaskFunction,
-    initialState,
-    timeout,
-    checkpointCallback,
-    restoreCallback
-  );
-
-  console.log('Final State:', finalState);
-}
-
-// Uncomment the following line to run the example usage
-// exampleUsage();
+// Example usage (uncomment to test):
+// const taskId = generateTaskId();
+// addTask(taskId, exampleTaskFunction, { progress: 0 });
+// executeTask(taskId);

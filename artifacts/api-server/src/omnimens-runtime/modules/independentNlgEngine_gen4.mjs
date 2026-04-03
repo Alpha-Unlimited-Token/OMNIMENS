@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: independentNlgEngine
- * Written: 2026-04-03T00:55:58.676Z
+ * Written: 2026-04-03T06:10:29.325Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -20,95 +20,100 @@
  * TRANSLATION STATUS:
  * Novel constructs: attention
  * All constructs have translation mappings
- * Compiled targets: javascript: OK (11 IR steps) | python: OK (11 IR steps) | c: OK (11 IR steps) | x86_64: OK (11 IR steps) | arm64: OK (11 IR steps) | avr: OK (11 IR steps)
+ * Compiled targets: javascript: OK (6 IR steps) | python: OK (6 IR steps) | c: OK (6 IR steps) | x86_64: OK (6 IR steps) | arm64: OK (6 IR steps) | avr: OK (6 IR steps)
  * Translation map version: 22
  */
 // independentNlgEngine.mjs
 
-import crypto from 'crypto';
+import { createHash } from 'crypto';
 
 /**
- * Generates random embeddings for initializing the lightweight transformer-based decoder.
- * @param {number} dim - Dimensionality of the embeddings.
- * @param {number} count - Number of embeddings to generate.
- * @returns {Array<Array<number>>} An array of embeddings.
+ * Generates a hash-based deterministic seed for reproducible randomness.
+ * Useful for initializing random processes in various agents.
+ * @param {string} input - The input string to hash.
+ * @returns {number} A deterministic seed value.
  */
-export function generateRandomEmbeddings(dim, count) {
-  const embeddings = [];
-  for (let i = 0; i < count; i++) {
-    const embedding = Array.from({ length: dim }, () => parseFloat((crypto.randomBytes(4).readUInt32LE() / 0xffffffff).toFixed(6)));
-    embeddings.push(embedding);
-  }
-  return embeddings;
+export function generateSeed(input) {
+  const hash = createHash('sha256').update(input).digest('hex');
+  return parseInt(hash.slice(0, 8), 16);
 }
 
 /**
  * Applies scaled dot-product attention mechanism.
- * @param {Array<Array<number>>} query - Query matrix.
- * @param {Array<Array<number>>} key - Key matrix.
- * @param {Array<Array<number>>} value - Value matrix.
- * @returns {Array<Array<number>>} Attention output matrix.
+ * @param {Array<number>} query - The query vector.
+ * @param {Array<number>} key - The key vector.
+ * @param {Array<number>} value - The value vector.
+ * @returns {Array<number>} The attention-weighted output vector.
  */
-export function applyAttention(query, key, value) {
-  const scaleFactor = Math.sqrt(query[0].length);
-
-  // Compute dot-product of query and key transpose
-  const scores = query.map(q => key.map(k => q.reduce((sum, qVal, idx) => sum + qVal * k[idx], 0)));
-
-  // Scale and apply softmax
-  const softmaxScores = scores.map(row => {
-    const maxScore = Math.max(...row);
-    const expScores = row.map(score => Math.exp(score - maxScore));
-    const sumExpScores = expScores.reduce((sum, val) => sum + val, 0);
-    return expScores.map(val => val / sumExpScores);
-  });
-
-  // Compute weighted sum of values
-  return softmaxScores.map(row => row.map((weight, idx) => value[idx].map(val => weight * val)).reduce((sum, weightedVal) => sum.map((s, i) => s + weightedVal[i]), Array(value[0].length).fill(0)));
-}
-
-/**
- * Generates conversational output based on input embeddings.
- * @param {Array<Array<number>>} inputEmbeddings - Input embeddings.
- * @param {Array<Array<number>>} transformerWeights - Transformer weights for the decoder.
- * @returns {string} Generated conversational output.
- */
-export function generateConversationalOutput(inputEmbeddings, transformerWeights) {
-  const query = inputEmbeddings;
-  const key = transformerWeights;
-  const value = transformerWeights;
-
-  const attentionOutput = applyAttention(query, key, value);
-
-  // Convert attention output to text (simple mapping for demonstration purposes)
-  const outputTokens = attentionOutput.map(row => row.map(val => String.fromCharCode(Math.round(val * 255))).join('')).join(' ');
-
-  return outputTokens.replace(/[^a-zA-Z0-9 ]/g, '');
-}
-
-/**
- * Utility function to train the lightweight transformer-based decoder.
- * @param {Array<Array<number>>} trainingData - Training data embeddings.
- * @param {number} epochs - Number of training epochs.
- * @returns {Array<Array<number>>} Trained transformer weights.
- */
-export function trainDecoder(trainingData, epochs) {
-  let transformerWeights = generateRandomEmbeddings(trainingData[0].length, trainingData.length);
-
-  for (let epoch = 0; epoch < epochs; epoch++) {
-    transformerWeights = trainingData.map((dataRow, idx) => dataRow.map((val, dimIdx) => (val + transformerWeights[idx][dimIdx]) / 2));
+export function scaledDotProductAttention(query, key, value) {
+  if (query.length !== key.length || key.length !== value.length) {
+    throw new Error('Query, key, and value vectors must have the same length.');
   }
 
-  return transformerWeights;
+  const dotProduct = query.reduce((sum, q, i) => sum + q * key[i], 0);
+  const scale = Math.sqrt(query.length);
+  const attentionWeight = Math.exp(dotProduct / scale);
+
+  return value.map(v => v * attentionWeight);
 }
 
 /**
- * Example usage of the module.
+ * Generates a sequence of tokens using a transformer-based decoder mechanism.
+ * @param {Array<number>} inputEmbedding - Input embedding vector.
+ * @param {number} maxTokens - Maximum number of tokens to generate.
+ * @param {function} tokenPredictor - Function to predict the next token embedding.
+ * @returns {Array<Array<number>>} Generated sequence of token embeddings.
  */
-export function exampleUsage() {
-  const inputEmbeddings = generateRandomEmbeddings(512, 10);
-  const transformerWeights = trainDecoder(inputEmbeddings, 5);
-  const conversationalOutput = generateConversationalOutput(inputEmbeddings, transformerWeights);
+export function generateSequence(inputEmbedding, maxTokens, tokenPredictor) {
+  if (typeof tokenPredictor !== 'function') {
+    throw new Error('tokenPredictor must be a function.');
+  }
 
-  return conversationalOutput;
+  const sequence = [inputEmbedding];
+
+  for (let i = 0; i < maxTokens; i++) {
+    const nextToken = tokenPredictor(sequence[sequence.length - 1]);
+    if (!nextToken || nextToken.length === 0) break;
+    sequence.push(nextToken);
+  }
+
+  return sequence;
+}
+
+/**
+ * Utility function to normalize a vector to unit length.
+ * Useful for embeddings and attention mechanisms.
+ * @param {Array<number>} vector - The vector to normalize.
+ * @returns {Array<number>} The normalized vector.
+ */
+export function normalizeVector(vector) {
+  const magnitude = Math.sqrt(vector.reduce((sum, v) => sum + v ** 2, 0));
+  if (magnitude === 0) {
+    throw new Error('Cannot normalize a zero vector.');
+  }
+  return vector.map(v => v / magnitude);
+}
+
+/**
+ * Token predictor example using a simple linear transformation.
+ * Replace this with a more sophisticated model for production use.
+ * @param {Array<number>} embedding - The input embedding vector.
+ * @returns {Array<number>} The next token embedding vector.
+ */
+export function simpleTokenPredictor(embedding) {
+  const transformationMatrix = embedding.map(() => Math.random() - 0.5);
+  return normalizeVector(transformationMatrix);
+}
+
+/**
+ * Main function to generate conversational output.
+ * Combines all utilities to generate natural language embeddings.
+ * @param {string} input - Input string to process.
+ * @param {number} maxTokens - Maximum tokens to generate.
+ * @returns {Array<Array<number>>} Sequence of generated embeddings.
+ */
+export function generateConversationalOutput(input, maxTokens = 20) {
+  const seed = generateSeed(input);
+  const inputEmbedding = Array.from({ length: 128 }, (_, i) => Math.sin(seed + i));
+  return generateSequence(inputEmbedding, maxTokens, simpleTokenPredictor);
 }

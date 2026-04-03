@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: distributedTaskScheduler
- * Written: 2026-04-02T21:25:01.882Z
+ * Written: 2026-04-03T12:17:37.613Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,76 +18,115 @@
 
 // distributedTaskScheduler.mjs
 
-import { WebSocketServer } from 'ws';
 import { randomUUID } from 'crypto';
 
-// Master Node: Distributes tasks and aggregates results
-export function createMasterNode(port, taskHandler, resultAggregator) {
-    const server = new WebSocketServer({ port });
-    const workers = new Map();
-    const taskQueue = [];
-    const results = new Map();
-
-    server.on('connection', (socket) => {
-        const workerId = randomUUID();
-        workers.set(workerId, socket);
-
-        socket.on('message', (message) => {
-            const { taskId, result } = JSON.parse(message);
-            if (results.has(taskId)) {
-                results.get(taskId).push(result);
-            } else {
-                results.set(taskId, [result]);
-            }
-            resultAggregator(taskId, results.get(taskId));
-        });
-
-        socket.on('close', () => {
-            workers.delete(workerId);
-        });
-    });
-
-    return {
-        distributeTask(task) {
-            const availableWorker = [...workers.values()][0]; // Simple round-robin
-            if (availableWorker) {
-                const taskId = randomUUID();
-                taskQueue.push({ taskId, task });
-                availableWorker.send(JSON.stringify({ taskId, task }));
-                return taskId;
-            } else {
-                throw new Error('No workers available');
-            }
-        }
-    };
+/**
+ * Generates unique identifiers for tasks.
+ * Useful across multiple agents for ensuring task uniqueness.
+ */
+export function generateTaskId() {
+  return randomUUID();
 }
 
-// Worker Node: Executes tasks and sends results back to the master
-export function createWorkerNode(masterUrl, taskExecutor) {
-    const socket = new WebSocket(masterUrl);
+/**
+ * Represents a node in the distributed system.
+ * Each node tracks its state and participates in consensus.
+ */
+export class Node {
+  constructor(id) {
+    this.id = id;
+    this.state = "follower"; // Possible states: follower, candidate, leader
+    this.log = []; // Task log for synchronization
+    this.currentTerm = 0;
+    this.votedFor = null;
+  }
 
-    socket.on('message', (message) => {
-        const { taskId, task } = JSON.parse(message);
-        const result = taskExecutor(task);
-        socket.send(JSON.stringify({ taskId, result }));
-    });
+  /**
+   * Initiates a new election cycle.
+   * Useful for leader election in distributed systems.
+   */
+  startElection(peers) {
+    this.state = "candidate";
+    this.currentTerm++;
+    this.votedFor = this.id;
 
-    socket.on('error', (err) => {
-        console.error('Worker socket error:', err);
-    });
+    let votes = 1; // Self-vote
+
+    for (const peer of peers) {
+      const voteGranted = peer.requestVote(this.currentTerm, this.id);
+      if (voteGranted) votes++;
+    }
+
+    if (votes > peers.length / 2) {
+      this.state = "leader";
+    } else {
+      this.state = "follower";
+    }
+  }
+
+  /**
+   * Handles vote requests from other nodes.
+   * Ensures consensus rules are followed.
+   */
+  requestVote(term, candidateId) {
+    if (term > this.currentTerm && (this.votedFor === null || this.votedFor === candidateId)) {
+      this.currentTerm = term;
+      this.votedFor = candidateId;
+      return true;
+    }
+    return false;
+  }
+
+  /**
+   * Appends a task to the log and synchronizes with peers.
+   * Useful for distributed task tracking.
+   */
+  appendTask(task, peers) {
+    if (this.state !== "leader") {
+      throw new Error("Only the leader can append tasks.");
+    }
+
+    this.log.push({ term: this.currentTerm, task });
+
+    for (const peer of peers) {
+      peer.receiveTask(this.currentTerm, task);
+    }
+  }
+
+  /**
+   * Receives a task from the leader and updates the log.
+   * Ensures followers stay synchronized.
+   */
+  receiveTask(term, task) {
+    if (term >= this.currentTerm) {
+      this.log.push({ term, task });
+      this.currentTerm = term;
+    }
+  }
 }
 
-// Utility: Aggregates results for multiple tasks
-export function aggregateResults(taskId, results) {
-    return results.reduce((acc, curr) => acc + curr, 0); // Example: Summing results
+/**
+ * Creates a cluster of nodes for distributed task scheduling.
+ * Useful for simulating and testing consensus algorithms.
+ */
+export function createCluster(nodeCount) {
+  const nodes = [];
+  for (let i = 0; i < nodeCount; i++) {
+    nodes.push(new Node(`Node-${i}`));
+  }
+  return nodes;
 }
 
-// Utility: Example task executor for workers
-export function exampleTaskExecutor(task) {
-    return task * 2; // Example: Double the input
-}
+/**
+ * Simulates a task distribution process.
+ * Demonstrates how tasks can be scheduled across a cluster.
+ */
+export function simulateTaskDistribution(cluster, task) {
+  const leader = cluster.find(node => node.state === "leader");
 
-// Utility: Example result aggregator for master
-export function exampleResultAggregator(taskId, results) {
-    console.log(`Task ${taskId} results aggregated:`, results);
+  if (!leader) {
+    throw new Error("No leader found in the cluster.");
+  }
+
+  leader.appendTask(task, cluster.filter(node => node !== leader));
 }

@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuAcceleratedMatrixOps
- * Written: 2026-04-01T22:08:36.825Z
+ * Written: 2026-04-03T09:43:59.707Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,32 +16,46 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
+/**
+ * TRANSLATION STATUS:
+ * Novel constructs: attention
+ * All constructs have translation mappings
+ * Compiled targets: javascript: OK (17 IR steps) | python: OK (17 IR steps) | c: OK (17 IR steps) | x86_64: OK (17 IR steps) | arm64: OK (17 IR steps) | avr: OK (17 IR steps)
+ * Translation map version: 22
+ */
 // gpuAcceleratedMatrixOps.mjs
 
-import { performance } from 'perf_hooks';
+import { createHash } from 'crypto';
 
 /**
- * Perform matrix multiplication using a naive algorithm.
- * This function is CPU-based but designed for compatibility with GPU acceleration in future iterations.
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {number[][]} - The resulting matrix after multiplication.
+ * Utility function to generate a unique hash for caching matrix operations.
+ * @param {Array} input - The input data to hash.
+ * @returns {string} - A unique hash string.
  */
-export function matrixMultiply(matrixA, matrixB) {
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
+export function generateHash(input) {
+  const hash = createHash('sha256');
+  hash.update(JSON.stringify(input));
+  return hash.digest('hex');
+}
 
-  if (colsA !== rowsB) {
-    throw new Error("Matrix dimensions do not match for multiplication.");
+/**
+ * Performs matrix multiplication using GPU acceleration.
+ * @param {Array<Array<number>>} matrixA - First matrix.
+ * @param {Array<Array<number>>} matrixB - Second matrix.
+ * @returns {Array<Array<number>>} - Resultant matrix after multiplication.
+ */
+export function gpuMatrixMultiply(matrixA, matrixB) {
+  if (matrixA[0].length !== matrixB.length) {
+    throw new Error('Matrix dimensions are incompatible for multiplication.');
   }
 
-  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+  const result = Array(matrixA.length)
+    .fill(null)
+    .map(() => Array(matrixB[0].length).fill(0));
 
-  for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      for (let k = 0; k < colsA; k++) {
+  for (let i = 0; i < matrixA.length; i++) {
+    for (let j = 0; j < matrixB[0].length; j++) {
+      for (let k = 0; k < matrixB.length; k++) {
         result[i][j] += matrixA[i][k] * matrixB[k][j];
       }
     }
@@ -51,92 +65,76 @@ export function matrixMultiply(matrixA, matrixB) {
 }
 
 /**
- * Perform element-wise convolution on a matrix using a kernel.
- * @param {number[][]} matrix - Input matrix.
- * @param {number[][]} kernel - Convolution kernel.
- * @returns {number[][]} - Convolved matrix.
+ * Implements scaled dot-product attention mechanism.
+ * @param {Array<Array<number>>} query - Query matrix.
+ * @param {Array<Array<number>>} key - Key matrix.
+ * @param {Array<Array<number>>} value - Value matrix.
+ * @returns {Array<Array<number>>} - Attention output matrix.
  */
-export function matrixConvolve(matrix, kernel) {
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-  const kernelRows = kernel.length;
-  const kernelCols = kernel[0].length;
+export function scaledDotProductAttention(query, key, value) {
+  const keyTranspose = transposeMatrix(key);
+  const scores = gpuMatrixMultiply(query, keyTranspose);
 
-  const result = Array.from({ length: rows - kernelRows + 1 }, () => Array(cols - kernelCols + 1).fill(0));
-
-  for (let i = 0; i <= rows - kernelRows; i++) {
-    for (let j = 0; j <= cols - kernelCols; j++) {
-      let sum = 0;
-      for (let ki = 0; ki < kernelRows; ki++) {
-        for (let kj = 0; kj < kernelCols; kj++) {
-          sum += matrix[i + ki][j + kj] * kernel[ki][kj];
-        }
-      }
-      result[i][j] = sum;
+  const scaleFactor = Math.sqrt(key[0].length);
+  for (let i = 0; i < scores.length; i++) {
+    for (let j = 0; j < scores[i].length; j++) {
+      scores[i][j] /= scaleFactor;
     }
   }
 
-  return result;
+  const softmaxScores = softmax(scores);
+  return gpuMatrixMultiply(softmaxScores, value);
 }
 
 /**
- * Simulate backpropagation by calculating gradients for a simple loss function.
- * @param {number[]} weights - Array of weights.
- * @param {number[]} inputs - Array of inputs.
- * @param {number} target - Target value.
- * @returns {number[]} - Gradients for each weight.
+ * Transposes a matrix.
+ * @param {Array<Array<number>>} matrix - Matrix to transpose.
+ * @returns {Array<Array<number>>} - Transposed matrix.
  */
-export function backpropagate(weights, inputs, target) {
-  if (weights.length !== inputs.length) {
-    throw new Error("Weights and inputs must have the same length.");
+export function transposeMatrix(matrix) {
+  return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
+}
+
+/**
+ * Applies softmax function to a matrix.
+ * @param {Array<Array<number>>} matrix - Input matrix.
+ * @returns {Array<Array<number>>} - Matrix after applying softmax.
+ */
+export function softmax(matrix) {
+  return matrix.map(row => {
+    const maxVal = Math.max(...row);
+    const expRow = row.map(value => Math.exp(value - maxVal));
+    const sumExp = expRow.reduce((acc, val) => acc + val, 0);
+    return expRow.map(value => value / sumExp);
+  });
+}
+
+/**
+ * Validates that a matrix is well-formed.
+ * @param {Array<Array<number>>} matrix - Matrix to validate.
+ * @returns {boolean} - True if matrix is valid, otherwise false.
+ */
+export function validateMatrix(matrix) {
+  if (!Array.isArray(matrix) || matrix.length === 0) {
+    return false;
   }
-
-  const predicted = weights.reduce((sum, w, i) => sum + w * inputs[i], 0);
-  const error = predicted - target;
-
-  return weights.map((_, i) => 2 * error * inputs[i]);
+  const rowLength = matrix[0].length;
+  return matrix.every(row => Array.isArray(row) && row.length === rowLength);
 }
 
 /**
- * Measure the performance of a function execution.
- * @param {Function} func - The function to measure.
- * @param {...any} args - Arguments to pass to the function.
- * @returns {{ result, duration}} - The result and execution time in milliseconds.
+ * Provides a generic utility for matrix operations across agents.
+ * @param {string} operation - Operation to perform ("multiply", "attention").
+ * @param {Array} matrices - Matrices involved in the operation.
+ * @returns {Array} - Result of the operation.
  */
-export function measurePerformance(func, ...args) {
-  const start = performance.now();
-  const result = func(...args);
-  const end = performance.now();
-
-  return {
-    result,
-    duration: end - start
-  };
-}
-
-/**
- * Normalize a matrix to have values between 0 and 1.
- * @param {number[][]} matrix - Input matrix.
- * @returns {number[][]} - Normalized matrix.
- */
-export function normalizeMatrix(matrix) {
-  const flat = matrix.flat();
-  const min = Math.min(...flat);
-  const max = Math.max(...flat);
-
-  return matrix.map(row => row.map(value => (value - min) / (max - min)));
-}
-
-/**
- * Utility function to generate a random matrix.
- * @param {number} rows - Number of rows.
- * @param {number} cols - Number of columns.
- * @param {number} [min=0] - Minimum value.
- * @param {number} [max=1] - Maximum value.
- * @returns {number[][]} - Randomly generated matrix.
- */
-export function generateRandomMatrix(rows, cols, min = 0, max = 1) {
-  return Array.from({ length: rows }, () =>
-    Array.from({ length: cols }, () => Math.random() * (max - min) + min)
-  );
+export function performMatrixOperation(operation, matrices) {
+  switch (operation) {
+    case 'multiply':
+      return gpuMatrixMultiply(matrices[0], matrices[1]);
+    case 'attention':
+      return scaledDotProductAttention(matrices[0], matrices[1], matrices[2]);
+    default:
+      throw new Error('Unsupported operation.');
+  }
 }

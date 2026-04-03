@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: slidingWindowMemory
- * Written: 2026-04-01T22:11:04.839Z
+ * Written: 2026-04-03T06:25:58.792Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,115 +18,88 @@
 
 // slidingWindowMemory.mjs
 
-import crypto from 'crypto';
+import { createHash } from 'crypto';
 
 /**
- * Generates a hash for a given string to track unique memory entries.
+ * Calculates a hash for a given string to enable efficient memory indexing.
  * @param {string} input - The input string to hash.
- * @returns {string} - A unique hash of the input.
+ * @returns {string} - A hexadecimal hash of the input.
  */
 export function generateHash(input) {
-  return crypto.createHash('sha256').update(input).digest('hex');
+  return createHash('sha256').update(input).digest('hex');
 }
 
 /**
- * Summarizes a block of text using a simple frequency-based keyword extraction algorithm.
- * @param {string} text - The input text to summarize.
- * @param {number} maxKeywords - The maximum number of keywords to extract.
- * @returns {string} - A compressed summary of the input text.
+ * Splits a long string into smaller chunks of a specified size.
+ * @param {string} text - The input string to chunk.
+ * @param {number} chunkSize - The maximum size of each chunk.
+ * @returns {string[]} - An array of string chunks.
  */
-export function summarizeText(text, maxKeywords = 5) {
-  const wordFrequency = {};
-  const words = text.toLowerCase().match(/\b\w+\b/g) || [];
-
-  for (const word of words) {
-    wordFrequency[word] = (wordFrequency[word] || 0) + 1;
+export function chunkText(text, chunkSize) {
+  const chunks = [];
+  for (let i = 0; i < text.length; i += chunkSize) {
+    chunks.push(text.slice(i, i + chunkSize));
   }
-
-  const sortedWords = Object.entries(wordFrequency)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, maxKeywords)
-    .map(([word]) => word);
-
-  return sortedWords.join(' ');
+  return chunks;
 }
 
 /**
- * Compresses memory blocks into a graph structure to retain essential relationships.
- * @param {Array<{ id, content}>} memoryBlocks - Array of memory blocks with unique IDs and content.
- * @returns {Map<string, Set<string>>} - A graph where nodes are memory block IDs and edges represent content similarity.
+ * Scores the relevance of a memory chunk based on keyword matches.
+ * @param {string} chunk - The memory chunk to evaluate.
+ * @param {string[]} keywords - An array of keywords to match.
+ * @returns {number} - A relevance score (higher is more relevant).
  */
-export function compressMemory(memoryBlocks) {
-  const graph = new Map();
-
-  for (let i = 0; i < memoryBlocks.length; i++) {
-    const { id: idA, content: contentA } = memoryBlocks[i];
-    graph.set(idA, new Set());
-
-    for (let j = i + 1; j < memoryBlocks.length; j++) {
-      const { id: idB, content: contentB } = memoryBlocks[j];
-      const similarity = calculateSimilarity(contentA, contentB);
-
-      if (similarity > 0.5) { // Threshold for similarity
-        graph.get(idA).add(idB);
-        if (!graph.has(idB)) graph.set(idB, new Set());
-        graph.get(idB).add(idA);
-      }
-    }
-  }
-
-  return graph;
+export function calculateRelevance(chunk, keywords) {
+  const lowerChunk = chunk.toLowerCase();
+  return keywords.reduce((score, keyword) => {
+    const lowerKeyword = keyword.toLowerCase();
+    return score + (lowerChunk.includes(lowerKeyword) ? 1 : 0);
+  }, 0);
 }
 
 /**
- * Calculates similarity between two pieces of text using Jaccard similarity.
- * @param {string} textA - The first text input.
- * @param {string} textB - The second text input.
- * @returns {number} - A similarity score between 0 and 1.
+ * Maintains a sliding window of memory chunks, dynamically updating based on relevance.
+ * @param {string[]} memory - The current memory chunks.
+ * @param {string[]} newChunks - New memory chunks to consider.
+ * @param {string[]} keywords - Keywords to prioritize for relevance.
+ * @param {number} maxChunks - The maximum number of chunks to retain in memory.
+ * @returns {string[]} - The updated memory chunks.
  */
-export function calculateSimilarity(textA, textB) {
-  const setA = new Set(textA.toLowerCase().match(/\b\w+\b/g) || []);
-  const setB = new Set(textB.toLowerCase().match(/\b\w+\b/g) || []);
-
-  const intersection = new Set([...setA].filter(x => setB.has(x)));
-  const union = new Set([...setA, ...setB]);
-
-  return union.size === 0 ? 0 : intersection.size / union.size;
-}
-
-/**
- * Maintains a sliding window of memory by summarizing older entries and keeping recent ones intact.
- * @param {Array<{ id, content}>} memoryBlocks - Array of memory blocks with unique IDs and content.
- * @param {number} windowSize - The number of recent memory blocks to keep in full detail.
- * @returns {Array<{ id, content}>} - Updated memory blocks with older entries summarized.
- */
-export function slidingWindow(memoryBlocks, windowSize) {
-  if (memoryBlocks.length <= windowSize) return memoryBlocks;
-
-  const recent = memoryBlocks.slice(-windowSize);
-  const older = memoryBlocks.slice(0, -windowSize);
-
-  const summarizedOlder = older.map(block => ({
-    id: block.id,
-    content: summarizeText(block.content)
+export function updateSlidingWindow(memory, newChunks, keywords, maxChunks) {
+  const allChunks = [...memory, ...newChunks];
+  const scoredChunks = allChunks.map(chunk => ({
+    chunk,
+    score: calculateRelevance(chunk, keywords)
   }));
 
-  return [...summarizedOlder, ...recent];
+  scoredChunks.sort((a, b) => b.score - a.score);
+  return scoredChunks.slice(0, maxChunks).map(entry => entry.chunk);
 }
 
 /**
- * Adds a new memory block to the sliding window while maintaining size constraints.
- * @param {Array<{ id, content}>} memoryBlocks - Current memory blocks.
- * @param {string} newContent - The content of the new memory block.
- * @param {number} windowSize - The maximum size of the memory window.
- * @returns {Array<{ id, content}>} - Updated memory blocks.
+ * Retrieves the most relevant memory chunks based on a query.
+ * @param {string[]} memory - The memory chunks to search.
+ * @param {string} query - The query to match against.
+ * @param {number} topN - The number of top results to return.
+ * @returns {string[]} - The most relevant memory chunks.
  */
-export function addMemoryBlock(memoryBlocks, newContent, windowSize) {
-  const newBlock = {
-    id: generateHash(newContent),
-    content: newContent
-  };
+export function retrieveRelevantChunks(memory, query, topN) {
+  const keywords = query.split(/\s+/);
+  const scoredChunks = memory.map(chunk => ({
+    chunk,
+    score: calculateRelevance(chunk, keywords)
+  }));
 
-  const updatedBlocks = [...memoryBlocks, newBlock];
-  return slidingWindow(updatedBlocks, windowSize);
+  scoredChunks.sort((a, b) => b.score - a.score);
+  return scoredChunks.slice(0, topN).map(entry => entry.chunk);
+}
+
+/**
+ * Combines multiple chunks into a single coherent context string.
+ * @param {string[]} chunks - The chunks to combine.
+ * @param {string} delimiter - The delimiter to use between chunks.
+ * @returns {string} - The combined context string.
+ */
+export function combineChunks(chunks, delimiter = ' ') {
+  return chunks.join(delimiter);
 }

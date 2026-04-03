@@ -1,0 +1,120 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-04-03T06:05:58.116Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// Complete ES module code here
+
+import { createHash } from 'crypto';
+
+/**
+ * Utility module for storing and retrieving high-dimensional embeddings efficiently using k-d trees.
+ * Designed for multi-modal reasoning and cross-agent utility.
+ */
+
+// Helper function to calculate Euclidean distance between two vectors
+export function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same dimensions');
+  }
+  return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0));
+}
+
+// Node structure for k-d tree
+class KDNode {
+  constructor(point, axis, left = null, right = null) {
+    this.point = point; // The embedding stored at this node
+    this.axis = axis; // The dimension to split on
+    this.left = left; // Left subtree
+    this.right = right; // Right subtree
+  }
+}
+
+// Build a k-d tree recursively
+function buildKDTree(points, depth = 0) {
+  if (points.length === 0) return null;
+
+  const axis = depth % points[0].length; // Cycle through dimensions
+  points.sort((a, b) => a[axis] - b[axis]);
+  const median = Math.floor(points.length / 2);
+
+  return new KDNode(
+    points[median],
+    axis,
+    buildKDTree(points.slice(0, median), depth + 1),
+    buildKDTree(points.slice(median + 1), depth + 1)
+  );
+}
+
+// Search for nearest neighbors in the k-d tree
+function nearestNeighborSearch(node, target, depth = 0, best = { node: null, distance: Infinity }) {
+  if (!node) return best;
+
+  const axis = depth % target.length;
+  const distance = euclideanDistance(target, node.point);
+
+  if (distance < best.distance) {
+    best = { node, distance };
+  }
+
+  const nextBranch = target[axis] < node.point[axis] ? node.left : node.right;
+  const oppositeBranch = target[axis] < node.point[axis] ? node.right : node.left;
+
+  best = nearestNeighborSearch(nextBranch, target, depth + 1, best);
+
+  if (Math.abs(target[axis] - node.point[axis]) < best.distance) {
+    best = nearestNeighborSearch(oppositeBranch, target, depth + 1, best);
+  }
+
+  return best;
+}
+
+// Main in-memory vector store class
+export class InMemoryVectorStore {
+  constructor() {
+    this.points = [];
+    this.kdTree = null;
+  }
+
+  // Add a new embedding to the store
+  addEmbedding(embedding) {
+    if (!Array.isArray(embedding)) {
+      throw new Error('Embedding must be an array');
+    }
+    this.points.push(embedding);
+    this.kdTree = buildKDTree(this.points); // Rebuild tree after adding
+  }
+
+  // Find the nearest neighbor for a given embedding
+  findNearestNeighbor(targetEmbedding) {
+    if (!this.kdTree) {
+      throw new Error('No embeddings stored yet');
+    }
+    const result = nearestNeighborSearch(this.kdTree, targetEmbedding);
+    return { embedding: result.node.point, distance: result.distance };
+  }
+
+  // Hash embeddings for efficient identification
+  static hashEmbedding(embedding) {
+    const hash = createHash('sha256');
+    hash.update(embedding.join(','));
+    return hash.digest('hex');
+  }
+}
+
+// Export utility functions for cross-agent use
+export const calculateDistance = euclideanDistance;
+export const hashVector = InMemoryVectorStore.hashEmbedding;

@@ -1,0 +1,123 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: inMemoryVectorStore
+ * Written: 2026-04-03T09:44:07.437Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// inMemoryVectorStore.mjs
+
+import { createHash } from 'crypto';
+
+/**
+ * Calculate the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} - The Euclidean distance.
+ */
+export function calculateEuclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must be of the same dimension');
+  }
+  return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0));
+}
+
+/**
+ * Generate a unique ID for a vector using a hash function.
+ * @param {number[]} vector - The vector to hash.
+ * @returns {string} - A unique ID for the vector.
+ */
+export function generateVectorId(vector) {
+  const hash = createHash('sha256');
+  hash.update(vector.join(','));
+  return hash.digest('hex');
+}
+
+/**
+ * Class representing an in-memory vector store using HNSW-like graph structure.
+ */
+export class InMemoryVectorStore {
+  constructor() {
+    this.nodes = new Map(); // Map of vector ID to vector and neighbors
+  }
+
+  /**
+   * Add a vector to the store.
+   * @param {number[]} vector - The vector to add.
+   */
+  addVector(vector) {
+    const id = generateVectorId(vector);
+    if (this.nodes.has(id)) {
+      throw new Error('Vector already exists in the store');
+    }
+
+    // Add the vector to the store
+    this.nodes.set(id, { vector, neighbors: [] });
+
+    // Update neighbors using a simple nearest neighbor strategy
+    for (const [otherId, otherNode] of this.nodes) {
+      if (id === otherId) continue;
+      const distance = calculateEuclideanDistance(vector, otherNode.vector);
+      this.nodes.get(id).neighbors.push({ id: otherId, distance });
+      otherNode.neighbors.push({ id, distance });
+    }
+
+    // Sort neighbors by distance and keep the closest ones (e.g., top 10)
+    this.nodes.get(id).neighbors.sort((a, b) => a.distance - b.distance);
+    this.nodes.get(id).neighbors = this.nodes.get(id).neighbors.slice(0, 10);
+
+    for (const [otherId, otherNode] of this.nodes) {
+      otherNode.neighbors.sort((a, b) => a.distance - b.distance);
+      otherNode.neighbors = otherNode.neighbors.slice(0, 10);
+    }
+  }
+
+  /**
+   * Find the nearest neighbors to a given query vector.
+   * @param {number[]} queryVector - The query vector.
+   * @param {number} k - Number of nearest neighbors to return.
+   * @returns {Array<{ id, vector, distance}>} - Nearest neighbors.
+   */
+  search(queryVector, k) {
+    const results = [];
+
+    for (const [id, node] of this.nodes) {
+      const distance = calculateEuclideanDistance(queryVector, node.vector);
+      results.push({ id, vector: node.vector, distance });
+    }
+
+    return results.sort((a, b) => a.distance - b.distance).slice(0, k);
+  }
+
+  /**
+   * Get all stored vectors.
+   * @returns {Array<{ id, vector}>} - All vectors in the store.
+   */
+  getAllVectors() {
+    return Array.from(this.nodes.entries()).map(([id, node]) => ({ id, vector: node.vector }));
+  }
+}
+
+/**
+ * Example utility function to normalize a vector.
+ * @param {number[]} vector - The vector to normalize.
+ * @returns {number[]} - The normalized vector.
+ */
+export function normalizeVector(vector) {
+  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
+  if (magnitude === 0) {
+    throw new Error('Cannot normalize a zero vector');
+  }
+  return vector.map(val => val / magnitude);
+}

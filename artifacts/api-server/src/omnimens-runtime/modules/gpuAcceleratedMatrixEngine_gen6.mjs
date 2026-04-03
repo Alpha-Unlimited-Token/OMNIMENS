@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuAcceleratedMatrixEngine
- * Written: 2026-04-01T22:11:11.610Z
+ * Written: 2026-04-03T04:59:05.629Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,82 +18,71 @@
 
 // gpuAcceleratedMatrixEngine.mjs
 
-import { JSDOM } from 'jsdom';
+import { createHash } from 'crypto';
 
 /**
- * Initializes a WebGL context for GPU-accelerated computations.
- * @returns {WebGLRenderingContext} - The WebGL context.
+ * Initializes a WebGL context for GPU computations.
+ * @returns {WebGLRenderingContext} - A WebGL rendering context.
  */
 export function initializeWebGLContext() {
-  const dom = new JSDOM('<!DOCTYPE html><canvas></canvas>');
-  const canvas = dom.window.document.querySelector('canvas');
+  const canvas = new OffscreenCanvas(1, 1);
   const gl = canvas.getContext('webgl');
-
   if (!gl) {
-    throw new Error('WebGL is not supported in the current environment.');
+    throw new Error('WebGL not supported on this environment.');
   }
-
   return gl;
 }
 
 /**
  * Compiles a WebGL shader.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {string} source - The GLSL source code.
- * @param {number} type - The type of shader (vertex or fragment).
- * @returns {WebGLShader} - The compiled shader.
+ * @param {WebGLRenderingContext} gl - WebGL context.
+ * @param {string} source - Shader source code.
+ * @param {number} type - Shader type (gl.VERTEX_SHADER or gl.FRAGMENT_SHADER).
+ * @returns {WebGLShader} - Compiled shader.
  */
 export function compileShader(gl, source, type) {
   const shader = gl.createShader(type);
   gl.shaderSource(shader, source);
   gl.compileShader(shader);
-
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
     const error = gl.getShaderInfoLog(shader);
     gl.deleteShader(shader);
-    throw new Error(`Shader compilation failed: ${error}`);
+    throw new Error(`Shader compilation error: ${error}`);
   }
-
   return shader;
 }
 
 /**
- * Creates a WebGL program from vertex and fragment shaders.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {string} vertexSource - The vertex shader source code.
- * @param {string} fragmentSource - The fragment shader source code.
- * @returns {WebGLProgram} - The linked WebGL program.
+ * Creates a WebGL program using vertex and fragment shaders.
+ * @param {WebGLRenderingContext} gl - WebGL context.
+ * @param {string} vertexSource - Vertex shader source code.
+ * @param {string} fragmentSource - Fragment shader source code.
+ * @returns {WebGLProgram} - Linked WebGL program.
  */
 export function createProgram(gl, vertexSource, fragmentSource) {
   const vertexShader = compileShader(gl, vertexSource, gl.VERTEX_SHADER);
   const fragmentShader = compileShader(gl, fragmentSource, gl.FRAGMENT_SHADER);
-
   const program = gl.createProgram();
   gl.attachShader(program, vertexShader);
   gl.attachShader(program, fragmentShader);
   gl.linkProgram(program);
-
   if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
     const error = gl.getProgramInfoLog(program);
     gl.deleteProgram(program);
-    throw new Error(`Program linking failed: ${error}`);
+    throw new Error(`Program linking error: ${error}`);
   }
-
   return program;
 }
 
 /**
- * Performs GPU-accelerated matrix multiplication.
- * @param {Float32Array} matrixA - The first matrix (flattened).
- * @param {Float32Array} matrixB - The second matrix (flattened).
- * @param {number} rowsA - Number of rows in matrix A.
- * @param {number} colsA - Number of columns in matrix A.
- * @param {number} colsB - Number of columns in matrix B.
- * @returns {Float32Array} - The resulting matrix (flattened).
+ * Performs matrix multiplication using WebGL.
+ * @param {WebGLRenderingContext} gl - WebGL context.
+ * @param {Float32Array} matrixA - First matrix (flattened).
+ * @param {Float32Array} matrixB - Second matrix (flattened).
+ * @param {number} size - Size of the matrices (assumes square matrices).
+ * @returns {Float32Array} - Resulting matrix (flattened).
  */
-export function gpuMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
-  const gl = initializeWebGLContext();
-
+export function gpuMatrixMultiply(gl, matrixA, matrixB, size) {
   const vertexSource = `
     attribute vec2 position;
     void main() {
@@ -105,38 +94,53 @@ export function gpuMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
     precision highp float;
     uniform sampler2D matrixA;
     uniform sampler2D matrixB;
-    uniform int rowsA;
-    uniform int colsA;
-    uniform int colsB;
+    uniform float size;
     void main() {
-      vec2 coord = gl_FragCoord.xy;
-      float sum = 0.0;
-      for (int i = 0; i < colsA; i++) {
-        float a = texture2D(matrixA, vec2(i / float(colsA), coord.y / float(rowsA))).r;
-        float b = texture2D(matrixB, vec2(coord.x / float(colsB), i / float(colsA))).r;
-        sum += a * b;
+      vec2 coord = gl_FragCoord.xy / size;
+      float result = 0.0;
+      for (float i = 0.0; i < size; i++) {
+        result += texture2D(matrixA, vec2(i / size, coord.y)).r *
+                  texture2D(matrixB, vec2(coord.x, i / size)).r;
       }
-      gl_FragColor = vec4(sum, 0.0, 0.0, 1.0);
+      gl_FragColor = vec4(result, 0.0, 0.0, 1.0);
     }
   `;
 
   const program = createProgram(gl, vertexSource, fragmentSource);
   gl.useProgram(program);
 
-  // TODO: Upload matrices to GPU, execute shader, and retrieve results.
+  const textureA = createMatrixTexture(gl, matrixA, size);
+  const textureB = createMatrixTexture(gl, matrixB, size);
 
-  return new Float32Array(rowsA * colsB); // Placeholder for result.
+  const output = new Float32Array(size * size);
+  const framebuffer = gl.createFramebuffer();
+  gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
+
+  const outputTexture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, outputTexture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size, size, 0, gl.RGBA, gl.FLOAT, null);
+  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, outputTexture, 0);
+
+  gl.drawArrays(gl.TRIANGLES, 0, 6);
+
+  gl.readPixels(0, 0, size, size, gl.RGBA, gl.FLOAT, output);
+
+  return output;
 }
 
 /**
- * Measures the performance of a function.
- * @param {Function} func - The function to measure.
- * @param {...any} args - Arguments to pass to the function.
- * @returns {Object} - Execution time and result.
+ * Creates a WebGL texture from a matrix.
+ * @param {WebGLRenderingContext} gl - WebGL context.
+ * @param {Float32Array} matrix - Matrix data (flattened).
+ * @param {number} size - Size of the matrix (assumes square matrices).
+ * @returns {WebGLTexture} - WebGL texture.
  */
-export function measurePerformance(func, ...args) {
-  const start = performance.now();
-  const result = func(...args);
-  const end = performance.now();
-  return { result, time: end - start };
+export function createMatrixTexture(gl, matrix, size) {
+  const texture = gl.createTexture();
+  gl.bindTexture(gl.TEXTURE_2D, texture);
+  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size, size, 0, gl.RGBA, gl.FLOAT, matrix);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
+  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+  return texture;
 }

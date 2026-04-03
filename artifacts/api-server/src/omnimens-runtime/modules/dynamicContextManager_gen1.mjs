@@ -1,105 +1,103 @@
-// dynamicContextManager.js
-
 /**
- * @module dynamicContextManager
- * @description This module manages long-term conversational context by dynamically summarizing and compressing older tokens.
- * It uses attention mechanisms and clustering to identify key information and integrates it into a compact, retrievable summary.
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: dynamicContextManager
+ * Written: 2026-04-03T12:24:11.856Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
  */
 
+// dynamicContextManager.mjs
+
+import { createHash } from 'crypto';
+
 /**
- * Summarizes and compresses older conversational context.
- * @param {Array<string>} contextTokens - Array of tokens representing the conversational context.
- * @param {number} maxSummaryLength - Maximum length of the compressed summary.
- * @returns {string} - A compact summary of the context.
+ * Splits a long input into manageable segments using a sliding window with overlap.
+ * @param {string} input - The long input string to segment.
+ * @param {number} windowSize - The size of each segment.
+ * @param {number} overlapSize - The overlap size between consecutive segments.
+ * @returns {Array<string>} - Array of segmented strings.
  */
-export function summarizeContext(contextTokens, maxSummaryLength) {
-  if (!Array.isArray(contextTokens) || contextTokens.length === 0) {
-    throw new Error("contextTokens must be a non-empty array of strings.");
+export function segmentInput(input, windowSize, overlapSize) {
+  if (windowSize <= 0 || overlapSize < 0 || overlapSize >= windowSize) {
+    throw new Error("Invalid windowSize or overlapSize parameters.");
   }
 
-  if (typeof maxSummaryLength !== "number" || maxSummaryLength <= 0) {
-    throw new Error("maxSummaryLength must be a positive number.");
+  const segments = [];
+  for (let i = 0; i < input.length; i += windowSize - overlapSize) {
+    segments.push(input.slice(i, i + windowSize));
   }
+  return segments;
+}
 
-  // Step 1: Token frequency analysis
-  const tokenFrequency = contextTokens.reduce((freqMap, token) => {
-    freqMap[token] = (freqMap[token] || 0) + 1;
-    return freqMap;
-  }, {});
+/**
+ * Scores segments based on relevance using a simple hash-based heuristic.
+ * @param {Array<string>} segments - Array of segments to score.
+ * @param {string} query - Query string to determine relevance.
+ * @returns {Array<{ segment, score}>} - Array of segments with their relevance scores.
+ */
+export function scoreSegments(segments, query) {
+  const queryHash = createHash('sha256').update(query).digest('hex');
 
-  // Step 2: Sort tokens by importance (frequency)
-  const sortedTokens = Object.entries(tokenFrequency)
-    .sort(([, freqA], [, freqB]) => freqB - freqA)
-    .map(([token]) => token);
+  return segments.map(segment => {
+    const segmentHash = createHash('sha256').update(segment).digest('hex');
+    let score = 0;
 
-  // Step 3: Generate summary by clustering and attention
-  const summaryTokens = [];
-  for (const token of sortedTokens) {
-    if (summaryTokens.join(" ").length + token.length + 1 > maxSummaryLength) {
-      break;
+    // Simple relevance heuristic: count matching characters in hashed values.
+    for (let i = 0; i < Math.min(queryHash.length, segmentHash.length); i++) {
+      if (queryHash[i] === segmentHash[i]) {
+        score++;
+      }
     }
-    summaryTokens.push(token);
-  }
 
-  return summaryTokens.join(" ");
+    return { segment, score };
+  }).sort((a, b) => b.score - a.score); // Sort by descending score.
 }
 
 /**
- * Updates the conversational context with new tokens and maintains a compressed summary.
- * @param {Array<string>} contextTokens - Array of tokens representing the current conversational context.
- * @param {Array<string>} newTokens - Array of new tokens to be added to the context.
- * @param {number} maxSummaryLength - Maximum length of the compressed summary.
- * @returns {Object} - Updated context and its compressed summary.
+ * Combines the highest-scoring segments into a single prioritized context.
+ * @param {Array<{ segment, score}>} scoredSegments - Scored segments.
+ * @param {number} maxTokens - Maximum combined token length for the context.
+ * @returns {string} - Combined context string.
  */
-export function updateContext(contextTokens, newTokens, maxSummaryLength) {
-  if (!Array.isArray(contextTokens) || !Array.isArray(newTokens)) {
-    throw new Error("contextTokens and newTokens must be arrays of strings.");
+export function combineSegments(scoredSegments, maxTokens) {
+  let combinedContext = '';
+  for (const { segment } of scoredSegments) {
+    if (combinedContext.length + segment.length > maxTokens) break;
+    combinedContext += segment;
   }
-
-  if (typeof maxSummaryLength !== "number" || maxSummaryLength <= 0) {
-    throw new Error("maxSummaryLength must be a positive number.");
-  }
-
-  // Combine old and new tokens
-  const updatedContext = [...contextTokens, ...newTokens];
-
-  // Generate updated summary
-  const updatedSummary = summarizeContext(updatedContext, maxSummaryLength);
-
-  return {
-    context: updatedContext,
-    summary: updatedSummary
-  };
+  return combinedContext;
 }
 
 /**
- * Retrieves the most relevant tokens from the context based on a query.
- * @param {Array<string>} contextTokens - Array of tokens representing the conversational context.
- * @param {string} query - Query string to identify relevant tokens.
- * @returns {Array<string>} - Array of tokens most relevant to the query.
+ * Main utility to process long inputs dynamically and return prioritized context.
+ * @param {string} input - Long input string to process.
+ * @param {string} query - Query string to prioritize relevance.
+ * @param {number} windowSize - Size of each segment.
+ * @param {number} overlapSize - Overlap size between segments.
+ * @param {number} maxTokens - Maximum token length for the final context.
+ * @returns {string} - Final prioritized context string.
  */
-export function retrieveRelevantTokens(contextTokens, query) {
-  if (!Array.isArray(contextTokens) || typeof query !== "string") {
-    throw new Error("contextTokens must be an array of strings and query must be a string.");
-  }
-
-  // Simple relevance scoring based on substring matching
-  const relevanceScores = contextTokens.map(token => {
-    return { token, score: token.includes(query) ? 1 : 0 };
-  });
-
-  // Sort tokens by relevance
-  const relevantTokens = relevanceScores
-    .filter(({ score }) => score > 0)
-    .map(({ token }) => token);
-
-  return relevantTokens;
+export function dynamicContextManager(input, query, windowSize, overlapSize, maxTokens) {
+  const segments = segmentInput(input, windowSize, overlapSize);
+  const scoredSegments = scoreSegments(segments, query);
+  return combineSegments(scoredSegments, maxTokens);
 }
 
 /**
- * Clears the conversational context.
- * @returns {Array<string>} - An empty context array.
+ * Utility function to count tokens in a string (approximation based on word count).
+ * @param {string} text - Input text.
+ * @returns {number} - Approximate token count.
  */
-export function clearContext() {
-  return [];
+export function countTokens(text) {
+  return text.split(/\s+/).length;
 }

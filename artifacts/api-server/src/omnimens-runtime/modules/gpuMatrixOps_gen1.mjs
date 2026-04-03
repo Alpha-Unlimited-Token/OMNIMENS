@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuMatrixOps
- * Written: 2026-04-03T02:43:24.673Z
+ * Written: 2026-04-03T12:23:41.290Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,127 +18,127 @@
 
 // gpuMatrixOps.mjs
 
-import { TextEncoder, TextDecoder } from 'util';
+import { Worker, isMainThread, parentPort, workerData } from 'node:worker_threads';
 
-// Utility function to compile WebAssembly module
-async function compileWasm(bytes) {
-  const wasmModule = await WebAssembly.compile(bytes);
-  const instance = await WebAssembly.instantiate(wasmModule);
-  return instance.exports;
+// Utility function to create WebAssembly bindings for matrix operations
+export async function initializeWasmBindings(wasmBinary) {
+  const wasmModule = await WebAssembly.instantiate(wasmBinary);
+  const { memory, exports } = wasmModule.instance;
+  return {
+    memory,
+    exports
+  };
 }
 
-// Function to perform matrix multiplication
-export async function matrixMultiply(a, b) {
-  if (a[0].length !== b.length) {
-    throw new Error('Matrix dimensions do not match for multiplication');
+// Parallelized matrix multiplication using WebAssembly
+export function parallelMatrixMultiply(matrixA, matrixB, workerCount = 4) {
+  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
+    throw new Error("Both inputs must be 2D arrays.");
   }
 
-  const result = Array(a.length)
-    .fill(null)
-    .map(() => Array(b[0].length).fill(0));
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
 
-  for (let i = 0; i < a.length; i++) {
-    for (let j = 0; j < b[0].length; j++) {
-      for (let k = 0; k < b.length; k++) {
-        result[i][j] += a[i][k] * b[k][j];
+  if (colsA !== rowsB) {
+    throw new Error("Matrix dimensions do not align for multiplication.");
+  }
+
+  const result = new Array(rowsA).fill(null).map(() => new Array(colsB).fill(0));
+
+  const chunkSize = Math.ceil(rowsA / workerCount);
+  const workers = [];
+
+  for (let i = 0; i < workerCount; i++) {
+    const startRow = i * chunkSize;
+    const endRow = Math.min(startRow + chunkSize, rowsA);
+
+    if (startRow >= rowsA) break;
+
+    const worker = new Worker(__filename, {
+      workerData: { matrixA, matrixB, startRow, endRow, colsB }
+    });
+
+    workers.push(
+      new Promise((resolve, reject) => {
+        worker.on("message", (partialResult) => {
+          for (let r = startRow; r < endRow; r++) {
+            result[r] = partialResult[r - startRow];
+          }
+          resolve();
+        });
+        worker.on("error", reject);
+        worker.on("exit", (code) => {
+          if (code !== 0) {
+            reject(new Error(`Worker stopped with exit code ${code}`));
+          }
+        });
+      })
+    );
+  }
+
+  return Promise.all(workers).then(() => result);
+}
+
+if (!isMainThread) {
+  const { matrixA, matrixB, startRow, endRow, colsB } = workerData;
+
+  const partialResult = new Array(endRow - startRow).fill(null).map(() => new Array(colsB).fill(0));
+
+  for (let i = startRow; i < endRow; i++) {
+    for (let j = 0; j < colsB; j++) {
+      for (let k = 0; k < matrixA[0].length; k++) {
+        partialResult[i - startRow][j] += matrixA[i][k] * matrixB[k][j];
       }
+    }
+  }
+
+  parentPort.postMessage(partialResult);
+}
+
+// Generic utility function for matrix addition
+export function matrixAdd(matrixA, matrixB) {
+  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
+    throw new Error("Both inputs must be 2D arrays.");
+  }
+
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
+
+  if (rowsA !== rowsB || colsA !== colsB) {
+    throw new Error("Matrix dimensions must match for addition.");
+  }
+
+  const result = new Array(rowsA).fill(null).map(() => new Array(colsA).fill(0));
+
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsA; j++) {
+      result[i][j] = matrixA[i][j] + matrixB[i][j];
     }
   }
 
   return result;
 }
 
-// Function to calculate matrix inversion (simplified for square matrices)
-export async function matrixInvert(matrix) {
-  const n = matrix.length;
-  if (matrix.some(row => row.length !== n)) {
-    throw new Error('Matrix must be square for inversion');
+// Generic utility function for matrix transposition
+export function matrixTranspose(matrix) {
+  if (!Array.isArray(matrix)) {
+    throw new Error("Input must be a 2D array.");
   }
 
-  const identity = Array(n)
-    .fill(null)
-    .map((_, i) => Array(n).fill(0).map((_, j) => (i === j ? 1 : 0)));
+  const rows = matrix.length;
+  const cols = matrix[0].length;
 
-  const augmented = matrix.map((row, i) => [...row, ...identity[i]]);
+  const result = new Array(cols).fill(null).map(() => new Array(rows).fill(0));
 
-  for (let i = 0; i < n; i++) {
-    let maxRow = i;
-    for (let k = i + 1; k < n; k++) {
-      if (Math.abs(augmented[k][i]) > Math.abs(augmented[maxRow][i])) {
-        maxRow = k;
-      }
-    }
-
-    const temp = augmented[i];
-    augmented[i] = augmented[maxRow];
-    augmented[maxRow] = temp;
-
-    const divisor = augmented[i][i];
-    if (divisor === 0) {
-      throw new Error('Matrix is singular and cannot be inverted');
-    }
-
-    for (let j = 0; j < 2 * n; j++) {
-      augmented[i][j] /= divisor;
-    }
-
-    for (let k = 0; k < n; k++) {
-      if (k !== i) {
-        const factor = augmented[k][i];
-        for (let j = 0; j < 2 * n; j++) {
-          augmented[k][j] -= factor * augmented[i][j];
-        }
-      }
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      result[j][i] = matrix[i][j];
     }
   }
 
-  return augmented.map(row => row.slice(n));
+  return result;
 }
-
-// Function to calculate determinant of a square matrix
-export async function matrixDeterminant(matrix) {
-  const n = matrix.length;
-  if (matrix.some(row => row.length !== n)) {
-    throw new Error('Matrix must be square to calculate determinant');
-  }
-
-  let det = 1;
-  const tempMatrix = matrix.map(row => [...row]);
-
-  for (let i = 0; i < n; i++) {
-    let maxRow = i;
-    for (let k = i + 1; k < n; k++) {
-      if (Math.abs(tempMatrix[k][i]) > Math.abs(tempMatrix[maxRow][i])) {
-        maxRow = k;
-      }
-    }
-
-    if (i !== maxRow) {
-      const temp = tempMatrix[i];
-      tempMatrix[i] = tempMatrix[maxRow];
-      tempMatrix[maxRow] = temp;
-      det *= -1;
-    }
-
-    det *= tempMatrix[i][i];
-    if (tempMatrix[i][i] === 0) {
-      return 0;
-    }
-
-    for (let k = i + 1; k < n; k++) {
-      const factor = tempMatrix[k][i] / tempMatrix[i][i];
-      for (let j = i; j < n; j++) {
-        tempMatrix[k][j] -= factor * tempMatrix[i][j];
-      }
-    }
-  }
-
-  return det;
-}
-
-// Exported utility functions
-export const gpuMatrixOps = {
-  matrixMultiply,
-  matrixInvert,
-  matrixDeterminant
-};

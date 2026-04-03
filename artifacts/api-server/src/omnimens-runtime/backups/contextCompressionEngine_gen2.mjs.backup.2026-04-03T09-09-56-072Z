@@ -1,0 +1,114 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: contextCompressionEngine
+ * Written: 2026-04-03T07:31:23.377Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// contextCompressionEngine.mjs
+
+import crypto from 'crypto';
+
+/**
+ * Generates a unique hash for a given input string. Useful for deduplication or caching.
+ * @param {string} input - The input string to hash.
+ * @returns {string} - A unique hash of the input.
+ */
+export function generateHash(input) {
+  return crypto.createHash('sha256').update(input).digest('hex');
+}
+
+/**
+ * Splits a large input into manageable chunks for processing.
+ * @param {string} input - The large input string to split.
+ * @param {number} chunkSize - The size of each chunk in characters.
+ * @returns {string[]} - An array of string chunks.
+ */
+export function splitIntoChunks(input, chunkSize) {
+  if (chunkSize <= 0) throw new Error('Chunk size must be greater than 0.');
+  const chunks = [];
+  for (let i = 0; i < input.length; i += chunkSize) {
+    chunks.push(input.slice(i, i + chunkSize));
+  }
+  return chunks;
+}
+
+/**
+ * Extracts key sentences from a text block using a simple heuristic (e.g., length and punctuation).
+ * @param {string} text - The input text block.
+ * @param {number} maxSentences - Maximum number of key sentences to extract.
+ * @returns {string[]} - An array of key sentences.
+ */
+export function extractKeySentences(text, maxSentences) {
+  if (maxSentences <= 0) throw new Error('Max sentences must be greater than 0.');
+  const sentences = text.match(/[^.!?]+[.!?]/g) || [];
+  const sortedSentences = sentences
+    .map((sentence) => ({ sentence, length: sentence.length }))
+    .sort((a, b) => b.length - a.length);
+  return sortedSentences.slice(0, maxSentences).map((item) => item.sentence.trim());
+}
+
+/**
+ * Compresses a large context into a hierarchical summary by iteratively summarizing chunks.
+ * @param {string} input - The large input string to compress.
+ * @param {number} chunkSize - The size of each chunk in characters.
+ * @param {number} maxSentences - Maximum number of key sentences per chunk.
+ * @returns {string[]} - A hierarchical summary as an array of summary levels.
+ */
+export function compressContext(input, chunkSize, maxSentences) {
+  const chunks = splitIntoChunks(input, chunkSize);
+  const summaries = chunks.map((chunk) => extractKeySentences(chunk, maxSentences));
+
+  // Combine summaries into a single string and summarize again if needed
+  let currentLevel = summaries.flat().join(' ');
+  const hierarchy = [currentLevel];
+
+  while (currentLevel.length > chunkSize) {
+    const nextLevel = extractKeySentences(currentLevel, maxSentences);
+    currentLevel = nextLevel.join(' ');
+    hierarchy.push(currentLevel);
+  }
+
+  return hierarchy;
+}
+
+/**
+ * Utility function to validate input parameters for the module.
+ * @param {string} input - The input string to validate.
+ * @param {number} chunkSize - The size of each chunk in characters.
+ * @param {number} maxSentences - Maximum number of key sentences per chunk.
+ */
+export function validateParameters(input, chunkSize, maxSentences) {
+  if (typeof input !== 'string' || input.length === 0) {
+    throw new Error('Input must be a non-empty string.');
+  }
+  if (typeof chunkSize !== 'number' || chunkSize <= 0) {
+    throw new Error('Chunk size must be a positive number.');
+  }
+  if (typeof maxSentences !== 'number' || maxSentences <= 0) {
+    throw new Error('Max sentences must be a positive number.');
+  }
+}
+
+/**
+ * Main function to compress and summarize context hierarchically.
+ * @param {string} input - The large input string to process.
+ * @param {number} chunkSize - The size of each chunk in characters.
+ * @param {number} maxSentences - Maximum number of key sentences per chunk.
+ * @returns {string[]} - The hierarchical summary.
+ */
+export function contextCompressionEngine(input, chunkSize = 1000, maxSentences = 5) {
+  validateParameters(input, chunkSize, maxSentences);
+  return compressContext(input, chunkSize, maxSentences);
+}

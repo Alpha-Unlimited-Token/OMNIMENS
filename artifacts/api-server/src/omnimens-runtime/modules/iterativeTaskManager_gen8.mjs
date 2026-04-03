@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: iterativeTaskManager
- * Written: 2026-04-02T15:05:06.623Z
+ * Written: 2026-04-03T07:33:56.677Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -21,95 +21,117 @@
 import { createHash } from 'crypto';
 
 /**
- * Splits a complex computation into smaller tasks with state persistence and dynamic priority scheduling.
- * @param {Array<Function>} tasks - Array of functions representing tasks. Each task should return a state object.
- * @param {Object} initialState - Initial state to pass to the first task.
- * @param {Function} priorityFunction - Function to dynamically prioritize tasks based on state.
- * @returns {Promise<Object>} Final state after all tasks are completed.
+ * Generate a unique hash for a task's state to enable checkpointing.
+ * @param {object} state - The current state of the task.
+ * @returns {string} - A unique hash representing the state.
  */
-export async function executeTasks(tasks, initialState, priorityFunction) {
-  if (!Array.isArray(tasks) || tasks.some(task => typeof task !== 'function')) {
-    throw new Error('Tasks must be an array of functions.');
+export function generateStateHash(state) {
+  const hash = createHash('sha256');
+  hash.update(JSON.stringify(state));
+  return hash.digest('hex');
+}
+
+/**
+ * Split a large task into smaller iterative units based on a dependency graph.
+ * @param {object} dependencyGraph - A graph where keys are task IDs and values are arrays of dependencies.
+ * @returns {Array} - An ordered list of task IDs for execution.
+ */
+export function resolveTaskOrder(dependencyGraph) {
+  const resolved = new Set();
+  const result = [];
+
+  function visit(task) {
+    if (resolved.has(task)) return;
+    if (!dependencyGraph[task]) throw new Error(`Task '${task}' is missing in the dependency graph.`);
+
+    for (const dep of dependencyGraph[task]) {
+      visit(dep);
+    }
+
+    resolved.add(task);
+    result.push(task);
   }
-  if (typeof priorityFunction !== 'function') {
-    throw new Error('priorityFunction must be a function.');
+
+  for (const task in dependencyGraph) {
+    visit(task);
   }
 
-  let state = { ...initialState };
-  const taskQueue = tasks.map((task, index) => ({ task, index, priority: 0 }));
+  return result;
+}
 
-  while (taskQueue.length > 0) {
-    // Dynamically update task priorities
-    taskQueue.forEach(taskObj => {
-      taskObj.priority = priorityFunction(taskObj.index, state);
-    });
+/**
+ * Checkpoint intermediate results of a task to resume after a timeout.
+ * @param {string} taskId - The ID of the task.
+ * @param {object} state - The current state of the task.
+ * @param {Map} checkpointStore - A Map to store checkpoints.
+ */
+export function checkpointTask(taskId, state, checkpointStore) {
+  const stateHash = generateStateHash(state);
+  checkpointStore.set(taskId, { state, stateHash });
+}
 
-    // Sort tasks by priority (highest priority first)
-    taskQueue.sort((a, b) => b.priority - a.priority);
+/**
+ * Resume a task from its last checkpoint.
+ * @param {string} taskId - The ID of the task.
+ * @param {Map} checkpointStore - A Map containing checkpoints.
+ * @returns {object|null} - The last checkpointed state or null if no checkpoint exists.
+ */
+export function resumeTask(taskId, checkpointStore) {
+  return checkpointStore.get(taskId) || null;
+}
 
-    // Execute the highest-priority task
-    const currentTask = taskQueue.shift();
+/**
+ * Dynamically schedule task execution based on available resources.
+ * @param {Array} taskOrder - An ordered list of task IDs for execution.
+ * @param {function} taskExecutor - A function to execute a task (accepts taskId and state).
+ * @param {Map} checkpointStore - A Map to store checkpoints.
+ * @param {number} timeoutMs - Maximum time in milliseconds for each task execution.
+ */
+export async function scheduleTasks(taskOrder, taskExecutor, checkpointStore, timeoutMs) {
+  for (const taskId of taskOrder) {
+    const checkpoint = resumeTask(taskId, checkpointStore);
+    const initialState = checkpoint ? checkpoint.state : {};
+
+    const taskPromise = taskExecutor(taskId, initialState);
+    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Task timeout')), timeoutMs));
+
     try {
-      const result = await currentTask.task(state);
-      state = { ...state, ...result };
-    } catch (err) {
-      console.error(`Error in task ${currentTask.index}:`, err);
+      const finalState = await Promise.race([taskPromise, timeoutPromise]);
+      checkpointTask(taskId, finalState, checkpointStore);
+    } catch (error) {
+      console.error(`Task '${taskId}' failed or timed out:`, error);
+      break; // Stop execution on failure
     }
   }
-
-  return state;
 }
 
 /**
- * Serializes a state object into a deterministic hash for checkpointing.
- * @param {Object} state - State object to serialize.
- * @returns {string} Hash string representing the state.
+ * Example task executor function for demonstration purposes.
+ * @param {string} taskId - The ID of the task.
+ * @param {object} state - The current state of the task.
+ * @returns {Promise<object>} - A promise resolving to the final state of the task.
  */
-export function serializeState(state) {
-  const stateString = JSON.stringify(state, Object.keys(state).sort());
-  return createHash('sha256').update(stateString).digest('hex');
-}
-
-/**
- * Restores a state object from a serialized hash (mock implementation).
- * @param {string} hash - Serialized hash of the state.
- * @returns {Object} Restored state object (mocked as hash cannot reverse to state).
- */
-export function restoreState(hash) {
-  console.warn('State restoration from hash is not implemented. Returning empty state.');
-  return {}; // Placeholder implementation
-}
-
-/**
- * Example priority function: prioritize tasks based on their index and current state.
- * @param {number} taskIndex - Index of the task.
- * @param {Object} state - Current state object.
- * @returns {number} Priority value (higher is better).
- */
-export function examplePriorityFunction(taskIndex, state) {
-  return (state.priorityModifier || 1) * (100 - taskIndex);
-}
-
-/**
- * Example task: Increment a counter in the state.
- * @param {Object} state - Current state object.
- * @returns {Object} Updated state.
- */
-export async function exampleTask(state) {
-  return new Promise(resolve => {
-    setTimeout(() => {
-      resolve({ counter: (state.counter || 0) + 1 });
-    }, 100);
+export async function exampleTaskExecutor(taskId, state) {
+  console.log(`Executing task '${taskId}' with state:`, state);
+  return new Promise((resolve) => {
+    setTimeout(() => resolve({ ...state, completed: true }), 500); // Simulate task work
   });
-} 
+}
 
 /**
  * Example usage of the module.
- * Uncomment to test in a Node.js environment.
  */
-// (async () => {
-//   const tasks = [exampleTask, exampleTask, exampleTask];
-//   const initialState = { counter: 0, priorityModifier: 2 };
-//   const finalState = await executeTasks(tasks, initialState, examplePriorityFunction);
-//   console.log('Final State:', finalState);
-// })();
+export async function exampleUsage() {
+  const dependencyGraph = {
+    task1: [],
+    task2: ['task1'],
+    task3: ['task1'],
+    task4: ['task2', 'task3']
+  };
+
+  const taskOrder = resolveTaskOrder(dependencyGraph);
+  const checkpointStore = new Map();
+
+  await scheduleTasks(taskOrder, exampleTaskExecutor, checkpointStore, 1000);
+  console.log('All tasks completed with checkpoints:', Array.from(checkpointStore.entries()));
+}

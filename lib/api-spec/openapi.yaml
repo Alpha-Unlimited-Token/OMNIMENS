@@ -13,8 +13,8 @@ tags:
     description: OpenAI AI chat, image, and audio operations
   - name: auth
     description: Authentication operations
-  - name: godflesh
-    description: GODFLESH AI chat product endpoints
+  - name: omnimens
+    description: OMNIMENS AI platform endpoints
 paths:
   /auth/user:
     get:
@@ -28,10 +28,10 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/GetCurrentAuthUserResponse"
-  /godflesh/status:
+  /omnimens/status:
     get:
-      operationId: getGodfleshStatus
-      tags: [godflesh]
+      operationId: getOmnimensStatus
+      tags: [omnimens]
       summary: Get user's message usage and subscription status
       responses:
         "200":
@@ -39,13 +39,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GodflesUserStatus"
+                $ref: "#/components/schemas/OmnimensUserStatus"
         "401":
           description: Not authenticated
-  /godflesh/checkout:
+  /omnimens/checkout:
     post:
-      operationId: createGodfleshCheckout
-      tags: [godflesh]
+      operationId: createOmnimensCheckout
+      tags: [omnimens]
       summary: Create Stripe checkout session for Pro subscription
       requestBody:
         required: true
@@ -63,13 +63,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GodfleshCheckoutSession"
+                $ref: "#/components/schemas/OmnimensCheckoutSession"
         "401":
           description: Not authenticated
-  /godflesh/portal:
+  /omnimens/portal:
     post:
-      operationId: createGodfleshPortal
-      tags: [godflesh]
+      operationId: createOmnimensPortal
+      tags: [omnimens]
       summary: Create Stripe customer portal session
       responses:
         "200":
@@ -77,13 +77,13 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/GodfleshPortalSession"
+                $ref: "#/components/schemas/OmnimensPortalSession"
         "401":
           description: Not authenticated
-  /godflesh/pricing:
+  /omnimens/pricing:
     get:
-      operationId: getGodfleshPricing
-      tags: [godflesh]
+      operationId: getOmnimensPricing
+      tags: [omnimens]
       summary: Get available pricing plans
       responses:
         "200":
@@ -93,7 +93,7 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: "#/components/schemas/GodfleshPricing"
+                  $ref: "#/components/schemas/OmnimensPricing"
   /healthz:
     get:
       operationId: healthCheck
@@ -330,7 +330,7 @@ components:
           $ref: "#/components/schemas/AuthUser"
       required:
         - isAuthenticated
-    GodflesUserStatus:
+    OmnimensUserStatus:
       type: object
       properties:
         messagesUsedToday:
@@ -347,7 +347,7 @@ components:
         - messagesUsedToday
         - dailyLimit
         - isPro
-    GodfleshPricing:
+    OmnimensPricing:
       type: object
       properties:
         priceId:
@@ -363,14 +363,14 @@ components:
         - amount
         - currency
         - interval
-    GodfleshCheckoutSession:
+    OmnimensCheckoutSession:
       type: object
       properties:
         url:
           type: string
       required:
         - url
-    GodfleshPortalSession:
+    OmnimensPortalSession:
       type: object
       properties:
         url:

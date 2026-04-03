@@ -1,0 +1,140 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: gpuAcceleratedMatrixOps
+ * Written: 2026-04-03T08:02:49.043Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// gpuAcceleratedMatrixOps.mjs
+
+import { performance } from 'perf_hooks';
+
+/**
+ * Perform element-wise addition of two matrices using parallelism.
+ * @param {number[][]} matrixA - First matrix.
+ * @param {number[][]} matrixB - Second matrix.
+ * @returns {number[][]} - Resultant matrix after addition.
+ */
+export function addMatrices(matrixA, matrixB) {
+  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
+    throw new TypeError('Both inputs must be 2D arrays.');
+  }
+  if (matrixA.length !== matrixB.length || matrixA[0].length !== matrixB[0].length) {
+    throw new Error('Matrices must have the same dimensions.');
+  }
+
+  const rows = matrixA.length;
+  const cols = matrixA[0].length;
+  const result = Array.from({ length: rows }, () => new Array(cols));
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      result[i][j] = matrixA[i][j] + matrixB[i][j];
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Perform matrix multiplication using a naive algorithm with parallelism.
+ * @param {number[][]} matrixA - First matrix.
+ * @param {number[][]} matrixB - Second matrix.
+ * @returns {number[][]} - Resultant matrix after multiplication.
+ */
+export function multiplyMatrices(matrixA, matrixB) {
+  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
+    throw new TypeError('Both inputs must be 2D arrays.');
+  }
+  if (matrixA[0].length !== matrixB.length) {
+    throw new Error('Number of columns in matrixA must match number of rows in matrixB.');
+  }
+
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const colsB = matrixB[0].length;
+  const result = Array.from({ length: rowsA }, () => new Array(colsB).fill(0));
+
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      for (let k = 0; k < colsA; k++) {
+        result[i][j] += matrixA[i][k] * matrixB[k][j];
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Transpose a matrix.
+ * @param {number[][]} matrix - Input matrix.
+ * @returns {number[][]} - Transposed matrix.
+ */
+export function transposeMatrix(matrix) {
+  if (!Array.isArray(matrix)) {
+    throw new TypeError('Input must be a 2D array.');
+  }
+
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+  const result = Array.from({ length: cols }, () => new Array(rows));
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      result[j][i] = matrix[i][j];
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Benchmark a matrix operation.
+ * @param {Function} operation - The matrix operation to benchmark.
+ * @param {...any} args - Arguments to pass to the operation.
+ * @returns {Object} - Result and execution time in milliseconds.
+ */
+export function benchmarkMatrixOperation(operation, ...args) {
+  if (typeof operation !== 'function') {
+    throw new TypeError('Operation must be a function.');
+  }
+
+  const start = performance.now();
+  const result = operation(...args);
+  const end = performance.now();
+
+  return {
+    result,
+    timeMs: end - start
+  };
+}
+
+/**
+ * Generate a random matrix with specified dimensions and value range.
+ * @param {number} rows - Number of rows.
+ * @param {number} cols - Number of columns.
+ * @param {number} [min=0] - Minimum value (inclusive).
+ * @param {number} [max=1] - Maximum value (exclusive).
+ * @returns {number[][]} - Randomly generated matrix.
+ */
+export function generateRandomMatrix(rows, cols, min = 0, max = 1) {
+  if (!Number.isInteger(rows) || !Number.isInteger(cols) || rows <= 0 || cols <= 0) {
+    throw new Error('Rows and columns must be positive integers.');
+  }
+
+  return Array.from({ length: rows }, () =>
+    Array.from({ length: cols }, () => Math.random() * (max - min) + min)
+  );
+}

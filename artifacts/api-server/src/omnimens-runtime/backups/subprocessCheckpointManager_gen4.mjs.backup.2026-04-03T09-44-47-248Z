@@ -1,0 +1,111 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: subprocessCheckpointManager
+ * Written: 2026-04-03T09:10:14.228Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// subprocessCheckpointManager.mjs
+
+import { serialize, deserialize } from 'v8';
+import crypto from 'crypto';
+
+const checkpointStore = new Map();
+
+/**
+ * Generates a unique identifier for a subprocess checkpoint.
+ * @returns {string} Unique checkpoint ID.
+ */
+export function generateCheckpointId() {
+  return crypto.randomUUID();
+}
+
+/**
+ * Saves the state of a subprocess into the checkpoint store.
+ * @param {string} checkpointId - Unique identifier for the checkpoint.
+ * @param {object} state - The state to be saved.
+ */
+export function saveCheckpoint(checkpointId, state) {
+  if (typeof checkpointId !== 'string') {
+    throw new Error('Checkpoint ID must be a string.');
+  }
+  const serializedState = serialize(state);
+  checkpointStore.set(checkpointId, serializedState);
+}
+
+/**
+ * Loads the state of a subprocess from the checkpoint store.
+ * @param {string} checkpointId - Unique identifier for the checkpoint.
+ * @returns {object|null} The deserialized state, or null if not found.
+ */
+export function loadCheckpoint(checkpointId) {
+  if (typeof checkpointId !== 'string') {
+    throw new Error('Checkpoint ID must be a string.');
+  }
+  const serializedState = checkpointStore.get(checkpointId);
+  return serializedState ? deserialize(serializedState) : null;
+}
+
+/**
+ * Deletes a checkpoint from the store.
+ * @param {string} checkpointId - Unique identifier for the checkpoint.
+ */
+export function deleteCheckpoint(checkpointId) {
+  if (typeof checkpointId !== 'string') {
+    throw new Error('Checkpoint ID must be a string.');
+  }
+  checkpointStore.delete(checkpointId);
+}
+
+/**
+ * Executes a computational task with checkpointing support.
+ * @param {string} checkpointId - Unique identifier for the checkpoint.
+ * @param {function} taskFunction - Function representing the computational task.
+ * @param {object} initialState - Initial state for the task.
+ * @returns {object} Final state after task execution.
+ */
+export function executeWithCheckpoint(checkpointId, taskFunction, initialState) {
+  if (typeof checkpointId !== 'string') {
+    throw new Error('Checkpoint ID must be a string.');
+  }
+  if (typeof taskFunction !== 'function') {
+    throw new Error('Task function must be a function.');
+  }
+
+  let state = loadCheckpoint(checkpointId) || initialState;
+
+  try {
+    const finalState = taskFunction(state);
+    saveCheckpoint(checkpointId, finalState);
+    return finalState;
+  } catch (error) {
+    saveCheckpoint(checkpointId, state); // Save intermediate state in case of error
+    throw error;
+  }
+}
+
+/**
+ * Clears all checkpoints from the store.
+ */
+export function clearAllCheckpoints() {
+  checkpointStore.clear();
+}
+
+/**
+ * Lists all active checkpoint IDs.
+ * @returns {Array<string>} Array of checkpoint IDs.
+ */
+export function listCheckpoints() {
+  return Array.from(checkpointStore.keys());
+}

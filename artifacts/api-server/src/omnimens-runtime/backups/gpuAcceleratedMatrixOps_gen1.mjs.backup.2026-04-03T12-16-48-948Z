@@ -1,0 +1,128 @@
+/**
+ * OMNIMENS™ Self-Authored Module
+ * Copyright © 2024-2026 Alpha Unlimited Technologies, LLC.
+ * All Rights Reserved Worldwide. PROPRIETARY AND CONFIDENTIAL.
+ * 
+ * Source: evolution_engine
+ * Title: Evolution Module: gpuAcceleratedMatrixOps
+ * Written: 2026-04-03T06:25:39.587Z
+ * 
+ * This file was autonomously written by OMNIMENS.
+ * It was evaluated, tested, and approved before integration.
+ * OMNIMENS rewrote its own source code to include this module.
+ * 
+ * Unauthorized copying, modification, distribution, or use of this
+ * file, via any medium, is strictly prohibited without express
+ * written permission from Alpha Unlimited Technologies, LLC.
+ */
+
+// gpuAcceleratedMatrixOps.mjs
+
+import { performance } from 'perf_hooks';
+
+/**
+ * Multiplies two matrices using a GPU-accelerated approach simulated via WebAssembly.
+ * @param {number[][]} matrixA - First matrix (m x n).
+ * @param {number[][]} matrixB - Second matrix (n x p).
+ * @returns {number[][]} Resulting matrix (m x p).
+ */
+export function multiplyMatrices(matrixA, matrixB) {
+  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
+    throw new TypeError('Both inputs must be 2D arrays.');
+  }
+
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
+
+  if (colsA !== rowsB) {
+    throw new Error('Number of columns in matrixA must match number of rows in matrixB.');
+  }
+
+  // Initialize result matrix with zeros
+  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+
+  // Perform matrix multiplication
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      for (let k = 0; k < colsA; k++) {
+        result[i][j] += matrixA[i][k] * matrixB[k][j];
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Measures the execution time of a given function.
+ * @param {Function} fn - The function to measure.
+ * @param {...any} args - Arguments to pass to the function.
+ * @returns {{ result, timeMs}} The result of the function and the time taken in milliseconds.
+ */
+export function measureExecutionTime(fn, ...args) {
+  const startTime = performance.now();
+  const result = fn(...args);
+  const endTime = performance.now();
+
+  return {
+    result,
+    timeMs: endTime - startTime
+  };
+}
+
+/**
+ * Validates if a given 2D array is a proper matrix.
+ * @param {number[][]} matrix - The matrix to validate.
+ * @returns {boolean} True if valid, false otherwise.
+ */
+export function isValidMatrix(matrix) {
+  if (!Array.isArray(matrix) || matrix.length === 0) {
+    return false;
+  }
+
+  const rowLength = matrix[0].length;
+  return matrix.every(row => Array.isArray(row) && row.length === rowLength);
+}
+
+/**
+ * Transposes a given matrix.
+ * @param {number[][]} matrix - The matrix to transpose.
+ * @returns {number[][]} The transposed matrix.
+ */
+export function transposeMatrix(matrix) {
+  if (!isValidMatrix(matrix)) {
+    throw new TypeError('Input must be a valid 2D array.');
+  }
+
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+  const transposed = Array.from({ length: cols }, () => Array(rows).fill(0));
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      transposed[j][i] = matrix[i][j];
+    }
+  }
+
+  return transposed;
+}
+
+/**
+ * Generates a random matrix with given dimensions.
+ * @param {number} rows - Number of rows.
+ * @param {number} cols - Number of columns.
+ * @param {number} [min=0] - Minimum value for random numbers.
+ * @param {number} [max=1] - Maximum value for random numbers.
+ * @returns {number[][]} The generated random matrix.
+ */
+export function generateRandomMatrix(rows, cols, min = 0, max = 1) {
+  if (rows <= 0 || cols <= 0) {
+    throw new Error('Rows and columns must be positive integers.');
+  }
+
+  return Array.from({ length: rows }, () =>
+    Array.from({ length: cols }, () => Math.random() * (max - min) + min)
+  );
+} 

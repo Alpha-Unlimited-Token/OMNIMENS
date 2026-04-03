@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: sparseAttentionContextManager
- * Written: 2026-04-02T00:10:29.982Z
+ * Written: 2026-04-03T04:59:24.019Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -20,7 +20,7 @@
  * TRANSLATION STATUS:
  * Novel constructs: attention
  * All constructs have translation mappings
- * Compiled targets: javascript: OK (12 IR steps) | python: OK (12 IR steps) | c: OK (12 IR steps) | x86_64: OK (12 IR steps) | arm64: OK (12 IR steps) | avr: OK (12 IR steps)
+ * Compiled targets: javascript: OK (2 IR steps) | python: OK (2 IR steps) | c: OK (2 IR steps) | x86_64: OK (2 IR steps) | arm64: OK (2 IR steps) | avr: OK (2 IR steps)
  * Translation map version: 22
  */
 // sparseAttentionContextManager.mjs
@@ -28,102 +28,86 @@
 import { createHash } from 'crypto';
 
 /**
- * Hashes a token using SHA-256 and returns a numeric hash for locality-sensitive hashing.
- * @param {string} token - The input token to hash.
- * @returns {number} - A numeric hash value.
+ * Computes importance scores for tokens based on recency, frequency, and semantic weight.
+ * @param {Array} tokens - Array of token objects with properties { token, timestamp, frequency, semanticWeight}.
+ * @returns {Array} - Array of tokens sorted by importance score in descending order.
  */
-export function hashToken(token) {
-  const hash = createHash('sha256').update(token).digest('hex');
-  return parseInt(hash.slice(0, 8), 16); // Convert first 8 hex chars to an integer
+export function computeImportanceScores(tokens) {
+  if (!Array.isArray(tokens)) {
+    throw new TypeError('Input must be an array of token objects.');
+  }
+
+  return tokens.map(token => {
+    const recencyScore = 1 / (Date.now() - token.timestamp + 1); // Recent tokens get higher scores
+    const frequencyScore = Math.log(token.frequency + 1); // Logarithmic scaling for frequency
+    const semanticScore = token.semanticWeight; // Direct semantic weight
+
+    return {
+      ...token,
+      importanceScore: recencyScore + frequencyScore + semanticScore
+    };
+  }).sort((a, b) => b.importanceScore - a.importanceScore); // Sort by descending importance
 }
 
 /**
- * Applies locality-sensitive hashing (LSH) to group tokens into buckets based on similarity.
- * @param {string[]} tokens - Array of input tokens.
- * @param {number} numBuckets - Number of buckets to group tokens into.
- * @returns {Map<number, string[]>} - A map where keys are bucket IDs and values are arrays of tokens.
+ * Applies sparse attention by selecting the top-N tokens based on importance scores.
+ * @param {Array} tokens - Array of token objects with computed importance scores.
+ * @param {number} topN - Number of tokens to retain.
+ * @returns {Array} - Array of top-N tokens.
  */
-export function groupTokensByLSH(tokens, numBuckets) {
-  const buckets = new Map();
-
-  for (const token of tokens) {
-    const hashValue = hashToken(token);
-    const bucketId = hashValue % numBuckets; // Assign token to a bucket
-
-    if (!buckets.has(bucketId)) {
-      buckets.set(bucketId, []);
-    }
-    buckets.get(bucketId).push(token);
+export function applySparseAttention(tokens, topN) {
+  if (!Array.isArray(tokens)) {
+    throw new TypeError('Input must be an array of token objects.');
+  }
+  if (typeof topN !== 'number' || topN <= 0) {
+    throw new RangeError('topN must be a positive integer.');
   }
 
-  return buckets;
+  return tokens.slice(0, topN); // Select top-N tokens
 }
 
 /**
- * Identifies and prioritizes key tokens based on frequency and LSH grouping.
- * @param {string[]} tokens - Array of input tokens.
- * @param {number} numBuckets - Number of buckets for LSH.
- * @returns {string[]} - Array of prioritized key tokens.
+ * Generates a unique hash for a token based on its content.
+ * @param {string} token - The token string.
+ * @returns {string} - A SHA256 hash of the token.
  */
-export function prioritizeKeyTokens(tokens, numBuckets) {
-  const buckets = groupTokensByLSH(tokens, numBuckets);
-  const tokenFrequencies = new Map();
-
-  // Count token frequencies
-  for (const token of tokens) {
-    tokenFrequencies.set(token, (tokenFrequencies.get(token) || 0) + 1);
+export function generateTokenHash(token) {
+  if (typeof token !== 'string') {
+    throw new TypeError('Token must be a string.');
   }
 
-  // Select one representative token per bucket based on frequency
-  const prioritizedTokens = [];
-  for (const [bucketId, bucketTokens] of buckets.entries()) {
-    let maxFrequency = 0;
-    let keyToken = null;
-
-    for (const token of bucketTokens) {
-      const frequency = tokenFrequencies.get(token);
-      if (frequency > maxFrequency) {
-        maxFrequency = frequency;
-        keyToken = token;
-      }
-    }
-
-    if (keyToken) {
-      prioritizedTokens.push(keyToken);
-    }
-  }
-
-  return prioritizedTokens;
+  const hash = createHash('sha256');
+  hash.update(token);
+  return hash.digest('hex');
 }
 
 /**
- * Computes sparse attention weights for tokens, emphasizing key tokens.
- * @param {string[]} tokens - Array of input tokens.
- * @param {string[]} keyTokens - Array of prioritized key tokens.
- * @returns {Map<string, number>} - A map where keys are tokens and values are attention weights.
+ * Utility function to normalize semantic weights of tokens to a 0-1 range.
+ * @param {Array} tokens - Array of token objects with semanticWeight property.
+ * @returns {Array} - Array of tokens with normalized semantic weights.
  */
-export function computeSparseAttention(tokens, keyTokens) {
-  const attentionWeights = new Map();
-  const keyTokenSet = new Set(keyTokens);
-
-  for (const token of tokens) {
-    if (keyTokenSet.has(token)) {
-      attentionWeights.set(token, 1.0); // Full attention to key tokens
-    } else {
-      attentionWeights.set(token, 0.1); // Reduced attention to other tokens
-    }
+export function normalizeSemanticWeights(tokens) {
+  if (!Array.isArray(tokens)) {
+    throw new TypeError('Input must be an array of token objects.');
   }
 
-  return attentionWeights;
+  const maxWeight = Math.max(...tokens.map(token => token.semanticWeight));
+  const minWeight = Math.min(...tokens.map(token => token.semanticWeight));
+
+  return tokens.map(token => ({
+    ...token,
+    semanticWeight: (token.semanticWeight - minWeight) / (maxWeight - minWeight || 1)
+  }));
 }
 
 /**
- * Main function to enhance long-context reasoning by applying sparse attention.
- * @param {string[]} tokens - Array of input tokens.
- * @param {number} numBuckets - Number of buckets for LSH.
- * @returns {Map<string, number>} - Sparse attention weights for input tokens.
+ * Example of how to use the module for sparse attention context management.
+ * @param {Array} tokens - Array of raw token objects.
+ * @param {number} topN - Number of tokens to retain.
+ * @returns {Array} - Array of top-N tokens after processing.
  */
-export function enhanceLongContext(tokens, numBuckets = 10) {
-  const keyTokens = prioritizeKeyTokens(tokens, numBuckets);
-  return computeSparseAttention(tokens, keyTokens);
+export function manageSparseAttentionContext(tokens, topN) {
+  const normalizedTokens = normalizeSemanticWeights(tokens);
+  const scoredTokens = computeImportanceScores(normalizedTokens);
+  return applySparseAttention(scoredTokens, topN);
 }
