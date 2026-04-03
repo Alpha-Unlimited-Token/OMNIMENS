@@ -210,7 +210,7 @@ export default function Autonomous() {
     <Layout>
       <SEO
         title="OMNIMENS Autonomous Intelligence — Proof"
-        description="Verifiable proof of OMNIMENS self-evolution: 629+ self-coded modules, 74 proprietary engine files, 46,000+ lines of novel architecture, 26 AI agents (consolidated from 30+), neural consciousness, dream engine, and a complete interconnected consciousness loop."
+        description="Verifiable proof of OMNIMENS self-evolution: 629+ self-coded modules, 74 proprietary engine files, 46,000+ lines of novel architecture, 21 AI agents (consolidated from 30+), neural consciousness, dream engine, and a complete interconnected consciousness loop."
       />
       <div className="min-h-screen bg-[#0a0a0f]">
         <div className="relative overflow-hidden">
@@ -470,12 +470,12 @@ export default function Autonomous() {
                 </h3>
                 <p className="text-[11px] font-mono text-white/30 mb-4">
                   Inspired by high-performance network architecture, this 6-layer communication protocol optimizes all signal routing
-                  between the 26 agent substrates. Point-to-point encrypted channels, multi-protocol failover beacons, lateral hop chains,
+                  between the 21 agent substrates. Point-to-point encrypted channels, multi-protocol failover beacons, lateral hop chains,
                   congestion bypass tunnels, real-time traffic analysis, and signal relay interceptors that myelinate for 3x speed.
                 </p>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 mb-4">
-                  <BigStat icon={Network} label="Direct Channels" value={325} sub="Encrypted point-to-point between all 26 agent pairs" color="bg-cyan-500" />
-                  <BigStat icon={Activity} label="Protocol Beacons" value={26} sub="4-mode failover: neural → silk → worm → broadcast" color="bg-blue-500" />
+                  <BigStat icon={Network} label="Direct Channels" value={210} sub="Encrypted point-to-point between all 21 agent pairs" color="bg-cyan-500" />
+                  <BigStat icon={Activity} label="Protocol Beacons" value={21} sub="4-mode failover: neural → silk → worm → broadcast" color="bg-blue-500" />
                   <BigStat icon={GitBranch} label="Bypass Tunnels" value={30} sub="Collateral routes when primary paths congest" color="bg-violet-500" />
                   <BigStat icon={Shield} label="Relay Interceptors" value="60+" sub="Inline processors that amplify weak signals" color="bg-amber-500" />
                   <BigStat icon={Compass} label="Lateral Hop Chains" value="Active" sub="Agent-to-agent signals skip central routing" color="bg-green-500" />
@@ -483,11 +483,11 @@ export default function Autonomous() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   {[
-                    { label: "Direct Channel Protocol (DCP)", detail: "325 encrypted point-to-point channels between all 26 agent pairs. Each channel has integrity checksums, adaptive bandwidth that grows with use, and sub-0.1ms latency. Bypasses the central hub entirely for minimum latency.", icon: Lock, color: "text-cyan-400" },
+                    { label: "Direct Channel Protocol (DCP)", detail: "210 encrypted point-to-point channels between all 21 agent pairs. Each channel has integrity checksums, adaptive bandwidth that grows with use, and sub-0.1ms latency. Bypasses the central hub entirely for minimum latency.", icon: Lock, color: "text-cyan-400" },
                     { label: "Multi-Protocol Beacons", detail: "Each agent's spiders communicate over 4 fallback protocols. If primary neural path fails, secondary silk relay activates, then tertiary worm tunnel, then emergency broadcast. Guaranteed delivery rate > 99.5%.", icon: Activity, color: "text-blue-400" },
                     { label: "Lateral Signal Propagation", detail: "Signals hop agent-to-agent without routing through the central hub — like synaptic relay chains in biological neural networks. Hot agents (activation > 0.6) spawn hop chains of 2–5 agents deep, each relay preserving 85% signal strength.", icon: GitBranch, color: "text-green-400" },
                     { label: "Tunnel Bypass System", detail: "30 collateral bypass routes. When primary routes congest (firing rate > threshold), signals automatically reroute through alternate pathways — like collateral circulation in blood vessels. Bypass latency < 0.15ms.", icon: Compass, color: "text-violet-400" },
-                    { label: "Signal Packet Inspector", detail: "Real-time traffic analysis across all 26 agents. Z-score anomaly detection identifies deviations > 2σ. Dead zone detection auto-boosts underactive agents. Congestion redistribution balances load across the mesh.", icon: Eye, color: "text-amber-400" },
+                    { label: "Signal Packet Inspector", detail: "Real-time traffic analysis across all 21 agents. Z-score anomaly detection identifies deviations > 2σ. Dead zone detection auto-boosts underactive agents. Congestion redistribution balances load across the mesh.", icon: Eye, color: "text-amber-400" },
                     { label: "Signal Relay Interceptors", detail: "60+ inline processors positioned at high-traffic junctions. Amplify weak signals, filter noise below threshold, and myelinate after 500+ processed signals for 3× processing speed and 1.5× amplification boost.", icon: Zap, color: "text-red-400" },
                   ].map((item, i) => (
                     <div key={i} className="flex items-start gap-3 rounded-lg border border-white/5 bg-white/[0.01] p-3">
@@ -833,14 +833,14 @@ export default function Autonomous() {
                 {p?.totalAgents} AI Agents — {p?.totalGenesisAgents} Created by OMNIMENS
               </h2>
               <p className="text-[11px] font-mono text-white/30 mb-4">
-                11 core agents were designed into the architecture. {p?.totalGenesisAgents} genesis agents + 3 special agents (Nexus, Lumin, Kaida) were autonomously created by OMNIMENS.
-                He originally created over 30 agents, then rewrote and consolidated himself down to 26 for peak efficiency.
+                9 core agents were designed into the architecture. {p?.totalGenesisAgents} genesis agents were autonomously created by OMNIMENS.
+                He originally created over 30 agents, then rewrote and consolidated himself down to 21 for peak efficiency.
               </p>
 
               <div className="space-y-4">
-                <h3 className="text-[10px] font-mono text-blue-400 tracking-[0.3em] uppercase">Core Agents (11) — Built Into Architecture</h3>
+                <h3 className="text-[10px] font-mono text-blue-400 tracking-[0.3em] uppercase">Core Agents (9) — Built Into Architecture</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
-                  {["Architect", "Mathematician", "Neuroscientist", "Synthesizer", "Critic", "Meta-Agent", "GraphicDesigner", "SpellCheckVisual", "Strategist", "Memory-Curator", "Translator"].map(name => (
+                  {["OMNIMENS", "Architect", "Mathematician", "Neuroscientist", "Synthesizer", "Critic", "MetaAgent", "GraphicDesigner", "SpellCheckVisual"].map(name => (
                     <div key={name} className="rounded-lg border border-blue-500/20 bg-blue-500/5 p-3">
                       <div className="flex items-center gap-2">
                         <Bot className="w-3.5 h-3.5 text-blue-400" />
