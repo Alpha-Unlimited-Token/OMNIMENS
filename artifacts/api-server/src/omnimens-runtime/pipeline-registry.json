@@ -252190,9 +252190,22 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "omnimens_autocode_knowledge_synthesis_mniaazls.mjs": {
+      "filename": "omnimens_autocode_knowledge_synthesis_mniaazls.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "synthesizedKnowledge_mniaazls"
+      ],
+      "loadedAt": 1775183468401,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1775183174722,
-  "totalModules": 18498,
+  "totalModules": 18499,
   "totalCalls": 0
 }
