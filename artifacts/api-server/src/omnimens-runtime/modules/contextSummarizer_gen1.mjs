@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: contextSummarizer
- * Written: 2026-04-02T20:36:21.342Z
+ * Written: 2026-04-03T02:44:14.542Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -21,84 +21,54 @@
 import crypto from 'crypto';
 
 /**
- * Summarizes and compresses conversational context using a transformer-inspired algorithm.
- * Provides utility functions for dialogue compression and context preservation.
+ * Summarizes and compresses conversational context hierarchically.
+ * Maintains coherence by combining transformer-like summarization and sliding window mechanisms.
  */
 
-/**
- * Tokenizes input text into sentences for processing.
- * @param {string} text - The input text to tokenize.
- * @returns {string[]} - Array of tokenized sentences.
- */
-export function tokenizeText(text) {
-  return text.match(/[^.!?]+[.!?]?/g) || [];
-}
-
-/**
- * Generates a hash-based identifier for a text snippet.
- * @param {string} text - The input text.
- * @returns {string} - A unique hash identifier.
- */
-export function generateTextHash(text) {
+// Utility function: Hashes input text for quick comparison and deduplication
+export function hashText(text) {
   return crypto.createHash('sha256').update(text).digest('hex');
 }
 
-/**
- * Scores sentences based on relevance using a simple heuristic.
- * @param {string[]} sentences - Array of sentences to score.
- * @returns {Object[]} - Array of objects with sentence and score.
- */
-export function scoreSentences(sentences) {
-  return sentences.map(sentence => {
-    const wordCount = sentence.split(' ').length;
-    const punctuationCount = (sentence.match(/[.,!?]/g) || []).length;
-    const score = wordCount + punctuationCount * 2;
-    return { sentence, score };
-  });
+// Utility function: Extracts key sentences from a block of text
+export function extractKeySentences(text, sentenceCount = 3) {
+  const sentences = text.match(/[^.!?]+[.!?]/g) || [];
+  return sentences.slice(0, sentenceCount).join(' ');
 }
 
-/**
- * Selects top sentences based on their scores to preserve key context.
- * @param {Object[]} scoredSentences - Array of scored sentences.
- * @param {number} compressionRatio - Ratio of sentences to retain (0-1).
- * @returns {string[]} - Array of summarized sentences.
- */
-export function selectTopSentences(scoredSentences, compressionRatio = 0.3) {
-  const sorted = scoredSentences.sort((a, b) => b.score - a.score);
-  const topCount = Math.max(1, Math.floor(sorted.length * compressionRatio));
-  return sorted.slice(0, topCount).map(item => item.sentence);
+// Utility function: Sliding window mechanism for context management
+export function slidingWindowContext(contextArray, windowSize = 5) {
+  return contextArray.slice(-windowSize);
 }
 
-/**
- * Summarizes conversational context.
- * @param {string} text - The input text to summarize.
- * @param {number} compressionRatio - Ratio of sentences to retain (0-1).
- * @returns {string} - Summarized text.
- */
-export function summarizeContext(text, compressionRatio = 0.3) {
-  const sentences = tokenizeText(text);
-  const scoredSentences = scoreSentences(sentences);
-  const topSentences = selectTopSentences(scoredSentences, compressionRatio);
-  return topSentences.join(' ');
+// Main function: Summarize context hierarchically
+export function summarizeContext(contextArray, windowSize = 5, sentenceCount = 3) {
+  const recentContext = slidingWindowContext(contextArray, windowSize);
+  const concatenatedContext = recentContext.join(' ');
+  const summary = extractKeySentences(concatenatedContext, sentenceCount);
+  return summary;
 }
 
-/**
- * Utility function for multi-agent systems to compress and preserve context.
- * @param {string[]} texts - Array of text inputs from multiple sources.
- * @param {number} compressionRatio - Ratio of sentences to retain (0-1).
- * @returns {Object} - Object mapping text hashes to summarized texts.
- */
-export function compressMultipleContexts(texts, compressionRatio = 0.3) {
-  const result = {};
-  for (const text of texts) {
-    const hash = generateTextHash(text);
-    result[hash] = summarizeContext(text, compressionRatio);
+// Example usage: Combine multiple agents' data into coherent summaries
+export function combineAgentContexts(agentContexts, windowSize = 5, sentenceCount = 3) {
+  const combinedContext = agentContexts.flat();
+  return summarizeContext(combinedContext, windowSize, sentenceCount);
+}
+
+// Edge case handling: Ensure empty or invalid inputs are gracefully managed
+export function validateContextInput(contextArray) {
+  if (!Array.isArray(contextArray)) {
+    throw new Error('Context input must be an array of strings.');
   }
-  return result;
+  return contextArray.filter(item => typeof item === 'string' && item.trim().length > 0);
 }
 
-/**
- * Example usage:
- * const summary = summarizeContext("This is a long conversation with many details.", 0.5);
- * console.log(summary);
- */
+// Exported functions for cross-agent utility
+export const contextUtilities = {
+  hashText,
+  extractKeySentences,
+  slidingWindowContext,
+  summarizeContext,
+  combineAgentContexts,
+  validateContextInput
+};

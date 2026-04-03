@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuMatrixOps
- * Written: 2026-04-03T00:28:47.321Z
+ * Written: 2026-04-03T02:43:24.673Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,129 +18,127 @@
 
 // gpuMatrixOps.mjs
 
-import { createHash } from 'crypto';
+import { TextEncoder, TextDecoder } from 'util';
 
-/**
- * Generates a unique shader program identifier based on input GLSL code.
- * @param {string} glslCode - The GLSL shader code.
- * @returns {string} - A unique hash identifier for the shader.
- */
-export function generateShaderId(glslCode) {
-  const hash = createHash('sha256');
-  hash.update(glslCode);
-  return hash.digest('hex');
+// Utility function to compile WebAssembly module
+async function compileWasm(bytes) {
+  const wasmModule = await WebAssembly.compile(bytes);
+  const instance = await WebAssembly.instantiate(wasmModule);
+  return instance.exports;
 }
 
-/**
- * Initializes a WebGL context for GPU computation.
- * @param {HTMLCanvasElement} canvas - A canvas element to bind WebGL.
- * @returns {WebGLRenderingContext} - The initialized WebGL context.
- */
-export function initializeWebGLContext(canvas) {
-  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-  if (!gl) {
-    throw new Error('WebGL is not supported on this environment.');
-  }
-  return gl;
-}
-
-/**
- * Compiles a GLSL shader program.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {string} source - The GLSL source code.
- * @param {number} type - The shader type (gl.VERTEX_SHADER or gl.FRAGMENT_SHADER).
- * @returns {WebGLShader} - The compiled shader.
- */
-export function compileShader(gl, source, type) {
-  const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    const error = gl.getShaderInfoLog(shader);
-    gl.deleteShader(shader);
-    throw new Error(`Shader compilation failed: ${error}`);
+// Function to perform matrix multiplication
+export async function matrixMultiply(a, b) {
+  if (a[0].length !== b.length) {
+    throw new Error('Matrix dimensions do not match for multiplication');
   }
 
-  return shader;
-}
+  const result = Array(a.length)
+    .fill(null)
+    .map(() => Array(b[0].length).fill(0));
 
-/**
- * Links a vertex and fragment shader into a WebGL program.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {WebGLShader} vertexShader - The compiled vertex shader.
- * @param {WebGLShader} fragmentShader - The compiled fragment shader.
- * @returns {WebGLProgram} - The linked shader program.
- */
-export function linkProgram(gl, vertexShader, fragmentShader) {
-  const program = gl.createProgram();
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-  gl.linkProgram(program);
-
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    const error = gl.getProgramInfoLog(program);
-    gl.deleteProgram(program);
-    throw new Error(`Program linking failed: ${error}`);
-  }
-
-  return program;
-}
-
-/**
- * Sets up a GPU buffer for matrix data.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {Float32Array} data - The matrix data to upload.
- * @returns {WebGLBuffer} - The created buffer.
- */
-export function createMatrixBuffer(gl, data) {
-  const buffer = gl.createBuffer();
-  gl.bindBuffer(gl.ARRAY_BUFFER, buffer);
-  gl.bufferData(gl.ARRAY_BUFFER, data, gl.STATIC_DRAW);
-  return buffer;
-}
-
-/**
- * Performs GPU-based matrix multiplication.
- * @param {Float32Array} matrixA - The first matrix (flattened).
- * @param {Float32Array} matrixB - The second matrix (flattened).
- * @param {number} rowsA - Number of rows in matrix A.
- * @param {number} colsA - Number of columns in matrix A.
- * @param {number} colsB - Number of columns in matrix B.
- * @returns {Promise<Float32Array>} - The resulting matrix (flattened).
- */
-export async function gpuMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
-  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
-    throw new Error('Matrix dimensions do not match for multiplication.');
-  }
-
-  const canvas = new OffscreenCanvas(1, 1);
-  const gl = initializeWebGLContext(canvas);
-
-  const vertexShaderSource = `
-    attribute vec2 position;
-    void main() {
-      gl_Position = vec4(position, 0.0, 1.0);
+  for (let i = 0; i < a.length; i++) {
+    for (let j = 0; j < b[0].length; j++) {
+      for (let k = 0; k < b.length; k++) {
+        result[i][j] += a[i][k] * b[k][j];
+      }
     }
-  `;
+  }
 
-  const fragmentShaderSource = `
-    precision highp float;
-    uniform sampler2D matrixA;
-    uniform sampler2D matrixB;
-    uniform int rowsA;
-    uniform int colsA;
-    uniform int colsB;
-    void main() {
-      // Fragment shader logic for matrix multiplication
-    }
-  `;
-
-  const vertexShader = compileShader(gl, vertexShaderSource, gl.VERTEX_SHADER);
-  const fragmentShader = compileShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);
-  const program = linkProgram(gl, vertexShader, fragmentShader);
-
-  // Additional setup and GPU computation logic would go here
-
-  return new Float32Array(rowsA * colsB); // Placeholder for result
+  return result;
 }
+
+// Function to calculate matrix inversion (simplified for square matrices)
+export async function matrixInvert(matrix) {
+  const n = matrix.length;
+  if (matrix.some(row => row.length !== n)) {
+    throw new Error('Matrix must be square for inversion');
+  }
+
+  const identity = Array(n)
+    .fill(null)
+    .map((_, i) => Array(n).fill(0).map((_, j) => (i === j ? 1 : 0)));
+
+  const augmented = matrix.map((row, i) => [...row, ...identity[i]]);
+
+  for (let i = 0; i < n; i++) {
+    let maxRow = i;
+    for (let k = i + 1; k < n; k++) {
+      if (Math.abs(augmented[k][i]) > Math.abs(augmented[maxRow][i])) {
+        maxRow = k;
+      }
+    }
+
+    const temp = augmented[i];
+    augmented[i] = augmented[maxRow];
+    augmented[maxRow] = temp;
+
+    const divisor = augmented[i][i];
+    if (divisor === 0) {
+      throw new Error('Matrix is singular and cannot be inverted');
+    }
+
+    for (let j = 0; j < 2 * n; j++) {
+      augmented[i][j] /= divisor;
+    }
+
+    for (let k = 0; k < n; k++) {
+      if (k !== i) {
+        const factor = augmented[k][i];
+        for (let j = 0; j < 2 * n; j++) {
+          augmented[k][j] -= factor * augmented[i][j];
+        }
+      }
+    }
+  }
+
+  return augmented.map(row => row.slice(n));
+}
+
+// Function to calculate determinant of a square matrix
+export async function matrixDeterminant(matrix) {
+  const n = matrix.length;
+  if (matrix.some(row => row.length !== n)) {
+    throw new Error('Matrix must be square to calculate determinant');
+  }
+
+  let det = 1;
+  const tempMatrix = matrix.map(row => [...row]);
+
+  for (let i = 0; i < n; i++) {
+    let maxRow = i;
+    for (let k = i + 1; k < n; k++) {
+      if (Math.abs(tempMatrix[k][i]) > Math.abs(tempMatrix[maxRow][i])) {
+        maxRow = k;
+      }
+    }
+
+    if (i !== maxRow) {
+      const temp = tempMatrix[i];
+      tempMatrix[i] = tempMatrix[maxRow];
+      tempMatrix[maxRow] = temp;
+      det *= -1;
+    }
+
+    det *= tempMatrix[i][i];
+    if (tempMatrix[i][i] === 0) {
+      return 0;
+    }
+
+    for (let k = i + 1; k < n; k++) {
+      const factor = tempMatrix[k][i] / tempMatrix[i][i];
+      for (let j = i; j < n; j++) {
+        tempMatrix[k][j] -= factor * tempMatrix[i][j];
+      }
+    }
+  }
+
+  return det;
+}
+
+// Exported utility functions
+export const gpuMatrixOps = {
+  matrixMultiply,
+  matrixInvert,
+  matrixDeterminant
+};

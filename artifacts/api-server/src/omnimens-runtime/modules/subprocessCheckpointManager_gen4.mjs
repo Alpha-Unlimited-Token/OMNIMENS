@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: subprocessCheckpointManager
- * Written: 2026-04-02T21:25:01.856Z
+ * Written: 2026-04-03T02:45:23.713Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,92 +18,86 @@
 
 // subprocessCheckpointManager.mjs
 
-import { createHash } from 'crypto';
+import { serialize, deserialize } from 'v8';
 
 /**
- * Generates a unique hash for a given computation state.
- * Useful for identifying and managing checkpoints.
- * @param {Object} state - The computation state to hash.
- * @returns {string} - A unique hash string.
+ * Creates a checkpoint of the current computation state.
+ * @param {Object} state - The state object to be serialized.
+ * @returns {Buffer} - Serialized state as a buffer.
  */
-export function generateStateHash(state) {
-  const stateString = JSON.stringify(state);
-  return createHash('sha256').update(stateString).digest('hex');
-}
-
-/**
- * Saves a computation state to an in-memory database.
- * @param {Map} db - The in-memory database (Map object).
- * @param {string} key - The unique key for the state.
- * @param {Object} state - The computation state to save.
- */
-export function saveCheckpoint(db, key, state) {
-  if (!(db instanceof Map)) {
-    throw new Error('Database must be a Map instance.');
+export function createCheckpoint(state) {
+  if (typeof state !== 'object' || state === null) {
+    throw new TypeError('State must be a non-null object.');
   }
-  db.set(key, JSON.stringify(state));
+  return serialize(state);
 }
 
 /**
- * Restores a computation state from an in-memory database.
- * @param {Map} db - The in-memory database (Map object).
- * @param {string} key - The unique key for the state.
- * @returns {Object|null} - The restored computation state or null if not found.
+ * Restores a checkpoint to resume computation.
+ * @param {Buffer} checkpoint - Serialized state buffer.
+ * @returns {Object} - Deserialized state object.
  */
-export function restoreCheckpoint(db, key) {
-  if (!(db instanceof Map)) {
-    throw new Error('Database must be a Map instance.');
+export function restoreCheckpoint(checkpoint) {
+  if (!Buffer.isBuffer(checkpoint)) {
+    throw new TypeError('Checkpoint must be a Buffer.');
   }
-  const stateString = db.get(key);
-  return stateString ? JSON.parse(stateString) : null;
+  return deserialize(checkpoint);
 }
 
 /**
- * Simulates a long-running computation with checkpointing.
- * @param {Map} db - The in-memory database (Map object).
- * @param {string} key - The unique key for the computation state.
- * @param {Function} computeStep - A function representing one step of computation.
- * @param {number} totalSteps - Total number of steps in the computation.
- * @returns {Object} - The final computation result.
+ * Iteratively processes a computation by checkpointing at intervals.
+ * @param {Function} computeStep - Function that performs one computation step and returns updated state.
+ * @param {Object} initialState - Initial state object for the computation.
+ * @param {number} maxSteps - Maximum number of steps to compute.
+ * @returns {Object} - Final state after computation.
  */
-export function runWithCheckpoints(db, key, computeStep, totalSteps) {
+export function iterativeComputation(computeStep, initialState, maxSteps) {
   if (typeof computeStep !== 'function') {
-    throw new Error('computeStep must be a function.');
+    throw new TypeError('computeStep must be a function.');
   }
-  if (typeof totalSteps !== 'number' || totalSteps <= 0) {
-    throw new Error('totalSteps must be a positive integer.');
+  if (typeof initialState !== 'object' || initialState === null) {
+    throw new TypeError('Initial state must be a non-null object.');
   }
-
-  let state = restoreCheckpoint(db, key) || { step: 0, result: null };
-
-  for (let i = state.step; i < totalSteps; i++) {
-    state.result = computeStep(state.result, i);
-    state.step = i + 1;
-    saveCheckpoint(db, key, state);
+  if (typeof maxSteps !== 'number' || maxSteps <= 0) {
+    throw new RangeError('maxSteps must be a positive integer.');
   }
 
-  return state.result;
+  let state = initialState;
+  for (let step = 0; step < maxSteps; step++) {
+    state = computeStep(state);
+    const checkpoint = createCheckpoint(state);
+    state = restoreCheckpoint(checkpoint); // Simulate checkpoint restoration
+  }
+  return state;
 }
 
 /**
- * Clears a checkpoint from the in-memory database.
- * @param {Map} db - The in-memory database (Map object).
- * @param {string} key - The unique key for the state.
+ * Example utility function for generic state mutation.
+ * @param {Object} state - Current state object.
+ * @returns {Object} - Updated state object.
  */
-export function clearCheckpoint(db, key) {
-  if (!(db instanceof Map)) {
-    throw new Error('Database must be a Map instance.');
+export function exampleComputeStep(state) {
+  if (typeof state.counter !== 'number') {
+    throw new TypeError('State must have a numeric counter property.');
   }
-  db.delete(key);
+  return { ...state, counter: state.counter + 1 };
 }
 
 /**
- * Example computation step function.
- * Multiplies the current result by the step index (or starts at 1 if null).
- * @param {number|null} currentResult - The current result of the computation.
- * @param {number} stepIndex - The current step index.
- * @returns {number} - The updated result.
+ * Validates the integrity of a state object.
+ * @param {Object} state - State object to validate.
+ * @returns {boolean} - True if valid, false otherwise.
  */
-export function exampleComputeStep(currentResult, stepIndex) {
-  return (currentResult || 1) * (stepIndex + 1);
+export function validateState(state) {
+  return typeof state === 'object' && state !== null && 'counter' in state && typeof state.counter === 'number';
+}
+
+/**
+ * Demonstrates usage of the module.
+ */
+export function demo() {
+  const initialState = { counter: 0 };
+  const maxSteps = 5;
+  const finalState = iterativeComputation(exampleComputeStep, initialState, maxSteps);
+  console.log('Final State:', finalState);
 }

@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-04-02T22:07:40.154Z
+ * Written: 2026-04-03T02:38:02.168Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,115 +16,137 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Complete ES module code here
+// inMemoryVectorStore.mjs
 
 import { createHash } from 'crypto';
 
 /**
- * Utility function to calculate the cosine similarity between two vectors.
- * @param {number[]} vectorA - The first vector.
- * @param {number[]} vectorB - The second vector.
- * @returns {number} - Cosine similarity value between -1 and 1.
+ * Utility to calculate Euclidean distance between two vectors.
+ * @param {number[]} vecA - First vector.
+ * @param {number[]} vecB - Second vector.
+ * @returns {number} - Euclidean distance.
  */
-export function cosineSimilarity(vectorA, vectorB) {
-    if (vectorA.length !== vectorB.length) {
-        throw new Error('Vectors must be of the same length');
-    }
-
-    const dotProduct = vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
-    const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
-    const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
-
-    if (magnitudeA === 0 || magnitudeB === 0) {
-        return 0; // Handle edge case where a vector has zero magnitude
-    }
-
-    return dotProduct / (magnitudeA * magnitudeB);
+export function euclideanDistance(vecA, vecB) {
+  if (vecA.length !== vecB.length) {
+    throw new Error('Vectors must have the same dimensions.');
+  }
+  return Math.sqrt(vecA.reduce((sum, val, i) => sum + Math.pow(val - vecB[i], 2), 0));
 }
 
 /**
- * Hashes a vector to a unique string identifier for efficient storage.
- * @param {number[]} vector - The vector to hash.
- * @returns {string} - A unique hash representing the vector.
+ * KD-Tree Node structure.
+ * @class
  */
-export function hashVector(vector) {
-    const hash = createHash('sha256');
-    hash.update(vector.join(','));
-    return hash.digest('hex');
+class KDTreeNode {
+  constructor(point, index, axis) {
+    this.point = point;
+    this.index = index;
+    this.axis = axis;
+    this.left = null;
+    this.right = null;
+  }
 }
 
 /**
- * Class representing an in-memory vector store with similarity search capabilities.
+ * Builds a KD-Tree from a set of points.
+ * @param {number[][]} points - Array of points (vectors).
+ * @param {number} depth - Current depth in the tree.
+ * @returns {KDTreeNode} - Root node of the KD-Tree.
+ */
+function buildKDTree(points, depth = 0) {
+  if (points.length === 0) return null;
+
+  const axis = depth % points[0].length;
+  points.sort((a, b) => a[axis] - b[axis]);
+  const median = Math.floor(points.length / 2);
+
+  return new KDTreeNode(
+    points[median],
+    median,
+    axis,
+    buildKDTree(points.slice(0, median), depth + 1),
+    buildKDTree(points.slice(median + 1), depth + 1)
+  );
+}
+
+/**
+ * Searches the KD-Tree for the nearest neighbor to a given target point.
+ * @param {KDTreeNode} node - Root node of the KD-Tree.
+ * @param {number[]} target - Target point (vector).
+ * @param {number} depth - Current depth in the tree.
+ * @param {object} best - Best match found so far.
+ * @returns {object} - Nearest neighbor and its distance.
+ */
+function nearestNeighborSearch(node, target, depth = 0, best = { node: null, distance: Infinity }) {
+  if (!node) return best;
+
+  const axis = depth % target.length;
+  const distance = euclideanDistance(target, node.point);
+
+  if (distance < best.distance) {
+    best = { node, distance };
+  }
+
+  const nextBranch = target[axis] < node.point[axis] ? node.left : node.right;
+  const otherBranch = target[axis] < node.point[axis] ? node.right : node.left;
+
+  best = nearestNeighborSearch(nextBranch, target, depth + 1, best);
+
+  if (Math.abs(target[axis] - node.point[axis]) < best.distance) {
+    best = nearestNeighborSearch(otherBranch, target, depth + 1, best);
+  }
+
+  return best;
+}
+
+/**
+ * In-memory vector store class.
+ * @class
  */
 export class InMemoryVectorStore {
-    constructor() {
-        this.store = new Map(); // Map to store vectors with their hashed keys
+  constructor() {
+    this.points = [];
+    this.tree = null;
+  }
+
+  /**
+   * Adds a vector to the store.
+   * @param {number[]} vector - Vector to add.
+   */
+  addVector(vector) {
+    this.points.push(vector);
+    this.tree = buildKDTree(this.points);
+  }
+
+  /**
+   * Finds the nearest neighbor to a given vector.
+   * @param {number[]} vector - Target vector.
+   * @returns {object} - Nearest neighbor and its distance.
+   */
+  findNearest(vector) {
+    if (!this.tree) {
+      throw new Error('Vector store is empty.');
     }
-
-    /**
-     * Adds a vector to the store.
-     * @param {number[]} vector - The vector to add.
-     * @param {any} metadata - Optional metadata to store with the vector.
-     */
-    addVector(vector, metadata = null) {
-        const key = hashVector(vector);
-        this.store.set(key, { vector, metadata });
-    }
-
-    /**
-     * Searches for the top N most similar vectors to the query vector.
-     * @param {number[]} queryVector - The query vector.
-     * @param {number} topN - The number of top results to return.
-     * @returns {Array<{ vector, metadata, similarity}>} - Top N similar vectors.
-     */
-    search(queryVector, topN = 1) {
-        if (topN <= 0) {
-            throw new Error('topN must be greater than 0');
-        }
-
-        const results = [];
-
-        for (const { vector, metadata } of this.store.values()) {
-            const similarity = cosineSimilarity(queryVector, vector);
-            results.push({ vector, metadata, similarity });
-        }
-
-        results.sort((a, b) => b.similarity - a.similarity); // Sort by descending similarity
-
-        return results.slice(0, topN);
-    }
-
-    /**
-     * Clears all vectors from the store.
-     */
-    clear() {
-        this.store.clear();
-    }
+    return nearestNeighborSearch(this.tree, vector);
+  }
 }
 
 /**
- * Utility function to normalize a vector to unit length.
- * @param {number[]} vector - The vector to normalize.
- * @returns {number[]} - The normalized vector.
+ * Generates a hash for a vector (useful for deduplication).
+ * @param {number[]} vector - Vector to hash.
+ * @returns {string} - Hash string.
  */
-export function normalizeVector(vector) {
-    const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
-    if (magnitude === 0) {
-        throw new Error('Cannot normalize a zero-magnitude vector');
-    }
-    return vector.map(val => val / magnitude);
+export function hashVector(vector) {
+  const hash = createHash('sha256');
+  hash.update(vector.join(','));
+  return hash.digest('hex');
 }
 
 /**
- * Utility function to generate a random vector of specified length.
- * @param {number} length - The length of the vector.
- * @param {number} [min=-1] - Minimum value for random components.
- * @param {number} [max=1] - Maximum value for random components.
- * @returns {number[]} - A random vector.
+ * Validates a vector for consistency.
+ * @param {number[]} vector - Vector to validate.
+ * @returns {boolean} - True if valid, false otherwise.
  */
-export function generateRandomVector(length, min = -1, max = 1) {
-    if (length <= 0) {
-        throw new Error('Vector length must be greater than 0');
-    }
-    return Array.from({ length }, () => Math.random() * (max - min) + min);
+export function validateVector(vector) {
+  return Array.isArray(vector) && vector.every(val => typeof val === 'number');
 }

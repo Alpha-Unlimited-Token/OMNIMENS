@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuAcceleratedMatrixOps
- * Written: 2026-04-02T22:07:28.724Z
+ * Written: 2026-04-03T02:41:02.720Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,126 +18,111 @@
 
 // gpuAcceleratedMatrixOps.mjs
 
-import { performance } from 'perf_hooks';
+import { createHash } from 'crypto';
 
 /**
- * Initializes a WebGL context for GPU-accelerated computations.
- * @returns {WebGLRenderingContext} A WebGL rendering context.
+ * Utility to hash strings for deterministic GPU kernel naming.
+ * @param {string} input - Input string to hash.
+ * @returns {string} - SHA256 hash of the input.
  */
-export function initializeWebGLContext() {
-  const canvas = new OffscreenCanvas(1, 1);
-  const gl = canvas.getContext('webgl');
-  if (!gl) {
-    throw new Error('WebGL not supported in this environment.');
-  }
-  return gl;
+export function hashString(input) {
+  return createHash('sha256').update(input).digest('hex');
 }
 
 /**
- * Compiles a WebGL shader.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {string} source - The shader source code.
- * @param {number} type - The type of shader (gl.VERTEX_SHADER or gl.FRAGMENT_SHADER).
- * @returns {WebGLShader} The compiled shader.
+ * Generate a WebGL-compatible shader kernel for matrix multiplication.
+ * @param {number} rowsA - Number of rows in matrix A.
+ * @param {number} colsA - Number of columns in matrix A.
+ * @param {number} colsB - Number of columns in matrix B.
+ * @returns {string} - GLSL shader code for matrix multiplication.
  */
-export function compileShader(gl, source, type) {
-  const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    const error = gl.getShaderInfoLog(shader);
-    gl.deleteShader(shader);
-    throw new Error(`Shader compilation failed: ${error}`);
+export function generateMatrixMultiplicationKernel(rowsA, colsA, colsB) {
+  const kernelName = `matrixMult_${rowsA}_${colsA}_${colsB}`;
+  const kernelHash = hashString(kernelName);
+  return `#version 300 es
+  precision highp float;
+
+  layout(location = 0) in vec2 aPos;
+  uniform sampler2D matrixA;
+  uniform sampler2D matrixB;
+  out vec4 result;
+
+  void main() {
+    int row = int(aPos.x);
+    int col = int(aPos.y);
+
+    float sum = 0.0;
+    for (int k = 0; k < ${colsA}; k++) {
+      float a = texelFetch(matrixA, ivec2(row, k), 0).r;
+      float b = texelFetch(matrixB, ivec2(k, col), 0).r;
+      sum += a * b;
+    }
+
+    result = vec4(sum, 0.0, 0.0, 1.0);
   }
-  return shader;
+  // Kernel hash: ${kernelHash}`;
 }
 
 /**
- * Creates a WebGL program from vertex and fragment shaders.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {string} vertexSource - The vertex shader source code.
- * @param {string} fragmentSource - The fragment shader source code.
- * @returns {WebGLProgram} The linked WebGL program.
- */
-export function createProgram(gl, vertexSource, fragmentSource) {
-  const vertexShader = compileShader(gl, vertexSource, gl.VERTEX_SHADER);
-  const fragmentShader = compileShader(gl, fragmentSource, gl.FRAGMENT_SHADER);
-
-  const program = gl.createProgram();
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-  gl.linkProgram(program);
-
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    const error = gl.getProgramInfoLog(program);
-    gl.deleteProgram(program);
-    throw new Error(`Program linking failed: ${error}`);
-  }
-
-  return program;
-}
-
-/**
- * Performs a matrix multiplication on the GPU.
- * @param {Float32Array} matrixA - The first matrix (flattened, row-major order).
- * @param {Float32Array} matrixB - The second matrix (flattened, row-major order).
- * @param {number} rowsA - The number of rows in matrix A.
- * @param {number} colsA - The number of columns in matrix A.
- * @param {number} colsB - The number of columns in matrix B.
- * @returns {Float32Array} The resulting matrix (flattened, row-major order).
+ * Perform matrix multiplication using WebGL shaders.
+ * @param {Float32Array} matrixA - Flattened array representing matrix A.
+ * @param {Float32Array} matrixB - Flattened array representing matrix B.
+ * @param {number} rowsA - Number of rows in matrix A.
+ * @param {number} colsA - Number of columns in matrix A.
+ * @param {number} colsB - Number of columns in matrix B.
+ * @returns {Float32Array} - Resulting flattened matrix after multiplication.
  */
 export function gpuMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
   if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
-    throw new Error('Matrix dimensions do not match.');
+    throw new Error('Matrix dimensions do not match input sizes.');
   }
 
-  const gl = initializeWebGLContext();
+  // Placeholder for WebGL implementation.
+  // Since WebGL is not natively supported in Node.js, this function would
+  // typically interface with a GPU.js or similar library in a browser context.
 
-  const vertexSource = `
-    attribute vec2 a_position;
-    void main() {
-      gl_Position = vec4(a_position, 0.0, 1.0);
-    }
-  `;
-
-  const fragmentSource = `
-    precision highp float;
-    uniform sampler2D u_matrixA;
-    uniform sampler2D u_matrixB;
-    uniform int u_rowsA;
-    uniform int u_colsA;
-    uniform int u_colsB;
-    void main() {
-      ivec2 coord = ivec2(gl_FragCoord.xy);
-      float sum = 0.0;
-      for (int i = 0; i < 1024; i++) {
-        if (i >= u_colsA) break;
-        float a = texture2D(u_matrixA, vec2(float(coord.y) / float(u_rowsA), float(i) / float(u_colsA))).r;
-        float b = texture2D(u_matrixB, vec2(float(i) / float(u_colsA), float(coord.x) / float(u_colsB))).r;
-        sum += a * b;
+  // For now, fallback to CPU-based multiplication as a stub.
+  const result = new Float32Array(rowsA * colsB);
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      let sum = 0;
+      for (let k = 0; k < colsA; k++) {
+        sum += matrixA[i * colsA + k] * matrixB[k * colsB + j];
       }
-      gl_FragColor = vec4(sum, 0.0, 0.0, 1.0);
+      result[i * colsB + j] = sum;
     }
-  `;
-
-  const program = createProgram(gl, vertexSource, fragmentSource);
-  gl.useProgram(program);
-
-  // TODO: Upload matrices to GPU, execute the shader, and retrieve the result.
-
-  // Placeholder return for now.
-  return new Float32Array(rowsA * colsB);
+  }
+  return result;
 }
 
 /**
- * Measures the execution time of a function.
- * @param {Function} func - The function to measure.
- * @param {...any} args - Arguments to pass to the function.
- * @returns {object} An object containing the result and execution time in milliseconds.
+ * Attention mechanism using scaled dot-product.
+ * @param {Float32Array} queries - Flattened query matrix.
+ * @param {Float32Array} keys - Flattened key matrix.
+ * @param {Float32Array} values - Flattened value matrix.
+ * @param {number} dModel - Dimensionality of the model.
+ * @returns {Float32Array} - Attention output matrix.
  */
-export function measureExecutionTime(func, ...args) {
-  const start = performance.now();
-  const result = func(...args);
-  const end = performance.now();
-  return { result, time: end - start };
+export function attentionMechanism(queries, keys, values, dModel) {
+  const scores = gpuMatrixMultiply(queries, keys, queries.length / dModel, dModel, keys.length / dModel);
+
+  // Softmax normalization.
+  const softmaxScores = scores.map((score) => Math.exp(score));
+  const sumScores = softmaxScores.reduce((sum, val) => sum + val, 0);
+  const normalizedScores = softmaxScores.map((val) => val / sumScores);
+
+  return gpuMatrixMultiply(normalizedScores, values, normalizedScores.length / dModel, dModel, values.length / dModel);
+}
+
+/**
+ * Hopfield memory update using energy minimization.
+ * @param {Float32Array} state - Current state vector.
+ * @param {Float32Array} weights - Weight matrix.
+ * @returns {Float32Array} - Updated state vector.
+ */
+export function hopfieldUpdate(state, weights) {
+  const updatedState = gpuMatrixMultiply(weights, state, weights.length / state.length, state.length, 1);
+
+  // Apply activation function (e.g., sign function for binary Hopfield networks).
+  return updatedState.map((val) => (val >= 0 ? 1 : -1));
 }

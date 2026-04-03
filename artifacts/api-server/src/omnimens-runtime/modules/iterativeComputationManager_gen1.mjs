@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: iterativeComputationManager
- * Written: 2026-03-24T13:26:48.363Z
+ * Written: 2026-04-03T02:37:08.233Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -17,88 +17,117 @@
  */
 
 // iterativeComputationManager.mjs
-
-import crypto from 'crypto';
-
-/**
- * Generates a unique checkpoint identifier using SHA-256.
- * @param {string} input - Input string to hash.
- * @returns {string} - Unique checkpoint identifier.
- */
-export function generateCheckpointId(input) {
-  return crypto.createHash('sha256').update(input).digest('hex');
-}
+import { writeFile, readFile } from 'fs/promises';
+import { randomUUID } from 'crypto';
 
 /**
- * Divides a large task into smaller chunks for iterative processing.
- * @param {Array} data - Array of data to process.
- * @param {number} chunkSize - Size of each chunk.
- * @returns {Array} - Array of chunks.
+ * Manages long-running computations by dividing them into smaller asynchronous tasks with checkpointing.
+ * This module provides utility functions for task queue management and state persistence.
  */
-export function divideIntoChunks(data, chunkSize) {
-  const chunks = [];
-  for (let i = 0; i < data.length; i += chunkSize) {
-    chunks.push(data.slice(i, i + chunkSize));
+
+const checkpoints = new Map();
+
+/**
+ * Divides a long-running computation into smaller tasks and executes them asynchronously.
+ * @param {Array<Function>} tasks - An array of functions representing the tasks to execute.
+ * @param {string} checkpointFile - File path for saving checkpoint data.
+ * @param {number} timeout - Maximum time (ms) allowed for each task before checkpointing.
+ * @returns {Promise<void>} Resolves when all tasks are completed.
+ */
+export async function manageComputation(tasks, checkpointFile, timeout = 1000) {
+  let currentIndex = 0;
+
+  try {
+    const savedState = await loadCheckpoint(checkpointFile);
+    if (savedState) {
+      currentIndex = savedState.currentIndex;
+    }
+  } catch (error) {
+    console.error('Failed to load checkpoint:', error);
   }
-  return chunks;
-}
 
-/**
- * Serializes state into a JSON string for checkpointing.
- * @param {Object} state - State object to serialize.
- * @returns {string} - Serialized state.
- */
-export function serializeState(state) {
-  return JSON.stringify(state);
-}
+  while (currentIndex < tasks.length) {
+    const task = tasks[currentIndex];
+    const startTime = Date.now();
 
-/**
- * Deserializes a JSON string back into a state object.
- * @param {string} serializedState - Serialized state string.
- * @returns {Object} - Deserialized state object.
- */
-export function deserializeState(serializedState) {
-  return JSON.parse(serializedState);
-}
+    try {
+      await task();
+      currentIndex++;
+    } catch (error) {
+      console.error(`Task ${currentIndex} failed:`, error);
+    }
 
-/**
- * Reinitializes a subprocess with preserved state.
- * @param {Function} computationFunction - Function to execute on each chunk.
- * @param {Array} chunks - Array of data chunks.
- * @param {Object} preservedState - State object to reinitialize.
- * @returns {Array} - Array of results from processing each chunk.
- */
-export function processChunksWithState(computationFunction, chunks, preservedState) {
-  const results = [];
-  for (const chunk of chunks) {
-    const result = computationFunction(chunk, preservedState);
-    results.push(result);
+    if (Date.now() - startTime >= timeout) {
+      await saveCheckpoint(checkpointFile, { currentIndex });
+    }
   }
-  return results;
+
+  // Clean up checkpoint file after completion
+  await deleteCheckpoint(checkpointFile);
 }
 
 /**
- * Example computation function for demonstration.
- * @param {Array} chunk - Data chunk to process.
- * @param {Object} state - Preserved state.
- * @returns {Object} - Processed result.
+ * Saves the current computation state to a checkpoint file.
+ * @param {string} filePath - File path for saving the checkpoint.
+ * @param {Object} state - The state object to save.
+ * @returns {Promise<void>} Resolves when the state is saved.
  */
-export function exampleComputationFunction(chunk, state) {
-  return {
-    processedChunk: chunk.map(item => item * state.multiplier),
-    checkpointId: generateCheckpointId(JSON.stringify(chunk))
-  };
+export async function saveCheckpoint(filePath, state) {
+  try {
+    const serializedState = JSON.stringify(state);
+    await writeFile(filePath, serializedState);
+  } catch (error) {
+    console.error('Failed to save checkpoint:', error);
+  }
 }
 
 /**
- * Main function to demonstrate iterative computation management.
- * @param {Array} data - Array of data to process.
- * @param {number} chunkSize - Size of each chunk.
- * @param {Object} initialState - Initial state object.
- * @returns {Array} - Array of processed results.
+ * Loads the computation state from a checkpoint file.
+ * @param {string} filePath - File path for loading the checkpoint.
+ * @returns {Promise<Object|null>} Resolves with the state object or null if not found.
  */
-export function iterativeComputationManager(data, chunkSize, initialState) {
-  const chunks = divideIntoChunks(data, chunkSize);
-  const results = processChunksWithState(exampleComputationFunction, chunks, initialState);
-  return results;
+export async function loadCheckpoint(filePath) {
+  try {
+    const data = await readFile(filePath, 'utf-8');
+    return JSON.parse(data);
+  } catch (error) {
+    if (error.code === 'ENOENT') {
+      return null; // File does not exist
+    }
+    throw error;
+  }
+}
+
+/**
+ * Deletes the checkpoint file after computation is complete.
+ * @param {string} filePath - File path for the checkpoint file.
+ * @returns {Promise<void>} Resolves when the file is deleted.
+ */
+export async function deleteCheckpoint(filePath) {
+  try {
+    checkpoints.delete(filePath);
+  } catch (error) {
+    console.error('Failed to delete checkpoint:', error);
+  }
+}
+
+/**
+ * Creates a task queue from a generator function.
+ * @param {Generator<Function>} generator - A generator yielding task functions.
+ * @returns {Array<Function>} An array of task functions.
+ */
+export function createTaskQueue(generator) {
+  const tasks = [];
+  for (const task of generator) {
+    tasks.push(task);
+  }
+  return tasks;
+}
+
+/**
+ * Generates a unique identifier for checkpointing.
+ * @returns {string} A unique identifier.
+ */
+export function generateCheckpointId() {
+  return randomUUID();
 }

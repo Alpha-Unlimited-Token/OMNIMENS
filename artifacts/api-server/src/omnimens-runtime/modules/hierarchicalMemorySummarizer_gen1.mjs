@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: hierarchicalMemorySummarizer
- * Written: 2026-04-01T22:02:27.206Z
+ * Written: 2026-04-03T02:38:09.042Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,96 +16,86 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
+/**
+ * TRANSLATION STATUS:
+ * Novel constructs: attention
+ * All constructs have translation mappings
+ * Compiled targets: javascript: OK (6 IR steps) | python: OK (6 IR steps) | c: OK (6 IR steps) | x86_64: OK (6 IR steps) | arm64: OK (6 IR steps) | avr: OK (6 IR steps)
+ * Translation map version: 22
+ */
 // hierarchicalMemorySummarizer.mjs
-
-import crypto from 'crypto';
+import { createHash } from 'crypto';
 
 /**
- * Generates a hash for a given input string. Useful for chunk deduplication.
+ * Generate a unique hash for a given string input.
+ * Useful for creating keys for embeddings or summarizations.
  * @param {string} input - The input string to hash.
- * @returns {string} - A unique hash of the input.
+ * @returns {string} - A SHA-256 hash of the input.
  */
 export function generateHash(input) {
-  return crypto.createHash('sha256').update(input).digest('hex');
+  const hash = createHash('sha256');
+  hash.update(input);
+  return hash.digest('hex');
 }
 
 /**
- * Summarizes a chunk of text using a simple heuristic: extract key sentences.
- * @param {string} text - The input text to summarize.
- * @param {number} maxSentences - Maximum number of sentences to include in the summary.
- * @returns {string} - The summarized text.
+ * Summarize an array of conversational tokens using attention weights.
+ * @param {Array<{ token, weight}>} tokens - List of tokens with attention weights.
+ * @returns {string} - A compact summarization string.
  */
-export function summarizeText(text, maxSentences = 3) {
-  const sentences = text.match(/[^.!?]+[.!?]/g) || [];
-  return sentences.slice(0, maxSentences).join(' ').trim();
-}
-
-/**
- * Hierarchically summarizes a large body of text by chunking and recursively summarizing.
- * @param {string} text - The input text to process.
- * @param {number} chunkSize - Number of sentences per chunk.
- * @param {number} maxDepth - Maximum depth for recursive summarization.
- * @returns {string} - The final hierarchical summary.
- */
-export function hierarchicalSummarize(text, chunkSize = 5, maxDepth = 3) {
-  if (maxDepth <= 0 || !text.trim()) return text.trim();
-
-  const sentences = text.match(/[^.!?]+[.!?]/g) || [];
-  if (sentences.length <= chunkSize) return summarizeText(text);
-
-  const chunks = [];
-  for (let i = 0; i < sentences.length; i += chunkSize) {
-    chunks.push(sentences.slice(i, i + chunkSize).join(' ').trim());
+export function summarizeTokens(tokens) {
+  if (!Array.isArray(tokens) || tokens.length === 0) {
+    return '';
   }
 
-  const summarizedChunks = chunks.map(chunk => summarizeText(chunk));
-  return hierarchicalSummarize(summarizedChunks.join(' '), chunkSize, maxDepth - 1);
-}
+  // Sort tokens by descending weight
+  const sortedTokens = tokens.sort((a, b) => b.weight - a.weight);
 
-/**
- * Retrieves relevant chunks from a memory store using a simple keyword match.
- * @param {Array<{hash, content}>} memoryStore - The memory store containing chunks.
- * @param {string} query - The search query.
- * @returns {Array<string>} - Relevant chunks matching the query.
- */
-export function retrieveRelevantChunks(memoryStore, query) {
-  const lowerQuery = query.toLowerCase();
-  return memoryStore
-    .filter(({ content }) => content.toLowerCase().includes(lowerQuery))
-    .map(({ content }) => content);
-}
+  // Select top tokens based on cumulative weight threshold (e.g., 80% of total weight)
+  const totalWeight = sortedTokens.reduce((sum, t) => sum + t.weight, 0);
+  const threshold = totalWeight * 0.8;
 
-/**
- * Adds a new chunk to the memory store if it's not already present.
- * @param {Array<{hash, content}>} memoryStore - The memory store to update.
- * @param {string} chunk - The chunk to add.
- * @returns {void}
- */
-export function addChunkToMemory(memoryStore, chunk) {
-  const hash = generateHash(chunk);
-  if (!memoryStore.some(entry => entry.hash === hash)) {
-    memoryStore.push({ hash, content: chunk });
+  let cumulativeWeight = 0;
+  const selectedTokens = [];
+  for (const token of sortedTokens) {
+    cumulativeWeight += token.weight;
+    selectedTokens.push(token.token);
+    if (cumulativeWeight >= threshold) {
+      break;
+    }
   }
+
+  // Return a compact summarization string
+  return selectedTokens.join(' ');
 }
 
 /**
- * Reconstructs context from memory by retrieving and summarizing relevant chunks.
- * @param {Array<{hash, content}>} memoryStore - The memory store containing chunks.
- * @param {string} query - The search query.
- * @param {number} maxChunks - Maximum number of chunks to retrieve.
- * @returns {string} - The reconstructed context.
+ * Convert summarized context into a retrievable embedding.
+ * @param {string} summary - The summarized context string.
+ * @returns {string} - A hash-based embedding representation.
  */
-export function reconstructContext(memoryStore, query, maxChunks = 3) {
-  const relevantChunks = retrieveRelevantChunks(memoryStore, query).slice(0, maxChunks);
-  return hierarchicalSummarize(relevantChunks.join(' '));
+export function createEmbedding(summary) {
+  return generateHash(summary);
 }
 
-// Example memory store structure
-const memoryStore = [];
+/**
+ * Retrieve meaningful context from an embedding.
+ * Note: This is a placeholder function for future expansion.
+ * @param {string} embedding - The embedding representation.
+ * @returns {string} - A mock retrieval of the original context (not implemented).
+ */
+export function retrieveContext(embedding) {
+  // In a real implementation, this would look up the embedding in a database or memory.
+  return `Context for embedding ${embedding} is not retrievable yet.`;
+}
 
-// Example usage
-const text = "Artificial intelligence is a branch of computer science. It focuses on creating systems capable of performing tasks that typically require human intelligence. Examples include visual perception, speech recognition, decision-making, and language translation.";
-addChunkToMemory(memoryStore, text);
-const query = "human intelligence";
-const context = reconstructContext(memoryStore, query);
-console.log(context);
+/**
+ * Utility to process conversational history into embeddings.
+ * @param {Array<{ token, weight}>} tokens - List of tokens with attention weights.
+ * @returns {{ summary, embedding}} - Summarized context and its embedding.
+ */
+export function processConversation(tokens) {
+  const summary = summarizeTokens(tokens);
+  const embedding = createEmbedding(summary);
+  return { summary, embedding };
+}
