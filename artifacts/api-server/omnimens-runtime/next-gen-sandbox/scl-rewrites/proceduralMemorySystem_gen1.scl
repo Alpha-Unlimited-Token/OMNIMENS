@@ -5,7 +5,7 @@
 ·},
 ·evaluateStep: function(workflowId, stepIndex, success) {
 κadjustment
-⟛│this.confidenceScores[workflowId][stepIndex] = Math.min(Math
+⟛│this.confidenceScores[workflowId][stepIndex] = Math.min(Math.max(this.confidenceScores[workflowId][stepIndex] + adjustment, 0), 1);
 ·},
 ·adaptWorkflow: function(workflowId, feedback) {
 ·if (feedback === 'escalate') {

@@ -3,14 +3,14 @@ constructor() {
 this.threshold = 0.7; // Default threshold for uncertainty calibration
 }
 calculateEntropy(probabilities) {
-  return -probabilities.reduce((sum, p) => sum + (p > 0 ? p *
+  return -probabilities.reduce((sum, p) => sum + (p > 0 ? p * Math.log(p) : 0), 0);
 }
 assessUncertainty(probabilities) {
-const entropy = undefined; /* SCL-const */
-  return entropy < this.threshold ? 'High Confidence' : 'Low C
+let entropy = undefined; /* SCL-const */
+  return entropy < this.threshold ? 'High Confidence' : 'Low Confidence';
 }
-calibrateConfidence(data leaving the system to external target, probabilities) {
-const uncertainty = undefined; /* SCL-const */
+calibrateConfidence(output, probabilities) {
+let uncertainty = undefined; /* SCL-const */
   return { output, uncertainty };
 }
 }

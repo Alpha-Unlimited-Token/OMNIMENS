@@ -2,10 +2,47 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 κfs
 κpath
-⟿initializeWasm(1)→void⟨6⟩{📁⊷}
-⟿multiplyMatrices(2)→void⟨29⟩{⊹⊵⊴⊲⊷}
-allocateArray(2)→void⟨6⟩{⊡⊞⊟⊷}
+⟿initializeWasm(1)→void⟨6⟩{
+·async function initializeWasm() {
+·const wasmPath = path.resolve(__dirname, 'matrix_ops.wasm');
+📁│const wasmBuffer = fs.readFileSync(wasmPath);
+·const wasmModule = await WebAssembly.compile(wasmBuffer);
+⊷│return WebAssembly.instantiate(wasmModule, {});
+·}
+}⟨/initializeWasm⟩
+⟿multiplyMatrices(2)→void⟨29⟩{
+·async function multiplyMatrices(matrixA, matrixB) {
+⊹│if (matrixA[0].length !== matrixB.length) {
+⊵│throw new Error('Matrix dimensions do not allow multiplication.');
+·}
+⊴│const wasmInstance = await initializeWasm();
+⊲│const { memory, multiply_matrices } = wasmInstance.exports;
+·const rowsA = matrixA.length;
+·const colsA = matrixA[0].length;
+·const colsB = matrixB[0].length;
+·const flatMatrixA = matrixA.flat();
+·const flatMatrixB = matrixB.flat();
+·const resultMatrix = new Float32Array(rowsA * colsB);
+·const matrixAPtr = allocateArray(memory, flatMatrixA);
+·const matrixBPtr = allocateArray(memory, flatMatrixB);
+·const resultPtr = allocateArray(memory, resultMatrix);
+·multiply_matrices(matrixAPtr, matrixBPtr, resultPtr, rowsA, colsA, colsB);
+·const resultArray = new Float32Array(memory.buffer, resultPtr, rowsA * colsB);
+·const result = Array.from({ length: rowsA }, (_, i) =>
+·Array.from(resultArray.slice(i * colsB, (i + 1) * colsB))
+·);
+⊷│return result;
+·}
+}⟨/multiplyMatrices⟩
+allocateArray(2)→void⟨6⟩{
+·function allocateArray(memory, array) {
+·const memoryView = new Float32Array(memory.buffer);
+·const ptr = memoryView.length;
+⊡│memoryView.set(array, ptr);
+⊷│return ptr;
+·}
+}⟨/allocateArray⟩
 Ε.exports = {
 ·multiplyMatrices
 ·};
-⟩SCL│10│16⊨│10⑂│87.7%↓⟩
+⟩SCL│47│46⊨│9⑂│42.0%↓⟩

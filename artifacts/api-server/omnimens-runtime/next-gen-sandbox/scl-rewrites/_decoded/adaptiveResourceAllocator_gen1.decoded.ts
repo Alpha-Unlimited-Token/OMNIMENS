@@ -8,9 +8,9 @@ monitorWorkload(agentId, workload) {
 this.reallocateResources();
 }
 reallocateResources() {
-this.priorityQueue = [...this.workloadMap.entries()].sort((a, b) => b[1] - a[1])
+this.priorityQueue = [...this.workloadMap.entries()].sort((a, b) => b[1] - a[1]);
 }
 allocate(agentId) {
-  return this.priorityQueue.findIndex(([id]) => id === agentId
+  return this.priorityQueue.findIndex(([id]) => id === agentId) !== -1;
 }
 }

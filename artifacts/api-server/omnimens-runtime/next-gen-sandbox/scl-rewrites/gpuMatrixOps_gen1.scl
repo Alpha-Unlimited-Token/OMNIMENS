@@ -1,8 +1,84 @@
 ⟨SCL v1│gpuMatrixOps_gen1.mjs│154→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩matrixMultiply(5)→void⟨19⟩{⊩⊹⊵⊷}
-⊩cosineSimilarity(2)→void⟨21⟩{⊩⊹⊵⊷}
-⊩transposeMatrix(3)→void⟨15⟩{⊩⊹⊵⊷}
-⊩normalizeVector(1)→void⟨21⟩{⊩⊵⊷}
-⊩euclideanDistance(2)→void⟨14⟩{⊩⊹⊵⊷}
-⟩SCL│7│24⊨│19⑂│95.5%↓⟩
+⊩matrixMultiply(5)→void⟨19⟩{
+⊩│export function matrixMultiply(A, B, m, k, n) {
+⊹│if (A.length !== m * k || B.length !== k * n) {
+⊵│throw new Error('Matrix dimensions are incompatible for multiplication.');
+·}
+·const result = new Float32Array(m * n);
+·for (let i = 0; i < m; i++) {
+·for (let j = 0; j < n; j++) {
+·let sum = 0;
+·for (let p = 0; p < k; p++) {
+·sum += A[i * k + p] * B[p * n + j];
+·}
+·result[i * n + j] = sum;
+·}
+·}
+⊷│return result;
+·}
+}⟨/matrixMultiply⟩
+⊩cosineSimilarity(2)→void⟨21⟩{
+⊩│export function cosineSimilarity(vec1, vec2) {
+⊹│if (vec1.length !== vec2.length) {
+⊵│throw new Error('Vectors must have the same length for cosine similarity.');
+·}
+·let dotProduct = 0;
+·let normA = 0;
+·let normB = 0;
+·for (let i = 0; i < vec1.length; i++) {
+·dotProduct += vec1[i] * vec2[i];
+·normA += vec1[i] * vec1[i];
+·normB += vec2[i] * vec2[i];
+·}
+·if (normA === 0 || normB === 0) {
+⊵│throw new Error('One of the vectors has zero magnitude.');
+·}
+⊷│return dotProduct / (Math.sqrt(normA) * Math.sqrt(normB));
+·}
+}⟨/cosineSimilarity⟩
+⊩transposeMatrix(3)→void⟨15⟩{
+⊩│export function transposeMatrix(matrix, m, n) {
+⊹│if (matrix.length !== m * n) {
+⊵│throw new Error('Matrix dimensions are incompatible for transposition.');
+·}
+·const result = new Float32Array(n * m);
+·for (let i = 0; i < m; i++) {
+·for (let j = 0; j < n; j++) {
+·result[j * m + i] = matrix[i * n + j];
+·}
+·}
+⊷│return result;
+·}
+}⟨/transposeMatrix⟩
+⊩normalizeVector(1)→void⟨21⟩{
+⊩│export function normalizeVector(vector) {
+·let norm = 0;
+·for (let i = 0; i < vector.length; i++) {
+·norm += vector[i] * vector[i];
+·}
+·norm = Math.sqrt(norm);
+·if (norm === 0) {
+⊵│throw new Error('Cannot normalize a zero-magnitude vector.');
+·}
+·const result = new Float32Array(vector.length);
+·for (let i = 0; i < vector.length; i++) {
+·result[i] = vector[i] / norm;
+·}
+⊷│return result;
+·}
+}⟨/normalizeVector⟩
+⊩euclideanDistance(2)→void⟨14⟩{
+⊩│export function euclideanDistance(vec1, vec2) {
+⊹│if (vec1.length !== vec2.length) {
+⊵│throw new Error('Vectors must have the same length for Euclidean distance.');
+·}
+·let sum = 0;
+·for (let i = 0; i < vec1.length; i++) {
+·const diff = vec1[i] - vec2[i];
+·sum += diff * diff;
+·}
+⊷│return Math.sqrt(sum);
+·}
+}⟨/euclideanDistance⟩
+⟩SCL│83│90⊨│20⑂│46.1%↓⟩

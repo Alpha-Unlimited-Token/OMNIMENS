@@ -1,11 +1,67 @@
 ⟨SCL v1│semanticSearchIndex_gen1.mjs│116→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩generateEmbeddingId(1)→void⟨5⟩{⊩⊷}
-⊩normalizeVector(1)→void⟨4⟩{⊩⋐⊷}
-⊩cosineSimilarity(2)→void⟨6⟩{⊩⊹⊵⋐⊷}
-⊩prepareInsertQuery(2)→void⟨4⟩{⊩⟠⊰⊷}
-⊩prepareSearchQuery(2)→void⟨10⟩{⊩⟠⊷}
-⊩validateVector(1)→void⟨8⟩{⊩⊵⊹}
-⊩exampleUsage(1)→void⟨16⟩{⊩}
-⟩SCL│10│29⊨│21⑂│91.4%↓⟩
+⊩generateEmbeddingId(1)→void⟨5⟩{
+⊩│export function generateEmbeddingId(embedding) {
+·const hash = crypto.createHash('sha256');
+·hash.update(embedding.join(','));
+⊷│return hash.digest('hex');
+·}
+}⟨/generateEmbeddingId⟩
+⊩normalizeVector(1)→void⟨4⟩{
+⊩│export function normalizeVector(vector) {
+⋐│const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
+⊷│return new Float32Array(vector.map(val => val / magnitude));
+·}
+}⟨/normalizeVector⟩
+⊩cosineSimilarity(2)→void⟨6⟩{
+⊩│export function cosineSimilarity(vectorA, vectorB) {
+⊹│if (vectorA.length !== vectorB.length) {
+⊵│throw new Error('Vectors must be of the same dimension.');
+·}
+⋐│return vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
+·}
+}⟨/cosineSimilarity⟩
+⊩prepareInsertQuery(2)→void⟨4⟩{
+⊩│export function prepareInsertQuery(id, embedding) {
+⟠│const embeddingJson = JSON.stringify(Array.from(embedding));
+⊰│return `INSERT INTO embeddings (id, vector) VALUES ('${id}', '${embeddingJson}') ON CONFLICT (id) DO NOTHING;`;
+·}
+}⟨/prepareInsertQuery⟩
+⊩prepareSearchQuery(2)→void⟨10⟩{
+⊩│export function prepareSearchQuery(queryVector, topN) {
+⟠│const queryJson = JSON.stringify(Array.from(queryVector));
+⊷│return `
+σ id, vector,
+·(vector <-> '${queryJson}'::jsonb) AS similarity
+·FROM embeddings
+·ORDER BY similarity ASC
+⏳ ${topN};
+·`;
+·}
+}⟨/prepareSearchQuery⟩
+⊩validateVector(1)→void⟨8⟩{
+⊩│export function validateVector(vector) {
+·if (!(vector instanceof Float32Array)) {
+⊵│throw new Error('Vector must be a Float32Array.');
+·}
+⊹│if (vector.length === 0) {
+⊵│throw new Error('Vector must not be empty.');
+·}
+·}
+}⟨/validateVector⟩
+⊩exampleUsage(1)→void⟨16⟩{
+⊩│export function exampleUsage() {
+·const embedding = new Float32Array([0.1, 0.2, 0.3]);
+·validateVector(embedding);
+·const normalized = normalizeVector(embedding);
+·const id = generateEmbeddingId(normalized);
+·console.log('Generated ID:', id);
+·console.log('Normalized Vector:', normalized);
+·const insertQuery = prepareInsertQuery(id, normalized);
+·console.log('Insert Query:', insertQuery);
+·const searchQuery = prepareSearchQuery(normalized, 5);
+·console.log('Search Query:', searchQuery);
+·}
+}⟨/exampleUsage⟩
+⟩SCL│66│69⊨│20⑂│43.1%↓⟩

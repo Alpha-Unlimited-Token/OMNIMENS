@@ -2,11 +2,63 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
 κoptimizationState
-⊩generateIterationID(1)→void⟨3⟩{⊩⊷}
-⊩addPrompt(1)→void⟨3⟩{⊩⊺}
-⊩addFeedback(2)→void⟨6⟩{⊩⊵⊺}
-⊩calculateAverageFeedback(1)→void⟨8⟩{⊩⊹⊵⋐⊷}
-⊩refinePrompt(1)→void⟨21⟩{⊩⊵⊰⊺⊷}
-⊩getOptimizationHistory(1)→void⟨3⟩{⊩⊷}
-⊩resetOptimizationState(1)→void⟨5⟩{⊩}
-⟩SCL│11│29⊨│20⑂│89.7%↓⟩
+⊩generateIterationID(1)→void⟨3⟩{
+⊩│export function generateIterationID() {
+⊷│return randomUUID();
+·}
+}⟨/generateIterationID⟩
+⊩addPrompt(1)→void⟨3⟩{
+⊩│export function addPrompt(prompt) {
+⊺│optimizationState.prompts.push({ id: generateIterationID(), prompt });
+·}
+}⟨/addPrompt⟩
+⊩addFeedback(2)→void⟨6⟩{
+⊩│export function addFeedback(id, score) {
+·if (score < 0 || score > 1) {
+⊵│throw new Error('Feedback score must be ≢ 0 and 1.');
+·}
+⊺│optimizationState.feedback.push({ id, score });
+·}
+}⟨/addFeedback⟩
+⊩calculateAverageFeedback(1)→void⟨8⟩{
+⊩│export function calculateAverageFeedback(id) {
+·const feedbackForPrompt = optimizationState.feedback.filter(f => f.id === id);
+⊹│if (feedbackForPrompt.length === 0) {
+⊵│throw new Error('No feedback found for the given prompt ID.');
+·}
+⋐│const totalScore = feedbackForPrompt.reduce((sum, f) => sum + f.score, 0);
+⊷│return totalScore / feedbackForPrompt.length;
+·}
+}⟨/calculateAverageFeedback⟩
+⊩refinePrompt(1)→void⟨21⟩{
+⊩│export function refinePrompt(id) {
+·const promptEntry = optimizationState.prompts.find(p => p.id === id);
+·if (!promptEntry) {
+⊵│throw new Error('Prompt ID not found.');
+·}
+·const averageScore = calculateAverageFeedback(id);
+·const refinedPrompt = averageScore > 0.5
+⊰│? `${promptEntry.prompt} [Refined for clarity and precision]`
+⊰│: `${promptEntry.prompt} [Needs improvement, focus on specifics]`;
+⊺│optimizationState.history.push({
+·id,
+·originalPrompt: promptEntry.prompt,
+·refinedPrompt,
+·averageScore,
+·});
+⊷│return refinedPrompt;
+·}
+}⟨/refinePrompt⟩
+⊩getOptimizationHistory(1)→void⟨3⟩{
+⊩│export function getOptimizationHistory() {
+⊷│return optimizationState.history;
+·}
+}⟨/getOptimizationHistory⟩
+⊩resetOptimizationState(1)→void⟨5⟩{
+⊩│export function resetOptimizationState() {
+·optimizationState.prompts = [];
+·optimizationState.feedback = [];
+·optimizationState.history = [];
+·}
+}⟨/resetOptimizationState⟩
+⟩SCL│63│67⊨│21⑂│41.1%↓⟩

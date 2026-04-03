@@ -1,4 +1,24 @@
 ⟨SCL v1│simulateSelfRewardTesting_gen1.mjs│31→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩testSelfRewardMechanism(2)→void⟨22⟩{⊩⟛⊺⊷⋐}
-⟩SCL│3│6⊨│5⑂│90.3%↓⟩
+⊩testSelfRewardMechanism(2)→void⟨22⟩{
+⊩│export function testSelfRewardMechanism(environment, rewardFn) {
+·const simulationResults = [];
+⟛│const maxCycles = Math.min(environment.simulationCycles || 100, 1000);
+·for (let i = 0; i < maxCycles; i++) {
+·const state = environment.getCurrentState();
+·const reward = rewardFn(state);
+⊺│simulationResults.push({ cycle: i, state, reward });
+·if (reward > environment.threshold) {
+·environment.adjustStrategy(state, reward);
+·}
+·}
+⊷│return {
+·totalCycles: simulationResults.length,
+⋐│avgReward: simulationResults.reduce((sum, r) => sum + r.reward, 0) / simulationResults.length,
+⟛│maxReward: Math.max(...simulationResults.map(r => r.reward)),
+·converged: simulationResults.slice(-10).every(r => r.reward > environment.threshold * 0.9),
+⊢: simulationResults.slice(-20)
+·};
+·}
+}⟨/testSelfRewardMechanism⟩
+⟩SCL│23│24⊨│6⑂│25.8%↓⟩

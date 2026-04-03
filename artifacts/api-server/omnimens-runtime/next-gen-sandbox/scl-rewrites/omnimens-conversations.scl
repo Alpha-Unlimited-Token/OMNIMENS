@@ -8,7 +8,7 @@
 ·cognitionBus,
 ·} from "./omnimens-unified-runtime.js";
 ⊭│type Role = "user" | "assistant";
-⊭│type ConversationRow = { id: number; userId: string; title?:
+⊭│type ConversationRow = { id: number; userId: string; title?: string; persona?: string };
 ⊭│type MessageRow = { role: Role; content: string };
 ⊭│type MemoryRow = {
 ·id: number;
@@ -25,7 +25,9 @@ const ⊞ = (table: string, data: unknown) =>
 dbGateway.⊞(ENGINE, table, data, "NORMAL");
 ·const log = (msg: string, ...extra: unknown[]) =>
 📢│console.log(`[OMNIMENS-CONVERSATIONS] ${msg}`, ...extra);
-⊩⟿getOrCreateConversation(1)→void⟨1⟩{⊩}
+⊩⟿getOrCreateConversation(1)→void⟨1⟩{
+⊩│export async function getOrCreateConversation(
+}⟨/getOrCreateConversation⟩
 ·userId: string,
 ⊳│conversationId?: number,
 ·persona = "GENERAL"
@@ -42,7 +44,9 @@ dbGateway.⊞(ENGINE, table, data, "NORMAL");
 ·]) as [{ id: number }];
 ⊷│return id;
 ·}
-⊩⟿saveMessage(1)→void⟨1⟩{⊩}
+⊩⟿saveMessage(1)→void⟨1⟩{
+⊩│export async function saveMessage(
+}⟨/saveMessage⟩
 ·conversationId: number,
 ·userId: string,
 ·role: Role,
@@ -70,7 +74,9 @@ dbGateway.⊞(ENGINE, table, data, "NORMAL");
 ·},
 ·});
 ·}
-⊩⟿generateConversationTitle(1)→void⟨1⟩{⊩}
+⊩⟿generateConversationTitle(1)→void⟨1⟩{
+⊩│export async function generateConversationTitle(
+}⟨/generateConversationTitle⟩
 ·conversationId: number,
 ·firstMessage: string
 ·): Promise<void> {
@@ -85,7 +91,9 @@ dbGateway.⊞(ENGINE, table, data, "NORMAL");
 ·} catch {
 ·}
 ·}
-⊩⟿loadConversationHistory(1)→void⟨1⟩{⊩}
+⊩⟿loadConversationHistory(1)→void⟨1⟩{
+⊩│export async function loadConversationHistory(
+}⟨/loadConversationHistory⟩
 ·conversationId: number,
 ·userId: string,
 ⏳ = 50
@@ -93,13 +101,15 @@ dbGateway.⊞(ENGINE, table, data, "NORMAL");
 κrows
 ⊷│return rows.reverse();
 ·}
-⊪│export const listConversations = (userId: string, limit = 30
+⊪│export const listConversations = (userId: string, limit = 30) =>
 ·read<ConversationRow>(TABLE.conversations, {
 ·where: { userId },
 ·orderBy: { lastMessageAt: "DESC" },
 ⏳,
 ·});
-⊩⟿deleteConversation(1)→void⟨1⟩{⊩}
+⊩⟿deleteConversation(1)→void⟨1⟩{
+⊩│export async function deleteConversation(
+}⟨/deleteConversation⟩
 ·conversationId: number,
 ·userId: string
 ·): Promise<void> {
@@ -107,18 +117,125 @@ dbGateway.⊞(ENGINE, table, data, "NORMAL");
 ·delete: { where: { id: conversationId, userId } },
 ·});
 ·}
-⊩⟿runMemoryImprovementCycle(1)→Promise<void>⟨96⟩{⟿⊩⊹⊰⊷⟠❔⊴⊱⏰}
-⊩⟿runGlobalMemoryImprovementCycle(1)→Promise<void>⟨19⟩{⟿⊩⏰⚡→⊰}
+⊩⟿runMemoryImprovementCycle(1)→Promise<void>⟨96⟩{
+⟿│export async function runMemoryImprovementCycle(userId: string): Promise<void> {
+·try {
+·const memories = await read<MemoryRow>(TABLE.memories, {
+·where: { userId, active: true },
+·orderBy: { updatedAt: "DESC" },
+⏳: 50,
+·});
+⊹│if (memories.length < 3) return;
+·const memoryList = memories
+·.map(
+⊰│(m, i) => `[${i + 1}] (${m.category}) ${m.content}`
+·)
+·.join("\n");
+·const aiRes = await apiManager.call(ENGINE, "openai", {
+·method: "POST",
+·path: "/chat/completions",
+·body: {
+·model: "gpt-4o-mini",
+·messages: [
+·{
+role: "η",
+⊷│content: `You are a memory optimization η. Analyze these user memory facts and return a JSON object with:
+·{
+·"toDeactivate": [indexes],
+"toAdd": [{"category":"preference|fact|goal|◧|instruction","content":"..."}],
+·"insights": "..."
+·}`,
+·},
+⊰│{ role: "user", content: `User memories:\n${memoryList}` },
+·],
+·max_tokens: 600,
+·response_format: { type: "json_object" },
+·},
+·});
+⟠│const parsed = JSON.parse(
+❔│aiRes?.choices?.[0]?.message?.content?.trim() || "{}"
+·);
+·if (Array.isArray(parsed.toDeactivate)) {
+·const ids = parsed.toDeactivate
+·.map((i: number) => memories[i - 1])
+·.filter(Boolean)
+·.map((m: MemoryRow) => m.id);
+·if (ids.length)
+⊴│await ⊞(TABLE.memories, {
+·update: { set: { active: false }, where: { id: { $in: ids } } },
+·});
 ·}
-⚡→│spikeBus.on("conversations:globalMemoryCycle", runGlobalMemo
-⚡→│spikeBus.on(/conversations:userMemory:.+/, async ({ userId }
+·if (Array.isArray(parsed.toAdd)) {
+·const newRows = parsed.toAdd
+⊹│.filter((m: any) => m.content && m.content.length > 4)
+⊱│.map((m: any) => ({
+·userId,
+·content: m.content.slice(0, 500),
+·category: m.category || "fact",
+·confidence: 0.95,
+⏰│sourceHash: `memory_improvement_${Date.now()}`,
+·active: true,
+·}));
+⊴│if (newRows.length) await ⊞(TABLE.memories, newRows);
+·}
+·if (parsed.insights) {
+⊴│await ⊞(TABLE.brain, [
+·{
+·category: "pattern",
+title: "Memory ✦ Insight",
+⊰│content: `User ${userId}: ${parsed.insights}`,
+·confidence: 0.8,
+·sourceConversation: "memory_improvement_cycle",
+·},
+⊱│]).catch(() => {});
+·cognitionBus.shareInsight(ENGINE, {
+·type: "discovery",
+·data: { userId, note: parsed.insights },
+·});
+·}
+cognitionBus.reportOutcome(ENGINE, { useful: true, ◧: "memory_cycle" });
+·log(
+⊰│`Memory cycle ⊣ for ${userId} — deactivated ${
+❔│parsed.toDeactivate?.length || 0
+❔│}, added ${parsed.toAdd?.length || 0}`
+·);
+·} catch (err) {
+cognitionBus.reportOutcome(ENGINE, { useful: false, ◧: "memory_cycle" });
+·log("Memory cycle error:", err);
+·}
+·}
+}⟨/runMemoryImprovementCycle⟩
+⊩⟿runGlobalMemoryImprovementCycle(1)→Promise<void>⟨19⟩{
+⟿│export async function runGlobalMemoryImprovementCycle(): Promise<void> {
+·try {
+·const recent = await read<{ userId: string }>(TABLE.messages, {
+⏰│where: { createdAt: { $gt: Date.now() - 86_400_000 } }, // last 24h
+·groupBy: ["userId"],
+⏳: 20,
+·});
+·recent.forEach(({ userId }, idx) =>
+⚡→│spikeBus.scheduleSpike(
+⊰│`conversations:userMemory:${userId}`,
+·{ userId },
+·idx * 1_000
+·)
+·);
+·} catch (err) {
+·log("Global memory cycle error:", err);
+·} finally {
+⚡→│spikeBus.scheduleSpike("conversations:globalMemoryCycle", {}, 15 * 60_000); // 15 min
+·}
+}⟨/runGlobalMemoryImprovementCycle⟩
+·}
+⚡→│spikeBus.on("conversations:globalMemoryCycle", runGlobalMemoryImprovementCycle);
+⚡→│spikeBus.on(/conversations:userMemory:.+/, async ({ userId }) =>
 ·runMemoryImprovementCycle(userId)
 ·);
 ⚡→│spikeBus.on("attention:conversations", () =>
-⚡→│spikeBus.scheduleSpike("conversations:globalMemoryCycle", {}
+⚡→│spikeBus.scheduleSpike("conversations:globalMemoryCycle", {}, 5_000)
 ·);
 ⚡→│spikeBus.on("cognition:curiosity", () =>
-⚡→│spikeBus.scheduleSpike("conversations:globalMemoryCycle", {}
+⚡→│spikeBus.scheduleSpike("conversations:globalMemoryCycle", {}, 1_000)
 ·);
 ⊱│cognitionBus.onInsight((_src, insight) => {
 ❔│if (insight.type === "discovery" && insight.data?.userId) {
@@ -130,6 +247,10 @@ dbGateway.⊞(ENGINE, table, data, "NORMAL");
 ·}
 ·});
 ·engineRegistry.registerEngine(ENGINE, "NORMAL", { dbQuota: 10 });
-⚡→│spikeBus.scheduleSpike("conversations:globalMemoryCycle", {}
-⊩shutdown(1)→void⟨3⟩{⊩}
-⟩SCL│134│71⊨│52⑂│56.5%↓⟩
+⚡→│spikeBus.scheduleSpike("conversations:globalMemoryCycle", {}, 10_000); // first run
+⊩shutdown(1)→void⟨3⟩{
+⊩│export function shutdown() {
+·engineRegistry.unregisterEngine(ENGINE);
+·}
+}⟨/shutdown⟩
+⟩SCL│255│174⊨│60⑂│17.2%↓⟩

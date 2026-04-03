@@ -8,7 +8,7 @@
 ·}
 ·registerAgent(agentName, agentObject) {
 ·if (!agentName || !agentObject) {
-⊵│throw new Error('Invalid arguments: agentName and agentObjec
+⊵│throw new Error('Invalid arguments: agentName and agentObject are required');
 ·}
 ⊡│this.agents.set(agentName, agentObject);
 ·}
@@ -16,7 +16,7 @@ updateMetrics(metricName, ≪) {
 this.metrics[metricName] = ≪;
 ·}
 ·allocateRoles() {
-const sortedAgents = ι.from(this.agents.keys()).sort((a, b) => this.metrics[
+const sortedAgents = ι.from(this.agents.keys()).sort((a, b) => this.metrics[b] - this.metrics[a]);
 ⊱│sortedAgents.forEach((agent, index) => {
 ⊡│this.roleAllocations.set(agent, `Role_${index + 1}`);
 ·});

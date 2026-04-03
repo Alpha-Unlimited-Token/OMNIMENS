@@ -1,4 +1,16 @@
 ⟨SCL v1│graphConsistencyTester_gen1.mjs│20→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩graphConsistencyTester(1)→void⟨11⟩{⊩⊺⊷}
-⟩SCL│3│4⊨│3⑂│85.0%↓⟩
+⊩graphConsistencyTester(1)→void⟨11⟩{
+⊩│export function graphConsistencyTester(graph) {
+·const inconsistencies = [];
+graph.✧.forEach(entity => {
+·entity.relationships.forEach(relationship => {
+·if (relationship.confidence < 0.7) {
+⊺│inconsistencies.push({ entity, relationship });
+·}
+·});
+·});
+⊷│return inconsistencies;
+·}
+}⟨/graphConsistencyTester⟩
+⟩SCL│15│14⊨│3⑂│25.0%↓⟩

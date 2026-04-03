@@ -16,8 +16,8 @@ this.semanticMemory[η.key] = η.data;
 ·}
 ·}
 ·consolidateMemory() {
-·this.episodicMemory = this.episodicMemory.slice(-100); // Keep only recent 100 e
-⊸│this.semanticMemory = Object.fromEntries(Object.entries(this
+·this.episodicMemory = this.episodicMemory.slice(-100); // Keep only recent 100 episodes
+⊸│this.semanticMemory = Object.fromEntries(Object.entries(this.semanticMemory).slice(-50)); // Limit size
 this.proceduralMemory = this.proceduralMemory.slice(-50); // ⏳ size
 ·}
 ·}

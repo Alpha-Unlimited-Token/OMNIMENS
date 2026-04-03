@@ -15,26 +15,24 @@ this.summarizeContext();
 }
 }
 summarizeContext() {
-const messagesToSummarize = undefined; /* SCL-const */
-const summarized = undefined; /* SCL-const */
+let messagesToSummarize = undefined; /* SCL-const */
+let summarized = undefined; /* SCL-const */
   this.summarizedContext.push(summarized);
 }
 simulateSemanticCompression(messages) {
-const combinedText = undefined; /* SCL-const */
-const compressedLength = undefined; /* SCL-const */
-  return combinedText.substring(0, compressedLength) + (compre
+let combinedText = undefined; /* SCL-const */
+let compressedLength = undefined; /* SCL-const */
+  return combinedText.substring(0, compressedLength) + (compressedLength < combinedText.length ? '...' : '');
 }
 getFullContext() {
-  return [...this.summarizedContext, ...this.recentMessages].j
+  return [...this.summarizedContext, ...this.recentMessages].join(' ');
 }
 clearContext() {
 this.recentMessages = [];
 this.summarizedContext = [];
 }
 }
-function createContextSummarizationManager(arg0, arg1) {
 function createContextSummarizationManager(windowSize = 5, embeddingCompressionFactor = 0.5) {
   return new ContextSummarizationManager(windowSize, embeddingCompressionFactor);
-}
 }
 export { createContextSummarizationManager };

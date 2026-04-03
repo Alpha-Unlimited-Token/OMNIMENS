@@ -1,8 +1,52 @@
 ⟨SCL v1│dynamicMemoryManager_gen1.mjs│134→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-buildKDTree(2)→void⟨17⟩{⊷⊹}
-nearestNeighbor(5)→void⟨35⟩{⊷⊳⊲}
-euclideanDistance(2)→void⟨3⟩{⋐⊷}
+buildKDTree(2)→void⟨17⟩{
+·function buildKDTree(points, depth = 0) {
+⊷│if (points.length === 0) return null;
+·const k = points[0].length; // Dimensionality of the points
+·const axis = depth % k; // Dimension to split on
+·points.sort((a, b) => a[axis] - b[axis]);
+·const medianIndex = Math.floor(points.length / 2);
+⊷│return {
+·point: points[medianIndex],
+·left: buildKDTree(points.slice(0, medianIndex), depth + 1),
+≪: buildKDTree(points.slice(medianIndex + 1), depth + 1)
+·};
+·}
+}⟨/buildKDTree⟩
+nearestNeighbor(5)→void⟨35⟩{
+·function nearestNeighbor(node, target, depth = 0, best = null, bestDistance = Infinity) {
+⊷│if (node === null) return { best, bestDistance };
+·const k = target.length;
+·const axis = depth % k;
+·const distance = euclideanDistance(node.point, target);
+·let currentBest = best;
+·let currentBestDistance = bestDistance;
+·if (distance < bestDistance) {
+·currentBest = node;
+·currentBestDistance = distance;
+·}
+⊳│const direction = target[axis] < node.point[axis] ? 'left' : '≪';
+⊳│const nextNode = direction === 'left' ? node.left : node.≪;
+⊳│const otherNode = direction === 'left' ? node.≪ : node.left;
+⊲│const { best: newBest, bestDistance: newBestDistance } = nearestNeighbor(nextNode, target, depth + 1, currentBest, currentBestDistance);
+·currentBest = newBest;
+·currentBestDistance = newBestDistance;
+·if (Math.abs(target[axis] - node.point[axis]) < currentBestDistance) {
+⊲│const { best: otherBest, bestDistance: otherBestDistance } = nearestNeighbor(otherNode, target, depth + 1, currentBest, currentBestDistance);
+·if (otherBestDistance < currentBestDistance) {
+·currentBest = otherBest;
+·currentBestDistance = otherBestDistance;
+·}
+·}
+⊷│return { best: currentBest, bestDistance: currentBestDistance };
+·}
+}⟨/nearestNeighbor⟩
+euclideanDistance(2)→void⟨3⟩{
+·function euclideanDistance(pointA, pointB) {
+⋐│return Math.sqrt(pointA.reduce((sum, val, i) => sum + (val - pointB[i]) ** 2, 0));
+·}
+}⟨/euclideanDistance⟩
 ⊶│class VectorStore {
 ·constructor() {
 ·this.tree = null;
@@ -13,10 +57,10 @@ euclideanDistance(2)→void⟨3⟩{⋐⊷}
 ·this.tree = buildKDTree(this.points);
 ·}
 findNearest(θ) {
-⊵│if (!this.tree) throw new Error('The vector store is empty.'
-⊲│const { best, bestDistance } = nearestNeighbor(this.tree, ta
+⊵│if (!this.tree) throw new Error('The vector store is empty.');
+⊲│const { best, bestDistance } = nearestNeighbor(this.tree, target);
 ⊷│return { point: best.point, distance: bestDistance };
 ·}
 ·}
 ·export { VectorStore, buildKDTree, nearestNeighbor, euclideanDistance };
-⟩SCL│21│16⊨│12⑂│84.3%↓⟩
+⟩SCL│65│52⊨│15⑂│51.5%↓⟩

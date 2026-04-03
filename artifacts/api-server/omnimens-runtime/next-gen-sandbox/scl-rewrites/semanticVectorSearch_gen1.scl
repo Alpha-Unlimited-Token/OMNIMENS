@@ -2,9 +2,29 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊲│const { Client } = require('pg');
 κcrypto
-⟿connectToDatabase(1)→void⟨5⟩{⊷}
-⟿initializeTable(1)→void⟨11⟩{}
-⟿insertEmbedding(3)→void⟨1⟩{}
+⟿connectToDatabase(1)→void⟨5⟩{
+·async function connectToDatabase(connectionString) {
+·const client = new Client({ connectionString });
+·await client.connect();
+⊷│return client;
+·}
+}⟨/connectToDatabase⟩
+⟿initializeTable(1)→void⟨11⟩{
+·async function initializeTable(client) {
+·const query = `
+α TABLE IF NOT EXISTS embeddings (
+·id SERIAL PRIMARY KEY,
+·vector JSONB NOT NULL,
+·metadata JSONB,
+·created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+·);
+·`;
+·await client.query(query);
+·}
+}⟨/initializeTable⟩
+⟿insertEmbedding(3)→void⟨1⟩{
+·async function insertEmbedding(client, vector, metadata = {}) {
+}⟨/insertEmbedding⟩
 κquery
 ·INSERT INTO embeddings (vector, metadata)
 ≢ ($1, $2)
@@ -13,9 +33,33 @@
 κresult
 ⊷│return result.rows[0].id;
 ·}
-cosineSimilarity(2)→void⟨6⟩{⋐⊷}
-⟿searchEmbeddings(3)→void⟨14⟩{⟠⊷}
-⟿disconnectFromDatabase(1)→void⟨3⟩{}
+cosineSimilarity(2)→void⟨6⟩{
+·function cosineSimilarity(vectorA, vectorB) {
+⋐│const dotProduct = vectorA.reduce((sum, a, idx) => sum + a * vectorB[idx], 0);
+⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a ** 2, 0));
+⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b ** 2, 0));
+⊷│return dotProduct / (magnitudeA * magnitudeB);
+·}
+}⟨/cosineSimilarity⟩
+⟿searchEmbeddings(3)→void⟨14⟩{
+async function searchEmbeddings(client, queryVector, ⏳ = 10) {
+const query = `σ id, vector, metadata FROM embeddings;`;
+·const result = await client.query(query);
+·const scoredResults = result.rows.map(row => {
+⟠│const vector = JSON.parse(row.vector);
+·const similarity = cosineSimilarity(queryVector, vector);
+⊷│return { id: row.id, similarity, metadata: row.metadata };
+·});
+⊷│return scoredResults
+·.sort((a, b) => b.similarity - a.similarity)
+.slice(0, ⏳);
+·}
+}⟨/searchEmbeddings⟩
+⟿disconnectFromDatabase(1)→void⟨3⟩{
+·async function disconnectFromDatabase(client) {
+·await client.end();
+·}
+}⟨/disconnectFromDatabase⟩
 Ε.exports = {
 ·connectToDatabase,
 ·initializeTable,
@@ -23,4 +67,4 @@ cosineSimilarity(2)→void⟨6⟩{⋐⊷}
 ·searchEmbeddings,
 ·disconnectFromDatabase
 ·};
-⟩SCL│25│18⊨│7⑂│78.6%↓⟩
+⟩SCL│69│50⊨│10⑂│41.0%↓⟩

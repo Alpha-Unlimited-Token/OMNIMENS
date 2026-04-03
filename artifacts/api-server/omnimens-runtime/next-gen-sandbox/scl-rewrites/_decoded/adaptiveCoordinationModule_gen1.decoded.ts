@@ -4,17 +4,17 @@ this.taskQueue = [];
   this.resourceMap = new Map();
 }
 distributeTasks(taskLoad, agents) {
-agents.forEach(create new agent or subprocess => {
-const computeCapacity = undefined; /* SCL-const */
-const taskAllocation = undefined; /* SCL-const */
-create new agent or subprocess.assignTasks(taskAllocation);
+agents.forEach(spawn => {
+let computeCapacity = undefined; /* SCL-const */
+let taskAllocation = undefined; /* SCL-const */
+spawn.assignTasks(taskAllocation);
 });
 }
-getAgentCapacity(create new agent or subprocess) {
+getAgentCapacity(spawn) {
   return agent.computeCapacity - agent.currentLoad;
 }
 allocateTasks(taskLoad, computeCapacity) {
-const allocation = undefined; /* SCL-const */
+let allocation = undefined; /* SCL-const */
   return allocation;
 }
 }

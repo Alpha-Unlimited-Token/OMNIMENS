@@ -1,7 +1,13 @@
 ⟨SCL v1│taskSchedulerWithCheckpointing_gen1.mjs│124→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩generateCheckpointId(2)→void⟨5⟩{⊩⟠⊷}
+⊩generateCheckpointId(2)→void⟨5⟩{
+⊩│export function generateCheckpointId(taskName, state) {
+·const hash = createHash('sha256');
+⟠│hash.update(taskName + JSON.stringify(state));
+⊷│return hash.digest('hex');
+·}
+}⟨/generateCheckpointId⟩
 ·export function* chunkTask(taskFunction, initialState, chunkSize) {
 ·let currentState = { ...initialState };
 ·let progress = 0;
@@ -11,12 +17,42 @@
 ·yield { progress, state: currentState };
 ·}
 ·}
-⊩scheduleTasksWithPriority(1)→void⟨23⟩{⊩⥀⊲⊺⊷}
-⊩resumeTaskFromCheckpoint(3)→void⟨10⟩{⊩⥀⊺⊷}
-⊩exampleTaskFunction(1)→void⟨3⟩{⊩⊷}
+⊩scheduleTasksWithPriority(1)→void⟨23⟩{
+⊩│export function scheduleTasksWithPriority(tasks) {
+·tasks.sort((a, b) => b.priority - a.priority);
+const ⊢ = [];
+⥀│for (const task of tasks) {
+⊲│const { taskName, taskFunction, initialState, chunkSize } = task;
+·const generator = chunkTask(taskFunction, initialState, chunkSize);
+·let checkpointId = generateCheckpointId(taskName, initialState);
+·let taskResult = [];
+⥀│for (const chunk of generator) {
+⊺│taskResult.push(chunk);
+·checkpointId = generateCheckpointId(taskName, chunk.state);
+·}
+⊺│⊢.push({ taskName, checkpointId, result: taskResult });
+·}
+⊷│return ⊢;
+·}
+}⟨/scheduleTasksWithPriority⟩
+⊩resumeTaskFromCheckpoint(3)→void⟨10⟩{
+⊩│export function resumeTaskFromCheckpoint(taskFunction, checkpointState, remainingChunks) {
+·const generator = chunkTask(taskFunction, checkpointState, remainingChunks);
+·const taskResult = [];
+⥀│for (const chunk of generator) {
+⊺│taskResult.push(chunk);
+·}
+⊷│return taskResult;
+·}
+}⟨/resumeTaskFromCheckpoint⟩
+⊩exampleTaskFunction(1)→void⟨3⟩{
+⊩│export function exampleTaskFunction(state) {
+⊷│return { counter: (state.counter || 0) + 1 };
+·}
+}⟨/exampleTaskFunction⟩
 ⊪│export const exampleUsage = () => {
 κtasks
 κresults
 ⊷│return results;
 ·};
-⟩SCL│21│23⊨│16⑂│83.1%↓⟩
+⟩SCL│57│51⊨│18⑂│54.0%↓⟩

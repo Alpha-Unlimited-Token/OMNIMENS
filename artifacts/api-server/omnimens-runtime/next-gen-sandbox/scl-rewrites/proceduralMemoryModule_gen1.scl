@@ -14,10 +14,10 @@
 ·});
 ·}
 ·adaptiveRefinement(workflow, metrics) {
-⊷│return workflow.map(step => ({ ...step, confidence: step.con
+⊷│return workflow.map(step => ({ ...step, confidence: step.confidence * metrics.adjustmentFactor }));
 ·}
 ·getBestWorkflows() {
-⊷│return this.memoryStore.sort((a, b) => b.metadata.confidence
+⊷│return this.memoryStore.sort((a, b) => b.metadata.confidence - a.metadata.confidence);
 ·}
 ·}
 ⟩SCL│22│6⊨│5⑂│35.3%↓⟩

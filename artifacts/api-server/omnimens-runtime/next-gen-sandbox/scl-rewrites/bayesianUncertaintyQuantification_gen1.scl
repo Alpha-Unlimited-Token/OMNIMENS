@@ -6,7 +6,7 @@
 ·const entropy = this.calculateEntropy(chain.map(step => step.probability));
 κadjustmentFactor
 ·chain.forEach(step => {
-⟛│step.probability = Math.min(Math.max(step.probability + adju
+⟛│step.probability = Math.min(Math.max(step.probability + adjustmentFactor * entropy, 0), 1);
 ·});
 ·}
 ·};

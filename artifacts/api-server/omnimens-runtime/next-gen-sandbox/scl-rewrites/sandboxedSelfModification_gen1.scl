@@ -1,4 +1,24 @@
 ⟨SCL v1│sandboxedSelfModification_gen1.mjs│28→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩sandboxedSelfModification(2)→void⟨19⟩{⊩⊷⊱⊺⊻⊵}
-⟩SCL│3│7⊨│6⑂│89.3%↓⟩
+⊩sandboxedSelfModification(2)→void⟨19⟩{
+⊩│export function sandboxedSelfModification(policyEvaluator, safetyValidator) {
+·const sandbox = [];
+⊷│return {
+⊱│simulateModification: (policy) => {
+·const simulationResult = policyEvaluator(policy);
+⊺│sandbox.push(simulationResult);
+⊷│return simulationResult;
+·},
+⊱│validateSafety: (modification) => {
+⊷│return safetyValidator(modification);
+·},
+⊱│applyModification: (modification) => {
+⊻│if (sandbox.includes(modification) && safetyValidator(modification)) {
+⊷│return modification;
+·}
+⊵│throw new Error('Modification ↺ safety checks or was not simulated.');
+·}
+·};
+·}
+}⟨/sandboxedSelfModification⟩
+⟩SCL│23│25⊨│11⑂│17.9%↓⟩

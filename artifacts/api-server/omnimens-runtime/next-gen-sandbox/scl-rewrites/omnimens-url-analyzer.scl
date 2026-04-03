@@ -12,13 +12,19 @@
 ⊭│type Vendor = "http-get";
 ⊬UrlContent⟨url:string│title:string│text:string│wordCount:number│error:string⟩
 ·engineRegistry.registerEngine(ENGINE_ID, "NORMAL", { dbQuota: 10 });
-⊩shutdown(1)→void⟨3⟩{⊩}
+⊩shutdown(1)→void⟨3⟩{
+⊩│export function shutdown() {
+·engineRegistry.unregisterEngine(ENGINE_ID);
+·}
+}⟨/shutdown⟩
 κENTITIES
 κENT_RE
-extractTextFromHtml(1)→{ title: string; text: string }⟨1⟩{}
+extractTextFromHtml(1)→{ title: string; text: string }⟨1⟩{
+·function extractTextFromHtml(html: string): { title: string; text: string } {
+}⟨/extractTextFromHtml⟩
 ·const strip = (s: string) =>
 ·s
-⊽│.replace(/<(script|style|nav|header|footer)[\s\S]*?<\/\1>/gi
+⊽│.replace(/<(script|style|nav|header|footer)[\s\S]*?<\/\1>/gi, " ")
 ⊽│.replace(/<[^>]+>/g, " ")
 ⊽│.replace(ENT_RE, (_, e) => ENTITIES[e] || " ")
 ⊽│.replace(/\s{3,}/g, "\n\n")
@@ -28,15 +34,50 @@ extractTextFromHtml(1)→{ title: string; text: string }⟨1⟩{}
 ·.trim();
 ⊷│return { title, text: strip(html) };
 ·}
-⊩⟿fetchUrlContent(1)→Promise<UrlContent>⟨42⟩{⊩⊲⊰⊷⊳❔⊻⟠⊱}
+⊩⟿fetchUrlContent(1)→Promise<UrlContent>⟨42⟩{
+⊩│export async function fetchUrlContent(url: string): Promise<UrlContent> {
+·try {
+·new URL(url); // throws if malformed
+⊲│const { ok, status, statusText, headers, body } = await apiManager.call(
+·ENGINE_ID,
+·"http-get" as Vendor,
+·{
+·url,
+·headers: {
+"User-α":
+·"Mozilla/5.0 (compatible; OMNIMENS/1.0; +https://omnimens.ai)",
+·Accept: "text/html,application/xhtml+xml,text/plain;q=0.9",
+·},
+·}
+·);
+·if (!ok) {
+⊰│return { url, title: "Error", text: "", wordCount: 0, error: `HTTP ${status}: ${statusText}` };
+·}
+⊳│const raw = typeof body === "string" ? body : String(body);
+❔│const type = (headers?.get?.("content-type") ?? "") as string;
+·let title = url;
+·let text = raw.slice(0, MAX_CONTENT_CHARS);
+⊻│if (type.includes("text/html")) ({ title, text } = extractTextFromHtml(raw));
+⊻│else if (type.includes("application/json"))
+⟠│text = JSON.stringify(JSON.parse(raw), null, 2).slice(0, MAX_CONTENT_CHARS);
+·const wordCount = text.split(/\s+/).filter(Boolean).length;
+·const doc = { url, title, text, wordCount };
+⊱│dbGateway.⊞(ENGINE_ID, "url_cache", doc, "NORMAL").catch(() => {});
+·cognitionBus.shareInsight(ENGINE_ID, { type: "url_fetched", data: { url, wordCount } });
+⊷│return doc;
+·} catch (err: any) {
+⊷│return { url, title: "Error", text: "", wordCount: 0, error: err.message || "Fetch ↺" };
+·}
+·}
+}⟨/fetchUrlContent⟩
 ⊪│export const extractUrls = (msg: string): string[] =>
-⊯│Array.from(new Set(msg.match(/https?:\/\/[^\s<>"']+/gi) || [
+⊯│Array.from(new Set(msg.match(/https?:\/\/[^\s<>"']+/gi) || [])).slice(0, 3);
 ⊪│export const formatUrlContent = (c: UrlContent): string =>
 ·c.error
 ⊰│? `[URL: ${c.url}]\nError: ${c.error}\n`
-⊰│: `[WEB PAGE: "${c.title}"]\nURL: ${c.url}\nWords: ${c.wordC
+⊰│: `[WEB PAGE: "${c.title}"]\nURL: ${c.url}\nWords: ${c.wordCount}\n\n${c.text}\n`;
 ⊱│cognitionBus.onInsight((_src, insight) => {
-❔│if (insight.type === "discovery" && insight.data?.relatedUrl
+❔│if (insight.type === "discovery" && insight.data?.relatedUrls) {
 ·(insight.data.relatedUrls as string[]).forEach((u) =>
 ⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:fetch`, { url: u }, 0)
 ·);
@@ -51,9 +92,9 @@ extractTextFromHtml(1)→{ title: string; text: string }⟨1⟩{}
 ⊰│spikeBus.on(`${ENGINE_ID}:fetch`, async ({ url }) => {
 ⊴│if (typeof url === "string") await fetchUrlContent(url);
 ·});
-⊰│spikeBus.on(`attention:${ENGINE_ID}`, () => spikeBus.schedul
-⚡→│spikeBus.on("cognition:curiosity", () => spikeBus.scheduleSp
+⊰│spikeBus.on(`attention:${ENGINE_ID}`, () => spikeBus.scheduleSpike(cycle, {}, 0));
+⚡→│spikeBus.on("cognition:curiosity", () => spikeBus.scheduleSpike(cycle, {}, 5_000));
 ·const log = (...args: any[]) =>
 ·console.log("[OMNIMENS-URL-ANALYZER]", ...args);
 ⚡→│log("Engine initialized, spike-driven and ready.");
-⟩SCL│58│45⊨│35⑂│60.0%↓⟩
+⟩SCL│99│80⊨│37⑂│31.7%↓⟩

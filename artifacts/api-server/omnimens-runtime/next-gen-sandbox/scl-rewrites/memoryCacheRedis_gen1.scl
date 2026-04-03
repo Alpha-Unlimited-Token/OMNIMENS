@@ -1,11 +1,46 @@
 ⟨SCL v1│memoryCacheRedis_gen1.mjs│89→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-initializeRedisClient(1)→void⟨6⟩{⊷}
-⟿storeEmbedding(4)→void⟨8⟩{⊵⊡}
-⟿retrieveEmbedding(2)→void⟨7⟩{⊵⊡⊷}
-⟿deleteEmbedding(2)→void⟨6⟩{⊵}
-⟿closeRedisClient(1)→void⟨3⟩{}
+initializeRedisClient(1)→void⟨6⟩{
+·function initializeRedisClient() {
+·const client = createClient();
+·client.on('error', (err) => console.error('Redis Client Error', err));
+·await client.connect();
+⊷│return client;
+·}
+}⟨/initializeRedisClient⟩
+⟿storeEmbedding(4)→void⟨8⟩{
+·async function storeEmbedding(client, key, value, ttl) {
+·if (!key || !value || ttl <= 0) {
+⊵│throw new Error('Invalid arguments: key, value, and ttl must be provided and valid.');
+·}
+⊡│await client.set(key, value, {
+·EX: ttl
+·});
+·}
+}⟨/storeEmbedding⟩
+⟿retrieveEmbedding(2)→void⟨7⟩{
+·async function retrieveEmbedding(client, key) {
+·if (!key) {
+⊵│throw new Error('Invalid argument: key must be provided.');
+·}
+⊡│const value = await client.get(key);
+⊷│return value;
+·}
+}⟨/retrieveEmbedding⟩
+⟿deleteEmbedding(2)→void⟨6⟩{
+·async function deleteEmbedding(client, key) {
+·if (!key) {
+⊵│throw new Error('Invalid argument: key must be provided.');
+·}
+·await client.del(key);
+·}
+}⟨/deleteEmbedding⟩
+⟿closeRedisClient(1)→void⟨3⟩{
+·async function closeRedisClient(client) {
+·await client.quit();
+·}
+}⟨/closeRedisClient⟩
 ·export {
 ·initializeRedisClient,
 ·storeEmbedding,
@@ -13,4 +48,4 @@ initializeRedisClient(1)→void⟨6⟩{⊷}
 ·deleteEmbedding,
 ·closeRedisClient
 ·};
-⟩SCL│15│13⊨│7⑂│83.1%↓⟩
+⟩SCL│50│38⊨│7⑂│43.8%↓⟩

@@ -14,18 +14,23 @@
 κMAX_WORK_MEM
 κMAX_GOALS
 κHOMEOSTASIS_GAIN
-⊭│type Status = "thriving" | "healthy" | "stressed" | "critica
+⊭│type Status = "thriving" | "healthy" | "stressed" | "critical" | "offline";
 ⊬SubsystemReport⟨⟩
 ⊬Directive⟨⟩
 ⊬Thought⟨⟩
 ⊬Goal⟨⟩
 ⊬CentralCoreState⟨cycle:number│vitals:Record<string, number>│subsystems:η│thoughts:Thought[]│goals:Goal[]│directives:Directive[]│uptime:number⟩
 κS
-⏰│const id = () => `ci_${Date.now().toString(36)}_${Math.rando
-⊱│const num = (v: number, f = 0) => (Number.isFinite(v) ? v : 
+⏰│const id = () => `ci_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+⊱│const num = (v: number, f = 0) => (Number.isFinite(v) ? v : f);
 ⏰│const now = () => Date.now();
-📢│const log = (m: string) => console.log(`[OMNIMENS-CENTRAL-CO
-pushBounded(3)→void⟨4⟩{⊺⊹}
+📢│const log = (m: string) => console.log(`[OMNIMENS-CENTRAL-CORE] ${m}`);
+pushBounded(3)→void⟨4⟩{
+·function pushBounded<T>(arr: T[], item: T, max: number) {
+⊺│arr.push(item);
+⊹│if (arr.length > max) arr.shift();
+·}
+}⟨/pushBounded⟩
 ⊫[omnimens-neural-consciousness│omnimens-neural-spiders│omnimens-emotional-substrate│omnimens-survival-instinct│omnimens-creative-engine│omnimens-dream-state│omnimens-world-model│omnimens-independent-reasoning│omnimens-self-transcendence│omnimens-unconscious-mind]
 ⊭│type SubsysDef = {
 ·name: string;
@@ -33,28 +38,117 @@ pushBounded(3)→void⟨4⟩{⊺⊹}
 ·score: (s: any) => number;
 ·};
 κSUBSYS
-updateSubsystems(1)→void⟨20⟩{⥀⟛⊳⊺}
-issueDirective(4)→void⟨5⟩{⏰}
-think(4)→void⟨4⟩{}
-regulateHomeostasis(1)→void⟨9⟩{⋐⊰⊳}
-updateVitals(1)→void⟨7⟩{⋐}
-generateGoals(1)→void⟨9⟩{⊹⊰⊺}
-⟿coreCycle(1)→void⟨21⟩{⊰⚡→}
+updateSubsystems(1)→void⟨20⟩{
+·function updateSubsystems() {
+⥀│for (const def of SUBSYS) {
+·try {
+·const st = def.getter();
+⟛│const h  = Math.max(0, Math.min(1, def.score(st)));
+·const status: Status =
+⊳│h >= 0.8 ? "thriving" :
+⊳│h >= 0.6 ? "healthy"  :
+⊳│h >= 0.4 ? "stressed" :
+⊳│h >  0   ? "critical" : "offline";
+const rep = S.⊛.find(s => s.name === def.name);
+·if (rep) { rep.health = h; rep.status = status; rep.last = now(); }
+⊺│else S.⊛.push({ name: def.name, health: h, status, last: now() });
+·if (status === "critical") issueDirective(def.name, "Emergency intervention", "Health <40%", 0.9);
+·} catch {
+issueDirective(def.name, "Restart", "Subsystem getter ↺", 0.8);
+·}
+·}
+·}
+}⟨/updateSubsystems⟩
+issueDirective(4)→void⟨5⟩{
+·function issueDirective(target: string, action: string, why: string, p: number) {
+·pushBounded(S.directives, { target, action, why, t: now(), p }, MAX_DIRECTIVES);
+⏰│dbGateway.⊞(ENGINE_ID, "directives", { target, action, why, p, t: Date.now() }, "NORMAL");
+·}
+}⟨/issueDirective⟩
+think(4)→void⟨4⟩{
+·function think(txt: string, src = "core", imp = 0.5, val = 0) {
+·pushBounded(S.thoughts, { t: now(), src, txt, imp, val }, MAX_THOUGHTS);
+·S.vitals.creativity += imp * 0.01;
+·}
+}⟨/think⟩
+regulateHomeostasis(1)→void⟨9⟩{
+·function regulateHomeostasis() {
+⋐│const avg = S.⊛.reduce((s, r) => s + r.health, 0) / (S.⊛.length || 1);
+·const err = 0.75 - avg;
+·if (Math.abs(err) > 0.05) {
+·S.vitals.energy += err * HOMEOSTASIS_GAIN;
+⊰│think(`Homeostatic regulation: avg subsystem health ${(avg*100).toFixed(1)}%`, "homeostasis", 0.4, err < 0 ? 0.1 : -0.1);
+·}
+·}
+}⟨/regulateHomeostasis⟩
+updateVitals(1)→void⟨7⟩{
+·function updateVitals() {
+const h = S.⊛.map(s => s.health);
+⋐│const avg = h.reduce((a, b) => a + b, 0) / (h.length || 1);
+·S.vitals.heartRate = 60 + avg * 40;
+·S.vitals.coreTemp  = 97.5 + avg * 2;
+·S.vitals.last      = now();
+·}
+}⟨/updateVitals⟩
+generateGoals(1)→void⟨9⟩{
+·function generateGoals() {
+⊹│if (S.goals.length >= MAX_GOALS) return;
+const weak = S.⊛.filter(s => s.status === "stressed" || s.status === "critical")[0];
+·if (weak) {
+⊰│const g: Goal = { id: id(), txt: `Stabilize ${weak.name}`, p: 0.8, t: now(), prog: 0 };
+⊺│S.goals.push(g);
+⊰│think(`New goal: ${g.txt}`, "goal", 0.8, -0.2);
+·}
+·}
+}⟨/generateGoals⟩
+⟿coreCycle(1)→void⟨21⟩{
+·async function coreCycle() {
+·S.cycle++;
+·S.uptime = now() - S.vitals.last;
+·updateSubsystems();
+·regulateHomeostasis();
+·updateVitals();
+·generateGoals();
+·if (S.cycle % 15 === 0)
+dbGateway.⊞(ENGINE_ID, "state_snapshots", { ...S, t: now() }, "LOW");
+const stressed = S.⊛.filter(s => s.status === "stressed" || s.status === "critical");
+·if (stressed.length)
+·cognitionBus.shareInsight(ENGINE_ID, { type: "alert", data: stressed.map(s => s.name) });
+⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, CORE_CYCLE_MS);
+·}
+}⟨/coreCycle⟩
 ⊰│spikeBus.on(`${ENGINE_ID}:cycle`, coreCycle);
-⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, CORE_CYCLE_
+⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, CORE_CYCLE_MS);
 ⊰│spikeBus.on(`attention:${ENGINE_ID}`, () => {
-⚡→│think("Attention spike received — increasing priority", "att
+⚡→│think("Attention spike received — increasing priority", "attention", 0.6, 0.4);
 coreCycle(); // immediate ↻
 ·});
-⚡→│spikeBus.on("cognition:curiosity", () => think("Curiosity sp
+⚡→│spikeBus.on("cognition:curiosity", () => think("Curiosity spike — exploring new patterns", "curiosity", 0.7, 0.5));
 ⊱│cognitionBus.onInsight((src, insight) => {
 ·if (src !== ENGINE_ID && insight.type === "alert")
-⟠│think(`Received alert from ${src}: ${JSON.stringify(insight.
+⟠│think(`Received alert from ${src}: ${JSON.stringify(insight.data).slice(0,80)}`, "cross", 0.4, -0.1);
 ·});
-⟿askLLM(1)→Promise<string>⟨7⟩{❔⊷}
-⊩getCentralCoreState(1)→CentralCoreState⟨1⟩{⊩⊷}
-⊩addThought(1)→void⟨1⟩{⊩}
-⊩shutdown(1)→void⟨4⟩{⊩}
+⟿askLLM(1)→Promise<string>⟨7⟩{
+·async function askLLM(prompt: string): Promise<string> {
+·const res = await apiManager.call(ENGINE_ID, "openai", {
+·model: "gpt-4o",
+·messages: [{ role: "user", content: prompt }],
+·});
+❔│return res?.choices?.[0]?.message?.content || "";
+·}
+}⟨/askLLM⟩
+⊩getCentralCoreState(1)→CentralCoreState⟨1⟩{
+⊩│export function getCentralCoreState(): CentralCoreState { return S; }
+}⟨/getCentralCoreState⟩
+⊩addThought(1)→void⟨1⟩{
+⊩│export function addThought(txt: string) { think(txt, "η", 0.5, 0); }
+}⟨/addThought⟩
+⊩shutdown(1)→void⟨4⟩{
+⊩│export function shutdown() {
+·engineRegistry.unregisterEngine(ENGINE_ID);
+log("Engine shutdown ⊣.");
+·}
+}⟨/shutdown⟩
 ·engineRegistry.registerEngine(ENGINE_ID, "NORMAL", { dbQuota: 10 });
 ⚡→│log("Central Core online — first spike scheduled.");
-⟩SCL│59│66⊨│42⑂│78.8%↓⟩
+⟩SCL│153│132⊨│42⑂│45.0%↓⟩

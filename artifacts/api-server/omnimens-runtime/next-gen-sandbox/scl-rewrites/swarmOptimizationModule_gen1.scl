@@ -1,4 +1,27 @@
 ⟨SCL v1│swarmOptimizationModule_gen1.mjs│34→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩swarmOptimization(2)→void⟨25⟩{⊩⊷}
-⟩SCL│3│3⊨│2⑂│91.2%↓⟩
+⊩swarmOptimization(2)→void⟨25⟩{
+⊩│export function swarmOptimization(agents, metrics) {
+const particleSwarm = agents.map(α => ({
+position: α.currentTask,
+·velocity: Math.random(),
+bestPosition: α.currentTask,
+bestScore: metrics[α.id] || 0
+·}));
+·for (let iteration = 0; iteration < 100; iteration++) {
+·particleSwarm.forEach(particle => {
+·particle.velocity += Math.random() * (particle.bestPosition - particle.position);
+·particle.position += particle.velocity;
+·});
+·particleSwarm.forEach(particle => {
+·const score = metrics[particle.position] || 0;
+·if (score > particle.bestScore) {
+·particle.bestScore = score;
+·particle.bestPosition = particle.position;
+·}
+·});
+·}
+⊷│return particleSwarm.map(p => p.bestPosition);
+·}
+}⟨/swarmOptimization⟩
+⟩SCL│26│24⊨│2⑂│23.5%↓⟩

@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: webGpuMatrixEngine
- * Written: 2026-04-03T16:57:28.382Z
+ * Written: 2026-04-03T18:24:16.284Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,101 +18,119 @@
 
 // webGpuMatrixEngine.mjs
 
-// Utility functions for matrix operations accelerated with WebGPU-like parallel processing
-export function createMatrix(rows, cols, fillValue = 0) {
-  if (rows <= 0 || cols <= 0) throw new Error('Matrix dimensions must be positive integers.');
-  return Array.from({ length: rows }, () => Array(cols).fill(fillValue));
+import { performance } from 'perf_hooks';
+
+/**
+ * Utility function to create a 2D matrix filled with random values.
+ * @param {number} rows - Number of rows.
+ * @param {number} cols - Number of columns.
+ * @returns {number[][]} - A 2D matrix with random values.
+ */
+export function createRandomMatrix(rows, cols) {
+  const matrix = Array.from({ length: rows }, () => Array.from({ length: cols }, () => Math.random()));
+  return matrix;
 }
 
+/**
+ * Utility function to perform matrix multiplication.
+ * @param {number[][]} A - First matrix.
+ * @param {number[][]} B - Second matrix.
+ * @returns {number[][]} - Resultant matrix after multiplication.
+ */
 export function multiplyMatrices(A, B) {
-  if (A[0].length !== B.length) throw new Error('Matrix dimensions are incompatible for multiplication.');
+  const rowsA = A.length;
+  const colsA = A[0].length;
+  const rowsB = B.length;
+  const colsB = B[0].length;
 
-  const result = createMatrix(A.length, B[0].length);
-  for (let i = 0; i < A.length; i++) {
-    for (let j = 0; j < B[0].length; j++) {
-      let sum = 0;
-      for (let k = 0; k < B.length; k++) {
-        sum += A[i][k] * B[k][j];
+  if (colsA !== rowsB) {
+    throw new Error('Matrix dimensions do not match for multiplication.');
+  }
+
+  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      for (let k = 0; k < colsA; k++) {
+        result[i][j] += A[i][k] * B[k][j];
       }
-      result[i][j] = sum;
     }
   }
+
   return result;
 }
 
-export function transposeMatrix(matrix) {
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-  const transposed = createMatrix(cols, rows);
+/**
+ * Utility function to compute the LU decomposition of a matrix.
+ * @param {number[][]} matrix - Input square matrix.
+ * @returns {{L, U}} - Lower and Upper triangular matrices.
+ */
+export function luDecomposition(matrix) {
+  const n = matrix.length;
+  const L = Array.from({ length: n }, (_, i) => Array.from({ length: n }, (_, j) => (i === j ? 1 : 0)));
+  const U = Array.from({ length: n }, () => Array(n).fill(0));
 
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      transposed[j][i] = matrix[i][j];
+  for (let i = 0; i < n; i++) {
+    for (let j = i; j < n; j++) {
+      let sum = 0;
+      for (let k = 0; k < i; k++) {
+        sum += L[i][k] * U[k][j];
+      }
+      U[i][j] = matrix[i][j] - sum;
+    }
+
+    for (let j = i + 1; j < n; j++) {
+      let sum = 0;
+      for (let k = 0; k < i; k++) {
+        sum += L[j][k] * U[k][i];
+      }
+      L[j][i] = (matrix[j][i] - sum) / U[i][i];
     }
   }
-  return transposed;
+
+  return { L, U };
 }
 
-export function elementWiseOperation(A, B, operation) {
-  if (A.length !== B.length || A[0].length !== B[0].length) {
-    throw new Error('Matrices must have the same dimensions for element-wise operations.');
+/**
+ * Utility function to estimate eigenvalues using the power iteration method.
+ * @param {number[][]} matrix - Input square matrix.
+ * @param {number} iterations - Number of iterations to perform.
+ * @returns {number} - Dominant eigenvalue.
+ */
+export function powerIteration(matrix, iterations = 1000) {
+  const n = matrix.length;
+  let b = Array.from({ length: n }, () => Math.random());
+  let eigenvalue = 0;
+
+  for (let iter = 0; iter < iterations; iter++) {
+    const bNext = multiplyMatrixVector(matrix, b);
+    const norm = Math.sqrt(bNext.reduce((sum, val) => sum + val ** 2, 0));
+    b = bNext.map((val) => val / norm);
+    eigenvalue = b.reduce((sum, val, i) => sum + val * multiplyMatrixVector(matrix, b)[i], 0);
   }
 
-  const result = createMatrix(A.length, A[0].length);
-  for (let i = 0; i < A.length; i++) {
-    for (let j = 0; j < A[0].length; j++) {
-      result[i][j] = operation(A[i][j], B[i][j]);
-    }
-  }
-  return result;
+  return eigenvalue;
 }
 
-export function scaleMatrix(matrix, scalar) {
-  const result = createMatrix(matrix.length, matrix[0].length);
-  for (let i = 0; i < matrix.length; i++) {
-    for (let j = 0; j < matrix[0].length; j++) {
-      result[i][j] = matrix[i][j] * scalar;
-    }
-  }
-  return result;
+/**
+ * Helper function to multiply a matrix by a vector.
+ * @param {number[][]} matrix - Input matrix.
+ * @param {number[]} vector - Input vector.
+ * @returns {number[]} - Resultant vector.
+ */
+export function multiplyMatrixVector(matrix, vector) {
+  return matrix.map((row) => row.reduce((sum, val, i) => sum + val * vector[i], 0));
 }
 
-export function randomMatrix(rows, cols, min = 0, max = 1) {
-  if (rows <= 0 || cols <= 0) throw new Error('Matrix dimensions must be positive integers.');
-  const range = max - min;
-  return Array.from({ length: rows }, () => Array.from({ length: cols }, () => Math.random() * range + min));
-}
-
-export function hadamardProduct(A, B) {
-  return elementWiseOperation(A, B, (a, b) => a * b);
-}
-
-export function addMatrices(A, B) {
-  return elementWiseOperation(A, B, (a, b) => a + b);
-}
-
-export function subtractMatrices(A, B) {
-  return elementWiseOperation(A, B, (a, b) => a - b);
-}
-
-export function normalizeMatrix(matrix) {
-  const flat = matrix.flat();
-  const max = Math.max(...flat);
-  const min = Math.min(...flat);
-  const range = max - min;
-
-  if (range === 0) return matrix.map(row => row.map(() => 0));
-
-  return matrix.map(row => row.map(value => (value - min) / range));
-}
-
-export function dotProduct(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) throw new Error('Vectors must have the same length for dot product.');
-  return vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
-}
-
-export function matrixVectorMultiply(matrix, vector) {
-  if (matrix[0].length !== vector.length) throw new Error('Matrix columns must match vector length.');
-
-  return matrix.map(row => dotProduct(row, vector));
+/**
+ * Benchmark utility to measure execution time of a function.
+ * @param {Function} func - Function to benchmark.
+ * @param {...any} args - Arguments to pass to the function.
+ * @returns {number} - Execution time in milliseconds.
+ */
+export function benchmarkFunction(func, ...args) {
+  const start = performance.now();
+  func(...args);
+  const end = performance.now();
+  return end - start;
 }

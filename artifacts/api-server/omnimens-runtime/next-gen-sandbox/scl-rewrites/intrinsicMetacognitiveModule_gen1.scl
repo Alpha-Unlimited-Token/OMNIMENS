@@ -7,7 +7,7 @@
 ·}
 ·logActivity(neuralActivity) {
 ⊺│this.activityLog.push(neuralActivity);
-⊹│if (this.activityLog.length > 1000) this.activityLog.shift()
+⊹│if (this.activityLog.length > 1000) this.activityLog.shift();
 ·}
 ·adjustSynapticWeights() {
 ·this.activityLog.forEach(activity => {

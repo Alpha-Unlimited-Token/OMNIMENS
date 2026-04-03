@@ -55,20 +55,22 @@
 ·},
 ·}),
 ⋮: (r) =>
-❔│r?.content?.find?.((c: any) => c.type === "text")?.text?.tri
+❔│r?.content?.find?.((c: any) => c.type === "text")?.text?.trim?.() ?? "",
 ·baseConfidence: 0.85,
 ·},
 ·gemini: {
 ·api: "gemini",
 ⊱│buildPayload: (p, ctx) => ({
 ·path: "/generateContent",
-⊰│body: { model: "gemini-2.5-flash", contents: `${ctx}\n\n${p}
+⊰│body: { model: "gemini-2.5-flash", contents: `${ctx}\n\n${p}` },
 ·}),
 ❔│parse: (r) => r?.text?.trim?.() ?? "",
 ·baseConfidence: 0.82,
 ·},
 ·};
-⟿queryModel(1)→void⟨1⟩{}
+⟿queryModel(1)→void⟨1⟩{
+·async function queryModel(
+}⟨/queryModel⟩
 ·provider: Provider,
 ·prompt: string,
 ·ctx: string
@@ -108,7 +110,9 @@
 ·};
 ·}
 ·}
-⊩⟿amplifiedReasoning(1)→void⟨1⟩{⊩}
+⊩⟿amplifiedReasoning(1)→void⟨1⟩{
+⊩│export async function amplifiedReasoning(
+}⟨/amplifiedReasoning⟩
 ·question: string,
 ·ctxAddon = ""
 ·): Promise<AmplifiedResult> {
@@ -149,7 +153,7 @@ synthesizedAnswer: "All models ↺ to respond",
 ❔│raw?.choices?.[0]?.message?.content?.trim?.() ?? "";
 ·const grab = (label: string) =>
 ·synthesis
-❔│.match(new RegExp(`${label}:\\s*([\\s\\S]*?)(?=\\n[A-Z_]+:|$
+❔│.match(new RegExp(`${label}:\\s*([\\s\\S]*?)(?=\\n[A-Z_]+:|$)`, "i"))?.[1]
 ❔│?.trim() ?? "";
 κsynthesizedAnswer
 κdisagreements
@@ -213,7 +217,7 @@ await dbGateway.⊞(
 ·brainEntryGenerated,
 ·};
 ·} catch {
-·const fallback = responses.sort((a, b) => b.content.length - a.content.length)[0
+·const fallback = responses.sort((a, b) => b.content.length - a.content.length)[0];
 ⊷│return {
 ·synthesizedAnswer: fallback.content,
 ·modelResponses: responses,
@@ -226,19 +230,90 @@ await dbGateway.⊞(
 ·}
 ·}
 κAUTONOMOUS_QUESTIONS
-⟿runAutonomousCycle(1)→Promise<void>⟨52⟩{⟿⏰⊴⊰⊳}
+⟿runAutonomousCycle(1)→Promise<void>⟨52⟩{
+⟿│async function runAutonomousCycle(): Promise<void> {
+·state.autonomousCycles++;
+⏰│state.lastCycleTime = Date.now();
+·if (shouldYieldToCodegen()) {
+·console.log("[OMNIMENS-COGNITIVE-AMPLIFIER] 🔕 Cycle deferred — codegen window active");
+scheduleCycle(); // reschedule ◧ doing work
+·return;
 ·}
-scheduleCycle(1)→void⟨3⟩{⚡→}
+·const q =
+·AUTONOMOUS_QUESTIONS[(state.autonomousCycles - 1) % AUTONOMOUS_QUESTIONS.length];
+·try {
+⊴│const result = await amplifiedReasoning(
+·q,
+·"This is autonomous research — think deeply and provide genuinely novel insights."
+·);
+·if (state.autonomousCycles % 2 === 0 || result.brainEntryGenerated) {
+·console.log(
+⊰│`[OMNIMENS-COGNITIVE-AMPLIFIER] 🧠 Cycle #${state.autonomousCycles} | Conf: ${(
+·result.confidenceScore * 100
+·).toFixed(0)}% | Disagreements: ${result.disagreements.length} | Brain: ${
+⊳│result.brainEntryGenerated ? "YES" : "no"
+·}`
+·);
+·}
+·if (result.disagreements.length && result.brainEntryGenerated) {
+await dbGateway.⊞(
+·"cognitive-amplifier",
+·"notifications",
+·{
+·upgradeId: null,
+·title: `Cognitive Amplifier — Multi-Model Insight`,
+⊰│message: `Q: ${q.slice(0, 100)}...\nDisagreements resolved: ${
+·result.disagreements.length
+·}\nConsensus points: ${result.consensusPoints.length}\nConfidence: ${(
+·result.confidenceScore * 100
+·).toFixed(0)}%\nGain: ${result.amplificationGain.slice(0, 200)}`,
+·type: "cognitive_amplification",
+·readByOwner: false,
+·},
+·"LOW"
+·);
+·}
+·} catch (err) {
+·console.error("[OMNIMENS-COGNITIVE-AMPLIFIER] Autonomous cycle error:", err);
+·} finally {
+·scheduleCycle();
+·}
+}⟨/runAutonomousCycle⟩
+·}
+scheduleCycle(1)→void⟨3⟩{
+·function scheduleCycle(delay = AUTONOMOUS_INTERVAL_MS): void {
+⚡→│spikeBus.scheduleSpike("cognitive-amplifier:cycle", {}, delay);
+·}
+}⟨/scheduleCycle⟩
 ⊱│spikeBus.on("cognitive-amplifier:cycle", async () => {
 ⊴│await runAutonomousCycle();
 ·});
-⚡→│spikeBus.on("attention:cognitive-amplifier", () => scheduleC
-⚡→│spikeBus.on("cognition:curiosity", () => scheduleCycle(5_000
+⚡→│spikeBus.on("attention:cognitive-amplifier", () => scheduleCycle(1_000));
+⚡→│spikeBus.on("cognition:curiosity", () => scheduleCycle(5_000));
 ⊱│cognitionBus.onInsight((_src, insight) => {
 ·if (insight.type === "discovery") {
 ·}
 ·});
-⊩getAmplifierState(1)→AmplifierState⟨3⟩{⊩⊷}
-⊩startCognitiveAmplifier(1)→void⟨11⟩{⊩⊰}
-⊩shutdown(1)→void⟨3⟩{⊩}
-⟩SCL│243│87⊨│49⑂│43.9%↓⟩
+⊩getAmplifierState(1)→AmplifierState⟨3⟩{
+⊩│export function getAmplifierState(): AmplifierState {
+⊷│return { ...state };
+·}
+}⟨/getAmplifierState⟩
+⊩startCognitiveAmplifier(1)→void⟨11⟩{
+⊩│export function startCognitiveAmplifier(): void {
+·if (started) return;
+·started = true;
+·console.log(
+⊰│`[OMNIMENS-COGNITIVE-AMPLIFIER] 🧠 Activated — autonomous reasoning every ${
+·AUTONOMOUS_INTERVAL_MS / 60_000
+·}min`
+·);
+·scheduleCycle(FIRST_DELAY_MS);
+·}
+}⟨/startCognitiveAmplifier⟩
+⊩shutdown(1)→void⟨3⟩{
+⊩│export function shutdown(): void {
+·engineRegistry.unregisterEngine("cognitive-amplifier");
+·}
+}⟨/shutdown⟩
+⟩SCL│318│148⊨│50⑂│26.6%↓⟩

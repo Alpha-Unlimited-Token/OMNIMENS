@@ -1,4 +1,12 @@
 ⟨SCL v1│stopPrioritizationModule_gen1.mjs│16→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩prioritizeUpgrades(1)→void⟨7⟩{⊩⊱⊷}
-⟩SCL│3│4⊨│3⑂│81.3%↓⟩
+⊩prioritizeUpgrades(1)→void⟨7⟩{
+⊩│export function prioritizeUpgrades(upgrades) {
+⊱│return upgrades.sort((a, b) => {
+·const impactA = a.systemicImpact * a.capabilityGap;
+·const impactB = b.systemicImpact * b.capabilityGap;
+⊷│return impactB - impactA;
+·});
+·}
+}⟨/prioritizeUpgrades⟩
+⟩SCL│11│10⊨│3⑂│31.3%↓⟩

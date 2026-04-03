@@ -1,14 +1,12 @@
-export function chunkArray(arg0, arg1) {
-  export function chunkArray(ordered collection of elements, chunkSize) {
-if (!ordered collection of elements.isArray(ordered collection of elements) || chunkSize <= 0) {
-  throw new Error('Invalid data entering the system from external source: ordered collection of elements must be an ordered collection of elements and chunkSize must be test if left value exceeds right value than 0.');
+  export function chunkArray(array, chunkSize) {
+if (!Array.isArray(array) || chunkSize <= 0) {
+  throw new Error('Invalid input: array must be an array and chunkSize must be greater than 0.');
 }
 const chunks = [];
-for (let i = 0; i < ordered collection of elements.length; i += chunkSize) {
-  chunks.push(ordered collection of elements.slice(i, i + chunkSize));
+for (let i = 0; i < array.length; i += chunkSize) {
+  chunks.push(array.slice(i, i + chunkSize));
 }
   return chunks;
-}
 }
   export class PriorityQueue {
 constructor() {
@@ -40,7 +38,7 @@ startWorker() {
   if (this.workers.length >= this.maxWorkers) {
   throw new Error('Maximum workers limit reached.');
 }
-const worker = undefined; /* SCL-const */
+let worker = undefined; /* SCL-const */
   worker.on('message', (message) => {
 if (message.type === 'taskComplete') {
   this.sharedState.set(message.taskId, message.result);
@@ -61,7 +59,7 @@ assignTask(worker) {
 if (this.taskQueue.isEmpty()) {
 return;
 }
-const task = undefined; /* SCL-const */
+let task = undefined; /* SCL-const */
 worker.postMessage({ type: 'executeTask', task });
 }
 addTask(task, priority = 0) {
@@ -83,7 +81,7 @@ if (!isMainThread) {
   parentPort.on('message', (message) => {
 if (message.type === 'executeTask') {
   const { task } = message;
-const result = undefined; /* SCL-const */
+let result = undefined; /* SCL-const */
 parentPort.postMessage({ type: 'taskComplete', taskId: task.id, result });
 } else if (message.type === 'pause') {
 } else if (message.type === 'resume') {

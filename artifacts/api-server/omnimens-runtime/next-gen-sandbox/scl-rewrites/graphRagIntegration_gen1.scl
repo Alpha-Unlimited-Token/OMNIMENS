@@ -14,7 +14,7 @@
 ·if (!this.graph.has(sourceId) || !this.graph.has(targetId)) {
 ⊵│throw new Error('Source or target node does not exist.');
 ·}
-⊡│this.graph.get(sourceId).push({ target: targetId, relationsh
+⊡│this.graph.get(sourceId).push({ target: targetId, relationship, confidenceWeight });
 ·}
 ·resolveConflicts() {
 ·for (const [agentId, edges] of this.graph.entries()) {

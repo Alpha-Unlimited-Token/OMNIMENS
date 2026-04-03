@@ -3,9 +3,77 @@
 ⊫[]
 κwasi
 ·let wasmInstance;
-⟿initializeWasm(1)→void⟨10⟩{⊴}
-⊩⟿multiplyMatrices(2)→void⟨25⟩{⊩⊴⊵⊺⊷}
-⊩⟿computeEigenvalues(1)→void⟨17⟩{⊩⊴⊵⊷}
-⊩⟿performLUDecomposition(1)→void⟨26⟩{⊩⊴⊵⊺⊷}
-⊩⟿initialize(1)→void⟨3⟩{⊩⊴}
-⟩SCL│10│24⊨│17⑂│90.3%↓⟩
+⟿initializeWasm(1)→void⟨10⟩{
+·async function initializeWasm() {
+·const wasmPath = path.resolve('./matrix_engine.wasm');
+⊴│const wasmBuffer = await readFile(wasmPath);
+·const wasmModule = await WebAssembly.compile(wasmBuffer);
+·const instance = await WebAssembly.instantiate(wasmModule, {
+·wasi_snapshot_preview1: wasi.wasiImport
+·});
+·wasi.initialize(instance);
+·wasmInstance = instance.exports;
+·}
+}⟨/initializeWasm⟩
+⊩⟿multiplyMatrices(2)→void⟨25⟩{
+⊩│export async function multiplyMatrices(matrixA, matrixB) {
+⊴│if (!wasmInstance) await initializeWasm();
+·const rowsA = matrixA.length;
+·const colsA = matrixA[0].length;
+·const rowsB = matrixB.length;
+·const colsB = matrixB[0].length;
+·if (colsA !== rowsB) {
+⊵│throw new Error('Matrix dimensions do not match for multiplication');
+·}
+·const flatA = matrixA.flat();
+·const flatB = matrixB.flat();
+·const result = new Float64Array(rowsA * colsB);
+·wasmInstance.multiply(flatA, flatB, result, rowsA, colsA, colsB);
+const θ = [];
+·for (let i = 0; i < rowsA; i++) {
+⊺│θ.push(Array.from(result.slice(i * colsB, (i + 1) * colsB)));
+·}
+⊷│return θ;
+·}
+}⟨/multiplyMatrices⟩
+⊩⟿computeEigenvalues(1)→void⟨17⟩{
+⊩│export async function computeEigenvalues(matrix) {
+⊴│if (!wasmInstance) await initializeWasm();
+·const rows = matrix.length;
+·const cols = matrix[0].length;
+·if (rows !== cols) {
+⊵│throw new Error('Matrix must be square to compute eigenvalues');
+·}
+·const flatMatrix = matrix.flat();
+·const eigenvalues = new Float64Array(rows);
+·wasmInstance.eigenvalues(flatMatrix, eigenvalues, rows);
+⊷│return Array.from(eigenvalues);
+·}
+}⟨/computeEigenvalues⟩
+⊩⟿performLUDecomposition(1)→void⟨26⟩{
+⊩│export async function performLUDecomposition(matrix) {
+⊴│if (!wasmInstance) await initializeWasm();
+·const rows = matrix.length;
+·const cols = matrix[0].length;
+·if (rows !== cols) {
+⊵│throw new Error('Matrix must be square for LU decomposition');
+·}
+·const flatMatrix = matrix.flat();
+·const lower = new Float64Array(rows * cols);
+·const upper = new Float64Array(rows * cols);
+·wasmInstance.luDecomposition(flatMatrix, lower, upper, rows);
+·const lowerMatrix = [];
+·const upperMatrix = [];
+·for (let i = 0; i < rows; i++) {
+⊺│lowerMatrix.push(Array.from(lower.slice(i * cols, (i + 1) * cols)));
+⊺│upperMatrix.push(Array.from(upper.slice(i * cols, (i + 1) * cols)));
+·}
+⊷│return { lower: lowerMatrix, upper: upperMatrix };
+·}
+}⟨/performLUDecomposition⟩
+⊩⟿initialize(1)→void⟨3⟩{
+⊩│export async function initialize() {
+⊴│await initializeWasm();
+·}
+}⟨/initialize⟩
+⟩SCL│78│82⊨│18⑂│24.3%↓⟩

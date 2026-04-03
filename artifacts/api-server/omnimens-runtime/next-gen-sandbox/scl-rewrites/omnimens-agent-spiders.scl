@@ -24,8 +24,10 @@ engineRegistry.registerEngine("α-spiders", "NORMAL", { dbQuota: 10 });
 κC
 ·const rand = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 ⏰│const now = () => Date.now();
-⊱│const safeNum = (v: number, f = 0) => (Number.isFinite(v) ? 
-⟿callLLM(1)→void⟨1⟩{}
+⊱│const safeNum = (v: number, f = 0) => (Number.isFinite(v) ? v : f);
+⟿callLLM(1)→void⟨1⟩{
+·async function callLLM(
+}⟨/callLLM⟩
 α: AgentName,
 ·prompt: string,
 ·model: string = "o3",
@@ -34,17 +36,98 @@ engineRegistry.registerEngine("α-spiders", "NORMAL", { dbQuota: 10 });
 κres
 ❔│return res?.choices?.[0]?.message?.content?.trim() || "";
 ·}
-⟿writeBeacon(1)→void⟨8⟩{⊰}
+⟿writeBeacon(1)→void⟨8⟩{
+·async function writeBeacon(b: Beacon) {
+await dbGateway.⊞("α-spiders", "agent_mesh", b, "NORMAL").catch(console.error);
+cognitionBus.shareInsight("α-spiders", { type: "discovery", data: b });
+cognitionBus.reportOutcome("α-spiders", { useful: true, ◧: b.query });
+·console.log(
+⊰│`[OMNIMENS-α-SPIDERS] 🕷️ Beacon (${b.agentName}) ${(b.relevanceScore * 100).toFixed(0)}% → ${
+·b.actionableInsight
+·}`,
+}⟨/writeBeacon⟩
 ·);
 ·}
-⟿processConfig(1)→void⟨69⟩{⊴⊹⊰⟠⊄}
-⟿cycle(1)→void⟨10⟩{⊴⚡→}
+⟿processConfig(1)→void⟨69⟩{
+·async function processConfig(cfg: SpiderConfig) {
+·const query = rand(cfg.huntingGrounds);
+⊴│const search = await webSearch(query, 6);
+⊹│if (search.length === 0) return;
+·const formatted = formatSearchResults(search, query);
+⊰│const scoutPrompt = `${cfg.analysisPrompt}
+Scan the following search ⊢ and extract ONE genuinely novel lead worth investigating.
+SEARCH ⊢:
+·${formatted}
+·Respond JSON only:
+·{"topic":"", "finding":"", "relevance":0.0}`;
+⊴│const scoutRaw = await callLLM(cfg.agentName, scoutPrompt, "o4-mini", 400);
+·let lead: { topic: string; finding: string; relevance: number } | null = null;
+·try {
+⟠│lead = JSON.parse(scoutRaw);
+·} catch {
+·return;
+·}
+⊄│if (!lead || safeNum(lead.relevance) < cfg.beaconThreshold) return;
+·const deepUrl = rand([...cfg.deepDiveUrls, ...search.map((s) => s.url).filter(Boolean)]);
+·let deepContent = "";
+·try {
+⊴│deepContent = await fetchPageContent(deepUrl, 2500);
+·} catch {
+·}
+⊰│const synthPrompt = `${cfg.analysisPrompt}
+·TOPIC: ${lead.topic}
+·INITIAL FINDING: ${lead.finding}
+·SOURCE CONTENT:
+·${deepContent.slice(0, 2000)}
+·Using your specialist expertise, synthesize the MOST ACTIONABLE INSIGHT in <=2 sentences and rate relevance 0-1.
+·Respond JSON only:
+·{"insight":"", "relevance":0.0}`;
+⊴│const synthRaw = await callLLM(cfg.agentName, synthPrompt, "o3", 600);
+·let synth: { insight: string; relevance: number } | null = null;
+·try {
+⟠│synth = JSON.parse(synthRaw);
+·} catch {
+·return;
+·}
+⊄│if (!synth || safeNum(synth.relevance) < cfg.beaconThreshold) return;
+·const beacon: Beacon = {
+·agentName: cfg.agentName,
+·query,
+·findings: lead.finding,
+·actionableInsight: synth.insight,
+·relevanceScore: synth.relevance,
+·sourceUrls: [deepUrl],
+·timestamp: now(),
+·};
+⊴│await writeBeacon(beacon);
+·}
+}⟨/processConfig⟩
+⟿cycle(1)→void⟨10⟩{
+·async function cycle() {
+·try {
+·const cfg = rand(C);
+⊴│await processConfig(cfg);
+·} catch (err) {
+console.error("[OMNIMENS-α-SPIDERS] Cycle error", err);
+·} finally {
+⚡→│spikeBus.scheduleSpike("α-spiders:cycle", {}, 60_000); // next in 60s
+·}
+·}
+}⟨/cycle⟩
 ⚡→│spikeBus.scheduleSpike("agent-spiders:cycle", {}, 5_000);
 ⚡→│spikeBus.on("agent-spiders:cycle", cycle);
-⚡→│spikeBus.on("attention:agent-spiders", () => spikeBus.schedu
-⚡→│spikeBus.on("cognition:curiosity", () => spikeBus.scheduleSp
+⚡→│spikeBus.on("attention:agent-spiders", () => spikeBus.scheduleSpike("agent-spiders:cycle", {}, 1_000));
+⚡→│spikeBus.on("cognition:curiosity", () => spikeBus.scheduleSpike("agent-spiders:cycle", {}, 10_000));
 ⊱│cognitionBus.onInsight((_src, insight) => {
 ·});
-⊩⟿runSpiderSwarm(1)→void⟨4⟩{⊩⚡→}
-⊩shutdown(1)→void⟨3⟩{⊩}
-⟩SCL│49│36⊨│23⑂│77.8%↓⟩
+⊩⟿runSpiderSwarm(1)→void⟨4⟩{
+⊩│export async function runSpiderSwarm() {
+⚡→│spikeBus.scheduleSpike("α-spiders:cycle", {}, 0);
+·}
+}⟨/runSpiderSwarm⟩
+⊩shutdown(1)→void⟨3⟩{
+⊩│export function shutdown() {
+engineRegistry.unregisterEngine("α-spiders");
+·}
+}⟨/shutdown⟩
+⟩SCL│132│107⊨│30⑂│40.3%↓⟩

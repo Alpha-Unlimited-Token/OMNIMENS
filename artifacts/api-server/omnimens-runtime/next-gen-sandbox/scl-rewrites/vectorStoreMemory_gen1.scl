@@ -7,20 +7,20 @@
 ·}
 ·addVector(vector, meta) {
 if (!ι.isArray(vector) || !vector.every(Number.isFinite)) {
-⊵│throw new Error("Vector must be an array of finite numbers."
+⊵│throw new Error("Vector must be an array of finite numbers.");
 ·}
 ⊺│this.vectors.push(vector);
 ⊺│this.metadata.push(meta);
 ·}
 ·static cosineSimilarity(vectorA, vectorB) {
-⋐│const dotProduct = vectorA.reduce((sum, val, i) => sum + val
-⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => su
-⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => su
-⊳│return magnitudeA && magnitudeB ? dotProduct / (magnitudeA *
+⋐│const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
+⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
+⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
+⊳│return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
 ·}
 ·search(queryVector, topK = 1) {
 if (!ι.isArray(queryVector) || !queryVector.every(Number.isFinite)) {
-⊵│throw new Error("Query vector must be an array of finite num
+⊵│throw new Error("Query vector must be an array of finite numbers.");
 ·}
 ⊱│const similarities = this.vectors.map((vector, index) => ({
 ·meta: this.metadata[index],
@@ -35,6 +35,10 @@ if (!ι.isArray(queryVector) || !queryVector.every(Number.isFinite)) {
 ·this.metadata = [];
 ·}
 ·}
-createVectorStore(1)→void⟨3⟩{⊷}
+createVectorStore(1)→void⟨3⟩{
+·function createVectorStore() {
+⊷│return new VectorStoreMemory();
+·}
+}⟨/createVectorStore⟩
 ·export { createVectorStore, VectorStoreMemory };
-⟩SCL│39│15⊨│12⑂│62.1%↓⟩
+⟩SCL│43│17⊨│12⑂│58.3%↓⟩

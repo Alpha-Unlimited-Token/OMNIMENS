@@ -1,8 +1,64 @@
 ⟨SCL v1│matrixOps_wasm_gen1.mjs│111→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩multiplyMatrices(2)→void⟨22⟩{⊩⊵⊷}
-⊩singleLayerInference(3)→void⟨9⟩{⊩⊹⊵⊷}
-⊩normalizeMatrix(1)→void⟨11⟩{⊩⟛⊷}
-⊩softmax(1)→void⟨7⟩{⊩⟛⋐⊷}
-⊩transposeMatrix(1)→void⟨14⟩{⊩⊷}
-⟩SCL│7│21⊨│16⑂│93.7%↓⟩
+⊩multiplyMatrices(2)→void⟨22⟩{
+⊩│export function multiplyMatrices(matrixA, matrixB) {
+·const rowsA = matrixA.length;
+·const colsA = matrixA[0].length;
+·const rowsB = matrixB.length;
+·const colsB = matrixB[0].length;
+·if (colsA !== rowsB) {
+⊵│throw new Error("Matrix dimensions do not allow multiplication.");
+·}
+·const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+·for (let i = 0; i < rowsA; i++) {
+·for (let j = 0; j < colsB; j++) {
+·for (let k = 0; k < colsA; k++) {
+·result[i][j] += matrixA[i][k] * matrixB[k][j];
+·}
+·}
+·}
+⊷│return result;
+·}
+}⟨/multiplyMatrices⟩
+⊩singleLayerInference(3)→void⟨9⟩{
+⊩│export function singleLayerInference(inputMatrix, weightMatrix, biasVector) {
+·const result = multiplyMatrices(inputMatrix, weightMatrix);
+⊹│if (result[0].length !== biasVector.length) {
+⊵│throw new Error("Bias vector length must match the number of columns in the resulting matrix.");
+·}
+⊷│return result.map(row => row.map((value, index) => value + biasVector[index]));
+·}
+}⟨/singleLayerInference⟩
+⊩normalizeMatrix(1)→void⟨11⟩{
+⊩│export function normalizeMatrix(matrix) {
+·const flatValues = matrix.flat();
+⟛│const min = Math.min(...flatValues);
+⟛│const max = Math.max(...flatValues);
+·if (min === max) {
+⊷│return matrix.map(row => row.map(() => 0.5)); // All values are the same, return uniform matrix.
+·}
+⊷│return matrix.map(row => row.map(value => (value - min) / (max - min)));
+·}
+}⟨/normalizeMatrix⟩
+⊩softmax(1)→void⟨7⟩{
+⊩│export function softmax(vector) {
+⟛│const maxVal = Math.max(...vector); // To improve numerical stability.
+·const expValues = vector.map(value => Math.exp(value - maxVal));
+⋐│const sumExp = expValues.reduce((sum, value) => sum + value, 0);
+⊷│return expValues.map(value => value / sumExp);
+·}
+}⟨/softmax⟩
+⊩transposeMatrix(1)→void⟨14⟩{
+⊩│export function transposeMatrix(matrix) {
+·const rows = matrix.length;
+·const cols = matrix[0].length;
+·const result = Array.from({ length: cols }, () => Array(rows).fill(0));
+·for (let i = 0; i < rows; i++) {
+·for (let j = 0; j < cols; j++) {
+·result[j][i] = matrix[i][j];
+·}
+·}
+⊷│return result;
+·}
+}⟨/transposeMatrix⟩
+⟩SCL│63│67⊨│18⑂│43.2%↓⟩

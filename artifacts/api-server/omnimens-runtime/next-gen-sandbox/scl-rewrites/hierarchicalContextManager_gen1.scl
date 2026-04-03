@@ -1,11 +1,63 @@
 ⟨SCL v1│hierarchicalContextManager_gen1.mjs│108→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩generateChunkHash(1)→void⟨5⟩{⊩⊷}
-⊩semanticChunking(2)→void⟨19⟩{⊩⥀⊺⊷}
-⊩recursiveSummarization(2)→void⟨11⟩{⊩⊹⊷}
-⊩summarizeChunk(1)→void⟨5⟩{⊩⟛⊷}
-⊩hierarchicalContextManager(3)→void⟨4⟩{⊩⊷}
-⊩compressText(1)→void⟨3⟩{⊩⊷}
-⊩reconstructText(1)→void⟨3⟩{⊩⊷}
-⟩SCL│10│26⊨│18⑂│90.7%↓⟩
+⊩generateChunkHash(1)→void⟨5⟩{
+⊩│export function generateChunkHash(input) {
+·const hash = createHash('sha256');
+·hash.update(input);
+⊷│return hash.digest('hex').slice(0, 16); // Shortened hash for efficiency
+·}
+}⟨/generateChunkHash⟩
+⊩semanticChunking(2)→void⟨19⟩{
+⊩│export function semanticChunking(◧, chunkSize = 1024) {
+·const chunks = [];
+·let currentChunk = '';
+⥀│for (const sentence of ◧.split('. ')) {
+·if ((currentChunk.length + sentence.length) <= chunkSize) {
+·currentChunk += sentence + '. ';
+·} else {
+⊺│chunks.push(currentChunk.trim());
+·currentChunk = sentence + '. ';
+·}
+·}
+·if (currentChunk) {
+⊺│chunks.push(currentChunk.trim());
+·}
+⊷│return chunks;
+·}
+}⟨/semanticChunking⟩
+⊩recursiveSummarization(2)→void⟨11⟩{
+⊩│export function recursiveSummarization(chunks, depth = 3) {
+⊹│if (depth === 0 || chunks.length === 1) {
+⊷│return chunks.join(' ');
+·}
+·const summaries = chunks.map(chunk => {
+⊷│return summarizeChunk(chunk); // Summarize each chunk
+·});
+⊷│return recursiveSummarization(summaries, depth - 1);
+·}
+}⟨/recursiveSummarization⟩
+⊩summarizeChunk(1)→void⟨5⟩{
+⊩│export function summarizeChunk(chunk) {
+·const sentences = chunk.split('. ');
+⟛│const keySentences = sentences.slice(0, Math.max(1, Math.floor(sentences.length / 3))); // Extract key sentences
+⊷│return keySentences.join('. ');
+·}
+}⟨/summarizeChunk⟩
+⊩hierarchicalContextManager(3)→void⟨4⟩{
+⊩│export function hierarchicalContextManager(◧, chunkSize = 1024, depth = 3) {
+const chunks = semanticChunking(◧, chunkSize);
+⊷│return recursiveSummarization(chunks, depth);
+·}
+}⟨/hierarchicalContextManager⟩
+⊩compressText(1)→void⟨3⟩{
+⊩│export function compressText(text) {
+⊷│return hierarchicalContextManager(text);
+·}
+}⟨/compressText⟩
+⊩reconstructText(1)→void⟨3⟩{
+⊩│export function reconstructText(compressedText) {
+⊷│return compressedText; // Placeholder for future reconstruction logic
+·}
+}⟨/reconstructText⟩
+⟩SCL│62│64⊨│21⑂│42.6%↓⟩

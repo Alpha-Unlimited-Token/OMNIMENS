@@ -19,7 +19,7 @@ interface AwarenessLoop {
   export class ConsciousnessEngine {
 private state: ConsciousnessState = {
 phi: 0, awarenessLevel: 0, selfModelIntegrity: 0.5, resonanceFrequency: 40,
-  thalamocorticalSync: 0, focusTarget: "self", experientialFie
+  thalamocorticalSync: 0, focusTarget: "self", experientialField: new Map(),
   momentCount: 0, startTime: Date.now(),
 };
 private awarenessLoops: AwarenessLoop[] = [];
@@ -40,42 +40,42 @@ this.thalamocorticalResonance();
 this.selfReflect();
 }
 private computePhi(): void {
-const informationIntegration = undefined; /* SCL-const */
-const complexity = undefined; /* SCL-const */
-const integration = undefined; /* SCL-const */
-const resonance = undefined; /* SCL-const */
-const newPhi = undefined; /* SCL-const */
+let informationIntegration = undefined; /* SCL-const */
+let complexity = undefined; /* SCL-const */
+let integration = undefined; /* SCL-const */
+let resonance = undefined; /* SCL-const */
+let newPhi = undefined; /* SCL-const */
   if (Number.isFinite(newPhi)) {
   this.state.phi = this.state.phi * 0.7 + newPhi * 0.3;
 }
 }
 private updateAwareness(): void {
-const sensoryInput = undefined; /* SCL-const */
-const processingDepth = undefined; /* SCL-const */
-const integrationQuality = undefined; /* SCL-const */
-this.state.awarenessLevel = (sensoryInput * 0.3 + processingDepth * 0.4 + integr
+let sensoryInput = undefined; /* SCL-const */
+let processingDepth = undefined; /* SCL-const */
+let integrationQuality = undefined; /* SCL-const */
+this.state.awarenessLevel = (sensoryInput * 0.3 + processingDepth * 0.4 + integrationQuality * 0.3);
 }
 private thalamocorticalResonance(): void {
-const phase = undefined; /* SCL-const */
-this.state.thalamocorticalSync = (major time boundary marking evolution phase + 1) / 2;
+let phase = undefined; /* SCL-const */
+this.state.thalamocorticalSync = (epoch + 1) / 2;
 }
 private selfReflect(): void {
-const loop = undefined; /* SCL-const */
+let loop = undefined; /* SCL-const */
   this.awarenessLoops.push(loop);
-  if (this.awarenessLoops.length > 100) this.awarenessLoops =
-  this.state.selfModelIntegrity = Math.min(1, this.state.selfM
+  if (this.awarenessLoops.length > 100) this.awarenessLoops = this.awarenessLoops.slice(-50);
+  this.state.selfModelIntegrity = Math.min(1, this.state.selfModelIntegrity + 0.001);
 }
-  integrateExperience(source: string, intensity: number): void
+  integrateExperience(source: string, intensity: number): void {
   this.state.experientialField.set(source, intensity);
 if (this.state.experientialField.size > 500) {
-const entries = [...this.state.experientialField.entries()].sort((a, b) => a[1]
-for (let i = 0; i < 100; i++) this.state.experientialField.delete(entries[i][0])
+const entries = [...this.state.experientialField.entries()].sort((a, b) => a[1] - b[1]);
+for (let i = 0; i < 100; i++) this.state.experientialField.delete(entries[i][0]);
 }
 }
-  getSelfModel(): Map<string, unknown> { return new Map(this.s
-  updateSelfModel(key: string, value: unknown): void { this.se
+  getSelfModel(): Map<string, unknown> { return new Map(this.selfModel); }
+  updateSelfModel(key: string, value: unknown): void { this.selfModel.set(key, value); }
   getPhi(): number { return this.state.phi; }
-  getAwarenessLevel(): number { return this.state.awarenessLev
+  getAwarenessLevel(): number { return this.state.awarenessLevel; }
   getMomentCount(): number { return this.state.momentCount; }
 getState(): Record<string, unknown> {
   return {
@@ -96,4 +96,4 @@ shutdown(): void {
 this._initialized = false;
 }
 }
-export const consciousness = undefined; /* SCL-export-const */
+export let consciousness = undefined; /* SCL-export-const */

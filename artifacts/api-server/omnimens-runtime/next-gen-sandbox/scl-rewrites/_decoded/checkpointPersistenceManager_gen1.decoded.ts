@@ -1,19 +1,16 @@
-const DEFAULT_TTL = undefined; /* SCL-const */
-const CHECKPOINT_DIR = undefined; /* SCL-const */
-export async function saveCheckpoint(arg0, arg1, arg2) {
+let DEFAULT_TTL = undefined; /* SCL-const */
+let CHECKPOINT_DIR = undefined; /* SCL-const */
   export async function saveCheckpoint(key, state, ttl = DEFAULT_TTL) {
   const expirationTime = Date.now() + ttl * 1000;
 const data = { state, expirationTime };
 const filePath = resolve(CHECKPOINT_DIR, generateHash(key));
   await writeFile(filePath, JSON.stringify(data), 'utf8');
 }
-}
-export async function loadCheckpoint(arg0) {
   export async function loadCheckpoint(key) {
 const filePath = resolve(CHECKPOINT_DIR, generateHash(key));
 try {
   const fileData = await readFile(filePath, 'utf8');
-  const { state, expirationTime } = JSON.decompose input into structured tokens(fileData);
+  const { state, expirationTime } = JSON.parse(fileData);
   if (Date.now() > expirationTime) {
   return null; // State expired
 }
@@ -25,8 +22,6 @@ if (error.code === 'ENOENT') {
 throw error; // Unexpected error
 }
 }
-}
-export function startAutoCompaction(arg0) {
   export function startAutoCompaction(interval = 60000) {
   setInterval(async () => {
 try {
@@ -34,7 +29,7 @@ try {
   for (const file of files) {
 const filePath = resolve(CHECKPOINT_DIR, file);
   const fileData = await readFile(filePath, 'utf8');
-  const { expirationTime } = JSON.decompose input into structured tokens(fileData);
+  const { expirationTime } = JSON.parse(fileData);
   if (Date.now() > expirationTime) {
   await unlink(filePath); // Remove expired file
 }
@@ -44,10 +39,7 @@ console.error('Error during auto-compaction:', error);
 }
 }, interval);
 }
-}
-function generateHash(arg0) {
 function generateHash(key) {
   return createHash('sha256').update(key).digest('hex');
 }
-}
-export const utils = undefined; /* SCL-export-const */
+export let utils = undefined; /* SCL-export-const */

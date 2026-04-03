@@ -1,7 +1,7 @@
 ⟨SCL v1│pseudo_realtime_data_stream_gen1.mjs│131→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊪│export const createDataStream = (fetchFunction, intervalMs =
+⊪│export const createDataStream = (fetchFunction, intervalMs = 1000) => {
 κeventEmitter
 ·let isRunning = false;
 ⊱│const start = async () => {
@@ -29,7 +29,7 @@
 ·off: eventEmitter.off.bind(eventEmitter),
 ·};
 ·};
-⊪│export const createBatchProcessor = (batchSize, processFunct
+⊪│export const createBatchProcessor = (batchSize, processFunction) => {
 ·let buffer = [];
 ⊱│const addData = async (data) => {
 ⊺│buffer.push(data);

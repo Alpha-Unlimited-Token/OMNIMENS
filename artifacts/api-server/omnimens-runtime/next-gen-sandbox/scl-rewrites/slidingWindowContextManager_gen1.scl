@@ -1,4 +1,39 @@
 ⟨SCL v1│slidingWindowContextManager_gen1.mjs│101→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩createSlidingWindowContextManager(2)→void⟨56⟩{⊩⊹⊺⊷⥀⊳}
-⟩SCL│3│7⊨│6⑂│97.0%↓⟩
+⊩createSlidingWindowContextManager(2)→void⟨56⟩{
+⊩│export function createSlidingWindowContextManager(maxRetainedItems = 10, maxSummaryLength = 500) {
+·const retained = []; // High-priority retained items
+·let summary = ""; // Summarized lower-priority history
+·function addContext(content, priority) {
+·const newItem = { content, priority };
+⊹│if (retained.length < maxRetainedItems || priority > retained[retained.length - 1].priority) {
+⊺│retained.push(newItem);
+·retained.sort((a, b) => b.priority - a.priority); // Sort by descending priority
+⊹│if (retained.length > maxRetainedItems) {
+⊺│const removed = retained.pop();
+·summary = summarize(summary + " " + removed.content, maxSummaryLength);
+·}
+·} else {
+·summary = summarize(summary + " " + content, maxSummaryLength);
+·}
+·}
+·function summarize(text, maxLength) {
+⊷│if (text.length <= maxLength) return text;
+const ⋮ = text.split(" ");
+·let result = "";
+⥀│for (const token of ⋮) {
+⊹│if ((result + token).length > maxLength) break;
+⊳│result += (result ? " " : "") + token;
+·}
+⊷│return result + "...";
+·}
+·function getContext() {
+⊷│return {
+·retained: [...retained],
+·summary
+·};
+·}
+⊷│return { addContext, getContext };
+·}
+}⟨/createSlidingWindowContextManager⟩
+⟩SCL│38│40⊨│12⑂│62.4%↓⟩

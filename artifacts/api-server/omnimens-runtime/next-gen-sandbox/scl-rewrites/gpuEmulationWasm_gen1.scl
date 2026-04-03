@@ -1,8 +1,72 @@
 ⟨SCL v1│gpuEmulationWasm_gen1.mjs│136→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩⟿initializeWasmModule(1)→void⟨12⟩{⊩⊷}
-⊩⟿wasmMatrixMultiply(5)→void⟨24⟩{⊩⊹⊵⊴⊡⊞⊟⊷}
-⊩⟿wasmVectorAdd(2)→void⟨24⟩{⊩⊹⊵⊴⊡⊞⊟⊷}
-⊩validateMatrixDimensions(4)→void⟨5⟩{⊩⊵}
-⟿exampleUsage(1)→void⟨19⟩{⊴}
-⟩SCL│7│24⊨│19⑂│94.9%↓⟩
+⊩⟿initializeWasmModule(1)→void⟨12⟩{
+⊩│export async function initializeWasmModule() {
+·const wasmCode = new Uint8Array([
+·0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00 // Minimal WASM header
+·]);
+·const wasmModule = await WebAssembly.compile(wasmCode);
+·const wasmInstance = await WebAssembly.instantiate(wasmModule);
+⊷│return wasmInstance;
+·}
+}⟨/initializeWasmModule⟩
+⊩⟿wasmMatrixMultiply(5)→void⟨24⟩{
+⊩│export async function wasmMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
+⊹│if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
+⊵│throw new Error("Invalid matrix dimensions.");
+·}
+⊴│const wasmInstance = await initializeWasmModule();
+·const memory = new Float32Array(wasmInstance.exports.memory.buffer);
+·const offsetA = 0;
+·const offsetB = rowsA * colsA;
+·const offsetC = offsetB + colsA * colsB;
+⊡│memory.set(matrixA, offsetA);
+⊡│memory.set(matrixB, offsetB);
+·wasmInstance.exports.matrixMultiply(offsetA, offsetB, offsetC, rowsA, colsA, colsB);
+⊞⊟│const result = memory.slice(offsetC, offsetC + rowsA * colsB);
+⊷│return result;
+·}
+}⟨/wasmMatrixMultiply⟩
+⊩⟿wasmVectorAdd(2)→void⟨24⟩{
+⊩│export async function wasmVectorAdd(vectorA, vectorB) {
+⊹│if (vectorA.length !== vectorB.length) {
+⊵│throw new Error("Vectors must be of the same length.");
+·}
+⊴│const wasmInstance = await initializeWasmModule();
+·const memory = new Float32Array(wasmInstance.exports.memory.buffer);
+·const offsetA = 0;
+·const offsetB = vectorA.length;
+·const offsetC = offsetB + vectorB.length;
+⊡│memory.set(vectorA, offsetA);
+⊡│memory.set(vectorB, offsetB);
+·wasmInstance.exports.vectorAdd(offsetA, offsetB, offsetC, vectorA.length);
+⊞⊟│const result = memory.slice(offsetC, offsetC + vectorA.length);
+⊷│return result;
+·}
+}⟨/wasmVectorAdd⟩
+⊩validateMatrixDimensions(4)→void⟨5⟩{
+⊩│export function validateMatrixDimensions(rowsA, colsA, rowsB, colsB) {
+·if (colsA !== rowsB) {
+⊵│throw new Error("Matrix dimensions are incompatible for multiplication.");
+·}
+·}
+}⟨/validateMatrixDimensions⟩
+⟿exampleUsage(1)→void⟨19⟩{
+·async function exampleUsage() {
+·const matrixA = new Float32Array([
+·1, 2,
+·3, 4
+·]);
+·const matrixB = new Float32Array([
+·5, 6,
+·7, 8
+·]);
+⊴│const resultMatrix = await wasmMatrixMultiply(matrixA, matrixB, 2, 2, 2);
+·console.log("Result Matrix:", resultMatrix);
+·const vectorA = new Float32Array([1, 2, 3]);
+·const vectorB = new Float32Array([4, 5, 6]);
+⊴│const resultVector = await wasmVectorAdd(vectorA, vectorB);
+·console.log("Result Vector:", resultVector);
+·}
+}⟨/exampleUsage⟩
+⟩SCL│71│78⊨│22⑂│47.8%↓⟩

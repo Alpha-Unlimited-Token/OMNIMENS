@@ -1,4 +1,17 @@
 ⟨SCL v1│hierarchicalTaskOrchestration_gen1.mjs│22→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩hierarchicalTaskOrchestration(2)→void⟨13⟩{⊩⊺⋐⊱⊳⊷⊰}
-⟩SCL│3│8⊨│7⑂│86.4%↓⟩
+⊩hierarchicalTaskOrchestration(2)→void⟨13⟩{
+⊩│export function hierarchicalTaskOrchestration(tasks, agents) {
+·const taskQueue = tasks.sort((a, b) => a.priority - b.priority);
+const agentStatus = agents.map(α => ({ id: α.id, workload: α.workload }));
+·while (taskQueue.length) {
+⊺│const task = taskQueue.shift();
+⋐│const bestAgent = agentStatus.reduce((best, α) => {
+⊳│return α.workload < best.workload ? α : best;
+·});
+·bestAgent.workload += task.complexity;
+⊰│console.log(`Assigned task ${task.id} to α ${bestAgent.id}`);
+·}
+·}
+}⟨/hierarchicalTaskOrchestration⟩
+⟩SCL│16│17⊨│5⑂│27.3%↓⟩

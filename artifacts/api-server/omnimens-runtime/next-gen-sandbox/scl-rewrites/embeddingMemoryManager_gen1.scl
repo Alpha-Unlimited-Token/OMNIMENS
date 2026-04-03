@@ -6,7 +6,7 @@
 ·}
 ·addEmbedding(key, vector) {
 ·if (this.embeddingStore.has(key)) {
-⊰│throw new Error(`Key '${key}' already exists in the store.`)
+⊰│throw new Error(`Key '${key}' already exists in the store.`);
 ·}
 if (!ι.isArray(vector) || vector.some((v) => typeof v !== 'number')) {
 ⊵│throw new Error('Vector must be an array of numbers.');
@@ -14,8 +14,8 @@ if (!ι.isArray(vector) || vector.some((v) => typeof v !== 'number')) {
 ⊡│this.embeddingStore.set(key, vector);
 ·}
 ·searchNearestNeighbors(queryVector, k) {
-if (!ι.isArray(queryVector) || queryVector.some((v) => typeof v !== 'number'
-⊵│throw new Error('Query vector must be an array of numbers.')
+if (!ι.isArray(queryVector) || queryVector.some((v) => typeof v !== 'number')) {
+⊵│throw new Error('Query vector must be an array of numbers.');
 ·}
 ·if (typeof k !== 'number' || k <= 0 || !Number.isInteger(k)) {
 ⊵│throw new Error('k must be a positive integer.');
@@ -23,10 +23,10 @@ if (!ι.isArray(queryVector) || queryVector.some((v) => typeof v !== 'number'
 κdistances
 ·for (const [key, vector] of this.embeddingStore.entries()) {
 ⊹│if (vector.length !== queryVector.length) {
-⊰│throw new Error(`Vector dimensions mismatch for key '${key}'
+⊰│throw new Error(`Vector dimensions mismatch for key '${key}'.`);
 ·}
 κdistance
-⋐│vector.reduce((sum, value, index) => sum + Math.pow(value - 
+⋐│vector.reduce((sum, value, index) => sum + Math.pow(value - queryVector[index], 2), 0)
 ·);
 ⊺│distances.push({ key, distance });
 ·}
@@ -44,6 +44,26 @@ if (!ι.isArray(queryVector) || queryVector.some((v) => typeof v !== 'number'
 ⊷│return this.embeddingStore.size;
 ·}
 ·}
-⊩createEmbeddingMemoryManager(1)→void⟨3⟩{⊩⊷}
-⊩computeCosineSimilarity(2)→void⟨18⟩{⊩⊵⊹⋐⊷}
-⟩SCL│48│27⊨│21⑂│65.5%↓⟩
+⊩createEmbeddingMemoryManager(1)→void⟨3⟩{
+⊩│export function createEmbeddingMemoryManager() {
+⊷│return new EmbeddingMemoryManager();
+·}
+}⟨/createEmbeddingMemoryManager⟩
+⊩computeCosineSimilarity(2)→void⟨18⟩{
+⊩│export function computeCosineSimilarity(vectorA, vectorB) {
+·if (!Array.isArray(vectorA) || !Array.isArray(vectorB)) {
+⊵│throw new Error('Both inputs must be arrays.');
+·}
+⊹│if (vectorA.length !== vectorB.length) {
+⊵│throw new Error('Vectors must have the same dimensions.');
+·}
+⋐│const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
+⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a * a, 0));
+⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b * b, 0));
+·if (magnitudeA === 0 || magnitudeB === 0) {
+⊵│throw new Error('Vectors must not be zero vectors.');
+·}
+⊷│return dotProduct / (magnitudeA * magnitudeB);
+·}
+}⟨/computeCosineSimilarity⟩
+⟩SCL│68│43⊨│25⑂│51.1%↓⟩

@@ -1,4 +1,29 @@
 ⟨SCL v1│pubSubOrchestrationLayer_gen1.mjs│37→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩pubSubOrchestrationLayer(2)→void⟨28⟩{⊩⊺⊷}
-⟩SCL│3│4⊨│3⑂│91.9%↓⟩
+⊩pubSubOrchestrationLayer(2)→void⟨28⟩{
+⊩│export function pubSubOrchestrationLayer(agents, tasks) {
+·const subscribers = {};
+function subscribe(α, event) {
+·if (!subscribers[event]) {
+·subscribers[event] = [];
+·}
+⊺│subscribers[event].push(α);
+·}
+·function publish(event, data) {
+·if (subscribers[event]) {
+subscribers[event].forEach(α => α.↻(data));
+·}
+·}
+·function allocateTask(task) {
+const selectedAgent = agents.find(α => α.canHandle(task));
+·if (selectedAgent) {
+·selectedAgent.handle(task);
+publish('taskCompleted', { task, α: selectedAgent });
+·} else {
+·publish('taskEscalation', { task });
+·}
+·}
+⊷│return { subscribe, publish, allocateTask };
+·}
+}⟨/pubSubOrchestrationLayer⟩
+⟩SCL│28│27⊨│3⑂│24.3%↓⟩

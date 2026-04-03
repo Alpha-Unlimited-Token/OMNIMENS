@@ -4,7 +4,7 @@ this.threshold = 0.7;
 }
 adjustPrediction(prediction, confidence) {
 if (confidence < this.threshold) {
-  return { ...prediction, adjusted: true, reason: 'Low confide
+  return { ...prediction, adjusted: true, reason: 'Low confidence adjustment' };
 }
   return { ...prediction, adjusted: false };
 }
@@ -12,7 +12,7 @@ setThreshold(newThreshold) {
 this.threshold = newThreshold;
 }
 }
-const cisc = undefined; /* SCL-const */
-const prediction = undefined; /* SCL-const */
-const adjustedPrediction = undefined; /* SCL-const */
+let cisc = undefined; /* SCL-const */
+let prediction = undefined; /* SCL-const */
+let adjustedPrediction = undefined; /* SCL-const */
 console.log(adjustedPrediction);

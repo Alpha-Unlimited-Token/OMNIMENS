@@ -17,7 +17,7 @@ const suitableAgent = this.agents.find(α => α.canHandle(task));
 ·if (suitableAgent) {
 ·suitableAgent.execute(task);
 ·} else {
-⊰│console.warn(`No suitable agent found for task: ${task.name}
+⊰│console.warn(`No suitable agent found for task: ${task.name}`);
 ·}
 ·});
 ·}

@@ -1,8 +1,55 @@
 ⟨SCL v1│matrixOpsWasm_gen1.mjs│98→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊲│const { TextEncoder, TextDecoder } = require('util');
-⟿initializeWasm(1)→void⟨15⟩{⊷}
-⟿addMatrices(2)→void⟨22⟩{⊹⊵⊴⊲⊡⊞⊟⊷}
-⟿multiplyMatrices(2)→void⟨22⟩{⊹⊵⊴⊲⊡⊞⊟⊷}
+⟿initializeWasm(1)→void⟨15⟩{
+·async function initializeWasm() {
+·const wasmCode = new Uint8Array([
+·0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, 0x01, 0x0a, 0x02, 0x60, 0x02, 0x7f, 0x7f, 0x01,
+·0x7f, 0x60, 0x03, 0x7f, 0x7f, 0x7f, 0x01, 0x7f, 0x03, 0x03, 0x02, 0x00, 0x01, 0x07, 0x17, 0x02,
+·0x03, 0x61, 0x64, 0x64, 0x00, 0x00, 0x05, 0x6d, 0x75, 0x6c, 0x74, 0x00, 0x01, 0x0a, 0x1f, 0x02,
+·0x0b, 0x00, 0x20, 0x00, 0x20, 0x01, 0x6a, 0x0f, 0x0b, 0x14, 0x00, 0x20, 0x00, 0x20, 0x01, 0x20,
+·0x02, 0x6c, 0x0f, 0x0b
+·]);
+·const wasmModule = await WebAssembly.compile(wasmCode);
+·const wasmInstance = await WebAssembly.instantiate(wasmModule);
+⊷│return wasmInstance;
+·}
+}⟨/initializeWasm⟩
+⟿addMatrices(2)→void⟨22⟩{
+·async function addMatrices(matrixA, matrixB) {
+⊹│if (matrixA.length !== matrixB.length) {
+⊵│throw new Error('Matrix dimensions must match for ∑.');
+·}
+⊴│const wasmInstance = await initializeWasm();
+⊲│const { memory, add } = wasmInstance.exports;
+·const buffer = new Float32Array(memory.buffer, 0, matrixA.length);
+⊡│buffer.set(matrixA);
+·const offset = matrixA.length;
+⊞⊟│const bufferB = new Float32Array(memory.buffer, offset * Float32Array.BYTES_PER_ELEMENT, matrixB.length);
+⊡│bufferB.set(matrixB);
+·const resultOffset = offset * 2;
+⊞⊟│const resultBuffer = new Float32Array(memory.buffer, resultOffset * Float32Array.BYTES_PER_ELEMENT, matrixA.length);
+·add(offset, resultOffset);
+⊷│return new Float32Array(resultBuffer);
+·}
+}⟨/addMatrices⟩
+⟿multiplyMatrices(2)→void⟨22⟩{
+·async function multiplyMatrices(matrixA, matrixB) {
+⊹│if (matrixA.length !== matrixB.length) {
+⊵│throw new Error('Matrix dimensions must match for multiplication.');
+·}
+⊴│const wasmInstance = await initializeWasm();
+⊲│const { memory, mult } = wasmInstance.exports;
+·const buffer = new Float32Array(memory.buffer, 0, matrixA.length);
+⊡│buffer.set(matrixA);
+·const offset = matrixA.length;
+⊞⊟│const bufferB = new Float32Array(memory.buffer, offset * Float32Array.BYTES_PER_ELEMENT, matrixB.length);
+⊡│bufferB.set(matrixB);
+·const resultOffset = offset * 2;
+⊞⊟│const resultBuffer = new Float32Array(memory.buffer, resultOffset * Float32Array.BYTES_PER_ELEMENT, matrixA.length);
+·mult(offset, resultOffset);
+⊷│return new Float32Array(resultBuffer);
+·}
+}⟨/multiplyMatrices⟩
 ·export { addMatrices, multiplyMatrices };
-⟩SCL│7│19⊨│16⑂│92.9%↓⟩
+⟩SCL│54│60⊨│20⑂│44.9%↓⟩

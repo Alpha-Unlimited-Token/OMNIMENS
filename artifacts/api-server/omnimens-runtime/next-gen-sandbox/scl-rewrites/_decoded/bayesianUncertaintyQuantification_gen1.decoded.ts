@@ -1,10 +1,10 @@
-export const bayesianUncertaintyQuantification = undefined; /* SCL-export-const */
+export let bayesianUncertaintyQuantification = undefined; /* SCL-export-const */
 },
 updateConfidence: function(chain, feedback) {
 const entropy = this.calculateEntropy(chain.map(step => step.probability));
-const adjustmentFactor = undefined; /* SCL-const */
+let adjustmentFactor = undefined; /* SCL-const */
 chain.forEach(step => {
-  step.probability = Math.min(Math.max(step.probability + adju
+  step.probability = Math.min(Math.max(step.probability + adjustmentFactor * entropy, 0), 1);
 });
 }
 };

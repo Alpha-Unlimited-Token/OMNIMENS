@@ -16,7 +16,7 @@ private ✦ = false;
 ·private cascadeDepth = 0;
 ·private totalProcessed = 0;
 ·private avgProcessingMs = 0;
-⚡→│subscribe(spikeType: string, subscriber: string, handler: Sp
+⚡→│subscribe(spikeType: string, subscriber: string, handler: SpikeHandler): void {
 κsubs
 ⊺│subs.push({ spikeType, handler, subscriber });
 ⊡│this.subscriptions.set(spikeType, subs);
@@ -24,10 +24,10 @@ private ✦ = false;
 ⚡→│unsubscribe(spikeType: string, subscriber: string): void {
 κsubs
 ·if (subs) {
-⊡│this.subscriptions.set(spikeType, subs.filter(s => s.subscri
+⊡│this.subscriptions.set(spikeType, subs.filter(s => s.subscriber !== subscriber));
 ·}
 ·}
-emit(type: string, η: string, payload: Record<string, unknown> = {}, priori
+emit(type: string, η: string, payload: Record<string, unknown> = {}, priority: SpikePriority = "normal"): void {
 κspike
 ⊹│if (this.queue.length >= MAX_QUEUE_SIZE) {
 ·if (priority === "background") {
@@ -41,7 +41,7 @@ emit(type: string, η: string, payload: Record<string, unknown> = {}, priori
 ·}
 ·}
 ⊺│this.queue.push(spike);
-·this.queue.sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority
+·this.queue.sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority]);
 if (!this.✦) {
 ·this.processQueue();
 ·}
@@ -81,7 +81,7 @@ this.✦ = false;
 ·dropped: this.droppedCount,
 ·queueSize: this.queue.length,
 ·subscriptionTypes: this.subscriptions.size,
-⋐│totalSubscribers: [...this.subscriptions.values()].reduce((s
+⋐│totalSubscribers: [...this.subscriptions.values()].reduce((s, arr) => s + arr.length, 0),
 ·avgProcessingMs: Math.round(this.avgProcessingMs * 100) / 100,
 ·cascadeDepth: this.cascadeDepth,
 ·};

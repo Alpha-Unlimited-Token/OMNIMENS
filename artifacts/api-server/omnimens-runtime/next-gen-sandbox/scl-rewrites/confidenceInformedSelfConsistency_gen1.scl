@@ -6,7 +6,7 @@
 ·}
 ·adjustPrediction(prediction, confidence) {
 ·if (confidence < this.threshold) {
-⊷│return { ...prediction, adjusted: true, reason: 'Low confide
+⊷│return { ...prediction, adjusted: true, reason: 'Low confidence adjustment' };
 ·}
 ⊷│return { ...prediction, adjusted: false };
 ·}

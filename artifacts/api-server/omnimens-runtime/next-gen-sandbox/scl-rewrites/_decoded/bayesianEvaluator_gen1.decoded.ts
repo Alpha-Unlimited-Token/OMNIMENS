@@ -9,7 +9,7 @@ calculateEntropy(probabilities) {
 }
 evaluateReasoningChain(reasoningChain) {
 const probabilities = reasoningChain.map(step => step.confidence);
-const entropy = undefined; /* SCL-const */
+let entropy = undefined; /* SCL-const */
 if (entropy < this.entropyThreshold) {
   return {
 isConsistent: true,

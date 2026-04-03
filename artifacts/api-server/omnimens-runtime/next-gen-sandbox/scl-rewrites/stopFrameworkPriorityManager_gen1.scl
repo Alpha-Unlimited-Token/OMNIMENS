@@ -11,7 +11,7 @@
 κimpactScore
 ⊷│return { task, impactScore };
 ·});
-⊷│return rankedTasks.sort((a, b) => b.impactScore - a.impactSc
+⊷│return rankedTasks.sort((a, b) => b.impactScore - a.impactScore);
 ·}
 ·calculateImpactScore(task, metrics) {
 κcapabilityGap

@@ -1,7 +1,11 @@
 ⟨SCL v1│persistentJobQueue_gen1.mjs│105→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩getCurrentTimestamp(1)→void⟨3⟩{⊩⊷}
+⊩getCurrentTimestamp(1)→void⟨3⟩{
+⊩│export function getCurrentTimestamp() {
+⊷│return new Date().toISOString();
+·}
+}⟨/getCurrentTimestamp⟩
 ⊶│class PersistentJobQueue {
 ·constructor(ttlSeconds) {
 ⊮│this.queue = new Map();
@@ -10,7 +14,7 @@
 ·addJob(jobData) {
 κjobId
 κtimestamp
-⊡│this.queue.set(jobId, { jobData, timestamp, status: 'pending
+⊡│this.queue.set(jobId, { jobData, timestamp, status: 'pending' });
 ⊷│return jobId;
 ·}
 ·getJobState(jobId) {
@@ -60,7 +64,22 @@ job.status = '↺';
 ·}
 ·}
 ·}
-⊩createJobQueue(1)→void⟨3⟩{⊩⊷}
-⊩checkpointQueueToDatabase(2)→void⟨4⟩{⊩}
-⊩restoreQueueFromDatabase(2)→void⟨5⟩{⊩⊷}
-⟩SCL│65│29⊨│16⑂│38.1%↓⟩
+⊩createJobQueue(1)→void⟨3⟩{
+⊩│export function createJobQueue(ttlSeconds = 3600) {
+⊷│return new PersistentJobQueue(ttlSeconds);
+·}
+}⟨/createJobQueue⟩
+⊩checkpointQueueToDatabase(2)→void⟨4⟩{
+⊩│export function checkpointQueueToDatabase(queue, dbSaveFunction) {
+·const serializedData = queue.serializeQueue();
+·dbSaveFunction(serializedData);
+·}
+}⟨/checkpointQueueToDatabase⟩
+⊩restoreQueueFromDatabase(2)→void⟨5⟩{
+⊩│export function restoreQueueFromDatabase(serializedData, ttlSeconds) {
+·const queue = createJobQueue(ttlSeconds);
+·queue.restoreQueue(serializedData);
+⊷│return queue;
+·}
+}⟨/restoreQueueFromDatabase⟩
+⟩SCL│84│40⊨│16⑂│20.0%↓⟩

@@ -7,15 +7,15 @@ addCounterfactual(scenario, expectedOutcome) {
 }
 verify(agentOutput) {
 for (const { scenario, expectedOutcome } of this.counterfactuals) {
-const result = undefined; /* SCL-const */
+let result = undefined; /* SCL-const */
 if (result !== expectedOutcome) {
-  console.log(`Counterfactual failed: Expected ${expectedOutco
+  console.log(`Counterfactual failed: Expected ${expectedOutcome}, got ${result}`);
 }
 }
 }
 scoreReasoning(agentOutputs) {
   return agentOutputs.map(output => {
-const antiConformityScore = undefined; /* SCL-const */
+let antiConformityScore = undefined; /* SCL-const */
   return { output, score: antiConformityScore };
 });
 }

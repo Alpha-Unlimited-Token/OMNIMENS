@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: multimodalIntegrationEngine
- * Written: 2026-04-02T22:07:45.910Z
+ * Written: 2026-04-03T18:28:15.497Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -20,7 +20,7 @@
  * TRANSLATION STATUS:
  * Novel constructs: attention
  * All constructs have translation mappings
- * Compiled targets: javascript: OK (17 IR steps) | python: OK (17 IR steps) | c: OK (17 IR steps) | x86_64: OK (17 IR steps) | arm64: OK (17 IR steps) | avr: OK (17 IR steps)
+ * Compiled targets: javascript: OK (1 IR steps) | python: OK (1 IR steps) | c: OK (1 IR steps) | x86_64: OK (1 IR steps) | arm64: OK (1 IR steps) | avr: OK (1 IR steps)
  * Translation map version: 22
  */
 // multimodalIntegrationEngine.mjs
@@ -28,85 +28,100 @@
 import { createHash } from 'crypto';
 
 /**
- * Generate a hash-based embedding for text input.
- * @param {string} text - The input text to process.
- * @returns {Float64Array} - A simple embedding vector for the text.
+ * Generate a hash for consistent embedding identification.
+ * Useful for cross-agent operations like caching and indexing.
+ * @param {string} input - Input string to hash.
+ * @returns {string} - Hexadecimal hash value.
  */
-export function generateTextEmbedding(text) {
-  const hash = createHash('sha256').update(text, 'utf8').digest();
-  const embedding = new Float64Array(hash.length / 8);
-  for (let i = 0; i < hash.length; i += 8) {
-    embedding[i / 8] = hash.readBigUInt64BE(i) % 1e6 / 1e6; // Normalize values
-  }
-  return embedding;
+export function generateHash(input) {
+  const hash = createHash('sha256');
+  hash.update(input);
+  return hash.digest('hex');
 }
 
 /**
- * Generate a pseudo-embedding for image input using pixel data.
- * @param {Uint8Array} pixelData - The raw pixel data of the image.
- * @returns {Float64Array} - A simple embedding vector for the image.
+ * Normalize embeddings to unit vectors for consistent multimodal fusion.
+ * @param {Array<number>} embedding - Array of numbers representing the embedding.
+ * @returns {Array<number>} - Normalized embedding.
  */
-export function generateImageEmbedding(pixelData) {
-  const embedding = new Float64Array(16); // Fixed-size embedding
-  for (let i = 0; i < pixelData.length; i++) {
-    embedding[i % 16] += pixelData[i] / 255; // Normalize and aggregate
-  }
-  for (let i = 0; i < embedding.length; i++) {
-    embedding[i] /= Math.sqrt(pixelData.length); // Normalize by input size
-  }
-  return embedding;
+export function normalizeEmbedding(embedding) {
+  const magnitude = Math.sqrt(embedding.reduce((sum, val) => sum + val ** 2, 0));
+  return embedding.map(val => val / magnitude);
 }
 
 /**
- * Align text and image embeddings using cosine similarity.
- * @param {Float64Array} textEmbedding - The embedding vector for text.
- * @param {Float64Array} imageEmbedding - The embedding vector for an image.
- * @returns {number} - The alignment score (cosine similarity).
+ * Fuse two embeddings (image and text) using attention-based weighted averaging.
+ * @param {Array<number>} imageEmbedding - Normalized image embedding.
+ * @param {Array<number>} textEmbedding - Normalized text embedding.
+ * @param {number} attentionWeight - Weight factor for image vs text (0 to 1).
+ * @returns {Array<number>} - Fused embedding.
  */
-export function alignEmbeddings(textEmbedding, imageEmbedding) {
-  const dotProduct = textEmbedding.reduce((sum, value, i) => sum + value * imageEmbedding[i], 0);
-  const textMagnitude = Math.sqrt(textEmbedding.reduce((sum, value) => sum + value ** 2, 0));
-  const imageMagnitude = Math.sqrt(imageEmbedding.reduce((sum, value) => sum + value ** 2, 0));
-  return dotProduct / (textMagnitude * imageMagnitude || 1); // Avoid division by zero
-}
-
-/**
- * Apply attention mechanism to focus on relevant parts of embeddings.
- * @param {Float64Array} embedding - The input embedding vector.
- * @param {number[]} attentionWeights - Weights for each dimension.
- * @returns {Float64Array} - The adjusted embedding.
- */
-export function applyAttention(embedding, attentionWeights) {
-  if (embedding.length !== attentionWeights.length) {
-    throw new Error('Embedding and attention weights must have the same length.');
+export function fuseEmbeddings(imageEmbedding, textEmbedding, attentionWeight) {
+  if (attentionWeight < 0 || attentionWeight > 1) {
+    throw new Error('Attention weight must be between 0 and 1');
   }
-  const adjustedEmbedding = new Float64Array(embedding.length);
-  for (let i = 0; i < embedding.length; i++) {
-    adjustedEmbedding[i] = embedding[i] * attentionWeights[i];
+  const fusedEmbedding = imageEmbedding.map((imgVal, idx) => {
+    const textVal = textEmbedding[idx] || 0; // Handle mismatched dimensions gracefully
+    return attentionWeight * imgVal + (1 - attentionWeight) * textVal;
+  });
+  return normalizeEmbedding(fusedEmbedding);
+}
+
+/**
+ * Calculate cosine similarity between two embeddings.
+ * Useful for cross-modal reasoning tasks like retrieval or ranking.
+ * @param {Array<number>} embeddingA - First embedding.
+ * @param {Array<number>} embeddingB - Second embedding.
+ * @returns {number} - Cosine similarity value (-1 to 1).
+ */
+export function cosineSimilarity(embeddingA, embeddingB) {
+  const dotProduct = embeddingA.reduce((sum, val, idx) => sum + val * (embeddingB[idx] || 0), 0);
+  const magnitudeA = Math.sqrt(embeddingA.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitudeB = Math.sqrt(embeddingB.reduce((sum, val) => sum + val ** 2, 0));
+  if (magnitudeA === 0 || magnitudeB === 0) {
+    throw new Error('Embeddings must not be zero vectors');
   }
-  return adjustedEmbedding;
+  return dotProduct / (magnitudeA * magnitudeB);
 }
 
 /**
- * Compute attention weights based on embedding importance.
- * @param {Float64Array} embedding - The input embedding vector.
- * @returns {number[]} - Normalized attention weights.
+ * Generate random embeddings for testing or fallback scenarios.
+ * Useful for agents requiring synthetic data generation.
+ * @param {number} dimension - Number of dimensions for the embedding.
+ * @returns {Array<number>} - Random embedding.
  */
-export function computeAttentionWeights(embedding) {
-  const total = embedding.reduce((sum, value) => sum + Math.abs(value), 0);
-  return embedding.map(value => Math.abs(value) / (total || 1)); // Avoid division by zero
+export function generateRandomEmbedding(dimension) {
+  if (dimension <= 0) {
+    throw new Error('Dimension must be a positive integer');
+  }
+  const embedding = Array.from({ length: dimension }, () => Math.random());
+  return normalizeEmbedding(embedding);
 }
 
 /**
- * Main function to integrate and reason over text and image inputs.
- * @param {string} text - The input text.
- * @param {Uint8Array} imagePixelData - The raw pixel data of the image.
- * @returns {number} - The alignment score after applying attention.
+ * Validate embedding dimensions for compatibility.
+ * Ensures cross-agent embeddings can be processed without errors.
+ * @param {Array<number>} embeddingA - First embedding.
+ * @param {Array<number>} embeddingB - Second embedding.
+ * @returns {boolean} - True if dimensions match, false otherwise.
  */
-export function integrateAndReason(text, imagePixelData) {
-  const textEmbedding = generateTextEmbedding(text);
-  const imageEmbedding = generateImageEmbedding(imagePixelData);
-  const attentionWeights = computeAttentionWeights(textEmbedding);
-  const adjustedTextEmbedding = applyAttention(textEmbedding, attentionWeights);
-  return alignEmbeddings(adjustedTextEmbedding, imageEmbedding);
+export function validateEmbeddingDimensions(embeddingA, embeddingB) {
+  return embeddingA.length === embeddingB.length;
+}
+
+/**
+ * Example usage: Fuse and compare embeddings.
+ * This function demonstrates multimodal reasoning capabilities.
+ */
+export function exampleUsage() {
+  const imageEmbedding = generateRandomEmbedding(128);
+  const textEmbedding = generateRandomEmbedding(128);
+  const fusedEmbedding = fuseEmbeddings(imageEmbedding, textEmbedding, 0.6);
+  const similarity = cosineSimilarity(imageEmbedding, fusedEmbedding);
+  return {
+    imageEmbedding,
+    textEmbedding,
+    fusedEmbedding,
+    similarity
+  };
 }

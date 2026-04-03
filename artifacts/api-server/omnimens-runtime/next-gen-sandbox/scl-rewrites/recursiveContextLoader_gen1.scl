@@ -1,10 +1,59 @@
 ⟨SCL v1│recursiveContextLoader_gen1.mjs│91→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩generateHash(1)→void⟨3⟩{⊩⊷}
-⊩importanceScore(2)→void⟨6⟩{⊩⊯⊷}
-⊩summarizeContext(2)→void⟨9⟩{⊩⟛⊷}
-⊩⟿recursiveContextLoader(5)→void⟨15⟩{⊩⊷⊻⊴}
-⊩hierarchicalSummarize(2)→void⟨3⟩{⊩⊷}
-⊩⟿exampleUsage(1)→void⟨13⟩{⊩⊴}
-⟩SCL│9│23⊨│16⑂│90.1%↓⟩
+⊩generateHash(1)→void⟨3⟩{
+⊩│export function generateHash(input) {
+⊷│return crypto.createHash('sha256').update(input).digest('hex');
+·}
+}⟨/generateHash⟩
+⊩importanceScore(2)→void⟨6⟩{
+⊩│export function importanceScore(contextChunk, keywords) {
+·const words = contextChunk.split(/\s+/);
+⊯│const keywordSet = new Set(keywords);
+·const matchCount = words.filter(word => keywordSet.has(word)).length;
+⊷│return matchCount / words.length;
+·}
+}⟨/importanceScore⟩
+⊩summarizeContext(2)→void⟨9⟩{
+⊩│export function summarizeContext(contextChunk, keywords) {
+·const sentences = contextChunk.split(/(?<=\.)\s+/);
+·const scoredSentences = sentences.map(sentence => ({
+·sentence,
+·score: importanceScore(sentence, keywords)
+·}));
+·scoredSentences.sort((a, b) => b.score - a.score);
+⟛│return scoredSentences.slice(0, Math.min(5, scoredSentences.length)).map(item => item.sentence).join(' ');
+·}
+}⟨/summarizeContext⟩
+⊩⟿recursiveContextLoader(5)→void⟨15⟩{
+⊩│export async function recursiveContextLoader(database, query, keywords, maxDepth = 3, currentDepth = 0) {
+·if (currentDepth >= maxDepth) {
+⊷│return '';
+·}
+⊻│const contextChunks = database.filter(entry => entry.includes(query));
+·const summaries = contextChunks.map(chunk => summarizeContext(chunk, keywords));
+·const combinedSummary = summaries.join(' ');
+·const nextKeywords = combinedSummary.split(/\s+/).slice(0, 10); // Extract top keywords for next iteration
+⊴│const deeperSummary = await recursiveContextLoader(database, query, nextKeywords, maxDepth, currentDepth + 1);
+⊷│return summarizeContext(combinedSummary + ' ' + deeperSummary, keywords);
+·}
+}⟨/recursiveContextLoader⟩
+⊩hierarchicalSummarize(2)→void⟨3⟩{
+⊩│export function hierarchicalSummarize(rawContext, keywords) {
+⊷│return summarizeContext(rawContext, keywords);
+·}
+}⟨/hierarchicalSummarize⟩
+⊩⟿exampleUsage(1)→void⟨13⟩{
+⊩│export async function exampleUsage() {
+·const simulatedDatabase = [
+·"Anthropic released Claude 3.5 Sonnet in June 2024. Claude 4 Opus came out in May 2025.",
+·"GPT-4o introduced multimodal reasoning with text, audio, and image integration techniques.",
+"xAI's Grok 4.1 improved multimodal ⬆ and reasoning capabilities in November 2025."
+·];
+·const query = "Claude Opus";
+·const keywords = ["Claude", "Opus", "multimodal", "reasoning", "integration"];
+⊴│const summary = await recursiveContextLoader(simulatedDatabase, query, keywords);
+·console.log(summary);
+·}
+}⟨/exampleUsage⟩
+⟩SCL│58│59⊨│16⑂│36.3%↓⟩

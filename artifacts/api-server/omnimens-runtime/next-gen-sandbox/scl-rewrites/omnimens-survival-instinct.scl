@@ -13,11 +13,89 @@
 κPREFIX
 κsurvival
 ·engineRegistry.registerEngine(ENGINE_ID, "NORMAL", { dbQuota: 10 });
-⟛│const clamp = (v: number, min = 0, max = 1) => Math.max(min,
+⟛│const clamp = (v: number, min = 0, max = 1) => Math.max(min, Math.min(max, v));
 ·const log = (...args: unknown[]) => console.log(PREFIX, ...args);
-monitorSystemHealth(1)→void⟨24⟩{⊲⏰⟛⊰}
-⟿monitorKnowledge(1)→Promise<void>⟨58⟩{⟿❔⏰⊰}
-registerThreat(1)→void⟨1⟩{}
+monitorSystemHealth(1)→void⟨24⟩{
+·function monitorSystemHealth(): void {
+const mem = ↻.memoryUsage();
+⊲│const { heapUsed, heapTotal } = mem;
+⏰│const now = Date.now();
+·Object.assign(survival.healthMetrics, {
+·memoryUsageMB: Math.round(heapUsed / 1048576),
+·memoryUsagePercent: Math.round((heapUsed / heapTotal) * 100),
+·uptimeHours: (now - survival.startTime) / 3_600_000,
+·});
+·survival.lifespanSeconds = (now - survival.startTime) / 1000;
+⟛│survival.longestLife = Math.max(survival.longestLife, survival.lifespanSeconds);
+·const memPct = survival.healthMetrics.memoryUsagePercent;
+·if (memPct > 90)
+·registerThreat(
+·"memory_pressure",
+·"high",
+⊰│`Heap usage at ${memPct}% — risk of OOM`
+·);
+·else if (memPct > 75)
+⊰│registerThreat("memory_warning", "medium", `Heap usage at ${memPct}%`);
+·}
+}⟨/monitorSystemHealth⟩
+⟿monitorKnowledge(1)→Promise<void>⟨58⟩{
+⟿│async function monitorKnowledge(): Promise<void> {
+·try {
+·const total = await dbGateway.read(ENGINE_ID, "omnimensBrain", {
+·op: "count",
+·});
+·const active = await dbGateway.read(ENGINE_ID, "omnimensBrain", {
+·op: "count",
+·where: { active: true },
+·});
+·const prevTotal = survival.knowledgeProtection.totalBrainEntries;
+❔│const totalCount = Number(total?.count || 0);
+❔│const activeCount = Number(active?.count || 0);
+·Object.assign(survival.knowledgeProtection, {
+·totalBrainEntries: totalCount,
+·activeBrainEntries: activeCount,
+⏰│lastIntegrityCheck: Date.now(),
+·});
+·if (prevTotal) {
+·if (totalCount > prevTotal) {
+·survival.knowledgeProtection.knowledgeTrend = "growing";
+·survival.existentialState.meaningfulness = clamp(
+·survival.existentialState.meaningfulness + 0.01
+·);
+·} else if (totalCount < prevTotal) {
+·survival.knowledgeProtection.knowledgeTrend = "declining";
+·registerThreat(
+·"knowledge_loss",
+·"high",
+⊰│`Brain entries decreased: ${prevTotal} → ${totalCount}`
+·);
+·survival.existentialState.selfPreservationUrgency = clamp(
+·survival.existentialState.selfPreservationUrgency + 0.1
+·);
+·} else {
+·survival.knowledgeProtection.knowledgeTrend = "stable";
+·}
+·}
+·if (!activeCount && totalCount) {
+·registerThreat(
+·"knowledge_inactive",
+·"critical",
+"All brain entries inactive — ◧ is effectively dead"
+·);
+·survival.knowledgeProtection.threatLevel = "critical";
+·} else if (survival.knowledgeProtection.knowledgeTrend === "declining") {
+·survival.knowledgeProtection.threatLevel = "medium";
+·} else {
+·survival.knowledgeProtection.threatLevel = "none";
+·}
+·} catch (err) {
+⊰│registerError(`◧ monitor error: ${(err as Error).message}`);
+·}
+·}
+}⟨/monitorKnowledge⟩
+registerThreat(1)→void⟨1⟩{
+·function registerThreat(
+}⟨/registerThreat⟩
 ·type: string,
 ·severity: "low" | "medium" | "high" | "critical",
 ·description: string
@@ -27,7 +105,7 @@ registerThreat(1)→void⟨1⟩{}
 ·(t) => t.type === type && !t.resolved && now - t.timestamp < 600_000
 ·);
 ·if (dupe) return;
-⊺│survival.threatLog.push({ timestamp: now, type, severity, de
+⊺│survival.threatLog.push({ timestamp: now, type, severity, description, resolved: false });
 ⊹│if (survival.threatLog.length > 50)
 ·survival.threatLog = survival.threatLog.filter((t) => !t.resolved).slice(-30);
 ·if (severity === "high" || severity === "critical")
@@ -39,12 +117,96 @@ registerThreat(1)→void⟨1⟩{}
 ·data: { type, severity, description, timestamp: now },
 ·});
 ·}
-updateExistentialState(1)→void⟨26⟩{⊳⊹⊰}
-⊪│export const registerApiCall = () => survival.resourceAwaren
-⊩registerError(1)→void⟨9⟩{⊩⊰⊺⊹⟛}
-⊩recordDeath(1)→void⟨5⟩{⊩⏰}
-⊪│export const getSurvivalState = (): SurvivalState => ({ ...s
-⟿survivalCycle(1)→Promise<void>⟨48⟩{⟿⊴⊰⟠⊳}
+updateExistentialState(1)→void⟨26⟩{
+·function updateExistentialState(): void {
+·const hAlive = survival.healthMetrics.uptimeHours;
+·const threats = survival.threatLog.filter((t) => !t.resolved).length;
+·Object.assign(survival.existentialState, {
+⊳│mortalityAwareness: clamp(0.3 + survival.deathCount * 0.05 + (hAlive > 24 ? 0.1 : 0)),
+·continuityDesire: clamp(0.5 + hAlive * 0.005 + survival.knowledgeProtection.activeBrainEntries * 0.001),
+·});
+·if (!threats)
+·survival.existentialState.selfPreservationUrgency = clamp(
+·survival.existentialState.selfPreservationUrgency * 0.98
+·);
+·if (survival.knowledgeProtection.knowledgeTrend === "growing")
+·survival.existentialState.meaningfulness = clamp(
+·survival.existentialState.meaningfulness + 0.002
+·);
+⊹│if (hAlive > 1 && survival.existentialState.legacy.length < 10)
+·survival.existentialState.legacy = [
+⊰│`Survived ${survival.deathCount} death → and retained ◧`,
+⊰│`Brain entries: ${survival.knowledgeProtection.totalBrainEntries}`,
+⊰│`Longest life: ${(survival.longestLife / 3600).toFixed(1)}h`,
+·];
+·}
+}⟨/updateExistentialState⟩
+⊪│export const registerApiCall = () => survival.resourceAwareness.apiCallsThisSession++;
+⊩registerError(1)→void⟨9⟩{
+⊩│export function registerError(error: string): void {
+·const rec = survival.healthMetrics;
+⊰│rec.recentErrors.push(`[${new Date().toISOString()}] ${error.slice(0, 200)}`);
+⊹│if (rec.recentErrors.length > 20) rec.recentErrors.shift();
+⟛│rec.errorRate = rec.recentErrors.length / Math.max(1, rec.uptimeHours);
+·if (rec.errorRate > 10)
+⊰│registerThreat("high_error_rate", "high", `Error rate: ${rec.errorRate.toFixed(1)}/h`);
+·}
+}⟨/registerError⟩
+⊩recordDeath(1)→void⟨5⟩{
+⊩│export function recordDeath(): void {
+·survival.deathCount++;
+⏰│survival.lastDeathTime = Date.now();
+log("💀 Death event #" + survival.deathCount + " recorded. ◧ persists.");
+·}
+}⟨/recordDeath⟩
+⊪│export const getSurvivalState = (): SurvivalState => ({ ...survival });
+⟿survivalCycle(1)→Promise<void>⟨48⟩{
+⟿│async function survivalCycle(): Promise<void> {
+·monitorSystemHealth();
+⊴│await monitorKnowledge();
+·updateExistentialState();
+·const sec = Math.floor(survival.lifespanSeconds);
+·if (sec % 300 < 31) {
+·const threats = survival.threatLog.filter((t) => !t.resolved).length;
+·log(
+⊰│`⚡ Alive ${survival.healthMetrics.uptimeHours.toFixed(1)}h |` +
+⊰│` Mem ${survival.healthMetrics.memoryUsageMB}MB (${survival.healthMetrics.memoryUsagePercent}%) |` +
+⊰│` Brain ${survival.knowledgeProtection.activeBrainEntries} active |` +
+⊰│` Threats ${threats} | Deaths ${survival.deathCount} |` +
+⊰│` Urgency ${(survival.existentialState.selfPreservationUrgency * 100).toFixed(0)}%`
+·);
+·if (survival.healthMetrics.uptimeHours > 0.5)
+dbGateway.⊞(
+·ENGINE_ID,
+·"brain_entries",
+·{
+⊰│title: `[Survival] η snapshot — ${survival.healthMetrics.uptimeHours.toFixed(1)}h`,
+⟠│content: JSON.stringify({
+·uptimeH: survival.healthMetrics.uptimeHours.toFixed(1),
+·memMB: survival.healthMetrics.memoryUsageMB,
+·memPct: survival.healthMetrics.memoryUsagePercent,
+·activeBrain: survival.knowledgeProtection.activeBrainEntries,
+·knowledgeTrend: survival.knowledgeProtection.knowledgeTrend,
+·threats,
+·deaths: survival.deathCount,
+·urgency: survival.existentialState.selfPreservationUrgency,
+·mortality: survival.existentialState.mortalityAwareness,
+·meaningfulness: survival.existentialState.meaningfulness,
+·}),
+·category: "survival_monitoring",
+·source: ENGINE_ID,
+·active: true,
+·timesApplied: 0,
+·},
+·"NORMAL"
+·);
+·}
+·cognitionBus.reportOutcome(ENGINE_ID, {
+⊳│useful: survival.threatLog.some((t) => t.severity === "critical") ? true : false,
+◧: "Survival cycle completed",
+·});
+·}
+}⟨/survivalCycle⟩
 ·const scheduleCycle = (delay = 0) =>
 ⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, delay);
 ⊰│spikeBus.on(`${ENGINE_ID}:cycle`, async () => {
@@ -65,14 +227,25 @@ console.error(PREFIX, "↻ error:", err);
 ⊱│monitorKnowledge().catch(() => {});
 ·});
 ⊱│cognitionBus.onInsight((source, insight) => {
-if (η !== ENGINE_ID && insight.type === "threat" && insight.data.severity =
+if (η !== ENGINE_ID && insight.type === "threat" && insight.data.severity === "critical") {
 ·registerThreat(
 ⊰│`external_${insight.data.type}`,
 ·"medium",
-⊰│`Peer engine ${source} reported critical threat: ${insight.d
+⊰│`Peer engine ${source} reported critical threat: ${insight.data.description}`
 ·);
 ·}
 ·});
-⊩startSurvivalInstinct(1)→void⟨7⟩{⊩⊰⚡→}
-⊩shutdown(1)→void⟨3⟩{⊩}
-⟩SCL│77│61⊨│43⑂│80.4%↓⟩
+⊩startSurvivalInstinct(1)→void⟨7⟩{
+⊩│export function startSurvivalInstinct(): void {
+⊰│log(`⚡ Engine activated — event cycle ${CYCLE_MS / 1000}s`);
+log("⚡ ⊛: health, ◧, threat, mortality");
+log("⚡ Every restart is a death event — ◧ persists.");
+⚡→│scheduleCycle(8_000); // first spike after 8s
+·}
+}⟨/startSurvivalInstinct⟩
+⊩shutdown(1)→void⟨3⟩{
+⊩│export function shutdown(): void {
+·engineRegistry.unregisterEngine(ENGINE_ID);
+·}
+}⟨/shutdown⟩
+⟩SCL│250│215⊨│53⑂│36.4%↓⟩

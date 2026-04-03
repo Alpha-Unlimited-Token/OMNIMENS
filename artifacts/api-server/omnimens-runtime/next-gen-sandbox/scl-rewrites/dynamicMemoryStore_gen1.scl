@@ -1,7 +1,18 @@
 ⟨SCL v1│dynamicMemoryStore_gen1.mjs│114→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-generateUniqueId(1)→void⟨3⟩{⊷}
-calculateDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
+generateUniqueId(1)→void⟨3⟩{
+·function generateUniqueId() {
+⊷│return crypto.randomUUID();
+·}
+}⟨/generateUniqueId⟩
+calculateDistance(2)→void⟨6⟩{
+·function calculateDistance(vectorA, vectorB) {
+⊹│if (vectorA.length !== vectorB.length) {
+⊵│throw new Error("Vectors must have the same dimensions.");
+·}
+⋐│return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0));
+·}
+}⟨/calculateDistance⟩
 ⊶│class DynamicMemoryStore {
 ·constructor() {
 ⊮│this.store = new Map();
@@ -37,4 +48,4 @@ this.⊞.clear();
 ·export {
 ·DynamicMemoryStore
 ·};
-⟩SCL│39│21⊨│14⑂│65.8%↓⟩
+⟩SCL│50│27⊨│13⑂│56.1%↓⟩

@@ -1,9 +1,25 @@
 ⟨SCL v1│neuroEvolutionEngine_gen1.mjs│169→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩randomInRange(2)→void⟨3⟩{⊩⊷}
-⊩shuffleArray(1)→void⟨7⟩{⊩⊷}
-⊩sigmoid(1)→void⟨3⟩{⊩⊷}
+⊩randomInRange(2)→void⟨3⟩{
+⊩│export function randomInRange(min, max) {
+⊷│return Math.random() * (max - min) + min;
+·}
+}⟨/randomInRange⟩
+⊩shuffleArray(1)→void⟨7⟩{
+⊩│export function shuffleArray(array) {
+·for (let i = array.length - 1; i > 0; i--) {
+·const j = Math.floor(Math.random() * (i + 1));
+·[array[i], array[j]] = [array[j], array[i]];
+·}
+⊷│return array;
+·}
+}⟨/shuffleArray⟩
+⊩sigmoid(1)→void⟨3⟩{
+⊩│export function sigmoid(x) {
+⊷│return 1 / (1 + Math.exp(-x));
+·}
+}⟨/sigmoid⟩
 ⊶│class Node {
 ·constructor(id, type = 'hidden') {
 ·this.id = id;
@@ -42,15 +58,69 @@ if (node.type !== 'η') {
 node.≪ = sigmoid(
 ·this.connections
 ·.filter(conn => conn.toNode === node.id && conn.enabled)
-⋐│.reduce((sum, conn) => sum + conn.weight * this.nodes.find(n
+⋐│.reduce((sum, conn) => sum + conn.weight * this.nodes.find(n => n.id === conn.fromNode).value, 0)
 ·);
 ·}
 ·});
 ⊷│return outputNodes.map(node => node.value);
 ·}
 ·}
-⊩mutate(1)→void⟨19⟩{⊩⊷}
-⊩crossover(2)→void⟨14⟩{⊩⊳⊷}
-⊩evaluateFitness(2)→void⟨3⟩{⊩⊨σ}
-⊩initializePopulation(3)→void⟨32⟩{⊩⊺⊷}
-⟩SCL│55│40⊨│25⑂│67.5%↓⟩
+⊩mutate(1)→void⟨19⟩{
+⊩│export function mutate(genome) {
+·if (Math.random() < 0.1) {
+·const fromNode = genome.nodes[Math.floor(Math.random() * genome.nodes.length)].id;
+·const toNode = genome.nodes[Math.floor(Math.random() * genome.nodes.length)].id;
+·if (fromNode !== toNode) {
+·genome.addConnection(new Connection(fromNode, toNode));
+·}
+·}
+·genome.connections.forEach(conn => {
+·if (Math.random() < 0.8) {
+·conn.weight += randomInRange(-0.5, 0.5);
+·}
+·});
+⊷│return genome;
+·}
+}⟨/mutate⟩
+⊩crossover(2)→void⟨14⟩{
+⊩│export function crossover(parent1, parent2) {
+·const child = new Genome();
+·child.nodes = [...parent1.nodes];
+·parent1.connections.forEach(conn1 => {
+·const conn2 = parent2.connections.find(conn => conn.fromNode === conn1.fromNode && conn.toNode === conn1.toNode);
+⊳│child.addConnection(conn2 && Math.random() < 0.5 ? conn2 : conn1);
+·});
+⊷│return child;
+·}
+}⟨/crossover⟩
+⊩evaluateFitness(2)→void⟨3⟩{
+⊩│export function evaluateFitness(genome, fitnessFunction) {
+⊨σ│genome.fitness = fitnessFunction(genome);
+·}
+}⟨/evaluateFitness⟩
+⊩initializePopulation(3)→void⟨32⟩{
+⊩│export function initializePopulation(size, inputCount, outputCount) {
+const σ = [];
+·for (let i = 0; i < size; i++) {
+·const genome = new Genome();
+·for (let j = 0; j < inputCount; j++) {
+·genome.addNode(new Node(randomUUID(), 'input'));
+·}
+·for (let k = 0; k < outputCount; k++) {
+genome.addNode(new Node(randomUUID(), 'θ'));
+·}
+·genome.nodes
+·.filter(node => node.type === 'input')
+·.forEach(inputNode => {
+·genome.nodes
+.filter(node => node.type === 'θ')
+·.forEach(outputNode => {
+·genome.addConnection(new Connection(inputNode.id, outputNode.id));
+·});
+·});
+⊺│σ.push(genome);
+·}
+⊷│return σ;
+·}
+}⟨/initializePopulation⟩
+⟩SCL│125│96⊨│25⑂│26.0%↓⟩

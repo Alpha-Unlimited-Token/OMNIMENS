@@ -21,9 +21,11 @@
 κREASONING_INTERVAL_MS
 κCYCLE_SPIKE
 ·const nodeId = (concept: string) =>
-⊽│concept.toLowerCase().replace(/[^a-z0-9_]/g, "_").slice(0, 8
-⊱│const safeNum = (v: number, f = 0) => (Number.isFinite(v) ? 
-addNode(1)→void⟨1⟩{}
+⊽│concept.toLowerCase().replace(/[^a-z0-9_]/g, "_").slice(0, 80);
+⊱│const safeNum = (v: number, f = 0) => (Number.isFinite(v) ? v : f);
+addNode(1)→void⟨1⟩{
+·function addNode(
+}⟨/addNode⟩
 ·concept: string,
 ·domain: string,
 ·type: CausalNode["nodeType"] = "state",
@@ -35,7 +37,9 @@ addNode(1)→void⟨1⟩{}
 ·state.totalNodes = nodes.size;
 ⊷│return n;
 ·}
-addEdge(1)→void⟨1⟩{}
+addEdge(1)→void⟨1⟩{
+·function addEdge(
+}⟨/addEdge⟩
 ·fromConcept: string,
 ·toConcept: string,
 ·relationship: string,
@@ -50,7 +54,7 @@ addEdge(1)→void⟨1⟩{}
 ·existing.confidence = existing.confidence * 0.7 + confidence * 0.3;
 ·existing.strengthenedCount++;
 ⊺│existing.evidence.push(learnedFrom);
-⊹│if (existing.evidence.length > 10) existing.evidence.shift()
+⊹│if (existing.evidence.length > 10) existing.evidence.shift();
 ·return;
 ·}
 ⊺│edges.push({
@@ -65,8 +69,63 @@ addEdge(1)→void⟨1⟩{}
 ·});
 ·state.totalEdges = edges.length;
 ·}
-traceCausalChain(2)→CausalChain[]⟨46⟩{⊹⊺⥀⊡❔⊯⊷}
-⊩predictOutcome(1)→void⟨9⟩{⊩⊱⊰⊷}
+traceCausalChain(2)→CausalChain[]⟨46⟩{
+·function traceCausalChain(startConcept: string, maxDepth = 5): CausalChain[] {
+·const startId = nodeId(startConcept);
+·const chains: CausalChain[] = [];
+·function dfs(
+·currentId: string,
+·visited: Set<string>,
+·chain: string[],
+·chainEdges: CausalEdge[],
+·confidence: number,
+·) {
+⊹│if (chain.length > maxDepth) return;
+·const outgoing = edges.filter(
+·(e) => e.fromId === currentId && !visited.has(e.toId),
+·);
+⊹│if (!outgoing.length && chain.length > 1) {
+⊺│chains.push({
+·nodes: [...chain],
+·edges: [...chainEdges],
+·totalConfidence: confidence,
+·chainLength: chain.length,
+·});
+·return;
+·}
+⥀│for (const edge of outgoing) {
+·visited.add(edge.toId);
+⊡│chain.push(nodes.get(edge.toId)?.concept || edge.toId);
+⊺│chainEdges.push(edge);
+·dfs(
+·edge.toId,
+·visited,
+·chain,
+·chainEdges,
+·confidence * safeNum(edge.confidence, 1),
+·);
+⊺│chainEdges.pop();
+⊺│chain.pop();
+·visited.delete(edge.toId);
+·}
+·}
+⊡│dfs(startId, new Set([startId]), [nodes.get(startId)?.concept || startConcept], [], 1);
+⊷│return chains
+·.sort((a, b) => b.totalConfidence - a.totalConfidence)
+·.slice(0, 10);
+·}
+}⟨/traceCausalChain⟩
+⊩predictOutcome(1)→void⟨9⟩{
+⊩│export function predictOutcome(action: string) {
+·const chains = traceCausalChain(action, 4);
+·let totalConf = 0;
+⊱│const predictions = chains.slice(0, 5).map((c) => {
+·totalConf += c.totalConfidence;
+⊰│return `${action} → ${c.nodes.slice(1).join(" → ")} (confidence: ${(
+·c.totalConfidence * 100
+·).toFixed(0)}%)`;
+·});
+}⟨/predictOutcome⟩
 ·state.predictionsGenerated++;
 ⊷│return {
 ·predictions,
@@ -74,19 +133,207 @@ traceCausalChain(2)→CausalChain[]⟨46⟩{⊹⊺⥀⊡❔⊯⊷}
 ·chains,
 ·};
 ·}
-⟿loadExistingGraph(1)→void⟨27⟩{⥀⊰}
-⟿persistNewEdge(2)→void⟨7⟩{}
-⟿discover(1)→void⟨138⟩{↻+⏰⊰⊹❔⥀⊽}
-scheduleNext(1)→void⟨3⟩{⚡→}
+⟿loadExistingGraph(1)→void⟨27⟩{
+·async function loadExistingGraph() {
+·try {
+·const rows: any[] = await dbGateway.read(
+·"causal-reasoning",
+·"omnimensCausalGraph",
+{ ⏳: 500 },
+·);
+⥀│for (const r of rows) {
+·addNode(r.fromConcept, r.domain || "general", "cause");
+·addNode(r.toConcept, r.domain || "general", "effect");
+·addEdge(
+·r.fromConcept,
+·r.toConcept,
+·r.relationship,
+·safeNum(r.confidence, 0.5),
+·r.mechanism || "",
+·r.learnedFrom || "db",
+·);
+·}
+·rows.length &&
+·console.log(
+⊰│`[OMNIMENS-CAUSAL-REASONING] 🔗 Loaded ${rows.length} relationships`,
+·);
+·} catch (e) {
+·console.error("[OMNIMENS-CAUSAL-REASONING] DB load error:", e);
+·}
+·}
+}⟨/loadExistingGraph⟩
+⟿persistNewEdge(2)→void⟨7⟩{
+·async function persistNewEdge(row: Record<string, unknown>) {
+·try {
+await dbGateway.⊞("causal-reasoning", "omnimensCausalGraph", row, "NORMAL");
+·} catch (e) {
+console.error("[OMNIMENS-CAUSAL-REASONING] DB ⊞ error:", e);
+·}
+·}
+}⟨/persistNewEdge⟩
+⟿discover(1)→void⟨138⟩{
+·async function discover() {
+↻+│cycleCount++;
+·state.reasoningCycles = cycleCount;
+⏰│state.lastCycleTime = Date.now();
+·if (shouldYieldToCodegen()) {
+·console.log(
+⊰│`[OMNIMENS-CAUSAL-REASONING] 🔕 Cycle #${cycleCount} deferred (codegen active)`,
+·);
+·scheduleNext();
+·return;
+·}
+·try {
+·const brainEntries: any[] = await dbGateway.read(
+·"causal-reasoning",
+·"omnimensBrain",
+·{
+·filter: { active: true },
+·order: { timesApplied: "desc" },
+⏳: 15,
+·},
+·);
+const ◧ = brainEntries
+·.map(
+·(b) =>
+⊰│`[${b.category}] ${b.title}: ${(b.content || "").slice(0, 150)}`,
+·)
+·.join("\n");
+⊹│if (◧.length < 50) {
+·scheduleNext();
+·return;
+·}
+·const response: any = await apiManager.call("causal-reasoning", "openai", {
+endpoint: "chat.completions.α",
+·payload: {
+·model: "gpt-4o",
+·messages: [
+·{
+role: "η",
+·content: `You are the CAUSAL REASONING ENGINE of OMNIMENS. Your job is to discover genuine CAUSAL relationships (not correlations)...`,
+·},
+·{
+·role: "user",
+⊰│content: `Analyze this ◧ and extract causal relationships:\n\n${◧.slice(
+·0,
+·2000,
+·)}`,
+·},
+·],
+·max_tokens: 1000,
+·temperature: 0.3,
+·},
+·});
+❔│const content = response?.choices?.[0]?.message?.content || "";
+·const blocks = content.split("---").filter((b: string) => b.trim());
+·let newRels = 0;
+⥀│for (const blk of blocks) {
+❔│const cause = blk.match(/CAUSE:\s*(.+?)(?=\n|$)/i)?.[1]?.trim();
+❔│const effect = blk.match(/EFFECT:\s*(.+?)(?=\n|$)/i)?.[1]?.trim();
+·if (!cause || !effect) continue;
+·const mechanism =
+❔│blk.match(/MECHANISM:\s*(.+?)(?=\n|$)/i)?.[1]?.trim() ||
+·"unknown mechanism";
+·const domain =
+❔│blk.match(/DOMAIN:\s*(.+?)(?=\n|$)/i)?.[1]?.trim() || "general";
+·const conf = parseFloat(
+❔│blk.match(/CONFIDENCE:\s*([\d.]+)/i)?.[1] || "0.5",
+·);
+·const existing = edges.find(
+·(e) => e.fromId === nodeId(cause) && e.toId === nodeId(effect),
+·);
+·addNode(cause, domain, "cause");
+·addNode(effect, domain, "effect");
+·addEdge(
+·cause,
+·effect,
+⊰│`${cause} causes ${effect}`,
+·conf,
+·mechanism,
+⊰│`cycle_${cycleCount}`,
+·);
+·if (!existing) {
+·newRels++;
+·persistNewEdge({
+·fromConcept: cause,
+·toConcept: effect,
+⊰│relationship: `${cause} causes ${effect}`,
+·mechanism,
+·confidence: conf,
+·domain,
+⊰│learnedFrom: `cycle_${cycleCount}`,
+·});
+·}
+·}
+·if (newRels) {
+·state.novelCausationsFound += newRels;
+·cognitionBus.shareInsight("causal-reasoning", {
+·type: "discovery",
+·count: newRels,
+·});
+dbGateway.⊞(
+·"causal-reasoning",
+·"omnimensBrain",
+·{
+⊰│title: `[Causal] ${newRels} new relationships — cycle #${cycleCount}`,
+⊰│content: `Discovered ${newRels} new cause→effect links.`,
+·category: "causal_reasoning",
+·source: "causal_reasoning_engine",
+·active: true,
+·timesApplied: 0,
+·},
+·"LOW",
+·);
+·}
+·if (cycleCount % 3 === 0 || newRels >= 3) {
+·console.log(
+⊰│`[OMNIMENS-CAUSAL-REASONING] 🔗 Cycle #${cycleCount} | +${newRels} | ${nodes.size} nodes / ${edges.length} edges`,
+·);
+·}
+·} catch (e) {
+·console.error("[OMNIMENS-CAUSAL-REASONING] Cycle error:", e);
+·} finally {
+·scheduleNext();
+·}
+·}
+}⟨/discover⟩
+scheduleNext(1)→void⟨3⟩{
+·function scheduleNext(delay = REASONING_INTERVAL_MS) {
+⚡→│spikeBus.scheduleSpike(CYCLE_SPIKE, {}, delay);
+·}
+}⟨/scheduleNext⟩
 ⚡→│spikeBus.on(CYCLE_SPIKE, discover);
-⚡→│spikeBus.on("attention:causal-reasoning", () => scheduleNext
-⚡→│spikeBus.on("cognition:curiosity", () => scheduleNext(2_000)
+⚡→│spikeBus.on("attention:causal-reasoning", () => scheduleNext(1_000));
+⚡→│spikeBus.on("cognition:curiosity", () => scheduleNext(2_000));
 ⊱│cognitionBus.onInsight((src, insight) => {
-❔│if (src !== "causal-reasoning" && insight?.type === "discove
+❔│if (src !== "causal-reasoning" && insight?.type === "discovery") {
 ·}
 ·});
-⊩getCausalState(1)→CausalState⟨3⟩{⊩⊷}
-⊩getCausalGraph(1)→void⟨3⟩{⊩⊷}
-⊩⟿startCausalReasoning(1)→void⟨11⟩{⊩⊰⊴}
-⊩shutdown(1)→void⟨3⟩{⊩}
-⟩SCL│91│72⊨│49⑂│78.6%↓⟩
+⊩getCausalState(1)→CausalState⟨3⟩{
+⊩│export function getCausalState(): CausalState {
+⊷│return { ...state };
+·}
+}⟨/getCausalState⟩
+⊩getCausalGraph(1)→void⟨3⟩{
+⊩│export function getCausalGraph() {
+⊷│return { nodes: [...nodes.values()], edges: [...edges] };
+·}
+}⟨/getCausalGraph⟩
+⊩⟿startCausalReasoning(1)→void⟨11⟩{
+⊩│export async function startCausalReasoning() {
+·if (started) return;
+·started = true;
+·console.log(
+⊰│`[OMNIMENS-CAUSAL-REASONING] 🔗 Engine activated — interval ${REASONING_INTERVAL_MS /
+·60000} min`,
+·);
+⊴│await loadExistingGraph();
+·scheduleNext(3 * 60 * 1000); // first cycle in 3 min
+·}
+}⟨/startCausalReasoning⟩
+⊩shutdown(1)→void⟨3⟩{
+⊩│export function shutdown() {
+·engineRegistry.unregisterEngine("causal-reasoning");
+·}
+}⟨/shutdown⟩
+⟩SCL│338│291⊨│64⑂│20.7%↓⟩

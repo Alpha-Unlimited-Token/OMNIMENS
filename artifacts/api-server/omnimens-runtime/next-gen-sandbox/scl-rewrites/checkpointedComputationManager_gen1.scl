@@ -1,10 +1,30 @@
 ⟨SCL v1│checkpointedComputationManager_gen1.mjs│102→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩serializeState(1)→void⟨3⟩{⊩⟠⊷}
-⊩deserializeState(1)→void⟨7⟩{⊩⟠⊷⊵}
-⊩generateTaskHash(1)→void⟨5⟩{⊩⟠⊷}
-⊩⟿executeWithCheckpoint(1)→void⟨1⟩{⊩}
+⊩serializeState(1)→void⟨3⟩{
+⊩│export function serializeState(state) {
+⟠│return JSON.stringify(state);
+·}
+}⟨/serializeState⟩
+⊩deserializeState(1)→void⟨7⟩{
+⊩│export function deserializeState(serializedState) {
+·try {
+⟠│return JSON.parse(serializedState);
+·} catch (error) {
+⊵│throw new Error('↺ to deserialize state: ' + error.message);
+·}
+·}
+}⟨/deserializeState⟩
+⊩generateTaskHash(1)→void⟨5⟩{
+⊩│export function generateTaskHash(taskInputs) {
+·const hash = createHash('sha256');
+⟠│hash.update(JSON.stringify(taskInputs));
+⊷│return hash.digest('hex');
+·}
+}⟨/generateTaskHash⟩
+⊩⟿executeWithCheckpoint(1)→void⟨1⟩{
+⊩│export async function executeWithCheckpoint(
+}⟨/executeWithCheckpoint⟩
 ·taskFunction,
 ·taskInputs,
 ·intermediateState,
@@ -29,16 +49,33 @@
 ⊵│throw new Error('Task failed: ' + error.message);
 ·}
 ·}
-⊩⟿resumeComputation(1)→void⟨1⟩{⊩}
+⊩⟿resumeComputation(1)→void⟨1⟩{
+⊩│export async function resumeComputation(
+}⟨/resumeComputation⟩
 ·serializedState,
 ·taskFunction,
 ·taskInputs
 ·) {
 κintermediateState
 κdependencyTracker
-⊷│return executeWithCheckpoint(taskFunction, taskInputs, inter
+⊷│return executeWithCheckpoint(taskFunction, taskInputs, intermediateState, dependencyTracker);
 ·}
-⊩⟿exampleTaskFunction(2)→void⟨10⟩{⊩⊲⊷}
-⊩initializeDependencyTracker(1)→void⟨3⟩{⊩⊷}
-⊩initializeIntermediateState(1)→void⟨3⟩{⊩⊷}
-⟩SCL│43│37⊨│24⑂│57.8%↓⟩
+⊩⟿exampleTaskFunction(2)→void⟨10⟩{
+⊩│export async function exampleTaskFunction(inputs, intermediateState) {
+⊲│const { a, b } = inputs;
+⊲│const { previousSum = 0 } = intermediateState;
+·const currentSum = previousSum + a + b;
+⊷│return { previousSum: currentSum };
+·}
+}⟨/exampleTaskFunction⟩
+⊩initializeDependencyTracker(1)→void⟨3⟩{
+⊩│export function initializeDependencyTracker() {
+⊷│return {};
+·}
+}⟨/initializeDependencyTracker⟩
+⊩initializeIntermediateState(1)→void⟨3⟩{
+⊩│export function initializeIntermediateState() {
+⊷│return {};
+·}
+}⟨/initializeIntermediateState⟩
+⟩SCL│80│56⊨│23⑂│21.6%↓⟩

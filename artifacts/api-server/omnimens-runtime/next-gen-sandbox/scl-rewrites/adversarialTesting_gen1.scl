@@ -6,7 +6,7 @@
 ·this.operations = operations;
 ·}
 ·generateEdgeCases() {
-⊷│return this.operations.generateComplexScenarios(this.memory)
+⊷│return this.operations.generateComplexScenarios(this.memory);
 ·}
 ·testAgents(agents) {
 κcases

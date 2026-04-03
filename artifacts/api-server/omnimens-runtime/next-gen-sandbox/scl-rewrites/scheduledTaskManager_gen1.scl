@@ -2,11 +2,74 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
 κtaskStates
-encryptState(2)→void⟨6⟩{⟠⊷}
-decryptState(2)→void⟨6⟩{⟠⊷}
-⊩scheduleTask(4)→void⟨29⟩{⊩⊰⊵⊡⟳⊱⊷}
-⊩getTaskState(2)→void⟨8⟩{⊩⊰⊵⊡⊷}
-⊩listScheduledTasks(1)→void⟨3⟩{⊩⊷}
-⊩updateTaskState(3)→void⟨8⟩{⊩⊰⊵⊡}
-⊩clearAllTasks(1)→void⟨3⟩{⊩}
-⟩SCL│11│32⊨│23⑂│87.1%↓⟩
+encryptState(2)→void⟨6⟩{
+·function encryptState(state, key) {
+·const cipher = crypto.createCipher('aes-256-cbc', key);
+⟠│let encrypted = cipher.update(JSON.stringify(state), 'utf8', 'hex');
+·encrypted += cipher.final('hex');
+⊷│return encrypted;
+·}
+}⟨/encryptState⟩
+decryptState(2)→void⟨6⟩{
+·function decryptState(encryptedState, key) {
+·const decipher = crypto.createDecipher('aes-256-cbc', key);
+·let decrypted = decipher.update(encryptedState, 'hex', 'utf8');
+·decrypted += decipher.final('utf8');
+⟠│return JSON.parse(decrypted);
+·}
+}⟨/decryptState⟩
+⊩scheduleTask(4)→void⟨29⟩{
+⊩│export function scheduleTask(taskName, intervalMs, taskFunction, encryptionKey) {
+·if (taskStates.has(taskName)) {
+⊰│throw new Error(`Task with name '${taskName}' is already scheduled.`);
+·}
+·const state = { progress: null, lastRun: null };
+·const encryptedState = encryptState(state, encryptionKey);
+⊡│taskStates.set(taskName, encryptedState);
+⟳│const intervalId = setInterval(() => {
+·try {
+⊡│const currentEncryptedState = taskStates.get(taskName);
+·const currentState = decryptState(currentEncryptedState, encryptionKey);
+·const updatedState = taskFunction(currentState);
+·updatedState.lastRun = new Date().toISOString();
+·const newEncryptedState = encryptState(updatedState, encryptionKey);
+⊡│taskStates.set(taskName, newEncryptedState);
+·} catch (error) {
+⊰│console.error(`Error in task '${taskName}':`, error);
+·}
+·}, intervalMs);
+⊱│return () => {
+·clearInterval(intervalId);
+·taskStates.delete(taskName);
+·};
+·}
+}⟨/scheduleTask⟩
+⊩getTaskState(2)→void⟨8⟩{
+⊩│export function getTaskState(taskName, encryptionKey) {
+·if (!taskStates.has(taskName)) {
+⊰│throw new Error(`Task with name '${taskName}' does not exist.`);
+·}
+⊡│const encryptedState = taskStates.get(taskName);
+⊷│return decryptState(encryptedState, encryptionKey);
+·}
+}⟨/getTaskState⟩
+⊩listScheduledTasks(1)→void⟨3⟩{
+⊩│export function listScheduledTasks() {
+⊷│return Array.from(taskStates.keys());
+·}
+}⟨/listScheduledTasks⟩
+⊩updateTaskState(3)→void⟨8⟩{
+⊩│export function updateTaskState(taskName, newState, encryptionKey) {
+·if (!taskStates.has(taskName)) {
+⊰│throw new Error(`Task with name '${taskName}' does not exist.`);
+·}
+·const encryptedState = encryptState(newState, encryptionKey);
+⊡│taskStates.set(taskName, encryptedState);
+·}
+}⟨/updateTaskState⟩
+⊩clearAllTasks(1)→void⟨3⟩{
+⊩│export function clearAllTasks() {
+·taskStates.clear();
+·}
+}⟨/clearAllTasks⟩
+⟩SCL│74│76⊨│21⑂│12.9%↓⟩

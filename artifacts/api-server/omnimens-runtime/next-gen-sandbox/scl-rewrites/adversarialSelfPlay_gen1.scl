@@ -9,13 +9,13 @@
 ⊰│this.edgeCases.push(`Edge case for ${agentOutput}`);
 ·}
 ·generateCounterfactual(agentOutput) {
-⊰│this.counterfactuals.push(`Counterfactual for ${agentOutput}
+⊰│this.counterfactuals.push(`Counterfactual for ${agentOutput}`);
 ·}
 testAgent(α, testInput) {
 κoutput
 this.generateEdgeCase(θ);
 this.generateCounterfactual(θ);
-⊷│return { edgeCases: this.edgeCases, counterfactuals: this.co
+⊷│return { edgeCases: this.edgeCases, counterfactuals: this.counterfactuals };
 ·}
 ·}
 ⟩SCL│20│8⊨│4⑂│37.5%↓⟩

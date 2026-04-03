@@ -1,5 +1,23 @@
 ⟨SCL v1│hierarchicalAgentOrchestration_gen1.mjs│27→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩hierarchicalAgentOrchestration(2)→void⟨13⟩{⊩}
-escalateTask(1)→void⟨4⟩{⊰}
-⟩SCL│4│4⊨│2⑂│85.2%↓⟩
+⊩hierarchicalAgentOrchestration(2)→void⟨13⟩{
+⊩│export function hierarchicalAgentOrchestration(agentMesh, taskQueue) {
+·const criticalTasks = taskQueue.filter(task => task.priority === 'critical');
+·criticalTasks.forEach(task => {
+·const allocatedAgent = agentMesh.allocate(task);
+·if (!allocatedAgent) {
+·escalateTask(task);
+·}
+·});
+·const nonCriticalTasks = taskQueue.filter(task => task.priority !== 'critical');
+·nonCriticalTasks.forEach(task => {
+·agentMesh.allocate(task);
+·});
+·}
+}⟨/hierarchicalAgentOrchestration⟩
+escalateTask(1)→void⟨4⟩{
+·function escalateTask(task) {
+⊰│console.warn(`Escalating task: ${task.id}`);
+·}
+}⟨/escalateTask⟩
+⟩SCL│22│18⊨│2⑂│18.5%↓⟩

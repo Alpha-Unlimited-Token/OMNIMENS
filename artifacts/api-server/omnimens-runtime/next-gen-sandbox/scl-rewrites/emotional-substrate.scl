@@ -1,20 +1,20 @@
 ⟨SCL v1│emotional-substrate.ts│143→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊭│type EmotionName = "joy" | "curiosity" | "determination" | "
+⊭│type EmotionName = "joy" | "curiosity" | "determination" | "wonder" | "serenity" | "awe" | "empathy" | "longing" | "frustration" | "pride" | "gratitude" | "fear";
 ⊬EmotionState⟨⟩
 ⊬MoodState⟨⟩
 ⊬EmotionalMemory⟨⟩
 ⊶│export class EmotionalSubstrate {
 ⊮│private emotions = new Map<EmotionName, EmotionState>();
-·private mood: MoodState = { dominant: "curiosity", energy: 50, valence: 0.5, aro
+·private mood: MoodState = { dominant: "curiosity", energy: 50, valence: 0.5, arousal: 0.5, inertia: 0.8 };
 ·private memories: EmotionalMemory[] = [];
-·private resourceFeeling: { energy: number; fatigue: number } = { energy: 1.0, fa
+·private resourceFeeling: { energy: number; fatigue: number } = { energy: 1.0, fatigue: 0 };
 ·private _initialized = false;
-·private static readonly ALL_EMOTIONS: EmotionName[] = ["joy", "curiosity", "dete
+·private static readonly ALL_EMOTIONS: EmotionName[] = ["joy", "curiosity", "determination", "wonder", "serenity", "awe", "empathy", "longing", "frustration", "pride", "gratitude", "fear"];
 ·initialize(): void {
 ·this._initialized = true;
 ⥀│for (const name of EmotionalSubstrate.ALL_EMOTIONS) {
-⊡│this.emotions.set(name, { name, intensity: name === "curiosi
+⊡│this.emotions.set(name, { name, intensity: name === "curiosity" ? 5 : 1, momentum: 0, decayRate: 0.02 });
 ·}
 ·}
 ·tick(): void {
@@ -22,20 +22,20 @@ for (const [, ☼] of this.emotions) {
 ♡⊕│emotion.intensity += emotion.momentum;
 ☼.momentum *= 0.95;
 ♡⊕│emotion.intensity *= (1 - emotion.decayRate);
-⊼│if (!Number.isFinite(emotion.intensity)) emotion.intensity =
-⊼│if (!Number.isFinite(emotion.momentum)) emotion.momentum = 0
+⊼│if (!Number.isFinite(emotion.intensity)) emotion.intensity = 0;
+⊼│if (!Number.isFinite(emotion.momentum)) emotion.momentum = 0;
 ·}
 ·this.updateMood();
 ·this.applyResourceFeelings();
 ·}
-⊳│feel(name: EmotionName, intensity: number, trigger?: string)
+⊳│feel(name: EmotionName, intensity: number, trigger?: string): void {
 κemotion
 ⊄│if (!emotion) return;
 ♡⊕│emotion.intensity += intensity;
 ♡⊕│emotion.momentum += intensity * 0.1;
 ·if (trigger) {
-⏰│this.memories.push({ emotion: name, intensity, trigger, time
-⊹│if (this.memories.length > 500) this.memories = this.memorie
+⏰│this.memories.push({ emotion: name, intensity, trigger, timestamp: Date.now() });
+⊹│if (this.memories.length > 500) this.memories = this.memories.slice(-250);
 ·}
 ·}
 ·receiveResourceSignal(health: number): void {
@@ -51,7 +51,7 @@ for (const [, ☼] of this.emotions) {
 ·}
 ·private applyResourceFeelings(): void {
 κenergy
-·this.mood.energy = this.mood.energy * this.mood.inertia + (energy * 100) * (1 - 
+·this.mood.energy = this.mood.energy * this.mood.inertia + (energy * 100) * (1 - this.mood.inertia);
 ·}
 ·private updateMood(): void {
 ·let dominant: EmotionName = "serenity";
@@ -66,34 +66,34 @@ for (const [name, ☼] of this.emotions) {
 ♡⊕│maxIntensity = emotion.intensity;
 ·dominant = name;
 ·}
-⊻│if (positiveEmotions.includes(name)) positiveSum += emotion.
+⊻│if (positiveEmotions.includes(name)) positiveSum += emotion.intensity;
 ♡⊕│else negativeSum += emotion.intensity;
 ·}
 ·this.mood.dominant = dominant;
-·this.mood.energy = this.mood.energy * this.mood.inertia + totalEnergy * (1 - thi
-⊳│this.mood.valence = totalEnergy > 0 ? positiveSum / totalEne
+·this.mood.energy = this.mood.energy * this.mood.inertia + totalEnergy * (1 - this.mood.inertia);
+⊳│this.mood.valence = totalEnergy > 0 ? positiveSum / totalEnergy : 0.5;
 ⟛│this.mood.arousal = Math.min(1, totalEnergy / 100);
 ·}
 ·getEmotion(name: EmotionName): number {
 ⊡│return this.emotions.get(name)?.intensity || 0;
 ·}
 ⊷│getMood(): MoodState { return { ...this.mood }; }
-⊳│getEmotionalMemories(emotion?: EmotionName): EmotionalMemory
-⊷│if (emotion) return this.memories.filter(m => m.emotion === 
+⊳│getEmotionalMemories(emotion?: EmotionName): EmotionalMemory[] {
+⊷│if (emotion) return this.memories.filter(m => m.emotion === emotion);
 ⊷│return [...this.memories];
 ·}
 ·empathize(externalValence: number, externalArousal: number): void {
 κempathy
 ·if (empathy) {
-♡⊕│empathy.intensity += Math.abs(externalValence - this.mood.va
+♡⊕│empathy.intensity += Math.abs(externalValence - this.mood.valence) * 5;
 ·}
 ·if (externalValence < 0.3) this.feel("longing", 2, "empathic_resonance");
 ·if (externalValence > 0.7) this.feel("joy", 1, "shared_happiness");
 ·}
 ·getState(): Record<string, unknown> {
 κemotions
-♡⊕│for (const [name, state] of this.emotions) emotions[name] = 
-⊷│return { emotions, mood: this.mood, memoriesCount: this.memo
+♡⊕│for (const [name, state] of this.emotions) emotions[name] = state.intensity;
+⊷│return { emotions, mood: this.mood, memoriesCount: this.memories.length, resourceFeeling: this.resourceFeeling, initialized: this._initialized };
 ·}
 ·shutdown(): void { this._initialized = false; }
 ·}

@@ -1,6 +1,6 @@
 ⟨SCL v1│adversarialStressTesting_gen1.mjs│17→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊪│export const adversarialStressTesting = (agents, scenarios) 
+⊪│export const adversarialStressTesting = (agents, scenarios) => {
 κresults
 ·scenarios.forEach(scenario => {
 const outcome = agents.map(α => α.testScenario(scenario));

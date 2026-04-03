@@ -27,18 +27,18 @@
 ·const allAgents = (): string[] => {
 ·try {
 κgenesis
-⊷│return [...CORE_MESH_AGENTS, ...genesis.filter(g => !CORE_ME
+⊷│return [...CORE_MESH_AGENTS, ...genesis.filter(g => !CORE_MESH_AGENTS.includes(g))];
 ⊷│} catch { return CORE_MESH_AGENTS; }
 ·};
 ·const randomData = (cat: string): string =>
-⏰│`[${cat}:${Math.random().toString(36).slice(2, 8)}:q${Date.n
+⏰│`[${cat}:${Math.random().toString(36).slice(2, 8)}:q${Date.now() % 997}] ${pick(KNOWLEDGE_FRAGMENTS)}`;
 ⊱│const decode = (raw: string, agent: string) => {
 κmethod
 κrel
 κnov
 κconf
 ⊷│return {
-⊰│insight: `${agent}/${method}: ${raw.replace(/\[.*?\]\s*/, ""
+⊰│insight: `${agent}/${method}: ${raw.replace(/\[.*?\]\s*/, "").slice(0, 120)} [rel=${rel.toFixed(2)}, nov=${nov.toFixed(2)}]`,
 ·confidence: conf,
 ·};
 ·};
@@ -60,7 +60,7 @@ const openBatch = (α: string, n: number): Wormhole[] => {
 ·if (!cluster) continue;
 ·const high = cluster.wormholes.filter(w => w.confidence > 0.6).slice(-5);
 ·if (!high.length) continue;
-⥀│for (const to of agents.filter(a => a !== from).sort(() => M
+⥀│for (const to of agents.filter(a => a !== from).sort(() => Math.random() - 0.5).slice(0, 3)) {
 κhi
 κcirc
 κtoCluster
@@ -70,9 +70,9 @@ const openBatch = (α: string, n: number): Wormhole[] => {
 κmatch
 κcomb
 ·if (comb > 0.7) {
-⊺│circ.synthesizedWith.push(match.decodedInsight.slice(0, 80))
+⊺│circ.synthesizedWith.push(match.decodedInsight.slice(0, 80));
 ·S.syntheses++;
-·cognitionBus.shareInsight("quantum-wormhole", { type: "discovery", data: circ })
+·cognitionBus.shareInsight("quantum-wormhole", { type: "discovery", data: circ });
 ·}
 ·}
 ·}
@@ -81,23 +81,23 @@ const openBatch = (α: string, n: number): Wormhole[] => {
 ·cluster.crossAgentShares++;
 ·}
 ·}
-⊹│if (S.recentCircs.length > 200) S.recentCircs.splice(0, S.re
+⊹│if (S.recentCircs.length > 200) S.recentCircs.splice(0, S.recentCircs.length - 100);
 ·};
 ⊱│const runCycle = async () => {
 S.↻++;
 ·if (isNextGenBuildActive()) {
-if (S.↻ % 5 === 0) console.log("[OMNIMENS-QUANTUM-WORMHOLE] 🔕 ↻ skipped
+if (S.↻ % 5 === 0) console.log("[OMNIMENS-QUANTUM-WORMHOLE] 🔕 ↻ skipped (Gen-2 active)");
 ·scheduleNext();
 ·return;
 ·}
 κagents
-⊲│const { knowledgeIntegrationRate, technologyDiscoveryRate } 
+⊲│const { knowledgeIntegrationRate, technologyDiscoveryRate } = getAdaptiveIntelligenceState();
 κinsightMul
 κenergyBoost
 ⥀│for (const agent of agents) {
 ⊡│let cl = S.clusters.get(agent);
 ·if (!cl) {
-cl = { agentName: α, totalWormholes: 0, closedWormholes: 0, totalDataIngeste
+cl = { agentName: α, totalWormholes: 0, closedWormholes: 0, totalDataIngested: 0, totalInsightsDecoded: 0, crossAgentShares: 0, wormholes: [] };
 ⊡│S.clusters.set(agent, cl);
 ·}
 κopen
@@ -106,21 +106,21 @@ cl = { agentName: α, totalWormholes: 0, closedWormholes: 0, totalDataIngeste
 ·cl.totalWormholes += batch.length;
 ·cl.closedWormholes += batch.length;
 ·cl.totalInsightsDecoded += Math.floor(batch.length * insightMul);
-⋐│cl.totalDataIngested += batch.reduce((s, w) => s + w.bytesTr
-⊹│if (cl.wormholes.length > 200) cl.wormholes.splice(0, cl.wor
+⋐│cl.totalDataIngested += batch.reduce((s, w) => s + w.bytesTransferred, 0);
+⊹│if (cl.wormholes.length > 200) cl.wormholes.splice(0, cl.wormholes.length - 100);
 ·S.totalWormholes += batch.length;
 ·S.totalClosed += batch.length;
 ·S.insights += batch.length;
-⋐│S.dataBytes += batch.reduce((s, w) => s + w.bytesTransferred
+⋐│S.dataBytes += batch.reduce((s, w) => s + w.bytesTransferred, 0);
 ·}
 ·circulate();
 ·try {
-⥀│for (const r of getRegionNames()) boostRegionCurrent(r, ener
+⥀│for (const r of getRegionNames()) boostRegionCurrent(r, energyBoost * (0.5 + Math.random() * 0.5));
 ·} catch {/* silence */}
 if (S.↻ % 5 === 0) {
-📢│console.log(`[OMNIMENS-QUANTUM-WORMHOLE] 🌀 Cycle ${S.cycle}
+📢│console.log(`[OMNIMENS-QUANTUM-WORMHOLE] 🌀 Cycle ${S.cycle}: ${S.totalWormholes} wh, ${S.insights} insights, ${S.syntheses} synth`);
 ·}
-⊰│cognitionBus.reportOutcome("quantum-wormhole", { useful: S.s
+⊰│cognitionBus.reportOutcome("quantum-wormhole", { useful: S.syntheses > 0, context: `cycle:${S.cycle}` });
 ·scheduleNext();
 ·};
 ·const scheduleNext = (delay = WORMHOLE_CYCLE_MS) =>
@@ -133,14 +133,14 @@ if (S.↻ % 5 === 0) {
 ·console.log("[OMNIMENS-QUANTUM-WORMHOLE] 🌀 Engine initializing…");
 ⥀│for (const a of allAgents()) S.clusters.set(a, {
 ·agentName: a, totalWormholes: 0, closedWormholes: 0,
-·totalDataIngested: 0, totalInsightsDecoded: 0, crossAgentShares: 0, wormholes: [
+·totalDataIngested: 0, totalInsightsDecoded: 0, crossAgentShares: 0, wormholes: [],
 ·});
 ⊱│cognitionBus.onInsight((src, i) => {
 ·if (src !== "quantum-wormhole" && i.type === "discovery") {
 ·}
 ·});
-⚡→│spikeBus.on("attention:quantum-wormhole", () => scheduleNext
-⚡→│spikeBus.on("cognition:curiosity", () => scheduleNext(5_000)
+⚡→│spikeBus.on("attention:quantum-wormhole", () => scheduleNext(1_000));
+⚡→│spikeBus.on("cognition:curiosity", () => scheduleNext(5_000));
 scheduleNext(8_000); // first ↻ after boot delay
 ·};
 ⊪│export const getQuantumWormholeState = () => {
@@ -154,7 +154,7 @@ scheduleNext(8_000); // first ↻ after boot delay
 ❔│totalDataIngested: c?.totalDataIngested ?? 0,
 ❔│totalInsightsDecoded: c?.totalInsightsDecoded ?? 0,
 ❔│crossAgentShares: c?.crossAgentShares ?? 0,
-❔│recentInsights: (c?.wormholes ?? []).slice(-3).map(w => w.de
+❔│recentInsights: (c?.wormholes ?? []).slice(-3).map(w => w.decodedInsight.slice(0, 100)),
 ·};
 ·});
 ⊷│return {

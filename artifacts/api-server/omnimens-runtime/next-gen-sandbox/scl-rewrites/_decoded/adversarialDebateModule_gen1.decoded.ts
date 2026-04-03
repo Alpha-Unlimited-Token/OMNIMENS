@@ -1,15 +1,14 @@
-export function adversarialDebateModule(arg0) {
   export function adversarialDebateModule(agents) {
 const debates = [];
-agents.forEach(create new agent or subprocess => {
-  create new agent or subprocess.on('proposal', (proposal) => {
+agents.forEach(spawn => {
+  spawn.on('proposal', (proposal) => {
 const debate = createDebate(proposal, agents);
   debates.push(debate);
 });
 });
 function createDebate(proposal, agents) {
-const counters = agents.map(create new agent or subprocess => create new agent or subprocess.counter(proposal));
-const defenses = agents.map(create new agent or subprocess => create new agent or subprocess.defend(proposal));
+const counters = agents.map(spawn => spawn.counter(proposal));
+const defenses = agents.map(spawn => spawn.defend(proposal));
   return {
 proposal,
 counters,
@@ -27,6 +26,5 @@ defenses.forEach(defense => {
 resolution += defense.effectiveness;
 });
   return resolution - divergence;
-}
 }
 }

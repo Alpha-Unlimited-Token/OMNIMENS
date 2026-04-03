@@ -14,13 +14,13 @@
 ⊬Prediction⟨type:string│predicted:string│domain:string│hierarchyLevel:number│confidence:number⟩
 ⊭│type Table = keyof typeof TABLES;
 κTABLES
-📢│const log = (msg: string) => console.log(`[OMNIMENS-PREDICTI
+📢│const log = (msg: string) => console.log(`[OMNIMENS-PREDICTIVE-PROCESSING] ${msg}`);
 ·const read = <T = any>(table: Table, query: any) =>
 ·dbGateway.read(ENGINE_ID, TABLES[table], query) as Promise<T[]>;
 const ⊞ = (table: Table, data: any) =>
 dbGateway.⊞(ENGINE_ID, TABLES[table], data, "NORMAL");
 ·const update = (table: Table, criteria: any, changes: any) =>
-❔│dbGateway.update?.(ENGINE_ID, TABLES[table], criteria, chang
+❔│dbGateway.update?.(ENGINE_ID, TABLES[table], criteria, changes); // optional
 ·const callLLM = async (prompt: string, tag: string) =>
 apiManager.call(ENGINE_ID, "openai", { prompt, tag }) as Promise<ι<any>>;
 κmodels
@@ -30,13 +30,13 @@ apiManager.call(ENGINE_ID, "openai", { prompt, tag }) as Promise<ι<any>>;
 ·domain: "agent_discoveries",
 ⊱│generator: async () => {
 κdiscoveries
-⊷│if (discoveries.length < 2 || !canMakeBackgroundCall(ENGINE_
+⊷│if (discoveries.length < 2 || !canMakeBackgroundCall(ENGINE_ID)) return [];
 κctx
-⊰│.map((d) => `${d.fromAgent}: ${(d.content ?? "").slice(0, 15
+⊰│.map((d) => `${d.fromAgent}: ${(d.content ?? "").slice(0, 150)}`)
 ·.join("\n");
 log("🧠 Predicting α discoveries");
 κpreds
-⊷│return preds.map(({ predicted, confidence = 0.5 }: any): Pre
+⊷│return preds.map(({ predicted, confidence = 0.5 }: any): Prediction => ({
 ·type: "agent_next_discovery",
 ·predicted,
 ·domain: "agent_discoveries",
@@ -49,7 +49,7 @@ log("🧠 Predicting α discoveries");
 ·domain: "knowledge_gaps",
 ⊱│generator: async () => {
 κbrain
-⊷│if (brain.length < 5 || !canMakeBackgroundCall(ENGINE_ID)) r
+⊷│if (brain.length < 5 || !canMakeBackgroundCall(ENGINE_ID)) return [];
 κcategories
 ⊱│brain.forEach((b) => {
 κk
@@ -63,7 +63,7 @@ log("🧠 Predicting α discoveries");
 ⊰│brain.map((b) => `[${b.category}] ${b.title}`).join("; ");
 log("🧠 Predicting ◧ gaps");
 κgaps
-⊷│return gaps.map(({ predicted, confidence = 0.5 }: any): Pred
+⊷│return gaps.map(({ predicted, confidence = 0.5 }: any): Prediction => ({
 ·type: "knowledge_gap",
 ·predicted,
 ·domain: "knowledge_gaps",
@@ -76,13 +76,13 @@ log("🧠 Predicting ◧ gaps");
 ·domain: "system_needs",
 ⊱│generator: async () => {
 κupgrades
-⊷│if (upgrades.length < 2 || !canMakeBackgroundCall(ENGINE_ID)
+⊷│if (upgrades.length < 2 || !canMakeBackgroundCall(ENGINE_ID)) return [];
 κctx
-⊰│.map((u) => `${u.subject}: ${(u.content ?? "").slice(0, 150)
+⊰│.map((u) => `${u.subject}: ${(u.content ?? "").slice(0, 150)}`)
 ·.join("\n");
 log("🧠 Predicting η needs");
 κneeds
-⊷│return needs.map(({ predicted, confidence = 0.5 }: any): Pre
+⊷│return needs.map(({ predicted, confidence = 0.5 }: any): Prediction => ({
 ·type: "system_need",
 ·predicted,
 ·domain: "system_needs",
@@ -92,25 +92,140 @@ log("🧠 Predicting η needs");
 ·},
 ·},
 ·];
-⟿resolvePredictionErrors(1)→Promise<number>⟨109⟩{⊴⥀⏰❔⊽⊱⊰⊷⟿⊩↻+🚨}
+⟿resolvePredictionErrors(1)→Promise<number>⟨109⟩{
+·async function resolvePredictionErrors(): Promise<number> {
+⊴│const unresolved = await read("predictions", {
+·where: { actual: null, predictionError: null },
+·orderBy: { createdAt: "DESC" },
+⏳: 10,
+·});
+·let resolved = 0;
+⥀│for (const pred of unresolved) {
+⏰│const ageMs = Date.now() - new Date(pred.createdAt).getTime();
+·if (ageMs < 3 * 60 * 60 * 1000) continue;
+·let actual = "";
+·let error = 0.5;
+·if (pred.predictionType === "agent_next_discovery") {
+❔│const α = (pred.predicted.match(/^([^:]+):/)?.[1] ?? "").trim();
+⊴│const beacons = await read("mesh", {
+·messageType: "spider_beacon",
+fromAgent: new RegExp(α, "i"),
+·createdAfter: pred.createdAt,
+⏳: 3,
+·});
+·if (beacons.length) {
+⊱│actual = beacons.map((b) => (b.content ?? "").slice(0, 100)).join("; ");
+·try {
+·log("🧠 Resolving prediction error");
+⊴│const cmp = await internalPredictiveProcessing(
+⊰│`PREDICTION: ${pred.predicted.slice(0, 300)}\nACTUAL: ${actual.slice(0, 300)}`,
+·"error_resolution"
+·);
+❔│error = cmp[0]?.confidence ?? 0.5;
+·if (error > 0.6) {
+⊴│await ⊞("brain", {
+·category: "insight",
+title: `[PREDICTION ERROR] Surprise ⊛ → model update`,
+❔│content: (cmp[0]?.predicted ?? "Prediction diverged").slice(0, 250),
+·confidence: 0.5 + error * 0.4,
+⊰│sourceConversation: `prediction_cycle_${cycleCount}`,
+·timesApplied: 0,
+·active: true,
+·});
+·}
+·} catch {/* swallow */}
+·} else if (ageMs < 6 * 60 * 60 * 1000) {
+·continue; // wait longer
+·} else {
+·actual = "No matching discoveries found — prediction unresolvable";
+·error = 0.7;
+·}
+·} else if (ageMs > 6 * 60 * 60 * 1000) {
+·actual = "Prediction expired — insufficient data for resolution";
+·error = 0.5;
+·} else continue;
+⊴│await update("predictions", { id: pred.id }, { actual, predictionError: error, modelUpdated: error > 0.6 });
+·resolved++;
+·}
+⊷│return resolved;
+·}
+⟿│export async function runPredictiveCycle(): Promise<void> {
+↻+│cycleCount++;
+·if (shouldYieldToCodegen()) {
+⊰│log(`🔕 Cycle #${cycleCount} DEFERRED — codegen priority`);
+·return;
+·}
+⏰│const start = Date.now();
+⊰│log(`▲ Cycle #${cycleCount} START`);
+⊴│const errorsResolved = await resolvePredictionErrors();
+⊰│if (errorsResolved) log(`Resolved ${errorsResolved} prediction error(s)`);
+·let newPreds = 0;
+·for (const { domain, generator } of models) {
+·try {
+⊴│const preds = await generator();
+·if (!preds.length) continue;
+⊴│await ⊞("predictions", preds);
+·newPreds += preds.length;
+⊰│log(`▲ ${domain}: ${preds.length} prediction(s) generated`);
+·cognitionBus.shareInsight(ENGINE_ID, {
+·type: "predictions",
+·domain,
+·count: preds.length,
+·});
+·} catch (e) {
+🚨│console.error(`[${ENGINE_ID}] model ${domain} ↺`, e);
+·}
+·}
+·if (newPreds || errorsResolved) {
+⊴│await ⊞("notifications", {
+·upgradeId: null,
+⊰│title: `Predictive ✦ Cycle #${cycleCount}`,
+⏰│message: `Generated ${newPreds} predictions, resolved ${errorsResolved} errors in ${(Date.now() - start) / 1000}s.`,
+·type: "predictive_processing",
+·readByOwner: false,
+·});
+·}
+·cognitionBus.reportOutcome(ENGINE_ID, {
+·useful: newPreds + errorsResolved > 0,
+⊰│◧: `cycle_${cycleCount}`,
+·});
+⏰│log(`▲ Cycle #${cycleCount} ⊣ — ${newPreds} preds, ${errorsResolved} resolved, ${((Date.now() - start) / 1000).toFixed(1)}s`);
+·}
+}⟨/resolvePredictionErrors⟩
 κBASE_INTERVAL
-scheduleNextCycle(1)→void⟨3⟩{⊰⚡→}
+scheduleNextCycle(1)→void⟨3⟩{
+·function scheduleNextCycle(delay: number) {
+⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, delay);
+·}
+}⟨/scheduleNextCycle⟩
 ⊰│spikeBus.on(`${ENGINE_ID}:cycle`, async () => {
 ⊴│await runPredictiveCycle().catch(console.error);
 ·scheduleNextCycle(BASE_INTERVAL * getThrottleMultiplier());
 ·});
-⊩startPredictiveProcessing(1)→void⟨7⟩{⊩⊳⊰}
+⊩startPredictiveProcessing(1)→void⟨7⟩{
+⊩│export function startPredictiveProcessing() {
+·const firstDelay =
+⊳│↻.env.NODE_ENV !== "production" ? 18 * 60 * 1000 : 45 * 60 * 1000;
+⊰│log(`Engine activated — first cycle in ${firstDelay / 60000}m, then every 4h`);
+⊰│log(`Models: ${models.map((m) => m.domain).join(", ")}`);
+·scheduleNextCycle(firstDelay);
+·}
+}⟨/startPredictiveProcessing⟩
 ⊪│export const getActivePredictions = () =>
-·read("predictions", { where: { actual: null }, orderBy: { createdAt: "DESC" }, l
+read("predictions", { where: { actual: null }, orderBy: { createdAt: "DESC" }, ⏳: 20 });
 ⊱│cognitionBus.onInsight((src, insight) => {
 ·if (src === ENGINE_ID) return;
-⊰│if (insight.type === "discovery") spikeBus.scheduleSpike(`${
+⊰│if (insight.type === "discovery") spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, 1000);
 ·});
 ⊱│spikeBus.on("cognition:curiosity", () => {
-⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, 5 * 60 * 10
+⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, 5 * 60 * 1000);
 ·});
 ⊰│spikeBus.on(`attention:${ENGINE_ID}`, () => {
 ⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, 2000);
 ·});
-⊩shutdown(1)→void⟨3⟩{⊩}
-⟩SCL│115│74⊨│47⑂│60.8%↓⟩
+⊩shutdown(1)→void⟨3⟩{
+⊩│export function shutdown() {
+·engineRegistry.unregisterEngine(ENGINE_ID);
+·}
+}⟨/shutdown⟩
+⟩SCL│230│179⊨│65⑂│21.5%↓⟩

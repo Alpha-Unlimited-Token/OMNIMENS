@@ -4,10 +4,41 @@
 κalgorithm
 κkey
 κiv
-⊩serializeState(1)→void⟨7⟩{⊩⟠⊷}
-⊩deserializeState(1)→void⟨6⟩{⊩⟠⊷}
-⊩persistState(1)→void⟨3⟩{⊩⊷}
-⊩restoreState(1)→void⟨3⟩{⊩⊷}
-⊩validateState(1)→void⟨3⟩{⊩⊷}
-⊩mergeStates(2)→void⟨3⟩{⊩⊷}
-⟩SCL│12│24⊨│14⑂│84.6%↓⟩
+⊩serializeState(1)→void⟨7⟩{
+⊩│export function serializeState(state) {
+⟠│const jsonString = JSON.stringify(state);
+·const cipher = createCipheriv(algorithm, key, iv);
+·let encrypted = cipher.update(jsonString, 'utf8', 'base64');
+·encrypted += cipher.final('base64');
+⊷│return encrypted;
+·}
+}⟨/serializeState⟩
+⊩deserializeState(1)→void⟨6⟩{
+⊩│export function deserializeState(encryptedState) {
+·const decipher = createDecipheriv(algorithm, key, iv);
+·let decrypted = decipher.update(encryptedState, 'base64', 'utf8');
+·decrypted += decipher.final('utf8');
+⟠│return JSON.parse(decrypted);
+·}
+}⟨/deserializeState⟩
+⊩persistState(1)→void⟨3⟩{
+⊩│export function persistState(state) {
+⊷│return serializeState(state);
+·}
+}⟨/persistState⟩
+⊩restoreState(1)→void⟨3⟩{
+⊩│export function restoreState(encryptedState) {
+⊷│return deserializeState(encryptedState);
+·}
+}⟨/restoreState⟩
+⊩validateState(1)→void⟨3⟩{
+⊩│export function validateState(state) {
+⊷│return state && typeof state === 'object' && !Array.isArray(state);
+·}
+}⟨/validateState⟩
+⊩mergeStates(2)→void⟨3⟩{
+⊩│export function mergeStates(baseState, newState) {
+⊷│return { ...baseState, ...newState };
+·}
+}⟨/mergeStates⟩
+⟩SCL│43│42⊨│13⑂│44.9%↓⟩
