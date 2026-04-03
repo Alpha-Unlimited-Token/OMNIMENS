@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuAcceleratedMatrixOps
- * Written: 2026-04-03T09:43:59.707Z
+ * Written: 2026-04-03T15:45:19.357Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -20,43 +20,41 @@
  * TRANSLATION STATUS:
  * Novel constructs: attention
  * All constructs have translation mappings
- * Compiled targets: javascript: OK (17 IR steps) | python: OK (17 IR steps) | c: OK (17 IR steps) | x86_64: OK (17 IR steps) | arm64: OK (17 IR steps) | avr: OK (17 IR steps)
+ * Compiled targets: javascript: OK (16 IR steps) | python: OK (16 IR steps) | c: OK (16 IR steps) | x86_64: OK (16 IR steps) | arm64: OK (16 IR steps) | avr: OK (16 IR steps)
  * Translation map version: 22
  */
 // gpuAcceleratedMatrixOps.mjs
 
 import { createHash } from 'crypto';
 
-/**
- * Utility function to generate a unique hash for caching matrix operations.
- * @param {Array} input - The input data to hash.
- * @returns {string} - A unique hash string.
- */
-export function generateHash(input) {
-  const hash = createHash('sha256');
-  hash.update(JSON.stringify(input));
-  return hash.digest('hex');
+// Utility function to validate input matrices
+export function validateMatrices(a, b) {
+  if (!Array.isArray(a) || !Array.isArray(b)) {
+    throw new Error('Both inputs must be 2D arrays.');
+  }
+  if (a.length === 0 || b.length === 0) {
+    throw new Error('Input matrices must not be empty.');
+  }
+  if (!Array.isArray(a[0]) || !Array.isArray(b[0])) {
+    throw new Error('Matrices must be 2D arrays.');
+  }
+  if (a[0].length !== b.length) {
+    throw new Error('Matrix multiplication not possible: columns of A must match rows of B.');
+  }
 }
 
-/**
- * Performs matrix multiplication using GPU acceleration.
- * @param {Array<Array<number>>} matrixA - First matrix.
- * @param {Array<Array<number>>} matrixB - Second matrix.
- * @returns {Array<Array<number>>} - Resultant matrix after multiplication.
- */
-export function gpuMatrixMultiply(matrixA, matrixB) {
-  if (matrixA[0].length !== matrixB.length) {
-    throw new Error('Matrix dimensions are incompatible for multiplication.');
-  }
+// GPU-accelerated matrix multiplication
+export function gpuMatrixMultiply(a, b) {
+  validateMatrices(a, b);
 
-  const result = Array(matrixA.length)
-    .fill(null)
-    .map(() => Array(matrixB[0].length).fill(0));
+  const result = Array(a.length)
+    .fill(0)
+    .map(() => Array(b[0].length).fill(0));
 
-  for (let i = 0; i < matrixA.length; i++) {
-    for (let j = 0; j < matrixB[0].length; j++) {
-      for (let k = 0; k < matrixB.length; k++) {
-        result[i][j] += matrixA[i][k] * matrixB[k][j];
+  for (let i = 0; i < a.length; i++) {
+    for (let j = 0; j < b[0].length; j++) {
+      for (let k = 0; k < b.length; k++) {
+        result[i][j] += a[i][k] * b[k][j];
       }
     }
   }
@@ -64,77 +62,62 @@ export function gpuMatrixMultiply(matrixA, matrixB) {
   return result;
 }
 
-/**
- * Implements scaled dot-product attention mechanism.
- * @param {Array<Array<number>>} query - Query matrix.
- * @param {Array<Array<number>>} key - Key matrix.
- * @param {Array<Array<number>>} value - Value matrix.
- * @returns {Array<Array<number>>} - Attention output matrix.
- */
-export function scaledDotProductAttention(query, key, value) {
-  const keyTranspose = transposeMatrix(key);
+// Scaled dot-product attention mechanism
+export function scaledDotProductAttention(query, key, value, scaleFactor = 1) {
+  validateMatrices(query, key);
+  validateMatrices(key, value);
+
+  const keyTranspose = key[0].map((_, colIndex) => key.map(row => row[colIndex]));
   const scores = gpuMatrixMultiply(query, keyTranspose);
 
-  const scaleFactor = Math.sqrt(key[0].length);
-  for (let i = 0; i < scores.length; i++) {
-    for (let j = 0; j < scores[i].length; j++) {
-      scores[i][j] /= scaleFactor;
+  const scaledScores = scores.map(row => row.map(val => val / scaleFactor));
+  const softmax = scaledScores.map(row => {
+    const maxVal = Math.max(...row);
+    const exps = row.map(val => Math.exp(val - maxVal));
+    const sumExps = exps.reduce((acc, val) => acc + val, 0);
+    return exps.map(val => val / sumExps);
+  });
+
+  return gpuMatrixMultiply(softmax, value);
+}
+
+// Hopfield network memory update
+export function hopfieldUpdate(memoryMatrix, inputVector) {
+  if (!Array.isArray(memoryMatrix) || !Array.isArray(inputVector)) {
+    throw new Error('Memory matrix and input vector must be arrays.');
+  }
+  if (memoryMatrix.length === 0 || inputVector.length === 0) {
+    throw new Error('Memory matrix and input vector must not be empty.');
+  }
+  if (memoryMatrix[0].length !== inputVector.length) {
+    throw new Error('Input vector length must match memory matrix column count.');
+  }
+
+  const inputTranspose = [inputVector];
+  const weightUpdate = gpuMatrixMultiply(inputTranspose, [inputVector]);
+
+  for (let i = 0; i < memoryMatrix.length; i++) {
+    for (let j = 0; j < memoryMatrix[i].length; j++) {
+      memoryMatrix[i][j] += weightUpdate[i][j];
     }
   }
 
-  const softmaxScores = softmax(scores);
-  return gpuMatrixMultiply(softmaxScores, value);
+  return memoryMatrix;
 }
 
-/**
- * Transposes a matrix.
- * @param {Array<Array<number>>} matrix - Matrix to transpose.
- * @returns {Array<Array<number>>} - Transposed matrix.
- */
-export function transposeMatrix(matrix) {
-  return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
-}
-
-/**
- * Applies softmax function to a matrix.
- * @param {Array<Array<number>>} matrix - Input matrix.
- * @returns {Array<Array<number>>} - Matrix after applying softmax.
- */
-export function softmax(matrix) {
-  return matrix.map(row => {
-    const maxVal = Math.max(...row);
-    const expRow = row.map(value => Math.exp(value - maxVal));
-    const sumExp = expRow.reduce((acc, val) => acc + val, 0);
-    return expRow.map(value => value / sumExp);
-  });
-}
-
-/**
- * Validates that a matrix is well-formed.
- * @param {Array<Array<number>>} matrix - Matrix to validate.
- * @returns {boolean} - True if matrix is valid, otherwise false.
- */
-export function validateMatrix(matrix) {
-  if (!Array.isArray(matrix) || matrix.length === 0) {
-    return false;
+// Hashing utility for matrix integrity checks
+export function hashMatrix(matrix) {
+  if (!Array.isArray(matrix) || !Array.isArray(matrix[0])) {
+    throw new Error('Input must be a 2D array.');
   }
-  const rowLength = matrix[0].length;
-  return matrix.every(row => Array.isArray(row) && row.length === rowLength);
+
+  const flatMatrix = matrix.flat().join(',');
+  return createHash('sha256').update(flatMatrix).digest('hex');
 }
 
-/**
- * Provides a generic utility for matrix operations across agents.
- * @param {string} operation - Operation to perform ("multiply", "attention").
- * @param {Array} matrices - Matrices involved in the operation.
- * @returns {Array} - Result of the operation.
- */
-export function performMatrixOperation(operation, matrices) {
-  switch (operation) {
-    case 'multiply':
-      return gpuMatrixMultiply(matrices[0], matrices[1]);
-    case 'attention':
-      return scaledDotProductAttention(matrices[0], matrices[1], matrices[2]);
-    default:
-      throw new Error('Unsupported operation.');
-  }
-}
+// Example export for testing purposes
+export const exampleMatrix = [
+  [1, 2, 3],
+  [4, 5, 6],
+  [7, 8, 9]
+];

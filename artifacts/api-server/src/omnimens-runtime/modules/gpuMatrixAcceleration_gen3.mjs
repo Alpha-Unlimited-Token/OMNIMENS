@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuMatrixAcceleration
- * Written: 2026-04-03T08:37:16.912Z
+ * Written: 2026-04-03T15:45:20.403Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,111 +16,116 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
+/**
+ * TRANSLATION STATUS:
+ * Novel constructs: attention
+ * All constructs have translation mappings
+ * Compiled targets: javascript: OK (10 IR steps) | python: OK (10 IR steps) | c: OK (10 IR steps) | x86_64: OK (10 IR steps) | arm64: OK (10 IR steps) | avr: OK (10 IR steps)
+ * Translation map version: 22
+ */
 // gpuMatrixAcceleration.mjs
 
 import { createHash } from 'crypto';
 
 /**
- * Generates a WebGL shader for matrix multiplication.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @returns {WebGLProgram} A compiled and linked WebGL program for matrix multiplication.
- */
-export function createMatrixMultiplicationShader(gl) {
-  const vertexShaderSource = `
-    attribute vec2 position;
-    void main() {
-      gl_Position = vec4(position, 0.0, 1.0);
-    }
-  `;
-
-  const fragmentShaderSource = `
-    precision highp float;
-    uniform sampler2D matrixA;
-    uniform sampler2D matrixB;
-    uniform vec2 dimensions;
-    void main() {
-      vec2 coords = gl_FragCoord.xy;
-      float sum = 0.0;
-      for (float i = 0.0; i < dimensions.x; i++) {
-        sum += texture2D(matrixA, vec2(i / dimensions.x, coords.y / dimensions.y)).r *
-               texture2D(matrixB, vec2(coords.x / dimensions.x, i / dimensions.y)).r;
-      }
-      gl_FragColor = vec4(sum, 0.0, 0.0, 1.0);
-    }
-  `;
-
-  const vertexShader = compileShader(gl, vertexShaderSource, gl.VERTEX_SHADER);
-  const fragmentShader = compileShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);
-  const program = linkProgram(gl, vertexShader, fragmentShader);
-
-  return program;
-}
-
-/**
- * Compiles a WebGL shader.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {string} source - The GLSL source code.
- * @param {number} type - The type of shader (VERTEX_SHADER or FRAGMENT_SHADER).
- * @returns {WebGLShader} The compiled shader.
- */
-export function compileShader(gl, source, type) {
-  const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    throw new Error(`Shader compilation error: ${gl.getShaderInfoLog(shader)}`);
-  }
-  return shader;
-}
-
-/**
- * Links a WebGL program.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {WebGLShader} vertexShader - The vertex shader.
- * @param {WebGLShader} fragmentShader - The fragment shader.
- * @returns {WebGLProgram} The linked program.
- */
-export function linkProgram(gl, vertexShader, fragmentShader) {
-  const program = gl.createProgram();
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-  gl.linkProgram(program);
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    throw new Error(`Program linking error: ${gl.getProgramInfoLog(program)}`);
-  }
-  return program;
-}
-
-/**
- * Hashes a matrix to ensure data integrity.
- * @param {Float32Array} matrix - The matrix data.
- * @returns {string} A SHA-256 hash of the matrix data.
+ * Utility function to hash matrix data for caching purposes.
+ * @param {Array} matrix - 2D matrix to hash.
+ * @returns {string} - SHA256 hash of the matrix.
  */
 export function hashMatrix(matrix) {
-  const hash = createHash('sha256');
-  hash.update(new Uint8Array(matrix.buffer));
-  return hash.digest('hex');
+  const matrixString = matrix.flat().join(',');
+  return createHash('sha256').update(matrixString).digest('hex');
 }
 
 /**
- * Validates matrix dimensions for multiplication.
- * @param {number[]} dimsA - Dimensions of matrix A [rows, cols].
- * @param {number[]} dimsB - Dimensions of matrix B [rows, cols].
- * @returns {boolean} True if dimensions are valid for multiplication, otherwise false.
+ * Performs matrix multiplication using pure JavaScript.
+ * @param {Array} A - First matrix (2D array).
+ * @param {Array} B - Second matrix (2D array).
+ * @returns {Array} - Resultant matrix after multiplication.
  */
-export function validateMatrixDimensions(dimsA, dimsB) {
-  return dimsA[1] === dimsB[0];
-}
+export function matrixMultiply(A, B) {
+  const rowsA = A.length;
+  const colsA = A[0].length;
+  const rowsB = B.length;
+  const colsB = B[0].length;
 
-/**
- * Creates a WebGL context for GPU computations.
- * @returns {WebGLRenderingContext} A WebGL rendering context.
- */
-export function createWebGLContext() {
-  const canvas = new OffscreenCanvas(1, 1);
-  const gl = canvas.getContext('webgl');
-  if (!gl) {
-    throw new Error('WebGL not supported in this environment.');
+  if (colsA !== rowsB) {
+    throw new Error('Matrix dimensions do not match for multiplication.');
   }
-  return gl;
+
+  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+
+  for (let i = 0; i < rowsA; i++) {
+    for (let j = 0; j < colsB; j++) {
+      for (let k = 0; k < colsA; k++) {
+        result[i][j] += A[i][k] * B[k][j];
+      }
+    }
+  }
+
+  return result;
+}
+
+/**
+ * Implements a basic attention mechanism.
+ * @param {Array} query - Query matrix.
+ * @param {Array} key - Key matrix.
+ * @param {Array} value - Value matrix.
+ * @returns {Array} - Attention output matrix.
+ */
+export function attentionMechanism(query, key, value) {
+  const keyTransposed = transposeMatrix(key);
+  const scores = matrixMultiply(query, keyTransposed);
+  const normalizedScores = softmax(scores);
+  return matrixMultiply(normalizedScores, value);
+}
+
+/**
+ * Updates a Hopfield network state.
+ * @param {Array} state - Current state vector.
+ * @param {Array} weights - Weight matrix.
+ * @returns {Array} - Updated state vector.
+ */
+export function hopfieldUpdate(state, weights) {
+  const newState = matrixMultiply([state], weights)[0];
+  return newState.map(value => (value >= 0 ? 1 : -1));
+}
+
+/**
+ * Transposes a matrix.
+ * @param {Array} matrix - 2D matrix to transpose.
+ * @returns {Array} - Transposed matrix.
+ */
+export function transposeMatrix(matrix) {
+  return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
+}
+
+/**
+ * Applies softmax normalization to a matrix.
+ * @param {Array} matrix - 2D matrix to normalize.
+ * @returns {Array} - Softmax-normalized matrix.
+ */
+export function softmax(matrix) {
+  return matrix.map(row => {
+    const maxVal = Math.max(...row);
+    const exps = row.map(value => Math.exp(value - maxVal));
+    const sumExps = exps.reduce((sum, exp) => sum + exp, 0);
+    return exps.map(exp => exp / sumExps);
+  });
+}
+
+/**
+ * Validates matrix dimensions for operations.
+ * @param {Array} matrix - Matrix to validate.
+ * @returns {boolean} - True if valid, false otherwise.
+ */
+export function validateMatrix(matrix) {
+  if (!Array.isArray(matrix) || !Array.isArray(matrix[0])) {
+    throw new Error('Input is not a valid 2D matrix.');
+  }
+  const rowLength = matrix[0].length;
+  if (!matrix.every(row => row.length === rowLength)) {
+    throw new Error('Matrix rows have inconsistent lengths.');
+  }
+  return true;
 }
