@@ -551,7 +551,7 @@ export default function OCCEScanner() {
                           </div>
                           <div className="flex justify-between text-[10px] font-mono">
                             <span className="text-gray-500">Agents Grounded</span>
-                            <span className="text-emerald-400">{live.selfRequestedSystems.emotionalRefactor.agentsGrounded}/26</span>
+                            <span className="text-emerald-400">{live.selfRequestedSystems.emotionalRefactor.agentsGrounded}/21</span>
                           </div>
                           <div className="flex justify-between text-[10px] font-mono">
                             <span className="text-gray-500">Cascades</span>
