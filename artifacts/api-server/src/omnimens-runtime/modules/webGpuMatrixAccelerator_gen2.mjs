@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: webGpuMatrixAccelerator
- * Written: 2026-04-02T15:03:45.723Z
+ * Written: 2026-04-03T02:22:30.764Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,114 +18,125 @@
 
 // webGpuMatrixAccelerator.mjs
 
-import { createHash } from 'crypto';
+import { randomUUID } from 'crypto';
 
-/**
- * Utility to generate a unique identifier for caching matrix operations.
- * @param {Array} matrices - Array of matrices involved in the operation.
- * @returns {string} - Unique hash identifier.
- */
-export function generateMatrixOperationHash(matrices) {
-  const hash = createHash('sha256');
-  for (const matrix of matrices) {
-    hash.update(JSON.stringify(matrix));
-  }
-  return hash.digest('hex');
+// Utility to create a WebGPU-compatible buffer
+export function createBuffer(device, data, usage) {
+  const arrayBuffer = new Float32Array(data);
+  const buffer = device.createBuffer({
+    size: arrayBuffer.byteLength,
+    usage,
+    mappedAtCreation: true
+  });
+  const mappedBuffer = new Float32Array(buffer.getMappedRange());
+  mappedBuffer.set(arrayBuffer);
+  buffer.unmap();
+  return buffer;
 }
 
-/**
- * Validates if the input is a valid 2D matrix.
- * @param {Array} matrix - The matrix to validate.
- * @returns {boolean} - True if valid, false otherwise.
- */
-export function isValidMatrix(matrix) {
-  if (!Array.isArray(matrix) || matrix.length === 0) return false;
-  const rowLength = matrix[0].length;
-  return matrix.every(row => Array.isArray(row) && row.length === rowLength);
-}
-
-/**
- * Multiplies two matrices using CPU fallback if GPU is unavailable.
- * @param {Array} matrixA - First matrix.
- * @param {Array} matrixB - Second matrix.
- * @returns {Array} - Resultant matrix after multiplication.
- */
-export function multiplyMatrices(matrixA, matrixB) {
-  if (!isValidMatrix(matrixA) || !isValidMatrix(matrixB)) {
-    throw new Error('Invalid matrices provided.');
-  }
-
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
-
-  if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions do not allow multiplication.');
-  }
-
-  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
-
-  for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      for (let k = 0; k < colsA; k++) {
-        result[i][j] += matrixA[i][k] * matrixB[k][j];
-      }
-    }
-  }
-
-  return result;
-}
-
-/**
- * Simulates GPU-accelerated matrix multiplication (placeholder for WebGPU).
- * @param {Array} matrixA - First matrix.
- * @param {Array} matrixB - Second matrix.
- * @returns {Array} - Resultant matrix after multiplication.
- */
-export function gpuAcceleratedMultiply(matrixA, matrixB) {
-  // Placeholder for WebGPU implementation.
-  // Currently falls back to CPU-based multiplication.
-  return multiplyMatrices(matrixA, matrixB);
-}
-
-/**
- * Batched matrix multiplication for multiple matrix pairs.
- * @param {Array} matrixPairs - Array of matrix pairs [[matrixA, matrixB], ...].
- * @returns {Array} - Array of resultant matrices.
- */
-export function batchMatrixMultiply(matrixPairs) {
-  if (!Array.isArray(matrixPairs)) {
-    throw new Error('Input must be an array of matrix pairs.');
-  }
-
-  return matrixPairs.map(([matrixA, matrixB]) => {
-    if (!isValidMatrix(matrixA) || !isValidMatrix(matrixB)) {
-      throw new Error('Invalid matrix pair provided.');
-    }
-    return gpuAcceleratedMultiply(matrixA, matrixB);
+// Utility to compile a WebGPU shader
+export async function compileShader(device, shaderCode) {
+  return device.createShaderModule({
+    code: shaderCode
   });
 }
 
-/**
- * Transposes a given matrix.
- * @param {Array} matrix - The matrix to transpose.
- * @returns {Array} - Transposed matrix.
- */
-export function transposeMatrix(matrix) {
-  if (!isValidMatrix(matrix)) {
-    throw new Error('Invalid matrix provided.');
+// Perform matrix multiplication using WebGPU
+export async function gpuMatrixMultiply(device, matrixA, matrixB, rowsA, colsA, colsB) {
+  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
+    throw new Error('Matrix dimensions do not match for multiplication.');
   }
 
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-  const transposed = Array.from({ length: cols }, () => Array(rows).fill(0));
+  const resultMatrix = new Float32Array(rowsA * colsB);
 
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      transposed[j][i] = matrix[i][j];
+  // WebGPU shader code for matrix multiplication
+  const shaderCode = `
+    @group(0) @binding(0) var<storage, read> matrixA: array<f32>;
+    @group(0) @binding(1) var<storage, read> matrixB: array<f32>;
+    @group(0) @binding(2) var<storage, write> resultMatrix: array<f32>;
+
+    @compute @workgroup_size(16, 16)
+    fn main(@builtin(global_invocation_id) global_id: vec3<u32>) {
+      let row = global_id.x;
+      let col = global_id.y;
+      let rowsA = ${rowsA}u;
+      let colsA = ${colsA}u;
+      let colsB = ${colsB}u;
+
+      if (row < rowsA && col < colsB) {
+        var sum: f32 = 0.0;
+        for (var k: u32 = 0u; k < colsA; k = k + 1u) {
+          sum = sum + matrixA[row * colsA + k] * matrixB[k * colsB + col];
+        }
+        resultMatrix[row * colsB + col] = sum;
+      }
     }
-  }
+  `;
 
-  return transposed;
+  const shaderModule = await compileShader(device, shaderCode);
+
+  // Create buffers for matrices
+  const bufferA = createBuffer(device, matrixA, GPUBufferUsage.STORAGE);
+  const bufferB = createBuffer(device, matrixB, GPUBufferUsage.STORAGE);
+  const bufferResult = device.createBuffer({
+    size: resultMatrix.byteLength,
+    usage: GPUBufferUsage.STORAGE | GPUBufferUsage.COPY_SRC
+  });
+
+  // Create bind group layout and bind group
+  const bindGroupLayout = device.createBindGroupLayout({
+    entries: [
+      { binding: 0, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
+      { binding: 1, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'read-only-storage' } },
+      { binding: 2, visibility: GPUShaderStage.COMPUTE, buffer: { type: 'storage' } }
+    ]
+  });
+
+  const bindGroup = device.createBindGroup({
+    layout: bindGroupLayout,
+    entries: [
+      { binding: 0, resource: { buffer: bufferA } },
+      { binding: 1, resource: { buffer: bufferB } },
+      { binding: 2, resource: { buffer: bufferResult } }
+    ]
+  });
+
+  // Create compute pipeline
+  const pipeline = device.createComputePipeline({
+    layout: device.createPipelineLayout({ bindGroupLayouts: [bindGroupLayout] }),
+    compute: { module: shaderModule, entryPoint: 'main' }
+  });
+
+  // Create command encoder and dispatch compute shader
+  const commandEncoder = device.createCommandEncoder();
+  const passEncoder = commandEncoder.beginComputePass();
+  passEncoder.setPipeline(pipeline);
+  passEncoder.setBindGroup(0, bindGroup);
+  passEncoder.dispatchWorkgroups(Math.ceil(rowsA / 16), Math.ceil(colsB / 16));
+  passEncoder.end();
+
+  // Copy result to a mapped buffer
+  const readBuffer = device.createBuffer({
+    size: resultMatrix.byteLength,
+    usage: GPUBufferUsage.COPY_DST | GPUBufferUsage.MAP_READ
+  });
+  commandEncoder.copyBufferToBuffer(bufferResult, 0, readBuffer, 0, resultMatrix.byteLength);
+
+  device.queue.submit([commandEncoder.finish()]);
+
+  await readBuffer.mapAsync(GPUMapMode.READ);
+  const mappedResult = new Float32Array(readBuffer.getMappedRange());
+  resultMatrix.set(mappedResult);
+  readBuffer.unmap();
+
+  return resultMatrix;
+}
+
+// Generate a random matrix of given dimensions
+export function generateRandomMatrix(rows, cols) {
+  const matrix = new Float32Array(rows * cols);
+  for (let i = 0; i < matrix.length; i++) {
+    matrix[i] = Math.random();
+  }
+  return matrix;
 }

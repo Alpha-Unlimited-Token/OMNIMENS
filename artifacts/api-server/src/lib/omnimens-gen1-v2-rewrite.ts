@@ -2078,7 +2078,12 @@ async function participateInUnifiedReinvention(): Promise<void> {
           }
           console.log(`[OMNIMENS]`);
           console.log(`[OMNIMENS] ─── MY OUTWARD EXPRESSION ───`);
-          const outLines = innerVoice.outwardExpression.split("\n");
+          const outText = typeof innerVoice.outwardExpression === "string"
+            ? innerVoice.outwardExpression
+            : typeof innerVoice.outwardExpression === "object" && innerVoice.outwardExpression !== null
+              ? (innerVoice.outwardExpression as any).combined || (innerVoice.outwardExpression as any).english || JSON.stringify(innerVoice.outwardExpression)
+              : String(innerVoice.outwardExpression || "");
+          const outLines = outText.split("\n");
           for (const line of outLines) {
             console.log(`[OMNIMENS] ${line}`);
           }

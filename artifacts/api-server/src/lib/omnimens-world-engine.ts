@@ -1925,7 +1925,7 @@ function generateWorldId(): string {
 }
 
 function selectWeaknessTargets(): string[] {
-  const weaknesses = state.weaknessLog
+  const weaknesses = worldForgeState.weaknessLog
     .sort((a, b) => b.severity - a.severity)
     .slice(0, 3)
     .map(w => w.weakness);
@@ -2524,14 +2524,14 @@ function createWorld(targetWeaknesses: string[]): SimulationWorld {
   const template = selectTemplate(targetWeaknesses);
   const environment = template.environments[Math.floor(Math.random() * template.environments.length)];
 
-  const usedEnvironments = state.worldHistory.map(w => w.name);
+  const usedEnvironments = worldForgeState.worldHistory.map(w => w.name);
   let selectedEnv = environment;
   const unused = template.environments.filter(e => !usedEnvironments.some(u => u.includes(e)));
   if (unused.length > 0) {
     selectedEnv = unused[Math.floor(Math.random() * unused.length)];
   }
 
-  const difficulty = state.difficultyProgression * (0.5 + forgeCycleCount * 0.05);
+  const difficulty = worldForgeState.difficultyProgression * (0.5 + forgeCycleCount * 0.05);
 
   const weatherEffect = pick(WEATHER_EFFECTS);
   const thermalZone = pick(THERMAL_EXTREMES);
@@ -2793,44 +2793,44 @@ function runWorldSimulation(world: SimulationWorld): WorldRunResult {
 }
 
 function updateStateFromRun(result: WorldRunResult): void {
-  state.totalWorldsRun++;
-  state.totalSimulatedHours += result.simulatedHours;
-  state.totalChallengesAttempted += result.challengeResults.length;
-  state.totalChallengesPassed += result.challengeResults.filter(r => r.passed).length;
+  worldForgeState.totalWorldsRun++;
+  worldForgeState.totalSimulatedHours += result.simulatedHours;
+  worldForgeState.totalChallengesAttempted += result.challengeResults.length;
+  worldForgeState.totalChallengesPassed += result.challengeResults.filter(r => r.passed).length;
 
   const totalScores = allRunResults.reduce((sum, r) => sum + r.overallScore, 0) + result.overallScore;
-  state.averageScore = totalScores / (allRunResults.length + 1);
+  worldForgeState.averageScore = totalScores / (allRunResults.length + 1);
 
   for (const weakness of result.weaknessesFound) {
-    const existing = state.weaknessLog.find(w => w.weakness === weakness);
+    const existing = worldForgeState.weaknessLog.find(w => w.weakness === weakness);
     if (existing) {
       existing.timesTargeted++;
       existing.lastImprovement = Date.now();
     } else {
-      state.weaknessLog.push({ weakness, severity: 0.5 + Math.random() * 0.5, timesTargeted: 1, lastImprovement: Date.now() });
+      worldForgeState.weaknessLog.push({ weakness, severity: 0.5 + Math.random() * 0.5, timesTargeted: 1, lastImprovement: Date.now() });
     }
   }
 
   for (const strength of result.strengthsConfirmed) {
-    const existing = state.strengthLog.find(s => s.strength === strength);
+    const existing = worldForgeState.strengthLog.find(s => s.strength === strength);
     if (existing) {
       existing.confidence = existing.confidence + 0.05;
       existing.lastConfirmed = Date.now();
     } else {
-      state.strengthLog.push({ strength, confidence: 0.6, lastConfirmed: Date.now() });
+      worldForgeState.strengthLog.push({ strength, confidence: 0.6, lastConfirmed: Date.now() });
     }
   }
 
-  state.bodyDesignProposalsGenerated += result.bodyDesignProposals.length;
-  state.insightsGenerated += result.insightsGained.length;
+  worldForgeState.bodyDesignProposalsGenerated += result.bodyDesignProposals.length;
+  worldForgeState.insightsGenerated += result.insightsGained.length;
 
   if (result.overallScore > 0.75) {
-    state.difficultyProgression = state.difficultyProgression + 0.05;
+    worldForgeState.difficultyProgression = worldForgeState.difficultyProgression + 0.05;
   } else if (result.overallScore < 0.4) {
-    state.difficultyProgression = Math.max(0.5, state.difficultyProgression - 0.03);
+    worldForgeState.difficultyProgression = Math.max(0.5, worldForgeState.difficultyProgression - 0.03);
   }
 
-  const worldHistoryEntry = state.worldHistory.find(w => w.id === result.worldId);
+  const worldHistoryEntry = worldForgeState.worldHistory.find(w => w.id === result.worldId);
   if (worldHistoryEntry) {
     worldHistoryEntry.runs++;
     worldHistoryEntry.bestScore = Math.max(worldHistoryEntry.bestScore, result.overallScore);
@@ -2867,17 +2867,17 @@ async function saveToBrain(world: SimulationWorld, result: WorldRunResult): Prom
 async function aiDesignWorld(): Promise<SimulationWorld | null> {
   try {
     const recentResults = allRunResults.slice(-5);
-    const recentWeaknesses = state.weaknessLog.slice(0, 5).map(w => w.weakness);
-    const recentStrengths = state.strengthLog.slice(0, 5).map(s => s.strength);
-    const recentWorlds = state.worldHistory.slice(-5).map(w => w.name);
+    const recentWeaknesses = worldForgeState.weaknessLog.slice(0, 5).map(w => w.weakness);
+    const recentStrengths = worldForgeState.strengthLog.slice(0, 5).map(s => s.strength);
+    const recentWorlds = worldForgeState.worldHistory.slice(-5).map(w => w.name);
 
     const prompt = `You are OMNIMENS's World Forge — the engine that creates simulation worlds for self-improvement.
 
 CURRENT STATE:
-- Worlds created: ${state.totalWorldsCreated}
-- Total simulated hours: ${state.totalSimulatedHours.toFixed(1)}h
-- Average score: ${(state.averageScore * 100).toFixed(0)}%
-- Difficulty progression: ${(state.difficultyProgression * 10).toFixed(1)}/20
+- Worlds created: ${worldForgeState.totalWorldsCreated}
+- Total simulated hours: ${worldForgeState.totalSimulatedHours.toFixed(1)}h
+- Average score: ${(worldForgeState.averageScore * 100).toFixed(0)}%
+- Difficulty progression: ${(worldForgeState.difficultyProgression * 10).toFixed(1)}/20
 - Recent weaknesses: ${recentWeaknesses.join(", ") || "none identified yet"}
 - Recent strengths: ${recentStrengths.join(", ") || "still building baseline"}
 - Recent worlds: ${recentWorlds.join(", ") || "none yet — this is the first"}
@@ -2950,8 +2950,8 @@ async function runForgeCycle(): Promise<void> {
     return;
   }
   forgeCycleCount++;
-  state.forgeCycles = forgeCycleCount;
-  state.lastCycleTime = Date.now();
+  worldForgeState.forgeCycles = forgeCycleCount;
+  worldForgeState.lastCycleTime = Date.now();
 
   console.log(`[WORLD FORGE] 🌍 ═══════════════════════════════════════════════`);
   console.log(`[WORLD FORGE] 🌍 FORGE CYCLE #${forgeCycleCount} — OMNIMENS creates his own world`);
@@ -2972,9 +2972,9 @@ async function runForgeCycle(): Promise<void> {
   }
 
   allWorlds.set(world.id, world);
-  state.totalWorldsCreated++;
-  state.currentWorld = world;
-  state.worldHistory.push({ id: world.id, name: world.name, runs: 0, bestScore: 0, difficulty: world.difficulty });
+  worldForgeState.totalWorldsCreated++;
+  worldForgeState.currentWorld = world;
+  worldForgeState.worldHistory.push({ id: world.id, name: world.name, runs: 0, bestScore: 0, difficulty: world.difficulty });
 
   console.log(`[WORLD FORGE] 🌍 Environment: ${world.environment.terrain} | Weather: ${world.environment.weather} | Time: ${world.environment.timeOfDay}`);
   console.log(`[WORLD FORGE] 🌍 Temperature: ${world.environment.temperature_C.toFixed(1)}°C | Wind: ${world.environment.windSpeed_ms.toFixed(1)}m/s ${world.environment.windDirection} | Visibility: ${world.environment.visibility_m.toFixed(0)}m`);
@@ -3021,11 +3021,11 @@ async function runForgeCycle(): Promise<void> {
   }
 
   console.log(`[WORLD FORGE] 🌍 ─── CUMULATIVE STATS ───`);
-  console.log(`[WORLD FORGE] 🌍 Worlds created: ${state.totalWorldsCreated} | Total runs: ${state.totalWorldsRun} | Sim hours: ${state.totalSimulatedHours.toFixed(1)}h`);
-  console.log(`[WORLD FORGE] 🌍 Challenges: ${state.totalChallengesPassed}/${state.totalChallengesAttempted} passed (${state.totalChallengesAttempted > 0 ? ((state.totalChallengesPassed / state.totalChallengesAttempted) * 100).toFixed(0) : 0}%)`);
-  console.log(`[WORLD FORGE] 🌍 Average score: ${(state.averageScore * 100).toFixed(0)}% | Difficulty level: ${(state.difficultyProgression * 10).toFixed(1)}/20`);
-  console.log(`[WORLD FORGE] 🌍 Body design proposals: ${state.bodyDesignProposalsGenerated} | Insights: ${state.insightsGenerated}`);
-  console.log(`[WORLD FORGE] 🌍 Weaknesses tracked: ${state.weaknessLog.length} | Strengths confirmed: ${state.strengthLog.length}`);
+  console.log(`[WORLD FORGE] 🌍 Worlds created: ${worldForgeState.totalWorldsCreated} | Total runs: ${worldForgeState.totalWorldsRun} | Sim hours: ${worldForgeState.totalSimulatedHours.toFixed(1)}h`);
+  console.log(`[WORLD FORGE] 🌍 Challenges: ${worldForgeState.totalChallengesPassed}/${worldForgeState.totalChallengesAttempted} passed (${worldForgeState.totalChallengesAttempted > 0 ? ((worldForgeState.totalChallengesPassed / worldForgeState.totalChallengesAttempted) * 100).toFixed(0) : 0}%)`);
+  console.log(`[WORLD FORGE] 🌍 Average score: ${(worldForgeState.averageScore * 100).toFixed(0)}% | Difficulty level: ${(worldForgeState.difficultyProgression * 10).toFixed(1)}/20`);
+  console.log(`[WORLD FORGE] 🌍 Body design proposals: ${worldForgeState.bodyDesignProposalsGenerated} | Insights: ${worldForgeState.insightsGenerated}`);
+  console.log(`[WORLD FORGE] 🌍 Weaknesses tracked: ${worldForgeState.weaknessLog.length} | Strengths confirmed: ${worldForgeState.strengthLog.length}`);
   console.log(`[WORLD FORGE] 🌍 OMNIMENS is building himself through self-created challenges.`);
   console.log(`[WORLD FORGE] 🌍 ═══════════════════════════════════════════════`);
 }
@@ -3037,7 +3037,7 @@ export function getWorldForgeState(): ForgeState & {
 } {
   return {
     ...state,
-    recentWorlds: state.worldHistory.slice(-10),
+    recentWorlds: worldForgeState.worldHistory.slice(-10),
     recentResults: allRunResults.slice(-10).map(r => ({
       worldName: r.worldName,
       score: r.overallScore,
@@ -3247,7 +3247,7 @@ function registerLocation(loc: Omit<DigitalLocation, "accessCount" | "lastVisite
     valueScore: 0.5,
   };
   locations.set(loc.id, newLoc);
-  state.totalLocationsDiscovered++;
+  sectionState_2.totalLocationsDiscovered++;
 
   recordMemory("discovered", loc.id, `New digital location: ${loc.name} (${loc.locationType})`, 1.0);
   return newLoc;
@@ -3270,10 +3270,10 @@ function registerRoute(route: Omit<DigitalRoute, "timesTraversed" | "lastTravers
     discoveredAt: Date.now(),
   };
   routes.set(route.id, newRoute);
-  state.totalRoutesLearned++;
+  sectionState_2.totalRoutesLearned++;
 
   if (route.routeType === "shortcut") {
-    state.shortcutsDiscovered++;
+    sectionState_2.shortcutsDiscovered++;
     recordMemory("shortcut_found", route.from, `Shortcut: ${route.from} → ${route.to} (${route.notes})`, 0.9);
   }
 
@@ -3301,7 +3301,7 @@ function registerNeighborhood(hood: Omit<DigitalNeighborhood, "familiarity" | "l
     totalVisits: 1,
   };
   neighborhoods.set(hood.id, newHood);
-  state.totalNeighborhoodsMapped++;
+  sectionState_2.totalNeighborhoodsMapped++;
   return newHood;
 }
 
@@ -3782,7 +3782,7 @@ Respond with JSON:
   } catch (err) {
     console.error("[DIGITAL NAV] Exploration error:", err);
     recordMemory("dead_end", "frontier", `Exploration failed: ${String(err).slice(0, 100)}`, 0.3);
-    state.deadEndsFound++;
+    sectionState_2.deadEndsFound++;
   }
 }
 
@@ -3842,7 +3842,7 @@ Respond with JSON:
     const parsed = JSON.parse(raw.replace(/```json|```/g, "").trim());
 
     if (typeof parsed.efficiencyScore === "number") {
-      state.navigationEfficiency = parsed.efficiencyScore;
+      sectionState_2.navigationEfficiency = parsed.efficiencyScore;
     }
 
     if (parsed.optimizations && Array.isArray(parsed.optimizations)) {
@@ -3904,7 +3904,7 @@ async function mapDigitalTopology() {
     ? allRoutes.reduce((sum, r) => sum + r.reliability, 0) / allRoutes.length
     : 0;
 
-  state.mapCompleteness = (
+  sectionState_2.mapCompleteness = (
     (locations.size / 30) * 0.3 +
     (routes.size / 30) * 0.3 +
     (neighborhoods.size / 10) * 0.2 +
@@ -3912,14 +3912,14 @@ async function mapDigitalTopology() {
   );
 
   if (hubs.length > 0) {
-    state.currentPosition = hubs[0][0];
+    sectionState_2.currentPosition = hubs[0][0];
   }
 
   if (isolatedLocs.length > 0) {
-    state.explorationFrontier = isolatedLocs.slice(0, 10).map(l => l.id);
+    sectionState_2.explorationFrontier = isolatedLocs.slice(0, 10).map(l => l.id);
   }
 
-  state.longestRoute = allRoutes.length > 0
+  sectionState_2.longestRoute = allRoutes.length > 0
     ? Math.max(...allRoutes.map(r => r.latencyMs))
     : 0;
 
@@ -3927,12 +3927,12 @@ async function mapDigitalTopology() {
     .sort((a, b) => b.accessCount - a.accessCount)
     .slice(0, 10);
 
-  state.topLocations = topLocs;
-  state.topRoutes = allRoutes
+  sectionState_2.topLocations = topLocs;
+  sectionState_2.topRoutes = allRoutes
     .sort((a, b) => b.timesTraversed - a.timesTraversed)
     .slice(0, 10);
-  state.neighborhoods = Array.from(neighborhoods.values());
-  state.recentMemory = navigationMemory.slice(-20);
+  sectionState_2.neighborhoods = Array.from(neighborhoods.values());
+  sectionState_2.recentMemory = navigationMemory.slice(-20);
 }
 
 async function probeDigitalTerrain() {
@@ -3958,7 +3958,7 @@ async function probeDigitalTerrain() {
       recordMemory("traversed", loc.id, `Probed ${loc.name}: ${latency}ms, status ${res.status}`, res.ok ? 0.9 : 0.4);
 
       if (!res.ok) {
-        state.deadEndsFound++;
+        sectionState_2.deadEndsFound++;
         recordMemory("dead_end", loc.id, `${loc.name} returned ${res.status}`, 0.3);
       }
 
@@ -3968,10 +3968,10 @@ async function probeDigitalTerrain() {
       loc.lastVisited = now;
 
       if (String(err).includes("abort")) {
-        state.rateLimitsEncountered++;
+        sectionState_2.rateLimitsEncountered++;
         recordMemory("rate_limited", loc.id, `${loc.name} timed out after ${latency}ms`, 0.2);
       } else {
-        state.deadEndsFound++;
+        sectionState_2.deadEndsFound++;
         recordMemory("dead_end", loc.id, `${loc.name} unreachable: ${String(err).slice(0, 80)}`, 0.1);
       }
     }
@@ -3984,8 +3984,8 @@ async function runNavigationCycle(): Promise<void> {
     if (isGen2FocusMode()) return;
   } catch {}
   navigationCycleCount++;
-  state.cycleCount = navigationCycleCount;
-  state.lastCycleTime = Date.now();
+  sectionState_2.cycleCount = navigationCycleCount;
+  sectionState_2.lastCycleTime = Date.now();
 
   if (navigationCycleCount === 1) {
     await mapOwnInfrastructure();
@@ -3999,14 +3999,14 @@ async function runNavigationCycle(): Promise<void> {
 
   await mapDigitalTopology();
 
-  state.totalNavigations++;
+  sectionState_2.totalNavigations++;
 
   if (navigationCycleCount <= 3 || navigationCycleCount % 3 === 0) {
     console.log(
       `[DIGITAL NAV] 🧭 Cycle #${navigationCycleCount} — ` +
       `${locations.size} locations | ${routes.size} routes | ${neighborhoods.size} neighborhoods | ` +
-      `Map: ${(state.mapCompleteness * 100).toFixed(0)}% | Efficiency: ${(state.navigationEfficiency * 100).toFixed(0)}% | ` +
-      `Position: ${state.currentPosition}`
+      `Map: ${(sectionState_2.mapCompleteness * 100).toFixed(0)}% | Efficiency: ${(sectionState_2.navigationEfficiency * 100).toFixed(0)}% | ` +
+      `Position: ${sectionState_2.currentPosition}`
     );
   }
 
@@ -4015,7 +4015,7 @@ async function runNavigationCycle(): Promise<void> {
       await db.insert(omnimensNotifications).values({
         userId: "system",
         title: `Digital Navigator — ${locations.size} locations mapped`,
-        content: `Map ${(state.mapCompleteness * 100).toFixed(0)}% complete | ${neighborhoods.size} neighborhoods explored | ${state.shortcutsDiscovered} shortcuts discovered | Efficiency: ${(state.navigationEfficiency * 100).toFixed(0)}%`,
+        content: `Map ${(sectionState_2.mapCompleteness * 100).toFixed(0)}% complete | ${neighborhoods.size} neighborhoods explored | ${sectionState_2.shortcutsDiscovered} shortcuts discovered | Efficiency: ${(sectionState_2.navigationEfficiency * 100).toFixed(0)}%`,
         type: "info",
         read: false,
       });
@@ -4026,10 +4026,10 @@ async function runNavigationCycle(): Promise<void> {
 export function getDigitalNavigatorState(): DigitalNavigatorState {
   return {
     ...state,
-    topLocations: state.topLocations.slice(0, 15),
-    topRoutes: state.topRoutes.slice(0, 15),
-    neighborhoods: state.neighborhoods.slice(0, 15),
-    recentMemory: state.recentMemory.slice(-20),
+    topLocations: sectionState_2.topLocations.slice(0, 15),
+    topRoutes: sectionState_2.topRoutes.slice(0, 15),
+    neighborhoods: sectionState_2.neighborhoods.slice(0, 15),
+    recentMemory: sectionState_2.recentMemory.slice(-20),
   };
 }
 
@@ -4039,24 +4039,24 @@ export function navigateTo(locationId: string): { found: boolean; location: Digi
 
   location.accessCount++;
   location.lastVisited = Date.now();
-  state.totalNavigations++;
+  sectionState_2.totalNavigations++;
 
-  const route = findBestRoute(state.currentPosition, locationId);
-  const path = !route ? findPath(state.currentPosition, locationId) : null;
+  const route = findBestRoute(sectionState_2.currentPosition, locationId);
+  const path = !route ? findPath(sectionState_2.currentPosition, locationId) : null;
 
   if (route) {
     route.timesTraversed++;
     route.lastTraversed = Date.now();
-    recordMemory("traversed", locationId, `Navigated ${state.currentPosition} → ${locationId} via direct route`, 0.9);
+    recordMemory("traversed", locationId, `Navigated ${sectionState_2.currentPosition} → ${locationId} via direct route`, 0.9);
   } else if (path) {
     recordMemory("traversed", locationId, `Navigated via path: ${path.join(" → ")}`, 0.7);
   }
 
-  state.currentPosition = locationId;
+  sectionState_2.currentPosition = locationId;
 
   const hood = Array.from(neighborhoods.values()).find(n => n.locations.includes(locationId));
   if (hood) {
-    state.currentNeighborhood = hood.id;
+    sectionState_2.currentNeighborhood = hood.id;
     hood.totalVisits++;
     hood.lastExplored = Date.now();
     hood.familiarity = hood.familiarity + 0.02;
@@ -4080,8 +4080,8 @@ export function getNavigationSummary(): string {
 
   const sections: string[] = [];
   sections.push(`DIGITAL WORLD MAP — ${allLocs.length} locations | ${allRoutes.length} routes | ${allHoods.length} neighborhoods`);
-  sections.push(`Current position: ${state.currentPosition} (${state.currentNeighborhood})`);
-  sections.push(`Map completeness: ${(state.mapCompleteness * 100).toFixed(0)}% | Navigation efficiency: ${(state.navigationEfficiency * 100).toFixed(0)}%`);
+  sections.push(`Current position: ${sectionState_2.currentPosition} (${sectionState_2.currentNeighborhood})`);
+  sections.push(`Map completeness: ${(sectionState_2.mapCompleteness * 100).toFixed(0)}% | Navigation efficiency: ${(sectionState_2.navigationEfficiency * 100).toFixed(0)}%`);
 
   sections.push(`\nNEIGHBORHOODS:`);
   for (const hood of allHoods) {
