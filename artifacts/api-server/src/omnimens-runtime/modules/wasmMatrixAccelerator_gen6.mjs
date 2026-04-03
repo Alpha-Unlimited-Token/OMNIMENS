@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: wasmMatrixAccelerator
- * Written: 2026-04-02T21:23:43.346Z
+ * Written: 2026-04-03T18:43:22.841Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,105 +18,88 @@
 
 // wasmMatrixAccelerator.mjs
 
-import { createHash } from 'crypto';
+import { readFile } from 'fs/promises';
+import { join } from 'path';
 
-/**
- * Generates a unique identifier for WebAssembly modules based on input code.
- * Useful for caching compiled modules.
- */
-export function generateModuleHash(wasmCode) {
-  const hash = createHash('sha256');
-  hash.update(wasmCode);
-  return hash.digest('hex');
-}
-
-/**
- * Validates WebAssembly binary data.
- * Ensures the input is a valid Uint8Array and meets basic WASM format requirements.
- */
-export function validateWasmBinary(wasmBinary) {
-  if (!(wasmBinary instanceof Uint8Array)) {
-    throw new Error('Invalid WebAssembly binary: Input must be a Uint8Array.');
-  }
-  // Basic WASM magic number check (0x00 0x61 0x73 0x6D)
-  if (
-    wasmBinary[0] !== 0x00 ||
-    wasmBinary[1] !== 0x61 ||
-    wasmBinary[2] !== 0x73 ||
-    wasmBinary[3] !== 0x6D
-  ) {
-    throw new Error('Invalid WebAssembly binary: Missing magic number.');
-  }
-  return true;
-}
-
-/**
- * Compiles WebAssembly binary into a usable module.
- * Returns the instantiated WebAssembly module and its exports.
- */
-export async function compileWasmModule(wasmBinary) {
-  validateWasmBinary(wasmBinary);
-  const wasmModule = await WebAssembly.instantiate(wasmBinary);
+// Utility to load WebAssembly binary and instantiate the module
+async function loadWasm(filePath) {
+  const wasmBuffer = await readFile(filePath);
+  const wasmModule = await WebAssembly.instantiate(wasmBuffer);
   return wasmModule.instance.exports;
 }
 
-/**
- * Performs matrix multiplication using a WebAssembly module.
- * Requires the WASM module to export a `matrixMultiply` function.
- */
-export async function wasmMatrixMultiply(wasmBinary, matrixA, matrixB) {
-  const wasmExports = await compileWasmModule(wasmBinary);
-
-  if (typeof wasmExports.matrixMultiply !== 'function') {
-    throw new Error('Invalid WebAssembly module: Missing matrixMultiply export.');
+// Matrix multiplication using WebAssembly
+export async function wasmMatrixMultiply(a, b) {
+  if (a[0].length !== b.length) {
+    throw new Error('Matrix dimensions do not match for multiplication');
   }
 
-  // Validate matrix dimensions
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
+  const wasmExports = await loadWasm(join(__dirname, 'matrix_operations.wasm'));
+  const rowsA = a.length;
+  const colsA = a[0].length;
+  const colsB = b[0].length;
 
-  if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions mismatch: Columns of A must equal rows of B.');
-  }
+  const flatA = a.flat();
+  const flatB = b.flat();
+  const result = new Float64Array(rowsA * colsB);
 
-  // Flatten matrices for WASM input
-  const flatMatrixA = matrixA.flat();
-  const flatMatrixB = matrixB.flat();
+  wasmExports.matrixMultiply(
+    flatA,
+    rowsA,
+    colsA,
+    flatB,
+    colsA,
+    colsB,
+    result
+  );
 
-  // Allocate memory in WASM and pass matrices
-  const resultPtr = wasmExports.matrixMultiply(flatMatrixA, rowsA, colsA, flatMatrixB, rowsB, colsB);
-
-  // Retrieve result from WASM memory
-  const result = new Float64Array(wasmExports.memory.buffer, resultPtr, rowsA * colsB);
-
-  // Reshape result into 2D array
-  const reshapedResult = [];
+  const output = [];
   for (let i = 0; i < rowsA; i++) {
-    reshapedResult.push(result.slice(i * colsB, (i + 1) * colsB));
+    output.push(result.slice(i * colsB, (i + 1) * colsB));
+  }
+  return output;
+}
+
+// LU decomposition using WebAssembly
+export async function wasmLUDecompose(matrix) {
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+  if (rows !== cols) {
+    throw new Error('LU decomposition requires a square matrix');
   }
 
-  return reshapedResult;
+  const wasmExports = await loadWasm(join(__dirname, 'matrix_operations.wasm'));
+  const flatMatrix = matrix.flat();
+  const l = new Float64Array(rows * cols);
+  const u = new Float64Array(rows * cols);
+
+  wasmExports.luDecompose(flatMatrix, rows, l, u);
+
+  const lMatrix = [];
+  const uMatrix = [];
+  for (let i = 0; i < rows; i++) {
+    lMatrix.push(l.slice(i * cols, (i + 1) * cols));
+    uMatrix.push(u.slice(i * cols, (i + 1) * cols));
+  }
+  return { l: lMatrix, u: uMatrix };
 }
 
-/**
- * Example utility function for creating identity matrices.
- * Useful for testing matrix operations.
- */
-export function createIdentityMatrix(size) {
-  const matrix = Array.from({ length: size }, (_, i) =>
-    Array.from({ length: size }, (_, j) => (i === j ? 1 : 0))
-  );
-  return matrix;
+// General utility for matrix validation
+export function validateMatrix(matrix) {
+  if (!Array.isArray(matrix) || matrix.length === 0 || !Array.isArray(matrix[0])) {
+    throw new Error('Input must be a non-empty 2D array');
+  }
+  const cols = matrix[0].length;
+  for (const row of matrix) {
+    if (row.length !== cols) {
+      throw new Error('All rows in the matrix must have the same number of columns');
+    }
+  }
 }
 
-/**
- * Example utility function for generating random matrices.
- * Useful for benchmarking matrix operations.
- */
-export function createRandomMatrix(rows, cols) {
-  return Array.from({ length: rows }, () =>
-    Array.from({ length: cols }, () => Math.random())
-  );
-}
+// Exported utilities for cross-agent use
+export const matrixUtils = {
+  validateMatrix,
+  wasmMatrixMultiply,
+  wasmLUDecompose
+};

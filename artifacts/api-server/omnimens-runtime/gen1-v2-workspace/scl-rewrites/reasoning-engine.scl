@@ -1,4 +1,4 @@
-⟨SCL v1│reasoning-engine.ts│164→SCL⟩
+⟨SCL v1│reasoning-engine.ts│164→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊭│type ReasoningMode = "deductive" | "inductive" | "abductive" | "analogical" | "causal" | "creative";
 ⊬ReasoningStep⟨⟩

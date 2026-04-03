@@ -1,4 +1,4 @@
-⟨SCL v1│selfModifyingCodeSystem_gen1.mjs│10→SCL⟩
+⟨SCL v1│selfModifyingCodeSystem_gen1.mjs│10→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊩selfModifyingCodeSystem(1)→void⟨1⟩{
 ⊩│export function selfModifyingCodeSystem(config) { /* Recursive, sandboxed self-modifying code implementation */ }

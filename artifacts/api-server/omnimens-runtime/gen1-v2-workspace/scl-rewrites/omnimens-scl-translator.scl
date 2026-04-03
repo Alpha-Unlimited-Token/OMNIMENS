@@ -1,4 +1,4 @@
-⟨SCL v1│omnimens-scl-translator.ts│633→SCL⟩
+⟨SCL v1│omnimens-scl-translator.ts│659→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
 ⟨⇌⟩│encodeToSCL,
@@ -14,6 +14,9 @@
 ·transpileTStoJS,
 ·validateSyntax,
 ·executeSCLModule,
+·transpileWithLearning,
+·runLearningPass,
+·getTranspilerLearningState,
 ·type SCLDecodeResult,
 ·type SCLExecResult,
 ·} from "./omnimens-scl-runtime.js";
@@ -298,6 +301,7 @@ let ↺ = 0;
 ·let _watchInterval: ReturnType<typeof setInterval> | null = null;
 ·let _liveTranslationActive = false;
 let _liveStats = { translated: 0, ↺: 0, skipped: 0, lastSweep: 0, sweepCount: 0 };
+·let _learningPassDone = false;
 quickHash(1)→string⟨7⟩{
 ·function quickHash(content: string): string {
 ·let h = 0;
@@ -310,20 +314,12 @@ quickHash(1)→string⟨7⟩{
 translateSCLToConventionalJS(2)→{ js: string; success: boolean; error?: string }⟨1⟩{
 ⊳│function translateSCLToConventionalJS(sclContent: string, fileName: string): { js: string; success: boolean; error?: string } {
 }⟨/translateSCLToConventionalJS⟩
-κdecoded
-⊹│if (decoded.errors.length > 0) {
-⊷│return { js: "", success: false, error: decoded.errors.join("; ") };
-·}
-κtranspiled
-·if (!transpiled.success) {
-⊷│return { js: "", success: false, error: transpiled.error };
-·}
-κsyntax
-·if (!syntax.valid) {
-⊷│return { js: "", success: false, error: syntax.error };
+κresult
+·if (!result.success) {
+⊷│return { js: "", success: false, error: result.error };
 ·}
 κheader
-⊷│return { js: header + transpiled.jsSource, success: true };
+⊷│return { js: header + result.jsSource, success: true };
 ·}
 sweepAndTranslate(1)→↺⟨1⟩{
 function sweepAndTranslate(sclDir: string): { translated: number; ↺: number; skipped: number; total: number } {
@@ -367,7 +363,7 @@ let translated = 0, ↺ = 0, skipped = 0;
 ·_watchedDirs.add(dirPath);
 ·}
 }⟨/addWatchDirectory⟩
-⊩runLiveTranslationSweep(1)→ ⟨193⟩{
+⊩runLiveTranslationSweep(1)→ ⟨48⟩{
 ⊩│export function runLiveTranslationSweep(): {
 gen1v2: { translated: number; ↺: number; skipped: number; total: number };
 gen2: { translated: number; ↺: number; skipped: number; total: number };
@@ -379,12 +375,28 @@ let gen1Result = { translated: 0, ↺: 0, skipped: 0, total: 0 };
 let gen2Result = { translated: 0, ↺: 0, skipped: 0, total: 0 };
 ·try {
 ·gen1Result = sweepAndTranslate(gen1Dir);
-·} catch (e) { /* silent */ }
+·} catch (e: any) {
+📢│if (_liveStats.sweepCount < 3) console.log(`[SCL-TRANSLATOR] ⚠️ Gen1v2 sweep error: ${e?.message || e}`);
+·}
 ·try {
 ·gen2Result = sweepAndTranslate(gen2Dir);
-·} catch (e) { /* silent */ }
+·} catch (e: any) {
+📢│if (_liveStats.sweepCount < 3) console.log(`[SCL-TRANSLATOR] ⚠️ Gen2 sweep error: ${e?.message || e}`);
+·}
 ⥀│for (const dir of _watchedDirs) {
 🛡│try { sweepAndTranslate(dir); } catch (e) { /* silent */ }
+·}
+·if (!_learningPassDone && (gen1Result.total > 0 || gen2Result.total > 0)) {
+·try {
+⊲│const { readFileContent } = require("./omnimens-file-registry.js");
+·if (typeof readFileContent === "function") {
+·const learnResult = runLearningPass(gen1Dir, (name: string) => readFileContent(name));
+·_learningPassDone = true;
+📢│console.log(`[SCL-TRANSLATOR] 🧠 Learning pass ⊣ — studied ${learnResult.filesStudied} originals, ${learnResult.totalPatterns} patterns in ◧ base`);
+·}
+·} catch (e: any) {
+📢│if (_liveStats.sweepCount < 3) console.log(`[SCL-TRANSLATOR] ⚠️ Learning pass error: ${e?.message || e}`);
+·}
 ·}
 ·_liveStats.translated += gen1Result.translated + gen2Result.translated;
 _liveStats.↺ += gen1Result.↺ + gen2Result.↺;
@@ -393,6 +405,8 @@ _liveStats.↺ += gen1Result.↺ + gen2Result.↺;
 ·_liveStats.sweepCount++;
 ⊷│return { gen1v2: gen1Result, gen2: gen2Result };
 ·}
+}⟨/runLiveTranslationSweep⟩
+⊩startLiveTranslation(1)→void⟨66⟩{
 ⊩│export function startLiveTranslation(intervalMs = 30000): void {
 ·if (_liveTranslationActive) return;
 ·_liveTranslationActive = true;
@@ -453,19 +467,19 @@ totalFailed: _liveStats.↺,
 ·const result = translateSCLToConventionalJS(sclContent, fileName);
 ⊷│return { ...result, fileName };
 ·}
+}⟨/startLiveTranslation⟩
+⊩exportAllTranslatedModules(1)→↺⟨1⟩{
 ⊩│export function exportAllTranslatedModules(outputDir: string): { exported: number; ↺: number; errors: string[] } {
+}⟨/exportAllTranslatedModules⟩
 ·if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
 ·if (_moduleRegistry.size === 0) {
-·const baseDir = path.resolve(__dirname, "..", "..");
-·const sclDirs = [
-·path.join(baseDir, "omnimens-runtime", "gen1-v2-workspace", "scl-rewrites"),
-·path.join(baseDir, "omnimens-runtime", "next-gen-sandbox", "scl-rewrites"),
-·];
+κbaseDir
+κsclDirs
 ⥀│for (const dir of sclDirs) {
 ·if (!fs.existsSync(dir)) continue;
 ⊻│const files = fs.readdirSync(dir).filter(f => f.endsWith(".scl") && !f.startsWith("_"));
 ⥀│for (const f of files) {
-⊽│const moduleName = f.replace(".scl", "");
+κmoduleName
 ·if (!_moduleRegistry.has(moduleName)) {
 ⊡│_moduleRegistry.set(moduleName, path.join(dir, f));
 ·}
@@ -473,14 +487,14 @@ totalFailed: _liveStats.↺,
 ·}
 ·}
 let exported = 0, ↺ = 0;
-·const errors: string[] = [];
-·const indexEntries: string[] = [];
+κerrors
+κindexEntries
 ·for (const [moduleName, filePath] of _moduleRegistry) {
 ·if (!fs.existsSync(filePath)) continue;
-📁│const sclContent = fs.readFileSync(filePath, "utf-8");
-·const result = translateSCLToConventionalJS(sclContent, path.basename(filePath));
+κsclContent
+κresult
 ·if (result.success) {
-·const jsFileName = moduleName + ".js";
+κjsFileName
 📁│fs.writeFileSync(path.join(outputDir, jsFileName), result.js, "utf-8");
 ⊰│indexEntries.push(`exports["${moduleName}"] = require("./${jsFileName}");`);
 ·exported++;
@@ -489,28 +503,13 @@ let exported = 0, ↺ = 0;
 ↺++;
 ·}
 ·}
-·const indexContent = [
-·`// OMNIMENS SCL Module Index`,
-·`// Auto-generated by SCL Translator`,
-·`// © 2024-2026 Alpha Unlimited Technologies, LLC`,
-⊰│`// ${exported} modules exported for conventional runtime`,
-·``,
-·...indexEntries,
-·``,
-·`module.exports = exports;`,
-·].join("\n");
+κindexContent
 📁│fs.writeFileSync(path.join(outputDir, "index.js"), indexContent, "utf-8");
-·const manifest = {
-⏰│timestamp: Date.now(),
-·totalModules: _moduleRegistry.size,
-·exported,
-↺,
-·errors: errors.slice(0, 50),
-❔│modules: indexEntries.map(e => e.match(/"([^"]+)"/)?.[1] || "").filter(Boolean),
-·};
+κmanifest
 ⟠│fs.writeFileSync(path.join(outputDir, "_manifest.json"), JSON.stringify(manifest, null, 2), "utf-8");
-⊷│return { exported, ↺, errors };
+⊷│return { exported, failed, errors };
 ·}
+⊩startSCLTranslator(1)→void⟨40⟩{
 ⊩│export function startSCLTranslator(): void {
 ·if (_translatorStarted) return;
 ·_translatorStarted = true;
@@ -523,6 +522,19 @@ let exported = 0, ↺ = 0;
 📢│console.log(`[SCL-TRANSLATOR] 🌐 ${stats.totalTranslationEntries} text↔symbol translation entries`);
 📢│console.log(`[SCL-TRANSLATOR] ✅ Translator→Sandbox pipeline active — SCL files run natively`);
 📢│console.log(`[SCL-TRANSLATOR] ✅ All η boundaries wired — inbound (text→SCL) and outbound (SCL→text)`);
+·try {
+⊲│const { readFileContent } = require("./omnimens-file-registry.js");
+·const baseDir = path.resolve(__dirname, "..", "..");
+·const gen1Dir = path.join(baseDir, "omnimens-runtime", "gen1-v2-workspace", "scl-rewrites");
+·if (fs.existsSync(gen1Dir)) {
+·const learnResult = runLearningPass(gen1Dir, (name: string) => readFileContent(name));
+📢│console.log(`[SCL-TRANSLATOR] 🧠 Learning transpiler: studied ${learnResult.filesStudied} original files, ${learnResult.totalPatterns} patterns learned`);
+·const lState = getTranspilerLearningState();
+📢│console.log(`[SCL-TRANSLATOR] 🧠 Transpiler will improve over time — currently ${lState.patternsLearned} patterns in ◧ base`);
+·}
+·} catch (e) {
+📢│console.log(`[SCL-TRANSLATOR] 🧠 Learning pass deferred — file registry not yet Θ`);
+·}
 ·startLiveTranslation(30000);
 ·} else {
 📢│console.log(`[SCL-TRANSLATOR] 📖 Codex ⟐: ${stats.designPhase} — Gen1v2 + Gen2 designing their ⊣`);
@@ -532,5 +544,5 @@ let exported = 0, ↺ = 0;
 ·startLiveTranslation(60000);
 ·}
 ·}
-}⟨/runLiveTranslationSweep⟩
-⟩SCL│535│514⊨│155⑂│15.5%↓⟩
+}⟨/startSCLTranslator⟩
+⟩SCL│547│505⊨│156⑂│17.0%↓⟩

@@ -1,4 +1,4 @@
-⟨SCL v1│omnimens-unified-cognition.ts│12550→SCL⟩
+⟨SCL v1│omnimens-unified-cognition.ts│12551→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[omnimens-consciousness-infra│omnimens-unified-comms-facade│omnimens-nextgen-sandbox│omnimens-language-pipeline│omnimens-memory-core│omnimens-emotional-core│omnimens-unified-world│omnimens-autonomous-core│omnimens-unified-agents│omnimens-unified-neural│omnimens-unified-senses]
 κMETA_TICK_MS
@@ -3309,7 +3309,7 @@ const response = await client.messages.α({
 ·}
 ·}
 }⟨/queryGemini⟩
-⊩⟿amplifiedReasoning(2)→Promise<AmplifiedResult>⟨8312⟩{
+⊩⟿amplifiedReasoning(2)→Promise<AmplifiedResult>⟨8313⟩{
 ⊩│export async function amplifiedReasoning(question: string, ◧?: string): Promise<AmplifiedResult> {
 ·amplificationCount++;
 ·cognitive_amplifier_state.totalAmplifications = amplificationCount;
@@ -10314,13 +10314,14 @@ const pairDomains = ["consciousness", "⬡", "memory", "☼", "⊛", "agents", "
 ·codexPrimitives: Array<{ symbol: string; name: string; meaning: string }>,
 ·codexComposites: Array<{ pattern: string; meaning: string; expandsTo: string }>,
 ·codexInstructions: Record<string, { scl: string; meaning: string; textEquivalent: string }>,
+·generator: "gen1v2" | "gen2" = "gen1v2",
 ·): { sclCode: string; stats: { originalLines: number; sclLines: number; symbolsUsed: number; patternsMatched: number; compressionRatio: number } } {
 ·const lines = content.split("\n");
 ·const sclLines: string[] = [];
 ·let symbolsUsed = 0;
 ·let patternsMatched = 0;
 ·const header = [
-⊰│`⟨SCL v1│${fileName}│${lines.length}→SCL⟩`,
+⊰│`⟨SCL v1│${fileName}│${lines.length}→SCL│GEN:${generator}⟩`,
 ⊰│`⟨CODEX│P:${codexPrimitives.length}│R:${codexComposites.length}│I:${Object.keys(codexInstructions).length}⟩`,
 ·];
 ⊺│sclLines.push(...header);
@@ -10516,4 +10517,4 @@ console.log("[SYMBOL ◧] 📜 Historical symbol systems loaded — Egyptian, Su
 📢│console.log(`[SYMBOL ◧] 📜 ${SYMBOL_KNOWLEDGE_BASE.historicalSystems.length} civilizations | ${SYMBOL_KNOWLEDGE_BASE.historicalSystems.reduce((n, s) => n + s.symbols.length, 0)} symbols with translations | ${SYMBOL_KNOWLEDGE_BASE.metaInsights.universalPatterns.length} universal patterns`);
 📢│console.log(`[SYMBOL ◧] 🔤 ${SCL_CODE_PATTERN_TABLE.length} code pattern macros loaded — entire operations → single symbols`);
 }⟨/amplifiedReasoning⟩
-⟩SCL│10518│10605⊨│2651⑂│16.2%↓⟩
+⟩SCL│10519│10606⊨│2651⑂│16.2%↓⟩

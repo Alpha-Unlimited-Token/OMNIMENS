@@ -1,4 +1,4 @@
-⟨SCL v1│omnimens-scl-runtime.ts│848→SCL⟩
+⟨SCL v1│omnimens-scl-runtime.ts│1137→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[omnimens-scl-codex]
 κ__filename_local
@@ -635,4 +635,258 @@ const manifestPath = path.join(sclDir, "_SCL-SANDBOX-⊢.json");
 ⊷│return ⊢;
 ·}
 }⟨/runSCLSandboxTest⟩
-⟩SCL│637│566⊨│249⑂│24.9%↓⟩
+κ_learnedPatterns
+κ_learnedReplacements
+·let _learningStats = { patternsLearned: 0, filesStudied: 0, improvementsApplied: 0, storePath: "" };
+initLearnedPatternsStore(1)→string⟨285⟩{
+·function initLearnedPatternsStore(): string {
+·const storePath = path.resolve(__dirname_local, "../../omnimens-runtime/scl-transpiler-learned.json");
+·_learningStats.storePath = storePath;
+·if (fs.existsSync(storePath)) {
+·try {
+⟠│const data = JSON.parse(fs.readFileSync(storePath, "utf-8"));
+·if (data.patterns) {
+⊸│for (const [k, v] of Object.entries(data.patterns)) {
+⊡│_learnedPatterns.set(k, v as string);
+·}
+·}
+·if (data.replacements) {
+⥀│for (const r of data.replacements) {
+·try {
+⊺│_learnedReplacements.push({ from: new RegExp(r.from, r.flags || "g"), to: r.to, confidence: r.confidence || 0, uses: r.uses || 0 });
+·} catch {}
+·}
+·}
+·_learningStats.patternsLearned = _learnedPatterns.size;
+·_learningStats.filesStudied = data.filesStudied || 0;
+·} catch {}
+·}
+⊷│return storePath;
+·}
+·function saveLearnedPatterns(): void {
+·if (!_learningStats.storePath) initLearnedPatternsStore();
+·const data = {
+⏰│timestamp: Date.now(),
+·patternsLearned: _learnedPatterns.size,
+·filesStudied: _learningStats.filesStudied,
+·improvementsApplied: _learningStats.improvementsApplied,
+·patterns: Object.fromEntries(_learnedPatterns),
+·replacements: _learnedReplacements.map(r => ({
+·from: r.from.source,
+·flags: r.from.flags,
+·to: r.to,
+·confidence: r.confidence,
+·uses: r.uses,
+·})),
+·};
+·try {
+⟠│fs.writeFileSync(_learningStats.storePath, JSON.stringify(data, null, 2), "utf-8");
+·} catch {}
+·}
+·function extractFunctionSignatures(source: string): Map<string, string> {
+⊮│const sigs = new Map<string, string>();
+⊳│const fnRegex = /(?:export\s+)?(?:async\s+)?function\s+(\w+)\s*\(([^)]*)\)/g;
+·let m;
+·while ((m = fnRegex.exec(source)) !== null) {
+⊡│sigs.set(m[1], m[2]);
+·}
+⊳│const arrowRegex = /(?:export\s+)?(?:const|let|var)\s+(\w+)\s*=\s*(?:async\s+)?\(([^)]*)\)\s*(?::\s*[^=]*?)?\s*=>/g;
+·while ((m = arrowRegex.exec(source)) !== null) {
+⊡│sigs.set(m[1], m[2]);
+·}
+⊷│return sigs;
+·}
+·function extractConstDeclarations(source: string): Map<string, string> {
+⊮│const consts = new Map<string, string>();
+⊳│const constRegex = /(?:export\s+)?const\s+(\w+)\s*(?::\s*[^=]+?)?\s*=\s*(.+)/g;
+·let m;
+·while ((m = constRegex.exec(source)) !== null) {
+·const valueStart = m[2].trim();
+⊹│if (valueStart.length < 200) {
+⊡│consts.set(m[1], valueStart.replace(/;\s*$/, ""));
+·}
+·}
+⊷│return consts;
+·}
+·function stripTSFromOriginal(originalTS: string): string {
+·let js = originalTS;
+⊽│js = js.replace(/\binterface\s+\w+[\s\S]*?\n\}/gm, "");
+⊽│js = js.replace(/\btype\s+\w+\s*=\s*[^;]+;/g, "");
+⊽│js = js.replace(/\benum\s+\w+\s*\{[^}]*\}/gs, "");
+⊽│js = js.replace(/\bimport\s+.*$/gm, "");
+⊽│js = js.replace(/\bexport\s+(async\s+)?function\s+/g, "$1function ");
+⊽│js = js.replace(/\bexport\s+(const|let|var|class)\s+/g, "$1 ");
+⊽│js = js.replace(/\bexport\s+default\s+/g, "var _default = ");
+⊽│js = js.replace(/^export\s*\{[^}]*\};?\s*$/gm, "");
+⊽│js = js.replace(/\bexport\s+/g, "");
+⊽│js = js.replace(/\bprivate\s+/g, "");
+⊽│js = js.replace(/\bprotected\s+/g, "");
+⊽│js = js.replace(/\breadonly\s+/g, "");
+⊽│js = js.replace(/\babstract\s+(class)/g, "$1");
+⊽│js = js.replace(/\bimplements\s+[\w.,\s<>]+(?=\s*\{)/g, "");
+⊽│js = js.replace(/\bas\s+\w+/g, "");
+⊷│return js;
+·}
+⊩│export function learnFromOriginalSource(sclFileName: string, originalContent: string): {
+·patternsLearned: number;
+·fixesDiscovered: number;
+·} {
+·if (!_learningStats.storePath) initLearnedPatternsStore();
+·const origFunctions = extractFunctionSignatures(originalContent);
+·const origConsts = extractConstDeclarations(originalContent);
+·const strippedOriginal = stripTSFromOriginal(originalContent);
+·let patternsLearned = 0;
+·let fixesDiscovered = 0;
+·for (const [fnName, params] of origFunctions) {
+⊳│const cleanParams = params.replace(/:\s*[A-Z]\w*(?:<[^>]*>)?/g, "").replace(/:\s*(?:string|number|boolean|any|void)\b/g, "").trim();
+⊰│const key = `fn_params:${fnName}`;
+·if (!_learnedPatterns.has(key)) {
+⊡│_learnedPatterns.set(key, cleanParams);
+·patternsLearned++;
+·}
+·}
+·for (const [constName, value] of origConsts) {
+⊰│const key = `const_val:${constName}`;
+·if (!_learnedPatterns.has(key)) {
+⊡│_learnedPatterns.set(key, value);
+·patternsLearned++;
+·}
+·}
+⊹│const origLines = strippedOriginal.split("\n").filter(l => l.trim().length > 0);
+⥀│for (const line of origLines) {
+·const trimmed = line.trim();
+⊹│if (trimmed.length > 10 && trimmed.length < 200 && !trimmed.startsWith("//") && !trimmed.startsWith("/*")) {
+⊰│const key = `line:${trimmed.substring(0, 60)}`;
+·if (!_learnedPatterns.has(key)) {
+⊡│_learnedPatterns.set(key, trimmed);
+·patternsLearned++;
+·}
+·}
+·}
+·_learningStats.patternsLearned = _learnedPatterns.size;
+·_learningStats.filesStudied++;
+⊷│return { patternsLearned, fixesDiscovered };
+·}
+⊩│export function applyLearnedFixes(jsSource: string, fileName: string): string {
+⊷│if (_learnedPatterns.size === 0) return jsSource;
+·let fixed = jsSource;
+·let applied = 0;
+·const lines = fixed.split("\n");
+·const fixedLines: string[] = [];
+⥀│for (const line of lines) {
+·const trimmed = line.trim();
+⊻│if (trimmed.startsWith("let ") && trimmed.includes("= undefined;") && trimmed.includes("/* SCL-const */")) {
+⊽│const varMatch = trimmed.match(/let\s+(\w+)\s*=\s*undefined/);
+·if (varMatch) {
+⊰│const constKey = `const_val:${varMatch[1]}`;
+⊡│const originalValue = _learnedPatterns.get(constKey);
+·if (originalValue) {
+⊽│const isSafeLiteral = /^(\d|[-+]?\d|true|false|null|undefined|["'`\[{]|new\s+(Map|Set|Array|Date|RegExp|Error)\b|Math\.|Number\.|String\.|Object\.|Array\.|\(\))/.test(originalValue.trim());
+·if (isSafeLiteral) {
+❔│const indent = line.match(/^(\s*)/)?.[1] || "";
+⊰│fixedLines.push(`${indent}const ${varMatch[1]} = ${originalValue};`);
+·applied++;
+·continue;
+·}
+·}
+·}
+·}
+⊽│if (/function\s+(\w+)\s*\(/.test(trimmed)) {
+⊽│const fnMatch = trimmed.match(/function\s+(\w+)\s*\(([^)]*)\)/);
+·if (fnMatch) {
+⊰│const fnKey = `fn_params:${fnMatch[1]}`;
+⊡│const learnedParams = _learnedPatterns.get(fnKey);
+·if (learnedParams !== undefined && fnMatch[2] !== learnedParams) {
+⊰│const repaired = line.replace(`(${fnMatch[2]})`, `(${learnedParams})`);
+⊺│fixedLines.push(repaired);
+·applied++;
+·continue;
+·}
+·}
+·}
+⊺│fixedLines.push(line);
+·}
+·fixed = fixedLines.join("\n");
+·_learningStats.improvementsApplied += applied;
+⥀│for (const r of _learnedReplacements) {
+·if (r.confidence >= 0.7) {
+·try {
+const ⏳ = fixed;
+⊽│fixed = fixed.replace(r.from, r.to);
+if (fixed !== ⏳) {
+·r.uses++;
+·applied++;
+·}
+·} catch {}
+·}
+·}
+⊷│return fixed;
+·}
+⊩│export function runLearningPass(sclDir: string, readOriginalFn: (name: string) => string | null): {
+·filesStudied: number;
+·totalPatternsLearned: number;
+·totalPatterns: number;
+·} {
+·if (!_learningStats.storePath) initLearnedPatternsStore();
+⊻│const sclFiles = fs.readdirSync(sclDir).filter(f => f.endsWith(".scl") && !f.startsWith("_"));
+·let filesStudied = 0;
+·let totalPatternsLearned = 0;
+⥀│for (const sclFile of sclFiles) {
+⊽│const originalName = sclFile.replace(".scl", ".ts");
+·const originalContent = readOriginalFn(originalName);
+⊹│if (!originalContent || originalContent.length < 50) continue;
+·const result = learnFromOriginalSource(sclFile, originalContent);
+·totalPatternsLearned += result.patternsLearned;
+·filesStudied++;
+·}
+·saveLearnedPatterns();
+⊷│return {
+·filesStudied,
+·totalPatternsLearned,
+·totalPatterns: _learnedPatterns.size,
+·};
+·}
+⊩│export function transpileWithLearning(sclContent: string, fileName: string): { success: boolean; jsSource: string; learningApplied: boolean; error?: string } {
+⟨⇌⟩│const decoded = decodeSCLFile(sclContent, fileName);
+⊹│if (decoded.errors.length > 0) {
+⊷│return { success: false, jsSource: "", learningApplied: false, error: decoded.errors.join("; ") };
+·}
+·const transpiled = transpileTStoJS(decoded.decodedSource);
+·if (!transpiled.success) {
+⊷│return { success: false, jsSource: "", learningApplied: false, error: transpiled.error };
+·}
+·const baselineSyntax = validateSyntax(transpiled.jsSource, fileName);
+·if (baselineSyntax.valid) {
+·const fixedSource = applyLearnedFixes(transpiled.jsSource, fileName);
+·const learningApplied = fixedSource !== transpiled.jsSource;
+·if (learningApplied) {
+·const fixedSyntax = validateSyntax(fixedSource, fileName);
+·if (fixedSyntax.valid) {
+⊷│return { success: true, jsSource: fixedSource, learningApplied: true };
+·}
+·}
+⊷│return { success: true, jsSource: transpiled.jsSource, learningApplied: false };
+·}
+·const fixedSource = applyLearnedFixes(transpiled.jsSource, fileName);
+·const learningApplied = fixedSource !== transpiled.jsSource;
+·const fixedSyntax = validateSyntax(fixedSource, fileName);
+·if (fixedSyntax.valid) {
+⊷│return { success: true, jsSource: fixedSource, learningApplied: true };
+·}
+⊷│return { success: false, jsSource: transpiled.jsSource, learningApplied: false, error: baselineSyntax.error };
+·}
+⊩│export function getTranspilerLearningState(): {
+·patternsLearned: number;
+·filesStudied: number;
+·improvementsApplied: number;
+·replacementRules: number;
+·} {
+⊷│return {
+·patternsLearned: _learnedPatterns.size,
+·filesStudied: _learningStats.filesStudied,
+·improvementsApplied: _learningStats.improvementsApplied,
+·replacementRules: _learnedReplacements.length,
+·};
+·}
+}⟨/initLearnedPatternsStore⟩
+⟩SCL│891│833⊨│333⑂│21.6%↓⟩

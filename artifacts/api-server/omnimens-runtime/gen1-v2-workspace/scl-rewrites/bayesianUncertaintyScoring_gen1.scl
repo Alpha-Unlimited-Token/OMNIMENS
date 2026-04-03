@@ -1,4 +1,4 @@
-⟨SCL v1│bayesianUncertaintyScoring_gen1.mjs│29→SCL⟩
+⟨SCL v1│bayesianUncertaintyScoring_gen1.mjs│29→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊩calculateUncertaintyScore(2)→void⟨9⟩{
 ⊩│export function calculateUncertaintyScore(inputs, model) {

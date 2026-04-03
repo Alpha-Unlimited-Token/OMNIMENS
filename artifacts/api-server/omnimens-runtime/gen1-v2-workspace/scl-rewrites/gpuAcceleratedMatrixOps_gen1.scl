@@ -1,4 +1,4 @@
-⟨SCL v1│gpuAcceleratedMatrixOps_gen1.mjs│130→SCL⟩
+⟨SCL v1│gpuAcceleratedMatrixOps_gen1.mjs│130→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊩matrixMultiply(2)→void⟨27⟩{
 ⊩│export function matrixMultiply(matrixA, matrixB) {

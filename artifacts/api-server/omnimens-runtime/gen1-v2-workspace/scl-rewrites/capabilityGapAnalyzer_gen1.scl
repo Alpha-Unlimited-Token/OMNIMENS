@@ -1,4 +1,4 @@
-⟨SCL v1│capabilityGapAnalyzer_gen1.mjs│24→SCL⟩
+⟨SCL v1│capabilityGapAnalyzer_gen1.mjs│24→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊩capabilityGapAnalyzer(1)→void⟨15⟩{
 ⊩│export function capabilityGapAnalyzer(systemMetrics) {

@@ -1,4 +1,4 @@
-⟨SCL v1│memory-system.ts│207→SCL⟩
+⟨SCL v1│memory-system.ts│207→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 η: https
 ⊭│type MemoryType = "short_term" | "long_term" | "episodic" | "semantic" | "procedural";

@@ -1,4 +1,4 @@
-⟨SCL v1│matrixOpsWasm_gen1.mjs│98→SCL⟩
+⟨SCL v1│matrixOpsWasm_gen1.mjs│98→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊲│const { TextEncoder, TextDecoder } = require('util');
 ⟿initializeWasm(1)→void⟨15⟩{

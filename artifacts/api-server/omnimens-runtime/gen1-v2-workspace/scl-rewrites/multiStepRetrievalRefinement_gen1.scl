@@ -1,4 +1,4 @@
-⟨SCL v1│multiStepRetrievalRefinement_gen1.mjs│24→SCL⟩
+⟨SCL v1│multiStepRetrievalRefinement_gen1.mjs│24→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊪│export const multiStepRetrievalRefinement = async (query, memoryModule) => {
 ·let refinedResults = [];

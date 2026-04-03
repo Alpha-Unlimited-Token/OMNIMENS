@@ -1,4 +1,4 @@
-⟨SCL v1│semanticMemory_gen1.mjs│100→SCL⟩
+⟨SCL v1│semanticMemory_gen1.mjs│100→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 cosineSimilarity(2)→void⟨15⟩{
 ·function cosineSimilarity(vectorA, vectorB) {

@@ -1,4 +1,4 @@
-⟨SCL v1│webAssemblyMatrixOps_gen1.mjs│92→SCL⟩
+⟨SCL v1│webAssemblyMatrixOps_gen1.mjs│92→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊩⟿initializeWasmModule(1)→void⟨13⟩{
 ⊩│export async function initializeWasmModule() {

@@ -1,4 +1,4 @@
-⟨SCL v1│omnimens-micro-transformer.ts│737→SCL⟩
+⟨SCL v1│omnimens-micro-transformer.ts│737→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 safe(2)→number⟨4⟩{
 ·function safe(v: any, fb: number = 0): number {

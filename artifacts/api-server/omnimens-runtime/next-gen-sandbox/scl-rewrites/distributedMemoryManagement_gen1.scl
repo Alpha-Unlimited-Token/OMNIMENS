@@ -1,4 +1,4 @@
-⟨SCL v1│distributedMemoryManagement_gen1.mjs│28→SCL⟩
+⟨SCL v1│distributedMemoryManagement_gen1.mjs│28→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊩⟿retrieveEmbedding(2)→void⟨10⟩{
 ⊩│export async function retrieveEmbedding(query, memoryHierarchy) {

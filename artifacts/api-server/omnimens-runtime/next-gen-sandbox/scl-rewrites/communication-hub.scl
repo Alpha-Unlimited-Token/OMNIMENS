@@ -1,4 +1,4 @@
-⟨SCL v1│communication-hub.ts│98→SCL⟩
+⟨SCL v1│communication-hub.ts│98→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊭│type EventHandler = (data: unknown) => void | Promise<void>;
 ⊬Subscription⟨id:string│topic:string│handler:EventHandler│subsystem:string│priority:number⟩

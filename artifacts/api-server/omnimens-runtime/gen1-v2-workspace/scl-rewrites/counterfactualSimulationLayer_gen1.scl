@@ -1,4 +1,4 @@
-⟨SCL v1│counterfactualSimulationLayer_gen1.mjs│32→SCL⟩
+⟨SCL v1│counterfactualSimulationLayer_gen1.mjs│32→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊩⟿simulateCounterfactuals(1)→void⟨11⟩{
 ⊩│export async function simulateCounterfactuals(agentOutputs) {

@@ -1,4 +1,4 @@
-⟨SCL v1│dynamicContextManager_gen1.mjs│115→SCL⟩
+⟨SCL v1│dynamicContextManager_gen1.mjs│115→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊩summarizeContext(2)→void⟨92⟩{
 ⊩│export function summarizeContext(contextTokens, maxSummaryLength) {

@@ -1,4 +1,4 @@
-⟨SCL v1│recursiveRetrievalPlanner_gen1.mjs│40→SCL⟩
+⟨SCL v1│recursiveRetrievalPlanner_gen1.mjs│40→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊩recursiveRetrievalPlanner(3)→void⟨16⟩{
 ⊩│export function recursiveRetrievalPlanner(query, memorySystem, evaluationMetrics) {

@@ -1,4 +1,4 @@
-⟨SCL v1│semanticContextCompression_gen1.mjs│154→SCL⟩
+⟨SCL v1│semanticContextCompression_gen1.mjs│154→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊩compressSemanticContext(2)→void⟨26⟩{
 ⊩│export function compressSemanticContext(contexts, numTopics = 5) {

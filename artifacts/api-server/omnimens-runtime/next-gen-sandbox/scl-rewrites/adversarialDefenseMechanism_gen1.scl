@@ -1,4 +1,4 @@
-⟨SCL v1│adversarialDefenseMechanism_gen1.mjs│30→SCL⟩
+⟨SCL v1│adversarialDefenseMechanism_gen1.mjs│30→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊪adversarialDefenseMechanism
 ⊹│if (typeof input !== 'string' || input.length > 1000) {

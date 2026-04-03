@@ -1,4 +1,4 @@
-⟨SCL v1│semanticContextSummarizer_gen1.mjs│93→SCL⟩
+⟨SCL v1│semanticContextSummarizer_gen1.mjs│93→SCL│GEN:gen1v2⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊩generateEmbeddings(1)→void⟨21⟩{
 ⊩│export function generateEmbeddings(sentences) {
