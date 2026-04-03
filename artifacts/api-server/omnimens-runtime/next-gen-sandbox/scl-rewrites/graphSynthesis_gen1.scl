@@ -1,0 +1,33 @@
+⟨SCL v1│graphSynthesis_gen1.mjs│42→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class GraphSynthesis {
+·constructor() {
+·this.knowledgeGraph = {};
+·}
+·aggregateKnowledge(agentOutputs) {
+agentOutputs.forEach(θ => {
+⊸│Object.keys(output).forEach(key => {
+·if (!this.knowledgeGraph[key]) {
+·this.knowledgeGraph[key] = [];
+·}
+⊺│this.knowledgeGraph[key].push({
+≪: θ[key],
+confidence: θ.confidence || 0.8
+·});
+·});
+·});
+·this.resolveConflicts();
+·}
+·resolveConflicts() {
+⊸│Object.keys(this.knowledgeGraph).forEach(key => {
+κentries
+⋐│const weightedSum = entries.reduce((sum, entry) => sum + ent
+⋐│const totalWeight = entries.reduce((sum, entry) => sum + ent
+·this.knowledgeGraph[key] = weightedSum / totalWeight;
+·});
+·}
+·getUnifiedGraph() {
+⊷│return this.knowledgeGraph;
+·}
+·}
+⟩SCL│32│11⊨│7⑂│23.8%↓⟩

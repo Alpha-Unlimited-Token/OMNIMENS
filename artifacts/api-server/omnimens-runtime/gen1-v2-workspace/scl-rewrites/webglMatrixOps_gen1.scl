@@ -1,0 +1,7 @@
+⟨SCL v1│webglMatrixOps_gen1.mjs│127→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩initializeWebGLContext(1)→void⟨8⟩{⊩⊵⊷}
+⊩compileShader(3)→void⟨11⟩{⊩⊰⊵⊷}
+⊩createProgram(3)→void⟨12⟩{⊩⊰⊵⊷}
+⊩multiplyMatrices(6)→void⟨45⟩{⊩⊷}
+⟩SCL│6│17⊨│13⑂│95.3%↓⟩

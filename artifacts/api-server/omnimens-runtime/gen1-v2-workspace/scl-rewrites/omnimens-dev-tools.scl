@@ -1,0 +1,165 @@
+⟨SCL v1│omnimens-dev-tools.ts│248→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+·engineRegistry.registerEngine("dev-tools", "NORMAL", { dbQuota: 10 });
+κ__filename
+κ__dirname
+κPY_DIR
+κPYTHON
+📢│const LOG = (msg: string) => console.log(`[OMNIMENS-DEV-TOOL
+⊩⟿runPythonTool(1)→void⟨1⟩{⊩}
+·script: string,
+·payload: unknown,
+·timeoutMs = 60_000,
+·): Promise<any> {
+κinput
+κproc
+·let stdout = "",
+·stderr = "";
+⊱│return new Promise((resolve) => {
+⏳│const timer = setTimeout(() => {
+·proc.kill("SIGKILL");
+⊰│resolve({ success: false, error: `Tool timeout after ${timeo
+·}, timeoutMs);
+⊱│proc.stdout.on("data", (d: Buffer) => (stdout += d));
+⊱│proc.stderr.on("data", (d: Buffer) => (stderr += d));
+⊱│proc.on("close", () => {
+·clearTimeout(timer);
+·try {
+⟠│resolve(JSON.parse(stdout.trim()));
+·} catch {
+·resolve({
+·success: false,
+error: stderr.slice(0, 800) || "No θ from Python tool",
+·});
+·}
+·});
+⊱│proc.on("error", (err) => {
+·clearTimeout(timer);
+·resolve({ success: false, error: err.message });
+·});
+proc.stdin.⊞(η);
+·proc.stdin.end();
+·});
+·}
+⊭│type Spec = Record<string, any>;
+κTOOL_DEF
+·string,
+·{ script: string; timeout: number; log: (s: Spec) => string }
+·> = {
+·chart: {
+·script: "chart_generator.py",
+·timeout: 30_000,
+⊰│log: (s) => `Generating ${s.type} chart: "${s.title}"`,
+·},
+·pdf: {
+·script: "pdf_processor.py",
+·timeout: 30_000,
+⊰│log: (s) => `PDF action: ${s.action}`,
+·},
+·doc: {
+·script: "document_processor.py",
+·timeout: 30_000,
+⊰│log: (s) => `Document action: ${s.action}`,
+·},
+·ocr: {
+·script: "ocr_engine.py",
+·timeout: 30_000,
+·log: () => `Running OCR`,
+·},
+·nlp: {
+·script: "nlp_analyzer.py",
+·timeout: 60_000,
+❔│log: (s) => `NLP ${s.action} on ${s.text?.length || 0} chars
+·},
+·media: {
+·script: "ffmpeg_tools.py",
+·timeout: 180_000,
+⊰│log: (s) => `FFmpeg: ${s.action}`,
+·},
+·diagram: {
+·script: "diagram_generator.py",
+·timeout: 30_000,
+⊰│log: (s) => `Generating diagram (${s.type || "network"})`,
+·},
+·ds: {
+·script: "data_science.py",
+·timeout: 60_000,
+⊰│log: (s) => `Data science: ${s.action}`,
+·},
+·math: {
+·script: "math_engine.py",
+·timeout: 30_000,
+⊰│log: (s) => `Math: ${s.action}`,
+·},
+·audio: {
+·script: "audio_analyzer.py",
+·timeout: 60_000,
+⊰│log: (s) => `Audio analysis: ${s.action}`,
+·},
+·code: {
+·script: "code_runner.py",
+⊱│timeout: (s) => (s.timeout || 15) * 1000 + 5000,
+⊰│log: (s) => `Code runner: op=${s.op} lang=${s.lang}`,
+·},
+·web: {
+·script: "web_tools.py",
+·timeout: 30_000,
+⊰│log: (s) => `Web ${s.op}: ${s.url}`,
+·},
+·git: {
+·script: "git_tools.py",
+·timeout: 90_000,
+⊰│log: (s) => `Git ${s.op}: ${s.url || s.path}`,
+·},
+η: {
+·script: "system_tools.py",
+·timeout: 30_000,
+⊰│log: (s) => `System ${s.op}`,
+·},
+·file: {
+·script: "file_tools.py",
+·timeout: 30_000,
+⊰│log: (s) => `File tool: ${s.op}`,
+·},
+·};
+⟿callTool(2)→Promise<any>⟨7⟩{⊳⊷}
+⊪│export const generateChart = (s: Spec) => callTool("chart", 
+⊪│export const processPDF = (s: Spec) => callTool("pdf", s);
+⊪│export const processDocument = (s: Spec) => callTool("doc", 
+⊪│export const runOCR = (img: string) => callTool("ocr", img);
+⊪│export const analyzeText = (s: Spec) => callTool("nlp", s);
+⊪│export const processMedia = (s: Spec) => callTool("media", s
+⊪│export const generateDiagram = (s: Spec) => callTool("diagra
+⊪│export const runDataScience = (s: Spec) => callTool("ds", s)
+⊪│export const solveMath = (s: Spec) => callTool("math", s);
+⊪│export const analyzeAudio = (s: Spec) => callTool("audio", s
+⊪│export const runCode = (s: Spec) => callTool("code", s);
+⊪│export const fetchWebUrl = (s: Spec) => callTool("web", s);
+⊪│export const runGitOp = (s: Spec) => callTool("git", s);
+⊪│export const getSystemInfo = (s: Spec) => callTool("system",
+⊪│export const runFileTool = (s: Spec) => callTool("file", s);
+⟿healthCheck(1)→void⟨5⟩{⊴⚡→}
+⚡→│spikeBus.on("dev-tools:health", healthCheck);
+⚡→│spikeBus.scheduleSpike("dev-tools:health", {}, 100);
+⊩⟿checkAllTools(1)→Promise<Record<string, boolean>>⟨17⟩{⊩⫘⊱⊸❔⊴⊷}
+κREGEX_MAP
+⊩detectDevToolIntent(1)→void⟨6⟩{⊩⊷⊸⊽}
+⊱│cognitionBus.onInsight((src, insight) => {
+❔│if (src !== "dev-tools" && insight?.type === "discovery") {
+⊰│LOG(`Learning from ${src} insight`);
+·}
+·});
+⚡→│spikeBus.on("attention:dev-tools", () => spikeBus.scheduleSp
+⊱│spikeBus.on("cognition:curiosity", () => {
+⚡→│LOG("Curiosity spike — re-checking tools");
+⚡→│spikeBus.scheduleSpike("dev-tools:health", {}, 0);
+·});
+⊩shutdown(1)→void⟨4⟩{⊩}
+⟩SCL│164│85⊨│67⑂│33.9%↓⟩

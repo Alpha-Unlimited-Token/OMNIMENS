@@ -1,0 +1,39 @@
+⟨SCL v1│omnimens-file-registry.ts│344→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+κ__filename_local
+κ__dirname_local
+⊭│export type FilePermission = "FULL_ACCESS" | "READ_ONLY";
+⊬RegisteredFile⟨name:string│path:string│absolutePath:string│permission:FilePermission│category:☼│description:string│lineCount:number│sizeBytes:number│canRewrite:boolean⟩
+κENGINE_DIR
+κMODULES_DIR
+κGEN1V2_DIR
+κSANDBOX_DIR
+κSAFETY_GUARD_FILES
+κSAFETY_SECTION_FILES
+κENGINE_FILE_CATEGORIES
+κENGINE_FILE_DESCRIPTIONS
+getFileStats(1)→{ lines: number; bytes: number }⟨1⟩{}
+·try {
+⊄│if (!fs.existsSync(filePath)) return { lines: 0, bytes: 0 };
+κstat
+κcontent
+⊷│return { lines: content.split("\n").length, bytes: stat.size
+·} catch {
+⊷│return { lines: 0, bytes: 0 };
+·}
+·}
+buildRegistry(1)→RegisteredFile[]⟨112⟩{⊻⥀⊺⊰⊳⛨⊄⊽⊷}
+·let _cachedRegistry: RegisteredFile[] | null = null;
+·let _cacheTime = 0;
+κCACHE_TTL_MS
+⊩getFileRegistry(1)→RegisteredFile[]⟨7⟩{⊩⏰⊷}
+⊩getAccessibleFiles(1)→RegisteredFile[]⟨3⟩{⊩⊷}
+⊩getReadOnlyFiles(1)→RegisteredFile[]⟨3⟩{⊩⊷⛨⊄}
+⊩getFilesByCategory(1)→RegisteredFile[]⟨3⟩{⊩⊷}
+⊩canWriteFile(1)→boolean⟨5⟩{⊩⛨⊄⊄⊷}
+⊩readFileContent(1)→string | null⟨9⟩{⊩⊄⊷📁}
+⊩writeFileContent(2)→boolean⟨15⟩{⊩⛨⊄🚨⊰⊳⊷📁}
+⊩getRegistrySummary(1)→ ⟨22⟩{⊩⥀⊷⛨⊄⋐}
+⊩getFileDigest(1)→string⟨28⟩{⊩⊯⥀⊰⊺⊳⛨⊄⊷}
+⟩SCL│38│76⊨│51⑂│89.0%↓⟩

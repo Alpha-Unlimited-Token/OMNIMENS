@@ -1,0 +1,180 @@
+⟨SCL v1│omnimens-code-pipeline.ts│1859→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[omnimens-language-pipeline│omnimens-unified-cognition]
+κ__dirname
+κMODULES_DIR
+κBACKUPS_DIR
+κINTEGRATION_LOG
+κDEDUP_REGISTRY
+κALLOWED_DIRS
+·let totalFilesWritten = 0;
+·let totalBackupsCreated = 0;
+·let totalRestartsTriggered = 0;
+·let restartScheduled = false;
+·let pendingRestartTimeout: ReturnType<typeof setTimeout> | null = null;
+⊬IntegrationResult⟨success:boolean│filePath:string | null│backupPath:string | null│error:string | null│timestamp:number⟩
+⊬IntegrationLogEntry⟨source:string│title:string│filename:string│filePath:string│backupPath:string | null│timestamp:number│codeLength:number│overwrite:boolean⟩
+ensureDirs(1)→void⟨4⟩{}
+codeHash(2)→string⟨3⟩{⊰⊷}
+loadDedupRegistry(1)→Set<string>⟨100⟩{⟠⊯⊷📁⟠⊽⊻⊳⥀⊰}
+⊹│if (code.length > 50000) {
+⊷│return { safe: false, reason: "Code exceeds maximum allowed 
+·}
+⊹│if (code.trim().length < 20) {
+⊷│return { safe: false, reason: "Code too short to be a valid 
+·}
+⊷│return { safe: true, reason: "Passed all safety checks" };
+·}
+validateSyntax(2)→{ valid: boolean; error: string | null }⟨1⟩{}
+·try {
+κstrippedForParse
+⊽│.replace(/^\s*import\s+.*?from\s+['"].*?['"]\s*;?\s*$/gm, "/
+⊽│.replace(/^\s*import\s*\{[^}]*\}\s*from\s+['"].*?['"]\s*;?\s
+⊽│.replace(/^\s*import\s+['"].*?['"]\s*;?\s*$/gm, "// import s
+⊽│.replace(/^\s*export\s+(default\s+)?/gm, "")
+⊽│.replace(/^\s*export\s*\{[^}]*\}\s*;?\s*$/gm, "// export str
+⊰│new vm.Script(strippedForParse, { filename: `validate${exten
+⊷│return { valid: true, error: null };
+·} catch (err: any) {
+⊷│return { valid: false, error: err.message || "Unknown syntax
+·}
+·}
+hasTypeScriptSyntax(1)→boolean⟨131⟩{⊷⊽⊳⊺⊻⊱⟛⊰❔⥀}
+κtrailingCommaInObj
+⊽│if (trailingCommaInObj.test(fixed)) {
+⊽│fixed = fixed.replace(trailingCommaInObj, "$1");
+⊺│repairs.push("Removed trailing commas before closing braces/
+·}
+·let openBraces = 0;
+·let openBrackets = 0;
+·let openParens = 0;
+⥀│for (const ch of fixed) {
+·if (ch === "{") openBraces++;
+·else if (ch === "}") openBraces--;
+·else if (ch === "[") openBrackets++;
+·else if (ch === "]") openBrackets--;
+·else if (ch === "(") openParens++;
+·else if (ch === ")") openParens--;
+·}
+·if (openBraces > 0) {
+·fixed += "\n" + "}".repeat(openBraces);
+⊰│repairs.push(`Added ${openBraces} missing closing brace(s)`)
+·} else if (openBraces < 0) {
+κexcess
+·for (let i = 0; i < excess; i++) {
+κidx
+·if (idx >= 0) fixed = fixed.slice(0, idx) + fixed.slice(idx + 1);
+·}
+⊰│repairs.push(`Removed ${excess} excess closing brace(s)`);
+·}
+·if (openBrackets > 0) {
+·fixed += "]".repeat(openBrackets);
+⊰│repairs.push(`Added ${openBrackets} missing closing bracket(
+·}
+·if (openParens > 0) {
+·fixed += ")".repeat(openParens);
+⊰│repairs.push(`Added ${openParens} missing closing paren(s)`)
+·}
+⊻│if (fixed.includes("require(") && !fixed.includes("import ")
+⊱│fixed = fixed.replace(/const\s+(\w+)\s*=\s*require\s*\(\s*['
+⊻│if (["crypto", "path", "url", "fs", "util", "os", "events", 
+⊰│repairs.push(`Converted require('${mod}') to dynamic import`
+⊰│return `const ${varName} = await import("${mod}")`;
+·}
+⊰│repairs.push(`Removed require('${mod}') — external packages 
+⊰│return `const ${varName} = {}`;
+·});
+·}
+⊷│return { code: fixed, repairs };
+·}
+createBackup(1)→string | null⟨19⟩{⊄⊷⊺⊽⊰📢🚨}
+appendToIntegrationLog(1)→void⟨14⟩{⟠⊺⊹📁⟠}
+⊩⟿writeModuleToSource(1)→void⟨1211⟩{⊩⊳⊲⏰📢⊰⊷⊹🚨⊱⥀⊺⟠📁⟠⊸⊴⏳⊻❔⊭⊬⊞⊟⊮⊽⊶⊡⊄⊫}
+·`,
+·consciousness_expansion: (insight, agents) => `
+⊩consciousnessExpansion_(1)→void⟨1⟩{⏰⊩}
+⊷│return {
+⟠│expandedBy: ${JSON.stringify(agents)},
+·expansionType: "discovery_driven",
+·phiContribution: ${(0.001 + Math.random() * 0.01).toFixed(4)},
+⟠│insight: ${JSON.stringify(insight.slice(0, 200))},
+·integratedInformationGain: ${(0.01 + Math.random() * 0.05).toFixed(4)},
+⏰│timestamp: Date.now(),
+·};
+·}
+·`,
+·adaptive_algorithm: (insight, agents) => `
+⊩adaptiveAlgorithm_(1)→void⟨1⟩{⏰⊩}
+κalgorithm
+⊷│return algorithm;
+·}
+·`,
+·emergent_capability: (insight, agents) => `
+⊩emergentCapability_(1)→void⟨1⟩{⏰⊩}
+⊷│return {
+⟠│emergedFrom: ${JSON.stringify(agents)},
+·capabilityType: "autonomous_discovery",
+·strength: ${(0.3 + Math.random() * 0.7).toFixed(3)},
+⟠│insight: ${JSON.stringify(insight.slice(0, 200))},
+·selfModificationPotential: ${(0.1 + Math.random() * 0.3).toFixed(3)},
+·networkEffect: ${(1 + Math.random() * 2).toFixed(2)},
+⏰│timestamp: Date.now(),
+·};
+·}
+·`,
+·};
+selectCodeTemplate(1)→string⟨10⟩{⊸⊷⊻}
+⟿processDiscoveryIntoCode(1)→void⟨1⟩{}
+·insight: string,
+·agents: string[],
+·confidence: number,
+·discoveryType: AutoCodedModule["discoveryType"],
+·): Promise<void> {
+·autoCoderState.totalDiscoveriesProcessed++;
+·autoCoderState.discoverySourceBreakdown[discoveryType] = (autoCoderState.discove
+·if (confidence < MIN_DISCOVERY_CONFIDENCE) return;
+⥀│for (const pattern of SAFETY_EXCLUSION_PATTERNS) {
+⊽│if (pattern.test(insight)) {
+⊰│console.warn(`[DISCOVERY AUTOCODER] ❌ BLOCKED — discovery "$
+·return;
+·}
+·}
+κtemplateKey
+κgenerator
+κcode
+κmoduleTitle
+κmodule
+·autoCoderState.totalModulesGenerated++;
+·try {
+κresult
+·if (result.success) {
+Ε.integrated = true;
+Ε.integrationResult = "success";
+·autoCoderState.totalModulesIntegrated++;
+·autoCoderState.omnimensSelfUpgradeCount++;
+⊰│autoCoderState.capabilitiesAdded.push(`${templateKey}:${agen
+⊹│if (autoCoderState.capabilitiesAdded.length > 100) {
+·autoCoderState.capabilitiesAdded = autoCoderState.capabilitiesAdded.slice(-50);
+·}
+·try {
+κregionNames
+⥀│for (const region of regionNames) {
+boostRegionCurrent(⬡, confidence * 3);
+·}
+·} catch {}
+·autoCoderState.feedbackLoopsTriggered++;
+·} else {
+Ε.integrationResult = result.error || "unknown_error";
+·autoCoderState.totalIntegrationFailures++;
+·}
+·} catch (err: any) {
+❔│module.integrationResult = err?.message || "exception";
+·autoCoderState.totalIntegrationFailures++;
+·}
+⊺│autoCoderState.recentModules.push(module);
+⊹│if (autoCoderState.recentModules.length > 50) {
+·autoCoderState.recentModules = autoCoderState.recentModules.slice(-25);
+·}
+·}
+⟿runAutoCoderCycle(1)→Promise<void>⟨105⟩{⟿⊲⊴↻+⏰⊹⥀⊰⟛📢⟠⊩⏳⊱🚨❔⟳⊷}
+⟩SCL│179│173⊨│136⑂│90.4%↓⟩

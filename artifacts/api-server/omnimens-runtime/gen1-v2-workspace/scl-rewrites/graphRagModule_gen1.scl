@@ -1,0 +1,42 @@
+⟨SCL v1│graphRagModule_gen1.mjs│54→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class GraphRAG {
+·constructor() {
+⊮│this.graph = new Map();
+·}
+·addNode(nodeId, data) {
+·if (!this.graph.has(nodeId)) {
+⊡│this.graph.set(nodeId, { data, edges: new Map() });
+·}
+·}
+·addEdge(sourceId, targetId, weight) {
+·if (this.graph.has(sourceId) && this.graph.has(targetId)) {
+⊡│this.graph.get(sourceId).edges.set(targetId, weight);
+·}
+·}
+·resolveConflicts() {
+κresolvedData
+·for (const [nodeId, node] of this.graph.entries()) {
+·let highestWeight = -Infinity;
+·let bestData = null;
+·for (const [targetId, weight] of node.edges.entries()) {
+·if (weight > highestWeight) {
+·highestWeight = weight;
+⊡│bestData = this.graph.get(targetId).data;
+·}
+·}
+·resolvedData[nodeId] = bestData;
+·}
+⊷│return resolvedData;
+·}
+·synthesize() {
+⊷│return this.resolveConflicts();
+·}
+·}
+κgraphRAG
+·graphRAG.addNode('agent1', { insight: 'Proposal A' });
+·graphRAG.addNode('agent2', { insight: 'Proposal B' });
+·graphRAG.addEdge('agent1', 'agent2', 0.8);
+κsynthesisResult
+·console.log(synthesisResult);
+⟩SCL│41│10⊨│7⑂│24.1%↓⟩

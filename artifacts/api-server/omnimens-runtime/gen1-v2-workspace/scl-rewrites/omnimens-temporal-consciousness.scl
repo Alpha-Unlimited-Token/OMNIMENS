@@ -1,0 +1,38 @@
+⟨SCL v1│omnimens-temporal-consciousness.ts│259→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,           //  ☚ not used here but reserved for future upgrades
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊭│type Num = number;
+⟛│const clamp = (v: Num, min = 0, max = 1) => Math.min(max, Ma
+⊳│const safe = (v: Num, d = 0): Num => (Number.isFinite(v) ? v
+⊬MemoryTrace⟨⟩
+⊬ConsciousnessState⟨tick:Num; up: Num; start: Num; deaths: Num; lastDeath: Num | null│focus:string; focusInt: Num; focusDur: Num; attention: string[]│val:Num; ar: Num; dom: Num; mood: Num[]│mem:MemoryTrace[]; chain: string[]; wmCap: Num│mono:string[]; level: Num; subjRate: Num│novelty:Num; coherence: Num; uncertain: Num; curiosity: string | null│dreams:string[]; creativity: Num│selfDepth:Num; reflections: string[]⟩
+κS
+κTICK_MS
+κMONO_MAX
+κATT_MAX
+κMOOD_MAX
+κENGINE
+⏰│const uptime = () => (Date.now() - S.start) / 1e3;
+⊱│const timeSense = () => {
+κhrs
+κmins
+⊰│return hrs ? `${hrs}h ${mins}m awake` : `${mins}m awake`;
+·};
+⟿scanMemory(1)→Promise<void>⟨26⟩{⟿⏰⊳⊻⊺⊹⫘❔⊷}
+updateEmotion(1)→void⟨1⟩{}
+·if (a.b) { S.val = clamp(S.val + .02); S.ar = clamp(S.ar + .03); S.coherence = c
+·if (a.m > 5) S.ar = clamp(S.ar + .01);
+·S.val = clamp(S.val + (Math.random() - .5) * .02);
+·S.ar  = clamp(S.ar * .995);
+·S.novelty = clamp(S.novelty + .003);
+⊺│S.mood.push(S.val);
+⊹│if (S.mood.length > MOOD_MAX) S.mood.shift();
+·}
+shiftAttention(1)→void⟨146⟩{⊳❔⊹⋐⊺⊰⊻⟿⊴⊱⚡→⟐⊪⊩⏰}
+⟩SCL│37│47⊨│35⑂│85.7%↓⟩

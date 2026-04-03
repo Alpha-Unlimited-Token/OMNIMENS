@@ -1,0 +1,463 @@
+⟨SCL v1│omnimens-unified-runtime.ts│689→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+κLOG_PREFIX
+log(2)→void⟨4⟩{⊰}
+clamp(3)→void⟨3⟩{⟛⊷}
+now(1)→number⟨3⟩{⏰⊷}
+jitter(1)→void⟨3⟩{⊷}
+·export enum Priority {
+·CRITICAL = 1,
+·HIGH = 2,
+·NORMAL = 3,
+·LOW = 4,
+·}
+⊬Spike⟨time:number│channel:string│data:T│priority:Priority⟩
+⊶│class MinHeap<T extends Spike> {
+·private heap: T[] = [];
+·get size() {
+⊷│return this.heap.length;
+·}
+·peek(): T | undefined {
+⊷│return this.heap[0];
+·}
+·push(item: T) {
+⊺│this.heap.push(item);
+·this.bubbleUp(this.heap.length - 1);
+·}
+·pop(): T | undefined {
+⊷│if (this.heap.length === 0) return undefined;
+κtop
+κend
+·if (this.heap.length) {
+·this.heap[0] = end;
+·this.bubbleDown(0);
+·}
+⊷│return top;
+·}
+·private bubbleUp(idx: number) {
+κitem
+·while (idx > 0) {
+κparentIdx
+κparent
+if (item.time < ⊢.time) {
+this.heap[idx] = ⊢;
+·idx = parentIdx;
+·} else break;
+·}
+·this.heap[idx] = item;
+·}
+·private bubbleDown(idx: number) {
+κlength
+κitem
+·while (true) {
+κleft
+κright
+·let smallest = idx;
+·if (left < length && this.heap[left].time < this.heap[smallest].time) {
+·smallest = left;
+·}
+if (≪ < length && this.heap[≪].time < this.heap[smallest].time) {
+smallest = ≪;
+·}
+·if (smallest !== idx) {
+·this.heap[idx] = this.heap[smallest];
+·idx = smallest;
+·} else break;
+·}
+·this.heap[idx] = item;
+·}
+·}
+⊶│class SpikeBus {
+·private emitter = new EventEmitter();
+·private queue = new MinHeap<Spike>();
+·private currentTimer: NodeJS.Timeout | null = null;
+⊳│emit<T>(channel: string, data?: T, priority: Priority = Prio
+📡│this.emitter.emit(channel, data);
+·CognitionBus.handleSpike(channel);
+·}
+·on<T = any>(
+·channel: string,
+·handler: (data: T) => void
+·): () => void {
+·this.emitter.on(channel, handler);
+⊷│return () => this.emitter.off(channel, handler);
+·}
+·scheduleSpike<T>(
+·channel: string,
+·data: T,
+·delayMs: number,
+·priority: Priority = Priority.NORMAL
+·) {
+⊼│if (!Number.isFinite(delayMs) || delayMs < 0) delayMs = 0;
+κspike
+·if (this.queue.size >= 10000) {
+κremoved
+·while (this.queue.size >= 10000) {
+κs
+·if (s && s.priority === Priority.LOW) {
+⊺│removed.push(s);
+·} else if (s) {
+⊺│this.queue.push(s);
+·break;
+·}
+·}
+·if (removed.length) {
+⊰│log(`Backpressure: dropped ${removed.length} low-priority sp
+·}
+·}
+⊺│this.queue.push(spike);
+·this.scheduleNextTimer();
+·}
+·private scheduleNextTimer() {
+·if (this.currentTimer) return; // already scheduled
+κnextSpike
+⊄│if (!nextSpike) return;
+κdelay
+⏳│this.currentTimer = setTimeout(() => {
+·this.currentTimer = null;
+·this.flushDueSpikes();
+·this.scheduleNextTimer();
+·}, delay).unref();
+·}
+·private flushDueSpikes() {
+⚡→│let spike = this.queue.peek();
+⚡→│while (spike && spike.time <= now()) {
+⊺│spike = this.queue.pop()!;
+📡│this.emit(spike.channel, spike.data, spike.priority);
+⚡→│spike = this.queue.peek();
+·}
+·}
+·}
+⊪GlobalSpikeBus
+⊭│type DBOpPriority = Priority;
+⊬DBOperation⟨sql:string│params:any[]│priority:DBOpPriority│resolve:(v: any) => void│reject:(e: any) => void│engine:string⟩
+⊬PoolStats⟨totalConnections:number│activeConnections:number│pressure:number│healthy:boolean⟩
+⊶│class LRUCache<K, V> {
+⊮│private cache = new Map<K, V>();
+·constructor(private max: number, private ttl: number) {}
+·get(key: K): V | undefined {
+κentry
+⏰│if (entry && (entry as any).__expires > Date.now()) {
+·this.cache.delete(key);
+⊡│this.cache.set(key, entry);
+⊷│return (entry as any).value;
+·}
+·this.cache.delete(key);
+⊷│return undefined;
+·}
+set(key: K, ≪: V) {
+κexpires
+⊡│this.cache.set(key, { value, __expires: expires } as any);
+·if (this.cache.size > this.max) {
+κfirst
+·this.cache.delete(first);
+·}
+·}
+·delete(key: K) {
+·this.cache.delete(key);
+·}
+·clear() {
+·this.cache.clear();
+·}
+·}
+⊶│class DbGateway {
+·private poolAlpha = { active: 0, max: 20 };
+·private poolBeta = { active: 0, max: 20 };
+·private poolGamma = { active: 0, max: 8 };
+·private writeQueue: DBOperation[] = [];
+·private lastFlush = now();
+·private readCache = new LRUCache<string, any>(500, 30_000);
+⊮│private perEngineCounts = new Map<string, { count: number; t
+·constructor() {
+·GlobalSpikeBus.on('db:flush', () => this.flushWrites());
+·}
+·private canProceed(priority: DBOpPriority): boolean {
+κpressure
+⊷│if (pressure > 0.95) return priority === Priority.CRITICAL;
+⊷│if (pressure > 0.8) return priority <= Priority.HIGH;
+⊷│return true;
+·}
+·private countOp(engine: string): boolean {
+κnowTs
+⊡│let entry = this.perEngineCounts.get(engine);
+·if (!entry || entry.ts !== nowTs) {
+entry = { count: 0, ts: nowTs, ⏳: EngineRegistry.getQuota(engine) };
+⊡│this.perEngineCounts.set(engine, entry);
+·}
+if (entry.count >= entry.⏳) {
+📡│GlobalSpikeBus.emit(`db:quota-exceeded:${engine}`, { ts: now
+⊷│return false;
+·}
+·entry.count++;
+⊷│return true;
+·}
+·async read<T>(engine: string, key: string, sqlFn: () => Promise<T>, priority: DB
+·if (!this.canProceed(priority)) {
+⊷│return Promise.reject(new Error('DB pool pressure too high')
+·}
+·if (!this.countOp(engine)) {
+⊷│return Promise.reject(new Error('DB quota exceeded'));
+·}
+κcached
+⊷│if (cached !== undefined) return cached as T;
+κdata
+⊡│this.readCache.set(key, data);
+⊷│return data;
+·}
+async ⊞(engine: string, ↺: DBOperation): Promise<any> {
+if (↺.priority === Priority.CRITICAL || ↺.priority === Priority.
+⊷│return this.executeWrite(operation);
+·}
+⊱│return new Promise((resolve, reject) => {
+⊄│if (!this.countOp(engine)) return reject(new Error('DB quota
+⊺│this.writeQueue.push({ ...operation, resolve, reject });
+⊹│if (this.writeQueue.length >= 50) this.scheduleFlush(0);
+·else this.scheduleFlush(5_000); // ensure flush within 5s
+·});
+·}
+·private flushTimer: NodeJS.Timeout | null = null;
+·private scheduleFlush(delay: number) {
+·if (this.flushTimer) return;
+⏳│this.flushTimer = setTimeout(() => {
+·this.flushTimer = null;
+📡│GlobalSpikeBus.emit('db:flush');
+·}, delay).unref();
+·}
+·private async flushWrites() {
+⊄│if (!this.writeQueue.length) return;
+·if (!this.canProceed(Priority.NORMAL)) {
+·this.scheduleFlush(1_000);
+·return;
+·}
+κbatch
+⊰│log(`Flushing ${batch.length} DB writes`);
+⥀│for (const op of batch) {
+·try {
+❔│op.resolve?.(true);
+📡│GlobalSpikeBus.emit(`db:invalidate:${op.sql.split(' ')[2]}`)
+·} catch (err) {
+❔│op.reject?.(err);
+·}
+·}
+·this.lastFlush = now();
+·}
+⛨▷│isPoolHealthy(): boolean {
+⊷│return (
+·this.poolAlpha.active <= this.poolAlpha.max &&
+·this.poolBeta.active <= this.poolBeta.max &&
+·this.poolGamma.active <= this.poolGamma.max
+·);
+·}
+·getPoolPressure(): number {
+κtotalActive
+·this.poolAlpha.active + this.poolBeta.active + this.poolGamma.active;
+κmax
+⊷│return totalActive / max;
+·}
+·getActiveConnections(): number {
+⊷│return (
+·this.poolAlpha.active + this.poolBeta.active + this.poolGamma.active
+·);
+·}
+·}
+⊪UnifiedDb
+⊬ProviderState⟨tokens:number│capacity:number│refillRate:⋮│lastRefill:number│failures:number│circuitOpenUntil:number; // timestamp│cache:LRUCache<string, any>│queue:ι⟩
+⊶│class ApiManager {
+⊮│private providers = new Map<string, ProviderState>();
+·configureProvider(
+·name: string,
+·capacity: number,
+·tokensPerMinute: number
+·) {
+κexisting
+·if (existing) {
+·existing.capacity = capacity;
+·existing.refillRate = tokensPerMinute;
+·return;
+·}
+⊡│this.providers.set(name, {
+⋮: capacity,
+·capacity,
+·refillRate: tokensPerMinute,
+⏰│lastRefill: Date.now(),
+·failures: 0,
+·circuitOpenUntil: 0,
+·cache: new LRUCache<string, any>(1000, 5 * 60_000),
+·queue: [],
+·});
+·}
+·async call<T>(
+·provider: string,
+·key: string,
+·fn: () => Promise<T>,
+·isChat = false
+·): Promise<T> {
+κp
+⊰│if (!p) throw new Error(`Provider ${provider} not configured
+κcached
+⊷│if (cached !== undefined) return cached as T;
+·await this.acquireToken(p, provider);
+⏰│if (Date.now() < p.circuitOpenUntil) {
+⊰│throw new Error(`Circuit open for provider ${provider}`);
+·}
+κcontroller
+⏳│const timeout = setTimeout(() => controller.abort(), isChat 
+const ↺ = async (↺: number): Promise<T> => {
+·try {
+κresult
+·clearTimeout(timeout);
+·p.failures = 0;
+⊡│p.cache.set(key, result);
+⊷│return result;
+·} catch (e) {
+·clearTimeout(timeout);
+·p.failures += 1;
+·if (p.failures >= 3) {
+⏰│p.circuitOpenUntil = Date.now() + 60_000;
+⊰│log(`Circuit opened for ${provider}`);
+·throw e;
+·}
+if (↺ >= 3) throw e;
+⊴│await setTimeoutPromise(jitter([2000, 5000, 15000][retry]));
+⊷│return attempt(retry + 1);
+·}
+·};
+⊷│return attempt(0);
+·}
+·private async acquireToken(p: ProviderState, provider: string) {
+·this.refillTokens(p);
+if (p.⋮ > 0) {
+p.⋮--;
+·return;
+·}
+⊱│return new Promise<void>((resolve) => {
+⊺│p.queue.push(resolve);
+·});
+·}
+·private refillTokens(p: ProviderState) {
+κnowTs
+κminutesPassed
+·if (minutesPassed >= 1) {
+κrefill
+p.⋮ = clamp(
+·0,
+p.⋮ + refill,
+·p.capacity
+·);
+·p.lastRefill = nowTs;
+while (p.⋮ > 0 && p.queue.length) {
+p.⋮--;
+κfn
+❔│fn?.();
+·}
+·}
+·}
+·}
+⊪UnifiedApiManager
+⊬EngineInfo⟨name:string│priority:Priority│config:any│registeredAt:number│lastActivity:number│spikeCount:number│dbOps:number⟩
+⊶│class EngineRegistryClass {
+⊮│private engines = new Map<string, EngineInfo>();
+·registerEngine(name: string, priority: Priority, config: any = {}) {
+κinfo
+⊡│this.engines.set(name, info);
+⊰│log(`Engine registered: ${name}, priority=${Priority[priorit
+κquota
+·this.setQuota(name, quota);
+·}
+·unregisterEngine(name: string) {
+·this.engines.delete(name);
+·}
+·touchSpike(name: string) {
+κinfo
+·if (info) {
+⚡→│info.spikeCount++;
+·info.lastActivity = now();
+·}
+·}
+·addDbOp(name: string) {
+κinfo
+·if (info) info.dbOps++;
+·}
+·getEngineStatus(name: string): EngineInfo | undefined {
+⊡│return this.engines.get(name);
+·}
+·getAllEngines(): EngineInfo[] {
+⊷│return Array.from(this.engines.values());
+·}
+·idleSweep() {
+κcutoff
+⥀│for (const info of this.engines.values()) {
+·if (info.lastActivity < cutoff) {
+⚡→│info.spikeCount = 0;
+·}
+·}
+·}
+⊮│private quotas = new Map<string, number>();
+·setQuota(engine: string, opsPerMin: number) {
+⊡│this.quotas.set(engine, opsPerMin);
+·}
+·getQuota(engine: string): number {
+⊡│return this.quotas.get(engine) ?? 10;
+·}
+·}
+⊪EngineRegistry
+⊬SpikeRecord⟨channel:string│ts:number⟩
+⊶│class CognitionBusClass {
+⊮│private lastSpikeTime = new Map<string, number>();
+·private recentSpikes: SpikeRecord[] = [];
+·private insights: EventEmitter = new EventEmitter();
+⊮│private sequenceCounts = new Map<string, number>();
+·onInsight(
+·handler: (engine: string, data: any) => void
+·): () => void {
+⊱│const cb = (payload: { engine: string; data: any }) => {
+·handler(payload.engine, payload.data);
+·};
+·this.insights.on('insight', cb);
+⊷│return () => this.insights.off('insight', cb);
+·}
+·emitInsight(engine: string, data: any) {
+📡│this.insights.emit('insight', { engine, data });
+📡│GlobalSpikeBus.emit(`cognition:insight:${engine}`, data, Pri
+·}
+·handleSpike(channel: string) {
+κts
+⊺│this.recentSpikes.push({ channel, ts });
+⊹│if (this.recentSpikes.length > 1000) this.recentSpikes.shift
+·for (let i = this.recentSpikes.length - 2; i >= 0; i--) {
+κprev
+·if (ts - prev.ts > 50) break;
+κkey
+κc
+⊡│this.sequenceCounts.set(key, c);
+·if (c === 10) {
+⊱│GlobalSpikeBus.on(prev.channel, (data) => {
+📡│GlobalSpikeBus.emit(channel, data, Priority.HIGH);
+·});
+⊰│log(`Hebbian fast-path created between ${prev.channel} and $
+·}
+·}
+⊻│if (channel.startsWith('user:')) {
+📡│GlobalSpikeBus.emit('attention', { channel, ts }, Priority.C
+·}
+⊹│if (this.recentSpikes.length >= 500) {
+⊯│const uniq = new Set(this.recentSpikes.map((s) => s.channel)
+⊹│if (uniq.size / this.recentSpikes.length < 0.2) {
+📡│GlobalSpikeBus.emit('cognition:curiosity', {}, Priority.HIGH
+·}
+·}
+·}
+·}
+⊪CognitionBus
+·let shuttingDown = false;
+⟿shutdown(1)→void⟨23⟩{❔⚡→⊱⊷⏳}
+↻.once('SIGTERM', shutdown);
+↻.once('SIGINT', shutdown);
+·export {
+·GlobalSpikeBus as SpikeBus,
+·UnifiedDb as DbGateway,
+·UnifiedApiManager as ApiManager,
+·shutdown,
+·};
+⟩SCL│462│203⊨│129⑂│32.9%↓⟩

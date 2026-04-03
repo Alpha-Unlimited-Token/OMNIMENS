@@ -1,0 +1,17 @@
+⟨SCL v1│adversarialTestingFramework_gen1.mjs│25→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class AdversarialTestingFramework {
+·constructor() {
+·this.testCases = [];
+·}
+·addTestCase(testCase) {
+⊺│this.testCases.push(testCase);
+·}
+·runTests() {
+·this.testCases.forEach(testCase => {
+⊰│console.log(`Running test case: ${testCase.name}`);
+·testCase.run();
+·});
+·}
+·}
+⟩SCL│16│3⊨│3⑂│36.0%↓⟩

@@ -1,0 +1,21 @@
+⟨SCL v1│metacognitiveRegulation_gen1.mjs│32→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export default class MetacognitiveRegulation {
+·constructor() {
+·this.errorHistory = [];
+·this.confidenceThreshold = 0.8;
+·}
+·adjustPlasticity(errorSignal, confidence) {
+·if (confidence < this.confidenceThreshold) {
+κadjustment
+·this.updatePlasticity(adjustment);
+·}
+·}
+·calculateAdjustment(errorSignal) {
+⊷│return Math.tanh(errorSignal);
+·}
+·updatePlasticity(adjustment) {
+·this.currentPlasticity += adjustment;
+·}
+·}
+⟩SCL│20│3⊨│2⑂│37.5%↓⟩

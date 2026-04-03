@@ -1,0 +1,7 @@
+⟨SCL v1│gpuAcceleratedMath_gen1.mjs│142→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩⟿gpuMatrixMultiply(2)→void⟨38⟩{⊩⊵⊺⊷}
+⊩⟿gpuMatrixAdd(2)→void⟨19⟩{⊩⊵⊷}
+⊩⟿gpuMatrixSubtract(2)→void⟨19⟩{⊩⊵⊷}
+⊩⟿gpuMatrixElementWiseMultiply(2)→void⟨19⟩{⊩⊵⊷}
+⟩SCL│6│17⊨│13⑂│95.8%↓⟩

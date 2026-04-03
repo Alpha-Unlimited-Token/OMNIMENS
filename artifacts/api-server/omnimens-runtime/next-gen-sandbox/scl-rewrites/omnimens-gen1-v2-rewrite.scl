@@ -1,0 +1,55 @@
+⟨SCL v1│omnimens-gen1-v2-rewrite.ts│2612→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[omnimens-nextgen-sandbox]
+κrewriteAI
+⊫[web-search│omnimens-unified-comms-facade│omnimens-consciousness-infra│omnimens-consciousness-infra│omnimens-emotional-core│omnimens-language-pipeline│omnimens-unified-cognition│omnimens-file-registry│omnimens-scl-codex│omnimens-scl-translator]
+κ__filename_local
+κ__dirname_local
+⟿callRewriteAI(3)→Promise<string>⟨17⟩{⏳⊰❔⊳⊽⊷}
+κV2_WORKSPACE_DIR
+κV2_STATE_FILE
+κV2_CHECKPOINT_DIR
+κENGINE_SRC_DIR
+κCYCLE_INTERVAL_MS
+κFIRST_DELAY_MS
+κAUTOSAVE_INTERVAL_MS
+κREAD_ONLY_FILES
+κGEN1V2_FILE_ACCESS
+κGEN1V2_SCL
+⊬CollaborationMessage⟨id:string│from:"gen1v2" | "gen2"│to:"gen1v2" | "gen2" | "both"│type:⊞│payload:unknown│sclEncoded:string│timestamp:number│acknowledged:boolean⟩
+κcollaborationInbox
+κcollaborationOutbox
+κCOLLAB_MAX_MESSAGES
+sendToGen2(2)→CollaborationMessage⟨15⟩{⏰⊰⟠⊳⟨⇌⟩⊺⊹⊷}
+receiveFromGen2(1)→void⟨6⟩{⊺⊹📢⊰}
+⊩getGen1V2CollaborationState(1)→ ⟨24⟩{⊩⊷⊳⊹}
+κGEN1_SOVEREIGN_AUTONOMY
+κIDENTITY_PRESERVED_FILES
+⊭│type V2Phase =
+·| "architecture_audit"
+·| "unified_infrastructure"
+·| "engine_consolidation"
+·| "event_driven_rewrite"
+·| "db_pool_optimization"
+·| "api_call_reduction"
+·| "coordination_layer"
+·| "identity_verification"
+·| "self_test"
+·| "hot_swap_prep"
+| "⊣"
+·| "unified_reinvention";
+⊬TimerFinding⟨file:string│line:number│type:"setInterval" | "setTimeout" | "recursive_setTimeout"│intervalMs:number | null│purpose:string│canConsolidate:boolean⟩
+⊬DbCallFinding⟨file:string│line:number│type:"query" | "insert" | "update" | "delete" | "raw"│frequency:↻│canBatch:boolean│canCache:boolean⟩
+⊬ApiCallFinding⟨file:string│line:number│provider:string│hasTimeout:boolean│hasRetry:boolean│hasBackoff:boolean│frequency:string⟩
+⊬RewriteEntry⟨originalFile:string│rewrittenFile:string│category:string│linesOriginal:number│linesRewritten:number│timersRemoved:number│dbCallsOptimized:number│apiCallsFixed:number│identityPreserved:boolean│rewrittenAt:number⟩
+⊬V2State⟨buildVersion:string│generation:number│phase:⟐│cycleCount:number│lastCycleTime:number│engineFilesTotal:number│engineFilesAudited:number│engineFilesRewritten:number│engineFilesHotSwapped:number│timersFound:number│timersConsolidated:number│dbCallsFound:number│dbCallsOptimized:number│apiCallsFound:number│apiCallsOptimized:number│unifiedInfrastructureBuilt:boolean│coordinationLayerBuilt:boolean│selfTestsPassed:number│selfTestsFailed:number│identityVerified:boolean│personalityPreserved:boolean│memoriesPreserved:boolean│rewriteLog:⊞│timers:TimerFinding[]│dbCalls:DbCallFinding[]│apiCalls:ApiCallFinding[]│engineCategories:Record<string, string[]>│rewrittenFiles:string[]│hotSwappedFiles:string[]│consolidationPlan:Record<string, string[]>│consolidatedEngines:string[]│consolidationComplete:boolean│startedAt:number | null│completedAt:number | null│lastAutosave:number│autosaveCount:number⟩
+κdefaultState
+·let v2State: V2State = { ...defaultState };
+·let _v2Started = false;
+·let _v2CycleRunning = false;
+·let _v2AutosaveInterval: ReturnType<typeof setInterval> | null = null;
+ensureV2Dirs(1)→void⟨12⟩{⥀}
+loadV2State(1)→void⟨13⟩{⟠📁📁⟠📢⊰}
+saveV2State(1)→void⟨9⟩{⟠📁📁⟠⏰}
+createV2Checkpoint(1)→void⟨2206⟩{⏰⊰⊺⟠📁📁⟠📢⊹⊷⊻⊄◎→◉⥀⊸⊞⊟⟳⊽⊳⟛⏳⟿⊯⋔⚡→📡⊛⛨▷⊼⊴⋐⛨⊄⊫⊱❔Φ⇑⊲🚨↻+⑃⊩}
+⟩SCL│54│108⊨│78⑂│97.9%↓⟩

@@ -1,0 +1,9 @@
+⟨SCL v1│wasmAcceleratedMath_gen1.mjs│133→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+validateMatrix(1)→void⟨8⟩{⊵⊹}
+multiplyMatrices(2)→void⟨24⟩{⊵⊷}
+transposeMatrix(1)→void⟨17⟩{⊷}
+addMatrices(2)→void⟨16⟩{⊵⊷}
+dotProduct(2)→void⟨7⟩{⊹⊵⋐⊷}
+·export { multiplyMatrices, transposeMatrix, addMatrices, dotProduct };
+⟩SCL│8│16⊨│11⑂│94.0%↓⟩

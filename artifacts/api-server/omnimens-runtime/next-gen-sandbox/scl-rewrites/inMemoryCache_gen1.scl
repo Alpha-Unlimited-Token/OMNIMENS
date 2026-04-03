@@ -1,0 +1,49 @@
+⟨SCL v1│inMemoryCache_gen1.mjs│120→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class InMemoryCache {
+·constructor(maxSize) {
+·if (maxSize <= 0 || !Number.isInteger(maxSize)) {
+⊵│throw new Error("maxSize must be a positive integer.");
+·}
+·this.maxSize = maxSize;
+⊮│this.cache = new Map(); // Stores the key-value pairs
+·}
+·get(key) {
+·if (!this.cache.has(key)) {
+⊷│return undefined;
+·}
+κvalue
+·this.cache.delete(key);
+⊡│this.cache.set(key, value);
+⊷│return value;
+·}
+set(key, ≪) {
+·if (this.cache.has(key)) {
+·this.cache.delete(key);
+·} else if (this.cache.size >= this.maxSize) {
+κlruKey
+·this.cache.delete(lruKey);
+·}
+⊡│this.cache.set(key, value);
+·}
+·has(key) {
+⊷│return this.cache.has(key);
+·}
+·delete(key) {
+⊷│return this.cache.delete(key);
+·}
+·clear() {
+·this.cache.clear();
+·}
+·size() {
+⊷│return this.cache.size;
+·}
+·keys() {
+⊷│return Array.from(this.cache.keys());
+·}
+≢() {
+⊷│return Array.from(this.cache.values());
+·}
+·}
+⊩createCache(1)→void⟨3⟩{⊩⊷}
+⟩SCL│48│19⊨│14⑂│60.0%↓⟩

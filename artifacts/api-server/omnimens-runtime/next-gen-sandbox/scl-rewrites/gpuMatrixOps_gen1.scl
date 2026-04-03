@@ -1,0 +1,8 @@
+⟨SCL v1│gpuMatrixOps_gen1.mjs│154→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩matrixMultiply(5)→void⟨19⟩{⊩⊹⊵⊷}
+⊩cosineSimilarity(2)→void⟨21⟩{⊩⊹⊵⊷}
+⊩transposeMatrix(3)→void⟨15⟩{⊩⊹⊵⊷}
+⊩normalizeVector(1)→void⟨21⟩{⊩⊵⊷}
+⊩euclideanDistance(2)→void⟨14⟩{⊩⊹⊵⊷}
+⟩SCL│7│24⊨│19⑂│95.5%↓⟩

@@ -1,0 +1,105 @@
+⟨SCL v1│omnimens-sensory-cortex.ts│487→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[web-search]
+engineRegistry.registerEngine("sensory-⬡", "NORMAL", { dbQuota: 10 });
+⊭│type Channel = "news" | "tech" | "science" | "market" | "soc
+⊬SensorySignal⟨channel:Channel│headline:string│significance:number│sentiment:number│relevanceToOmnimens:number│timestamp:number│source:"real_search" | "deep_analysis" | "anomaly" | "peripheral"│url:string│rawSnippet:string│noveltyScore:number│deduplicationKey:string⟩
+⊬ChannelState⟨signalCount:number│avgSignificance:number│lastScanTime:number│recentTopics:string[]│baselineSentiment:number│trendDirection:"rising" | "stable" | "falling"│scanErrorCount:number│attentionWeight:number⟩
+⊬AnomalyEvent⟨signal:⊛│reason:string│deviationMagnitude:number│timestamp:number⟩
+⊬SensoryState⟨perceptionCycles:number│totalSignalsProcessed:number│highSignificanceEvents:number│currentWorldState:string│recentSignals:⊛│dominantTrend:string│worldMood:number│lastPerceptionTime:number│channels:Record<Channel, ChannelState>│layer1Cycles:number│layer2Scans:number│layer3Analyses:number│anomaliesDetected:number│recentAnomalies:AnomalyEvent[]│signalDeduplicationWindow:Map<string, number>│attentionFocus:Channel | "general"│perceptionUptime:number⟩
+κCHANNELS
+κCHANNEL_SEARCH_QUERIES
+κstate
+⥀│for (const ch of CHANNELS) {
+·state.channels[ch] = {
+·signalCount: 0,
+·avgSignificance: 0,
+·lastScanTime: 0,
+·recentTopics: [],
+·baselineSentiment: 0,
+·trendDirection: "stable",
+·scanErrorCount: 0,
+·attentionWeight: 1,
+·};
+·}
+·state.channels.ai_frontier.attentionWeight = 1.5;
+·state.channels.tech.attentionWeight = 1.3;
+⊱│const safeNum = (v: number, fb = 0) => (Number.isFinite(v) ?
+κstopWords
+"the a an is are was were be been ✧ have has had do does did will would coul
+·" "
+·)
+·);
+·const extractWords = (txt: string) =>
+·txt
+·.toLowerCase()
+⊽│.replace(/[^a-z\s]/g, "")
+·.split(/\s+/)
+⊹│.filter((w) => w.length > 3 && !stopWords.has(w));
+·const dedupKey = (title = "", snippet = "") =>
+⊰│extractWords(`${title} ${snippet}`).slice(0, 6).sort().join(
+⊱│const isDup = (k: string) => {
+κt
+⏰│return t ? Date.now() - t < 3_600_000 : false;
+·};
+⊡│const markSeen = (k: string) => state.signalDeduplicationWin
+⊱│const cleanDedup = (now: number) => {
+·for (const [k, t] of state.signalDeduplicationWindow.entries())
+·if (now - t > 7_200_000) state.signalDeduplicationWindow.delete(k);
+·};
+scoreSignificance(2)→number⟨8⟩{⊽⊹⊷}
+κpos
+κneg
+⊱│const scoreSentiment = (t = "") => {
+κp
+κn
+⊳│return p + n === 0 ? 0 : (p - n) / (p + n);
+·};
+scoreRelevance(2)→number⟨8⟩{⊽⊷}
+scoreNovelty(2)→number⟨6⟩{⊯⟛⊷}
+anomaly(1)→AnomalyEvent | null⟨31⟩{⊷⊰⚡→⏰}
+ingest(1)→void⟨37⟩{⊺⊰⟠}
+peripheralAwareness(1)→void⟨17⟩{⏰⥀⟛⚡→}
+⟿activeScan(1)→void⟨41⟩{⊴⊹⥀⏰⚡→}
+⟿deepAnalysis(1)→void⟨81⟩{⏰⊹⚡→⊰⊲❔⊵⊳⊽⊺⥀⊻}
+⚡→│spikeBus.scheduleSpike("sensory-cortex:deep-analysis", {}, 3
+·}
+⊪│export const getSensoryState = (): SensoryState => ({
+·...state,
+⊮│signalDeduplicationWindow: new Map(),
+·});
+⊪│export const getRecentSignals = (n = 20) => state.recentSign
+⊪│export const getAnomalies = (n = 10) => state.recentAnomalie
+⊪│export const getTrendHistory = (n = 20) => state.trendHistor
+⊪│export const getCrossChannelCorrelations = () => state.cross
+⊪│export const getAttentionFocus = () => ({
+·channel: state.attentionFocus,
+❔│weight: state.channels[state.attentionFocus as Channel]?.att
+·});
+⚡→│spikeBus.on("sensory-cortex:peripheral", peripheralAwareness
+⚡→│spikeBus.on("sensory-cortex:active-scan", () => activeScan()
+⚡→│spikeBus.on("sensory-cortex:deep-analysis", () => deepAnalys
+⊱│spikeBus.on("attention:sensory-cortex", () => {
+⥀│for (const ch of CHANNELS) state.channels[ch].attentionWeigh
+·});
+⊱│spikeBus.on("cognition:curiosity", () => {
+⟛│const minWeight = Math.min(...CHANNELS.map((c) => state.chan
+⥀│for (const ch of CHANNELS)
+·if (state.channels[ch].attentionWeight === minWeight) state.channels[ch].attenti
+·});
+⊱│cognitionBus.onInsight((src, insight) => {
+if (src !== "sensory-⬡" && insight.type === "discovery")
+·state.channels.ai_frontier.attentionWeight += 0.1;
+·});
+·let _started = false;
+⏰│let startTime = Date.now();
+⊩startSensoryCortex(1)→void⟨10⟩{⊩⏰⚡→}
+⊩shutdown(1)→void⟨3⟩{⊩}
+⟩SCL│104│100⊨│76⑂│78.6%↓⟩

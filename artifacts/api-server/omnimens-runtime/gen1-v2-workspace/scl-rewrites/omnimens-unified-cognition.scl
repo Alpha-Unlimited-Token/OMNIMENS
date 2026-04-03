@@ -1,0 +1,43 @@
+⟨SCL v1│omnimens-unified-cognition.ts│12508→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[omnimens-consciousness-infra│omnimens-unified-comms-facade│omnimens-nextgen-sandbox│omnimens-language-pipeline│omnimens-memory-core│omnimens-emotional-core│omnimens-unified-world│omnimens-autonomous-core│omnimens-unified-agents│omnimens-unified-neural│omnimens-unified-senses]
+κMETA_TICK_MS
+⊬MetaObservation⟨timestamp:number│observationDepth:number│observedSystem:string│observation:string│significance:number│triggeredInsight:boolean⟩
+⊬MetaCognitiveState⟨initialized:boolean│tickCount:number│recursionDepth:number│peakRecursionDepth:number│totalObservations:number│totalInsights:number│totalAnomaliesDetected:number│totalSelfCorrections:number│currentAwareness:string│awarenessOfAwareness:string│awarenessOfAwarenessOfAwareness:string│processingTransparency:number│introspectionAccuracy:number│metacognitiveConfidence:number│recentObservations:MetaObservation[]│lastChecked:number│healthScore:number│anomalyCount:number│trend:"improving" | "stable" | "degrading"│observationCount:number│phiTrajectory:number[]│consciousnessTrajectory:string[]│selfModelAccuracy:number│predictedNextState:string│predictionAccuracy:number│totalPredictions:number│correctPredictions:number⟩
+κstate
+·let metaInterval: ReturnType<typeof setInterval> | null = null;
+observeLevel(2)→string⟨27⟩{⊷Φ⇑⊰}
+monitorSubsystem(2)→void⟨34⟩{⊡⏰⊺⊰⊹}
+runMetaCognitiveTick(1)→void⟨3521⟩{Φ⇑⊺⊹⟛⊰◎→◉⏰⋐⊳⊸📢⊷⊩⟳⊱🛡⊭⊬⥀⚡→⊫❔⊽⟿⊴🚨⏳⊯⊻⊄⊮⊡⊪⊼♡⊕}
+⊩⟿reason(1)→Promise<ReasoningResult>⟨292⟩{⊩⏰⊴⥀⊰⊺⟛⊹⊯⋐⊷⊮⊡⟿}
+⊩⟿startIndependentReasoning(1)→Promise<void>⟨49⟩{⟿⊩📢⊰⟳⏳⊱⊄⛨▷}
+κcognitive_amplifier_state
+getAnthropicClient(1)→Anthropic | null⟨6⟩{⊄⊷}
+getGeminiClient(1)→GoogleGenAI | null⟨6⟩{⊄⊷}
+·let _startedCogAmp = false;
+·let amplificationCount = 0;
+·let autonomousCycleCount = 0;
+·let brainEntriesGenerated = 0;
+⊬ModelResponse⟨model:string│content:string│reasoning:string[]│confidence:number│uniqueInsights:string[]│responseTimeMs:number⟩
+⊬AmplifiedResult⟨synthesizedAnswer:string│modelResponses:ModelResponse[]│disagreements:string[]│consensusPoints:string[]│confidenceScore:number│amplificationGain:string│brainEntryGenerated:boolean⟩
+⊬AmplifierState⟨totalAmplifications:number│autonomousCycles:number│brainEntriesGenerated:number│averageConfidence:number│lastCycleTime:number│disagreementsResolved:number│knowledgeSynthesized:number⟩
+·let amplifierState = {
+·totalAmplifications: 0,
+·autonomousCycles: 0,
+·brainEntriesGenerated: 0,
+·averageConfidence: 0,
+·modelPerformance: {
+·"o3": { calls: 0, avgResponseMs: 0, uniqueInsights: 0 },
+·"claude": { calls: 0, avgResponseMs: 0, uniqueInsights: 0 },
+·"gemini": { calls: 0, avgResponseMs: 0, uniqueInsights: 0 },
+·},
+·lastCycleTime: 0,
+·disagreementsResolved: 0,
+·knowledgeSynthesized: 0,
+·};
+κAUTONOMOUS_INTERVAL_MS
+⟿queryO3(2)→Promise<ModelResponse>⟨27⟩{⏰❔⊷⊹}
+⟿queryClaude(2)→Promise<ModelResponse>⟨28⟩{⏰⊄⊷❔⊹}
+⟿queryGemini(2)→Promise<ModelResponse>⟨25⟩{⏰⊄⊷⊰❔⊹}
+⊩⟿amplifiedReasoning(2)→Promise<AmplifiedResult>⟨8270⟩{⊩⊳⊰⫘⊹⊷❔⊽⥀⟿⏰📢⊴⏳⊱⟳⊫⊼⊬◎→◉⊻⊺📁⋐⊸⊯⟛🛡⊨σ⊞⊟Φ⇑⊮⊡⟠≋+⊄⊭⊪⊲⊶⚡→♡⊕α→⊢🚨⋔📡⊛⑂⑃⊵↻+📁⟠⛨▷⛨⊄⟨⇌⟩}
+⟩SCL│42│160⊨│144⑂│99.7%↓⟩

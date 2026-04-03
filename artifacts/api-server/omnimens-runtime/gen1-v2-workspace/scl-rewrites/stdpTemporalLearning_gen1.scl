@@ -1,0 +1,15 @@
+⟨SCL v1│stdpTemporalLearning_gen1.mjs│21→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊪│export const stdpTemporalLearning = (neurons, spikeTimings) 
+κlearningRate
+⊱│neurons.forEach((neuron, index) => {
+κdeltaTime
+·if (deltaTime > 0) {
+·neuron.synapticWeights += learningRate * deltaTime;
+·} else {
+·neuron.synapticWeights -= learningRate * Math.abs(deltaTime);
+·}
+·});
+⊷│return neurons;
+·};
+⟩SCL│14│5⊨│3⑂│33.3%↓⟩

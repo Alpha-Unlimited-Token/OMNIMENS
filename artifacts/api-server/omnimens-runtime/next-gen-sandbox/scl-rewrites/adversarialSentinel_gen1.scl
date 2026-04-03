@@ -1,0 +1,26 @@
+⟨SCL v1│adversarialSentinel_gen1.mjs│38→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class AdversarialSentinel {
+·constructor() {
+·this.perturbationThreshold = 0.05;
+·this.verificationPaths = 3;
+·}
+analyzeInput(η) {
+κperturbations
+const ⊢ = perturbations.map(p => this.evaluatePath(p));
+⊷│return this.detectAdversarialCases(results);
+·}
+generatePerturbations(η) {
+⊱│return Array.from({ length: this.verificationPaths }, (_, i)
+⊷│return { ...input, variation: i * this.perturbationThreshold
+·});
+·}
+·evaluatePath(perturbedInput) {
+⊷│return Math.random(); // Replace with actual evaluation logi
+·}
+detectAdversarialCases(⊢) {
+⋐│const average = results.reduce((a, b) => a + b, 0) / results
+⊷│return results.some(r => Math.abs(r - average) > this.pertur
+·}
+·}
+⟩SCL│25│12⊨│7⑂│34.2%↓⟩

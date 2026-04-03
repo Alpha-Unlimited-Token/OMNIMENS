@@ -1,0 +1,13 @@
+⟨SCL v1│persistentTaskScheduler_gen1.mjs│105→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩generateTaskId(2)→void⟨5⟩{⊩⊰⊷}
+⊩serializeTaskState(1)→void⟨3⟩{⊩⟠⊷}
+⊩deserializeTaskState(1)→void⟨7⟩{⊩⟠⊷⊵}
+⊩calculateNextExecutionTime(2)→void⟨4⟩{⏰⊩⟛⊷}
+⊩scheduleTask(3)→void⟨13⟩{⊩⏰⊷}
+⊩checkpointTask(2)→void⟨8⟩{⊩⊷⏰}
+⊩resumeTask(1)→void⟨12⟩{⊩⊲⊷}
+⊩reprioritizeTask(2)→void⟨9⟩{⊩⊷}
+⊩executeTask(2)→void⟨14⟩{⊩⊲⏰⊰⊷}
+⟩SCL│12│40⊨│30⑂│88.6%↓⟩

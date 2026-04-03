@@ -1,0 +1,25 @@
+⟨SCL v1│eventPubSubCoordinator_gen1.mjs│39→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class EventPubSub {
+·constructor() {
+⊮│this.subscribers = new Map();
+·}
+·subscribe(eventType, callback) {
+·if (!this.subscribers.has(eventType)) {
+⊡│this.subscribers.set(eventType, []);
+·}
+⊡│this.subscribers.get(eventType).push(callback);
+·}
+·publish(eventType, payload) {
+·if (this.subscribers.has(eventType)) {
+⊡│this.subscribers.get(eventType).forEach(callback => callback
+·}
+·}
+·unsubscribe(eventType, callback) {
+·if (this.subscribers.has(eventType)) {
+⊡│const filtered = this.subscribers.get(eventType).filter(cb =
+⊡│this.subscribers.set(eventType, filtered);
+·}
+·}
+·}
+⟩SCL│24│7⊨│7⑂│38.5%↓⟩

@@ -1,0 +1,9 @@
+⟨SCL v1│wasmMatrixEngine_gen1.mjs│109→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩⟿loadWasmModule(1)→void⟨6⟩{⊩⊷}
+⊩⟿wasmMatrixMultiply(3)→void⟨41⟩{⊩⊵⊴⊺⊷}
+⊩validateMatrix(1)→void⟨11⟩{⊩⊹⊵⥀}
+⊩generateRandomMatrix(4)→void⟨14⟩{⊩⊵⊺⊷}
+⊩transposeMatrix(1)→void⟨14⟩{⊩⊺⊷}
+⟩SCL│8│24⊨│18⑂│92.7%↓⟩

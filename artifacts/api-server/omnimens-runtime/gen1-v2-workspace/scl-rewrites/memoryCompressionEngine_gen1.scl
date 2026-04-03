@@ -1,0 +1,9 @@
+⟨SCL v1│memoryCompressionEngine_gen1.mjs│131→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩pca(2)→void⟨19⟩{⊩⊹⊵⋐⊷}
+⊩kMeans(3)→void⟨40⟩{⊩⊹⊵⊱⊯⊷⋐⊳}
+⊷│return { centroids, assignments };
+·}
+⊩compressContext(3)→void⟨23⟩{⊩⊹⊵⊽⊯⊷⊲⊱}
+eigenDecomposition(1)→void⟨4⟩{⊵}
+⟩SCL│8│27⊨│23⑂│93.9%↓⟩

@@ -1,0 +1,6 @@
+⟨SCL v1│contextSummarization_gen1.mjs│93→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩generateEmbeddings(1)→void⟨18⟩{⊩⊹⊵⋐⊷}
+⊩compressContext(1)→void⟨22⟩{⊩⊹⊵⊱⋐⊷}
+exampleUsage(1)→void⟨16⟩{}
+⟩SCL│5│14⊨│11⑂│94.6%↓⟩

@@ -1,0 +1,33 @@
+⟨SCL v1│graphMemoryIntegrator_gen1.mjs│45→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class GraphMemoryIntegrator {
+·constructor() {
+⊮│this.graph = new Map();
+·}
+·addNode(nodeId, data) {
+⊡│this.graph.set(nodeId, { data, edges: new Map() });
+·}
+·addEdge(nodeId1, nodeId2, weight) {
+·if (this.graph.has(nodeId1) && this.graph.has(nodeId2)) {
+⊡│this.graph.get(nodeId1).edges.set(nodeId2, weight);
+⊡│this.graph.get(nodeId2).edges.set(nodeId1, weight);
+·}
+·}
+·getRelevantNodes(nodeId, threshold = 0.5) {
+κrelevantNodes
+·if (this.graph.has(nodeId)) {
+⊡│for (const [neighbor, weight] of this.graph.get(nodeId).edge
+·if (weight >= threshold) {
+⊺│relevantNodes.push({ nodeId: neighbor, weight });
+·}
+·}
+·}
+⊷│return relevantNodes;
+·}
+·}
+κmemoryIntegrator
+·memoryIntegrator.addNode('episodicEvent1', { type: 'event', content: 'User logge
+memoryIntegrator.addNode('semanticKnowledge1', { type: '◧', content: 'Lo
+·memoryIntegrator.addEdge('episodicEvent1', 'semanticKnowledge1', 0.8);
+⊞⊟│console.log(memoryIntegrator.getRelevantNodes('episodicEvent
+⟩SCL│32│12⊨│9⑂│28.9%↓⟩

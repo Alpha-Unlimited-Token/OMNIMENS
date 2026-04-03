@@ -1,0 +1,10 @@
+⟨SCL v1│webGLMatrixEngine_gen1.mjs│113→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+·'use strict';
+⊫[]
+⊩createMatrix(3)→void⟨11⟩{⊩⊷}
+⊩multiplyMatrices(2)→void⟨24⟩{⊩⊵⊷}
+⊩computeEigenvalues(2)→void⟨17⟩{⊩⊹⊵⋐⊷}
+⊩multiplyMatrixVector(2)→void⟨18⟩{⊩⊵⊷}
+⊩hashMatrix(1)→void⟨7⟩{⊩⥀⊷}
+⟩SCL│9│22⊨│16⑂│92.0%↓⟩

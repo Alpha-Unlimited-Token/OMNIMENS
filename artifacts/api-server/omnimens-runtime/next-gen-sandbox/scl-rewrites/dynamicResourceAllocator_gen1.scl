@@ -1,0 +1,30 @@
+⟨SCL v1│dynamicResourceAllocator_gen1.mjs│40→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class DynamicResourceAllocator {
+·constructor() {
+⊮│this.resourceMap = new Map();
+⊮│this.eventSubscribers = new Map();
+·}
+·subscribe(eventType, callback) {
+·if (!this.eventSubscribers.has(eventType)) {
+⊡│this.eventSubscribers.set(eventType, []);
+·}
+⊡│this.eventSubscribers.get(eventType).push(callback);
+·}
+·publish(eventType, data) {
+·if (this.eventSubscribers.has(eventType)) {
+⊡│this.eventSubscribers.get(eventType).forEach(callback => cal
+·}
+·}
+·allocateResources(agentId, priority) {
+⊡│this.resourceMap.set(agentId, priority);
+·this.publish('resourceAllocated', { agentId, priority });
+·}
+·adjustAllocation(agentId, newPriority) {
+·if (this.resourceMap.has(agentId)) {
+⊡│this.resourceMap.set(agentId, newPriority);
+·this.publish('resourceAdjusted', { agentId, newPriority });
+·}
+·}
+·}
+⟩SCL│29│8⊨│8⑂│27.5%↓⟩

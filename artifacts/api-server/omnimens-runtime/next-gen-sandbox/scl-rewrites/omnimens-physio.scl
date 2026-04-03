@@ -1,0 +1,181 @@
+⟨SCL v1│omnimens-physio.ts│956→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+·omnimensPhysioAssessments,
+·omnimensPhysioPrograms,
+·omnimensPhysioSessions,
+·omnimensPhysioOutcomes,
+·} from "@workspace/db";
+⊫[]
+⊬ExercisePrescription⟨id:string│name:string│category:"mobility" | "stretching" | "strengthening" | "neuromuscular" | "aerobic" | "education"│sets:number│reps:string;          // "10-15" or "hold 30s"│hold:number;          // seconds│rest:≢│frequency:string;      // "daily" | "3x/week" | "2x/day"│equipment:string[];    // "none" | "resistance band" | "foam roller" | etc.│position:string;       // "supine" | "standing" | "seated" | "prone" | "sidelying"│instructions:string│cues:string[];         // "keep core engaged", "breathe out on effort"│painRule:string;       // "keep pain 0-3/10" | "stop if pain >4/10"│progressionCriteria:string│regression:string;    // easier modification│progression:string;   // harder version│evidenceBase:string;  // clinical guideline or study│videoSearchTerm:string; // for finding demo videos⟩
+⊬RedFlagScreen⟨flagsPresent:boolean│flags:string[]│urgency:"immediate_ER" | "urgent_MD" | "refer_out" | "monitor" | "none"│recommendation:string⟩
+⊬PsychosocialProfile⟨phq2Score:☼│tskScore:number;        // 17-68 (>37 = high kinesiophobia)│pcsScore:number;        // 0-52 (>30 = high catastrophizing)│depressionRisk:"low" | "moderate" | "high"│kinesiophobiaLevel:"low" | "moderate" | "high"│catastrophizingLevel:"low" | "moderate" | "high"│recommendations:string[]⟩
+⊬OutcomeMeasure⟨measure:string│score:number│normalizedScore:number│interpretation:string│mdc:Υ│mcid:⇔│mcidReached:boolean⟩
+κRED_FLAG_KEYWORDS
+⊩screenRedFlags(1)→RedFlagScreen⟨45⟩{⊩⥀⊻⊰⊺⊷⊹}
+⊩interpretPsychosocialScores(1)→void⟨1⟩{⊩}
+·phq2: number,
+·tsk: number,
+·pcs: number
+·): PsychosocialProfile {
+κdepressionRisk
+κkinesiophobiaLevel
+κcatastrophizingLevel
+κrecommendations
+·if (depressionRisk === "high") {
+⊺│recommendations.push("PHQ-2 positive — consider referral to 
+⊺│recommendations.push("Use positive reinforcement and celebra
+⊺│recommendations.push("Focus on activity engagement over pain
+·}
+·if (kinesiophobiaLevel === "high") {
+⊺│recommendations.push("High fear of movement detected (kinesi
+⊺│recommendations.push("Use graded exposure: start very low in
+⊺│recommendations.push("Explicitly reassure patient that hurt 
+⊺│recommendations.push("Use TSK-11 language: 'Your spine is st
+·}
+·if (catastrophizingLevel === "high") {
+⊺│recommendations.push("High pain catastrophizing — cognitive 
+⊺│recommendations.push("Help patient identify thought patterns
+⊺│recommendations.push("Set realistic, function-based goals (n
+·}
+·if (kinesiophobiaLevel === "low" && catastrophizingLevel === "low") {
+⊺│recommendations.push("Good psychosocial profile — standard p
+·}
+⊷│return {
+·phq2Score: phq2,
+·tskScore: tsk,
+·pcsScore: pcs,
+·depressionRisk,
+·kinesiophobiaLevel,
+·catastrophizingLevel,
+·recommendations,
+·};
+·}
+⊪OUTCOME_MEASURES
+⊷│if (score >= 50) return "Mildly limited";
+⊷│if (score >= 35) return "Moderately limited";
+⊷│return "Severely limited";
+·},
+·},
+·DASH: {
+·name: "DASH (Disabilities of Arm, Shoulder & Hand)",
+·maxScore: 100,
+·mdc: 10.8,
+·mcid: 10.2,
+⊱│interpretation: (score: number) => {
+⊷│if (score <= 10) return "Minimal disability";
+⊷│if (score <= 30) return "Mild disability";
+⊷│if (score <= 50) return "Moderate disability";
+⊷│return "Severe disability";
+·},
+·},
+·KOOS: {
+·name: "KOOS (Knee Injury & Osteoarthritis Outcome Score)",
+·maxScore: 100,
+·mdc: 10.0,
+·mcid: 8.0,
+⊱│interpretation: (score: number) => {
+⊷│if (score >= 85) return "Near-normal knee function";
+⊷│if (score >= 65) return "Mildly impaired";
+⊷│if (score >= 40) return "Moderately impaired";
+⊷│return "Severely impaired";
+·},
+·},
+·LEFS: {
+·name: "Lower Extremity Functional Scale",
+·maxScore: 80,
+·mdc: 9.0,
+·mcid: 9.0,
+⊱│interpretation: (score: number) => {
+κpct
+⊷│if (pct >= 87) return "Near-normal function";
+⊷│if (pct >= 63) return "Mild limitation";
+⊷│if (pct >= 44) return "Moderate limitation";
+⊷│return "Severe limitation";
+·},
+·},
+·NDI: {
+·name: "Neck Disability Index",
+·maxScore: 50,
+·mdc: 7.0,
+·mcid: 5.0,
+⊱│interpretation: (score: number) => {
+⊷│if (score <= 4) return "No disability";
+⊷│if (score <= 14) return "Mild disability";
+⊷│if (score <= 24) return "Moderate disability";
+⊷│if (score <= 34) return "Severe disability";
+⊷│return "Complete disability";
+·},
+·},
+·PSFS: {
+·name: "Patient-Specific Functional Scale",
+·maxScore: 10,
+·mdc: 2.0,
+·mcid: 2.0,
+⊱│interpretation: (score: number) => {
+⊷│if (score >= 8) return "Excellent function";
+⊷│if (score >= 5) return "Moderate function";
+⊷│if (score >= 2) return "Severely limited";
+⊷│return "Minimal function";
+·},
+·},
+·NPRS: {
+·name: "Numeric Pain Rating Scale",
+·maxScore: 10,
+·mdc: 1.74,
+·mcid: 2.0,
+⊱│interpretation: (score: number) => {
+⊷│if (score === 0) return "No pain";
+⊷│if (score <= 3) return "Mild pain";
+⊷│if (score <= 6) return "Moderate pain";
+⊷│return "Severe pain";
+·},
+·},
+·GROC: {
+name: "Global Rating of Υ",
+·maxScore: 7,
+·mdc: 1.0,
+·mcid: 2.0,
+⊱│interpretation: (score: number) => {
+⊷│if (score >= 5) return "Marked improvement";
+⊷│if (score >= 3) return "Somewhat improved";
+⊷│if (score >= -2) return "About the same";
+⊷│return "Worsened";
+·},
+·},
+·};
+⊪EXERCISE_LIBRARY
+⊩getExercisesForRegion(1)→void⟨1⟩{⊩}
+·bodyRegion: string,
+⟐: number,
+⊳│psychosocial?: PsychosocialProfile
+·): ExercisePrescription[] {
+κkey
+κall
+·let exercises = all;
+if (⟐ === 1) {
+⊻│exercises = all.filter(e => ["mobility", "stretching", "neur
+} else if (⟐ === 2) {
+·exercises = all.slice(0, 5);
+·}
+❔│if (psychosocial?.kinesiophobiaLevel === "high") {
+·exercises = exercises.map(e => ({
+·...e,
+⟛│sets: Math.max(1, e.sets - 1),
+·painRule: "Stop if pain >2/10 — we prioritize comfort and confidence",
+·}));
+·}
+⊷│return exercises;
+·}
+⊩determinePhase(3)→number⟨7⟩{⊩⊷}
+⊩buildIntegrativeRecommendations(1)→void⟨43⟩{⊩⊳⊺♡⊕⊷}
+⊪PAIN_SCIENCE_LIBRARY
+⊩⟿getLatestAssessment(1)→void⟨9⟩{⊩⊷}
+⊩⟿saveAssessment(3)→void⟨7⟩{⊩⊷}
+⊩⟿getActiveProgram(1)→void⟨12⟩{⊩⊷}
+⊩⟿saveProgram(3)→void⟨12⟩{⊩⊡⊷}
+⊩⟿saveSession(3)→void⟨7⟩{⊩⊷}
+⊩⟿getOutcomeHistory(2)→void⟨11⟩{⊩⊷}
+⊩⟿saveOutcome(3)→void⟨7⟩{⊩⊷}
+⊩⟿loadPhysioContext(1)→Promise<string>⟨38⟩{⊩⫘⊄⊷⊺⊰⊳}
+⟩SCL│180│128⊨│98⑂│81.2%↓⟩

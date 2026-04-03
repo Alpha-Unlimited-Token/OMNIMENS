@@ -1,0 +1,18 @@
+⟨SCL v1│treeOfThoughtVoting_gen1.mjs│26→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export default class TreeOfThoughtVoting {
+·constructor(agents) {
+·this.agents = agents;
+·}
+·evaluateOptions(options) {
+·const scores = options.map(option => {
+⋐│return this.agents.reduce((score, agent) => {
+κconfidence
+⊷│return score + confidence * agent.weight;
+·}, 0);
+·});
+κbestOptionIndex
+⊷│return options[bestOptionIndex];
+·}
+·}
+⟩SCL│17│6⊨│4⑂│34.6%↓⟩

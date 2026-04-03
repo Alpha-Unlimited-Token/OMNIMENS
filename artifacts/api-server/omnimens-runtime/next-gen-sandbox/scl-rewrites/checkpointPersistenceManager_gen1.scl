@@ -1,0 +1,11 @@
+⟨SCL v1│checkpointPersistenceManager_gen1.mjs│93→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+κDEFAULT_TTL
+κCHECKPOINT_DIR
+⊩⟿saveCheckpoint(3)→void⟨6⟩{⊩⏰⟠⊴}
+⊩⟿loadCheckpoint(1)→void⟨16⟩{⊩⊴⟠⊲⏰⊷}
+⊩startAutoCompaction(1)→void⟨17⟩{⊩⟳⊱⊴⥀⟠⊲⏰}
+generateHash(1)→void⟨3⟩{⊷}
+⊪utils
+⟩SCL│10│27⊨│19⑂│89.2%↓⟩

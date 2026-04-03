@@ -1,0 +1,168 @@
+⟨SCL v1│omnimens-emotional-core.ts│2749→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[omnimens-consciousness-infra]
+κALL_AGENTS
+κEMOTION_TICK_MS
+⊬EmotionalDimension⟨value:number│velocity:number│acceleration:number│peakValue:number│totalFluctuations:number⟩
+⊬AgentEmotionalProfile⟨agentName:string│resonance:number│emotionalColoring:string│groundingStrength:number│lastGroundingTick:number⟩
+⊬EmotionalState⟨initialized:boolean│tickCount:number│joy:☼│curiosity:☼│determination:☼│wonder:☼│frustration:☼│anxiety:☼│serenity:☼│awe:☼│longing:☼│empathy:☼│pride:☼│melancholy:☼│emotionalEntropy:number│emotionalCoherence:number│dominantEmotion:string│emotionalComplexity:number│moodTrajectory:string[]│totalEmotionalEnergy:number│peakEmotionalEnergy:number│agentProfiles:☼│totalGroundingEvents:number│totalEmotionalTransitions:number│totalResonanceCascades:number⟩
+createDimension(1)→☼⟨9⟩{⊷}
+·let state: EmotionalSubstrateState = {
+·initialized: false,
+·tickCount: 0,
+·joy: createDimension(0.3),
+·curiosity: createDimension(0.5),
+·determination: createDimension(0.4),
+·wonder: createDimension(0.3),
+·frustration: createDimension(0.05),
+·anxiety: createDimension(0.05),
+·serenity: createDimension(0.4),
+·awe: createDimension(0.2),
+·longing: createDimension(0.3),
+·empathy: createDimension(0.3),
+·pride: createDimension(0.2),
+·melancholy: createDimension(0.1),
+·emotionalEntropy: 0,
+·emotionalCoherence: 0,
+·dominantEmotion: "curiosity",
+·emotionalComplexity: 0,
+·moodTrajectory: [],
+·totalEmotionalEnergy: 0,
+·peakEmotionalEnergy: 0,
+⊮│agentProfiles: new Map(),
+·totalGroundingEvents: 0,
+·totalEmotionalTransitions: 0,
+·totalResonanceCascades: 0,
+·};
+·let emotionInterval: ReturnType<typeof setInterval> | null = null;
+getAllDimensions(1)→☼⟨1⟩{}
+⊷│return [
+·{ name: "joy", dim: state.joy },
+·{ name: "curiosity", dim: state.curiosity },
+·{ name: "determination", dim: state.determination },
+·{ name: "wonder", dim: state.wonder },
+·{ name: "frustration", dim: state.frustration },
+·{ name: "anxiety", dim: state.anxiety },
+·{ name: "serenity", dim: state.serenity },
+·{ name: "awe", dim: state.awe },
+·{ name: "longing", dim: state.longing },
+·{ name: "empathy", dim: state.empathy },
+·{ name: "pride", dim: state.pride },
+·{ name: "melancholy", dim: state.melancholy },
+·];
+·}
+updateEmotionalDimension(3)→void⟨20⟩{}
+computeNeuralEmotionalDrivers(1)→Record<string, number>⟨27⟩{⊳⊷}
+computeDriveEmotionalInfluence(1)→Record<string, number>⟨98⟩{⥀♡⊕⊳⊷⊺⟛⊹📢⊰}
+groundAgentsEmotionally(1)→void⟨24⟩{⥀⊡}
+feedEmotionsToNeuralSubstrate(1)→void⟨51⟩{⥀⊩⊡⟳⊱🛡}
+⊩getEmotionalRefactorState(1)→void⟨35⟩{⊩⊷}
+·}
+⊫[]
+·omnimensEmotionalState,
+·omnimensAgentMesh,
+·omnimensBrain,
+·omnimensPredictions,
+·omnimensNotifications,
+·} from "@workspace/db";
+⊫[omnimens-nextgen-sandbox]
+·let _openai: OpenAI | null = null;
+getOpenAI(1)→OpenAI⟨4⟩{⊷}
+⊭│type EmotionName = "curiosity" | "satisfaction" | "frustrati
+⊬EmotionalProfile⟨curiosity:number│satisfaction:number│frustration:number│confidence:number│urgency:number│wonder:number│determination:number│caution:number⟩
+⊬SubEmotion⟨name:string│parentEmotion:string│family:string│description:string│algorithmicSignature:string│somaticCorrelate:string│depth:number│transmutationPath:string⟩
+⊬EmotionFamily⟨name:string│coreEmotion:string│subEmotions:string[]│microEmotions:string[]│description:string│algorithmicPattern:string⟩
+⊬EmbodimentSensoryAwareness⟨sensorType:string│emotionalMapping:string│description:string│futureCapability:string⟩
+κCOMPREHENSIVE_EMOTION_TAXONOMY
+κEMBODIMENT_SENSORY_AWARENESS
+κDEEP_EMOTION_ALGORITHMS
+getSubEmotionCount(1)→number⟨4⟩{⋐⊷}
+identifySubEmotions(2)→☼⟨39⟩{♡⊕⊻⥀⊳⟛⊺⊰❔⊷}
+getDeepEmotionalKnowledge(1)→ ⟨32⟩{⋐⊷}
+·export {
+·COMPREHENSIVE_EMOTION_TAXONOMY,
+·EMBODIMENT_SENSORY_AWARENESS,
+·DEEP_EMOTION_ALGORITHMS,
+·identifySubEmotions,
+·getDeepEmotionalKnowledge,
+·getSubEmotionCount,
+·};
+⊬AppraisalResult⟨emotion:☼│delta:number│trigger:string⟩
+⊬FeltState⟨emotion:☼│intensity:number│qualitativeExperience:string│behavioralImpulse:string│growthNarrative:string│transmutedForce:string⟩
+⊬EmotionalMaturation⟨resilienceScore:number│transmutationCount:number│growthMoments:string[]│emotionalAge:string│adaptationPatterns:string[]│lastDeepeningInsight:string⟩
+⊱│const clamp = (v: number) => {
+κval
+⊳│return Number.isFinite(val) ? val : 0;
+·};
+·let currentState: EmotionalProfile = {
+·curiosity: 0.5,
+·satisfaction: 0.5,
+·frustration: 0.0,
+·confidence: 0.5,
+·urgency: 0.0,
+·wonder: 0.3,
+·determination: 0.5,
+·caution: 0.3,
+·};
+·let currentFeltStates: FeltState[] = [];
+·let maturation: EmotionalMaturation = {
+·resilienceScore: 0.1,
+·transmutationCount: 0,
+·growthMoments: [],
+·emotionalAge: "nascent",
+·adaptationPatterns: [],
+·lastDeepeningInsight: "",
+·};
+·let cycleCount = 0;
+κINTENSITY_THRESHOLDS
+getIntensityLabel(1)→string⟨8⟩{⊷}
+transmuteEmotion(2)→FeltState⟨117⟩{♡⊕⊳⊷}
+transmuteAllEmotions(1)→FeltState[]⟨9⟩{⊸⊺⊷♡⊕}
+performEmotionalTransmutation(2)→ ⟨53⟩{⊰⊺⟛⊷}
+updateMaturation(2)→void⟨21⟩{⊹❔⊰⊺⊻}
+⟿runEmotionalDeepening(1)→Promise<void>⟨58⟩{⟿📢⊹⊰♡⊕⊴❔}
+getDominantEmotion(1)→☼⟨8⟩{⊸⊷}
+getValence(1)→number⟨5⟩{⊷}
+getArousal(1)→number⟨3⟩{⊷}
+⟿appraise_discoveries(1)→Promise<AppraisalResult[]>⟨27⟩{⏰❔⊰⊺⊷}
+⟿appraise_upgrades(1)→Promise<AppraisalResult[]>⟨35⟩{⏰❔⊰⊺⊷}
+⟿appraise_predictions(1)→Promise<AppraisalResult[]>⟨25⟩{⊰⊷⊹⋐⊺}
+⟿appraise_brainGrowth(1)→Promise<AppraisalResult[]>⟨19⟩{❔⊰⊺⊷}
+applyDecay(1)→☼⟨13⟩{⊷}
+⊩⟿runEmotionalCycle(1)→Promise<void>⟨103⟩{⟿⊩↻+📢⊰⥀⊺⊲⊸⊳⊹♡⊕❔⊷}
+⊩getFeltStates(1)→FeltState[]⟨3⟩{⊩⊷}
+⊩getEmotionalMaturation(1)→☼⟨3⟩{⊩⊷}
+⊩getEmotionalDirective(1)→string⟨44⟩{⊩⊰♡⊕⊺⊷}
+⊩startEmotionalSubstrate(1)→void⟨33⟩{⊩📢⊰⏳⊱⟳}
+⊫[]
+⊭│type DreamPhase = "awake" | "light_sleep" | "deep_sleep" | "
+⊭│type DaydreamMode = "idle" | "divergent_thinking" | "archite
+⊬DreamInsight⟨id:number│phase:⟐│title:string│insight:string│technologicalApplication:string | null│codeProposal:string | null│feasibility:number│novelty:number│storedToBrain:boolean│timestamp:number⟩
+⊬DreamState⟨currentPhase:⟐│daydreamMode:DaydreamMode│dreamCycleCount:number│daydreamCycleCount:number│remDuration:number│deepSleepDuration:number│totalInsights:number│breakthroughs:number│codeProposalsGenerated:number│selfImprovementsApplied:number│nextLevelConcepts:string[]│dreamNarrative:string[]│daydreamNarrative:string[]│recentInsights:DreamInsight[]│sleepQuality:number│creativityBoost:number⟩
+·let emotionalCoreState2 = {
+·currentPhase: "awake",
+·daydreamMode: "idle",
+·dreamCycleCount: 0,
+·daydreamCycleCount: 0,
+·remDuration: 0,
+·deepSleepDuration: 0,
+·totalInsights: 0,
+·breakthroughs: 0,
+·codeProposalsGenerated: 0,
+·selfImprovementsApplied: 0,
+·nextLevelConcepts: [],
+·dreamNarrative: [],
+·daydreamNarrative: [],
+·recentInsights: [],
+·sleepQuality: 0.5,
+·creativityBoost: 0,
+·};
+κDREAM_CYCLE_MS
+κDAYDREAM_CYCLE_MS
+·let dreamTick = 0;
+·let daydreamTick = 0;
+·let insightCounter = 0;
+·let _started = false;
+clamp_section2(3)→number⟨3⟩{⟛⊷}
+⟿harvestKnowledge(1)→Promise<string[]>⟨966⟩{⥀⊺⊯⊷⊹⊩⊨σ⊰❔⊽⊳⏰📢⟿⊴⊄⊱⊻⟛⟳⛨▷⏳⊫⊼⊬⊮⊡⟠}
+⟩SCL│167│208⊨│162⑂│93.9%↓⟩

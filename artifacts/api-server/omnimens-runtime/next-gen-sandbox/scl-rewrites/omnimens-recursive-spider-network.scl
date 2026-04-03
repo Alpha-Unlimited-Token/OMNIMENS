@@ -1,0 +1,147 @@
+⟨SCL v1│omnimens-recursive-spider-network.ts│254→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[]
+·webSearch,
+·fetchPageContent,
+·formatSearchResults,
+·} from "./web-search.js";
+⊫[]
+·getActiveGenesisAgentNames,
+·getActiveGenesisAgentDomains,
+} from "./omnimens-α-genesis.js";
+⊫[omnimens-nextgen-sandbox]
+⊭│type Model = "o3" | "o4-mini";
+⊬SpiderNode⟨id:string│agentName:string│generation:number│parentId:string | null│query:string│findings:string│sourceUrls:string[]│confidence:number│childCount:number│timestamp:number⟩
+⊬RecursiveSwarmStats⟨agentName:string│totalSpidersDeployed:number│totalBeaconsGenerated:number│totalBrainWrites:number│generationBreakdown:Record<number, number>│elapsedMs:number⟩
+⊬SpiderGenConfig⟨maxGenerations:number│babiesPerMother:number│motherSpawnRate:number│maxConcurrentPerAgent:number│maxTotalSpidersPerAgent:number│beaconThreshold:number│queryDiversityFactor:number⟩
+κDEFAULT_CONFIG
+κCORE_AGENTS
+κAGENT_SEARCH_DOMAINS
+·let recursiveCycleRunning = false;
+·let recursiveSwarmCycleCount = 0;
+κactiveSpiderCounts
+κswarmStatHistory
+κrecentQueryFingerprints
+⊱│const safeNum = (v: number, f = 0) => (Number.isFinite(v) ? 
+κQUERY_DEDUP_WINDOW_MS
+·const fingerprint = (q: string) =>
+·q
+·.toLowerCase()
+⊽│.replace(/[^a-z0-9\s]/g, "")
+·.split(/\s+/)
+⊹│.filter((w) => w.length > 3)
+·.sort()
+·.slice(0, 8)
+·.join("|");
+⊱│const isDuplicateQuery = (q: string) => {
+κfp
+κnow
+⊱│recentQueryFingerprints.forEach((ts, k) => {
+·if (now - ts > QUERY_DEDUP_WINDOW_MS) recentQueryFingerprints.delete(k);
+·});
+⊷│if (recentQueryFingerprints.has(fp)) return true;
+⊡│recentQueryFingerprints.set(fp, now);
+⊷│return false;
+·};
+κspiderQuery
+·prompt: string,
+·model: Model = "o4-mini",
+·tok = 600,
+·): Promise<string> => {
+κcfg
+·try {
+κres
+❔│return res?.choices?.[0]?.message?.content?.trim() ?? "";
+·} catch {
+·if (model === "o3")
+⊷│return spiderQuery(prompt, "o4-mini", tok).catch(() => "");
+⊷│return "";
+·}
+·};
+⊱│const diversify = (base: string, gen: number, parent: string
+⊷│if (gen <= 1) return base;
+κangles
+κangle
+κparentKey
+·.split(/\s+/)
+⊹│.filter((w) => w.length > 5)
+·.slice(0, 3)
+·.join(" ");
+⊰│return `${parentKey} ${angle} ${gen === 2 ? "2025 2026" : "l
+·};
+κevaluateSpawnDecision
+⊢: SpiderNode,
+·generation: number,
+·current: number,
+·max: number,
+·config: SpiderGenConfig,
+⊱│) => {
+·if (
+·current >= max ||
+⊹│parent.findings.length < 20 ||
+isDuplicateQuery(⊢.query) ||
+(generation >= 4 && ⊢.confidence < 0.85)
+·)
+⊷│return { should: false, babies: 0 };
+if (⊢.confidence >= 0.85)
+⊷│return { should: true, babies: config.babiesPerMother };
+κratio
+·let babies = config.babiesPerMother;
+⟛│if (ratio > 0.7) babies = Math.max(2, Math.floor(babies * 0.
+⟛│else if (ratio > 0.5) babies = Math.max(3, Math.floor(babies
+⟛│if (parent.confidence < 0.4) babies = Math.max(1, Math.floor
+⟛│if (generation >= 4 && parent.confidence >= 0.85) babies = M
+⊷│return { should: true, babies };
+·};
+κspawnBabySpider
+α: string,
+⊢: SpiderNode,
+·idx: number,
+·cfg: SpiderGenConfig,
+·all: SpiderNode[],
+·domain: string,
+·): Promise<SpiderNode[]> => {
+⊡│if ((activeSpiderCounts.get(agent) ?? 0) >= cfg.maxTotalSpid
+⊷│return [];
+⊡│activeSpiderCounts.set(agent, (activeSpiderCounts.get(agent)
+κbabyId
+κgen
+κbases
+κquery
+·bases[Math.floor(Math.random() * bases.length)],
+·gen,
+⊢.findings,
+·);
+κresults
+·try {
+κsearch
+κformatted
+κpage
+·Math.random() < 0.4
+⊴│? await fetchPageContent(
+⊻│(search.find((r) => r.url && !r.url.includes("wikipedia")) |
+·.url ?? "",
+·1500,
+·).catch(() => "")
+·: "";
+κprompt
+⊢ finding: "${⊢.findings.slice(0, 300)}"
+⊰│${domain ? `Domain: ${domain}` : ""}
+·SEARCH:
+·${formatted.slice(0, 2000)}
+⊰│${page ? `PAGE:\n${page.slice(0, 800)}` : ""}
+·Respond JSON:
+·{"finding":"","confidence":0.0,"suggestTopics":[]}`;
+κraw
+⊄│if (!raw) return [];
+κparsed
+⊪_v2RewriteModule
+·export {};
+⟩SCL│146│80⊨│37⑂│42.5%↓⟩

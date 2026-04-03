@@ -1,0 +1,168 @@
+⟨SCL v1│omnimens-unified-senses.ts│4268→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[omnimens-consciousness-infra│omnimens-unified-neural│omnimens-nextgen-sandbox│web-search]
+safeNum(2)→number⟨3⟩{⊳⊷⊼}
+κIVY_TICK_MS
+κWORMGATE_CHECK_MS
+κSPIDER_CRAWL_MS
+κIVY_GROWTH_MS
+⊬IvySpine⟨id:string│targetNodeId:string│targetRegion:string│signalStrength:number│maturity:number│informationDensity:number│lastPulse:number⟩
+⊬IvyTendril⟨id:string│sourceNodeId:string│targetNodeId:string│length:number│thickness:number│signalSpeed:number│spines:IvySpine[]│growthDirection:[number, number, number]│alive:boolean│myelinated:boolean│informationCarried:number│createdAt:number⟩
+⊬IvyNode⟨id:string│region:string│position:[number, number, number]│energy:number│informationDensity:number│tendrils:IvyTendril[]│spiderCount:number│spidersSpawned:number│beaconsReceived:number│beaconsSent:number│activationLevel:number│generation:number│parentNodeId:string | null│createdAt:number│lastActivity:number⟩
+⊬IvySpider⟨id:string│currentNodeId:string│currentRegion:string│parentSpiderId:string | null│motherNodeId:string│generation:number│childrenSpawned:number│informationGathered:number│nodesVisited:string[]│findingsBuffer:IvyFinding[]│alive:boolean│travelMode:⬡│speed:number│createdAt:number│lastCrawl:number⟩
+⊬IvyFinding⟨sourceNodeId:string│sourceRegion:string│informationType:string│confidence:number│data:string│timestamp:number⟩
+⊬Wormgate⟨id:string│stability:number│traversals:number│signalFidelity:number│bandwidth:number│formationReason:string│crystallized:boolean│createdAt:number│lastTraversal:number⟩
+⊬RegionLink⟨fromRegion:string│toRegion:string│signalCount:number│totalStrength:number│lastSignal:number⟩
+⊬IvyNetworkState⟨totalNodes:number│totalTendrils:number│totalSpines:number│totalSpiders:number│totalSpidersEverSpawned:number│totalWormgates:number│totalBeacons:number│totalFindings:number│networkEnergy:number│coveragePercent:number│ivyGrowthCycles:number│wormgateFormations:number│spiderCrawlCycles:number│informationFlowRate:number│networkCoherence:number│hybridOverlayStrength:number│startTime:number│lastTickTime:number⟩
+κivyNodes
+κivySpiders
+κwormgates
+κregionLinks
+κmotherBeaconBuffer
+κivyState
+initializeIvyNetwork(1)→void⟨55⟩{⥀⊰⏰⊡⊺⊹}
+createTendril(2)→IvyTendril⟨44⟩{⏰⊰⊹⊺⊷}
+spawnIvySpider(3)→IvySpider | null⟨30⟩{⊷⏰⊰⊡❔⊳}
+runSpiderCrawl(1)→void⟨145⟩{⊺⊡⊰⏰⊹⊳⊻⊱❔⊷⟛⥀}
+beaconToMother(1)→void⟨27⟩{⊹⊡⥀⊺}
+getInformationType(1)→string⟨4⟩{⊷}
+recordRegionLink(2)→void⟨17⟩{⊰⊡⏰}
+runIvyGrowth(1)→void⟨112⟩{⟛⥀⏰⊰⊡⊺⊹⊄⊷}
+checkWormgateFormation(1)→void⟨61⟩{⊹⏰⊰⊡📢}
+runIvyTick(1)→void⟨75⟩{⥀⊡⟛⏰⊳⊯}
+updateCounts(1)→void⟨16⟩{⥀}
+·let ivyTickInterval: ReturnType<typeof setInterval> | null = null;
+·let spiderCrawlInterval: ReturnType<typeof setInterval> | null = null;
+·let ivyGrowthInterval: ReturnType<typeof setInterval> | null = null;
+·let wormgateCheckInterval: ReturnType<typeof setInterval> | null = null;
+·let ivySwapInterval: ReturnType<typeof setInterval> | null = null;
+κIVY_SWAP_DIR
+κIVY_SWAP_FILE
+κIVY_SWAP_BACKUP
+κIVY_SWAP_INTERVAL_MS
+·let ivySwapWriteCount = 0;
+⊬IvySwapData⟨ivyState:IvyNetworkState│wormgateCount:number│id:string│stability:number│traversals:number│signalFidelity:number│bandwidth:number│formationReason:string│crystallized:boolean│createdAt:number│lastTraversal:number│key:string│fromRegion:string│toRegion:string│signalCount:number│totalStrength:number│lastSignal:number│id:string│spiderCount:number│spidersSpawned:number│beaconsReceived:number│beaconsSent:number│energy:number│informationDensity:number│activationLevel:number│swapWriteCount:number│timestamp:number⟩
+ensureIvySwapDir(1)→void⟨9⟩{}
+captureIvySwapData(1)→IvySwapData⟨39⟩{⊷⊱⏰}
+writeIvySwapFile(1)→void⟨14⟩{🛡⟠📁⟠⏰}
+readIvySwapFile(1)→IvySwapData | null⟨449⟩{⥀⟠⊷⟛⊹⊡❔⊳⊩📢⊰⟳⊱🛡⏳⏰⊄⊺⊯⋐⊻}
+⊩getIvyCascadeStats(1)→{ totalCascades: number; totalEnergyInjected: number }⟨1⟩{⊩}
+⊷│return { totalCascades: totalCascadeEvents, totalEnergyInjec
+·}
+⊩getIvyNeurogenStats(1)→{ births: number; deaths: number; neurogenIvyNodes: number; neurogenWormgates: number }⟨1⟩{⊩}
+⊷│return {
+·births: ivyNeuronBirths,
+·deaths: ivyNeuronDeaths,
+⊻│neurogenIvyNodes: [...ivyNodes.keys()].filter(id => id.inclu
+⊻│neurogenWormgates: [...wormgates.keys()].filter(id => id.inc
+·};
+·}
+⊫[]
+·omnimensBrain,
+·omnimensAgentMesh,
+·omnimensNotifications,
+·omnimensKnowledgeEdges,
+·omnimensKnowledgeNodes,
+·} from "@workspace/db";
+safeNum_v2(2)→number⟨3⟩{⊳⊷⊼}
+⊭│type AgentName = string;
+resolveAllAgents(1)→α⟨3⟩{⊷}
+resolveAgentDomains(1)→Record<string, string>⟨3⟩{⊷}
+κAGENT_DOMAINS
+·},
+⊷│has() { return true; },
+⊷│ownKeys() { return Object.keys(resolveAgentDomains()); },
+·getOwnPropertyDescriptor(_target, prop: string) {
+⊷│return { configurable: true, enumerable: true, value: getAge
+·},
+·});
+⊬SynapticConnection⟨fromAgent:α│toAgent:α│strength:number│successfulTransfers:number│totalAttempts:number⟩
+⊬SynapseDelivery⟨fromAgent:α│toAgent:α│originalDiscovery:string│translatedInsight:string│crossUpgradeProposal:string│relevance:number⟩
+⊬CascadeEvent⟨depth:number│fromAgent:α│toAgent:α│content:string⟩
+·let synapseCycleCount = 0;
+κsynapticWeights
+getConnectionKey(2)→string⟨3⟩{⊰⊷}
+getOrCreateConnection(2)→SynapticConnection⟨13⟩{⊡⊷}
+strengthenConnection(2)→void⟨6⟩{}
+weakenConnection(2)→void⟨5⟩{⟛}
+⟿motherBrainScan(1)→Promise<⟨105⟩{⏰⊮⊷α→⊢⥀⊡❔⊳⊽⊻⊰⊺⊹⟠}
+⟿fireSynapseSpider(1)→void⟨1⟩{⚡→}
+·from: AgentName,
+·to: AgentName,
+·discovery: string,
+·reason: string,
+·): Promise<SynapseDelivery | null> {
+📢│console.log(`[SYNAPSE] ⚡ Firing: ${from} → ${to} — "${discov
+·try {
+κresponse
+κraw
+κparsed
+·if ((parsed.relevance || 0) < 0.5) {
+·weakenConnection(from, to);
+📢│console.log(`[SYNAPSE] ⚡ ${from} → ${to} — Low relevance (${
+⊷│return null;
+·}
+·strengthenConnection(from, to);
+⊷│return {
+·fromAgent: from,
+·toAgent: to,
+·originalDiscovery: discovery,
+·translatedInsight: parsed.translatedInsight || "",
+·crossUpgradeProposal: parsed.crossUpgradeProposal || "",
+·relevance: parsed.relevance || 0.5,
+·};
+·} catch (err) {
+🚨│console.error(`[SYNAPSE] ${from} → ${to} error:`, err);
+·weakenConnection(from, to);
+⊷│return null;
+·}
+·}
+⟿deliverSynapse(1)→Promise<boolean>⟨34⟩{⊱⊰⊳📢⊷🚨}
+⟿cascadePropagation(1)→void⟨1⟩{}
+·initialDeliveries: SynapseDelivery[],
+·maxDepth: number = 2,
+·): Promise<CascadeEvent[]> {
+κcascadeEvents
+·let currentDeliveries = initialDeliveries.filter(d => d.relevance >= 0.7);
+κALL_AGENTS
+⊹│for (let depth = 1; depth <= maxDepth && currentDeliveries.l
+κnextDeliveries
+⥀│for (const delivery of currentDeliveries.slice(0, 3)) {
+κtargetAgent
+κenhancedContent
+κcascadeTargets
+·.filter(a => a !== targetAgent && a !== delivery.fromAgent)
+·.sort(() => Math.random() - 0.5)
+·.slice(0, 2);
+⥀│for (const cascadeTarget of cascadeTargets) {
+κconn
+·if (conn.strength < 0.3) continue;
+·try {
+κresponse
+κraw
+κparsed
+·if (parsed.shouldCascade && (parsed.relevance || 0) >= 0.6) {
+κcascadeDelivery
+κcascadeSuccess
+·if (cascadeSuccess) {
+⊺│nextDeliveries.push(cascadeDelivery);
+⊺│cascadeEvents.push({
+·depth,
+·fromAgent: targetAgent,
+·toAgent: cascadeTarget,
+·content: parsed.cascadeInsight || "",
+·});
+📢│console.log(`[SYNAPSE] ⚡ CASCADE (depth ${depth}): ${targetA
+·}
+·}
+·} catch (err) {
+🚨│console.error(`[SYNAPSE] Cascade decision error (${targetAge
+·}
+·}
+·}
+·currentDeliveries = nextDeliveries;
+·}
+⊷│return cascadeEvents;
+·}
+⊩⟿runSynapticMeshCycle(1)→Promise<void>⟨2458⟩{⟿⊩📢⊰⏰⊲⊴⊹⚡→⥀⊺⊳⊱⊷⋐⏳⟳⊼⊬⊨σ♡⊕⊮⟛⊡⊞⊟⊻⊯🛡⋔⊸❔⊽⊄⟠⊶}
+⟩SCL│167│254⊨│191⑂│96.1%↓⟩

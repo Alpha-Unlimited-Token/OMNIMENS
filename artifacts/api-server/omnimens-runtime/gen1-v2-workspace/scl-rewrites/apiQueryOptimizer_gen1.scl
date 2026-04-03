@@ -1,0 +1,59 @@
+⟨SCL v1│apiQueryOptimizer_gen1.mjs│101→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊶│class LRUCache {
+constructor(⏳) {
+this.⏳ = ⏳;
+⊮│this.cache = new Map();
+·}
+·get(key) {
+·if (this.cache.has(key)) {
+κvalue
+·this.cache.delete(key);
+⊡│this.cache.set(key, value);
+⊷│return value;
+·}
+⊷│return undefined;
+·}
+set(key, ≪) {
+·if (this.cache.has(key)) {
+·this.cache.delete(key);
+} else if (this.cache.size >= this.⏳) {
+κoldestKey
+·this.cache.delete(oldestKey);
+·}
+⊡│this.cache.set(key, value);
+·}
+·}
+⊩generateQueryHash(1)→void⟨3⟩{⊩⟠⊷}
+⊩batchQueries(2)→void⟨8⟩{⊩⊺⊷}
+⊶│export class APIQueryOptimizer {
+·constructor(cacheLimit = 100, batchSize = 10) {
+·this.cache = new LRUCache(cacheLimit);
+·this.batchSize = batchSize;
+·}
+·async executeQueries(queries, queryExecutor) {
+κresults
+κuncachedQueries
+⥀│for (const query of queries) {
+κqueryHash
+κcachedResult
+·if (cachedResult !== undefined) {
+⊺│results.push({ query, result: cachedResult });
+·} else {
+⊺│uncachedQueries.push(query);
+·}
+·}
+κqueryBatches
+⥀│for (const batch of queryBatches) {
+κbatchResults
+·for (let i = 0; i < batch.length; i++) {
+κqueryHash
+⊡│this.cache.set(queryHash, batchResults[i]);
+⊺│results.push({ query: batch[i], result: batchResults[i] });
+·}
+·}
+⊷│return results;
+·}
+·}
+⟩SCL│58│36⊨│20⑂│42.6%↓⟩

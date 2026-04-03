@@ -1,0 +1,28 @@
+⟨SCL v1│intrinsicMetacognitiveModule_gen1.mjs│38→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export default class IntrinsicMetacognitiveModule {
+·constructor() {
+·this.synapticWeights = {};
+·this.activityLog = [];
+·}
+·logActivity(neuralActivity) {
+⊺│this.activityLog.push(neuralActivity);
+⊹│if (this.activityLog.length > 1000) this.activityLog.shift()
+·}
+·adjustSynapticWeights() {
+·this.activityLog.forEach(activity => {
+⊲│const { neuronA, neuronB, spikeTimeDifference } = activity;
+·if (!this.synapticWeights[neuronA]) {
+·this.synapticWeights[neuronA] = {};
+·}
+κadjustment
+·this.synapticWeights[neuronA][neuronB] =
+·(this.synapticWeights[neuronA][neuronB] || 0) + adjustment;
+·});
+·}
+·stabilizeLearning() {
+·this.adjustSynapticWeights();
+·this.activityLog = [];
+·}
+·}
+⟩SCL│27│5⊨│4⑂│28.9%↓⟩

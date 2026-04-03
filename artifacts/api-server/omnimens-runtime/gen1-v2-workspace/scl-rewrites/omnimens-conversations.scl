@@ -1,0 +1,135 @@
+⟨SCL v1│omnimens-conversations.ts│308→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊭│type Role = "user" | "assistant";
+⊭│type ConversationRow = { id: number; userId: string; title?:
+⊭│type MessageRow = { role: Role; content: string };
+⊭│type MemoryRow = {
+·id: number;
+·userId: string;
+·category: string;
+·content: string;
+·active: boolean;
+·};
+κENGINE
+κTABLE
+⊳│const read = <T>(table: string, query?: unknown) =>
+·dbGateway.read<T[]>(ENGINE, table, query);
+const ⊞ = (table: string, data: unknown) =>
+dbGateway.⊞(ENGINE, table, data, "NORMAL");
+·const log = (msg: string, ...extra: unknown[]) =>
+📢│console.log(`[OMNIMENS-CONVERSATIONS] ${msg}`, ...extra);
+⊩⟿getOrCreateConversation(1)→void⟨1⟩{⊩}
+·userId: string,
+⊳│conversationId?: number,
+·persona = "GENERAL"
+·): Promise<number> {
+·if (conversationId) {
+·const [row] = await read<ConversationRow>(TABLE.conversations, {
+·where: { id: conversationId, userId },
+⏳: 1,
+·});
+⊷│if (row) return row.id;
+·}
+⊴│const [{ id }] = await write(TABLE.conversations, [
+·{ userId, title: "New Conversation", persona },
+·]) as [{ id: number }];
+⊷│return id;
+·}
+⊩⟿saveMessage(1)→void⟨1⟩{⊩}
+·conversationId: number,
+·userId: string,
+·role: Role,
+·content: string,
+⊳│imageUrl?: string,
+⊳│creditsUsed?: number
+·): Promise<void> {
+⊴│await write(TABLE.messages, [
+·{
+·conversationId,
+·userId,
+·role,
+·content: content.slice(0, 50_000),
+·imageUrl,
+·creditsUsed,
+·},
+·]);
+⊴│await write(TABLE.conversations, {
+·update: {
+·set: {
+·messageCount: { $inc: 1 },
+·lastMessageAt: new Date(),
+·},
+·where: { id: conversationId },
+·},
+·});
+·}
+⊩⟿generateConversationTitle(1)→void⟨1⟩{⊩}
+·conversationId: number,
+·firstMessage: string
+·): Promise<void> {
+·try {
+κres
+κtitle
+❔│res?.choices?.[0]?.message?.content?.trim()?.slice(0, 80) ||
+·"New Conversation";
+⊴│await write(TABLE.conversations, {
+·update: { set: { title }, where: { id: conversationId } },
+·});
+·} catch {
+·}
+·}
+⊩⟿loadConversationHistory(1)→void⟨1⟩{⊩}
+·conversationId: number,
+·userId: string,
+⏳ = 50
+·): Promise<MessageRow[]> {
+κrows
+⊷│return rows.reverse();
+·}
+⊪│export const listConversations = (userId: string, limit = 30
+·read<ConversationRow>(TABLE.conversations, {
+·where: { userId },
+·orderBy: { lastMessageAt: "DESC" },
+⏳,
+·});
+⊩⟿deleteConversation(1)→void⟨1⟩{⊩}
+·conversationId: number,
+·userId: string
+·): Promise<void> {
+⊴│await write(TABLE.conversations, {
+·delete: { where: { id: conversationId, userId } },
+·});
+·}
+⊩⟿runMemoryImprovementCycle(1)→Promise<void>⟨96⟩{⟿⊩⊹⊰⊷⟠❔⊴⊱⏰}
+⊩⟿runGlobalMemoryImprovementCycle(1)→Promise<void>⟨19⟩{⟿⊩⏰⚡→⊰}
+·}
+⚡→│spikeBus.on("conversations:globalMemoryCycle", runGlobalMemo
+⚡→│spikeBus.on(/conversations:userMemory:.+/, async ({ userId }
+·runMemoryImprovementCycle(userId)
+·);
+⚡→│spikeBus.on("attention:conversations", () =>
+⚡→│spikeBus.scheduleSpike("conversations:globalMemoryCycle", {}
+·);
+⚡→│spikeBus.on("cognition:curiosity", () =>
+⚡→│spikeBus.scheduleSpike("conversations:globalMemoryCycle", {}
+·);
+⊱│cognitionBus.onInsight((_src, insight) => {
+❔│if (insight.type === "discovery" && insight.data?.userId) {
+⚡→│spikeBus.scheduleSpike(
+⊰│`conversations:userMemory:${insight.data.userId}`,
+·{ userId: insight.data.userId },
+·10_000
+·);
+·}
+·});
+·engineRegistry.registerEngine(ENGINE, "NORMAL", { dbQuota: 10 });
+⚡→│spikeBus.scheduleSpike("conversations:globalMemoryCycle", {}
+⊩shutdown(1)→void⟨3⟩{⊩}
+⟩SCL│134│71⊨│52⑂│56.5%↓⟩

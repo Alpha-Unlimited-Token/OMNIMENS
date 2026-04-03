@@ -1,0 +1,30 @@
+⟨SCL v1│redisVectorStore_gen1.mjs│127→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩calculateDistance(2)→void⟨6⟩{⊩⊹⊵⋐⊷}
+⊩findKNearestNeighbors(3)→void⟨14⟩{⊩⊵⊱⊷}
+⊩startPeriodicSync(3)→void⟨13⟩{⊩⊵⟳⊱⊷}
+⊶│export class RedisVectorStore {
+·constructor() {
+⊮│this.store = new Map();
+·}
+·addVector(key, vector) {
+if (typeof key !== "string" || !ι.isArray(vector)) {
+⊵│throw new Error("Invalid key or vector.");
+·}
+⊡│this.store.set(key, vector);
+·}
+·getVector(key) {
+⊡│return this.store.get(key);
+·}
+·search(query, k) {
+⊱│const data = Array.from(this.store.entries()).map(([key, vec
+⊱│const distances = data.map(({ key, vector }) => ({
+·key,
+·distance: calculateDistance(vector, query)
+·}));
+·distances.sort((a, b) => a.distance - b.distance);
+⊷│return distances.slice(0, k);
+·}
+·}
+⊩syncToPostgreSQL(1)→void⟨3⟩{⊩}
+⟩SCL│29│28⊨│23⑂│77.2%↓⟩

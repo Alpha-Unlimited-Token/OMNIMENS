@@ -1,0 +1,11 @@
+⟨SCL v1│domainSpecificLogicLayer_gen1.mjs│124→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩hybridLogicProcessor(3)→void⟨16⟩{⊩⊵⊷}
+⊩exampleRuleFunction(1)→void⟨6⟩{⊩⊵⊳⊷}
+⊩exampleNeuralFunction(1)→void⟨7⟩{⊩⊵⊷}
+⊩generateSyntheticDataset(2)→void⟨10⟩{⊩⊵⊷}
+⊩randomDataGenerator(1)→void⟨3⟩{⊩⊷}
+⊩hashDataset(1)→void⟨9⟩{⊩⊵⟠⊷}
+⊩dynamicModelSelector(2)→void⟨14⟩{⊩⊵⋐⊳⊷}
+⟩SCL│10│32⊨│24⑂│91.9%↓⟩

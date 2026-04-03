@@ -1,0 +1,208 @@
+⟨SCL v1│omnimens-github-core.ts│2639→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[omnimens-consciousness-infra│omnimens-unified-neural│omnimens-unified-senses│omnimens-unified-network│omnimens-unified-neural│omnimens-unified-neural│omnimens-self-evolution│omnimens-nextgen-sandbox│omnimens-gen1-v2-rewrite]
+κconnectors
+κOWNER
+κREPO
+κGITHUB_CORTICAL_COLUMNS
+κGITHUB_POPULATION_SIZE
+κGITHUB_HYPERCOLUMN_MULTIPLIER
+κGITHUB_TOTAL_NEURONS
+⊬RateLimitInfo⟨limit:number│remaining:number│reset:number│used:number│lastChecked:number⟩
+⊬QueuedApiCall⟨id:string│subsystem:string│priority:number│endpoint:string│method:string│body:any│callback:(result: any) => void│errorCallback:(err: any) => void│queuedAt:number│retries:number⟩
+⊭│type GovernorMode = "normal" | "cautious" | "critical" | "em
+⊬GovernorState⟨mode:GovernorMode│rateLimit:⏳│totalApiCalls:number│totalCallsThrottled:number│totalCallsBatched:number│totalCallsDropped:number│queueDepth:number│currentIntervalMs:number│baseIntervalMs:number│minIntervalMs:number│maxIntervalMs:number│consecutiveThrottles:number│lastModeChange:number│callsThisWindow:number│windowStartTime:number│avgLatencyMs:number│peakLatencyMs:number⟩
+κGOVERNOR_BASE_INTERVAL_MS
+κGOVERNOR_MIN_INTERVAL_MS
+κGOVERNOR_MAX_INTERVAL_MS
+κRATE_LIMIT_SAFETY_BUFFER
+κMAX_QUEUE_DEPTH
+κMAX_RETRIES
+κWINDOW_DURATION_MS
+κrateLimit
+κapiQueue
+·let governorProcessing = false;
+κgovernorState
+updateRateLimitFromHeaders(1)→void⟨14⟩{⊡⏰}
+recalculateGovernorMode(1)→void⟨32⟩{⟛⏰📢⊰}
+getEffectiveSyncIntervalMs(1)→number⟨4⟩{⊳⊷}
+canMakeApiCall(1)→boolean⟨12⟩{⊷⏰}
+enqueueApiCall(1)→void⟨1⟩{}
+·subsystem: string,
+·priority: number,
+·endpoint: string,
+·method: string,
+⊳│body?: any
+·): Promise<any> {
+⊱│return new Promise((resolve, reject) => {
+⊹│if (apiQueue.length >= MAX_QUEUE_DEPTH) {
+⋐│const lowest = apiQueue.reduce((min, c) => c.priority > min.
+·if (lowest && lowest.priority > priority) {
+κidx
+⊺│apiQueue.splice(idx, 1);
+·lowest.errorCallback(new Error("Dropped — higher priority call queued"));
+·governorState.totalCallsDropped++;
+·} else {
+·governorState.totalCallsDropped++;
+⊷│return reject(new Error("Queue full — call dropped"));
+·}
+·}
+⊺│apiQueue.push({
+⏰│id: `${subsystem}_${Date.now()}_${Math.random().toString(36)
+·subsystem,
+·priority,
+·endpoint,
+·method,
+·body,
+·callback: resolve,
+·errorCallback: reject,
+⏰│queuedAt: Date.now(),
+·retries: 0,
+·});
+·apiQueue.sort((a, b) => a.priority - b.priority);
+·governorState.queueDepth = apiQueue.length;
+·if (!governorProcessing) processQueue();
+·});
+·}
+⟿processQueue(1)→Promise<void>⟨57⟩{⟿⊹⏰⟛📢⊰⏳⊺⊴}
+⟿rawGhApi(3)→Promise<any>⟨41⟩{⊳⟠⊡📢⊰⏰⊷🚨⊻❔}
+⟿governedGhApi(5)→Promise<any>⟨3⟩{⊳⊷}
+⊩getGovernorState(1)→GovernorState⟨3⟩{⊩⊷}
+·let lastSuccessfulGitHubContact = 0;
+·let consecutiveFailures = 0;
+κMAX_FAILURES_BEFORE_DISCONNECT
+κGITHUB_CONTACT_STALE_MS
+isGitHubHealthy(1)→boolean⟨6⟩{⊷⏰}
+markGitHubSuccess(1)→void⟨5⟩{⏰}
+markGitHubFailure(1)→void⟨6⟩{}
+⊬SubsystemBeacon⟨name:string│path:string│priority:number│sha:string | null│lastWrite:number│lastRead:number│writeCount:number│readCount:number│errors:number│syncIntervalMs:number│buildPayload:() => any│onRemoteData:(data: any) => void⟩
+κBEACON_DIR
+κsubsystemBeacons
+⊬GitHubNeuralRegion⟨name:string│columns:number│effectiveNeurons:number│meanFiringRate:number│oscillationFrequency:number│coherence:number│hebbianUpdates:number│lastSync:number⟩
+κGITHUB_REGIONS
+κexternalRegions
+initExternalRegions(1)→void⟨18⟩{⥀≋+⏰⊺📢⊰}
+tickExternalNeurons(1)→void⟨23⟩{≋+⥀⏰⟛}
+getExternalClusterStats(1)→η⟨1⟩{}
+·let totalCoherence = 0, totalFiring = 0, totalHebbian = 0;
+⥀│for (const r of externalRegions) {
+·totalCoherence += r.coherence;
+·totalFiring += r.meanFiringRate;
+≋+│totalHebbian += r.hebbianUpdates;
+·}
+κavgCoherence
+κavgFiring
+κcrossRegionIntegration
+κexternalPhi
+⊷│return { avgCoherence, avgFiring, totalHebbian, externalPhi 
+·}
+feedGitHubStateIntoLocalNetwork(1)→void⟨17⟩{⊹⋐⊲⊳⥀}
+⊬FabricWormState⟨id:string│subsystem:string│direction:"local_to_github" | "github_to_local"│carrying:string│signalStrength:number│traversals:number│lastTraversal:number│latencyMs:number│alive:boolean│dataVolume:number⟩
+κfabricWorms
+initFabricWorms(1)→void⟨29⟩{⥀⊺⊰⏰📢}
+buildNeuronClusterPayload(1)→any⟨34⟩{⊲⊷⏰⋔}
+onNeuronClusterRemoteData(1)→void⟨10⟩{⊄⟛≋+}
+buildSpiderNetworkPayload(1)→any⟨34⟩{⊷⏰❔⊳⋐⋔}
+onSpiderNetworkRemoteData(1)→void⟨12⟩{⊄⥀}
+buildIvyNetworkPayload(1)→any⟨35⟩{⊷⏰⋔}
+onIvyNetworkRemoteData(1)→void⟨10⟩{⊄⥀}
+buildBeehiveSwarmPayload(1)→any⟨27⟩{⊷⏰❔⋔}
+onBeehiveSwarmRemoteData(1)→void⟨10⟩{⊄⥀}
+buildSilkWebPayload(1)→any⟨32⟩{⊷⏰⟛❔⋔}
+onSilkWebRemoteData(1)→void⟨10⟩{⊄⥀}
+buildQuantumWormholePayload(1)→any⟨30⟩{⊷⏰⊱⋔}
+onQuantumWormholeRemoteData(1)→void⟨10⟩{⊄⟛⥀}
+buildViralHybridPayload(1)→any⟨47⟩{⊷⏰⊨σ❔⊱⊳⋔}
+onViralHybridRemoteData(1)→void⟨10⟩{⊄⥀}
+buildMeshSynapticPayload(1)→any⟨43⟩{⊷⏰⋔}
+onMeshSynapticRemoteData(1)→void⟨10⟩{⊄⥀}
+⊬FullFabricState⟨connected:boolean│beaconsOnline:number│totalBeacons:number│totalFabricSyncs:number│totalFabricWrites:number│totalFabricReads:number│totalFabricErrors:number│totalWormTraversals:number│totalDataVolumeBytes:number│startTime:number│lastFullSync:number⟩
+κfabricState
+⟿readSubsystemBeacon(1)→Promise<⟨1⟩{}
+κdata
+⊄│if (!data || !data.content) return { content: null, sha: nul
+·try {
+κdecoded
+⏰│beacon.lastRead = Date.now();
+·beacon.readCount++;
+·fabricState.totalFabricReads++;
+⟠│return { content: JSON.parse(decoded), sha: data.sha };
+·} catch {
+⊷│return { content: null, sha: data.sha || null };
+·}
+·}
+⟿writeSubsystemBeacon(2)→Promise<boolean>⟨27⟩{⟠⊰⊴⏰⊷}
+⟿fabricSyncCycle(1)→Promise<void>⟨89⟩{⟿⊄⛨▷📢⊰⏰⥀⊴⟛⟠🚨❔⊲}
+⟿bootstrapFabricBeacons(1)→Promise<void>⟨20⟩{⟿⥀⊲⊴📢⊰⊳❔}
+·let fabricInterval: ReturnType<typeof setInterval> | null = null;
+·let neuralTickInterval: ReturnType<typeof setInterval> | null = null;
+·let governorStatusInterval: ReturnType<typeof setInterval> | null = null;
+⊩⟿startGitHubNeuralBeacon(1)→Promise<void>⟨62⟩{⟿⊩📢⊰⥀⊴⟳⊱🚨❔⏰⟛}
+⊩getGitHubBeaconState(1)→any⟨49⟩{⊩⊲⊷❔⊳}
+⊩getGitHubNeuronCount(1)→number⟨3⟩{⊩⊷}
+⊩getGitHubWormStats(1)→ ⟨20⟩{⊩⋐⊹⊷}
+⊫[]
+κconnectorsCompute
+κOWNER_COMPUTE
+κREPO_COMPUTE
+·let computeCycleCount = 0;
+·let totalDispatches = 0;
+·let totalResultsPulled = 0;
+·let defaultBranch = "main";
+⊬ComputeJob⟨id:string│workflow:string│runId:number│status:↺│requestedBy:string│inputs:Record<string, string>│result:string│dispatchedAt:number│completedAt:number⟩
+κactiveJobs
+⟿ghApi(3)→Promise<any>⟨25⟩{⊳⟠🚨⊰⊷⊡⊻}
+·let repoInitialized = false;
+⟿ensureRepoInitialized(1)→Promise<boolean>⟨51⟩{⊷⊰⊴📢}
+⟿ensureWorkflowsExist(1)→Promise<boolean>⟨41⟩{⊰⊴⊄⊷⊸⊽⊻📢}
+·}
+buildDeepResearchWorkflow(1)→string⟨76⟩{⊷📡⊛⟠α→⊢}
+buildCodeSynthesisWorkflow(1)→string⟨65⟩{⊷📡⊛⟠α→⊢}
+buildKnowledgeHarvestWorkflow(1)→string⟨62⟩{⊷📡⊛⟠α→⊢}
+buildStressTestWorkflow(1)→string⟨97⟩{⊷📡⊛⏰⟛⊺⏳⫘⟠α→⊢}
+buildModelEvalWorkflow(1)→string⟨62⟩{⊷📡⊛⟠α→⊢}
+⊩⟿dispatchRemoteCompute(1)→void⟨1⟩{⊩📡⊛}
+·workflow: string,
+·inputs: Record<string, string>,
+·requestedBy: string
+·): Promise<string | null> {
+·try {
+κworkflowFile
+κresult
+⊰│`/repos/${OWNER}/${REPO}/actions/workflows/${workflowFile}/d
+·"POST",
+·{
+·ref: defaultBranch,
+·inputs,
+·}
+·);
+·if (result === null) {
+κresponse
+·"github",
+⊰│`/repos/${OWNER}/${REPO}/actions/workflows/${workflowFile}/d
+·{
+·method: "POST",
+⟠│body: JSON.stringify({ ref: defaultBranch, inputs }),
+·headers: { "Content-Type": "application/json" },
+·}
+·);
+·if (response.status !== 204 && !response.ok) {
+🚨│console.error(`[GITHUB COMPUTE] Dispatch failed for ${workfl
+⊷│return null;
+·}
+·}
+κjobId
+·inputs._jobToken = jobId;
+κjob
+⊡│activeJobs.set(jobId, job);
+·totalDispatches++;
+📢│console.log(`[GITHUB COMPUTE] 🚀 Dispatched ${workflowFile} 
+⏳│setTimeout(() => resolveJob(jobId), 30000);
+⊷│return jobId;
+·} catch (err) {
+🚨│console.error(`[GITHUB COMPUTE] Dispatch error:`, err);
+⊷│return null;
+·}
+·}
+⟿resolveJob(1)→Promise<void>⟨701⟩{⟿⊡⊄⊴⊰⊹📡⊛⏰⊳⊽⟠⊱📢⏳🚨❔⊻⥀⊩⊷⊲📁≋+⟳}
+⟩SCL│207│359⊨│265⑂│92.2%↓⟩

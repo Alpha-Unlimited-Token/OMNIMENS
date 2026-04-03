@@ -1,0 +1,7 @@
+⟨SCL v1│wasmAcceleratedOps_gen1.mjs│135→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩⟿gpuMatrixMultiply(2)→void⟨26⟩{⊩⊷}
+validateMatrices(2)→void⟨16⟩{⊵⊹}
+flattenMatrix(1)→void⟨13⟩{⊷}
+unflattenMatrix(3)→void⟨13⟩{⊺⊷}
+⟩SCL│6│11⊨│7⑂│95.6%↓⟩

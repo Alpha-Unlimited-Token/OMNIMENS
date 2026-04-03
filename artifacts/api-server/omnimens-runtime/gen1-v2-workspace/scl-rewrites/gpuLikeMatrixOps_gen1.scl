@@ -1,0 +1,15 @@
+⟨SCL v1│gpuLikeMatrixOps_gen1.mjs│156→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+initializeWebGLContext(1)→void⟨11⟩{⊲⊵⊷}
+createShader(3)→void⟨13⟩{⊰⊵⊷}
+createProgram(3)→void⟨17⟩{⊰⊵⊷}
+multiplyMatrices(2)→void⟨41⟩{⊹⊵⊷}
+multiplyMatrixVector(2)→void⟨15⟩{⊹⊵⊷}
+Ε.exports = {
+·initializeWebGLContext,
+·createShader,
+·createProgram,
+·multiplyMatrices,
+·multiplyMatrixVector
+·};
+⟩SCL│14│21⊨│15⑂│91.0%↓⟩

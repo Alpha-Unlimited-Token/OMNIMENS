@@ -1,0 +1,29 @@
+⟨SCL v1│memoryConsolidationModule_gen1.mjs│39→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export default class MemoryConsolidation {
+·constructor() {
+·this.memoryTraces = [];
+·}
+·applySTDP(inputTrace, outputTrace) {
+κlearningRate
+κtimeDifference
+·if (timeDifference > 0) {
+·inputTrace.weight += learningRate * Math.exp(-timeDifference);
+·} else {
+·inputTrace.weight -= learningRate * Math.exp(timeDifference);
+·}
+⊷│return inputTrace;
+·}
+·memoryReplay() {
+⥀│for (const trace of this.memoryTraces) {
+·trace.replayed = true;
+·}
+·}
+⊞(inputTrace, outputTrace) {
+κupdatedTrace
+⊺│this.memoryTraces.push(updatedTrace);
+·this.memoryReplay();
+⊷│return this.memoryTraces;
+·}
+·}
+⟩SCL│28│9⊨│5⑂│28.2%↓⟩

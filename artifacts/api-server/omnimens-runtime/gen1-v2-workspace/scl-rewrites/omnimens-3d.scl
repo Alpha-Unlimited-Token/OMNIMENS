@@ -1,0 +1,101 @@
+⟨SCL v1│omnimens-3d.ts│153→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+·OMNIMENS 3D Generation Engine (v2.0) — Event-Driven, Unified Runtime
+·──────────────────────────────────────────────────────────────────────────────*/
+⊫[]
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[omnimens-blender│omnimens-openscad]
+κexecFileAsync
+·engineRegistry.registerEngine("3d", "NORMAL", { dbQuota: 10 });
+⊱│spikeBus.on("3d:cycle", async () => {
+⚡→│spikeBus.scheduleSpike("3d:cycle", {}, 5_000);
+·});
+⚡→│spikeBus.scheduleSpike("3d:cycle", {}, 5_000); // kick-off
+⊱│cognitionBus.onInsight((src, insight) => {
+❔│if (src !== "3d" && insight?.type === "discovery") {
+·console.log("[OMNIMENS-3D] Learned from", src, insight);
+·}
+·});
+⊭│export type Generated3DModel = {
+·glbBase64: string;
+·glbSizeBytes: number;
+·threejsHtml: string;
+·pythonScript: string;
+·description: string;
+·vertexCount: number;
+·faceCount: number;
+⊳│toolUsed?: "blender" | "openscad" | "trimesh";
+⊳│previewImageBase64?: string;
+⊳│zipBase64?: string;
+⊳│zipSizeBytes?: number;
+⊳│formats?: string[];
+·};
+κTRIMESH_SYS_PROMPT
+⊞ a ⊣ Python script that uses only trimesh/numpy/scipy/pillow.
+·Export a watertight, manifold .glb to os.environ['OUTPUT_PATH'] with artistic de
+κexecPy
+·script: string
+·): Promise<{ buf: Buffer; v: number; f: number }> => {
+κdir
+⊴│await mkdir(dir, { recursive: true });
+κpy
+κout
+κstats
+κfull
+⊫[]
+⊽│m=trimesh.load('${out.replace(/\\/g, "/")}')
+·d={'vertices':len(getattr(m,'vertices',[])), 'faces':len(getattr(m,'faces',[]))}
+⊽│open('${stats.replace(/\\/g, "/")}',"w").write(json.dumps(d)
+⊴│await writeFile(py, full, "utf8");
+⊴│await execFileAsync("python3", [py], {
+·timeout: 120_000,
+env: { ...↻.env, OUTPUT_PATH: out },
+·maxBuffer: 10 * 1024 * 1024,
+⊱│}).catch((e) => {
+·console.error("[OMNIMENS-3D] Python error:", e.message);
+·throw e;
+·});
+⫘│const [buf, raw] = await Promise.all([
+·readFile(out),
+·readFile(stats, "utf8").catch(() => '{"vertices":0,"faces":0}'),
+·]);
+·let s = { vertices: 0, faces: 0 };
+·try {
+⟠│s = JSON.parse(raw);
+·} catch {}
+⫘│Promise.all([unlink(py), unlink(out), unlink(stats)]).catch(
+⊷│return { buf, v: s.vertices, f: s.faces };
+·};
+⊰│const minViewer = (b64: string, title: string) => `<!DOCTYPE
+⊫[]
+κr
+κs
+κo
+κl
+·const bytes=Uint8Array.from(atob("${b64}"),c=>c.charCodeAt(0));
+new GLTFLoader().⋮(bytes.buffer,"",g=>{
+·s.add(g.scene);const box=new T.Box3().setFromObject(g.scene);
+κd
+·});
+⊱│window.addEventListener('resize',()=>{c.aspect=innerWidth/in
+·r.setSize(innerWidth,innerHeight);
+⊱│const loop=()=>{requestAnimationFrame(loop);o.update();r.ren
+·</script></body></html>`;
+·const ai = (payload: unknown) =>
+·apiManager.call("3d", "openai", payload) as Promise<any>;
+κclassifyPromptFor3DTool
+·prompt: string
+·): Promise<"blender" | "openscad" | "trimesh"> => {
+⊷│return "trimesh";
+·};
+·const genTrimeshScript = async (prompt: string): Promise<string> => {
+κres
+❔│let script = res.choices?.[0]?.message?.content || "";
+κm
+⟩SCL│100│51⊨│27⑂│34.6%↓⟩

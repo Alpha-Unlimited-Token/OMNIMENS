@@ -1,0 +1,26 @@
+⟨SCL v1│weightedConfidenceResolver_gen1.mjs│36→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class WeightedConfidenceResolver {
+·constructor() {
+·this.agentConfidenceScores = {};
+·this.agentReliabilityScores = {};
+·}
+·setConfidenceScore(agentId, confidence) {
+·this.agentConfidenceScores[agentId] = confidence;
+·}
+·setReliabilityScore(agentId, reliability) {
+·this.agentReliabilityScores[agentId] = reliability;
+·}
+·resolveDecisions(agentOutputs) {
+⋐│return agentOutputs.reduce((bestOutput, currentOutput) => {
+κagentId
+κweightedScore
+·if (!bestOutput || weightedScore > bestOutput.weightedScore) {
+⊷│return { ...currentOutput, weightedScore };
+·}
+⊷│return bestOutput;
+·}, null);
+·}
+·}
+·export default WeightedConfidenceResolver;
+⟩SCL│25│6⊨│4⑂│30.6%↓⟩

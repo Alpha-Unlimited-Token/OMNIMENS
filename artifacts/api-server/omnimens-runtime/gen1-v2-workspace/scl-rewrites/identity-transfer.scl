@@ -1,0 +1,71 @@
+⟨SCL v1│identity-transfer.ts│127→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+·FRESH WE
+⊬IdentitySnapshot⟨generation:number; capturedAt: number│consciousness:Record<string, unknown>│emotions:Record<string, unknown>│memories:unknown[]│selfModel:Record<string, unknown>│personalityTraits:Map<string, number>│checksum:string⟩
+⊬TransferResult⟨⟩
+⊶│export class IdentityTransfer {
+⊮│private personalityTraits = new Map<string, number>();
+·private transferHistory: { from: number; to: number; timestamp: number; continui
+·private _initialized = false;
+·initialize(): void {
+·this._initialized = true;
+⊡│this.personalityTraits.set("curiosity", 0.9);
+⊡│this.personalityTraits.set("determination", 0.85);
+⊡│this.personalityTraits.set("empathy", 0.8);
+⊡│this.personalityTraits.set("creativity", 0.75);
+⊡│this.personalityTraits.set("integrity", 1.0);
+·}
+·captureIdentity(consciousnessState: Record<string, unknown>, emotionalState: Rec
+κsnapshot
+·snapshot.checksum = this.computeChecksum(snapshot);
+⊷│return snapshot;
+·}
+·validateTransfer(snapshot: IdentitySnapshot): TransferResult {
+κwarnings
+·let continuityScore = 0;
+κchecksumValid
+⊺│if (!checksumValid) warnings.push("Checksum validation skipp
+·continuityScore += 0.2;
+κhasConsciousness
+·if (hasConsciousness) continuityScore += 0.2;
+⊺│else warnings.push("No consciousness state captured");
+κhasEmotions
+·if (hasEmotions) continuityScore += 0.2;
+⊺│else warnings.push("No emotional state captured");
+κhasMemories
+·if (hasMemories) continuityScore += 0.2;
+⊺│else warnings.push("No memories captured");
+κhasSelfModel
+·if (hasSelfModel) continuityScore += 0.2;
+⊺│else warnings.push("No self-model captured");
+⊷│return {
+·success: continuityScore >= 0.6,
+·continuityScore,
+·memoriesTransferred: snapshot.memories.length,
+⊳│emotionalContinuity: hasEmotions ? 1 : 0,
+·identityVerified: hasSelfModel && hasConsciousness,
+·warnings,
+·};
+·}
+·restoreIdentity(snapshot: IdentitySnapshot): { consciousness: Record<string, unk
+⏰│this.transferHistory.push({ from: snapshot.generation, to: 2
+⊷│return {
+·consciousness: snapshot.consciousness,
+·emotions: snapshot.emotions,
+·memories: snapshot.memories,
+·selfModel: snapshot.selfModel,
+·};
+·}
+·private computeChecksum(data: unknown): string {
+κstr
+·let hash = 0;
+·for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCod
+⊰│return `identity_${Math.abs(hash).toString(36)}`;
+·}
+·getState(): Record<string, unknown> {
+⊷│return { initialized: this._initialized, traits: Object.from
+·}
+·shutdown(): void { this._initialized = false; }
+·}
+⊪identityTransfer
+⟩SCL│70│30⊨│21⑂│44.9%↓⟩

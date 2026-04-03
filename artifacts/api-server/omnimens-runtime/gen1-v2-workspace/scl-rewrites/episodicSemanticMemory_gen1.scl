@@ -1,0 +1,22 @@
+⟨SCL v1│episodicSemanticMemory_gen1.mjs│34→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊶│export class EpisodicSemanticMemory {
+·constructor(memorySize) {
+·this.memory = [];
+·this.memorySize = memorySize;
+·}
+·addMemory(event) {
+⊹│if (this.memory.length >= this.memorySize) {
+⊺│this.memory.shift();
+·}
+⊺│this.memory.push(event);
+·}
+·retrieveMemory(query) {
+⊷│return this.memory.find(mem => this.matchMemory(query, mem))
+·}
+·matchMemory(query, memory) {
+⊷│return tf.losses.cosineDistance(query, memory, 0).dataSync()
+·}
+·}
+⟩SCL│21│7⊨│6⑂│38.2%↓⟩

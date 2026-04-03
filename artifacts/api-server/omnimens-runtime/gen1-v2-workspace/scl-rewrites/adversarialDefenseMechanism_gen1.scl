@@ -1,0 +1,22 @@
+⟨SCL v1│adversarialDefenseMechanism_gen1.mjs│30→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊪adversarialDefenseMechanism
+⊹│if (typeof input !== 'string' || input.length > 1000) {
+⊺│flags.push('malformedInput');
+·}
+⊽│if (/\b(exploit|hack|attack)\b/.test(input)) {
+⊺│flags.push('adversarialPattern');
+·}
+⊷│return flags;
+·},
+·applyCorrections: function(flags) {
+⊻│if (flags.includes('malformedInput')) {
+⊷│return 'Input rejected due to invalid format.';
+·}
+⊻│if (flags.includes('adversarialPattern')) {
+⊷│return 'Input flagged for adversarial behavior.';
+·}
+⊷│return 'Input accepted.';
+·}
+·};
+⟩SCL│21│11⊨│10⑂│30.0%↓⟩

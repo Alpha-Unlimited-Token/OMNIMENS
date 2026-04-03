@@ -1,0 +1,11 @@
+⟨SCL v1│selfHostedTransformer_gen1.mjs│112→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+κACTIVATION_FUNCTIONS
+⊩applyTransformerLayer(3)→void⟨14⟩{⊩⊰⊵⊱⊷⋐}
+⊩generateEmbedding(2)→void⟨9⟩{⊩⊱⊷}
+⊩cosineSimilarity(2)→void⟨11⟩{⊩⊹⊵⋐⊷}
+⊩similaritySearch(2)→void⟨10⟩{⊩⊱⊷}
+⊩quantizeWeights(2)→void⟨7⟩{⊩⟛⊷}
+⊪MODULE_DESCRIPTION
+⟩SCL│10│28⊨│20⑂│91.1%↓⟩

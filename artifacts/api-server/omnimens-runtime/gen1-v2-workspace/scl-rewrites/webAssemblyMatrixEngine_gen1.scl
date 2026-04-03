@@ -1,0 +1,11 @@
+⟨SCL v1│webAssemblyMatrixEngine_gen1.mjs│103→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+κwasi
+·let wasmInstance;
+⟿initializeWasm(1)→void⟨10⟩{⊴}
+⊩⟿multiplyMatrices(2)→void⟨25⟩{⊩⊴⊵⊺⊷}
+⊩⟿computeEigenvalues(1)→void⟨17⟩{⊩⊴⊵⊷}
+⊩⟿performLUDecomposition(1)→void⟨26⟩{⊩⊴⊵⊺⊷}
+⊩⟿initialize(1)→void⟨3⟩{⊩⊴}
+⟩SCL│10│24⊨│17⑂│90.3%↓⟩

@@ -1,0 +1,31 @@
+⟨SCL v1│bayesianConfidenceModule_gen1.mjs│43→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class BayesianConfidence {
+·constructor() {
+·this.prior = {};
+·this.evidence = {};
+·}
+·setPrior(variable, probability) {
+·this.prior[variable] = probability;
+·}
+·updateEvidence(variable, evidenceProbability) {
+·this.evidence[variable] = evidenceProbability;
+·}
+·calculatePosterior(variable) {
+·if (!this.prior[variable] || !this.evidence[variable]) {
+⊵│throw new Error('Prior or evidence missing for variable');
+·}
+κlikelihood
+κprior
+κposterior
+⊷│return posterior;
+·}
+·getConfidenceScore(variable) {
+⊷│return this.calculatePosterior(variable);
+·}
+·}
+κconfidenceModule
+·confidenceModule.setPrior('taskSuccess', 0.7);
+·confidenceModule.updateEvidence('taskSuccess', 0.9);
+·console.log(confidenceModule.getConfidenceScore('taskSuccess'));
+⟩SCL│30│8⊨│4⑂│30.2%↓⟩

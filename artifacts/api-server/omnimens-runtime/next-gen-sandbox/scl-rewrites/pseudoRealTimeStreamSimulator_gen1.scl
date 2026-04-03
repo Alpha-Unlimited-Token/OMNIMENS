@@ -1,0 +1,12 @@
+⟨SCL v1│pseudoRealTimeStreamSimulator_gen1.mjs│102→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+κcache
+⊩⟿fetchData(1)→void⟨7⟩{⊩⊴⊰⊵⊷}
+⊩cacheData(3)→void⟨4⟩{⊩⏰⊡}
+⊩getCachedData(1)→void⟨8⟩{⊩⊡⏰⊷}
+⊩⟿simulateRealTimeStream(3)→void⟨12⟩{⊩⊴⊰⏳}
+⊩queryLatestData(1)→void⟨4⟩{⊩⊷}
+⊩clearExpiredCache(1)→void⟨8⟩{⊩⏰}
+⊩getCacheStatus(1)→void⟨3⟩{⊩⊱⊷}
+⟩SCL│11│32⊨│23⑂│89.2%↓⟩

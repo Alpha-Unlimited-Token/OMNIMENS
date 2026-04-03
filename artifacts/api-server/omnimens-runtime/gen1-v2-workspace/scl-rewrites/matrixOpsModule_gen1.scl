@@ -1,0 +1,7 @@
+⟨SCL v1│matrixOpsModule_gen1.mjs│104→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⟿compileWasmMatrixMultiplication(1)→void⟨13⟩{⊷}
+⊩⟿multiplyMatrices(5)→void⟨23⟩{⊩⊹⊵⊴⊲⊡⊷}
+⊩dotProduct(2)→void⟨12⟩{⊩⊹⊵⊷}
+⊩transposeMatrix(3)→void⟨11⟩{⊩⊷}
+⟩SCL│6│18⊨│14⑂│94.2%↓⟩

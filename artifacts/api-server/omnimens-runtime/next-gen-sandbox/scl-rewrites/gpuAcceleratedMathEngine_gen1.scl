@@ -1,0 +1,14 @@
+⟨SCL v1│gpuAcceleratedMathEngine_gen1.mjs│131→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+κfs
+κpath
+⟿loadWasm(1)→void⟨6⟩{📁⊷}
+⟿matrixMultiply(2)→void⟨31⟩{⊹⊵⊴⊲⊡⊺⊷}
+⟿dotProduct(2)→void⟨16⟩{⊹⊵⊴⊲⊡⊷}
+⟿vectorAdd(2)→void⟨19⟩{⊹⊵⊴⊲⊡⊷}
+Ε.exports = {
+·matrixMultiply,
+·dotProduct,
+·vectorAdd
+·};
+⟩SCL│13│28⊨│21⑂│90.1%↓⟩

@@ -1,0 +1,41 @@
+⟨SCL v1│vectorStoreNode_gen1.mjs│115→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│class HNSWNode {
+·constructor(vector, id) {
+·this.vector = vector;
+·this.id = id;
+·this.neighbors = []; // Neighbors in the graph
+·}
+·}
+euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
+⊶│class HNSW {
+·constructor() {
+·this.nodes = []; // All nodes in the graph
+·}
+·addVector(vector) {
+κid
+κnewNode
+⊱│this.nodes.forEach((node) => {
+κdistance
+⊺│node.neighbors.push({ node: newNode, distance });
+⊺│newNode.neighbors.push({ node, distance });
+·});
+·newNode.neighbors.sort((a, b) => a.distance - b.distance);
+⊺│this.nodes.push(newNode);
+⊷│return id;
+·}
+·search(queryVector, k) {
+·if (k <= 0) {
+⊵│throw new Error("k must be greater than 0.");
+·}
+κresults
+⊱│this.nodes.forEach((node) => {
+κdistance
+⊺│results.push({ id: node.id, distance });
+·});
+⊷│return results.sort((a, b) => a.distance - b.distance).slice
+·}
+·}
+⊩createHNSW(1)→void⟨3⟩{⊩⊷}
+·export { euclideanDistance };
+⟩SCL│40│24⊨│17⑂│65.2%↓⟩

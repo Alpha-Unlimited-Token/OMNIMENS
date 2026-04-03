@@ -1,0 +1,28 @@
+⟨SCL v1│graphRagMemory_gen1.mjs│38→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊶│export class GraphRAGMemory {
+·constructor() {
+·this.graph = new Graph({ directed: true });
+·}
+·addNode(entity, data) {
+·if (!this.graph.hasNode(entity)) {
+·this.graph.setNode(entity, data);
+·}
+·}
+addEdge(η, θ, relationship) {
+if (!this.graph.hasEdge(η, θ)) {
+this.graph.setEdge(η, θ, relationship);
+·}
+·}
+·queryGraph(entity) {
+⊷│return {
+·node: this.graph.node(entity),
+·edges: this.graph.outEdges(entity).map(edge => ({
+θ: edge.w,
+·relationship: this.graph.edge(edge)
+·}))
+·};
+·}
+·}
+⟩SCL│27│7⊨│2⑂│28.9%↓⟩

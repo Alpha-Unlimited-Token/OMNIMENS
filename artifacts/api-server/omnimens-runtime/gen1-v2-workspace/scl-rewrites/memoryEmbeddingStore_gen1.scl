@@ -1,0 +1,17 @@
+⟨SCL v1│memoryEmbeddingStore_gen1.mjs│97→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+κembeddingStore
+cosineSimilarity(2)→void⟨15⟩{⊹⊵⋐⊷}
+addEmbedding(3)→void⟨1⟩{}
+if (!ι.isArray(embedding) || embedding.some(isNaN)) {
+⊵│throw new Error('Embedding must be an array of numbers.');
+·}
+⊡│embeddingStore.set(id, { embedding, metadata });
+·}
+retrieveRelevantEmbeddings(2)→void⟨11⟩{⊵⊺}
+⊷│return results.sort((a, b) => b.similarity - a.similarity).s
+·}
+clearStore(1)→void⟨3⟩{}
+getStoreSize(1)→void⟨3⟩{⊷}
+·export { addEmbedding, retrieveRelevantEmbeddings, clearStore, getStoreSize };
+⟩SCL│16│17⊨│10⑂│83.5%↓⟩

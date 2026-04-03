@@ -1,0 +1,6 @@
+⟨SCL v1│webAssemblyMatrixOps_gen1.mjs│92→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩⟿initializeWasmModule(1)→void⟨13⟩{⊩⊷}
+⊩⟿addMatrices(2)→void⟨18⟩{⊩⊹⊵⊴⊷}
+⊩⟿multiplyMatrices(2)→void⟨23⟩{⊩⊵⊴⊷}
+⟩SCL│5│14⊨│11⑂│94.6%↓⟩

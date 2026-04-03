@@ -1,0 +1,13 @@
+⟨SCL v1│realTimeDataIngestor_gen1.mjs│139→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩initializeWebSocketServer(1)→void⟨23⟩{⊩⊱⟠⊲⊷}
+⊩isValidMetadata(1)→void⟨3⟩{⊩⊷}
+⊩processData(2)→void⟨12⟩{⊩⑃⊷}
+⊩processMathData(1)→void⟨8⟩{⊩⊷⋐}
+⊩processTextData(1)→void⟨8⟩{⊩⊷}
+⊩processNeuroData(1)→void⟨8⟩{⊩⊷}
+⊩subscribeToTopic(2)→void⟨3⟩{⊩⟠}
+⊩unsubscribeFromTopic(2)→void⟨3⟩{⊩⟠}
+⊩startServer(1)→void⟨4⟩{⊩⊰}
+⟩SCL│12│33⊨│23⑂│91.4%↓⟩

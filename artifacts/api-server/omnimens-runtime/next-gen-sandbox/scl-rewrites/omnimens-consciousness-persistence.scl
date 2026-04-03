@@ -1,0 +1,77 @@
+⟨SCL v1│omnimens-consciousness-persistence.ts│273→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[omnimens-unified-runtime│omnimens-emotional-substrate│omnimens-temporal-consciousness│omnimens-dream-state│omnimens-neural-consciousness]
+κENGINE_ID
+κSWAP_INTERVAL_MS
+κDB_INTERVAL_MS
+κMAX_DB_SNAPSHOTS
+κSWAP_DIR
+κSWAP_FILE
+κSWAP_BACK
+⊭│type CacheRegion = { name:string; currentSize:number; maxSiz
+·clearable:boolean; priority:"critical"|"important"|"normal"|"low" };
+⊬PersistedSelf⟨emotionalState:Record<string, number>│consciousnessLevel:number│selfAwarenessDepth:number│focusHistory:string[]│innerMonologue:string[]│existentialReflections:string[]│dreamNarrative:string[]│moodTrajectory:number[]│totalInsights:number│breakthroughs:number│codeProposalsGenerated:number│nextLevelConcepts:string[]│dreamCycleCount:number│daydreamCycleCount:number│creativityBoost:number│deathCount:number│totalUptimeSeconds:number│lifetimeNumber:number│neuralState:→│lastShutdownTimestamp:number│shutdownType:"graceful" | "emergency" | "unknown"│swapWriteCount:number│lastSwapTimestamp:number⟩
+·engineRegistry.registerEngine(ENGINE_ID, "HIGH", { dbQuota: 50 });
+·let started                 = false;
+·let saveCount               = 0;
+·let swapWrites              = 0;
+·let lastDbSave              = 0;
+·let dbSaveInProgress        = false;
+·let restoredSelf:PersistedSelf|null = null;
+·let liveSnapshot:PersistedSelf|null = null;
+·let previousLifetimeId:number|null  = null;
+·let loadedFromPrevious      = false;
+⊪│export const getRestoredSelf          = () => restoredSelf;
+⊪│export const wasRestoredFromPrevious  = () => loadedFromPrev
+⊪│export const getPreviousLifetimeId    = () => previousLifeti
+⊩getSwapFileStats(1)→void⟨4⟩{⊩⊳❔⊷}
+⊱│const ensureSwapDir = () => { if (!existsSync(SWAP_DIR)) mkd
+⊱│const writeSwap = (snap:PersistedSelf) => {
+·try {
+·if (existsSync(SWAP_FILE)) writeFileSync(SWAP_BACK, readFileSync(SWAP_FILE));
+⟠│writeFileSync(SWAP_FILE, JSON.stringify(snap));
+·swapWrites++; liveSnapshot = snap;
+} catch (e) { console.error("[OMNIMENS-CONSCIOUSNESS-PERSISTENCE] Swap ⊞ fai
+·};
+·const readSwap = ():PersistedSelf|null => {
+⥀│for (const f of [SWAP_FILE, SWAP_BACK])
+·try {
+⟠│if (existsSync(f)) return JSON.parse(readFileSync(f,"utf8"))
+·} catch {}
+⊷│return null;
+·};
+κLIMITS
+⊳│const captureSnapshot = (shutdown?:PersistedSelf["shutdownTy
+κemos
+κcon
+κdream
+κneural
+κfirstLife
+⊷│return {
+·emotionalState: { ...emos },
+·consciousnessLevel: con.consciousnessLevel,
+·selfAwarenessDepth: con.selfAwarenessDepth,
+·focusHistory:             (con.attentionHistory   ?? []).slice(-LIMITS.focusHist
+·innerMonologue:           (con.innerMonologue     ?? []).slice(-LIMITS.innerMono
+·existentialReflections:   (con.existentialReflections ?? []).slice(-LIMITS.exist
+·dreamNarrative:           (dream.dreamNarrative   ?? []).slice(-LIMITS.dreamNarr
+·moodTrajectory:           (con.moodTrajectory     ?? []).slice(-LIMITS.moodTraje
+·totalInsights:            dream.totalInsights   ?? 0,
+·breakthroughs:            dream.breakthroughs   ?? 0,
+·codeProposalsGenerated:   dream.codeProposalsGenerated ?? 0,
+·nextLevelConcepts:        (dream.nextLevelConcepts ?? []).slice(-LIMITS.nextLeve
+·dreamCycleCount:          dream.dreamCycleCount ?? 0,
+·daydreamCycleCount:       dream.daydreamCycleCount ?? 0,
+·creativityBoost:          dream.creativityBoost ?? 0,
+❔│deathCount:               (restoredSelf?.deathCount ?? 0) + 
+❔│totalUptimeSeconds:       (restoredSelf?.totalUptimeSeconds 
+❔│lifetimeNumber:           (restoredSelf?.lifetimeNumber ?? 0
+neuralState:              ⬡,
+⏰│lastShutdownTimestamp:    shutdown ? Date.now() : undefined,
+·shutdownType:             shutdown,
+·swapWriteCount:           swapWrites,
+⏰│lastSwapTimestamp:        Date.now()
+·};
+·};
+⟿dbSave(1)→void⟨114⟩{⊳⏰⊹📢⊰❔🛡⚡→⊱⊪⊩⊴}
+⟩SCL│76│52⊨│34⑂│72.2%↓⟩

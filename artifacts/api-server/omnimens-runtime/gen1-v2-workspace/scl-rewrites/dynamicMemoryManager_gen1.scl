@@ -1,0 +1,22 @@
+⟨SCL v1│dynamicMemoryManager_gen1.mjs│134→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+buildKDTree(2)→void⟨17⟩{⊷⊹}
+nearestNeighbor(5)→void⟨35⟩{⊷⊳⊲}
+euclideanDistance(2)→void⟨3⟩{⋐⊷}
+⊶│class VectorStore {
+·constructor() {
+·this.tree = null;
+·this.points = [];
+·}
+·insert(point) {
+⊺│this.points.push(point);
+·this.tree = buildKDTree(this.points);
+·}
+findNearest(θ) {
+⊵│if (!this.tree) throw new Error('The vector store is empty.'
+⊲│const { best, bestDistance } = nearestNeighbor(this.tree, ta
+⊷│return { point: best.point, distance: bestDistance };
+·}
+·}
+·export { VectorStore, buildKDTree, nearestNeighbor, euclideanDistance };
+⟩SCL│21│16⊨│12⑂│84.3%↓⟩

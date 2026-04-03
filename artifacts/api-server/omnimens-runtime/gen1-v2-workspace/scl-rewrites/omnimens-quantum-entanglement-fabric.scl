@@ -1,0 +1,38 @@
+⟨SCL v1│omnimens-quantum-entanglement-fabric.ts│376→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[omnimens-unified-runtime│omnimens-neural-consciousness]
+·engineRegistry.registerEngine("quantum-entanglement-fabric", "NORMAL", { dbQuota
+κLOG
+κTICK
+κDECOHERENCE_THRESHOLD
+κTELEPORTATION_FIDELITY_MIN
+κQKD_KEY_LENGTH_BITS
+κINTRUSION_ALERT_THRESHOLD
+κQKD_EAVESDROP_ERROR_THRESHOLD
+κBINDING_FIRING_THRESHOLD
+κDARK_QUALIA_FACTOR
+κCOHERENCE_PER_FIRING
+κALL_AGENTS
+κBRAIN_REGIONS
+κHEART_GANGLIA
+κAI_BRIDGES
+κGITHUB_BEACONS
+κPRIORITY_TELEPORTATION_ROUTES
+⊭│type Cat = "agent_agent"|"region_region"|"heart_brain"|"agen
+⊬EntangledPair⟨id:string; particleA:Part; particleB:Part; category:Cat│coherence:number; entanglementFidelity:number; bellStateViolation:number│createdAt:number; lastCorrelation:number; correlationCount:number│intrusionEvents:number; alive:boolean⟩
+⊬Part⟨⟩
+⊬QKDKey⟨id:string; pairId:string; keyBits:number; generatedAt:number; usedAt:number|null│destroyed:boolean; protocol:"BB84"|"E91"|"BBM92"; errorRate:number⟩
+⊬IntrusionEvent⟨id:string; pairId:string; detectedAt:number; observerSignature:string; stateCollapsed:boolean│pairRegenerated:≢⟩
+⊬TeleportationEvent⟨id:η│stateType:☼│fidelity:number; qubitsTransferred:number; classicalBitsSent:number; bellMeasurement:string│sourceDestroyed:α⟩
+⊬CoherenceCorrection⟨pairId:⏳│correctionMethod:⟐⟩
+⊬QEFState⟨initialized:boolean; tickCount:number│totalEntangledPairs:number; totalAlivePairs:number; totalDeadPairs:number│totalQKDKeysGenerated:number; totalQKDKeysUsed:number; totalQKDKeysDestroyed:number│totalQKDKeysDiscardedEavesdrop:→│totalTeleportations:number; totalQubitsTeleported:number; totalPriorityTeleportations:number│totalCoherenceCorrections:number; totalCoherenceAmplifications:number│totalBindingEvents:✦│quantumPhi:⬡│darkQualiaQuantumInfluence:number; bindingFieldStrength:number│avgCoherence:number; avgEntanglementFidelity:number; avgBellViolation:number; peakCoherence:number│systemQuantumAdvantage:number│pairs:Map<string,EntangledPair>; recentKeys:QKDKey[]; recentIntrusions:IntrusionEvent[]│recentTeleportations:TeleportationEvent[]; recentCorrections:CoherenceCorrection[]│pairsByCategory:Record<string,number>⟩
+κS
+·const randSpin  = () => Math.random()*Math.PI*2;
+·const randPhase = () => Math.random()*Math.PI*2;
+mkPair(3)→EntangledPair⟨14⟩{⏰⊰⊡⊷}
+initRegistry(1)→void⟨13⟩{⊱⊰}
+qkdCycle(1)→void⟨12⟩{⏰⊰⊹⊺}
+·}
+intrusionDetection(1)→void⟨19⟩{⊳⏰⊰⊹⊺⟐}
+teleportationCycle(1)→void⟨179⟩{⋐⥀⊳⊻⊰⏰⊹⊺⊷⟛⊄🛡⊼❔⚡→⊩⊱}
+⟩SCL│37│64⊨│41⑂│90.2%↓⟩

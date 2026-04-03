@@ -1,0 +1,50 @@
+⟨SCL v1│omnimens-agent-spiders.ts│221→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[web-search]
+engineRegistry.registerEngine("α-spiders", "NORMAL", { dbQuota: 10 });
+⊭│type AgentName =
+·| "Architect"
+·| "Critic"
+·| "Synthesizer"
+·| "Mathematician"
+·| "Neuroscientist"
+| "Meta-α"
+·| "GraphicDesigner"
+·| "SpellCheckVisual"
+·| "OMNIMENS";
+⊬SpiderConfig⟨agentName:α│huntingGrounds:string[]│deepDiveUrls:string[]│analysisPrompt:string│beaconThreshold:number⟩
+⊬Beacon⟨agentName:α│query:string│findings:string│actionableInsight:string│relevanceScore:number│sourceUrls:string[]│timestamp:number⟩
+κC
+·const rand = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+⏰│const now = () => Date.now();
+⊱│const safeNum = (v: number, f = 0) => (Number.isFinite(v) ? 
+⟿callLLM(1)→void⟨1⟩{}
+α: AgentName,
+·prompt: string,
+·model: string = "o3",
+·maxTokens = 800,
+·): Promise<string> {
+κres
+❔│return res?.choices?.[0]?.message?.content?.trim() || "";
+·}
+⟿writeBeacon(1)→void⟨8⟩{⊰}
+·);
+·}
+⟿processConfig(1)→void⟨69⟩{⊴⊹⊰⟠⊄}
+⟿cycle(1)→void⟨10⟩{⊴⚡→}
+⚡→│spikeBus.scheduleSpike("agent-spiders:cycle", {}, 5_000);
+⚡→│spikeBus.on("agent-spiders:cycle", cycle);
+⚡→│spikeBus.on("attention:agent-spiders", () => spikeBus.schedu
+⚡→│spikeBus.on("cognition:curiosity", () => spikeBus.scheduleSp
+⊱│cognitionBus.onInsight((_src, insight) => {
+·});
+⊩⟿runSpiderSwarm(1)→void⟨4⟩{⊩⚡→}
+⊩shutdown(1)→void⟨3⟩{⊩}
+⟩SCL│49│36⊨│23⑂│77.8%↓⟩

@@ -1,0 +1,88 @@
+⟨SCL v1│master-tick-orchestrator.ts│145→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊭│type TickTier = "critical" | "standard" | "background";
+⊬Subsystem⟨name:string│tier:TickTier│handler:() => void | Promise<void>│lastTick:number│tickCount:number│avgDuration:number│enabled:boolean│dependencies:string[]⟩
+κTIER_INTERVALS
+⊶│export class MasterTickOrchestrator {
+⊮│private subsystems = new Map<string, Subsystem>();
+·private tickTimer: ReturnType<typeof setInterval> | null = null;
+·private tickCount = 0;
+·private lastTickDuration = 0;
+·private skipNonCritical = false;
+·private resourceHealthy = true;
+·private running = false;
+·register(name: string, tier: TickTier, handler: () => void | Promise<void>, depe
+⊡│this.subsystems.set(name, {
+·name, tier, handler, lastTick: 0, tickCount: 0, avgDuration: 0, enabled: true, d
+·});
+·}
+·unregister(name: string): void {
+this.⊛.delete(name);
+·}
+·setResourceHealth(healthy: boolean): void {
+·this.resourceHealthy = healthy;
+·}
+·start(baseIntervalMs = 1000): void {
+·if (this.running) return;
+·this.running = true;
+⟳│this.tickTimer = setInterval(() => this.tick(), baseInterval
+·}
+·stop(): void {
+·if (this.tickTimer) clearInterval(this.tickTimer);
+·this.running = false;
+·}
+·private async tick(): Promise<void> {
+κtickStart
+·this.tickCount++;
+κsorted
+⥀│for (const sub of sorted) {
+·if (!sub.enabled) continue;
+κinterval
+κelapsed
+·if (elapsed < interval) continue;
+·if (this.skipNonCritical && sub.tier !== "critical") continue;
+·if (!this.resourceHealthy && sub.tier === "background") continue;
+·const depsReady = sub.dependencies.every(dep => {
+κdepSub
+⊷│return depSub && depSub.tickCount > 0;
+·});
+·if (!depsReady) continue;
+κsubStart
+·try {
+·await sub.handler();
+·} catch (err) {
+·}
+κsubDuration
+⏰│sub.lastTick = Date.now();
+·sub.tickCount++;
+·sub.avgDuration = sub.avgDuration * 0.9 + subDuration * 0.1;
+·}
+⏰│this.lastTickDuration = Date.now() - tickStart;
+·this.skipNonCritical = this.lastTickDuration > 2000;
+·}
+·private getDependencySortedSubsystems(): Subsystem[] {
+κsorted
+κvisited
+⊱│const visit = (name: string) => {
+·if (visited.has(name)) return;
+·visited.add(name);
+κsub
+⊄│if (!sub) return;
+⥀│for (const dep of sub.dependencies) visit(dep);
+⊺│sorted.push(sub);
+·};
+⥀│for (const name of this.subsystems.keys()) visit(name);
+⊷│return sorted;
+·}
+getStats(): { tickCount: number; lastTickDuration: number; ⊛: { name: s
+⊷│return {
+·tickCount: this.tickCount,
+·lastTickDuration: this.lastTickDuration,
+⊛: [...this.⊛.≢()].map(s => ({
+·name: s.name, tier: s.tier, tickCount: s.tickCount, avgDuration: Math.round(s.av
+·})),
+·};
+·}
+·}
+⊪orchestrator
+⟩SCL│87│32⊨│17⑂│40.0%↓⟩

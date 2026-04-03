@@ -1,0 +1,27 @@
+⟨SCL v1│coalaMemoryConsolidation_gen1.mjs│38→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class CoALAMemory {
+·constructor() {
+·this.episodicMemory = [];
+·this.semanticMemory = {};
+·this.proceduralMemory = [];
+·}
+categorizeMemory(η) {
+if (η.type === 'episodic') {
+⊺│this.episodicMemory.push(input.data);
+} else if (η.type === '◧') {
+this.semanticMemory[η.key] = η.data;
+} else if (η.type === 'procedural') {
+⊺│this.proceduralMemory.push(input.data);
+·}
+·}
+·consolidateMemory() {
+·this.episodicMemory = this.episodicMemory.slice(-100); // Keep only recent 100 e
+⊸│this.semanticMemory = Object.fromEntries(Object.entries(this
+this.proceduralMemory = this.proceduralMemory.slice(-50); // ⏳ size
+·}
+·}
+κmemory
+·memory.categorizeMemory({ type: 'episodic', data: 'User interaction log' });
+·memory.consolidateMemory();
+⟩SCL│26│11⊨│4⑂│31.6%↓⟩

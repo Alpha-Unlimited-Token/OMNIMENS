@@ -1,0 +1,8 @@
+⟨SCL v1│wasmMatrixOps_gen1.mjs│158→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⟿loadWasm(1)→void⟨11⟩{⊷}
+⟿multiplyMatrices(2)→void⟨36⟩{⊴⊲⊡⊺⊷}
+⟿invertMatrix(1)→void⟨34⟩{⊴⊲⊡⊵⊺⊷}
+⟿eigenDecomposition(1)→void⟨36⟩{⊴⊲⊡⊺⊷}
+·export { multiplyMatrices, invertMatrix, eigenDecomposition };
+⟩SCL│7│21⊨│17⑂│95.6%↓⟩

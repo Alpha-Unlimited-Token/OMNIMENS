@@ -1,0 +1,57 @@
+⟨SCL v1│omnimens-neural-spiders.ts│323→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+engineRegistry.registerEngine("⬡-spiders", "NORMAL", { dbQuota: 10 });
+⊭│type BeeRole =
+·| "worker"
+·| "nurse"
+·| "scout"
+·| "royal_jelly"
+·| "forager"
+·| "guard";
+⊭│type DirectiveType =
+·| "stabilize"
+·| "boost"
+·| "harvest"
+·| "patrol"
+·| "repair"
+·| "scout"
+·| "reinforce";
+⊬Spider⟨id:string│name:string│type:⊢│target:string│targetRegion:string│status:"active" | "dormant" | "expired"│crawlCount:number│synapsesInjected:number│currentDirectiveId:string│beeRole:BeeRole⟩
+⊬Harvest⟨source:string│metrics:Record<string, number>│healthScore:number│insights:number│ts:number⟩
+⊬Directive⟨id:string│type:DirectiveType│targetRegion:string│params:Record<string, any>│issued:number│done:number⟩
+κCRAWL_INTERVAL
+κHEARTBEAT_INTERVAL
+κCHILD_LIFETIME
+κCRIT_FLOOR
+κSTAB_THRESHOLD
+κparents
+κchildren
+κdirectives
+·const nid = (p = "s") =>
+⏰│`${p}_${Date.now().toString(36)}_${Math.random().toString(36
+κroles
+·const roleOf = (idx: number) => roles[idx % roles.length];
+⏰│const now = () => Date.now();
+📢│const log = (m: string) => console.log(`[OMNIMENS-NEURAL-SPI
+⟿harvestBrainDB(1)→Promise<Harvest>⟨16⟩{⊷⊳}
+⟿harvestEngines(1)→Promise<Harvest>⟨11⟩{⊲⊴❔⊷⊳}
+κharvesters
+createParent(3)→Spider⟨15⟩{⊡⊷}
+spawnChild(2)→Spider⟨20⟩{⊰⊡⚡→⊷}
+issueDirective(3)→void⟨1⟩{}
+κd
+⊡│directives.set(d.id, d);
+cognitionBus.shareInsight("⬡-spiders", {
+·type: "directive",
+·data: d,
+·});
+·}
+⟿crawl(1)→void⟨126⟩{⥀⊴⊺⊱⊡⊄⊰⚡→⊩⊷}
+⟩SCL│56│53⊨│33⑂│82.7%↓⟩

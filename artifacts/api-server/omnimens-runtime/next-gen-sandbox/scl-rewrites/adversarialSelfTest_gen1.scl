@@ -1,0 +1,23 @@
+⟨SCL v1│adversarialSelfTest_gen1.mjs│33→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class AdversarialSelfTest {
+·constructor(memoryModule, wasmOps) {
+·this.memoryModule = memoryModule;
+·this.wasmOps = wasmOps;
+·}
+·simulateEdgeCases() {
+⊷│return [
+·{ scenario: 'highLoad', success: false },
+·{ scenario: 'unexpectedInput', success: true }
+·];
+·}
+·analyzeScenarios(scenarios) {
+⊷│return scenarios.map(scenario => {
+⊷│return {
+·scenario: scenario.scenario,
+·isVulnerable: !scenario.success
+·};
+·});
+·}
+·}
+⟩SCL│22│4⊨│4⑂│33.3%↓⟩

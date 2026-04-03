@@ -1,0 +1,6 @@
+⟨SCL v1│semanticContextSummarizer_gen1.mjs│93→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩generateEmbeddings(1)→void⟨21⟩{⊩⊵⊷⊽⊱⋐}
+⊩clusterEmbeddings(2)→void⟨33⟩{⊩⊵⋐⊷⟛⊺⊱⊹}
+⊩summarizeContext(2)→void⟨4⟩{⊩⊷}
+⟩SCL│5│19⊨│16⑂│94.6%↓⟩

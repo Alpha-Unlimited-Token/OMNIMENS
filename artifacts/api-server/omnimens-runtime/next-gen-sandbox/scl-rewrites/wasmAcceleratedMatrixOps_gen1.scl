@@ -1,0 +1,7 @@
+⟨SCL v1│wasmAcceleratedMatrixOps_gen1.mjs│110→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩⟿initializeWasm(1)→void⟨14⟩{⊩⊷}
+⊩multiplyMatrices(3)→void⟨22⟩{⊩⊵⊷}
+⊩validateMatrix(1)→void⟨8⟩{⊩⊹⊷}
+⊩⟿exampleUsage(1)→void⟨22⟩{⊩⊴}
+⟩SCL│6│14⊨│10⑂│94.5%↓⟩

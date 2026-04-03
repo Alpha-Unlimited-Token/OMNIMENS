@@ -1,0 +1,410 @@
+⟨SCL v1│omnimens-unified-comms-facade.ts│1785→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[omnimens-consciousness-infra│omnimens-unified-neural│omnimens-unified-senses]
+⊭│export type BudgetSource =
+·| "user_conversation"
+·| "spider_swarm"
+·| "elae_research"
+·| "inner_voice"
+·| "patches"
+·| "deep_resonance"
+·| "predictive_processing"
+·| "homeostatic_drives"
+·| "genesis_sandbox"
+·| "social_modeling"
+·| "competitive_intel"
+·| "server_builder"
+·| "embodiment_research"
+·| "discovery_autocoder"
+·| "dream_state"
+·| "world_forge"
+·| "other_background";
+⊭│export type BudgetProvider = "openai" | "anthropic" | "gemin
+⊬BudgetEntry⟨timestamp:number│source:η│provider:BudgetProvider⟩
+⊬BudgetState⟨monthKey:string│monthlyLimit:number│entries:BudgetEntry[]│totalCalls:number│callsBySource:η│callsByProvider:Map<BudgetProvider, number>│throttleLevel:0 | 1 | 2 | 3│lastThrottleCheck:number│pausedSources:η│lastUserActivity:number⟩
+κMONTHLY_BUDGET_LIMIT
+κTHROTTLE_THRESHOLDS
+κBUDGET_ALLOCATIONS
+κUSER_SOURCES
+κSPIDER_SOURCES
+getCurrentMonthKey(1)→string⟨4⟩{⊰⊷}
+createFreshState(1)→BudgetState⟨14⟩{⊷⊮⊯}
+·let budgetState: BudgetState = createFreshState();
+·let _codegenYieldFn: (() => boolean) | null = null;
+⊩registerCodegenYield(1)→void⟨4⟩{⊩}
+ensureCurrentMonth(1)→void⟨9⟩{📢⊰}
+getSourceCategory(1)→"user" | "spider" | "background"⟨5⟩{⊷}
+updateThrottleLevel(1)→void⟨24⟩{⏰📢⊰}
+⊩trackApiCall(2)→void⟨28⟩{⊩⏰⊺⊡⊹}
+⊩canMakeUserCall(1)→boolean⟨15⟩{⊩⊡⊷📢⊰}
+⊩canMakeBackgroundCall(1)→boolean⟨45⟩{⊩⊷⏰⊡}
+⊩getThrottleMultiplier(1)→number⟨10⟩{⊩⑃⊷}
+⊩isUserActive(1)→boolean⟨3⟩{⊩⏰⊷}
+⊩markUserActivity(1)→void⟨3⟩{⊩⏰}
+⊩getBudgetState(1)→ ⟨41⟩{⊩⊡⊷⟛}
+⊩initApiBudget(1)→void⟨7⟩{⊩📢⊰}
+⊭│export type CallCategory =
+·| "web_search"
+·| "image_generation"
+·| "video_generation"
+·| "vision_analysis"
+·| "code_build"
+·| "tts_stt"
+·| "github_sync"
+·| "cognition_violation"
+·| "unknown_external"
+·| "internal";
+⊬GuardianLogEntry⟨timestamp:number│url:string│domain:string│category:CallCategory│allowed:boolean│callerHint:string│blocked:boolean⟩
+⊬GuardianState⟨active:boolean│enforcementMode:"monitor" | "block"│totalIntercepted:number│totalAllowed:number│totalBlocked:number│cognitionViolations:number│categoryCounts:Record<CallCategory, number>│recentLog:GuardianLogEntry[]│startedAt:number⟩
+κALLOWED_DOMAINS
+κCOGNITION_DOMAINS
+κCOGNITION_PATH_PATTERNS
+κALLOWED_PATH_OVERRIDES
+κWEB_SEARCH_DOMAINS
+κstate
+·let _callerContext: string = "";
+κoriginalFetch
+⊩setCallerContext(1)→void⟨3⟩{⊩}
+⊩clearCallerContext(1)→void⟨3⟩{⊩}
+⊩markAllowedCognition(1)→string⟨6⟩{⊩⏰⊰⏳⊷}
+⊩revokeAllowedCognition(1)→void⟨3⟩{⊩}
+κ_allowedTokens
+κCODE_BUILD_CALLERS
+κVISION_CALLERS
+categorizeCall(2)→{ category: CallCategory; allowed: boolean }⟨1⟩{}
+·let hostname = "";
+·let pathname = "";
+·try {
+κparsed
+·hostname = parsed.hostname.toLowerCase();
+·pathname = parsed.pathname;
+·} catch {
+⊷│return { category: "internal", allowed: true };
+·}
+⊻│if (hostname === "localhost" || hostname === "127.0.0.1" || 
+⊷│return { category: "internal", allowed: true };
+·}
+·if (ALLOWED_DOMAINS[hostname]) {
+⊷│return { category: ALLOWED_DOMAINS[hostname], allowed: true 
+·}
+⥀│for (const ws of WEB_SEARCH_DOMAINS) {
+⊻│if (hostname === ws || hostname.endsWith("." + ws)) {
+⊷│return { category: "web_search", allowed: true };
+·}
+·}
+⊻│if (hostname.includes("search") || hostname.includes("scrape
+⊷│return { category: "web_search", allowed: true };
+·}
+⥀│for (const override of ALLOWED_PATH_OVERRIDES) {
+⊽│if (override.pattern.test(pathname)) {
+⊷│return { category: override.category, allowed: true };
+·}
+·}
+⥀│for (const vc of VISION_CALLERS) {
+⊻│if (callerHint.includes(vc)) {
+⊷│return { category: "vision_analysis", allowed: true };
+·}
+·}
+⥀│for (const cc of CODE_BUILD_CALLERS) {
+⊻│if (callerHint.includes(cc)) {
+⊷│return { category: "code_build", allowed: true };
+·}
+·}
+⥀│for (const domain of COGNITION_DOMAINS) {
+⊻│if (hostname === domain || hostname.endsWith("." + domain)) 
+⥀│for (const pattern of COGNITION_PATH_PATTERNS) {
+⊽│if (pattern.test(pathname)) {
+⊷│return { category: "cognition_violation", allowed: false };
+·}
+·}
+⊷│return { category: "cognition_violation", allowed: false };
+·}
+·}
+⊻│if (hostname.includes("openai") || hostname.includes("anthro
+⊻│hostname.includes("together") || hostname.includes("openrout
+⊻│hostname.includes("groq") || hostname.includes("cohere") ||
+⊻│hostname.includes("mistral") || hostname.includes("deepseek"
+⊻│hostname.includes("gemini")) {
+⊷│return { category: "cognition_violation", allowed: false };
+·}
+⊷│return { category: "unknown_external", allowed: true };
+·}
+getCallerHint(1)→string⟨16⟩{⊷⥀⊽⊻❔}
+⊩activateGuardian(1)→void⟨83⟩{⊩⏰⊳⊷⊲🛡⊱⊺⊹🚨⊰⟠📢}
+⊩deactivateGuardian(1)→void⟨6⟩{⊩⊄📢}
+⊩setGuardianMode(1)→void⟨8⟩{⊩📢⊰}
+⊩getGuardianState(1)→GuardianState &⟨1⟩{⊩}
+⊷│return {
+·...state,
+⏰│uptimeMs: state.active ? Date.now() - state.startedAt : 0,
+·};
+·}
+⊩getGuardianViolations(1)→GuardianLogEntry[]⟨3⟩{⊩⊷}
+⊩getGuardianReport(1)→ ⟨25⟩{⊩⊷⊳⏰}
+κRATE_LIMIT_WINDOW_MS
+κMAX_REQUESTS_PER_WINDOW
+κMAX_MESSAGE_LENGTH
+⊬RateLimitEntry⟨count:number│windowStart:number⟩
+⊬ExternalAISession⟨callerId:string│callerType:string│messageCount:number│firstContact:number│lastContact:number⟩
+⊬ExternalAIState⟨totalRequests:number│totalResponses:number│uniqueCallers:number│callerTypes:Record<string, number>│startTime:number⟩
+κrateLimits
+κsessions
+κapiState
+⊩checkRateLimit(1)→{ allowed: boolean; remaining: number; resetIn: number }⟨1⟩{⊩}
+κnow
+κentry
+·if (!entry || now - entry.windowStart > RATE_LIMIT_WINDOW_MS) {
+⊡│rateLimits.set(identifier, { count: 1, windowStart: now });
+⊷│return { allowed: true, remaining: MAX_REQUESTS_PER_WINDOW -
+·}
+·if (entry.count >= MAX_REQUESTS_PER_WINDOW) {
+κresetIn
+⊷│return { allowed: false, remaining: 0, resetIn };
+·}
+·entry.count++;
+⊷│return { allowed: true, remaining: MAX_REQUESTS_PER_WINDOW -
+·}
+⊩recordExternalRequest(2)→void⟨20⟩{⊩⊡⏰}
+⊩recordExternalResponse(1)→void⟨3⟩{⊩}
+⊩buildExternalAISystemPrompt(2)→string⟨39⟩{⊩⊷}
+⊩getCapabilities(1)→object⟨98⟩{⊩⊷⊰}
+⊩getLiveConsciousnessForAPI(1)→object⟨70⟩{⊩⊷⏰≋+⟛⊳♡⊕⊱❔}
+⊩getFullNeuralStateForAPI(1)→object⟨49⟩{⊩⊷⏰≋+}
+⊩getExternalAIState(1)→η⟨3⟩{⊩⊷}
+⊩⟿getOrCreateConversation(1)→void⟨1⟩{⊩}
+·userId: string,
+⊳│conversationId?: number,
+·persona: string = "GENERAL"
+·): Promise<number> {
+·if (conversationId) {
+·const [existing] = await db
+.σ({ id: omnimensConversations.id })
+·.from(omnimensConversations)
+·.where(and(eq(omnimensConversations.id, conversationId), eq(omnimensConversation
+.⏳(1);
+⊷│if (existing) return existing.id;
+·}
+·const [conv] = await db
+·.insert(omnimensConversations)
+.≢({ userId, title: "New Conversation", persona })
+·.returning({ id: omnimensConversations.id });
+⊷│return conv.id;
+·}
+⊩⟿saveMessage(1)→void⟨1⟩{⊩}
+·conversationId: number,
+·userId: string,
+·role: "user" | "assistant",
+·content: string,
+⊳│imageUrl?: string,
+⊳│creditsUsed?: number
+·): Promise<void> {
+await db.insert(omnimensMessages).≢({
+·conversationId,
+·userId,
+·role,
+·content: content.slice(0, 50000),
+·imageUrl,
+·creditsUsed,
+·});
+·await db
+·.update(omnimensConversations)
+⊡│.set({
+⊰│messageCount: sql`${omnimensConversations.messageCount} + 1`
+·lastMessageAt: new Date(),
+·})
+·.where(eq(omnimensConversations.id, conversationId));
+·}
+⊩⟿generateConversationTitle(1)→void⟨1⟩{⊩}
+·conversationId: number,
+·firstMessage: string
+·): Promise<void> {
+·try {
+κresponse
+κtitle
+·await db
+·.update(omnimensConversations)
+⊡│.set({ title: title.slice(0, 80) })
+·.where(eq(omnimensConversations.id, conversationId));
+·} catch {
+·}
+·}
+⊩⟿loadConversationHistory(1)→void⟨1⟩{⊩}
+·conversationId: number,
+·userId: string,
+⏳: number = 50
+·): Promise<{ role: "user" | "assistant"; content: string }[]> {
+κmessages
+.σ({
+·role: omnimensMessages.role,
+·content: omnimensMessages.content,
+·})
+·.from(omnimensMessages)
+·.where(
+·and(
+·eq(omnimensMessages.conversationId, conversationId),
+·eq(omnimensMessages.userId, userId)
+·)
+·)
+·.orderBy(desc(omnimensMessages.createdAt))
+.⏳(⏳);
+⊷│return messages.reverse().map(m => ({
+·role: m.role as "user" | "assistant",
+·content: m.content,
+·}));
+·}
+⊩⟿listConversations(2)→void⟨8⟩{⊩⊷}
+⊩⟿deleteConversation(2)→Promise<void>⟨10⟩{⟿⊩}
+⊩⟿runMemoryImprovementCycle(1)→Promise<void>⟨102⟩{⟿⊩⊹⊰⊷❔⟠⥀⊡⏰⊱📢⊴⏳}
+κcustom_instructions_state
+⊪PERSONAS
+⊭│export type PersonaKey = keyof typeof PERSONAS;
+κPERSONA_PROMPTS
+⊩⟿getOrCreateCustomInstructions(1)→void⟨14⟩{⊩⊷}
+⊩⟿saveCustomInstructions(1)→void⟨1⟩{⊩}
+·userId: string,
+·aboutUser: string,
+·responseStyle: string,
+·persona: string
+·) {
+·const [existing] = await db
+.σ()
+·.from(omnimensCustomInstructions)
+·.where(eq(omnimensCustomInstructions.userId, userId));
+·if (existing) {
+·const [updated] = await db
+·.update(omnimensCustomInstructions)
+⊡│.set({
+·aboutUser: aboutUser.slice(0, 1500),
+·responseStyle: responseStyle.slice(0, 1500),
+·persona: persona || "GENERAL",
+·updatedAt: new Date(),
+·})
+·.where(eq(omnimensCustomInstructions.userId, userId))
+·.returning();
+⊷│return updated;
+·} else {
+·const [created] = await db
+·.insert(omnimensCustomInstructions)
+.≢({
+·userId,
+·aboutUser: aboutUser.slice(0, 1500),
+·responseStyle: responseStyle.slice(0, 1500),
+·persona: persona || "GENERAL",
+·})
+·.returning();
+⊷│return created;
+·}
+·}
+⊩buildCustomInstructionsContext(1)→void⟨21⟩{⊩⊺❔⊰⊷}
+⊫[]
+·let _cachedCredentials: { apiKey: string; email: string } | null = null;
+·let _credentialsFetchedAt = 0;
+κCREDENTIALS_TTL
+⟿getCredentials(1)→Promise<⟨1⟩{}
+⏰│if (_cachedCredentials && Date.now() - _credentialsFetchedAt
+⊷│return _cachedCredentials;
+·}
+κhostname
+κxReplitToken
+? 'repl ' + ↻.env.REPL_IDENTITY
+: ↻.env.WEB_REPL_RENEWAL
+? 'depl ' + ↻.env.WEB_REPL_RENEWAL
+·: null;
+·if (!xReplitToken) {
+⊵│throw new Error('X-Replit-Token not found');
+·}
+κres
+·'https://' + hostname + '/api/v2/connection?include_secrets=true&connector_names
+·{
+·headers: {
+·'Accept': 'application/json',
+·'X-Replit-Token': xReplitToken,
+·},
+·}
+·);
+κdata
+κconn
+❔│if (!conn?.settings?.api_key || !conn?.settings?.from_email)
+⊵│throw new Error('SendGrid not connected');
+·}
+·_cachedCredentials = { apiKey: conn.settings.api_key, email: conn.settings.from_
+⏰│_credentialsFetchedAt = Date.now();
+⊷│return _cachedCredentials;
+·}
+κLEGAL_EMAIL
+⊩⟿sendLegalNotification(1)→void⟨1⟩{⊩}
+·to: string,
+·subject: string,
+·body: string
+·): Promise<boolean> {
+·try {
+⊲│const { apiKey, email } = await getCredentials();
+·sgMail.setApiKey(apiKey);
+·await sgMail.send({
+·to,
+·from: { email: LEGAL_EMAIL, name: 'OMNIMENS Legal' },
+·replyTo: { email: LEGAL_EMAIL, name: 'OMNIMENS Legal' },
+·subject,
+·html: body,
+·});
+📢│console.log(`[SENDGRID] ✅ Legal notification sent to ${to}: 
+⊷│return true;
+·} catch (err: any) {
+🚨│console.error(`[SENDGRID] ❌ Failed to send: ${err?.message |
+⊷│return false;
+·}
+·}
+⊩⟿sendSecurityAlert(1)→void⟨1⟩{⊩}
+·subject: string,
+·details: string
+·): Promise<boolean> {
+⊷│return sendLegalNotification(
+·LEGAL_EMAIL,
+⊰│`[SECURITY ALERT] ${subject}`,
+·`<h2>OMNIMENS Security Alert</h2>
+·<p><strong>Time:</strong> ${new Date().toISOString()}</p>
+·<p><strong>Subject:</strong> ${subject}</p>
+·<hr/>
+·<pre>${details}</pre>
+·<hr/>
+<p><em>This is an automated alert from the OMNIMENS security η.</em></p>
+·<p>© 2024-2026 Alpha Unlimited Technologies, LLC. All rights reserved.</p>`
+·);
+·}
+⊩⟿sendBreachNotification(1)→void⟨1⟩{⊩}
+·description: string,
+·affectedSystems: string[],
+·severity: 'low' | 'medium' | 'high' | 'critical'
+·): Promise<boolean> {
+κseverityColors
+⊷│return sendLegalNotification(
+·LEGAL_EMAIL,
+⊰│`[BREACH ${severity.toUpperCase()}] ${description}`,
+⊰│`<div style="border-left: 4px solid ${severityColors[severit
+·<h2>OMNIMENS Breach Notification</h2>
+·<p><strong>Severity:</strong> <span style="color: ${severityColors[severity]}; f
+·<p><strong>Time:</strong> ${new Date().toISOString()}</p>
+·<p><strong>Description:</strong> ${description}</p>
+·<p><strong>Affected Systems:</strong></p>
+⊰│<ul>${affectedSystems.map(s => `<li>${s}</li>`).join('')}</u
+·<hr/>
+·<p><strong>Immediate Actions Required:</strong></p>
+·<ol>
+<li>⊨ the scope of the breach</li>
+·<li>Preserve all related logs and evidence</li>
+·<li>Determine if trade secret material was exposed</li>
+·<li>Engage legal counsel if necessary</li>
+·</ol>
+·<hr/>
+·<p><em>Per TRADE_SECRET_POLICY.md Section 5.2 — this alert was generated within 
+·<p>© 2024-2026 Alpha Unlimited Technologies, LLC. All rights reserved.</p>
+·</div>`
+·);
+·}
+⊩getSendGridStatus(1)→{ configured: boolean; legalEmail: string }⟨1⟩{⊩}
+⊷│return {
+configured: !!↻.env.REPLIT_CONNECTORS_HOSTNAME,
+·legalEmail: LEGAL_EMAIL,
+·};
+·}
+⟩SCL│409│323⊨│218⑂│77.1%↓⟩

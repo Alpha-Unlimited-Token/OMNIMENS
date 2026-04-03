@@ -1,0 +1,31 @@
+⟨SCL v1│hierarchicalReasoningFramework_gen1.mjs│41→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class HierarchicalReasoningFramework {
+·constructor() {
+·this.branches = [];
+⊮│this.pubSubSystem = new Map();
+·}
+·createBranch(id, data) {
+κbranch
+⊺│this.branches.push(branch);
+⊡│this.pubSubSystem.set(id, []);
+⊷│return branch;
+·}
+·backtrack(branchId) {
+·const branch = this.branches.find(b => b.id === branchId);
+·if (branch) {
+·branch.state = 'backtracked';
+⊡│this.pubSubSystem.get(branchId).forEach(callback => callback
+·}
+·}
+·subscribe(branchId, callback) {
+·if (this.pubSubSystem.has(branchId)) {
+⊡│this.pubSubSystem.get(branchId).push(callback);
+·}
+·}
+·allocateResources(priorityFn) {
+·this.branches.sort((a, b) => priorityFn(b) - priorityFn(a));
+⊷│return this.branches;
+·}
+·}
+⟩SCL│30│9⊨│8⑂│26.8%↓⟩

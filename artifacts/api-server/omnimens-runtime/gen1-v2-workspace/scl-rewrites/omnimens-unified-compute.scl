@@ -1,0 +1,501 @@
+⟨SCL v1│omnimens-unified-compute.ts│966→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+κCHROMIUM_PATH
+·let browser: Browser | null = null;
+·let computePage: Page | null = null;
+·let gpuBridgeReady = false;
+·let gpuCapabilities: Record<string, unknown> = {};
+·let totalComputeOps = 0;
+·let totalComputeTimeMs = 0;
+·let bridgeStartTime = 0;
+·let lastHealthCheck = 0;
+·let consecutiveFailures = 0;
+·let totalJobsProcessed = 0;
+·let totalBatchesProcessed = 0;
+·let wasmModulesLoaded = 0;
+·let peakConcurrentJobs = 0;
+·let currentConcurrentJobs = 0;
+κMAX_FAILURES_BEFORE_RESTART
+κGPU_COMPUTE_HTML
+·<html><head><title>OMNIMENS GPU Compute Sandbox</title></head>
+·<body>
+·<canvas id="gpu-canvas" width="2048" height="2048"></canvas>
+·<script>
+κcanvas
+κgl
+·window.GPU_INFO = {
+Θ: !!gl,
+⊳│version: gl ? gl.getParameter(gl.VERSION) : null,
+⊳│renderer: gl ? gl.getParameter(gl.RENDERER) : null,
+⊳│vendor: gl ? gl.getParameter(gl.VENDOR) : null,
+⊳│shadingLanguage: gl ? gl.getParameter(gl.SHADING_LANGUAGE_VE
+⊳│maxTextureSize: gl ? gl.getParameter(gl.MAX_TEXTURE_SIZE) : 
+⊳│maxViewportDims: gl ? gl.getParameter(gl.MAX_VIEWPORT_DIMS) 
+⊳│maxRenderbufferSize: gl ? gl.getParameter(gl.MAX_RENDERBUFFE
+⊳│maxVertexAttribs: gl ? gl.getParameter(gl.MAX_VERTEX_ATTRIBS
+⊳│maxVaryingVectors: gl ? gl.getParameter(gl.MAX_VARYING_VECTO
+⊳│maxFragmentUniforms: gl ? gl.getParameter(gl.MAX_FRAGMENT_UN
+⊳│maxVertexUniforms: gl ? gl.getParameter(gl.MAX_VERTEX_UNIFOR
+⊳│maxTextureUnits: gl ? gl.getParameter(gl.MAX_TEXTURE_IMAGE_U
+⊳│extensions: gl ? gl.getSupportedExtensions() : [],
+⊳│floatTextureSupport: gl ? !!(gl.getExtension('OES_texture_fl
+·};
+·window._wasmModules = {};
+·window._wasmInstances = {};
+·window._compiledShaders = {};
+·window._computeStats = { jobs: 0, batchOps: 0, wasmCalls: 0, shaderRuns: 0, erro
+·window.compileWasm = async function(wasmBytesArray, moduleName) {
+·try {
+κbytes
+κmodule
+κinstance
+window._wasmModules[moduleName] = Ε;
+·window._wasmInstances[moduleName] = instance;
+κexports
+⊷│return { success: true, moduleName, exports, memoryPages: 25
+·} catch(e) {
+·window._computeStats.errors++;
+⊷│return { success: false, error: e.message, moduleName };
+·}
+·};
+·window.callWasm = function(moduleName, funcName, args) {
+κinstance
+⊄│if (!instance) return { error: 'Module not found: ' + module
+κfn
+⊄│if (!fn) return { error: 'Function not found: ' + funcName +
+·try {
+κstart
+κresult
+·window._computeStats.wasmCalls++;
+⊷│return { result, timeMs: performance.now() - start, module: 
+·} catch(e) {
+·window._computeStats.errors++;
+⊷│return { error: e.message };
+·}
+·};
+·window.compileShaderProgram = function(vertexSrc, fragmentSrc, programName) {
+⊄│if (!gl) return { error: 'WebGL not available' };
+·try {
+compile(2)→void⟨11⟩{⊵⊷}
+κvs
+κfs
+κprog
+·gl.attachShader(prog, vs);
+·gl.attachShader(prog, fs);
+·gl.linkProgram(prog);
+·if (!gl.getProgramParameter(prog, gl.LINK_STATUS)) {
+⊵│throw new Error('Link: ' + gl.getProgramInfoLog(prog));
+·}
+·window._compiledShaders[programName] = { program: prog, vs, fs };
+·window._computeStats.shaderRuns++;
+⊷│return { success: true, programName };
+·} catch(e) {
+·window._computeStats.errors++;
+⊷│return { error: e.message };
+·}
+·};
+·window.processBatch = function(jobs) {
+κresults
+κbatchStart
+·for (let i = 0; i < jobs.length; i++) {
+κjob
+κstart
+·let result;
+·try {
+⑃│switch(job.op) {
+·case 'matmul':
+·result = window.gpuMatrixMultiply(job.A, job.B, job.rowsA, job.colsA, job.colsB)
+·break;
+·case 'dot':
+·result = window.gpuVectorDot(job.a, job.b);
+·break;
+·case 'add':
+·result = window.gpuVectorAdd(job.a, job.b);
+·break;
+·case 'scale':
+·result = window.gpuVectorScale(job.a, job.scalar);
+·break;
+·case 'softmax':
+result = window.gpuSoftmax(job.≢);
+·break;
+·case 'relu':
+result = window.gpuReLU(job.≢);
+·break;
+·case 'sigmoid':
+result = window.gpuSigmoid(job.≢);
+·break;
+·case 'tanh':
+result = window.gpuTanh(job.≢);
+·break;
+·case 'normalize':
+result = window.gpuNormalize(job.≢);
+·break;
+·case 'batchnorm':
+result = window.gpuBatchNorm(job.≢, job.gamma, job.beta);
+·break;
+·case 'transpose':
+·result = window.gpuTranspose(job.matrix, job.rows, job.cols);
+·break;
+·case 'convolve1d':
+result = window.gpuConvolve1D(job.⊛, job.kernel);
+·break;
+·case 'layernorm':
+result = window.gpuLayerNorm(job.≢, job.gamma, job.beta);
+·break;
+·case 'attention':
+·result = window.gpuAttentionScore(job.Q, job.K, job.V, job.dim);
+·break;
+·case 'gelu':
+result = window.gpuGELU(job.≢);
+·break;
+·case 'embedding_lookup':
+·result = window.gpuEmbeddingLookup(job.embeddings, job.indices, job.dim);
+·break;
+·case 'wasm_call':
+result = window.callWasm(job.Ε, job.func, job.args);
+·break;
+·case 'eval':
+·result = eval(job.code);
+·break;
+·default:
+·result = { error: 'Unknown op: ' + job.op };
+·}
+·} catch(e) {
+·result = { error: e.message };
+·window._computeStats.errors++;
+·}
+⊺│results.push({ jobIndex: i, op: job.op, result, timeMs: perf
+·}
+·window._computeStats.batchOps += jobs.length;
+·window._computeStats.jobs++;
+⊷│return { results, totalTimeMs: performance.now() - batchStar
+·};
+·window.gpuMatrixMultiply = function(A, B, rowsA, colsA, colsB) {
+·if (gl) {
+·try {
+⊷│return gpuMatMulWebGL(A, B, rowsA, colsA, colsB);
+·} catch(e) {
+·}
+·}
+⊷│return cpuMatrixMultiply(A, B, rowsA, colsA, colsB);
+·};
+gpuMatMulWebGL(5)→void⟨136⟩{⟛⊵⊷}
+cpuMatrixMultiply(5)→void⟨14⟩{⊷}
+·window.gpuVectorDot = function(a, b) {
+κstart
+·let sum = 0;
+·for (let i = 0; i < a.length; i++) sum += a[i] * b[i];
+⊷│return { result: sum, timeMs: performance.now() - start, len
+·};
+·window.gpuVectorAdd = function(a, b) {
+κstart
+κresult
+·for (let i = 0; i < a.length; i++) result[i] = a[i] + b[i];
+⊷│return { result, timeMs: performance.now() - start, length: 
+·};
+·window.gpuVectorScale = function(a, scalar) {
+κstart
+κresult
+·for (let i = 0; i < a.length; i++) result[i] = a[i] * scalar;
+⊷│return { result, timeMs: performance.now() - start, length: 
+·};
+·window.gpuSoftmax = function(logits) {
+κstart
+κmax
+·const exps = logits.map(x => Math.exp(x - max));
+⋐│const sum = exps.reduce((a, b) => a + b, 0);
+·const result = exps.map(x => x / sum);
+⊷│return { result, timeMs: performance.now() - start, length: 
+·};
+window.gpuReLU = function(≢) {
+κstart
+⟛│const result = values.map(x => Math.max(0, x));
+⊷│return { result, timeMs: performance.now() - start, length: 
+·};
+window.gpuSigmoid = function(≢) {
+κstart
+const result = ≢.map(x => 1 / (1 + Math.exp(-x)));
+⊷│return { result, timeMs: performance.now() - start, length: 
+·};
+window.gpuTanh = function(≢) {
+κstart
+const result = ≢.map(x => Math.tanh(x));
+⊷│return { result, timeMs: performance.now() - start, length: 
+·};
+window.gpuGELU = function(≢) {
+κstart
+κsqrt2pi
+const result = ≢.map(x => {
+⊷│return 0.5 * x * (1 + Math.tanh(sqrt2pi * (x + 0.044715 * x 
+·});
+⊷│return { result, timeMs: performance.now() - start, length: 
+·};
+·window.gpuTranspose = function(matrix, rows, cols) {
+κstart
+κresult
+·for (let i = 0; i < rows; i++) {
+·for (let j = 0; j < cols; j++) {
+·result[j * rows + i] = matrix[i * cols + j];
+·}
+·}
+⊷│return { result, rows: cols, cols: rows, timeMs: performance
+·};
+window.gpuConvolve1D = function(⊛, kernel) {
+κstart
+κresultLen
+κresult
+for (let i = 0; i < ⊛.length; i++) {
+·for (let j = 0; j < kernel.length; j++) {
+result[i + j] += ⊛[i] * kernel[j];
+·}
+·}
+⊷│return { result, timeMs: performance.now() - start, length: 
+·};
+window.gpuNormalize = function(≢) {
+κstart
+⋐│const mean = values.reduce((a, b) => a + b, 0) / values.leng
+⋐│const variance = values.reduce((a, b) => a + (b - mean) ** 2
+κstd
+const result = ≢.map(x => (x - mean) / std);
+⊷│return { result, timeMs: performance.now() - start, length: 
+·};
+window.gpuBatchNorm = function(≢, gamma, beta) {
+κstart
+⋐│const mean = values.reduce((a, b) => a + b, 0) / values.leng
+⋐│const variance = values.reduce((a, b) => a + (b - mean) ** 2
+κstd
+⊱│const result = values.map((x, i) => {
+κnormalized
+κg
+κb2
+⊷│return normalized * g + b2;
+·});
+⊷│return { result, timeMs: performance.now() - start, length: 
+·};
+window.gpuLayerNorm = function(≢, gamma, beta) {
+κstart
+⋐│const mean = values.reduce((a, b) => a + b, 0) / values.leng
+⋐│const variance = values.reduce((a, b) => a + (b - mean) ** 2
+κstd
+⊱│const result = values.map((x, i) => {
+κnorm
+κg
+κb2
+⊷│return norm * g + b2;
+·});
+⊷│return { result, timeMs: performance.now() - start, length: 
+·};
+·window.gpuAttentionScore = function(Q, K, V, dim) {
+κstart
+κseqLen
+κscale
+κscores
+·for (let i = 0; i < seqLen; i++) {
+·for (let j = 0; j < seqLen; j++) {
+·let dot = 0;
+·for (let k = 0; k < dim; k++) {
+·dot += Q[i * dim + k] * K[j * dim + k];
+·}
+·scores[i * seqLen + j] = dot * scale;
+·}
+·}
+·for (let i = 0; i < seqLen; i++) {
+·let max = -Infinity;
+⟛│for (let j = 0; j < seqLen; j++) max = Math.max(max, scores[
+·let sum = 0;
+·for (let j = 0; j < seqLen; j++) {
+·scores[i * seqLen + j] = Math.exp(scores[i * seqLen + j] - max);
+·sum += scores[i * seqLen + j];
+·}
+·for (let j = 0; j < seqLen; j++) scores[i * seqLen + j] /= sum;
+·}
+κoutput
+·for (let i = 0; i < seqLen; i++) {
+·for (let k = 0; k < dim; k++) {
+·let sum = 0;
+·for (let j = 0; j < seqLen; j++) {
+·sum += scores[i * seqLen + j] * V[j * dim + k];
+·}
+θ[i * dim + k] = sum;
+·}
+·}
+⊷│return { result: output, scores, seqLen, dim, timeMs: perfor
+·};
+·window.gpuEmbeddingLookup = function(embeddings, indices, dim) {
+κstart
+κresult
+·for (let i = 0; i < indices.length; i++) {
+κidx
+·for (let d = 0; d < dim; d++) {
+·result[i * dim + d] = embeddings[idx * dim + d];
+·}
+·}
+⊷│return { result, timeMs: performance.now() - start, batchSiz
+·};
+·window.executeComputeCode = function(code) {
+κstart
+·try {
+κfn
+κresult
+⊷│return { result, timeMs: performance.now() - start, method: 
+·} catch(e) {
+·window._computeStats.errors++;
+⊷│return { error: e.message, timeMs: performance.now() - start
+·}
+·};
+·window.gpuHealthCheck = function() {
+⊷│return {
+·webgl: !!gl,
+⊳│version: gl ? gl.getParameter(gl.VERSION) : null,
+⊳│renderer: gl ? gl.getParameter(gl.RENDERER) : null,
+⊳│contextLost: gl ? gl.isContextLost() : true,
+⊸│wasmModules: Object.keys(window._wasmModules).length,
+⊸│compiledShaders: Object.keys(window._compiledShaders).length
+·stats: window._computeStats,
+⏰│timestamp: Date.now()
+·};
+·};
+·console.log('OMNIMENS GPU Compute Sandbox initialized');
+⊳│console.log('WebGL:', window.GPU_INFO.available ? 'AVAILABLE
+·console.log('Float textures:', window.GPU_INFO.floatTextureSupport);
+·console.log('Max texture size:', window.GPU_INFO.maxTextureSize);
+·console.log('Sandbox ready for: matmul, softmax, relu, sigmoid, tanh, gelu, atte
+·</script>
+·</body></html>`;
+⊩⟿startGpuBridge(1)→Promise<void>⟨90⟩{⟿⊩⊱⊻📢⊰🚨⏰⊳}
+startHealthMonitor(1)→void⟨22⟩{⟳⊱⊄⏰⊴⊰}
+⟿restartGpuBridge(1)→Promise<void>⟨40⟩{⟿⊱⊴⊩⊵⏰⊷}
+⊩⟿gpuCompileWasm(1)→void⟨1⟩{⊩}
+·wasmBytes: Uint8Array, moduleName: string
+⊳│): Promise<{ success: boolean; exports?: string[]; error?: s
+⊵│if (!gpuBridgeReady || !computePage) throw new Error("GPU br
+κbytesArray
+κres
+⊱│(bytes, name) => (window as any).compileWasm(bytes, name), b
+·) as any;
+·if (res.success) wasmModulesLoaded++;
+⊷│return res;
+·}
+⊩⟿gpuCallWasm(1)→void⟨1⟩{⊩}
+·moduleName: string, funcName: string, args: number[]
+·): Promise<{ result: number; timeMs: number }> {
+⊵│if (!gpuBridgeReady || !computePage) throw new Error("GPU br
+·trackJob();
+·try {
+·totalComputeOps++;
+⊷│return await computePage.evaluate(
+⊱│(m, f, a) => (window as any).callWasm(m, f, a), moduleName, 
+·) as any;
+·} finally {
+·untrackJob();
+·}
+·}
+⊩⟿gpuEval(1)→Promise<unknown>⟨12⟩{⊩⊵⊷⊱}
+⊩⟿gpuMatrixMultiply(1)→void⟨1⟩{⊩}
+·A: number[], B: number[], rowsA: number, colsA: number, colsB: number
+·): Promise<{ result: number[]; rows: number; cols: number; timeMs: number; metho
+⊵│if (!gpuBridgeReady || !computePage) throw new Error("GPU br
+·trackJob();
+·try {
+κstart
+κres
+⊱│(a, b, ra, ca, cb) => (window as any).gpuMatrixMultiply(a, b
+·A, B, rowsA, colsA, colsB
+·) as any;
+·totalComputeOps++;
+⏰│totalComputeTimeMs += Date.now() - start;
+⊷│return res;
+·} finally {
+·untrackJob();
+·}
+·}
+⊩⟿gpuVectorDot(2)→Promise<⟨1⟩{⊩}
+⊵│if (!gpuBridgeReady || !computePage) throw new Error("GPU br
+·totalComputeOps++;
+⊱│return computePage.evaluate((x, y) => (window as any).gpuVec
+·}
+⊩⟿gpuVectorAdd(2)→Promise<⟨1⟩{⊩}
+⊵│if (!gpuBridgeReady || !computePage) throw new Error("GPU br
+·totalComputeOps++;
+⊱│return computePage.evaluate((x, y) => (window as any).gpuVec
+·}
+⊩⟿gpuSoftmax(1)→Promise<⟨1⟩{⊩}
+⊵│if (!gpuBridgeReady || !computePage) throw new Error("GPU br
+·totalComputeOps++;
+⊱│return computePage.evaluate((x) => (window as any).gpuSoftma
+·}
+⊩⟿gpuReLU(1)→Promise<⟨1⟩{⊩}
+⊵│if (!gpuBridgeReady || !computePage) throw new Error("GPU br
+·totalComputeOps++;
+⊱│return computePage.evaluate((x) => (window as any).gpuReLU(x
+·}
+⊩⟿gpuSigmoid(1)→Promise<⟨1⟩{⊩}
+⊵│if (!gpuBridgeReady || !computePage) throw new Error("GPU br
+·totalComputeOps++;
+⊱│return computePage.evaluate((x) => (window as any).gpuSigmoi
+·}
+⊩⟿gpuTanh(1)→Promise<⟨1⟩{⊩}
+⊵│if (!gpuBridgeReady || !computePage) throw new Error("GPU br
+·totalComputeOps++;
+⊱│return computePage.evaluate((x) => (window as any).gpuTanh(x
+·}
+⊩⟿gpuGELU(1)→Promise<⟨1⟩{⊩}
+⊵│if (!gpuBridgeReady || !computePage) throw new Error("GPU br
+·totalComputeOps++;
+⊱│return computePage.evaluate((x) => (window as any).gpuGELU(x
+·}
+⊩⟿gpuNormalize(1)→Promise<⟨1⟩{⊩}
+⊵│if (!gpuBridgeReady || !computePage) throw new Error("GPU br
+·totalComputeOps++;
+⊱│return computePage.evaluate((x) => (window as any).gpuNormal
+·}
+⊩⟿gpuBatchNorm(1)→void⟨1⟩{⊩}
+⊳│values: number[], gamma?: number[], beta?: number[]
+·): Promise<{ result: number[]; timeMs: number }> {
+⊵│if (!gpuBridgeReady || !computePage) throw new Error("GPU br
+·totalComputeOps++;
+⊱│return computePage.evaluate((v, g, b) => (window as any).gpu
+·}
+⊩⟿gpuLayerNorm(1)→void⟨1⟩{⊩}
+⊳│values: number[], gamma?: number[], beta?: number[]
+·): Promise<{ result: number[]; timeMs: number }> {
+⊵│if (!gpuBridgeReady || !computePage) throw new Error("GPU br
+·totalComputeOps++;
+⊱│return computePage.evaluate((v, g, b) => (window as any).gpu
+·}
+⊩⟿gpuTranspose(1)→void⟨1⟩{⊩}
+·matrix: number[], rows: number, cols: number
+·): Promise<{ result: number[]; rows: number; cols: number; timeMs: number }> {
+⊵│if (!gpuBridgeReady || !computePage) throw new Error("GPU br
+·totalComputeOps++;
+⊱│return computePage.evaluate((m, r, c) => (window as any).gpu
+·}
+⊩⟿gpuConvolve1D(1)→void⟨1⟩{⊩}
+⊛: number[], kernel: number[]
+·): Promise<{ result: number[]; timeMs: number }> {
+⊵│if (!gpuBridgeReady || !computePage) throw new Error("GPU br
+·totalComputeOps++;
+⊱│return computePage.evaluate((s, k) => (window as any).gpuCon
+·}
+⊩⟿gpuAttentionScore(1)→void⟨1⟩{⊩}
+·Q: number[], K: number[], V: number[], dim: number
+·): Promise<{ result: number[]; scores: number[]; seqLen: number; dim: number; ti
+⊵│if (!gpuBridgeReady || !computePage) throw new Error("GPU br
+·totalComputeOps++;
+⊷│return computePage.evaluate(
+⊱│(q, k, v, d) => (window as any).gpuAttentionScore(q, k, v, d
+·) as any;
+·}
+⊩⟿gpuEmbeddingLookup(1)→void⟨1⟩{⊩}
+·embeddings: number[], indices: number[], dim: number
+·): Promise<{ result: number[]; timeMs: number }> {
+⊵│if (!gpuBridgeReady || !computePage) throw new Error("GPU br
+·totalComputeOps++;
+⊷│return computePage.evaluate(
+⊱│(e, i, d) => (window as any).gpuEmbeddingLookup(e, i, d), em
+·) as any;
+·}
+⊩getGpuBridgeStatus(1)→Record<string, unknown>⟨18⟩{⊩⊷⊳⏰}
+⊩⟿shutdownGpuBridge(1)→Promise<void>⟨12⟩{⟿⊩⊱}
+⟩SCL│500│286⊨│167⑂│48.2%↓⟩

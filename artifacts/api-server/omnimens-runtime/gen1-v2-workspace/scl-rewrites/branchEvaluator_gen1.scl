@@ -1,0 +1,21 @@
+⟨SCL v1│branchEvaluator_gen1.mjs│31→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class BranchEvaluator {
+·constructor() {
+·this.branches = [];
+·}
+·addBranch(branch, confidence) {
+⊺│this.branches.push({ branch, confidence });
+·}
+·evaluateBranches() {
+·const weightedResults = this.branches.map(b => b.branch * b.confidence);
+κbestBranch
+⊷│return bestBranch.branch;
+·}
+·}
+κevaluator
+·evaluator.addBranch('Option A', 0.8);
+·evaluator.addBranch('Option B', 0.6);
+κbestOption
+·console.log('Best Option:', bestOption);
+⟩SCL│20│6⊨│3⑂│35.5%↓⟩

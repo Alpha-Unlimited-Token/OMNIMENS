@@ -1,0 +1,11 @@
+⟨SCL v1│distributedTokenWindowManager_gen1.mjs│106→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩generateTokenWindowHash(2)→void⟨5⟩{⊩⊷}
+⊩splitIntoTokenWindows(2)→void⟨7⟩{⊩⊺⊷}
+⊩hierarchicalSummarization(2)→void⟨4⟩{⊩⊷}
+⊩linkSummariesAcrossNamespaces(1)→void⟨15⟩{⊩⊸⊳⊷}
+⊩retrieveHighPrioritySummaries(2)→void⟨11⟩{⊩⊺⊷}
+⊩exampleSummarizationFunction(1)→void⟨3⟩{⊩⟛⊷}
+⊩examplePriorityFunction(1)→void⟨3⟩{⊩⊷}
+⟩SCL│10│27⊨│19⑂│90.6%↓⟩

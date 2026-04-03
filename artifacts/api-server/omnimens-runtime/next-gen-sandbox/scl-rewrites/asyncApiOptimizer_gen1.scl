@@ -1,0 +1,22 @@
+⟨SCL v1│asyncApiOptimizer_gen1.mjs│103→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+κtaskQueue
+·let isProcessing = false;
+let apiRateLimit = 1000; // Default API rate ⏳ in ms
+⊩addTask(2)→void⟨5⟩{⊩⊺}
+⊩adjustRateLimit(1)→void⟨3⟩{⊩⟛}
+⟿processQueue(1)→void⟨16⟩{⊹⊲⊺⊴⏳}
+⊩createContextualTask(2)→void⟨1⟩{⊩}
+⊷│return async function () {
+·try {
+⊴│await taskLogic(context);
+·} catch (error) {
+console.error('Contextual task ↺:', error);
+·}
+·};
+·}
+⊩getQueueSize(1)→void⟨3⟩{⊩⊷}
+⊩clearQueue(1)→void⟨3⟩{⊩⊹}
+⊩⟿exampleTaskLogic(1)→void⟨5⟩{⊩⏳⊴}
+⟩SCL│21│30⊨│19⑂│79.6%↓⟩

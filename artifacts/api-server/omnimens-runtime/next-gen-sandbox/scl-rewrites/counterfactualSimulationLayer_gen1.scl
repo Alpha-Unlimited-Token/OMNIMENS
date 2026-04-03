@@ -1,0 +1,6 @@
+⟨SCL v1│counterfactualSimulationLayer_gen1.mjs│32→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩⟿simulateCounterfactuals(1)→void⟨11⟩{⊩⊷}
+generateAlternatives(1)→void⟨4⟩{⊷}
+evaluateAlternatives(1)→void⟨6⟩{⊷}
+⟩SCL│5│7⊨│4⑂│84.4%↓⟩

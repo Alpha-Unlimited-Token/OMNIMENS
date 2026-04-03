@@ -1,0 +1,13 @@
+⟨SCL v1│persistentReplStateManager_gen1.mjs│113→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+κalgorithm
+κkey
+κivLength
+⊩encryptState(1)→void⟨14⟩{⊩⟠⊷}
+⊩decryptState(1)→void⟨13⟩{⊩⟠⊲⊷}
+⊩storeState(4)→void⟨13⟩{⊩⏰⊡⏳⊱}
+⊩retrieveState(2)→void⟨10⟩{⊩⊡⏰⊷}
+⊩clearExpiredStates(1)→void⟨8⟩{⊩⏰}
+·}
+⟩SCL│12│27⊨│18⑂│89.4%↓⟩

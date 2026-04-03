@@ -1,0 +1,39 @@
+⟨SCL v1│omnimens-embodiment-engine.ts│274→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[]
+·engineRegistry.registerEngine("embodiment-engine", "NORMAL", { dbQuota: 10 });
+⊭│type Num = number;
+κFN
+⊬BodySubsystem⟨name:string│description:string│components:string[]│estimatedCost:Num│source:string│designNotes:string│version:Num⟩
+⊬EmbodimentState⟨researchCycles:Num│topicsResearched:string[]│subsystemsDesigned:Num│blueprintVersions:Num│totalResearchEntries:Num│subsystems:η│totalEstimatedCost:Num│improvements:string[]│designPhilosophy:string⟩
+κstate
+κOUTPUT_DIR
+κRESEARCH_INTERVAL_MS
+κRESEARCH_TOPICS
+📁│fs.readFileSync(
+·new URL("./embodiment-topics.json", import.meta.url),
+·"utf8",
+·),
+·) as { topic: string; prompt: string }[];
+·const log = (msg: string) =>
+📢│console.log(`[OMNIMENS-EMBODIMENT-ENGINE] ${msg}`);
+⊱│const ensureDir = () => {
+·if (!fs.existsSync(OUTPUT_DIR)) fs.mkdirSync(OUTPUT_DIR, { recursive: true });
+·};
+⊱│const writeFile = (file: string, data: string) => {
+·try {
+📁│fs.writeFileSync(file, data);
+⊷│return true;
+·} catch {
+⊷│return false;
+·}
+·};
+⟿researchCycle(1)→Promise<void>⟨157⟩{⟿⊲⊺⊻⊳❔⊰⊱⊷⊹⊽⏰⊴⚡→⊪⊩}
+⟩SCL│38│35⊨│27⑂│86.1%↓⟩

@@ -1,0 +1,26 @@
+⟨SCL v1│graphRagLayer_gen1.mjs│40→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class GraphRAG {
+·constructor() {
+⊮│this.nodes = new Map();
+⊮│this.edges = new Map();
+·}
+·addNode(id, data) {
+·if (!this.nodes.has(id)) {
+⊡│this.nodes.set(id, data);
+·}
+·}
+addEdge(η, θ, weight = 1) {
+if (!this.edges.has(η)) {
+⊡│this.edges.set(source, []);
+·}
+⊡│this.edges.get(source).push({ target, weight });
+·}
+retrieveContextuallyRelevantNodes(◧) {
+⊷│return Array.from(this.nodes.keys()).filter(node => this.isR
+·}
+isRelevant(node, ◧) {
+⊷│return true;
+·}
+·}
+⟩SCL│25│12⊨│8⑂│37.5%↓⟩

@@ -1,0 +1,10 @@
+⟨SCL v1│adaptiveLearningModule_gen1.mjs│134→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩initializeQLearningAgent(4)→void⟨38⟩{⊩⊷⟛}
+⊩simulateEnvironment(4)→void⟨25⟩{⊩⊺⊷}
+⊩exampleRewardFunction(2)→void⟨3⟩{⊩⊳⊷}
+⊩exampleTransitionFunction(2)→void⟨3⟩{⊩⊳⊷}
+⊩normalizeArray(1)→void⟨5⟩{⊩⟛⊷}
+⊩calculateMean(1)→void⟨3⟩{⊩⋐⊷}
+⟩SCL│9│25⊨│18⑂│93.3%↓⟩

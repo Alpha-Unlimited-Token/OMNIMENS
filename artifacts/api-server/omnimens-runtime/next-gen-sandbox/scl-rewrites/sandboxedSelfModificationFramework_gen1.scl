@@ -1,0 +1,7 @@
+⟨SCL v1│sandboxedSelfModificationFramework_gen1.mjs│32→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩sandboxSelfModification(1)→void⟨8⟩{⊩}
+executeInSandbox(1)→void⟨4⟩{⊷}
+escalateToIntegration(1)→void⟨4⟩{}
+logFailure(1)→void⟨4⟩{}
+⟩SCL│6│6⊨│2⑂│81.3%↓⟩

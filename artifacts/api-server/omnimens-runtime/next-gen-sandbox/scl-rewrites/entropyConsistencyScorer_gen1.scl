@@ -1,0 +1,5 @@
+⟨SCL v1│entropyConsistencyScorer_gen1.mjs│18→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩calculateEntropy(1)→void⟨3⟩{⊩⋐⊳⊷}
+⊩scoreReasoningChain(1)→void⟨5⟩{⊩⊷}
+⟩SCL│4│8⊨│6⑂│77.8%↓⟩

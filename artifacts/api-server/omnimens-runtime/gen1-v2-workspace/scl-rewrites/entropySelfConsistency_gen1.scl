@@ -1,0 +1,15 @@
+⟨SCL v1│entropySelfConsistency_gen1.mjs│22→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class EntropySelfConsistency {
+·calculateEntropy(probabilities) {
+⋐│return -probabilities.reduce((sum, p) => sum + p * Math.log2
+·}
+·evaluateChains(chains) {
+⊷│return chains.map(chain => {
+·const probabilities = chain.map(step => step.probability);
+κentropy
+⊷│return { chain, entropy };
+·});
+·}
+·}
+⟩SCL│14│5⊨│4⑂│36.4%↓⟩

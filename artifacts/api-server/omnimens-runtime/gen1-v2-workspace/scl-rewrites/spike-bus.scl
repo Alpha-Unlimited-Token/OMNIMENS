@@ -1,0 +1,92 @@
+⟨SCL v1│spike-bus.ts│177→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊭│type SpikePriority = "critical" | "normal" | "background";
+⊬Spike⟨type:string│source:string│payload:Record<string, unknown>│priority:SpikePriority│timestamp:number│id:string⟩
+⊭│type SpikeHandler = (spike: Spike) => void | Promise<void>;
+⊬Subscription⟨spikeType:string│handler:SpikeHandler│subscriber:string⟩
+κPRIORITY_ORDER
+κMAX_QUEUE_SIZE
+κMAX_CASCADE_DEPTH
+⊶│export class SpikeBus {
+⊮│private subscriptions = new Map<string, Subscription[]>();
+·private queue: Spike[] = [];
+private ✦ = false;
+⚡→│private spikeCount = 0;
+·private droppedCount = 0;
+·private cascadeDepth = 0;
+·private totalProcessed = 0;
+·private avgProcessingMs = 0;
+⚡→│subscribe(spikeType: string, subscriber: string, handler: Sp
+κsubs
+⊺│subs.push({ spikeType, handler, subscriber });
+⊡│this.subscriptions.set(spikeType, subs);
+·}
+⚡→│unsubscribe(spikeType: string, subscriber: string): void {
+κsubs
+·if (subs) {
+⊡│this.subscriptions.set(spikeType, subs.filter(s => s.subscri
+·}
+·}
+emit(type: string, η: string, payload: Record<string, unknown> = {}, priori
+κspike
+⊹│if (this.queue.length >= MAX_QUEUE_SIZE) {
+·if (priority === "background") {
+·this.droppedCount++;
+·return;
+·}
+·const bgIndex = this.queue.findIndex(s => s.priority === "background");
+·if (bgIndex >= 0) {
+⊺│this.queue.splice(bgIndex, 1);
+·this.droppedCount++;
+·}
+·}
+⊺│this.queue.push(spike);
+·this.queue.sort((a, b) => PRIORITY_ORDER[a.priority] - PRIORITY_ORDER[b.priority
+if (!this.✦) {
+·this.processQueue();
+·}
+·}
+·private async processQueue(): Promise<void> {
+if (this.✦) return;
+this.✦ = true;
+⊹│while (this.queue.length > 0) {
+κspike
+κhandlers
+κwildcardHandlers
+κallHandlers
+⊹│if (allHandlers.length === 0) continue;
+κstart
+·this.cascadeDepth++;
+·if (this.cascadeDepth > MAX_CASCADE_DEPTH) {
+·this.cascadeDepth--;
+·continue;
+·}
+⥀│for (const sub of allHandlers) {
+·try {
+⚡→│await sub.handler(spike);
+·} catch (err) {
+·}
+·}
+·this.cascadeDepth--;
+·this.totalProcessed++;
+κelapsed
+·this.avgProcessingMs = this.avgProcessingMs * 0.95 + elapsed * 0.05;
+·}
+this.✦ = false;
+·}
+·getStats(): Record<string, unknown> {
+⊷│return {
+⚡→│totalEmitted: this.spikeCount,
+·totalProcessed: this.totalProcessed,
+·dropped: this.droppedCount,
+·queueSize: this.queue.length,
+·subscriptionTypes: this.subscriptions.size,
+⋐│totalSubscribers: [...this.subscriptions.values()].reduce((s
+·avgProcessingMs: Math.round(this.avgProcessingMs * 100) / 100,
+·cascadeDepth: this.cascadeDepth,
+·};
+·}
+·}
+⊪spikeBus
+⊪SpikeTypes
+⟩SCL│91│42⊨│22⑂│48.6%↓⟩

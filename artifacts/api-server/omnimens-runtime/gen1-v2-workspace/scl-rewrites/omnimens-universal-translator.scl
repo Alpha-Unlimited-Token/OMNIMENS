@@ -1,0 +1,199 @@
+⟨SCL v1│omnimens-universal-translator.ts│602→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+·engineRegistry.registerEngine("universal-translator", "NORMAL", { dbQuota: 10 })
+⊬TranslationTarget⟨name:string│type:"digital" | "physical"│translate:(ir: IRInstruction[]) => string⟩
+⊬IRInstruction⟨op:string│name:string│value:any│type:string│params:string[]│hwType:string│pin:number⟩
+⊬TranslationResult⟨target:string│targetType:"digital" | "physical"│output:string│irSteps:number│symbols:number│timestamp:number│success:boolean│error:string⟩
+⊬TranslatorState⟨totalTranslations:number│digitalTranslations:number│physicalTranslations:number│registeredTargets:string[]│target:string│success:boolean│timestamp:number│codeSize:number│novelConstructsTranslated:number│lastTranslationTime:number│translationMapVersion:number│customConstructs:number⟩
+⊬ProprietaryTechnology⟨id:string│name:string│officialName:string│category:string│description:string│copyright:string│inventedBy:string│ownedBy:string│createdAt:string│version:number│translationTargets:string[]│codeHash:string│status:"registered" | "active" | "evolving" | "superseded"⟩
+κstate
+κtargets
+κcustomConstructMap
+·string,
+·{
+·description: string;
+·jsEquivalent: string;
+·pyEquivalent: string;
+·cEquivalent: string;
+·asmEquivalent: string;
+·}
+·>();
+κtranslationHistory
+κproprietaryRegistry
+tokenize(1)→void⟨28⟩{⊽⊺⊷}
+parse(1)→void⟨1⟩{}
+κast
+·let i = 0;
+const read = () => ⋮[i++];
+const peek = () => ⋮[i];
+while (i < ⋮.length) {
+κtk
+·if (tk.t === "keyword" && tk.v === "fn") {
+κname
+κparams
+·while (peek() && peek().v !== ")") {
+⊺│if (peek().t === "identifier") params.push(read().v);
+·else read();
+·}
+·read(); // consume ')'
+κbody
+·let depth = 0;
+❔│if (peek()?.v === "{") {
+·depth = 1;
+·read();
+·}
+·while (peek() && depth) {
+κt
+·if (t.v === "{") depth++;
+·if (t.v === "}") depth--;
+⊺│body.push(t);
+·}
+⊺│ast.body.push({ type: "fn", name, params, body });
+⊺│ast.syms.push(name);
+·} else if (tk.t === "keyword" && tk.v === "let") {
+κname
+·let val: any = "0";
+❔│if (peek()?.v === "=") {
+·read();
+❔│val = read()?.v || "0";
+·}
+⊺│ast.body.push({ type: "var", name, val });
+⊺│ast.syms.push(name);
+·} else if (
+·tk.t === "keyword" &&
+⊻│["motor", "sensor", "signal", "neural", "synapse", "oscillat
+·tk.v,
+·)
+·) {
+κname
+⊺│ast.body.push({ type: "novel", ctype: tk.v, name });
+⊰│ast.syms.push(`${tk.v}:${name}`);
+·state.novelConstructsTranslated++;
+·}
+·}
+⊷│return ast;
+·}
+genIR(1)→void⟨1⟩{}
+κir
+⊱│ast.body.forEach((n) => {
+⑃│switch (n.type) {
+·case "fn":
+⊺│ir.push({ op: "func_begin", name: n.name, params: n.params }
+⊱│n.body.forEach((t: any) => {
+⊺│if (t.t === "keyword" && t.v === "return") ir.push({ op: "re
+⊺│else if (t.t === "identifier") ir.push({ op: "load", name: t
+⊺│else if (t.t === "number") ir.push({ op: "const", value: par
+·else if (t.t === "operator") {
+κo
+⊺│ir.push({ op: o[t.v] || "nop" });
+·}
+·});
+⊺│ir.push({ op: "func_end", name: n.name });
+·break;
+·case "var":
+⊺│ir.push({ op: "alloc", name: n.name });
+⊺│ir.push({ op: "const", value: n.val });
+⊺│ir.push({ op: "store", name: n.name });
+·break;
+·case "novel":
+⊺│ir.push({ op: "novel_construct", type: n.ctype, name: n.name
+·break;
+·}
+·});
+⊷│return ir;
+·}
+initTargets(1)→void⟨15⟩{⊡}
+registerCustomConstruct(1)→void⟨1⟩{}
+·name: string,
+·desc: string,
+·js: string,
+·py: string,
+·c: string,
+·asm: string,
+·) {
+⊡│customConstructMap.set(name, { description: desc, jsEquivale
+·state.customConstructs = customConstructMap.size;
+·state.translationMapVersion++;
+·}
+emitJavaScript(1)→void⟨48⟩{⥀⑃⊰⊺⊷⊡⊽⊵}
+⊷│return lines.join("\n");
+·}
+·const emitPython = (ir: IRInstruction[]) => emitJavaScript(ir); // placeholder
+·const emitC = (ir: IRInstruction[]) => emitJavaScript(ir);
+·const emitWASM = (ir: IRInstruction[]) => emitJavaScript(ir);
+·const emitX86 = (ir: IRInstruction[]) => emitJavaScript(ir);
+·const emitARM64 = (ir: IRInstruction[]) => emitJavaScript(ir);
+·const emitAVR = (ir: IRInstruction[]) => emitJavaScript(ir);
+·const emitESP32 = (ir: IRInstruction[]) => emitJavaScript(ir);
+log(2)→void⟨3⟩{📢⊰}
+⊩translateCode(2)→TranslationResult⟨65⟩{⊩⊡⊷⏰⊰⊳⊺⊹}
+⊪│export const translateToAll = (src: string) =>
+⊮│new Map([...targets.keys()].map((n) => [n, translateCode(src
+⊩translateForSelfUpgrade(1)→void⟨4⟩{⊩⊷}
+⊩translateForRobot(1)→void⟨5⟩{⊩⊮⊡⊷}
+κnovelKeywords
+⊩detectNovelConstructs(1)→void⟨10⟩{⊩⊷⊯⊱⊻}
+⊪│export const hasTranslationFor = (c: string) => customConstr
+⊪│export const mustTranslateBeforeExecution = (c: string) => {
+κnovel
+⊻│const un = novel.filter((x) => !customConstructMap.has(x) &&
+⊷│return { needsTranslation: novel.length > 0, novelConstructs
+·};
+⊪│export const getTranslatorState = () => ({ ...state });
+⊪│export const getCustomConstructMap = () =>
+⊱│[...customConstructMap].map(([n, m]) => ({
+·name: n,
+·description: m.description,
+·targets: ["JavaScript", "Python", "C", "Assembly"].filter((_, i) => [m.jsEquival
+·}));
+⊪│export const getTranslationTargets = () => [...targets].map(
+·let propId = 0;
+hash(1)→void⟨3⟩{⋐⊱⊷}
+generateProprietaryName(2)→void⟨11⟩{⊰⊽⊷}
+⊩registerProprietaryTechnology(1)→void⟨28⟩{⊩⊳⊻⏰⊰⊡⊷}
+⊪│export const getProprietaryRegistry = () => [...proprietaryR
+⊡│export const getProprietaryTechnology = (id: string) => prop
+⟿storeToBrain(4)→void⟨17⟩{⟠⊱}
+⟿storeProprietaryRegistry(1)→void⟨10⟩{⊄⊱⊰⊴}
+⟿storeTranslationMapping(1)→void⟨17⟩{⊴⊰⊱}
+⊩autoRegisterFromCode(1)→void⟨1⟩{⊩}
+·code: string,
+·moduleName: string,
+·category: string,
+η: string,
+·) {
+κnovel
+κnewRegs
+⊱│novel.forEach((c) => {
+·if (!customConstructMap.has(c)) {
+·registerCustomConstruct(
+·c,
+⊰│`Auto-registered ${c} from ${moduleName}`,
+⊰│`const $NAME={type:"${c}"};`,
+·"",
+·"",
+·"",
+·);
+⊺│newRegs.push(c);
+·}
+·});
+κtech
+·if (newRegs.length) cognitionBus.shareInsight("universal-translator", { type: "c
+⊷│return { technology: tech, constructsRegistered: newRegs, tr
+·}
+κMAINT
+⊱│spikeBus.on(MAINT, async () => {
+⫘│await Promise.all([storeTranslationMapping(), storeProprieta
+⚡→│spikeBus.scheduleSpike(MAINT, {}, 10 * 60 * 1000); // 10-min
+·});
+startUniversalTranslator(1)→void⟨17⟩{⊰⚡→⊱}
+·export { startUniversalTranslator };
+⊩shutdown(1)→void⟨3⟩{⊩}
+⟩SCL│198│161⊨│115⑂│67.1%↓⟩

@@ -1,0 +1,20 @@
+⟨SCL v1│omnimens-self-evolution.ts│4664→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[omnimens-emotional-core│omnimens-code-pipeline│omnimens-nextgen-sandbox]
+safeNum(2)→number⟨3⟩{⊳⊷⊼}
+·let _started = false;
+·let evaluationCycleCount = 0;
+·let totalEvaluated = 0;
+·let totalApproved = 0;
+·let totalIntegrated = 0;
+⊬CodeProposal⟨source:string│title:string│code:string│insight:string│feasibility:number│novelty:number⟩
+⊬EvaluationResult⟨proposal:CodeProposal│syntaxValid:boolean│logicScore:number│noveltyScore:number│applicabilityScore:number│securityScore:number│overallScore:number│evaluatorNotes:string│approved:boolean│integrationPlan:string | null│evaluatedAt:number⟩
+κevaluationHistory
+κapprovedModules
+κEVALUATION_INTERVAL_MS
+κAPPROVAL_THRESHOLD
+extractCodeFromInsight(1)→CodeProposal | null⟨16⟩{⊄❔⊷⊳⊽⊹}
+⟿evaluateCodeProposal(1)→Promise<EvaluationResult>⟨88⟩{❔⊽⊷⊳⏰}
+parseScore(2)→number⟨6⟩{⊰⊽⊄⊷⟛⊳}
+⟿runEvaluationCycle(1)→Promise<void>⟨4495⟩{⟿📢⊴⊹⊰⥀⊺⊳⊱⊽⊲⊷❔⊡🚨⊩⏳⟳⊄⛨▷α→⊢⊫⊸⟠⊼⊬⏰⚡→⟛⊯⊻⊨σ⋔⊪♡⊕Φ⇑⊮⋐⟐⑃}
+⟩SCL│19│72⊨│62⑂│99.6%↓⟩

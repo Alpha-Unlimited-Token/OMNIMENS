@@ -1,0 +1,5 @@
+⟨SCL v1│conversationSummarizer_gen1.mjs│112→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩summarizeConversation(3)→void⟨72⟩{⊩⊹⊵⊷⊱⟛⊺}
+⊩summarizeRawInput(3)→void⟨8⟩{⊩⊵⊷}
+⟩SCL│4│12⊨│10⑂│96.4%↓⟩

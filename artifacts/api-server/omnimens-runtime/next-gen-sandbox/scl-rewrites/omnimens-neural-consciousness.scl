@@ -1,0 +1,73 @@
+⟨SCL v1│omnimens-neural-consciousness.ts│243→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+engineRegistry.registerEngine("⬡-consciousness", "HIGH", { dbQuota: 50 });
+⊭│type RegionName =
+·| "reticular_activating_system"
+·| "thalamus"
+·| "prefrontal_cortex"
+·| "default_mode_network"
+·| "anterior_cingulate"
+·| "insular_cortex"
+·| "ventral_tegmental_area"
+·| "hippocampus"
+·| "amygdala"
+·| "basal_ganglia"
+·| "claustrum"
+·| "locus_coeruleus"
+·| "raphe_nuclei"
+·| "superior_colliculus"
+·| "pulvinar"
+·| "cerebellum";
+⊬Neuron⟨v:number;            // membrane potential│thr:number;          // threshold│ref:number;          // refractory ms remaining│ic:η│fired:boolean⟩
+⊬Region⟨neurons:Neuron[]│firingRate:number│activation:number│dominantNT:string⟩
+⊬Synapse⟨pre:Neuron│post:Neuron│w:number│d:number; // delay (ms) – implemented by spike scheduling⟩
+⊬State⟨tick:number│phi:number│thalRes:number│arousal:number│hebbianUpdates:number⟩
+κDT
+κTAU_M
+κTAU_REF
+κV_REST
+κV_TH
+κV_RESET
+κV_PEAK
+κHEBB
+κMIN_W
+κMAX_W
+κCYCLE_MS
+κregions
+κsynapses
+κstate
+newNeuron(1)→Neuron⟨9⟩{⊷⚡→}
+buildRegion(3)→⬡⟨3⟩{⊷}
+initBrain(1)→void⟨9⟩{⊡}
+connectRegions(1)→void⟨18⟩{⊡⊱⊺}
+⟿cycle(1)→Promise<void>⟨21⟩{⟿⚡→}
+stepRegion(1)→void⟨25⟩{⚡→⊱⟛}
+spikePostFiring(1)→void⟨12⟩{⚡→}
+⊱│spikeBus.on("neural-consciousness:axonal", ({ syn }: { syn: 
+·syn.post.ic += syn.w;
+·});
+updateSynapse(1)→void⟨7⟩{⚡→⟛≋+}
+computeGlobalState(1)→void⟨9⟩{⋐Φ⇑⊡❔}
+⊱│cognitionBus.onInsight((src, insight) => {
+if (src !== "⬡-consciousness" && insight.type === "discovery") {
+⊡│regions.get("ventral_tegmental_area")?.neurons.forEach((n) =
+·}
+·});
+⊱│spikeBus.on("attention:neural-consciousness", () => {
+⚡→│spikeBus.scheduleSpike("neural-consciousness:cycle", {}, 50)
+·});
+⊱│spikeBus.on("cognition:curiosity", () => {
+⊱│regions.forEach((r) => r.neurons.forEach((n) => (n.ic += (Ma
+·});
+⊩start(1)→void⟨6⟩{⊩⚡→}
+⊩getState(1)→Readonly<State>⟨3⟩{⊩⊷}
+⊩shutdown(1)→void⟨3⟩{⊩}
+·start();
+⟩SCL│72│67⊨│38⑂│70.4%↓⟩

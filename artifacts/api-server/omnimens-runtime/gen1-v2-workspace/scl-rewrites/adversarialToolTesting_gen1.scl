@@ -1,0 +1,25 @@
+⟨SCL v1│adversarialToolTesting_gen1.mjs│35→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class AdversarialToolTesting {
+·constructor() {
+·this.testCases = [];
+·}
+·addTestCase(testCase) {
+⊺│this.testCases.push(testCase);
+·}
+·runTests(tool) {
+⊷│return this.testCases.map(test => {
+·try {
+⊷│return { test, result: test(tool) };
+·} catch (error) {
+⊷│return { test, error };
+·}
+·});
+·}
+·}
+κadversarialTesting
+·adversarialTesting.addTestCase(tool => tool.run() === 'expectedOutput');
+·const tool = { run: () => 'unexpectedOutput' };
+κresults
+console.log(⊢);
+⟩SCL│24│8⊨│5⑂│31.4%↓⟩

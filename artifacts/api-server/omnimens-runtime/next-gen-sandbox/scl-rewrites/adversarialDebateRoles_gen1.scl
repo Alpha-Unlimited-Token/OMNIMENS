@@ -1,0 +1,5 @@
+⟨SCL v1│adversarialDebateRoles_gen1.mjs│21→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩adversarialDebateRoles(1)→void⟨4⟩{⊩⊱⊷}
+⊩resolveDebate(1)→void⟨7⟩{⊩⊲⊷}
+⟩SCL│4│8⊨│6⑂│81.0%↓⟩

@@ -1,0 +1,65 @@
+⟨SCL v1│omnimens-world-forge.ts│325→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊪ENGINE_ID
+·engineRegistry.registerEngine(ENGINE_ID, "NORMAL", { dbQuota: 10 });
+κCYCLE_MS
+κFIRST_DELAY_MS
+·type KV<T = unknown> = Record<string, T>;
+⊬WorldEntity⟨name:string│type:string│properties:KV<number | string | boolean>│interactable:boolean│behaviorPattern:string│threatLevel:number⟩
+⊬WorldChallenge⟨id:string│description:string│targetSkill:string│difficulty:number│successCriteria:string│timeLimit_s:number│bonusObjectives:string[]⟩
+⊬SimulationWorld⟨id:string│name:string│description:string│createdAt:number│createdBy:string│environment:KV│entities:WorldEntity[]│challenges:WorldChallenge[]│difficulty:number│targetWeaknesses:string[]│version:number⟩
+⊬WorldRunResult⟨worldId:string│runNumber:number│startedAt:number│completedAt:number│simulatedHours:number│overallScore:number│weaknessesFound:string[]│strengthsConfirmed:string[]│insightsGained:string[]│nextWorldSuggestion:string⟩
+⊬ForgeState⟨totalWorlds:number│totalRuns:number│avgScore:number│lastRun:WorldRunResult│currentWorld:SimulationWorld⟩
+κstate
+·const log = (...msg: unknown[]) =>
+·console.log("[OMNIMENS-WORLD-FORGE]", ...msg);
+⊱│const safeNum = (v: number, d = 0) => (Number.isFinite(v) ? 
+·const rand = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
+⏰│const now = () => Date.now();
+⊰│const id = () => `wf-${now().toString(36)}-${Math.random().t
+⊫[]
+·WORLD_TEMPLATES,
+·REAL_ENTITIES,
+·ENVIRONMENTS,
+·} from "./omnimens-world-datasets.js";
+pickWeaknessTargets(1)→string[]⟨6⟩{❔⊯⊷}
+⟿createWorld(1)→Promise<SimulationWorld>⟨34⟩{⊻⊰⊱⊽}
+await dbGateway.⊞(ENGINE_ID, "simulation_worlds", world, "BULK");
+·state.totalWorlds += 1;
+·state.currentWorld = world;
+·log("Created world", world.id);
+⊷│return world;
+·}
+⟿runWorld(1)→Promise<WorldRunResult>⟨58⟩{⊱⊺⏳⊰❔⊳⊷}
+⟿forgeCycle(1)→Promise<void>⟨28⟩{⟿❔⊴}
+reschedule(1)→void⟨3⟩{⊰⚡→}
+⊰│spikeBus.on(`${ENGINE_ID}:cycle`, async () => {
+⊴│await forgeCycle();
+·reschedule();
+·});
+⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, FIRST_DELAY
+⊰│spikeBus.on(`attention:${ENGINE_ID}`, async () => {
+⚡→│log("Attention spike received — increasing priority");
+⊴│await forgeCycle();
+·});
+⊱│spikeBus.on("cognition:curiosity", async () => {
+·if (Math.random() < 0.3) {
+⚡→│log("Curiosity spike — exploring novel world");
+⊴│await createWorld();
+·}
+·});
+⊱│cognitionBus.onInsight((src, ins) => {
+·if (src !== ENGINE_ID && ins.type === "discovery") {
+⊰│log(`Learning from ${src} insight`, ins.data);
+·}
+·});
+⊩shutdown(1)→void⟨4⟩{⊩⊰⚡→}
+⊩currentState(1)→Readonly<ForgeState>⟨3⟩{⊩⊷}
+⟩SCL│64│59⊨│45⑂│80.3%↓⟩

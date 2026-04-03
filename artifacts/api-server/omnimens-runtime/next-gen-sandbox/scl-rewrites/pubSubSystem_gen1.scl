@@ -1,0 +1,22 @@
+⟨SCL v1│pubSubSystem_gen1.mjs│33→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class PubSubSystem {
+·constructor() {
+⊮│this.subscribers = new Map();
+·}
+·subscribe(eventType, callback) {
+·if (!this.subscribers.has(eventType)) {
+⊡│this.subscribers.set(eventType, []);
+·}
+⊡│this.subscribers.get(eventType).push(callback);
+·}
+·publish(eventType, data) {
+·if (this.subscribers.has(eventType)) {
+⊡│this.subscribers.get(eventType).forEach(callback => callback
+·}
+·}
+·escalate(eventType, data) {
+⊰│console.log(`Escalating event ${eventType} with data:`, data
+·}
+·}
+⟩SCL│21│6⊨│6⑂│36.4%↓⟩

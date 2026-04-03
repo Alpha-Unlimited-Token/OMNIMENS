@@ -1,0 +1,26 @@
+⟨SCL v1│sleepPhaseMemoryConsolidation_gen1.mjs│43→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export default class SleepPhase {
+·constructor(memoryStorage) {
+·this.memoryStorage = memoryStorage;
+·}
+·consolidateMemory() {
+κepisodicMemories
+κsemanticMemories
+κproceduralMemories
+κconsolidatedMemories
+·episodicMemories,
+·semanticMemories,
+·proceduralMemories
+·);
+·this.memoryStorage.storeConsolidatedMemories(consolidatedMemories);
+·}
+applyHopfieldDynamics(episodic, ◧, procedural) {
+κcombinedMemories
+κuniquePatterns
+⊱│return Array.from(uniquePatterns).map((pattern) => {
+⊷│return pattern.trim().toLowerCase(); // Simplified optimizat
+·});
+·}
+·}
+⟩SCL│25│10⊨│3⑂│41.9%↓⟩

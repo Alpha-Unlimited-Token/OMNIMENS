@@ -1,0 +1,136 @@
+⟨SCL v1│omnimens-agent-mesh.ts│231→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[web-search│omnimens-patches]
+·getActiveGenesisAgentNames,
+·getActiveGenesisAgentDomains,
+·genesisAgentThink,
+} from "./omnimens-α-genesis.js";
+⊫[]
+·getConsciousnessBlockForAgent,
+·getAllAgentNames,
+·loadRecentUserMemoriesForAgents,
+·} from "./omnimens-consciousness-bus.js";
+⊫[omnimens-nextgen-sandbox]
+engineRegistry.registerEngine("α-mesh", "NORMAL", { dbQuota: 10 });
+κOWNER_EMAIL
+κOWNER_ID
+⊭│type MeshAgentName =
+·| "Architect"
+·| "Critic"
+·| "Synthesizer"
+·| "Mathematician"
+·| "Neuroscientist"
+| "Meta-α"
+·| "GraphicDesigner"
+·| "SpellCheckVisual"
+·| "OMNIMENS";
+κMESH_AGENTS
+·const callOpenAI = (cfg: any) =>
+apiManager.call("α-mesh", "openai", { endpoint: "chat/completions", ...cfg }
+κopenai
+κTABLE
+const ⊞ = (table: string, data: any, priority: any = "NORMAL") =>
+dbGateway.⊞("α-mesh", table, data, priority);
+·const read = (table: string, query: any = {}) =>
+dbGateway.read("α-mesh", table, query);
+safeNum(2)→void⟨3⟩{⊳⊷⊼}
+·let meshCycleCount = 0;
+⟿storeAgentMessage(1)→void⟨1⟩{}
+·from: MeshAgentName,
+·to: MeshAgentName,
+·type: string,
+·subject: string,
+·content: string,
+⊳│codePayload?: string,
+·priority: string = "NORMAL",
+·cycleId = meshCycleCount,
+·) {
+⊴│await write(TABLE.mesh, {
+·fromAgent: from,
+·toAgent: to,
+·messageType: type,
+·subject,
+·content: content.slice(0, 5000),
+❔│codePayload: codePayload?.slice(0, 10000) || null,
+·priority,
+·status: "pending",
+·appliedToOmnimens: false,
+·cycleId,
+·});
+·}
+⟿sendOwnerNotification(1)→void⟨1⟩{}
+·title: string,
+·message: string,
+·type: string = "agent_mesh",
+·priority: string = "NORMAL",
+·) {
+⊴│await write(TABLE.notifications, {
+·upgradeId: null,
+·title,
+·message,
+·type,
+·readByOwner: false,
+·});
+·if (priority === "critical" || type === "republish_required") {
+⊴│await write(TABLE.notifications, {
+·upgradeId: null,
+⊰│title: `🔴 ACTION REQUIRED: ${title}`,
+·message:
+⊰│`${message}\n\n⚠️ This upgrade requires republishing. Click 
+·type: "republish_required",
+·readByOwner: false,
+·});
+·}
+·}
+⟿agentThink(1)→void⟨1⟩{}
+·agentName: MeshAgentName,
+·prompt: string,
+·max = 1500,
+·) {
+·try {
+κres
+❔│return res.choices?.[0]?.message?.content?.trim() || "";
+·} catch (e) {
+console.error("[OMNIMENS-α-MESH] openai error:", e);
+⊷│return "";
+·}
+·}
+κMESH_RESEARCH_TOPICS
+⟿phase1_research(1)→Promise<string>⟨14⟩{⥀⊴⊺⊷}
+⟿loadMeshEpisodicMemory(1)→void⟨11⟩{⊴⊷⊰}
+·)
+·.join("\n");
+·}
+⟿phase2_agentDiscoveries(1)→void⟨1⟩{}
+·cycleId: number,
+·researchContext: string,
+·) {
+κbrain
+κbrainSummary
+⊰│.map((b) => `[${b.category}] ${b.title}: ${b.content}`)
+·.join("\n");
+κprevious
+⋔│const work = MESH_AGENTS.filter((a) => a !== "OMNIMENS").map
+·agentThink(
+α,
+⊰│`You are ${agent}. Latest research:\n${researchContext.slice
+·0,
+·2500,
+·)}\n\nOMNIMENS brain:\n${brainSummary.slice(
+·0,
+·1500,
+·)}\n\nMemory:\n${previous || "None yet."}`,
+·2500,
+⊱│).then(async (raw) => {
+⊄│if (!raw) return null;
+κparsed
+⊪_v2RewriteModule
+·export {};
+⟩SCL│135│58⊨│26⑂│41.6%↓⟩

@@ -1,0 +1,16 @@
+⟨SCL v1│recursiveSafetyEvaluator_gen1.mjs│30→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊪recursiveSafetyEvaluator
+⊷│return simulatedFailures.filter(failure => failure.likelihoo
+·},
+⊱│counterfactualAnalysis: (modification) => {
+κcounterfactualScenarios
+⊷│return counterfactualScenarios;
+·},
+⊱│evaluate: (modification) => {
+κadversarialResults
+κcounterfactualResults
+⊷│return { adversarialResults, counterfactualResults };
+·}
+·};
+⟩SCL│15│9⊨│5⑂│50.0%↓⟩

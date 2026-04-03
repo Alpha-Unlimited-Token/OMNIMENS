@@ -1,0 +1,24 @@
+⟨SCL v1│eventDrivenPubSubLayer_gen1.mjs│35→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class PubSubCoordinator {
+·constructor() {
+⊮│this.subscribers = new Map();
+·}
+·subscribe(eventType, callback) {
+·if (!this.subscribers.has(eventType)) {
+⊡│this.subscribers.set(eventType, []);
+·}
+⊡│this.subscribers.get(eventType).push(callback);
+·}
+·publish(eventType, data) {
+·if (this.subscribers.has(eventType)) {
+⊡│this.subscribers.get(eventType).forEach(callback => callback
+·}
+·}
+·delegateTask(eventType, task) {
+κpriority
+·this.publish(eventType, { task, priority });
+·}
+·}
+⊪pubSubLayer
+⟩SCL│23│7⊨│5⑂│34.3%↓⟩

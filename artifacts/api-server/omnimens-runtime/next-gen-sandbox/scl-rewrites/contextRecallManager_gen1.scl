@@ -1,0 +1,19 @@
+⟨SCL v1│contextRecallManager_gen1.mjs│107→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊲│const { Client } = require('pg');
+κcrypto
+generateHash(1)→void⟨3⟩{⊷}
+initializeDatabase(1)→void⟨5⟩{⊷}
+⟿ensureTable(1)→void⟨11⟩{}
+⟿saveContext(2)→void⟨9⟩{}
+⟿retrieveContext(3)→void⟨11⟩{⊰⊷}
+⟿closeDatabase(1)→void⟨3⟩{}
+Ε.exports = {
+·generateHash,
+·initializeDatabase,
+·ensureTable,
+·saveContext,
+·retrieveContext,
+·closeDatabase
+·};
+⟩SCL│18│13⊨│5⑂│83.2%↓⟩

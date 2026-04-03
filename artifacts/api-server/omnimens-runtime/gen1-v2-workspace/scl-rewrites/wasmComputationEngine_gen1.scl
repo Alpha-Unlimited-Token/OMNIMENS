@@ -1,0 +1,14 @@
+⟨SCL v1│wasmComputationEngine_gen1.mjs│104→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩⟿loadWasmModule(1)→void⟨10⟩{⊩⊴⊷⊰⊵}
+⊩executeWasmFunction(3)→void⟨14⟩{⊩⊲⊰⊵⊷}
+⊩validateWasmModule(2)→void⟨5⟩{⊩⊲⊷}
+⊩⟿exampleUsage(1)→void⟨16⟩{⊩⊴⊵⊰}
+·export default {
+·loadWasmModule,
+·executeWasmFunction,
+·validateWasmModule,
+·exampleUsage
+·};
+⟩SCL│13│22⊨│17⑂│87.5%↓⟩

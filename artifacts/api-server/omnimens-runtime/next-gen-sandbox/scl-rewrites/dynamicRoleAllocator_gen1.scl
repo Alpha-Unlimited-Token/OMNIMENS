@@ -1,0 +1,17 @@
+⟨SCL v1│dynamicRoleAllocator_gen1.mjs│25→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class DynamicRoleAllocator {
+·constructor() {
+·this.agents = [];
+·}
+registerAgent(α) {
+⊺│this.agents.push(agent);
+·}
+·allocateRoles(metrics) {
+·this.agents.sort((a, b) => metrics[b.id] - metrics[a.id]);
+⊱│this.agents.forEach((agent, index) => {
+⊳│agent.role = index === 0 ? 'primary' : 'secondary';
+·});
+·}
+·}
+⟩SCL│16│5⊨│4⑂│36.0%↓⟩

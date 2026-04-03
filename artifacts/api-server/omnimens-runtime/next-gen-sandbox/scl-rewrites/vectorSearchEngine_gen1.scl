@@ -1,0 +1,10 @@
+⟨SCL v1│vectorSearchEngine_gen1.mjs│195→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩euclideanDistance(2)→void⟨6⟩{⊩⊹⊵⋐⊷}
+⊩createNode(2)→void⟨7⟩{⊩⊷⊮}
+⊩createHNSWGraph(1)→void⟨7⟩{⊩⊷⊮}
+⊩addNode(3)→void⟨35⟩{⊩⊡⥀}
+connectNode(4)→void⟨18⟩{⊡⊄⊯}
+trimNeighbors(3)→void⟨7⟩{⊡⊹⊯}
+⊩search(3)→void⟨31⟩{⊩⊷⊯⊹⊺⊡⥀}
+⟩SCL│9│34⊨│27⑂│95.4%↓⟩

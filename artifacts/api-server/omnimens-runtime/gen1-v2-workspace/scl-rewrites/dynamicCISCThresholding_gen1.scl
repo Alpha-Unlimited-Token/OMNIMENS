@@ -1,0 +1,20 @@
+⟨SCL v1│dynamicCISCThresholding_gen1.mjs│28→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class DynamicCISCThresholding {
+·constructor() {
+·this.adversarialLog = [];
+·this.baseThreshold = 0.8;
+·}
+·logInteraction(interaction) {
+⊺│this.adversarialLog.push(interaction);
+⊹│if (this.adversarialLog.length > 100) {
+⊺│this.adversarialLog.shift(); // Maintain lightweight log
+·}
+·}
+·calculateThreshold() {
+κrecentInteractions
+·const adversarialCount = recentInteractions.filter(i => i.isAdversarial).length;
+⟛│return Math.min(1, this.baseThreshold + adversarialCount * 0
+·}
+·}
+⟩SCL│19│6⊨│5⑂│32.1%↓⟩

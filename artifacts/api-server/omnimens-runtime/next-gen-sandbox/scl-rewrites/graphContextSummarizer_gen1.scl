@@ -1,0 +1,10 @@
+⟨SCL v1│graphContextSummarizer_gen1.mjs│127→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩computeSemanticSimilarity(2)→void⟨7⟩{⊩⊯⊷}
+⊩constructSemanticGraph(1)→void⟨18⟩{⊩⥀⊺⊷}
+⊩clusterGraph(1)→void⟨27⟩{⊩⊯⊺⥀⊷}
+⊩compressClusters(2)→void⟨17⟩{⊩⥀⊳⊷⊯⊺}
+⊩summarizeContexts(1)→void⟨5⟩{⊩⊷}
+⊩tokenizeText(1)→void⟨3⟩{⊩⊷⊽}
+⟩SCL│9│30⊨│23⑂│92.9%↓⟩

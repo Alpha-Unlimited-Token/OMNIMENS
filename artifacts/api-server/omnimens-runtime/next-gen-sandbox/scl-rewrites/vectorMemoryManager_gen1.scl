@@ -1,0 +1,36 @@
+⟨SCL v1│vectorMemoryManager_gen1.mjs│111→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+cosineSimilarity(2)→void⟨6⟩{⋐⊳⊷}
+⊶│class VectorMemoryManager {
+·constructor() {
+⊮│this.vectorStore = new Map();
+·}
+·addVector(id, vector) {
+if (!ι.isArray(vector) || vector.some(≪ => typeof ≪ !== 'number')) {
+⊵│throw new Error('Invalid vector: must be an array of numbers
+·}
+⊡│this.vectorStore.set(id, { id, vector });
+·}
+·getVectorById(id) {
+κentry
+⊳│return entry ? entry.vector : null;
+·}
+·findMostSimilarVector(queryVector) {
+⊷│if (this.vectorStore.size === 0) return null;
+·let bestMatch = null;
+·let highestSimilarity = -Infinity;
+for (const { id, vector } of this.vectorStore.≢()) {
+κsimilarity
+·if (similarity > highestSimilarity) {
+·highestSimilarity = similarity;
+·bestMatch = { id, similarity };
+·}
+·}
+⊷│return bestMatch;
+·}
+·clearStore() {
+·this.vectorStore.clear();
+·}
+·}
+·export { VectorMemoryManager, cosineSimilarity };
+⟩SCL│35│15⊨│10⑂│68.5%↓⟩

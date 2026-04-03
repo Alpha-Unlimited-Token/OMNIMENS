@@ -1,0 +1,31 @@
+⟨SCL v1│adversarialToolTester_gen1.mjs│42→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class AdversarialToolTester {
+·constructor() {
+·this.testCases = [];
+·}
+·addTestCase(testCase) {
+⊺│this.testCases.push(testCase);
+·}
+·runTests(tool) {
+⊰│console.log(`Running adversarial tests on tool: ${tool.name}
+·let passed = true;
+⥀│for (const test of this.testCases) {
+·try {
+κresult
+·if (!result) {
+⊰│console.error(`Test failed for tool: ${tool.name}`);
+·passed = false;
+·}
+·} catch (error) {
+⊰│console.error(`Error during test: ${error.message}`);
+·passed = false;
+·}
+·}
+⊷│return passed;
+·}
+·}
+κtester
+tester.addTestCase(tool => typeof tool.Ε === 'function');
+⊹│tester.addTestCase(tool => tool.name.length > 0);
+⟩SCL│30│11⊨│8⑂│28.6%↓⟩

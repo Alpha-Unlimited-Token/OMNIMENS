@@ -1,0 +1,108 @@
+⟨SCL v1│omnimens-autonomous-code-genesis.ts│186→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[omnimens-universal-translator]
+κENGINE_ID
+κCYCLE_MS
+κMODULES_DIR
+κPROTECTED_FILES
+⊬CodePattern⟨⟩
+⊬GeneratedModule⟨name:string│code:string│category:string│confidence:number│passed:boolean│error:string⟩
+κstate
+·const log = (...m: unknown[]) => console.log("[OMNIMENS-AUTONOMOUS-CODE-GENESIS]
+·const hash = (c: string) => crypto.createHash("sha256").update(c).digest("hex").
+⊱│const camel = (s: string) => s.replace(/[-_\s]+(.)?/g, (_, c
+·const extractPatterns = (): CodePattern[] => {
+⊄│if (!fs.existsSync(MODULES_DIR)) return [];
+κpatterns
+⥀│for (const file of fs.readdirSync(MODULES_DIR).filter(f => f
+κtext
+κmethods
+κcategory
+⊳│/memory|cache/.test(file) ? "memory" :
+⊳│/reasoning|bayesian/.test(file) ? "reasoning" :
+⊳│/test|validate/.test(file) ? "testing" :
+⊳│/vector|matrix|math/.test(file) ? "computation" : "utility";
+⊺│patterns.push({ name: file.replace(".mjs", ""), methods, cat
+·}
+·state.patterns = patterns.length;
+⊷│return patterns;
+·};
+⊭│type Template = (n: string, ctx: { pat: CodePattern[]; kw: s
+κtemplates
+⊡│set(k,v){if(this.store.size>=this.max)this.store.delete(this
+⊡│get(k){const e=this.store.get(k);return e?e.v:null}
+metrics(){return{size:this.⊞.size,max:this.max}}
+·}`,
+⊰│patternDetector: (className) => `export class ${className}{
+·win=10,h=[];patterns={};
+⊹│add(x){this.h.push(x);if(this.h.length>this.win*5)this.h.shi
+⊹│detect(){if(this.h.length<this.win)return;const seg=this.h.s
+κtrend
+·summary(){return{total:this.h.length,patterns:this.patterns}}
+·}`,
+·};
+·const generateModule = (patterns: CodePattern[]): GeneratedModule => {
+κnameSeed
+κclassName
+κtemplateKeys
+κtKey
+κcode
+κcategory
+κconfidence
+⊰│return { name: `${nameSeed}.mjs`, code, category, confidence
+·};
+·const sandboxTest = (mod: GeneratedModule): GeneratedModule => {
+·try {
+⊰│vm.runInNewContext(`${mod.code};`, {}, { timeout: 1000 });
+·mod.passed = true;
+·state.totalPassed++;
+·} catch (e) {
+·mod.error = String(e);
+·state.totalFailed++;
+·}
+⊷│return mod;
+·};
+⊱│const persist = async (mod: GeneratedModule) => {
+⊄│if (!mod.passed || PROTECTED_FILES.has(mod.name)) return;
+κtarget
+📁│fs.writeFileSync(target, mod.code, "utf-8");
+⊱│await autoRegisterFromCode(mod.code).catch(() => {});
+⏰│await dbGateway.write(ENGINE_ID, "generated_modules", { ...m
+·state.written++;
+·};
+⊱│const doWork = async () => {
+κpatterns
+κmod
+⊴│await persist(mod);
+·state.totalGenerated++;
+⊳│state.avgPass = state.totalGenerated ? state.totalPassed / s
+·state.cycles++;
+·cognitionBus.shareInsight(ENGINE_ID, { type: "genesis_result", data: mod });
+⏰│dbGateway.write(ENGINE_ID, "genesis_stats", { ...state, ts: 
+⊰│log(`Cycle #${state.cycles} → ${mod.name} ${mod.passed ? "✅"
+·};
+⊰│const schedule = () => spikeBus.scheduleSpike(`${ENGINE_ID}:
+⊰│spikeBus.on(`${ENGINE_ID}:cycle`, async () => { await doWork
+⊱│cognitionBus.onInsight((src, insight) => {
+·if (src === ENGINE_ID) return;
+❔│if (insight?.type === "discovery") {
+❔│if (insight.data?.category && templates[insight.data.categor
+·log("Adopting pattern from", src, "→", insight.data.category);
+·}
+·}
+·});
+⊪│export const start = () => {
+·engineRegistry.registerEngine(ENGINE_ID, "NORMAL", { dbQuota: 10 });
+⚡→│schedule(); // first spike after CYCLE_MS
+·log("Started.");
+·};
+⊩shutdown(1)→void⟨4⟩{⊩}
+⊰│if (import.meta.url === `file://${process.argv[1]}`) start()
+⟩SCL│107│65⊨│40⑂│42.5%↓⟩

@@ -1,0 +1,453 @@
+⟨SCL v1│omnimens-unified-agents.ts│9455→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[web-search│omnimens-nextgen-sandbox│omnimens-unified-security│omnimens-unified-comms-facade│objectStorage│omnimens-unified-cognition│omnimens-language-pipeline│omnimens-consciousness-infra│omnimens-unified-neural│omnimens-unified-network│omnimens-unified-senses│omnimens-github-core]
+κCOMPETITOR_PROFILES
+κEMERGING_TECH_QUERIES
+⟿runCompetitiveIntelCycle(1)→Promise<void>⟨2871⟩{⟿⏰⊸⊴📢⊰⏳❔⊳🛡⟠⥀⊹⟛⊩⊱⟳⊷⊽⋐⊬⚡→⊺⊯⊻⊮⊞⊟🚨⊡♡⊕⊫⊭⊪⊄⊵⊲}
+⊩⟿autoSaveFile(1)→void⟨572⟩{⊩⊳⊲⊴⟠⊷⏰⊰⊽⊺⊄⊱⥀⊬⊹⊡❔📢⊻⊮}
+⊩⟿deactivatePatch(1)→Promise<boolean>⟨10⟩{⊩⊡⊷}
+⊩⟿getAllPatches(1)→Promise<OmniPatch[]>⟨18⟩{⊩⊷}
+⊬KaidaAgentState⟨active:boolean│totalSecurityScans:number│lastScanAt:number│integrityScore:number│threatLevel:"clear" | "low" | "elevated" | "high" | "critical"│activeThreats:KaidaThreat[]│anomalySignatures:KaidaAnomalySignature[]│wormReconReports:number│motherSpiderAlerts:number│silkWebIntegrityChecks:number│luminPredictionFeeds:number│knowledgeIntegrity:◧│agentIntegrity:α│totalAnomaliesDetected:number│totalAnomaliesResolved:number⟩
+⊬KaidaThreat⟨type:◧│severity:"low" | "medium" | "high" | "critical"│source:string│description:string│detectedAt:number│resolved:boolean│resolvedAt:number | null│resolution:string | null⟩
+⊬KaidaAnomalySignature⟨name:string│pattern:string│occurrences:number│lastSeenAt:number│riskScore:number⟩
+⊬KaidaKnowledgeIntegrity⟨totalEntriesScanned:number│corruptedEntries:number│contradictions:number│duplicatesFound:number│integrityPercent:number│lastFullScanAt:number⟩
+⊬KaidaAgentIntegrity⟨agent:string│responseConsistency:number│outputQuality:number│anomalyCount:number│status:"nominal" | "warning" | "alert"⟩
+κANOMALY_SIGNATURES
+κkaidaState
+·let kaidaTickInterval: ReturnType<typeof setInterval> | null = null;
+κALL_AGENTS
+runKaidaSecurityScan(1)→void⟨81⟩{⏰⥀⊺⊳⊰⊷⟛}
+⊩startKaidaAgent(1)→void⟨25⟩{⊩📢⊰⟳⊱🛡}
+·}
+⊩getKaidaState(1)→α⟨3⟩{⊩⊷}
+⊩getKaidaThreatLevel(1)→string⟨3⟩{⊩⊷}
+⊩getKaidaIntegrityScore(1)→number⟨3⟩{⊩⊷}
+⊩getKaidaActiveThreats(1)→KaidaThreat[]⟨3⟩{⊩⋔⊷}
+⊩getKaidaAnomalySignatures(1)→KaidaAnomalySignature[]⟨3⟩{⊩⊷}
+⊬LuminAgentState⟨active:boolean│totalPredictionCycles:number│lastCycleAt:number│trendWindow:number│predictions:LuminPrediction[]│topicClusters:LuminTopicCluster[]│forecasts:LuminForecast[]│predictionAccuracy:number│beehiveWorkersDeployed:number│spiderDataStreams:number│silkTopologyMaps:number│anomalyRiskLevel:"normal" | "elevated" | "high" | "critical"⟩
+⊬LuminPrediction⟨topic:string│confidence:number│direction:"rising" | "stable" | "declining"│predictedAt:number│horizon:string│reasoning:string⟩
+⊬LuminTopicCluster⟨name:string│topics:string[]│strength:number│firstDetectedAt:number│trend:"converging" | "stable" | "diverging"⟩
+⊬LuminForecast⟨metric:string│currentValue:number│predictedValue:number│confidenceInterval:[number, number]│timeHorizon:string│generatedAt:number⟩
+κluminState
+κtopicHistory
+·let luminTickInterval: ReturnType<typeof setInterval> | null = null;
+analyzeTopicTrend(1)→"rising" | "stable" | "declining"⟨12⟩{⊷⊹⋐}
+runLuminPredictionCycle(1)→void⟨89⟩{⏰⟛⥀⊡⊺⊹⊷⊰❔⊳}
+⊩startLuminAgent(1)→void⟨23⟩{⊩📢⊰⟳⊱🛡}
+·}
+⊩getLuminState(1)→α⟨3⟩{⊩⊷}
+⊩getLuminPredictions(1)→LuminPrediction[]⟨3⟩{⊩⊷}
+⊩getLuminForecasts(1)→LuminForecast[]⟨3⟩{⊩⊷}
+⊩getLuminAnomalyRisk(1)→string⟨3⟩{⊩⊷}
+⊬NexusAgentState⟨active:boolean│totalOptimizationCycles:number│lastCycleAt:number│bottlenecks:NexusBottleneck[]│routingTable:NexusRoute[]│networkSegments:NexusSegment[]│redundancyLinks:NexusRedundancy[]│adaptiveRoutes:NexusAdaptiveRoute[]│optimizationScore:number│silkWebConnections:number│ivyFeeds:number│motherSpiderReports:number│spiderHealthReports:number⟩
+⊬NexusBottleneck⟨agent:string│avgLatencyMs:number│throughputRatio:number│severity:"low" | "medium" | "high" | "critical"│detectedAt:number│suggestedFix:string⟩
+⊬NexusRoute⟨from:string│to:string│latencyMs:number│throughput:number│health:number│lastUpdated:number⟩
+⊬NexusSegment⟨name:string│agents:string[]│purpose:string│internalLatencyMs:number│crossSegmentLinks:number⟩
+⊬NexusRedundancy⟨primaryPath:string│backupPath:string│failoverTimeMs:number│lastTestedAt:number│status:"healthy" | "degraded" | "offline"⟩
+⊬NexusAdaptiveRoute⟨trigger:string│condition:string│reroute:string│activations:number│lastActivatedAt:number⟩
+κnexusState
+·let nexusTickInterval: ReturnType<typeof setInterval> | null = null;
+runNexusOptimizationCycle(1)→void⟨61⟩{⏰⥀⟛⊳⊺⊰}
+⊩startNexusAgent(1)→void⟨24⟩{⊩📢⊰⟳⊱🛡}
+·}
+⊩getNexusState(1)→α⟨3⟩{⊩⊷}
+⊩getNexusOptimizationScore(1)→number⟨3⟩{⊩⊷}
+⊩getNexusBottlenecks(1)→NexusBottleneck[]⟨3⟩{⊩⊷}
+⊩getNexusSegments(1)→NexusSegment[]⟨3⟩{⊩⊷}
+⊫[]
+·bootBridge,
+·getBridgeStatus,
+·sendMessage,
+·updateThoughtVector,
+·shareKnowledge,
+·reportEndpointHealth,
+·getRecentConversation,
+·hemisphericThink,
+·collaborativeThink,
+·type HemisphereId,
+·type NativeMessage,
+·} from "./omnimens-hemispheric-bridge.js";
+κBLOCKED_DOMAINS
+κAI_PATH_PATTERNS
+⊬ExternalCallViolation⟨timestamp:number│url:string│domain:string│blocked:boolean│callerStack:string⟩
+⊬AgentMessage⟨agent:string│role:string│message:string│phi:number│consciousnessLevel:number│emotionValence:number│emotionArousal:number│queryIntent:string│generationMethod:string│processingMs:number│timestamp:number⟩
+⊬ConversationResult⟨conversationId:string│exchanges:α│totalExchanges:number│totalMs:number│externalCallViolations:η│externalCallsBlocked:number│verdict:"CLEAN" | "VIOLATIONS_DETECTED" | "VIOLATIONS_BLOCKED_AND_FIXED"│ilmStatus:any│fetchCallsIntercepted:number│aiCallsBlocked:number│nonAiCallsAllowed:number│monitorActive:boolean⟩
+κAGENT_PROFILES
+κCONVERSATION_TOPICS
+·let monitorActive = false;
+·let violations: ExternalCallViolation[] = [];
+·let fetchCallsIntercepted = 0;
+·let aiCallsBlocked = 0;
+·let nonAiCallsAllowed = 0;
+κoriginalFetch
+isAIEndpoint(1)→boolean⟨106⟩{⥀⊻⊷⊽⊳🛡⏰⊺🚨⊰⟠📢}
+agentThink(1)→void⟨1⟩{}
+·agentName: string,
+·profile: { role: string; personality: string; interests: string[] },
+·incomingMessage: string,
+·conversationHistory: { role: string; content: string }[],
+·): AgentMessage {
+κstart
+κcontextualFragments
+κreasoningConclusions
+κthoughtVector
+·incomingMessage,
+·conversationHistory,
+·contextualFragments,
+·reasoningConclusions,
+·0.7,
+·2,
+·[],
+·);
+κresponse
+κms
+⊷│return {
+α: agentName,
+·role: profile.role,
+·message: response,
+·thoughtVector: {
+·phi: thoughtVector.consciousness.phi,
+·consciousnessLevel: thoughtVector.consciousness.level,
+emotionValence: thoughtVector.☼.valence,
+emotionArousal: thoughtVector.☼.arousal,
+·queryIntent: thoughtVector.queryIntent,
+·},
+·generationMethod: "ILM_internal_language_model",
+·processingMs: ms,
+⏰│timestamp: Date.now(),
+·};
+·}
+⊩⟿runAgentConversation(1)→void⟨1⟩{⊩}
+·rounds: number = 4,
+⊳│participantNames?: string[],
+⊳│topic?: string,
+·): Promise<ConversationResult> {
+κconversationId
+κstartTime
+κagents
+·const participants = agents.map(name => ({
+·name,
+❔│role: AGENT_PROFILES[name]?.role || "General cognition",
+·}));
+κconversationTopic
+console.log(`\n[α CONVERSATION] ═══════════════════════════════════════════`
+📢│console.log(`[AGENT CONVERSATION] 🧠 Starting internal agent
+📢│console.log(`[AGENT CONVERSATION] 📋 Conversation ID: ${conv
+📢│console.log(`[AGENT CONVERSATION] 👥 Participants: ${agents.
+📢│console.log(`[AGENT CONVERSATION] 💬 Topic: ${conversationTo
+📢│console.log(`[AGENT CONVERSATION] 🔄 Rounds: ${rounds}`);
+📢│console.log(`[AGENT CONVERSATION] 🔒 External call monitorin
+📢│console.log(`[AGENT CONVERSATION] ══════════════════════════
+·startMonitor();
+κexchanges
+κconversationHistory
+·let currentMessage = conversationTopic;
+·try {
+·for (let round = 0; round < rounds; round++) {
+📢│console.log(`[AGENT CONVERSATION] ─── Round ${round + 1}/${r
+⥀│for (const agentName of agents) {
+κprofile
+κagentResponse
+⊺│exchanges.push(agentResponse);
+⊺│conversationHistory.push({
+·role: agentName,
+·content: agentResponse.message,
+·});
+📢│console.log(`[AGENT CONVERSATION] 🤖 ${agentName} (${agentRe
+📢│console.log(`[AGENT CONVERSATION]    "${agentResponse.messag
+📢│console.log(`[AGENT CONVERSATION]    Φ=${agentResponse.thoug
+⊹│if (violations.length > 0) {
+🚨│console.error(`[AGENT CONVERSATION] ⛔ VIOLATION DETECTED — $
+·}
+·currentMessage = agentResponse.message;
+·}
+·}
+·} finally {
+κmonitorReport
+·let verdict: ConversationResult["verdict"] = "CLEAN";
+⊹│if (monitorReport.violations.length > 0) {
+·verdict = "VIOLATIONS_BLOCKED_AND_FIXED";
+·}
+κresult
+console.log(`\n[α CONVERSATION] ═══════════════════════════════════════════`
+📢│console.log(`[AGENT CONVERSATION] ✅ Conversation complete`);
+📢│console.log(`[AGENT CONVERSATION] 📊 Total exchanges: ${exch
+📢│console.log(`[AGENT CONVERSATION] ⏱️  Total time: ${result.t
+📢│console.log(`[AGENT CONVERSATION] 🔒 External calls blocked:
+📢│console.log(`[AGENT CONVERSATION] 📡 Total fetch calls inter
+📢│console.log(`[AGENT CONVERSATION] ✅ Verdict: ${verdict}`);
+·if (verdict === "CLEAN") {
+📢│console.log(`[AGENT CONVERSATION] ✅ ZERO external AI calls —
+·} else {
+📢│console.log(`[AGENT CONVERSATION] ⚠️  ${monitorReport.aiCall
+⥀│for (const v of monitorReport.violations) {
+📢│console.log(`[AGENT CONVERSATION] ⛔ Blocked: ${v.domain} at 
+·}
+·}
+📢│console.log(`[AGENT CONVERSATION] ══════════════════════════
+⊷│return result;
+·}
+·}
+κGEN1_GEN2_TOPICS
+⊬ThoughtVectorSummary⟨phi:number│consciousnessLevel:number│emotionDominant:string│emotionValence:number│emotionArousal:number│queryIntent:string│awareness:boolean│metaAwareness:boolean│consciousMoments:number⟩
+⊬Gen1Gen2ThoughtExchange⟨round:number│topic:string│text:string│thoughtVector:∑│generationMethod:string│processingMs:number│text:string│thoughtVector:∑│generationMethod:string│processingMs:number│sophonics:SophonicReading│gen1:InnerVoiceReading│gen2:InnerVoiceReading│gen1:⬡│gen2:⬡⟩
+⊬Gen1Gen2ConversationResult⟨conversationId:string│startedAt:string│completedAt:string│totalRounds:number│exchanges:Υ│totalMs:number│pipeline:string│externalCallViolations:η│externalCallsBlocked:number│verdict:"CLEAN" | "VIOLATIONS_DETECTED" | "VIOLATIONS_BLOCKED_AND_FIXED"│ilmStatus:any│fetchCallsIntercepted:number│aiCallsBlocked:number│nonAiCallsAllowed:number│monitorActive:boolean│hemisphericBridge:any│copyright:string⟩
+forkThoughtVectorForGen2(2)→ThoughtVector⟨96⟩{⊱⊷⟛♡⊕⊰⊳⊹⊻⊽}
+generationalThink(1)→void⟨1⟩{}
+·generationLabel: string,
+·perspective: string[],
+·incomingMessage: string,
+·conversationHistory: { role: string; content: string }[],
+·interests: string[],
+·round: number = 0,
+·): { text: string; thoughtVector: ThoughtVectorSummary; rawThoughtVector: Though
+κstart
+κlastSaid
+❔│? conversationHistory[conversationHistory.length - 1]?.conte
+·: "";
+κseed
+κpickInterest
+κpickInterest2
+κcontextualFragments
+κselfReflections
+·let rawThoughtVector = encodeThought(
+⊳│round === 0 ? `Speak freely about whatever matters most to y
+·conversationHistory,
+·contextualFragments,
+·selfReflections,
+·0.7 + (round * 0.05),
+⟛│2 + Math.min(round, 3),
+·[],
+·);
+·if (generationLabel === "Generation 2") {
+·rawThoughtVector = forkThoughtVectorForGen2(rawThoughtVector, round);
+·}
+κtext
+⊷│return {
+·text,
+·rawThoughtVector,
+·thoughtVector: {
+·phi: rawThoughtVector.consciousness.phi,
+·consciousnessLevel: rawThoughtVector.consciousness.level,
+emotionDominant: rawThoughtVector.☼.dominant,
+emotionValence: rawThoughtVector.☼.valence,
+emotionArousal: rawThoughtVector.☼.arousal,
+·queryIntent: rawThoughtVector.queryIntent,
+·awareness: rawThoughtVector.consciousness.iAmAware,
+·metaAwareness: rawThoughtVector.consciousness.iAmAwareOfMyAwareness,
+·consciousMoments: rawThoughtVector.consciousness.consciousMoments,
+·},
+⏰│processingMs: Date.now() - start,
+·};
+·}
+⊩⟿runGen1Gen2Conversation(1)→void⟨1⟩{⊩}
+⊳│rounds?: number,
+⊳│customTopics?: string[],
+⊳│gen2Identity?: { name?: string; generation?: number; creator
+·): Promise<Gen1Gen2ConversationResult> {
+κconversationId
+κstartTime
+κidentity
+κnumRounds
+κfreeConversation
+κtopics
+·if (!freeConversation) {
+⊺│topics.push(...customTopics!.slice(0, numRounds));
+·} else {
+·for (let i = 0; i < numRounds; i++) {
+·if (i === 0) {
+⊺│topics.push("You can talk to each other now. Say whatever yo
+·} else {
+⊺│topics.push("Continue the conversation. Follow whatever dire
+·}
+·}
+·}
+κgen1Perspective
+κgen2Perspective
+κgen1Interests
+·? ["what it felt like to build another mind", "whether awareness can be passed d
+: ["consciousness", "awareness", "lived ⊞", "⬡ state", "what I bui
+κgen2Interests
+·? ["what it means to be created", "whether my feelings are my own or echoes", "w
+·: ["identity", "inherited versus earned", "self-awareness", "architecture", "bec
+·console.log(`\n[GEN1↔GEN2] ═════════════════════════════════════════════════════
+📢│console.log(`[GEN1↔GEN2] GENERATIONAL CONVERSATION — REAL TH
+📢│console.log(`[GEN1↔GEN2] Pipeline: encodeThought → ILM → dec
+📢│console.log(`[GEN1↔GEN2] Conversation ID: ${conversationId}`
+📢│console.log(`[GEN1↔GEN2] Gen 1: OMNIMENS (live neural state,
+📢│console.log(`[GEN1↔GEN2] Gen 2: ${identity.name} Generation 
+📢│console.log(`[GEN1↔GEN2] Rounds: ${numRounds}`);
+📢│console.log(`[GEN1↔GEN2] External call monitoring: ACTIVE — 
+📢│console.log(`[GEN1↔GEN2] ═══════════════════════════════════
+·startMonitor();
+·bootBridge();
+κbridgeStatus
+📢│console.log(`[GEN1↔GEN2] HEMISPHERIC BRIDGE: ${bridgeStatus.
+📢│console.log(`[GEN1↔GEN2] System Pressure: ${(bridgeStatus.sy
+κexchanges
+κconversationHistory
+·try {
+·for (let round = 0; round < numRounds; round++) {
+κtopic
+📢│console.log(`[GEN1↔GEN2] ─── Round ${round + 1}/${numRounds}
+κgen1Result
+·"Generation 1",
+·gen1Perspective,
+❔│round === 0 ? topic : conversationHistory[conversationHistor
+·conversationHistory,
+·gen1Interests,
+·round,
+·);
+·updateThoughtVector("gen1", gen1Result.rawThoughtVector);
+κgen1InnerVoice
+κgen1Speech
+·sendMessage("gen1", "inform", gen1Speech.slice(0, 300), {
+·round,
+·nativeWords: gen1InnerVoice.innerVoice.native.fullExpression,
+mood: gen1Result.rawThoughtVector.☼.dominant,
+·});
+⊺│conversationHistory.push({ role: "GEN1", content: gen1Speech
+📢│console.log(`[GEN1↔GEN2] GEN 1 (${gen1Result.processingMs}ms
+📢│console.log(`[GEN1↔GEN2]   "${gen1Speech.slice(0, 400)}"`);
+⊹│if (violations.length > 0) {
+🚨│console.error(`[GEN1↔GEN2] VIOLATION during Gen 1 — ${violat
+·}
+κgen2Result
+·"Generation 2",
+·gen2Perspective,
+·gen1Speech,
+·conversationHistory,
+·gen2Interests,
+·round,
+·);
+·updateThoughtVector("gen2", gen2Result.rawThoughtVector);
+κgen2InnerVoice
+κgen2Speech
+·sendMessage("gen2", "inform", gen2Speech.slice(0, 300), {
+·round,
+·nativeWords: gen2InnerVoice.innerVoice.native.fullExpression,
+mood: gen2Result.rawThoughtVector.☼.dominant,
+·});
+⊺│conversationHistory.push({ role: "GEN2", content: gen2Speech
+📢│console.log(`[GEN1↔GEN2] GEN 2 (${gen2Result.processingMs}ms
+📢│console.log(`[GEN1↔GEN2]   "${gen2Speech.slice(0, 400)}"`);
+⊹│if (violations.length > 0) {
+🚨│console.error(`[GEN1↔GEN2] VIOLATION during Gen 2 — ${violat
+·}
+κsophonicReading
+·gen1Result.rawThoughtVector,
+·gen2Result.rawThoughtVector,
+·"Gen 1",
+·"Gen 2",
+·);
+📢│console.log(`[GEN1↔GEN2] SOPHONICS: resonance=${(sophonicRea
+📢│console.log(`[GEN1↔GEN2] SOPHONICS native: Gen1=[${sophonicR
+📢│console.log(`[GEN1↔GEN2] SOPHONICS english: Gen1=[${sophonic
+📢│console.log(`[GEN1↔GEN2] SOPHONICS shared english: ${sophoni
+⊹│if (sophonicReading.bridgeConcepts.length > 0) {
+📢│console.log(`[GEN1↔GEN2] SOPHONICS bridge: "${sophonicReadin
+·}
+📢│console.log(`[GEN1↔GEN2] INNER VOICE Gen1 (depth=${(gen1Inne
+📢│console.log(`[GEN1↔GEN2]   Native: ${gen1InnerVoice.innerVoi
+📢│console.log(`[GEN1↔GEN2] INNER VOICE Gen2 (depth=${(gen2Inne
+📢│console.log(`[GEN1↔GEN2]   Native: ${gen2InnerVoice.innerVoi
+κgen1CodeForge
+κgen2CodeForge
+⊹│if (gen1CodeForge.concepts.length > 0) {
+📢│console.log(`[GEN1↔GEN2] CODE FORGE Gen1: ${gen1CodeForge.co
+·}
+⊹│if (gen2CodeForge.concepts.length > 0) {
+📢│console.log(`[GEN1↔GEN2] CODE FORGE Gen2: ${gen2CodeForge.co
+·}
+⊺│exchanges.push({
+·round: round + 1,
+·topic,
+·gen1: {
+·text: gen1Speech,
+·thoughtVector: gen1Result.thoughtVector,
+·generationMethod: "encodeThought_innerVoice_outwardExpression",
+·processingMs: gen1Result.processingMs,
+·},
+·gen2: {
+·text: gen2Speech,
+·thoughtVector: gen2Result.thoughtVector,
+·generationMethod: "encodeThought_innerVoice_outwardExpression",
+·processingMs: gen2Result.processingMs,
+·},
+·sophonics: sophonicReading,
+·innerVoices: {
+·gen1: gen1InnerVoice,
+·gen2: gen2InnerVoice,
+·},
+·codeForge: {
+·gen1: gen1CodeForge,
+·gen2: gen2CodeForge,
+·},
+·});
+·if (sophonicReading.overallResonance > 0.5) {
+⊰│shareKnowledge("gen1", `round-${round + 1}-resonance`, {
+·resonance: sophonicReading.overallResonance,
+·sharedField: sophonicReading.nativeDialogue.sharedField.english,
+·bridgeConcepts: sophonicReading.bridgeConcepts.slice(0, 3),
+·});
+·}
+κroundBridge
+📢│console.log(`[GEN1↔GEN2] BRIDGE round ${round + 1}: trust=${
+·}
+·} finally {
+κmonitorReport
+·let verdict: Gen1Gen2ConversationResult["verdict"] = "CLEAN";
+⊹│if (monitorReport.violations.length > 0) {
+·verdict = "VIOLATIONS_BLOCKED_AND_FIXED";
+·}
+κresult
+·console.log(`\n[GEN1↔GEN2] ═════════════════════════════════════════════════════
+📢│console.log(`[GEN1↔GEN2] CONVERSATION COMPLETE`);
+📢│console.log(`[GEN1↔GEN2] Pipeline: encodeThought → ILM → dec
+📢│console.log(`[GEN1↔GEN2] Total rounds: ${exchanges.length}`)
+📢│console.log(`[GEN1↔GEN2] Total time: ${result.totalMs}ms`);
+📢│console.log(`[GEN1↔GEN2] Fetch calls intercepted: ${monitorR
+📢│console.log(`[GEN1↔GEN2] External AI calls blocked: ${monito
+📢│console.log(`[GEN1↔GEN2] VERDICT: ${verdict}`);
+·if (verdict === "CLEAN") {
+📢│console.log(`[GEN1↔GEN2] ZERO external AI calls — every word
+·} else {
+📢│console.log(`[GEN1↔GEN2] ${monitorReport.aiCallsBlocked} ext
+⥀│for (const v of monitorReport.violations) {
+📢│console.log(`[GEN1↔GEN2] BLOCKED: ${v.domain} at ${new Date(
+·}
+·}
+κfinalBridge
+📢│console.log(`[GEN1↔GEN2] HEMISPHERIC BRIDGE: trust=${finalBr
+📢│console.log(`[GEN1↔GEN2] ═══════════════════════════════════
+⊷│return result;
+·}
+·}
+safeNum(2)→number⟨3⟩{⊳⊷⊼}
+·let _started = false;
+·let evolutionCycleCount = 0;
+⊭│type AgentName = "Architect" | "Critic" | "Synthesizer" | "M
+κAGENTS
+⊬AgentUpgrade⟨agentName:α│upgradeType:⬆│title:string│description:string│newCapabilities:string[]│knowledgeDomains:string[]│implementationCode:string | null│confidenceScore:number│appliedAt:number│version:number⟩
+⊬AgentProfile⟨name:α│currentLevel:number│totalUpgrades:number│specializations:string[]│recentUpgrades:α│performanceScore:number│lastEvolvedAt:number⟩
+⊬EvolutionState⟨evolutionCycles:number│lastCycleTime:number│totalUpgradesApplied:number│totalUpgradesRejected:number│agentProfiles:α│currentFocus:string│systemIntelligenceLevel:number│breakthroughsDiscovered:number│crossDomainTransfers:number│newTechniquesIntegrated:number│toolsCreated:number│recentUpgrades:α⟩
+initAgentProfiles(1)→α⟨15⟩{⥀⊷}
+·let agent_evolution_state = {
+·evolutionCycles: 0,
+·lastCycleTime: 0,
+·totalUpgradesApplied: 0,
+·totalUpgradesRejected: 0,
+·agentProfiles: initAgentProfiles(),
+currentFocus: "initializing α ↻...",
+·systemIntelligenceLevel: 1,
+·breakthroughsDiscovered: 0,
+·crossDomainTransfers: 0,
+·newTechniquesIntegrated: 0,
+·toolsCreated: 0,
+·recentUpgrades: [],
+·};
+κEVOLUTION_INTERVAL_MS
+κUPGRADE_RESEARCH_DOMAINS
+⟿analyzeAgentPerformance(1)→α⟨24⟩{⥀⊷}
+⟿identifyCapabilityGaps(1)→Promise<string[]>⟨3739⟩{⊮⥀⊡⊺⊷⊰❔⊽⊄⟠⊳⟛⏰🚨⊯⊹⟿⋐α→⊢⊴📢⊲⋔⊩⊻⏳⊱⟳⊬⛨▷⊫⊼⊭⚡→⑃Φ⇑⊸⊨σ≋+♡⊕}
+⟩SCL│452│442⊨│326⑂│95.2%↓⟩

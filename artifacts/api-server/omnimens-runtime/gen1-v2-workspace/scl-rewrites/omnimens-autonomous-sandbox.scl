@@ -1,0 +1,20 @@
+⟨SCL v1│omnimens-autonomous-sandbox.ts│163→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[omnimens-unified-runtime│omnimens-source-integration]
+⊭│type Num = number;
+⊭│type Ms = number;
+⊬SandboxResult⟨code:string│success:boolean│output:string│error:string | null│executionTimeMs:Ms│memoryUsedMB:Num⟩
+⊬SandboxState⟨totalExecutions:Num│successfulExecutions:Num│failedExecutions:Num│upgradesProposed:Num│upgradesApproved:Num│sandboxCycles:Num│lastCycleTime:Num│autonomousModulesGenerated:Num⟩
+·const log = (...m: any[]) => console.log("[OMNIMENS-AUTONOMOUS-SANDBOX]", ...m);
+κINTERVAL_MS
+κTIMEOUT_MS
+κFIRST_DELAY_MS
+κENGINE_ID
+κstate
+·engineRegistry.registerEngine(ENGINE_ID, "NORMAL", { dbQuota: 10 });
+execInVM(2)→SandboxResult⟨46⟩{⟠⊳⊮⊺⊰⊱⊡⟛⊷}
+updateStats(1)→void⟨4⟩{⊳}
+⊪│export const runInSandbox = (code:string)=>execInVM(code);
+κcodeThemes
+⟿nextCycle(1)→Promise<void>⟨27⟩{⟿⏰⊰❔⊽}
+⟩SCL│19│30⊨│20⑂│88.3%↓⟩

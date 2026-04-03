@@ -1,0 +1,56 @@
+⟨SCL v1│local_gpt4o_cache_gen1.mjs│102→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩hashQuery(1)→void⟨5⟩{⊩⊷}
+⊩cosineSimilarity(2)→void⟨11⟩{⊩⊵⊹⋐⊷}
+⊶│export class LRUCache {
+·constructor(maxSize = 100) {
+·this.maxSize = maxSize;
+⊮│this.cache = new Map();
+·}
+·get(key) {
+⊄│if (!this.cache.has(key)) return null;
+κvalue
+·this.cache.delete(key);
+⊡│this.cache.set(key, value); // Move to the end (most recentl
+⊷│return value;
+·}
+set(key, ≪) {
+·if (this.cache.has(key)) this.cache.delete(key);
+⊡│this.cache.set(key, value);
+·if (this.cache.size > this.maxSize) {
+κoldestKey
+·this.cache.delete(oldestKey);
+·}
+·}
+·has(key) {
+⊷│return this.cache.has(key);
+·}
+·}
+⊶│export class GPT4oCache {
+·constructor(maxCacheSize = 100) {
+·this.cache = new LRUCache(maxCacheSize);
+·}
+·storeResponse(query, response) {
+κqueryHash
+⊡│this.cache.set(queryHash, { query, response });
+·}
+·findSimilarResponse(query, similarityThreshold = 0.8) {
+κqueryHash
+κqueryVector
+·for (const [key, { query: cachedQuery, response }] of this.cache.cache.entries()
+κcachedVector
+κsimilarity
+·if (similarity >= similarityThreshold) {
+⊷│return response;
+·}
+·}
+⊷│return null; // No sufficiently similar response found
+·}
+·vectorizeQuery(query) {
+⊷│return Array.from(query).map(char => char.charCodeAt(0));
+·}
+·}
+⊩normalizeText(1)→void⟨3⟩{⊩⊷⊽}
+⊪gptCache
+⟩SCL│55│35⊨│22⑂│46.1%↓⟩

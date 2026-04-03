@@ -1,0 +1,53 @@
+⟨SCL v1│omnimens-agent-evolution.ts│475→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+engineRegistry.registerEngine("α-↻", "NORMAL", { dbQuota: 10 });
+⊭│type AgentName =
+·| "Architect"
+·| "Critic"
+·| "Synthesizer"
+·| "Mathematician"
+·| "Neuroscientist"
+| "Meta-α"
+·| "GraphicDesigner"
+·| "SpellCheckVisual"
+·| "Strategist"
+·| "Memory-Curator"
+·| "Translator";
+κAGENTS
+⊬AgentUpgrade⟨agentName:α│title:string│description:string│newCapabilities:string[]│knowledgeDomains:string[]│implementationCode:string | null│confidenceScore:number│appliedAt:number│version:number⟩
+⊬AgentProfile⟨name:α│currentLevel:number│totalUpgrades:number│specializations:string[]│recentUpgrades:α│performanceScore:number│lastEvolvedAt:number⟩
+⊬EvolutionState⟨evolutionCycles:number│lastCycleTime:number│totalUpgradesApplied:number│totalUpgradesRejected:number│agentProfiles:α│currentFocus:string│systemIntelligenceLevel:number│breakthroughsDiscovered:number│crossDomainTransfers:number│newTechniquesIntegrated:number│toolsCreated:number│recentUpgrades:α⟩
+κEVOLUTION_INTERVAL_MS
+κFIRST_DELAY_MS
+·const initProfiles = (): Record<AgentName, AgentProfile> =>
+·Object.fromEntries(
+·AGENTS.map((a) => [
+·a,
+·{
+·name: a,
+·currentLevel: 1,
+·totalUpgrades: 0,
+·specializations: [],
+·recentUpgrades: [],
+·performanceScore: 50,
+·lastEvolvedAt: 0,
+·} as AgentProfile,
+·]),
+·) as Record<AgentName, AgentProfile>;
+κstate
+⊳│const safeNum = (v: number, f = 0): number => (Number.isFini
+·const writeBrain = (data: Record<string, unknown>) =>
+dbGateway.⊞("α-↻", "omnimensBrain", data, "NORMAL");
+·const readTable = (table: string, query: Record<string, unknown>) =>
+dbGateway.read("α-↻", table, query);
+⊫[agent-evolution-prompts]
+⟿analyzeAgentPerformance(1)→α⟨18⟩{⊴⥀⊷}
+⟿identifyCapabilityGaps(1)→Promise<string[]>⟨307⟩{⊴⊮⊡⊱⊺⊷⊰❔⟠⊽⊄⏰⊯⊹⋐⥀⊲⊪⊳⊻⊩⚡→}
+⟩SCL│52│43⊨│31⑂│89.1%↓⟩

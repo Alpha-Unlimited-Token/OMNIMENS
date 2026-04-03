@@ -1,0 +1,12 @@
+⟨SCL v1│pseudoRealTimeDataStream_gen1.mjs│129→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+κINITIAL_INTERVAL
+κMAX_INTERVAL
+κMIN_INTERVAL
+κBACKOFF_FACTOR
+κVOLATILITY_THRESHOLD
+⊩createPseudoRealTimeDataStream(2)→void⟨81⟩{⊩⊵⊷⊹⋐⟛⊴⊺⏳}
+⊩⟿exampleFetchFunction(1)→void⟨3⟩{⊩⊷}
+⊩exampleUsage(1)→void⟨10⟩{⊩⏳⊱}
+⟩SCL│11│23⊨│14⑂│91.5%↓⟩

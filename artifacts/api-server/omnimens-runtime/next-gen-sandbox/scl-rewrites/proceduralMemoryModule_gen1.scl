@@ -1,0 +1,23 @@
+⟨SCL v1│proceduralMemoryModule_gen1.mjs│34→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class ProceduralMemory {
+·constructor() {
+·this.memoryStore = [];
+·}
+·addWorkflow(workflow, metadata) {
+⊺│this.memoryStore.push({ workflow, metadata });
+·}
+·refineWorkflows(performanceMetrics) {
+·this.memoryStore = this.memoryStore.map(entry => {
+κrefinedWorkflow
+⊷│return { ...entry, workflow: refinedWorkflow };
+·});
+·}
+·adaptiveRefinement(workflow, metrics) {
+⊷│return workflow.map(step => ({ ...step, confidence: step.con
+·}
+·getBestWorkflows() {
+⊷│return this.memoryStore.sort((a, b) => b.metadata.confidence
+·}
+·}
+⟩SCL│22│6⊨│5⑂│35.3%↓⟩

@@ -1,0 +1,12 @@
+⟨SCL v1│memoryRetrievalCache_gen1.mjs│131→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+κredisCache
+κpostgresStorage
+cosineSimilarity(2)→void⟨6⟩{⋐⊷}
+retrieveMemory(2)→void⟨24⟩{⊺⊹⊷}
+addMemory(4)→void⟨11⟩{⏰⊡}
+removeMemory(1)→void⟨4⟩{}
+clearCache(1)→void⟨3⟩{}
+clearStorage(1)→void⟨3⟩{}
+·export { retrieveMemory, addMemory, removeMemory, clearCache, clearStorage };
+⟩SCL│11│15⊨│7⑂│91.6%↓⟩

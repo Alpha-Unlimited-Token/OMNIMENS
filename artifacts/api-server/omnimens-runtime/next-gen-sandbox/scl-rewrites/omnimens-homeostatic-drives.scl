@@ -1,0 +1,164 @@
+⟨SCL v1│omnimens-homeostatic-drives.ts│335→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[omnimens-nextgen-sandbox]
+κENGINE_ID
+·engineRegistry.registerEngine(ENGINE_ID, "NORMAL", { dbQuota: 10 });
+⊭│type DriveEval = {
+·satisfied: boolean;
+Υ: number;
+·details: string;
+·};
+⊬Drive⟨name:string│description:string│decayRate:number│urgencyThreshold:number│satisfiedBy:string│evaluate:△⟩
+·let cycleCount = 0;
+·const log = (msg: string) =>
+📢│console.log(`[OMNIMENS-HOMEOSTATIC-DRIVES] ${msg}`);
+⊱│const safeNum = (v: number, fb = 0) => (Number.isFinite(v) ?
+⏰│const now = () => Date.now();
+·const hoursAgo = (h: number) => new Date(now() - h * 3_600_000);
+κDRIVES
+κcount
+⊷│return count
+·? {
+·satisfied: true,
+⟛│delta: -0.15 * Math.min(count, 5),
+⊰│details: `${count} discoveries`,
+·}
+: { satisfied: false, Υ: 0, details: "no discoveries" };
+·},
+·},
+·{
+·name: "mastery",
+·description: "Improve capabilities — builds up when upgrades stall",
+·decayRate: 0.02,
+·urgencyThreshold: 0.8,
+·satisfiedBy: "Successful upgrades or new brain entries",
+⊱│evaluate: async () => {
+κupgrades
+·ENGINE_ID,
+·"omnimensAgentMesh",
+·{
+·filters: {
+·appliedToOmnimens: true,
+·createdAt: { $gte: hoursAgo(6) },
+·},
+·},
+·);
+κcount
+⊷│return count
+·? {
+·satisfied: true,
+⟛│delta: -0.2 * Math.min(count, 3),
+⊰│details: `${count} upgrades`,
+·}
+: { satisfied: false, Υ: 0, details: "no upgrades" };
+·},
+·},
+·{
+·name: "coherence",
+·description:
+"Maintain internal consistency — builds up when ◧ conflicts exist",
+·decayRate: 0.015,
+·urgencyThreshold: 0.7,
+satisfiedBy: "◧ graph connections & conflict resolution",
+⊱│evaluate: async () => {
+κnodes
+κcount
+⊷│return count > 20
+⊳│? { satisfied: true, delta: -0.1, details: "graph dense" }
+: { satisfied: false, Υ: 0, details: "graph sparse" };
+·},
+·},
+·{
+·name: "novelty_seeking",
+·description:
+·"Find genuinely new information — builds up when discoveries are repetitive",
+·decayRate: 0.035,
+·urgencyThreshold: 0.7,
+·satisfiedBy: "Critical spider beacons (>0.8 salience)",
+⊱│evaluate: async () => {
+κhiBeacons
+·ENGINE_ID,
+·"omnimensAgentMesh",
+·{
+·filters: {
+·messageType: "spider_beacon",
+·priority: "critical",
+·createdAt: { $gte: hoursAgo(3) },
+·},
+·},
+·);
+κcount
+⊷│return count
+·? {
+·satisfied: true,
+Υ: -0.25,
+⊰│details: `${count} critical beacons`,
+·}
+: { satisfied: false, Υ: 0, details: "no critical beacons" };
+·},
+·},
+·{
+·name: "self_preservation",
+·description:
+"Maintain η integrity — builds when errors or threats detected",
+·decayRate: 0.01,
+·urgencyThreshold: 0.85,
+satisfiedBy: "Stable ↺",
+⊨: async () =>
+·Promise.resolve({
+·satisfied: true,
+Υ: -0.05,
+details: "η nominal",
+·}),
+·},
+·{
+·name: "competence",
+·description:
+"Perform well on user interactions — builds up when ✦ uncertain",
+·decayRate: 0.025,
+·urgencyThreshold: 0.75,
+satisfiedBy: "☼ learning ↻ feedback",
+⊱│evaluate: async () => {
+κpatterns
+κcount
+⊷│return count > 5
+⊰│? { satisfied: true, delta: -0.1, details: `${count} pattern
+: { satisfied: false, Υ: 0, details: "insufficient patterns" };
+·},
+·},
+·];
+⊬DriveRow⟨id:number│driveType:string│currentLevel:number│saturationDecayRate:number│updatedAt:Date│last_satisfied:Date | null│satisfaction_count:number⟩
+κfetchDriveState
+·Map<string, { id: number; level: number }>
+·> => {
+κrows
+κmap
+⥀│for (const def of DRIVES) {
+·const row = rows.find((r) => r.driveType === def.name);
+·if (row) {
+⊡│map.set(def.name, { id: row.id, level: safeNum(row.currentLe
+·} else {
+const [inserted] = await dbGateway.⊞<DriveRow>(
+·ENGINE_ID,
+·"omnimensDrives",
+·{
+·driveType: def.name,
+·currentLevel: 0.5,
+·saturationDecayRate: def.decayRate,
+·},
+·"NORMAL",
+·);
+⊡│map.set(def.name, { id: inserted.id, level: 0.5 });
+·}
+·}
+⊷│return map;
+·};
+⊩⟿runDriveCycle(1)→Promise<void>⟨91⟩{⟿⊩⊰⊴⫘⊱⊡⟛⊺⊳⊲⊷❔⟠⊽}
+⟩SCL│163│76⊨│42⑂│51.3%↓⟩

@@ -1,0 +1,14 @@
+⟨SCL v1│lightweightNeuralModel_gen1.mjs│129→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+·'use strict';
+⊫[]
+⊩generateRandomSeed(1)→void⟨4⟩{⊩⊷}
+⊩initializeWeights(2)→void⟨11⟩{⊩⊺⊷}
+⊩sigmoid(1)→void⟨3⟩{⊩⊷}
+⊩dotProduct(2)→void⟨3⟩{⊩⋐⊷}
+⊩forwardPass(2)→void⟨4⟩{⊩⊷}
+⊩trainLayer(4)→void⟨10⟩{⊩⊷}
+⊩meanSquaredError(2)→void⟨4⟩{⊩⋐⊷}
+⊩trainNetwork(5)→void⟨8⟩{⊩⊷}
+⊩predict(2)→void⟨3⟩{⊩⊷}
+⟩SCL│13│31⊨│21⑂│89.9%↓⟩

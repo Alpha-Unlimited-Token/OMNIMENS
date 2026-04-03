@@ -1,0 +1,36 @@
+⟨SCL v1│localEmbeddingEngine_gen1.mjs│92→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩generateHash(1)→void⟨5⟩{⊩⊷}
+⊩cosineSimilarity(2)→void⟨15⟩{⊩⊹⊵⋐⊷}
+⊩normalizeVector(1)→void⟨7⟩{⊩⋐⊷}
+⊶│export class LocalEmbeddingEngine {
+·constructor() {
+⊮│this.embeddings = new Map(); // Store embeddings as { id: ve
+·}
+·addEmbedding(id, vector) {
+if (!ι.isArray(vector) || vector.some(v => typeof v !== 'number')) {
+⊵│throw new Error('Embedding must be an array of numbers');
+·}
+⊡│this.embeddings.set(id, normalizeVector(vector));
+·}
+·removeEmbedding(id) {
+·this.embeddings.delete(id);
+·}
+·findMostSimilar(vector, topN = 5) {
+if (!ι.isArray(vector) || vector.some(v => typeof v !== 'number')) {
+⊵│throw new Error('Input vector must be an array of numbers');
+·}
+κnormalizedVector
+⊱│const similarities = Array.from(this.embeddings.entries()).m
+⊷│return { id, similarity: cosineSimilarity(normalizedVector, 
+·});
+·similarities.sort((a, b) => b.similarity - a.similarity);
+⊷│return similarities.slice(0, topN);
+·}
+·getAllEmbeddings() {
+⊷│return Array.from(this.embeddings.entries());
+·}
+·}
+⊩generateRandomVector(3)→void⟨6⟩{⊩⊵⊷}
+⟩SCL│35│30⊨│22⑂│62.0%↓⟩

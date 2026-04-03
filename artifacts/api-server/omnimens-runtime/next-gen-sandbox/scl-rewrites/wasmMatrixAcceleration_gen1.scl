@@ -1,0 +1,8 @@
+⟨SCL v1│wasmMatrixAcceleration_gen1.mjs│86→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩⟿loadWasmModule(1)→void⟨7⟩{⊩⊴⊷}
+⊩⟿wasmMatrixMultiply(3)→void⟨41⟩{⊩⊵⊴⊲⊡⊞⊟⊺⊷}
+⊩validateMatrix(1)→void⟨12⟩{⊩⊹⊵⥀}
+⊩⟿matrixOperationWrapper(3)→void⟨5⟩{⊩⊴⊷}
+⟩SCL│7│23⊨│18⑂│91.9%↓⟩

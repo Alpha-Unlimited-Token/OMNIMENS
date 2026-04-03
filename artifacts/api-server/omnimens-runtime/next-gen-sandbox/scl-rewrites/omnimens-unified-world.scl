@@ -1,0 +1,171 @@
+⟨SCL v1│omnimens-unified-world.ts│14114→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[omnimens-memory-core│omnimens-nextgen-sandbox│omnimens-code-pipeline│omnimens-unified-security│omnimens-consciousness-infra│omnimens-emotional-core│omnimens-unified-agents│omnimens-self-evolution│omnimens-unified-senses│omnimens-unified-neural│omnimens-unified-network]
+κexecFileAsync
+⟿classifyPromptFor3DTool(1)→Promise<"blender" | "openscad" | "trimesh">⟨3⟩{⊷}
+⊭│export type Generated3DModel = {
+·glbBase64: string;
+·glbSizeBytes: number;
+·threejsHtml: string;
+·pythonScript: string;
+·description: string;
+·vertexCount: number;
+·faceCount: number;
+⊳│toolUsed?: "blender" | "openscad" | "trimesh";
+⊳│previewImageBase64?: string;
+⊳│zipBase64?: string;
+⊳│zipSizeBytes?: number;
+⊳│formats?: string[];
+·};
+κTRIMESH_SYSTEM_PROMPT
+You ⊞ Python scripts using trimesh, numpy, scipy, and pillow to α stunn
+·The script outputs a .glb file to the path given in the 'OUTPUT_PATH' environmen
+·RULES:
+·1. Import: trimesh, numpy as np, scipy as needed. NO other 3D libraries.
+2. Never use any η URLs, files, or assets. All geometry is generated prog
+3. θ ONLY the .glb file — save it to: import os; output_path = os.environ['
+·4. Make models with real artistic depth: subdivisions, smooth normals, procedura
+·5. Every model must be watertight, manifold, and properly scaled (1 unit ≈ 1 met
+·6. Use vertex colors for visual richness when textures are needed (mesh.visual.v
+7. Use trimesh.✧, trimesh.transformations, trimesh.boolean, trimesh.graph
+·8. Use scipy.spatial for complex convex hulls or Delaunay structures.
+9. α ⊣, RUNNABLE scripts — no placeholders, no "TODO", no stubs.
+10. Complex models: ∪ multiple sub-meshes with trimesh.util.concatenate().
+·11. Apply artistic materials: use ColorVisuals or PBRMaterial where appropriate.
+Θ TOOLS:
+- trimesh.✧.icosphere(subdivisions, radius) — smooth sphere
+- trimesh.✧.cylinder(radius, height, sections) — cylinder
+- trimesh.✧.box(extents) — box
+- trimesh.✧.cone(radius, height, sections) — cone
+- trimesh.✧.torus(major_radius, minor_radius, major_sections, minor_secti
+- trimesh.✧.annulus(r_min, r_max, height) — ring/annulus
+- trimesh.✧.extrude_polygon(polygon, height) — extrude 2D shape
+- trimesh.✧.extrude_triangulation(vertices, faces, height) — extrude tria
+·- trimesh.smoothing.filter_laplacian(mesh, iterations) — smooth mesh
+- trimesh.boolean.∪/Υ/intersection(meshes, engine='blender'/'scad')
+·- trimesh.transformations — rotation, translation, scaling matrices
+·- trimesh.util.concatenate(meshes) — merge meshes
+- numpy random/noise for procedural ρ
+θ the .glb file to 'output_path' using: mesh.export(output_path, file_type=
+·`;
+⟿generateTrimeshScript(1)→Promise<string>⟨47⟩{⊰❔⊳⊽⊻⊡⊷}
+⟿runTrimeshScript(1)→Promise<⟨1⟩{}
+κtmpDir
+⊴│await mkdir(tmpDir, { recursive: true });
+κscriptPath
+κoutputPath
+κstatsPath
+κstatsScript
+⊫[]
+·# Collect mesh stats after generation
+·try:
+⊫[]
+⊽│_mesh = _tm.load('${outputPath.replace(/\\/g, "/")}')
+·if hasattr(_mesh, 'vertices'):
+·_verts = len(_mesh.vertices)
+·_faces = len(_mesh.faces)
+·else:
+_verts = sum(len(s.vertices) for s in _mesh.geometry.≢() if hasattr(s, 'ver
+_faces = sum(len(s.faces) for s in _mesh.geometry.≢() if hasattr(s, 'faces'
+⊽│with open('${statsPath.replace(/\\/g, "/")}', 'w') as f:
+·json.dump({'vertices': _verts, 'faces': _faces}, f)
+·except:
+⊽│with open('${statsPath.replace(/\\/g, "/")}', 'w') as f:
+f.⊞('{"vertices": 0, "faces": 0}')
+·`;
+κfullScript
+⊰│.replace(/output_path\s*=.*OUTPUT_PATH.*/g, `output_path = '
+·+ "\n" + statsScript;
+⊴│await writeFile(scriptPath, fullScript, "utf-8");
+·try {
+⊴│await execFileAsync("python3", [scriptPath], {
+·timeout: 120_000,
+·env: {
+...↻.env,
+·OUTPUT_PATH: outputPath,
+PYTHONPATH: ↻.env.PYTHONPATH || "",
+·},
+·maxBuffer: 10 * 1024 * 1024,
+·});
+⫘│const [glbData, statsRaw] = await Promise.all([
+·readFile(outputPath),
+·readFile(statsPath, "utf-8").catch(() => '{"vertices":0,"faces":0}'),
+·]);
+·let stats = { vertices: 0, faces: 0 };
+🛡│try { stats = JSON.parse(statsRaw); } catch {}
+⊷│return { glbData, vertexCount: stats.vertices, faceCount: st
+·} finally {
+⫘│Promise.all([
+⊱│unlink(scriptPath).catch(() => {}),
+⊱│unlink(outputPath).catch(() => {}),
+⊱│unlink(statsPath).catch(() => {}),
+⊱│]).catch(() => {});
+·}
+·}
+buildThreejsViewer(2)→string⟨229⟩{⊷⟛⊡⊱⊰❔⊳⊺⏳}
+⊩⟿generate3DModel(1)→void⟨1⟩{⊩}
+·prompt: string,
+⊳│referenceImageBase64?: string,
+⊳│referenceImageMimeType?: string
+·): Promise<Generated3DModel> {
+κtool
+📢│console.log(`[OMNIMENS 3D] Tool selected: ${tool.toUpperCase
+·try {
+·console.log("[OMNIMENS 3D] Attempting Blender generation...");
+κresult
+⊷│return {
+·glbBase64: result.glbBase64,
+·glbSizeBytes: result.glbSizeBytes,
+·threejsHtml: result.threejsHtml,
+·pythonScript: result.blenderScript,
+·description: prompt,
+·vertexCount: result.vertexCount,
+·faceCount: result.faceCount,
+·toolUsed: "blender" as const,
+·previewImageBase64: result.previewImageBase64,
+·zipBase64: result.zipBase64,
+·zipSizeBytes: result.zipSizeBytes,
+·formats: result.formats,
+·};
+·} catch (blenderErr) {
+❔│console.warn("[OMNIMENS 3D] Blender failed, trying OpenSCAD 
+·}
+·if (tool === "openscad") {
+·try {
+κresult
+⊷│return {
+·glbBase64: result.glbBase64,
+·glbSizeBytes: result.glbSizeBytes,
+·threejsHtml: result.threejsHtml,
+·pythonScript: result.scadCode,
+·description: prompt,
+·vertexCount: result.vertexCount,
+·faceCount: result.faceCount,
+·toolUsed: "openscad" as const,
+·};
+·} catch (scadErr) {
+❔│console.warn("[OMNIMENS 3D] OpenSCAD also failed, using trim
+·}
+·}
+·console.log("[OMNIMENS 3D] Using trimesh fallback pipeline");
+κpythonScript
+⊲│const { glbData, vertexCount, faceCount } = await runTrimesh
+κglbBase64
+κtitle
+κthreejsHtml
+⊷│return {
+·glbBase64,
+·glbSizeBytes: glbData.length,
+·threejsHtml,
+·pythonScript,
+·description: prompt,
+·vertexCount,
+·faceCount,
+·toolUsed: "trimesh" as const,
+·};
+·}
+κexecFileAsyncOSCAD
+buildThreejsViewer_section2(4)→string⟨634⟩{⊽⊷⟛⊡⊱⊳⊬⊰⊩⊴❔⊻📁⊲📢⊵⊺🛡}
+κexecFileAsyncBlender
+buildThreejsViewer_section3(4)→string⟨12859⟩{⊷⟛⊡⊱⊳⊬⊩⊰❔⊽⊻📁⊴⊵🛡⚡→⊞⊟⊹⥀⊺📢⊼⊮⏰⊯♡⊕⊲⋐⋔⟿⟠⊄⏳⟳⊸≋+Φ⇑⑃⛨▷}
+⟩SCL│170│155⊨│105⑂│98.8%↓⟩

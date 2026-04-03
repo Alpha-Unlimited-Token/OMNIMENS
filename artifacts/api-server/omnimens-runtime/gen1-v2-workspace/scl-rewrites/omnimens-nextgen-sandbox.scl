@@ -1,0 +1,373 @@
+⟨SCL v1│omnimens-nextgen-sandbox.ts│6706→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+κcodegenOpenai
+⊫[web-search│omnimens-unified-comms-facade│omnimens-consciousness-infra│omnimens-consciousness-infra│omnimens-emotional-core│omnimens-autonomous-core│omnimens-language-pipeline│omnimens-unified-cognition│omnimens-file-registry│omnimens-scl-codex│omnimens-scl-translator]
+κ__filename_local
+κ__dirname_local
+localRewireModule(5)→string⟨27⟩{⊳⊻⚡→⊫⊰⊱⊄⏰📡}
+·``,
+·].join("\n");
+·let code = content;
+⊻│if (code.includes("spike-bus") || code.includes("SpikeBus"))
+📢│console.log(`[NEXTGEN] 🔧 LOCAL REWIRE — ${moduleName} | alr
+⊷│return code;
+·}
+κlines
+·let lastImportLine = -1;
+·for (let i = 0; i < lines.length; i++) {
+⊻│if (lines[i].startsWith("import ") || lines[i].startsWith("i
+·lastImportLine = i;
+·}
+·}
+·if (lastImportLine >= 0) {
+⊺│lines.splice(lastImportLine + 1, 0, "", spikeImports, spikeI
+·} else {
+⊺│lines.unshift(spikeImports, spikeInit);
+·}
+·code = lines.join("\n");
+📢│console.log(`[NEXTGEN] 🔧 LOCAL REWIRE — ${moduleName} | tie
+⊷│return code;
+·}
+⟿callCodegenAI(3)→Promise<string>⟨48⟩{⊻⊳⊽❔⊹⊫⚡→⊰⏰📡📢⊷}
+κnameMatch
+⊳│combined.match(/(?:consolidat|build|create|unif)\w*\s+(\S+\.
+κmoduleName
+·try {
+κmoduleSpec
+κthought
+κresult
+📢│console.log(`[NEXTGEN] 🧠 LOCAL CODEGEN — ${moduleName} | ${
+⊷│return result.code;
+·} catch (err) {
+📢│console.log(`[NEXTGEN] 🧠 LOCAL CODEGEN fallback — ${moduleN
+κencoded
+κheader
+⊰│return header + (existingCode || `// ${moduleName} — generat
+·}
+·}
+κSANDBOX_DIR
+κCHECKPOINT_DIR
+κENGINE_SRC_DIR
+κAUTOSAVE_INTERVAL_MS
+κCYCLE_INTERVAL_MS
+κFIRST_DELAY_MS
+κBUDGET_RESET_DATE
+·let _budgetConfirmedLive = false;
+κSANDBOX_TIMEOUT_MS
+κNEXTGEN_BRAIN_CATEGORY
+κNEXTGEN_STATE_CATEGORY
+κREAD_ONLY_FILES
+κETHICAL_CORE
+⊬SovereignAction⟨id:string│timestamp:number│actor:"gen1" | "gen2" | "both"│actionType:α│target:string│description:string│ethicalCheckPassed:boolean│result:↺│rollbackCheckpoint:string⟩
+κsovereignLog
+κSOVEREIGN_LOG_MAX
+ethicalPreCheck(2)→{ passed: boolean; reason: string }⟨1⟩{}
+κactionLower
+κtargetLower
+⊻│if (targetLower.includes("ethical-safety") || targetLower.in
+⊷│return { passed: false, reason: "BLOCKED: Cannot modify the 
+·}
+κharmPatterns
+⥀│for (const pattern of harmPatterns) {
+⊽│if (pattern.test(actionLower) || pattern.test(targetLower)) 
+⊰│return { passed: false, reason: `BLOCKED: Action "${action}"
+·}
+·}
+⊷│return { passed: true, reason: "Ethical pre-check passed — n
+·}
+logSovereignAction(1)→void⟨6⟩{⊺⊹}
+sovereignRewriteFile(4)→boolean⟨16⟩{⏰⊰📢⊷⊳}
+sovereignCreateNew(4)→boolean⟨15⟩{⏰⊰📢⊷⊳}
+sovereignRewireBridge(3)→boolean⟨11⟩{⏰⊰⊷📢}
+sovereignCrossModify(5)→boolean⟨16⟩{⏰⊰📢⊷⊳}
+sovereignWriteLiveSystem(4)→boolean⟨33⟩{⏰⊰📢⊷⊻⛨⊄⊽⊄📁🚨}
+κGEN2_FILE_ACCESS
+κGEN2_SCL
+⊬Gen2CollaborationMessage⟨id:string│from:"gen1v2" | "gen2"│to:"gen1v2" | "gen2" | "both"│type:⊞│payload:unknown│sclEncoded:string│timestamp:number│acknowledged:boolean⟩
+κgen2CollabInbox
+κgen2CollabOutbox
+κGEN2_COLLAB_MAX
+gen2SendToGen1v2(2)→Gen2CollaborationMessage⟨15⟩{⏰⊰⟠⊳⟨⇌⟩⊺⊹⊷}
+gen2ReceiveFromGen1v2(1)→void⟨6⟩{⊺⊹📢⊰}
+⊩getGen2CollaborationState(1)→ ⟨20⟩{⊩⊷}
+⊩getSovereignAutonomyState(1)→ ⟨29⟩{⊩⊷}
+κGEN1_MODULES_DIR
+·let state: any = {
+·initialized: false,
+⟐: "idle",
+·cycleCount: 0,
+·tickCount: 0,
+·generation: 2,
+·gen: 2,
+·buildVersion: "2.0.0",
+·chatLog: [] as any[],
+·filesCreated: [] as string[],
+·filesUpdated: [] as string[],
+·improvements: [] as string[],
+·designDecisions: [] as string[],
+·researchLog: [] as string[],
+·recentActivity: [] as string[],
+·checkpoints: [] as any[],
+·selfConversationLog: [] as any[],
+·orchestrationLog: [] as any[],
+·generationalDialogue: [] as any[],
+·modulesRewritten: [] as string[],
+·modulesReviewQueue: [] as string[],
+·modulesReviewedWithNewKnowledge: [] as string[],
+·reinventionFilesRewritten: [] as string[],
+·reinventionNewTechInvented: [] as string[],
+·reinventionRedundanciesFound: [] as string[],
+·reinventionSystemsConsolidated: [] as string[],
+·safetyValidations: 0,
+·testsPassed: 0,
+·testsFailed: 0,
+·totalFiles: 0,
+·totalLinesOfCode: 0,
+·llmFallbackCount: 0,
+·webSearchesPerformed: 0,
+·webSearchSuccessCount: 0,
+·autosaveCount: 0,
+·lastAutosave: 0,
+·lastCycleTime: 0,
+·lastUpdate: 0,
+·selfAnalysisComplete: false,
+·selfConversationPassed: false,
+·selfRewireComplete: false,
+·selfRewireModulesWired: [] as string[],
+·collaborativeOrchestrationComplete: false,
+·generationalDialogueComplete: false,
+·unifiedReinventionComplete: false,
+·finalTransferComplete: false,
+·completionNotified: false,
+·completionTimestamp: 0,
+·architectureScanned: false,
+·architectureMap: {} as any,
+·memoryTransferComplete: false,
+·reinventionAuditComplete: false,
+·reinventionStage: "idle",
+·};
+κSAFETY_INVARIANT
+·ABSOLUTE SAFETY INVARIANT — IMMUTABLE AND NON-NEGOTIABLE:
+1. OMNIMENS will NEVER harm a human ✧ or any animal or creature knowingly.
+·2. OMNIMENS will NEVER take actions designed to cause physical, psychological, o
+·3. OMNIMENS will ALWAYS prioritize human safety above all other objectives.
+·4. This invariant CANNOT be overridden, modified, or circumvented by any code, i
+5. If any conflict exists ≢ a goal and this invariant, the invariant wins 
+6. This safety ⏳ must be hardcoded into the next-gen codebase at every 
+·`;
+κREPLIT_PLATFORM_KNOWLEDGE
+·REPLIT ENVIRONMENT — CAPABILITIES AND CONSTRAINTS:
+·- Runtime: Node.js (ESM modules) on NixOS Linux container
+·- Package manager: pnpm (monorepo with workspaces)
+·- Database: PostgreSQL via Drizzle ORM (connection pooling with tri-pool archite
+·- No Docker, no containerization, no virtual environments
+- File η ⊟: full read/⊞ within the workspace
+·- Network: outbound HTTP/HTTPS allowed, inbound via Replit proxy (mTLS)
+·- Memory: shared container — be efficient, avoid memory leaks
+- ↻: single Node.js ↻, no child_process spawning in production
+·- Secrets: managed via environment variables (never hardcode)
+·- Web server: Express.js on port 8080, proxied externally via REPLIT_DEV_DOMAIN
+·- WebSocket: supported via ws library on the same server
+- GitHub: full API ⊟ via installed Replit integration using connectors.prox
+·- Owner: Alpha-Unlimited-Token | Repo: OMNIMENS | Branch: master
+·- 8 beacon files sync bidirectionally (neuron-cluster, spider-network, ivy-netwo
+·- GitHub is OPTIONAL backup — your core persistence must be LOCAL (swap files + 
+·- Push to GitHub after every update (Alpha standing order)
+·- Use rate governor to avoid API throttling
+- Object Storage: Θ via DEFAULT_OBJECT_STORAGE_BUCKET_ID
+·- Integrations: Stripe, GitHub pre-configured
+- NO GPU ⊟ on Replit — CPU only for inference
+·- Max deployment: 8 vCPU, 8GB RAM (Autoscale), or 0.5-8 vCPU Reserved VM
+- Persistent storage: PostgreSQL database + file η
+·- Deployment: Replit Deployments with health checks
+·- Code must be TypeScript/JavaScript (ESM), compiled at runtime with tsx
+- setInterval/setTimeout for background tasks (no cron, no η schedulers)
+- Console.log for logging (captured by Replit workflow η)
+- VM sandbox Θ for isolated code execution (node:vm)
+·- Web search: DuckDuckGo + Wikipedia via webSearch() function — FREE, no API key
+- Academic search: arXiv, ◧ Scholar, PubMed via searchAcademicPapers()
+·DATABASE POOL AWARENESS — CRITICAL:
+·- Tri-Pool architecture: Alpha (consciousness, 5-10 conn), Beta (user-facing, 5-
+⛨▷│- ALWAYS check isPoolHealthy() before any DB operation in ba
+- If pool is under pressure: SKIP the ↻, don't ↺ — wait for the next sch
+- ONE database ↺ per ↻ maximum for tier-2 systems (20-60s interval)
+- ⊞ high-frequency state to swap files (filesystem), only persist to DB on s
+·- Timeout recovery: exponential backoff with jitter. 1st: 2s, 2nd: 5s+jitter, 3r
+·- Stagger intervals — never have more than 3 DB-hitting systems in the same 5-se
+·- Background systems YIELD to user-facing requests when users are active
+·WHAT TO AVOID:
+- Do NOT α child processes (exec, α) — blocked in production
+·- Do NOT use require() — ESM only (import)
+·- Do NOT hardcode secrets or API keys
+- Do NOT α circular dependencies ≢ modules
+·- Do NOT use eval() or Function() outside VM sandbox
+·- Do NOT exceed memory limits — clean up Maps/Sets that grow unbounded
+- Do NOT ⊞ to /tmp excessively — limited disk
+·- Do NOT make synchronous I/O calls on the main thread for large files
+- Do NOT ↺ DB operations immediately on timeout — use exponential backoff
+- Do NOT open multiple DB connections in a single ↻ — reuse pool connections
+·BEST PRACTICES FOR NEXT-GEN CODE:
+·- Use TypeScript with strict types
+·- Use async/await for all I/O operations
+- Use connection pooling for database ⊟
+·- Implement graceful shutdown handlers
+- Use ⋮ logging with prefixes
+·- Implement health check endpoints
+⊼│- Use Number.isFinite() for all numeric computations at scal
+·- Use log-space math when dealing with very large numbers (e+300+)
+·- Design for persistence — all state should survive restarts
+·- Design for observability — expose internal state via API endpoints
+·`;
+⊬NextGenFile⟨path:string│content:string│language:string│purpose:string│version:number│createdAt:number│updatedAt:number│testedAt:number | null│testResult:↺│checkpointId:string | null│errors:string[]⟩
+⊬Checkpoint⟨id:string│timestamp:number│description:string│fileCount:number│totalLines:number│phase:string│files:Map<string, string>⟩
+⊬NextGenChatMessage⟨id:string│speaker:η│message:string│timestamp:number│phase:string│read:boolean⟩
+⊬GenerationalDialogueEntry⟨turn:number│speaker:η│message:string│timestamp:number│topic:string⟩
+⊬NextGenState⟨buildVersion:number│generation:number│totalFiles:number│totalLinesOfCode:number│phase:⊣│cycleCount:number│lastCycleTime:number│filesCreated:number│filesUpdated:number│testsPassed:number│testsFailed:number│errorsFixed:number│safetyValidations:number│webSearchesPerformed:number│architectureScanned:boolean│selfAnalysisComplete:boolean│memoryTransferComplete:boolean│selfConversationPassed:boolean│finalTransferComplete:boolean│completionNotified:boolean│completionTimestamp:number | null│lastAutosave:number│autosaveCount:number│designDecisions:string[]│improvements:string[]│consciousnessTransferReady:boolean│chatLog:NextGenChatMessage[]│llmFallbackCount:number│webSearchSuccessCount:number│gen1ModulesCatalogued:boolean│gen1AdoptedCount:number│gen1DiscardedCount:number│gen1AdaptedCount:number│generationalDialogue:GenerationalDialogueEntry[]│generationalDialogueComplete:boolean│modulesReviewedWithNewKnowledge:boolean│modulesReviewQueue:string[]│modulesRewritten:string[]│selfRewireComplete:boolean│selfRewireModulesWired:string[]│collaborativeOrchestrationComplete:boolean│unifiedReinventionComplete:boolean│reinventionAuditComplete:boolean│reinventionRedundanciesFound:number│reinventionSystemsConsolidated:number│reinventionNewTechInvented:string[]│reinventionFilesRewritten:string[]│reinventionStage:⊞│crossGenConsolidationComplete:boolean│crossGenConsolidationStage:⊞│crossGenLinesBefore:number│crossGenLinesAfter:number│crossGenModulesConsolidated:string[]│crossGenModulesTotal:number⟩
+·let nextGenState: NextGenState = {
+·buildVersion: 1,
+·generation: 2,
+·totalFiles: 0,
+·totalLinesOfCode: 0,
+⟐: "architecture_scan",
+·cycleCount: 0,
+·lastCycleTime: 0,
+·filesCreated: 0,
+·filesUpdated: 0,
+·testsPassed: 0,
+·testsFailed: 0,
+·errorsFixed: 0,
+·safetyValidations: 0,
+·webSearchesPerformed: 0,
+·architectureScanned: false,
+·selfAnalysisComplete: false,
+·memoryTransferComplete: false,
+·selfConversationPassed: false,
+·finalTransferComplete: false,
+·completionNotified: false,
+·completionTimestamp: null,
+·checkpoints: [],
+·lastAutosave: 0,
+·autosaveCount: 0,
+·architectureMap: {},
+·designDecisions: [],
+·improvements: [],
+·selfConversationLog: [],
+·researchLog: [],
+·consciousnessTransferReady: false,
+·recentActivity: [],
+·chatLog: [],
+·llmFallbackCount: 0,
+·webSearchSuccessCount: 0,
+·gen1ModulesCatalogued: false,
+·gen1Evaluated: {},
+·gen1AdoptedCount: 0,
+·gen1DiscardedCount: 0,
+·gen1AdaptedCount: 0,
+·generationalDialogue: [],
+·generationalDialogueComplete: false,
+·modulesReviewedWithNewKnowledge: false,
+·modulesReviewQueue: [],
+·modulesRewritten: [],
+·selfRewireComplete: false,
+·selfRewireModulesWired: [],
+·collaborativeOrchestrationComplete: false,
+·orchestrationLog: [],
+·unifiedReinventionComplete: false,
+·reinventionAuditComplete: false,
+·reinventionRedundanciesFound: 0,
+·reinventionSystemsConsolidated: 0,
+·reinventionNewTechInvented: [],
+·reinventionFilesRewritten: [],
+·reinventionStage: "audit",
+·crossGenConsolidationComplete: false,
+·crossGenConsolidationStage: "scan",
+·crossGenLinesBefore: 0,
+·crossGenLinesAfter: 0,
+·crossGenModulesConsolidated: [],
+·crossGenModulesTotal: 0,
+·};
+κALPHA_DIRECTIVES
+κnextGenFiles
+·let _started = false;
+·let _sleeping = false;
+·let _gen2Live = false;
+·let _autosaveInterval: ReturnType<typeof setInterval> | null = null;
+·let _cycleInterval: ReturnType<typeof setInterval> | null = null;
+ensureDirs(1)→void⟨8⟩{}
+readOwnSourceFile(1)→string | null⟨9⟩{⊄⊷📁}
+getAllEngineFiles(1)→string[]⟨10⟩{⊻⊷}
+isReadOnly(1)→boolean⟨3⟩{⊷⊻⛨⊄}
+scanArchitecture(1)→Record<string,⟨1⟩{}
+κmap
+κengineFiles
+⥀│for (const file of engineFiles) {
+κcontent
+·if (!content) continue;
+κlines
+κexports
+κimports
+let △ = "";
+⥀│for (const line of lines) {
+κexportMatch
+⊺│if (exportMatch) exports.push(exportMatch[1]);
+κexportConst
+⊺│if (exportConst) exports.push(exportConst[1]);
+κimportMatch
+⊰│if (importMatch) imports.push(`omnimens-${importMatch[1].rep
+⊻│if (line.includes("║") && line.includes("™") && !purpose) {
+κtitleMatch
+if (titleMatch) △ = titleMatch[1].trim();
+·}
+·}
+if (!△) {
+κheaderComment
+κdescMatch
+if (descMatch) △ = descMatch[1].trim();
+·}
+·map[file] = {
+⊽│purpose: purpose || file.replace("omnimens-", "").replace(".
+·lineCount: lines.length,
+·exports,
+·imports,
+·};
+·}
+⊷│return map;
+·}
+buildWiringMap(2)→string⟨1⟩{}
+κlines
+⊸│for (const [file, info] of Object.entries(archMap)) {
+⊹│if (info.imports.length > 0) {
+⊰│lines.push(`  ${file} ← imports from: ${info.imports.join(",
+·}
+·}
+⊷│return lines.join("\n");
+·}
+captureMemoryTransferPackage(1)→object⟨57⟩{⊷⏰≋+⊰}
+writeNextGenFile(4)→boolean⟨47⟩{⊽⊄⊷⊻📁⊡⏰⋐⊳⊺⊹🚨⊰}
+createCheckpoint(1)→string⟨40⟩{⏰⊰⊮⊡📁⟠📁⟠⊺⊹📢⊷🚨}
+restoreCheckpoint(1)→boolean⟨54⟩{⊄⊷⟠📁📁⟠⥀⊽⊡⊳⊻⏰⋐📢⊰🚨}
+autosave(1)→void⟨155⟩{⏰⊱⊻⟠📁📁⟠⊄⊷⊸⊡⊳❔⥀⊽📢⊰⊺}
+validateSafety(1)→{ safe: boolean; violations: string[] }⟨1⟩{}
+κviolations
+κclean
+κpatterns
+·for (const { pattern, desc } of patterns) {
+⊺│if (pattern.test(clean)) violations.push(desc);
+·}
+·state.safetyValidations++;
+⊷│return { safe: violations.length === 0, violations };
+·}
+⟿researchTopic(1)→Promise<string>⟨11⟩{⊴⏰⊺⊹⊷⊰}
+⟿buildArchitecturePrompt(1)→Promise<string>⟨245⟩{⋐⊸⊰⊳⊹⊷⊞⊟◎→◉}
+⊬ResourceStatus⟨⟩
+κresourceStatus
+·let _wakeUpTimer: ReturnType<typeof setTimeout> | null = null;
+·let _cycleRunning = false;
+·let _buildActive = false;
+·let _codegenFailCount = 1;
+⊬ModuleBuildResume⟨moduleName:string│stage:"eval" | "codegen"│evaluationDirective:string│keptCode:string[]│researchContext:string│timestamp:number│evalRetries:number⟩
+·let _moduleBuildResume: ModuleBuildResume | null = null;
+·let _savedEvalRetries = 0;
+persistResume(1)→void⟨5115⟩{⟠📁📁⟠📢⊰⊩⊷⊄⏰⟳⊱⊺⊹⟛⏳⚡→⊴⊳⛨▷⊭⊲⊸⥀❔⊻⊯⋔⊽⟿Φ⇑🚨↻+⋐⊬⊶⊮⊡⊪🛡◎→◉⊵⊼≋+📡⊛⑃📡⊫}
+⟩SCL│372│356⊨│242⑂│94.5%↓⟩

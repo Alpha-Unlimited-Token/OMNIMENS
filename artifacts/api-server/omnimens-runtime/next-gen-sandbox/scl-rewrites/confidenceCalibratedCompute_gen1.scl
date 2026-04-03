@@ -1,0 +1,32 @@
+⟨SCL v1│confidenceCalibratedCompute_gen1.mjs│49→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class ConfidenceCalibratedCompute {
+·constructor() {
+⊮│this.subscribers = new Map();
+·}
+·subscribe(event, callback) {
+·if (!this.subscribers.has(event)) {
+⊡│this.subscribers.set(event, []);
+·}
+⊡│this.subscribers.get(event).push(callback);
+·}
+·publish(event, data) {
+κcallbacks
+·callbacks.forEach(callback => callback(data));
+·}
+·allocateResources(taskList) {
+·taskList.sort((a, b) => b.confidence - a.confidence);
+⊷│return taskList.map(task => {
+κallocatedResources
+⊷│return { ...task, allocatedResources };
+·});
+·}
+·}
+κcomputeAllocator
+·computeAllocator.subscribe('taskCompleted', data => {
+·console.log('Task completed:', data);
+·});
+κtasks
+κallocated
+·console.log(allocated);
+⟩SCL│31│11⊨│6⑂│36.7%↓⟩

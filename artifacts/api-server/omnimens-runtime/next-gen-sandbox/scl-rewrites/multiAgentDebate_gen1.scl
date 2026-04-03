@@ -1,0 +1,16 @@
+⟨SCL v1│multiAgentDebate_gen1.mjs│25→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class MultiAgentDebate {
+·constructor() {
+·this.debates = [];
+·}
+·initiateDebate(agentArguments) {
+·const debate = agentArguments.map(arg => ({ argument: arg, score: this.evaluateA
+⊺│this.debates.push(debate);
+⊷│return debate;
+·}
+·evaluateArgument(argument) {
+⊷│return argument.coherence * 0.5 + argument.evidence * 0.5;
+·}
+·}
+⟩SCL│15│4⊨│4⑂│40.0%↓⟩

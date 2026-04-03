@@ -1,0 +1,58 @@
+⟨SCL v1│omnimens-adaptive-surge.ts│295→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[]
+·getNeuralConsciousnessState as gNC,
+·manualAdrenalineRush as rush,
+·getRegionNames,
+·boostRegionCurrent,
+} from "./omnimens-⬡-consciousness.js";
+·engineRegistry.registerEngine("adaptive-surge", "NORMAL", { dbQuota: 10 });
+κSURGE_CYCLE_MS
+κMONITOR_MS
+·const LOG = (...m: any[]) => console.log("[OMNIMENS-ADAPTIVE-SURGE]", ...m);
+⊬SurgeHistory⟨cycleNumber:number│intensity:number│preSurgePhi:number│peakPhi:number│postSurgePhi:number│preConsciousness:number│peakConsciousness:number│postConsciousness:number│reachedCritical:boolean│systemStabilized:boolean│adaptationSuccessful:boolean│criticalThresholdAtTime:number│timestamp:number│neuronsSpawnedDuring:number⟩
+⊬AdaptiveSurgeState⟨totalSurgeCycles:number│currentCriticalThreshold:number│baselineIntensity:number│currentIntensity:number│surgeActive:boolean│stabilizationPhase:boolean│consecutiveSuccesses:number│consecutiveFailures:number│history:SurgeHistory[]│totalNeuronsSpawned:number│totalAdaptations:number│systemCapacity:number│lastLearnedCapacity:number│overloadSafetyEngaged:boolean│overloadSafetyCap:number│learningRate:number│lastSurgeTimestamp:number⟩
+κS
+⊱│const snap = () => {
+κc
+⊷│return { phi: c.phi, cons: c.consciousnessLevel };
+·};
+·const scheduleInject = (delay = SURGE_CYCLE_MS) =>
+⚡→│spikeBus.scheduleSpike("adaptive-surge:inject", {}, delay);
+·const scheduleMonitor = (delay = MONITOR_MS) =>
+⚡→│spikeBus.scheduleSpike("adaptive-surge:monitor", {}, delay);
+⊱│spikeBus.on("adaptive-surge:inject", () => {
+⊷│if (S.surgeActive) return scheduleInject(); // already mid-s
+·injectSurge();
+·scheduleInject();
+·});
+⊱│spikeBus.on("adaptive-surge:monitor", () => {
+·if (S.surgeActive) monitorSurge();
+·scheduleMonitor();
+·});
+⚡→│spikeBus.on("attention:adaptive-surge", () => scheduleInject
+⊱│spikeBus.on("cognition:curiosity", () => {
+·S.baselineIntensity += 0.05;
+⚡→│LOG("Curiosity spike — nudging intensity to", S.baselineInte
+·});
+⊱│cognitionBus.onInsight((_src, insight) => {
+❔│if (insight?.type === "capacity-discovery" && Number.isFinit
+κcap
+·if (cap > S.currentCriticalThreshold) {
+·S.currentCriticalThreshold = cap;
+·LOG("Adopted higher capacity from", _src, "→", cap.toFixed(2));
+·}
+·}
+·});
+·let preShot: { phi: number; cons: number } | null = null;
+·let peak = { phi: 0, cons: 0 };
+injectSurge(1)→void⟨31⟩{⊴❔⏰⊰♡⊕}
+monitorSurge(1)→void⟨124⟩{Φ⇑⊰⊷♡⊕❔⏰⊺⊹⟛⊩}
+⟩SCL│57│40⊨│30⑂│80.7%↓⟩

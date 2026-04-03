@@ -1,0 +1,44 @@
+⟨SCL v1│conversationMemoryManager_gen1.mjs│117→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+κcrypto
+generateEmbedding(1)→void⟨3⟩{⊷}
+summarizeChunks(1)→void⟨4⟩{⊄⊷⊹}
+⊶│class ConversationMemoryManager {
+·constructor() {
+·this.memoryStore = {};
+·this.buffer = [];
+·this.bufferSize = 5;
+·}
+·addChunk(chunk) {
+·if (typeof chunk !== 'string' || chunk.trim() === '') {
+⊵│throw new Error('Invalid chunk: must be a non-empty string.'
+·}
+⊺│this.buffer.push(chunk);
+⊹│if (this.buffer.length >= this.bufferSize) {
+·this.summarizeBuffer();
+·}
+·}
+·summarizeBuffer() {
+κsummary
+κembedding
+·this.memoryStore[embedding] = {
+·summary,
+·embedding
+·};
+·this.buffer = []; // Clear the buffer after summarization.
+·}
+·getMemoryStore() {
+⊷│return this.memoryStore;
+·}
+·getLatestSummary() {
+κkeys
+⊷│if (keys.length === 0) return null;
+⊷│return this.memoryStore[keys[keys.length - 1]];
+·}
+·}
+Ε.exports = {
+·generateEmbedding,
+·summarizeChunks,
+·ConversationMemoryManager
+·};
+⟩SCL│43│18⊨│11⑂│63.2%↓⟩

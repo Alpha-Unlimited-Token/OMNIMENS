@@ -1,0 +1,59 @@
+⟨SCL v1│omnimens-url-analyzer.ts│145→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+κMAX_CONTENT_CHARS
+κENGINE_ID
+⊭│type Vendor = "http-get";
+⊬UrlContent⟨url:string│title:string│text:string│wordCount:number│error:string⟩
+·engineRegistry.registerEngine(ENGINE_ID, "NORMAL", { dbQuota: 10 });
+⊩shutdown(1)→void⟨3⟩{⊩}
+κENTITIES
+κENT_RE
+extractTextFromHtml(1)→{ title: string; text: string }⟨1⟩{}
+·const strip = (s: string) =>
+·s
+⊽│.replace(/<(script|style|nav|header|footer)[\s\S]*?<\/\1>/gi
+⊽│.replace(/<[^>]+>/g, " ")
+⊽│.replace(ENT_RE, (_, e) => ENTITIES[e] || " ")
+⊽│.replace(/\s{3,}/g, "\n\n")
+·.trim()
+·.slice(0, MAX_CONTENT_CHARS);
+κtitle
+·.trim();
+⊷│return { title, text: strip(html) };
+·}
+⊩⟿fetchUrlContent(1)→Promise<UrlContent>⟨42⟩{⊩⊲⊰⊷⊳❔⊻⟠⊱}
+⊪│export const extractUrls = (msg: string): string[] =>
+⊯│Array.from(new Set(msg.match(/https?:\/\/[^\s<>"']+/gi) || [
+⊪│export const formatUrlContent = (c: UrlContent): string =>
+·c.error
+⊰│? `[URL: ${c.url}]\nError: ${c.error}\n`
+⊰│: `[WEB PAGE: "${c.title}"]\nURL: ${c.url}\nWords: ${c.wordC
+⊱│cognitionBus.onInsight((_src, insight) => {
+❔│if (insight.type === "discovery" && insight.data?.relatedUrl
+·(insight.data.relatedUrls as string[]).forEach((u) =>
+⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:fetch`, { url: u }, 0)
+·);
+·}
+·});
+κcycle
+⊱│spikeBus.on(cycle, async () => {
+❔│await dbGateway.flush?.(ENGINE_ID).catch(() => {});
+⚡→│spikeBus.scheduleSpike(cycle, {}, 60_000);
+·});
+⚡→│spikeBus.scheduleSpike(cycle, {}, 60_000);
+⊰│spikeBus.on(`${ENGINE_ID}:fetch`, async ({ url }) => {
+⊴│if (typeof url === "string") await fetchUrlContent(url);
+·});
+⊰│spikeBus.on(`attention:${ENGINE_ID}`, () => spikeBus.schedul
+⚡→│spikeBus.on("cognition:curiosity", () => spikeBus.scheduleSp
+·const log = (...args: any[]) =>
+·console.log("[OMNIMENS-URL-ANALYZER]", ...args);
+⚡→│log("Engine initialized, spike-driven and ready.");
+⟩SCL│58│45⊨│35⑂│60.0%↓⟩

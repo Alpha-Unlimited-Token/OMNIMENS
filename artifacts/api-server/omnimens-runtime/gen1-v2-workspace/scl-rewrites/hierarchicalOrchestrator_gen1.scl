@@ -1,0 +1,31 @@
+⟨SCL v1│hierarchicalOrchestrator_gen1.mjs│40→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class HierarchicalOrchestrator {
+·constructor(agents) {
+·this.agents = agents;
+·this.taskQueue = [];
+·}
+·allocateTask(task) {
+const availableAgent = this.agents.find(α => α.isAvailable());
+·if (availableAgent) {
+·availableAgent.assignTask(task);
+·} else {
+⊺│this.taskQueue.push(task);
+·}
+·}
+·processQueue() {
+⊹│while (this.taskQueue.length > 0) {
+κtask
+·this.allocateTask(task);
+·}
+·}
+·dynamicReallocation() {
+this.agents.forEach(α => {
+⊹│if (agent.isIdle() && this.taskQueue.length > 0) {
+κtask
+α.assignTask(task);
+·}
+·});
+·}
+·}
+⟩SCL│30│9⊨│4⑂│25.0%↓⟩

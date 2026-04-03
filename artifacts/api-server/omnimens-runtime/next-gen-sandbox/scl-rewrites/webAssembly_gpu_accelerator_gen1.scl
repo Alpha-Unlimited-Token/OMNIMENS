@@ -1,0 +1,7 @@
+⟨SCL v1│webAssembly_gpu_accelerator_gen1.mjs│79→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⟿compileWasmModule(1)→void⟨11⟩{⊷}
+⟿multiplyMatrices(2)→void⟨22⟩{⊹⊵⊴⊷}
+isValidMatrix(1)→void⟨5⟩{⊄⊷⊹}
+·export { compileWasmModule, multiplyMatrices, isValidMatrix };
+⟩SCL│6│11⊨│8⑂│92.4%↓⟩

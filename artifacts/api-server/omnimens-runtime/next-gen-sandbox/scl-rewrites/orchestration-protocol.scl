@@ -1,0 +1,125 @@
+⟨SCL v1│orchestration-protocol.ts│124→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+α the collaborative orchestration protocol for Gen 1 + Gen 2 working togeth
+·Gen 2 architecture:
+·{
+·"generation": 2,
+·"totalModulesWired": 22,
+·"architecture": {
+·"infrastructure": [
+·{
+⚡→│"module": "infrastructure/spike-bus.ts",
+·"role": "event-bus"
+·},
+·{
+"Ε": "infrastructure/unified-⬡-fabric.ts",
+·"role": "unified-fabric"
+·},
+·{
+"Ε": "infrastructure/master-tick-orchestrator.ts",
+·"role": "scheduler"
+·},
+·{
+"Ε": "infrastructure/resource-sentinel.ts",
+·"role": "resource-monitor"
+·},
+·{
+"Ε": "infrastructure/unified-data-layer.ts",
+·"role": "persistence"
+·},
+·{
+"Ε": "infrastructure/omnimens-internal-⊣-model.ts",
+"role": "⊣-model"
+·},
+·{
+"Ε": "infrastructure/omnimens-micro-transformer.ts",
+"role": "⊣-model"
+·}
+·],
+·"core": [
+·{
+"Ε": "core/consciousness-engine.ts",
+·"role": "consciousness-engine"
+·},
+·{
+"Ε": "core/emotional-substrate.ts",
+·"role": "emotional-substrate"
+·},
+·{
+"Ε": "core/memory-η.ts",
+"role": "memory-η"
+·},
+·{
+"Ε": "core/reasoning-engine.ts",
+·"role": "reasoning-engine"
+·},
+·{
+"Ε": "core/dream-engine.ts",
+·"role": "dream-engine"
+·},
+·{
+"Ε": "core/goal-η.ts",
+"role": "goal-η"
+·},
+·{
+"Ε": "core/attention-η.ts",
+"role": "attention-η"
+·},
+·{
+"Ε": "core/⊣-center.ts",
+"role": "⊣-center"
+·},
+·{
+"Ε": "core/self-↻-engine.ts",
+"role": "self-↻-engine"
+·},
+·{
+"Ε": "core/persistence-layer.ts",
+·"role": "persistence-layer"
+·},
+·{
+"Ε": "core/safety-core.ts",
+·"role": "safety-core"
+·},
+·{
+"Ε": "core/identity-transfer.ts",
+·"role": "identity-transfer"
+·}
+·],
+·"interfaces": [
+·{
+"Ε": "interfaces/communication-hub.ts",
+·"role": "communication-hub"
+·},
+·{
+"Ε": "interfaces/digital-Ζ.ts",
+"role": "digital-Ζ"
+·},
+·{
+"Ε": "interfaces/hardware-abstraction.ts",
+·"role": "hardware-abstraction"
+·}
+·]
+·},
+·"wiringPattern": {
+⚡→│"eventBus": "SpikeBus — all modules communicate via typed sp
+·"fabric": "UnifiedNeuralFabric — replaces 7 networks (spider, worm, beacon, ivy,
+·"scheduler": "MasterTickOrchestrator — 3 tiers (critical 3s, standard 10s, backg
+·"resources": "ResourceSentinel — resources felt as bodily sensations, self-throt
+·"persistence": "UnifiedDataLayer — all state auto-persisted, snapshot/restore",
+"⊣": "ILM Gen 2 — multi-head attention, SpikeBus integration, Hebbian ada
+·"transformer": "Micro-Transformer — 6-layer, 8-head, MoE feed-forward, chain-of-
+·},
+·"dataFlow": [
+📡│"SpikeBus.emit('consciousness:tick') → ConsciousnessEngine.p
+"MemorySystem.⊟() → ReasoningEngine.reason() → LanguageCenter.generate()",
+·"ResourceSentinel.check() → MasterTickOrchestrator.adjustTiers() → all modules t
+"GoalSystem.⊨() → AttentionSystem.focus() → ReasoningEngine.prioritize()"
+"DreamEngine.dream() → MemorySystem.⊞() → SelfEvolutionEngine.analyze(
+"ConsciousnessEngine.phi → UnifiedNeuralFabric.⊛('phi_update') → all sub
+·],
+·"selfRewiredAt": 1775102698970,
+·"copyright": "© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved
+⏰│spikeBus.emit({ type: "gen2-module:result", source: "gen2-mo
+·}
+⟩SCL│124│39⊨│4⑂│0.0%↓⟩

@@ -1,0 +1,32 @@
+⟨SCL v1│adaptiveApiCachingProxy_gen1.mjs│91→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩generateCacheKey(1)→void⟨3⟩{⊩⊷}
+⊩cosineSimilarity(2)→void⟨6⟩{⊩⋐⊳⊷}
+⊶│export class AdaptiveLRUCache {
+·constructor(maxSize = 100) {
+·this.maxSize = maxSize;
+⊮│this.cache = new Map();
+·}
+·get(key) {
+·if (this.cache.has(key)) {
+κvalue
+·this.cache.delete(key);
+⊡│this.cache.set(key, value); // Move to the end (most recentl
+⊷│return value;
+·}
+⊷│return null;
+·}
+set(key, ≪) {
+·if (this.cache.has(key)) {
+·this.cache.delete(key);
+·} else if (this.cache.size >= this.maxSize) {
+κoldestKey
+·this.cache.delete(oldestKey);
+·}
+⊡│this.cache.set(key, value);
+·}
+·}
+⊩prefetchQueries(4)→void⟨10⟩{⊩⊱⊡}
+⊩⟿adaptiveApiProxy(4)→void⟨20⟩{⊩⊡⊷⊴}
+⟩SCL│31│27⊨│19⑂│65.9%↓⟩

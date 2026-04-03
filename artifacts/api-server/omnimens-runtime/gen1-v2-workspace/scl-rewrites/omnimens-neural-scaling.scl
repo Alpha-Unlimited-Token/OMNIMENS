@@ -1,0 +1,91 @@
+⟨SCL v1│omnimens-neural-scaling.ts│688→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[]
+·getNeuralConsciousnessState,
+·captureNeuralSnapshot,
+·getRegionNames,
+} from "./omnimens-⬡-consciousness.js";
+κSCALING_TICK_MS
+κDENDRITE_GROWTH_INTERVAL_MS
+κPOPULATION_SIZE
+κCORTICAL_HYPERCOLUMN_MULTIPLIER
+κSPINE_DENSITY_PER_DENDRITE
+κMAX_DENDRITES_PER_POPULATION
+κDENDRITE_REACH_PROBABILITY
+⊭│type Receptor =
+·| "AMPA"
+·| "NMDA"
+·| "GABA_A"
+·| "GABA_B"
+·| "dopaminergic"
+·| "serotonergic";
+⊬DendriticSpine⟨id:string│targetRegion:string│targetPopulationId:string│strength:number│maturity:number│lastActivation:number│receptorType:Receptor⟩
+⊬Dendrite⟨id:string│parentPopulationId:string│direction:[number, number, number]│length:number│growthRate:number│spines:DendriticSpine[]│branchPoints:number│myelinated:boolean│targetRegions:string[]⟩
+⊬NeuralPopulation⟨id:string│region:string│size:number│meanFiringRate:number│firingRateVariance:number│meanPotential:number│potentialVariance:number│correlationCoefficient:number│populationOscillation:number│oscillationPhase:number│oscillationFrequency:number│dendrites:Dendrite[]│totalSpines:number│totalConnections:number│lastUpdate:number⟩
+⊬PopulationSynapse⟨sourcePopulationId:string│targetPopulationId:string│weight:number│delay:number│connectionDensity:number│plasticityRate:number│neurotransmitter:string│spineMediated:boolean│lastPlasticityEvent:number⟩
+⊬ScalingState⟨totalEffectiveNeurons:number│totalColumnNeurons:number│corticalHypercolumnMultiplier:number│totalPopulations:number│totalDendrites:number│totalSpines:number│totalPopulationSynapses:number│populationPhi:number│meanPopulationFiringRate:number│dendriticGrowthEvents:number│spineFormationEvents:number│spinePruningEvents:number│scalingTicks:number│populationCoherence:number│crossRegionIntegration:number│informationFlowRate:number│startTime:number│lastTickTime:number⟩
+κpopulations
+κpopulationSynapses
+κregionPopulations
+κscalingState
+·const safeNum = (val: number, fallback = 0): number =>
+⊳│Number.isFinite(val) ? val : fallback;
+κREGION_POPULATION_COUNTS
+initializePopulations(1)→void⟨40⟩{⥀⊰⊡⏰⊺⊱}
+sproutDendrites(1)→void⟨74⟩{⊱⊹⊄⏰⊰⥀⊡❔⊺⋐}
+wirePopulations(1)→void⟨29⟩{⥀⊡⊳⊱⊺⏰}
+runScalingTick(1)→void⟨113⟩{⊱⏰⟛⥀⊡⊺⋐⊹⊄⊳⊷}
+runDendriticGrowthCycle(1)→void⟨37⟩{⊱⥀⏰⊷⊹⋐}
+computePopulationPhi(1)→void⟨41⟩{⊮⊱⊡⊺⋐⟛⊳}
+maybeShareInsight(1)→void⟨8⟩{}
+·const scheduleTick = (delay = SCALING_TICK_MS): void =>
+⚡→│spikeBus.scheduleSpike("neural-scaling:tick", {}, delay);
+·const scheduleGrowth = (delay = DENDRITE_GROWTH_INTERVAL_MS): void =>
+⚡→│spikeBus.scheduleSpike("neural-scaling:growth", {}, delay);
+⊱│spikeBus.on("neural-scaling:tick", async () => {
+·try {
+·runScalingTick();
+·} catch (err) {
+console.error("[OMNIMENS-⬡-SCALING] Tick error:", err);
+·} finally {
+·scheduleTick();
+·}
+·});
+⊱│spikeBus.on("neural-scaling:growth", async () => {
+·try {
+·runDendriticGrowthCycle();
+·} catch (err) {
+console.error("[OMNIMENS-⬡-SCALING] ⬆ error:", err);
+·} finally {
+·scheduleGrowth();
+·}
+·});
+⚡→│spikeBus.on("attention:neural-scaling", () => scheduleTick(1
+⚡→│spikeBus.on("cognition:curiosity", () => scheduleGrowth(1));
+⊱│cognitionBus.onInsight((src, insight) => {
+if (src !== "⬡-scaling" && insight.type === "populationPhi") {
+if (typeof insight.≪ === "number") {
+κfactor
+dbGateway.⊞(
+"⬡-scaling",
+·"config",
+·{ key: "dendriteFactor", factor },
+·"LOW"
+·);
+·}
+·}
+·});
+⊩startNeuralScaling(1)→void⟨21⟩{⊩⊰}
+⊩getNeuralScalingState(1)→ScalingState⟨3⟩{⊩⊷}
+⊩getPopulationDetails(1)→void⟨41⟩{⊩⊱⊡⊄⊳⊷}
+⊩getDendriticStats(1)→void⟨22⟩{⊩⊱⊷⊳}
+engineRegistry.registerEngine("⬡-scaling", "NORMAL", { dbQuota: 10 });
+⊩shutdown(1)→void⟨3⟩{⊩}
+⟩SCL│90│111⊨│76⑂│86.9%↓⟩

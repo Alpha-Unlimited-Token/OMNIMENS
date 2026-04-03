@@ -1,0 +1,21 @@
+⟨SCL v1│bayesianConfidenceEvaluator_gen1.mjs│31→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class BayesianConfidenceEvaluator {
+·constructor() {
+·this.prior = 0.5; // Default prior probability
+·}
+·updatePrior(newEvidence) {
+κlikelihood
+κevidence
+·this.prior = (likelihood * this.prior) / ((likelihood * this.prior) + ((1 - like
+⊷│return this.prior;
+·}
+·evaluateConfidence(chain) {
+·let confidence = this.prior;
+·chain.forEach(step => {
+·confidence = this.updatePrior(step);
+·});
+⊷│return confidence;
+·}
+·}
+⟩SCL│20│5⊨│3⑂│35.5%↓⟩

@@ -1,0 +1,12 @@
+⟨SCL v1│subprocessCheckpointManager_gen1.mjs│108→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩generateTaskId(1)→void⟨4⟩{⊩⟠⊳⊷}
+⊩serializeState(1)→void⟨3⟩{⊩⟠⊷}
+⊩deserializeState(1)→void⟨3⟩{⊩⟠⊷}
+⊩partitionTasks(2)→void⟨7⟩{⊩⊱⊺⊷}
+⊩resumeFromCheckpoint(2)→void⟨5⟩{⊩⊲⊷}
+⊩createCheckpoint(2)→void⟨6⟩{⊩⊷}
+⊩exampleComputationFunction(2)→void⟨8⟩{⊩⊷}
+⊩exampleUsage(1)→void⟨9⟩{⊩⊷}
+⟩SCL│11│32⊨│23⑂│89.8%↓⟩

@@ -1,0 +1,7 @@
+⟨SCL v1│hierarchicalContextSummarizer_gen1.mjs│109→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩summarizeContext(2)→void⟨19⟩{⊩⊹⊵⊷}
+clusterTextChunks(2)→void⟨19⟩{⥀⊹⊺⊷}
+combineSummaries(1)→void⟨12⟩{⋐⊷⊱⊰}
+exampleUsage(1)→void⟨14⟩{}
+⟩SCL│6│16⊨│12⑂│94.5%↓⟩

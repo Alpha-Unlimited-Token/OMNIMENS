@@ -1,0 +1,29 @@
+⟨SCL v1│weightedKnowledgeGraph_gen1.mjs│39→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class WeightedKnowledgeGraph {
+·constructor() {
+⊮│this.graph = new Map();
+·}
+·addNode(nodeId, data, weight = 1) {
+·if (!this.graph.has(nodeId)) {
+⊡│this.graph.set(nodeId, { data, edges: new Map(), weight });
+·} else {
+⊡│this.graph.get(nodeId).weight += weight;
+·}
+·}
+·addEdge(sourceId, targetId, confidence) {
+·if (this.graph.has(sourceId) && this.graph.has(targetId)) {
+⊡│this.graph.get(sourceId).edges.set(targetId, confidence);
+·}
+·}
+·resolveConflicts() {
+⊱│this.graph.forEach((node, nodeId) => {
+⊱│node.edges.forEach((confidence, targetId) => {
+·if (confidence < 0.5) {
+⊰│console.log(`Conflict detected between ${nodeId} and ${targe
+·}
+·});
+·});
+·}
+·}
+⟩SCL│28│8⊨│8⑂│28.2%↓⟩

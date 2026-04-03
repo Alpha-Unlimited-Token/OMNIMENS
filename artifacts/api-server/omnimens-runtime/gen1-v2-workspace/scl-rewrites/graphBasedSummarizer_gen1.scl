@@ -1,0 +1,9 @@
+⟨SCL v1│graphBasedSummarizer_gen1.mjs│99→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩extractEntities(1)→void⟨5⟩{⊩⊳⊽⊯⊷}
+⊩mapRelationships(2)→void⟨24⟩{⊩⊮⥀⊡⊯⊻⟛⊷}
+⊩rankNodes(1)→void⟨9⟩{⊩⊺⊷}
+⊩summarizeText(1)→void⟨12⟩{⊩⊡⊰⊷}
+⊩generateGraphHash(1)→void⟨6⟩{⊩⟠⊷}
+⟩SCL│8│29⊨│23⑂│91.9%↓⟩

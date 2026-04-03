@@ -1,0 +1,66 @@
+⟨SCL v1│persistentJobQueue_gen1.mjs│105→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩getCurrentTimestamp(1)→void⟨3⟩{⊩⊷}
+⊶│class PersistentJobQueue {
+·constructor(ttlSeconds) {
+⊮│this.queue = new Map();
+·this.ttlSeconds = ttlSeconds;
+·}
+·addJob(jobData) {
+κjobId
+κtimestamp
+⊡│this.queue.set(jobId, { jobData, timestamp, status: 'pending
+⊷│return jobId;
+·}
+·getJobState(jobId) {
+⊡│return this.queue.get(jobId) || null;
+·}
+·processJobs(processFunction) {
+·for (const [jobId, job] of this.queue.entries()) {
+·if (job.status === 'pending') {
+·try {
+κresult
+·job.status = 'completed';
+·job.result = result;
+·} catch (error) {
+job.status = '↺';
+·job.error = error.message;
+·}
+·}
+·}
+·}
+·removeExpiredJobs() {
+κnow
+·for (const [jobId, job] of this.queue.entries()) {
+κjobTime
+κageSeconds
+·if (ageSeconds > this.ttlSeconds) {
+·this.queue.delete(jobId);
+·}
+·}
+·}
+·serializeQueue() {
+κserialized
+·for (const [jobId, job] of this.queue.entries()) {
+⊺│serialized.push({ jobId, ...job });
+·}
+⊷│return serialized;
+·}
+·restoreQueue(serializedData) {
+·this.queue.clear();
+⥀│for (const job of serializedData) {
+⊡│this.queue.set(job.jobId, {
+·jobData: job.jobData,
+·timestamp: job.timestamp,
+·status: job.status,
+·result: job.result || null,
+·error: job.error || null
+·});
+·}
+·}
+·}
+⊩createJobQueue(1)→void⟨3⟩{⊩⊷}
+⊩checkpointQueueToDatabase(2)→void⟨4⟩{⊩}
+⊩restoreQueueFromDatabase(2)→void⟨5⟩{⊩⊷}
+⟩SCL│65│29⊨│16⑂│38.1%↓⟩

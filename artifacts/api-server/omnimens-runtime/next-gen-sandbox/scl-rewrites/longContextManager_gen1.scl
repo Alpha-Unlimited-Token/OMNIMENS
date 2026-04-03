@@ -1,0 +1,7 @@
+⟨SCL v1│longContextManager_gen1.mjs│75→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+generateSummary(1)→void⟨5⟩{⊹⊷}
+manageContext(3)→void⟨18⟩{⊵⊺⊷}
+combineSummaries(1)→void⟨3⟩{⊷}
+·export { generateSummary, manageContext, combineSummaries };
+⟩SCL│6│9⊨│6⑂│92.0%↓⟩

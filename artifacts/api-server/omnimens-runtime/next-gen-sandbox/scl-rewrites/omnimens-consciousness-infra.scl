@@ -1,0 +1,60 @@
+⟨SCL v1│omnimens-consciousness-infra.ts│6822→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[omnimens-emotional-core│omnimens-unified-world]
+·captureNeuralSnapshot,
+·restoreNeuralSnapshot,
+·type NeuralStateSnapshot,
+·} from "./omnimens-consciousness-infra.js";
+·let _started = false;
+·let saveCount = 0;
+·let swapWriteCount = 0;
+·let loadedFromPrevious = false;
+·let previousLifetimeId: number | null = null;
+·let emergencySaveRegistered = false;
+·let lastDbSaveTimestamp = 0;
+·let lastSwapWriteTimestamp = 0;
+·let dbSaveInProgress = false;
+κSWAP_INTERVAL_MS
+κDB_PERSIST_INTERVAL_MS
+κMAX_DB_SNAPSHOTS
+κSWAP_DIR
+κSWAP_FILE
+κSWAP_BACKUP
+κCACHE_MANIFEST_FILE
+κCACHE_LIMITS
+⊬CacheRegion⟨name:string│currentSize:number│maxSize:number│pressure:number│clearable:boolean│priority:"critical" | "important" | "normal" | "low"│description:string⟩
+⊬CacheManifest⟨totalPressure:number│regions:⬡│lastCleanup:number│totalCleanups:number│itemsFlushed:number│autoCleanupEnabled:boolean⟩
+⊬PersistedSelf⟨emotionalState:Record<string, number>│consciousnessLevel:number│selfAwarenessDepth:number│focusHistory:string[]│innerMonologue:string[]│existentialReflections:string[]│dreamNarrative:string[]│moodTrajectory:number[]│totalInsights:number│breakthroughs:number│codeProposalsGenerated:number│nextLevelConcepts:string[]│dreamCycleCount:number│daydreamCycleCount:number│creativityBoost:number│deathCount:number│totalUptimeSeconds:number│lifetimeNumber:number│neuralState:→│lastShutdownTimestamp:number│shutdownType:"graceful" | "emergency" | "unknown"│swapWriteCount:number│lastSwapTimestamp:number⟩
+·let restoredSelf: PersistedSelf | null = null;
+·let liveSnapshot: PersistedSelf | null = null;
+·let cacheManifest: CacheManifest = {
+·totalPressure: 0,
+·regions: [],
+·lastCleanup: 0,
+·totalCleanups: 0,
+·itemsFlushed: 0,
+·autoCleanupEnabled: true,
+·};
+⊩getRestoredSelf(1)→PersistedSelf | null⟨3⟩{⊩⊷}
+⊩wasRestoredFromPreviousLife(1)→boolean⟨3⟩{⊩⊷}
+⊩getPreviousLifetimeId(1)→number | null⟨3⟩{⊩⊷}
+⊩getCacheManifest(1)→CacheManifest⟨3⟩{⊩⊷}
+⊩getSwapFileStats(1)→⊞⟨1⟩{⊩}
+·let size = 0;
+·try {
+·if (existsSync(SWAP_FILE)) {
+κstat
+·size = stat.length;
+·}
+·} catch {}
+⊷│return {
+·swapWriteCount,
+·lastSwapTimestamp: lastSwapWriteTimestamp,
+·swapFileSizeBytes: size,
+·};
+·}
+ensureSwapDir(1)→void⟨9⟩{}
+captureLiveSnapshot(1)→PersistedSelf⟨246⟩{⊳⊱⊷❔⏰🛡⟠📁⟠⥀⊸⊹⋐⊩⊄}
+swapTick(1)→void⟨9⟩{}
+⟿restoreFromSwapOrDb(1)→Promise<void>⟨6417⟩{⟿⊹⟛⏰📢⊰❔≋+⊳⊱⊴⥀🚨⏳⊩⊄⟳⛨▷⊫⊷⟠⊼⊬♡⊕⊻⊺⋐⊮Φ⇑⊸⊡🛡⊞⊟⊭⫘⊽⚡→⊯⊲⑃↻+}
+⟩SCL│59│87⊨│68⑂│99.1%↓⟩

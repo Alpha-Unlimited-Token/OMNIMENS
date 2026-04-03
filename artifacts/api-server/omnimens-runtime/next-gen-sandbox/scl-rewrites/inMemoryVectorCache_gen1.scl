@@ -1,0 +1,64 @@
+⟨SCL v1│inMemoryVectorCache_gen1.mjs│138→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+κcrypto
+⊶│class InMemoryVectorCache {
+·constructor(maxSize = 1000) {
+·if (maxSize <= 0) {
+⊵│throw new Error('maxSize must be a positive integer.');
+·}
+·this.maxSize = maxSize;
+⊮│this.cache = new Map(); // Key-value store for embeddings.
+·}
+·_hashKey(key) {
+⊷│return crypto.createHash('sha256').update(key).digest('hex')
+·}
+·set(key, embedding) {
+·if (!(embedding instanceof Float32Array)) {
+⊵│throw new Error('Embedding must be a Float32Array.');
+·}
+κhashedKey
+·if (this.cache.has(hashedKey)) {
+⊡│this.cache.get(hashedKey).timestamp = Date.now();
+⊡│this.cache.get(hashedKey).embedding = embedding;
+·} else {
+·if (this.cache.size >= this.maxSize) {
+·this._evictLRU();
+·}
+⊡│this.cache.set(hashedKey, {
+·key,
+·embedding,
+⏰│timestamp: Date.now()
+·});
+·}
+·}
+·get(key) {
+κhashedKey
+·if (this.cache.has(hashedKey)) {
+κentry
+⏰│entry.timestamp = Date.now(); // Update access time for LRU.
+⊷│return entry.embedding;
+·}
+⊷│return null; // Key not found.
+·}
+·_evictLRU() {
+·let oldestKey = null;
+·let oldestTimestamp = Infinity;
+·for (const [key, entry] of this.cache.entries()) {
+·if (entry.timestamp < oldestTimestamp) {
+·oldestTimestamp = entry.timestamp;
+·oldestKey = key;
+·}
+·}
+·if (oldestKey !== null) {
+·this.cache.delete(oldestKey);
+·}
+·}
+·clear() {
+·this.cache.clear();
+·}
+·size() {
+⊷│return this.cache.size;
+·}
+·}
+Ε.exports = { InMemoryVectorCache };
+⟩SCL│63│18⊨│13⑂│54.3%↓⟩

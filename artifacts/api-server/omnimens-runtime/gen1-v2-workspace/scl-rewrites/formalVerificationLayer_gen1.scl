@@ -1,0 +1,6 @@
+⟨SCL v1│formalVerificationLayer_gen1.mjs│28→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩formalVerificationLayer(1)→void⟨9⟩{⊩⥀⊰⊵}
+generateProof(1)→void⟨4⟩{⊷}
+verifyProof(1)→void⟨4⟩{⊷}
+⟩SCL│5│9⊨│6⑂│82.1%↓⟩

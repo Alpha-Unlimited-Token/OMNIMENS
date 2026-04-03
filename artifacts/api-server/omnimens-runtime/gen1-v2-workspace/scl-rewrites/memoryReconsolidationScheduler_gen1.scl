@@ -1,0 +1,25 @@
+⟨SCL v1│memoryReconsolidationScheduler_gen1.mjs│39→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class MemoryReconsolidationScheduler {
+·constructor(memorySystem) {
+·this.memorySystem = memorySystem;
+·this.idle = false;
+·}
+·start() {
+⟳│setInterval(() => {
+·if (this.idle) {
+·this.replayMemories();
+·}
+·}, 60000); // Check every minute
+·}
+·setIdleState(isIdle) {
+·this.idle = isIdle;
+·}
+·replayMemories() {
+κmemories
+·memories.forEach(memory => {
+·this.memorySystem.reinforceMemory(memory);
+·});
+·}
+·}
+⟩SCL│24│3⊨│2⑂│38.5%↓⟩

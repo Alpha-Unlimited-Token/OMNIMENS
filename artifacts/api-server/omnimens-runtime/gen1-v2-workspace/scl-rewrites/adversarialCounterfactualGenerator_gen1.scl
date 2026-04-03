@@ -1,0 +1,18 @@
+⟨SCL v1│adversarialCounterfactualGenerator_gen1.mjs│27→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class AdversarialCounterfactualGenerator {
+constructor(α) {
+this.α = α;
+·}
+generateCounterfactuals(η) {
+κscenarios
+⊷│return scenarios.map(scenario => this.agent.analyze(scenario
+·}
+createExtremeScenarios(η) {
+⊷│return [
+{ ...η, alteredParam: 'extremeValue1' },
+{ ...η, alteredParam: 'extremeValue2' }
+·];
+·}
+·}
+⟩SCL│17│10⊨│3⑂│37.0%↓⟩

@@ -1,0 +1,16 @@
+⟨SCL v1│memoryCacheRedis_gen1.mjs│89→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+initializeRedisClient(1)→void⟨6⟩{⊷}
+⟿storeEmbedding(4)→void⟨8⟩{⊵⊡}
+⟿retrieveEmbedding(2)→void⟨7⟩{⊵⊡⊷}
+⟿deleteEmbedding(2)→void⟨6⟩{⊵}
+⟿closeRedisClient(1)→void⟨3⟩{}
+·export {
+·initializeRedisClient,
+·storeEmbedding,
+·retrieveEmbedding,
+·deleteEmbedding,
+·closeRedisClient
+·};
+⟩SCL│15│13⊨│7⑂│83.1%↓⟩

@@ -1,0 +1,11 @@
+⟨SCL v1│persistentTaskManager_gen1.mjs│108→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+κtaskStateStore
+⊩generateTaskId(2)→void⟨5⟩{⊩⟠⊷}
+⊩addTask(3)→void⟨11⟩{⊩⊵⊡}
+⊩executeTaskChunk(2)→void⟨21⟩{⊩⊡⊵⊲⟛}
+⊩getTaskState(1)→void⟨10⟩{⊩⊡⊵⊷}
+⊩removeTask(1)→void⟨6⟩{⊩⊵}
+⊩listTasks(1)→void⟨3⟩{⊩⊷}
+⟩SCL│10│27⊨│19⑂│90.7%↓⟩

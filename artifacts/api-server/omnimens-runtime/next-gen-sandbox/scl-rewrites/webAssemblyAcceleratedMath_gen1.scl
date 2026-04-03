@@ -1,0 +1,8 @@
+⟨SCL v1│webAssemblyAcceleratedMath_gen1.mjs│144→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩multiplyMatrices(2)→void⟨22⟩{⊩⊵⊷}
+⊩invertMatrix(1)→void⟨44⟩{⊩⊹⊵⊱⊷}
+⊩validateMatrix(1)→void⟨8⟩{⊩⊹⊷}
+⊩generateRandomMatrix(2)→void⟨5⟩{⊩⊷}
+⊩transposeMatrix(1)→void⟨14⟩{⊩⊷}
+⟩SCL│7│20⊨│15⑂│95.1%↓⟩

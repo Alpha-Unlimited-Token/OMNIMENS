@@ -1,0 +1,29 @@
+⟨SCL v1│omnimens-virtual-augmentation.ts│167→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+·engineRegistry.registerEngine("virtual-augmentation", "NORMAL", { dbQuota: 10 })
+κMIN
+κFIRST_DELAY
+κPERIOD
+⊬EnvNode⟨id:string; name: string; nodeType: string; domain: string│state:string; con: string[]; freq: number; ts: number; imp: number⟩
+⊬Path⟨from:string; to: string; type: string; w: number; lat: number│rel:number; phys?: string | null⟩
+⊬Research⟨⟩
+⊬AugState⟨cycles:number; last: number; nodes: number; paths: number│physResearch:number; autonomy: number; env: EnvNode[]; links: Path[]│recent:Research[]; focusDig: string; focusPhys: string⟩
+κS
+κENGINES
+·const log = (msg: string) =>
+📢│console.log(`[OMNIMENS-VIRTUAL-AUGMENTATION] ${msg}`);
+⊳│const safeNum = (n: number, f = 0) => Number.isFinite(n) ? n
+·const writeBrain = (entry: Record<string, unknown>) =>
+dbGateway.⊞("virtual-augmentation", "brain_entries", entry, "NORMAL");
+⟿mapEnvironment(1)→void⟨45⟩{⊰⏰⊺⊱⊸}
+κTOPICS
+makePrompt(4)→void⟨7⟩{⊰⊷}
+⟿researchNavigation(1)→void⟨28⟩{⫘❔⊹⊽}
+⟩SCL│28│29⊨│18⑂│83.2%↓⟩

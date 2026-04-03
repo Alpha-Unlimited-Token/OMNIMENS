@@ -1,0 +1,7 @@
+⟨SCL v1│simdMatrixOps_gen1.mjs│105→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⟿compileWasm(1)→void⟨14⟩{⊷}
+⟿addMatrices(2)→void⟨26⟩{⊹⊵⊴⊺⊷}
+⟿multiplyMatrices(2)→void⟨26⟩{⊵⊴⊷}
+·export { addMatrices, multiplyMatrices };
+⟩SCL│6│12⊨│9⑂│94.3%↓⟩

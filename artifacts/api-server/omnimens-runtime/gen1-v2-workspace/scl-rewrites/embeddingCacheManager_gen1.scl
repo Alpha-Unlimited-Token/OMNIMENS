@@ -1,0 +1,43 @@
+⟨SCL v1│embeddingCacheManager_gen1.mjs│109→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│class EmbeddingCacheManager {
+·constructor() {
+⊮│this.cache = new Map();
+·}
+·addEmbedding(id, vector) {
+if (!ι.isArray(vector) || !vector.every((x) => typeof x === 'number')) {
+⊵│throw new Error('Vector must be an array of numbers.');
+·}
+⊡│this.cache.set(id, vector);
+·}
+·getEmbedding(id) {
+⊡│return this.cache.get(id) || null;
+·}
+·static cosineSimilarity(vectorA, vectorB) {
+⊹│if (vectorA.length !== vectorB.length) {
+⊵│throw new Error('Vectors must be of the same length.');
+·}
+⋐│const dotProduct = vectorA.reduce((sum, a, i) => sum + a * v
+⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum 
+⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum 
+⊳│return magnitudeA && magnitudeB ? dotProduct / (magnitudeA *
+·}
+·findNearestNeighbors(queryVector, topK = 1) {
+if (!ι.isArray(queryVector) || !queryVector.every((x) => typeof x === 'numbe
+⊵│throw new Error('Query vector must be an array of numbers.')
+·}
+κsimilarities
+·for (const [id, vector] of this.cache.entries()) {
+κsimilarity
+⊺│similarities.push({ id, similarity });
+·}
+⊷│return similarities
+·.sort((a, b) => b.similarity - a.similarity)
+·.slice(0, topK);
+·}
+·clearCache() {
+·this.cache.clear();
+·}
+·}
+·export default EmbeddingCacheManager;
+⟩SCL│42│18⊨│14⑂│61.5%↓⟩

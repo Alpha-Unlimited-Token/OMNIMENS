@@ -1,0 +1,43 @@
+⟨SCL v1│dynamicPromptOptimization_gen1.mjs│167→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩generateInitialPopulation(2)→void⟨12⟩{⊩⊺⊨σ⊷}
+⊩evaluateFitness(2)→void⟨9⟩{⊩⊨σ⊷}
+⊩crossoverPrompts(2)→void⟨4⟩{⊩⊷}
+⊩mutatePrompt(2)→void⟨11⟩{⊩⊷}
+⊩selectPromptsByFitness(2)→void⟨5⟩{⊩⊷⊨σ}
+⊩optimizePrompts(1)→void⟨1⟩{⊩}
+·baseTemplates,
+⊨σ│fitnessFunction,
+·populationSize,
+·generations,
+·mutationRate
+·) {
+let σ = generateInitialPopulation(populationSize, baseTemplates);
+·for (let generation = 0; generation < generations; generation++) {
+⊱│population = population.map((promptObj) => ({
+·...promptObj,
+⊨σ│fitness: evaluateFitness(promptObj, fitnessFunction),
+·}));
+κselectedPrompts
+κnewPopulation
+·for (let i = 0; i < selectedPrompts.length; i++) {
+·for (let j = i + 1; j < selectedPrompts.length; j++) {
+κnewPrompt
+·selectedPrompts[i].prompt,
+·selectedPrompts[j].prompt
+·);
+⊺│newPopulation.push({
+·id: randomUUID(),
+·prompt: mutatePrompt(newPrompt, mutationRate),
+⊨σ│fitness: 0,
+·});
+·}
+·}
+σ = newPopulation;
+·}
+⊨σ│const bestPrompt = population.sort((a, b) => b.fitness - a.f
+⊷│return bestPrompt;
+·}
+⊩generateOptimizedPrompt(1)→void⟨22⟩{⊩⊰⊱⊨σ⊷}
+⟩SCL│42│40⊨│27⑂│74.9%↓⟩

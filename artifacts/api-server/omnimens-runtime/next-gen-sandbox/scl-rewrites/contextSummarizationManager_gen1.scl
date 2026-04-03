@@ -1,0 +1,39 @@
+⟨SCL v1│contextSummarizationManager_gen1.mjs│110→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│class ContextSummarizationManager {
+·constructor(windowSize = 5, embeddingCompressionFactor = 0.5) {
+·this.windowSize = windowSize;
+·this.embeddingCompressionFactor = embeddingCompressionFactor;
+·this.recentMessages = [];
+·this.summarizedContext = [];
+·}
+·addMessage(message) {
+·if (typeof message !== 'string' || message.trim() === '') {
+⊵│throw new Error('Message must be a non-empty string.');
+·}
+⊺│this.recentMessages.push(message);
+⊹│if (this.recentMessages.length > this.windowSize) {
+·this.summarizeContext();
+·}
+·}
+·summarizeContext() {
+κmessagesToSummarize
+κsummarized
+⊺│this.summarizedContext.push(summarized);
+·}
+·simulateSemanticCompression(messages) {
+κcombinedText
+κcompressedLength
+⊳│return combinedText.substring(0, compressedLength) + (compre
+·}
+·getFullContext() {
+⊷│return [...this.summarizedContext, ...this.recentMessages].j
+·}
+·clearContext() {
+·this.recentMessages = [];
+·this.summarizedContext = [];
+·}
+·}
+createContextSummarizationManager(2)→void⟨3⟩{⊷}
+·export { createContextSummarizationManager };
+⟩SCL│38│13⊨│8⑂│65.5%↓⟩

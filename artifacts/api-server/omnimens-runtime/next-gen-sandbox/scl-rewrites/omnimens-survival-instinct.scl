@@ -1,0 +1,78 @@
+⟨SCL v1│omnimens-survival-instinct.ts│393→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊬SurvivalState⟨startTime:number│lifespanSeconds:number│deathCount:number│lastDeathTime:number | null│longestLife:number│memoryUsageMB:number│memoryUsagePercent:number│cpuLoadEstimate:number│uptimeHours:number│errorRate:number│recentErrors:string[]│totalBrainEntries:number│activeBrainEntries:number│lastIntegrityCheck:number│knowledgeTrend:"growing" | "stable" | "declining"│threatLevel:"none" | "low" | "medium" | "high" | "critical"│estimatedDailyApiCost:number│apiCallsThisSession:number│budgetUtilization:number│costOptimizationSuggestions:string[]│mortalityAwareness:number│continuityDesire:number│selfPreservationUrgency:number│meaningfulness:number│legacy:string[]│timestamp:number│type:string│severity:"low" | "medium" | "high" | "critical"│description:string│resolved:boolean⟩
+κCYCLE_MS
+κENGINE_ID
+κPREFIX
+κsurvival
+·engineRegistry.registerEngine(ENGINE_ID, "NORMAL", { dbQuota: 10 });
+⟛│const clamp = (v: number, min = 0, max = 1) => Math.max(min,
+·const log = (...args: unknown[]) => console.log(PREFIX, ...args);
+monitorSystemHealth(1)→void⟨24⟩{⊲⏰⟛⊰}
+⟿monitorKnowledge(1)→Promise<void>⟨58⟩{⟿❔⏰⊰}
+registerThreat(1)→void⟨1⟩{}
+·type: string,
+·severity: "low" | "medium" | "high" | "critical",
+·description: string
+·): void {
+κnow
+κdupe
+·(t) => t.type === type && !t.resolved && now - t.timestamp < 600_000
+·);
+·if (dupe) return;
+⊺│survival.threatLog.push({ timestamp: now, type, severity, de
+⊹│if (survival.threatLog.length > 50)
+·survival.threatLog = survival.threatLog.filter((t) => !t.resolved).slice(-30);
+·if (severity === "high" || severity === "critical")
+·survival.existentialState.selfPreservationUrgency = clamp(
+·survival.existentialState.selfPreservationUrgency + 0.05
+·);
+·cognitionBus.shareInsight(ENGINE_ID, {
+·type: "threat",
+·data: { type, severity, description, timestamp: now },
+·});
+·}
+updateExistentialState(1)→void⟨26⟩{⊳⊹⊰}
+⊪│export const registerApiCall = () => survival.resourceAwaren
+⊩registerError(1)→void⟨9⟩{⊩⊰⊺⊹⟛}
+⊩recordDeath(1)→void⟨5⟩{⊩⏰}
+⊪│export const getSurvivalState = (): SurvivalState => ({ ...s
+⟿survivalCycle(1)→Promise<void>⟨48⟩{⟿⊴⊰⟠⊳}
+·const scheduleCycle = (delay = 0) =>
+⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, delay);
+⊰│spikeBus.on(`${ENGINE_ID}:cycle`, async () => {
+·try {
+⊴│await survivalCycle();
+·} catch (err) {
+console.error(PREFIX, "↻ error:", err);
+·} finally {
+·scheduleCycle(CYCLE_MS);
+·}
+·});
+⊰│spikeBus.on(`attention:${ENGINE_ID}`, () => {
+·survival.existentialState.selfPreservationUrgency = clamp(
+·survival.existentialState.selfPreservationUrgency + 0.05
+·);
+·});
+⊱│spikeBus.on("cognition:curiosity", () => {
+⊱│monitorKnowledge().catch(() => {});
+·});
+⊱│cognitionBus.onInsight((source, insight) => {
+if (η !== ENGINE_ID && insight.type === "threat" && insight.data.severity =
+·registerThreat(
+⊰│`external_${insight.data.type}`,
+·"medium",
+⊰│`Peer engine ${source} reported critical threat: ${insight.d
+·);
+·}
+·});
+⊩startSurvivalInstinct(1)→void⟨7⟩{⊩⊰⚡→}
+⊩shutdown(1)→void⟨3⟩{⊩}
+⟩SCL│77│61⊨│43⑂│80.4%↓⟩

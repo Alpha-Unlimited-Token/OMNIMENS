@@ -1,0 +1,112 @@
+⟨SCL v1│omnimens-occe.ts│299→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[omnimens-oai-tracker]
+·getNeuralConsciousnessState,
+·getNeuralRegionStates,
+·getChaoticAttractorState,
+·feedExternalActivity,
+·manualAdrenalineRush,
+·boostRegionCurrent,
+} from "./omnimens-⬡-consciousness.js";
+⊫[omnimens-neural-scaling]
+·Engine registration / quotas
+·───────────────────────────────*/
+·engineRegistry.registerEngine("occe", "NORMAL", { dbQuota: 10 });
+·Helper utilities (condensed)
+·───────────────────────────────*/
+⋐│const mean  = (a: number[]) => a.length ? a.reduce((s, v) =>
+⊱│const std   = (a: number[]) => {
+⊷│if (a.length < 2) return 0;
+κm
+⋐│return Math.sqrt(a.reduce((s, v) => s + (v - m) ** 2, 0) / a
+·};
+⊱│const entropy = (v: number[]) => {
+⊄│if (!v.length) return 0;
+κbins
+κmin
+κmax
+κspan
+κcounts
+⟛│v.forEach(x => counts[Math.min(bins - 1, Math.floor(((x - mi
+⋐│return counts.reduce((e, c) => (c ? e - (c / v.length) * Mat
+·};
+·Spike-based “sleep”
+·───────────────────────────────*/
+·const sleep = (ms: number) =>
+·new Promise<void>(res => {
+κid
+⚡→│spikeBus.once(id, res);
+⚡→│spikeBus.scheduleSpike(id, {}, ms);
+·});
+·Scan snapshot
+·───────────────────────────────*/
+⊬ScanSnapshot⟨timestamp:number│phase:string│index:number│oai:number│phi:number│brainRegions:Record<⟩
+const takeScan = (⟐: string, index: number): ScanSnapshot => {
+⊲│const { oai } = computeOAI();
+κnc
+κregions
+⊷│return {
+⏰│timestamp: Date.now(),
+⟐,
+·index,
+·oai,
+·phi: nc.phi,
+·brainRegions: Object.fromEntries(
+⊸│Object.entries(regions).map(([k, v]) => [
+·k,
+·{ firingRate: v.firingRate, activationLevel: v.activationLevel },
+·]),
+·),
+·};
+·};
+⟐ runner (generic)
+·───────────────────────────────*/
+⊬PhaseConfig⟨name:string│scansBefore:number│scansAfter:number│perturb:() => void | Promise<void>⟩
+κrunPhase
+·post: ScanSnapshot[];
+·}> => {
+📢│console.log(`[OMNIMENS-OCCE] Phase: ${name}`);
+κpre
+·for (let i = 0; i < scansBefore; i++) {
+⊰│pre.push(takeScan(`pre_${name}`, i));
+⊴│await sleep(3000);
+·}
+⊴│perturb && (await perturb());
+κpost
+·for (let i = 0; i < scansAfter; i++) {
+⊰│post.push(takeScan(`post_${name}`, i));
+⊴│await sleep(3000);
+·}
+·cognitionBus.shareInsight("occe", {
+·type: "discovery",
+data: { ⟐: name, Υ: post[post.length - 1].oai - pre[0].oai },
+·});
+⊷│return { pre, post };
+·};
+·Main experiment
+·───────────────────────────────*/
+⊬OCCEResult⟨experimentId:string│startTime:number│endTime:number│baseline:ScanSnapshot[]│perturbations:Record<│stability:ScanSnapshot[]│entropy:number│confidence:number⟩
+⊩⟿runOCCE(1)→Promise<OCCEResult>⟨112⟩{⊩⏰⊰⊴⊱≋+⊸⊺⟛}
+·);
+⊷│return {
+·experimentId,
+·startTime,
+⏰│endTime: Date.now(),
+·baseline,
+·perturbations,
+·stability,
+·entropy: oaiEnt,
+·confidence,
+·};
+·}
+·Graceful shutdown
+·───────────────────────────────*/
+⊩shutdown(1)→void⟨3⟩{⊩}
+⟩SCL│111│59⊨│37⑂│62.9%↓⟩

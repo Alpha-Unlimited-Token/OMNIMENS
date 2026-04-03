@@ -1,0 +1,8 @@
+⟨SCL v1│webAssemblyMathEngine_gen1.mjs│106→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+κwasmCode
+⟿initializeWasm(1)→void⟨5⟩{⊷}
+⊩⟿dotProduct(2)→void⟨14⟩{⊩⊹⊵⊴⊷}
+⊩⟿matrixMultiply(2)→void⟨23⟩{⊩⊵⊴⊷}
+⊩⟿example(1)→void⟨17⟩{⊩⊴}
+⟩SCL│7│17⊨│12⑂│93.4%↓⟩

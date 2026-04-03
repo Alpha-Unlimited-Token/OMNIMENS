@@ -1,0 +1,21 @@
+⟨SCL v1│confidenceInformedSelfConsistency_gen1.mjs│31→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class ConfidenceInformedSelfConsistency {
+·constructor() {
+·this.threshold = 0.7;
+·}
+·adjustPrediction(prediction, confidence) {
+·if (confidence < this.threshold) {
+⊷│return { ...prediction, adjusted: true, reason: 'Low confide
+·}
+⊷│return { ...prediction, adjusted: false };
+·}
+·setThreshold(newThreshold) {
+·this.threshold = newThreshold;
+·}
+·}
+κcisc
+κprediction
+κadjustedPrediction
+·console.log(adjustedPrediction);
+⟩SCL│20│6⊨│3⑂│35.5%↓⟩

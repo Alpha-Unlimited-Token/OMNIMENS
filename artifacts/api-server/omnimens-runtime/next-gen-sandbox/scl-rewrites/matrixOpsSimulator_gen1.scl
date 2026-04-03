@@ -1,0 +1,12 @@
+⟨SCL v1│matrixOpsSimulator_gen1.mjs│118→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+validateMatrix(1)→void⟨8⟩{⊹⊵}
+multiplyMatrices(2)→void⟨24⟩{⊵⊷}
+addMatrices(2)→void⟨16⟩{⊵⊷}
+transposeMatrix(1)→void⟨11⟩{⊷}
+·export {
+·multiplyMatrices,
+·addMatrices,
+·transposeMatrix
+·};
+⟩SCL│11│11⊨│7⑂│90.7%↓⟩

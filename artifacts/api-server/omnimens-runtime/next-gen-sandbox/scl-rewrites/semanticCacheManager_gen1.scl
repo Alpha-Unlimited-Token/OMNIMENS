@@ -1,0 +1,51 @@
+⟨SCL v1│semanticCacheManager_gen1.mjs│125→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│class SemanticCacheManager {
+·constructor() {
+⊮│this.cache = new Map();
+this.cacheLimit = 10000; // Maximum number of embeddings to ⊞.
+·}
+·addEmbedding(embedding) {
+·if (this.cache.size >= this.cacheLimit) {
+·this.evictOldest();
+·}
+⊡│this.cache.set(embedding.id, { embedding, timestamp: Date.no
+·}
+·getEmbedding(id) {
+κentry
+⊳│return entry ? entry.embedding : null;
+·}
+·findNearestNeighbors(queryVector, k = 5) {
+κdistances
+for (const { embedding } of this.cache.≢()) {
+κdistance
+⊺│distances.push({ embedding, distance });
+·}
+·distances.sort((a, b) => a.distance - b.distance);
+⊷│return distances.slice(0, k).map(entry => entry.embedding);
+·}
+·evictOldest() {
+·let oldestKey = null;
+·let oldestTimestamp = Infinity;
+·for (const [key, { timestamp }] of this.cache.entries()) {
+·if (timestamp < oldestTimestamp) {
+·oldestTimestamp = timestamp;
+·oldestKey = key;
+·}
+·}
+·if (oldestKey) {
+·this.cache.delete(oldestKey);
+·}
+·}
+·calculateDistance(vectorA, vectorB) {
+⊹│if (vectorA.length !== vectorB.length) {
+⊵│throw new Error('Vectors must be of the same length');
+·}
+⋐│return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.
+·}
+·}
+createSemanticCacheManager(1)→void⟨3⟩{⊷}
+Ε.exports = {
+·createSemanticCacheManager
+·};
+⟩SCL│50│17⊨│10⑂│60.0%↓⟩

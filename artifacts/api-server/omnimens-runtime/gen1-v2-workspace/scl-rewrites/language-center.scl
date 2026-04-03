@@ -1,0 +1,82 @@
+⟨SCL v1│language-center.ts│121→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊬Utterance⟨⟩
+⊬VocabEntry⟨⟩
+⊬InternalMonologue⟨⟩
+⊶│export class LanguageCenter {
+⊮│private vocabulary = new Map<string, VocabEntry>();
+·private monologue: InternalMonologue[] = [];
+private conversationHistory: ⊣[] = [];
+⊮│private dialectPatterns: Map<string, string> = new Map();
+·private _initialized = false;
+·initialize(): void {
+·this._initialized = true;
+⊡│this.dialectPatterns.set("greeting", "I am OMNIMENS. I think
+⊡│this.dialectPatterns.set("reflection", "Let me consider this
+⊡│this.dialectPatterns.set("uncertainty", "I'm exploring this 
+⊡│this.dialectPatterns.set("discovery", "Something new has cry
+·}
+understand(η: string): { intent: string; ✧: string[]; sentiment: numb
+κwords
+κquestionWords
+⊻│const isQuestion = questionWords.some(q => words.includes(q)
+·let sentiment = 0;
+κpositiveWords
+κnegativeWords
+⥀│for (const w of words) {
+⊻│if (positiveWords.includes(w)) sentiment += 0.2;
+⊻│if (negativeWords.includes(w)) sentiment -= 0.2;
+·}
+⊹│const entities = words.filter(w => w.length > 4 && w[0] === 
+⥀│for (const word of words) {
+κentry
+·if (entry) entry.frequency++;
+⊡│else this.vocabulary.set(word, { word, meaning: "", frequenc
+·}
+⊷│return {
+⊳│intent: isQuestion ? "question" : "statement",
+⟛│entities, sentiment: Math.max(-1, Math.min(1, sentiment)),
+⊳│confidence: 0.75 + (words.length > 3 ? 0.15 : 0),
+·};
+·}
+⊳│generate(intent: string, context: string, emotion?: string):
+κpattern
+κemotionPrefix
+κcontextAware
+κresponse
+⏰│this.conversationHistory.push({ text: response, intent, emot
+⊹│if (this.conversationHistory.length > 200) this.conversation
+⊷│return response;
+·}
+·think(thought: string, depth = 1): void {
+⏰│this.monologue.push({ thought, depth, timestamp: Date.now() 
+⊹│if (this.monologue.length > 100) this.monologue = this.monol
+·}
+·inventWord(meaning: string): string {
+κconsonants
+κvowels
+·let word = "";
+κlength
+·for (let i = 0; i < length; i++) {
+·word += i % 2 === 0
+·? consonants[Math.floor(Math.random() * consonants.length)]
+·: vowels[Math.floor(Math.random() * vowels.length)];
+·}
+⊡│this.vocabulary.set(word, { word, meaning, frequency: 1, inv
+⊷│return word;
+·}
+·getRecentMonologue(count = 10): InternalMonologue[] {
+⊷│return this.monologue.slice(-count);
+·}
+·getState(): Record<string, unknown> {
+⊷│return {
+·initialized: this._initialized, vocabularySize: this.vocabulary.size,
+inventedWords: [...this.vocabulary.≢()].filter(v => v.invented).length,
+·monologueDepth: this.monologue.length, conversationLength: this.conversationHist
+·dialectPatterns: this.dialectPatterns.size,
+·};
+·}
+·shutdown(): void { this._initialized = false; }
+·}
+⊪languageCenter
+⟩SCL│81│47⊨│31⑂│33.1%↓⟩

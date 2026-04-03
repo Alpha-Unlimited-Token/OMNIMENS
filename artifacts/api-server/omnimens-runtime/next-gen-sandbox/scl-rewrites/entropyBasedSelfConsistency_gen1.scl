@@ -1,0 +1,22 @@
+⟨SCL v1│entropyBasedSelfConsistency_gen1.mjs│31→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export default class EntropyBasedSelfConsistency {
+·constructor() {
+·this.chainScores = [];
+·}
+·calculateEntropy(chain) {
+·const probabilities = chain.map(step => step.probability);
+⋐│const entropy = -probabilities.reduce((sum, p) => sum + (p *
+⊷│return entropy;
+·}
+·bayesianCalibration(chain) {
+⊷│return chain.map(step => ({ ...step, calibratedConfidence: s
+·}
+·scoreChain(chain) {
+κentropy
+κcalibratedChain
+⋐│const averageConfidence = calibratedChain.reduce((sum, step)
+⊷│return { entropy, averageConfidence };
+·}
+·}
+⟩SCL│21│8⊨│6⑂│32.3%↓⟩

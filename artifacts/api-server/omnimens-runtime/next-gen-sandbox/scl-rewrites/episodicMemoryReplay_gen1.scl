@@ -1,0 +1,18 @@
+⟨SCL v1│episodicMemoryReplay_gen1.mjs│32→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class EpisodicMemoryReplay {
+·constructor(memoryStore) {
+·this.memoryStore = memoryStore;
+·}
+·replayMemory() {
+κepisodicMemories
+·episodicMemories.forEach(memory => {
+·this.simulateCounterfactual(memory);
+·});
+·}
+·simulateCounterfactual(memory) {
+⊰│console.log(`Simulating counterfactual for memory: ${memory}
+·}
+·}
+⊩initializeMemoryReplay(1)→void⟨4⟩{⊩}
+⟩SCL│17│5⊨│3⑂│46.9%↓⟩

@@ -1,0 +1,7 @@
+⟨SCL v1│webAssemblyAccelerator_gen1.mjs│107→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩⟿initializeWasmModule(1)→void⟨10⟩{⊩⊷}
+⊩wasmMatrixMultiply(5)→void⟨19⟩{⊩⊹⊵⊷}
+⊩isSimdSupported(1)→void⟨14⟩{⊩⊷}
+⊩simdMatrixAdd(2)→void⟨19⟩{⊩⊹⊵⊷}
+⟩SCL│6│16⊨│12⑂│94.4%↓⟩

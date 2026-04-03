@@ -1,0 +1,11 @@
+⟨SCL v1│parallelMatrixOps_gen1.mjs│81→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+κfs
+κpath
+⟿initializeWasm(1)→void⟨6⟩{📁⊷}
+⟿multiplyMatrices(2)→void⟨29⟩{⊹⊵⊴⊲⊷}
+allocateArray(2)→void⟨6⟩{⊡⊞⊟⊷}
+Ε.exports = {
+·multiplyMatrices
+·};
+⟩SCL│10│16⊨│10⑂│87.7%↓⟩

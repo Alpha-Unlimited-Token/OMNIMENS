@@ -1,0 +1,40 @@
+⟨SCL v1│omnimens-scl-translator.ts│206→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⟨⇌⟩│encodeToSCL,
+⟨⇌⟩│decodeSCL,
+·getCodexState,
+·isCodexReady,
+·getSCLStats,
+·lookupSymbol,
+·type SCLSymbol,
+·} from "./omnimens-scl-codex.js";
+⊬TranslationResult⟨original:string│translated:string│direction:"inbound" | "outbound"│symbolsUsed:string[]│bytesSaved:number│timestamp:number⟩
+⊬TranslationBoundary⟨name:string│type:η│translationsIn:number│translationsOut:number│totalBytesSaved:number⟩
+κboundaries
+·let totalTranslations = 0;
+·let totalBytesSaved = 0;
+getOrCreateBoundary(2)→⟐⟨8⟩{⊡⊷}
+⊩translateInbound(3)→TranslationResult⟨27⟩{⊩⟨⇌⟩⟛⥀⊺⊻⊷⏰}
+⊩translateOutbound(3)→TranslationResult⟨24⟩{⊩⟨⇌⟩⥀⊺⊻⊷⏰}
+⊩compressStateToSCL(2)→string⟨14⟩{⊩⊄⟠⊷⊸⟨⇌⟩⊰⊳⊺⊼}
+⊩decompressSCLState(1)→Record<string, unknown>⟨13⟩{⊩⥀⟨⇌⟩⊳⊼⊷}
+⊩compressAgentMessage(4)→string⟨6⟩{⊩⟨⇌⟩⊰⊷}
+⊩decompressAgentMessage(1)→{ from: string; to: string; type: string; content: string }⟨1⟩{⊩}
+κarrowIdx
+κcolonIdx
+κpipeIdx
+·if (arrowIdx < 0 || colonIdx < 0 || pipeIdx < 0) {
+⊷│return { from: "unknown", to: "unknown", type: "raw", conten
+·}
+⊷│return {
+⟨⇌⟩│from: decodeSCL(scl.slice(0, arrowIdx)),
+⟨⇌⟩│to: decodeSCL(scl.slice(arrowIdx + 1, colonIdx)),
+·type: scl.slice(colonIdx + 1, pipeIdx),
+⟨⇌⟩│content: decodeSCL(scl.slice(pipeIdx + 1)),
+·};
+·}
+⊩getTranslatorState(1)→ ⟨15⟩{⊩⊷}
+·let _translatorStarted = false;
+⊩startSCLTranslator(1)→void⟨21⟩{⊩📢⊰}
+⟩SCL│39│66⊨│52⑂│81.1%↓⟩

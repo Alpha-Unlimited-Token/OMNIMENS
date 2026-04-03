@@ -1,0 +1,23 @@
+⟨SCL v1│realTimeDataStream_gen1.mjs│90→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩createWebSocketServer(2)→void⟨29⟩{⊩⊱⟠⊰⊷}
+⊩createStateManager(1)→void⟨1⟩{⊩}
+·let state = { ...initialState };
+⊷│return {
+⊱│getState: () => ({ ...state }),
+⊱│updateState: (updates) => {
+·if (typeof updates === 'object' && updates !== null) {
+·state = { ...state, ...updates };
+·} else {
+⊵│throw new Error('State updates must be an object');
+·}
+·},
+⊱│resetState: () => {
+·state = { ...initialState };
+·}
+·};
+·}
+⊩startRealTimeDataStream(1)→void⟨19⟩{⊩⊱⊷⟛}
+⊪realTimeUtilityFunctions
+⟩SCL│22│20⊨│15⑂│75.6%↓⟩

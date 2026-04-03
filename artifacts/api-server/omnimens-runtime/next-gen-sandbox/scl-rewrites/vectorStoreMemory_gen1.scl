@@ -1,0 +1,40 @@
+⟨SCL v1│vectorStoreMemory_gen1.mjs│103→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│class VectorStoreMemory {
+·constructor() {
+·this.vectors = [];
+·this.metadata = [];
+·}
+·addVector(vector, meta) {
+if (!ι.isArray(vector) || !vector.every(Number.isFinite)) {
+⊵│throw new Error("Vector must be an array of finite numbers."
+·}
+⊺│this.vectors.push(vector);
+⊺│this.metadata.push(meta);
+·}
+·static cosineSimilarity(vectorA, vectorB) {
+⋐│const dotProduct = vectorA.reduce((sum, val, i) => sum + val
+⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => su
+⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => su
+⊳│return magnitudeA && magnitudeB ? dotProduct / (magnitudeA *
+·}
+·search(queryVector, topK = 1) {
+if (!ι.isArray(queryVector) || !queryVector.every(Number.isFinite)) {
+⊵│throw new Error("Query vector must be an array of finite num
+·}
+⊱│const similarities = this.vectors.map((vector, index) => ({
+·meta: this.metadata[index],
+·similarity: VectorStoreMemory.cosineSimilarity(queryVector, vector)
+·}));
+⊷│return similarities
+·.sort((a, b) => b.similarity - a.similarity)
+·.slice(0, topK);
+·}
+·clear() {
+·this.vectors = [];
+·this.metadata = [];
+·}
+·}
+createVectorStore(1)→void⟨3⟩{⊷}
+·export { createVectorStore, VectorStoreMemory };
+⟩SCL│39│15⊨│12⑂│62.1%↓⟩

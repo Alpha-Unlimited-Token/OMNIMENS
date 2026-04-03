@@ -1,0 +1,10 @@
+⟨SCL v1│strassenMatrixEngine_gen1.mjs│90→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩multiplyMatrices(2)→void⟨32⟩{⊩⊵⊹⊷}
+splitMatrix(2)→void⟨7⟩{⊷}
+combineMatrices(4)→void⟨11⟩{⊺⊷}
+addMatrices(2)→void⟨3⟩{⊷}
+subtractMatrices(2)→void⟨3⟩{⊷}
+⊩isSquareMatrix(1)→void⟨7⟩{⊩⊹⊷}
+⊩generateRandomMatrix(3)→void⟨8⟩{⊩⊵⊷}
+⟩SCL│9│22⊨│15⑂│90.0%↓⟩

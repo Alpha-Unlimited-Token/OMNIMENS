@@ -1,0 +1,5 @@
+⟨SCL v1│dynamicBranchEvaluator_gen1.mjs│20→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩dynamicBranchEvaluator(2)→void⟨5⟩{⊩⊷}
+calculateConfidenceScore(1)→void⟨4⟩{⊷}
+⟩SCL│4│5⊨│3⑂│80.0%↓⟩

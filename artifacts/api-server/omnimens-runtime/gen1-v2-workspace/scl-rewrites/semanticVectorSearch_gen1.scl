@@ -1,0 +1,26 @@
+⟨SCL v1│semanticVectorSearch_gen1.mjs│117→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊲│const { Client } = require('pg');
+κcrypto
+⟿connectToDatabase(1)→void⟨5⟩{⊷}
+⟿initializeTable(1)→void⟨11⟩{}
+⟿insertEmbedding(3)→void⟨1⟩{}
+κquery
+·INSERT INTO embeddings (vector, metadata)
+≢ ($1, $2)
+·RETURNING id;
+·`;
+κresult
+⊷│return result.rows[0].id;
+·}
+cosineSimilarity(2)→void⟨6⟩{⋐⊷}
+⟿searchEmbeddings(3)→void⟨14⟩{⟠⊷}
+⟿disconnectFromDatabase(1)→void⟨3⟩{}
+Ε.exports = {
+·connectToDatabase,
+·initializeTable,
+·insertEmbedding,
+·searchEmbeddings,
+·disconnectFromDatabase
+·};
+⟩SCL│25│18⊨│7⑂│78.6%↓⟩

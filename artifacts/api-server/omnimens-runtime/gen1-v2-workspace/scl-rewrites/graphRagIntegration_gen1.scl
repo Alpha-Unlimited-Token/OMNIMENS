@@ -1,0 +1,29 @@
+⟨SCL v1│graphRagIntegration_gen1.mjs│41→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class GraphRAG {
+·constructor() {
+⊮│this.graph = new Map();
+·}
+·addNode(agentId, data, confidence) {
+·if (!this.graph.has(agentId)) {
+⊡│this.graph.set(agentId, []);
+·}
+⊡│this.graph.get(agentId).push({ data, confidence });
+·}
+·connectNodes(sourceId, targetId, relationship, confidenceWeight) {
+·if (!this.graph.has(sourceId) || !this.graph.has(targetId)) {
+⊵│throw new Error('Source or target node does not exist.');
+·}
+⊡│this.graph.get(sourceId).push({ target: targetId, relationsh
+·}
+·resolveConflicts() {
+·for (const [agentId, edges] of this.graph.entries()) {
+·edges.sort((a, b) => b.confidence - a.confidence);
+⊡│this.graph.set(agentId, edges.slice(0, 5));
+·}
+·}
+·getGraph() {
+⊷│return this.graph;
+·}
+·}
+⟩SCL│28│8⊨│8⑂│31.7%↓⟩

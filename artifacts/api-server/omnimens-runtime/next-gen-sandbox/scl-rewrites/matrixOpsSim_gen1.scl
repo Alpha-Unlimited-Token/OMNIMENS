@@ -1,0 +1,7 @@
+⟨SCL v1│matrixOpsSim_gen1.mjs│123→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩addMatrices(2)→void⟨7⟩{⊩⊹⊵⊷}
+⊩multiplyMatrices(2)→void⟨22⟩{⊩⊵⊷}
+⊩invertMatrix(1)→void⟨39⟩{⊩⊹⊵⊱⊳⊷}
+⊩isValidMatrix(1)→void⟨3⟩{⊩⊷}
+⟩SCL│6│19⊨│15⑂│95.1%↓⟩

@@ -1,0 +1,11 @@
+⟨SCL v1│iterativeComputationManager_gen1.mjs│95→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩generateCheckpointId(1)→void⟨3⟩{⊩⊷}
+⊩divideIntoChunks(2)→void⟨7⟩{⊩⊺⊷}
+⊩serializeState(1)→void⟨3⟩{⊩⟠⊷}
+⊩deserializeState(1)→void⟨3⟩{⊩⟠⊷}
+⊩processChunksWithState(3)→void⟨8⟩{⊩⥀⊺⊷}
+⊩exampleComputationFunction(2)→void⟨6⟩{⊩⊷⟠}
+⊩iterativeComputationManager(3)→void⟨5⟩{⊩⊷}
+⟩SCL│10│28⊨│20⑂│89.5%↓⟩

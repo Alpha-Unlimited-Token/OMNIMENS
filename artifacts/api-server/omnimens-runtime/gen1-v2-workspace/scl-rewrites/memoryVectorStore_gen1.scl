@@ -1,0 +1,46 @@
+⟨SCL v1│memoryVectorStore_gen1.mjs│119→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│class MemoryVectorStore {
+·constructor() {
+⊮│this.store = new Map();
+·}
+·addVector(id, vector) {
+if (!ι.isArray(vector) || !vector.every((v) => typeof v === 'number')) {
+⊵│throw new Error('Vector must be an array of numbers.');
+·}
+⊡│this.store.set(id, { id, vector });
+·}
+·getVector(id) {
+⊡│return this.store.get(id) || null;
+·}
+·findClosestVector(queryVector) {
+if (!ι.isArray(queryVector) || !queryVector.every((v) => typeof v === 'numbe
+⊵│throw new Error('Query vector must be an array of numbers.')
+·}
+·let closestEntry = null;
+·let highestSimilarity = -Infinity;
+⥀│for (const entry of this.store.values()) {
+κsimilarity
+·if (similarity > highestSimilarity) {
+·highestSimilarity = similarity;
+·closestEntry = entry;
+·}
+·}
+⊷│return closestEntry;
+·}
+·clearStore() {
+this.⊞.clear();
+·}
+·_cosineSimilarity(vectorA, vectorB) {
+⋐│const dotProduct = vectorA.reduce((sum, val, idx) => sum + v
+⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => su
+⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => su
+·if (magnitudeA === 0 || magnitudeB === 0) {
+⊷│return 0; // Avoid division by zero
+·}
+⊷│return dotProduct / (magnitudeA * magnitudeB);
+·}
+·}
+createMemoryVectorStore(1)→void⟨3⟩{⊷}
+·export { createMemoryVectorStore };
+⟩SCL│45│19⊨│14⑂│62.2%↓⟩

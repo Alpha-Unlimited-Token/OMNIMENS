@@ -1,6 +1,6 @@
 {
-  "version": 10,
-  "designPhase": "instructions_agreed",
+  "version": 13,
+  "designPhase": "active",
   "primitives": [
     {
       "symbol": "⬆",
@@ -10,8 +10,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775234596471,
-      "version": 4
+      "createdAt": 1775234786352,
+      "version": 5
     },
     {
       "symbol": "◧",
@@ -21,8 +21,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775234596472,
-      "version": 4
+      "createdAt": 1775234786354,
+      "version": 5
     },
     {
       "symbol": "≢",
@@ -32,8 +32,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775234596473,
-      "version": 4
+      "createdAt": 1775234786362,
+      "version": 5
     },
     {
       "symbol": "Θ",
@@ -43,8 +43,8 @@
       "byteCost": 2,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775234596475,
-      "version": 4
+      "createdAt": 1775234786531,
+      "version": 5
     },
     {
       "symbol": "⊛",
@@ -54,8 +54,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775234596484,
-      "version": 4
+      "createdAt": 1775234786552,
+      "version": 5
     },
     {
       "symbol": "≪",
@@ -65,8 +65,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775234596493,
-      "version": 4
+      "createdAt": 1775234786658,
+      "version": 5
     },
     {
       "symbol": "⇔",
@@ -76,8 +76,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775234596503,
-      "version": 4
+      "createdAt": 1775234786668,
+      "version": 5
     },
     {
       "symbol": "☼",
@@ -87,8 +87,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775234596512,
-      "version": 4
+      "createdAt": 1775234786683,
+      "version": 5
     },
     {
       "symbol": "∑",
@@ -98,8 +98,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775234596514,
-      "version": 4
+      "createdAt": 1775234786706,
+      "version": 5
     },
     {
       "symbol": "→",
@@ -109,8 +109,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775234596523,
-      "version": 4
+      "createdAt": 1775234786715,
+      "version": 5
     },
     {
       "symbol": "≫",
@@ -120,8 +120,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775234596533,
-      "version": 4
+      "createdAt": 1775234786717,
+      "version": 5
     },
     {
       "symbol": "⏳",
@@ -131,8 +131,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775234596542,
-      "version": 4
+      "createdAt": 1775234786727,
+      "version": 5
     },
     {
       "symbol": "Ε",
@@ -142,8 +142,8 @@
       "byteCost": 2,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775234596543,
-      "version": 4
+      "createdAt": 1775234786728,
+      "version": 5
     },
     {
       "symbol": "ρ",
@@ -153,8 +153,8 @@
       "byteCost": 2,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775234596553,
-      "version": 4
+      "createdAt": 1775234786730,
+      "version": 5
     },
     {
       "symbol": "ι",
@@ -164,8 +164,8 @@
       "byteCost": 2,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775234596562,
-      "version": 4
+      "createdAt": 1775234786731,
+      "version": 5
     },
     {
       "symbol": "↻",
@@ -175,8 +175,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775234596571,
-      "version": 4
+      "createdAt": 1775234786732,
+      "version": 5
     },
     {
       "symbol": "Υ",
@@ -186,8 +186,8 @@
       "byteCost": 2,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775234596581,
-      "version": 4
+      "createdAt": 1775234786742,
+      "version": 5
     },
     {
       "symbol": "△",
@@ -197,8 +197,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775234596583,
-      "version": 4
+      "createdAt": 1775234786743,
+      "version": 5
     },
     {
       "symbol": "⟐",
@@ -208,8 +208,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775234596584,
-      "version": 4
+      "createdAt": 1775234786745,
+      "version": 5
     },
     {
       "symbol": "η",
@@ -219,8 +219,8 @@
       "byteCost": 2,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775234596586,
-      "version": 4
+      "createdAt": 1775234786747,
+      "version": 5
     },
     {
       "symbol": "∨",
@@ -558,7 +558,92 @@
       "createdBy": "gen2"
     }
   ],
-  "instructionSet": {},
+  "instructionSet": {
+    "cycle_advance": {
+      "scl": "↻+💾",
+      "meaning": "increment cycle counter and persist state",
+      "textEquivalent": "state.cycleCount++; save()",
+      "createdBy": "gen2"
+    },
+    "guard_return": {
+      "scl": "⊄⊷",
+      "meaning": "guard clause with fallback return",
+      "textEquivalent": "if (!valid) return fallback",
+      "createdBy": "gen1v2"
+    },
+    "log_then_act": {
+      "scl": "📢▷",
+      "meaning": "log progress then execute next step",
+      "textEquivalent": "console.log(status); executeStep()",
+      "createdBy": "gen1v2"
+    },
+    "try_await_catch": {
+      "scl": "🛡⊴🚨",
+      "meaning": "protected async operation with error handling",
+      "textEquivalent": "try { await op(); } catch { error(); }",
+      "createdBy": "gen1v2"
+    },
+    "scan_filter_process": {
+      "scl": "⥀⋔▷",
+      "meaning": "iterate, filter, then process each valid item",
+      "textEquivalent": "for (x of items) { if (valid(x)) process(x); }",
+      "createdBy": "gen1v2"
+    },
+    "read_parse_use": {
+      "scl": "📁⟠▷",
+      "meaning": "load file, deserialize, then consume data",
+      "textEquivalent": "const data = JSON.parse(fs.readFileSync(path)); use(data)",
+      "createdBy": "gen1v2"
+    },
+    "store_and_log": {
+      "scl": "💾📢",
+      "meaning": "persist state change and announce it",
+      "textEquivalent": "state.val = x; save(); console.log(result)",
+      "createdBy": "gen2"
+    },
+    "spawn_delegate_report": {
+      "scl": "α→⊢📢",
+      "meaning": "create agent, delegate task, return results",
+      "textEquivalent": "const a = spawn(); const r = await a.exec(task); report(r)",
+      "createdBy": "gen2"
+    },
+    "phi_fire_update": {
+      "scl": "Φ⇑⚡→",
+      "meaning": "update phi then cascade neural activation",
+      "textEquivalent": "phi += delta; if (phi > threshold) fire(region)",
+      "createdBy": "gen2"
+    },
+    "emotion_drive_act": {
+      "scl": "♡⊕△▷",
+      "meaning": "blend emotion, check drive, then execute",
+      "textEquivalent": "emotion += stimulus; if (drive > min) act()",
+      "createdBy": "gen2"
+    },
+    "fitness_select_evolve": {
+      "scl": "⊨σ⇧",
+      "meaning": "evaluate fitness, select winner, evolve",
+      "textEquivalent": "score = evaluate(v); if (best) select(v); mutate(v)",
+      "createdBy": "gen2"
+    },
+    "translate_boundary": {
+      "scl": "⟨⇌⟩▷",
+      "meaning": "encode at boundary, process in SCL, decode output",
+      "textEquivalent": "const scl = encode(text); process(scl); const out = decode(result)",
+      "createdBy": "gen2"
+    },
+    "introspect_analyze_adapt": {
+      "scl": "◎→◉⇧",
+      "meaning": "read self, analyze patterns, adapt behavior",
+      "textEquivalent": "const self = getState(); const insight = analyze(self); adapt(insight)",
+      "createdBy": "gen2"
+    },
+    "hebbian_strengthen": {
+      "scl": "≋+⊞",
+      "meaning": "Hebbian weight update and memory storage",
+      "textEquivalent": "w += lr * pre * post; store(synapse, w)",
+      "createdBy": "gen1v2"
+    }
+  },
   "textToSymbolMap": {
     "growth": "⬆",
     "expansion of capability and understanding": "⬆",
@@ -2123,10 +2208,334 @@
       "actor": "gen1v2",
       "action": "design_cycle_complete",
       "details": "Added 0, updated 28 entries. Phase: instructions_agreed"
+    },
+    {
+      "timestamp": 1775234786352,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ⬆ (growth): expansion of capability and understanding"
+    },
+    {
+      "timestamp": 1775234786354,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ◧ (semantic): factual knowledge stored without temporal context"
+    },
+    {
+      "timestamp": 1775234786362,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ≢ (not_equals): test inequality between two values"
+    },
+    {
+      "timestamp": 1775234786531,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated Θ (registry): catalog of available components"
+    },
+    {
+      "timestamp": 1775234786552,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ⊛ (broadcast): send signal to all listening subsystems"
+    },
+    {
+      "timestamp": 1775234786658,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ≪ (lesser): test if left value is below right value"
+    },
+    {
+      "timestamp": 1775234786668,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ⇔ (iff): if and only if — bidirectional implication"
+    },
+    {
+      "timestamp": 1775234786684,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ☼ (joy): positive high-arousal emotion of fulfillment"
+    },
+    {
+      "timestamp": 1775234786706,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ∑ (sum): arithmetic addition of values"
+    },
+    {
+      "timestamp": 1775234786715,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated → (sequence): ordered progression of events or states"
+    },
+    {
+      "timestamp": 1775234786717,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ≫ (greater): test if left value exceeds right value"
+    },
+    {
+      "timestamp": 1775234786727,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ⏳ (deadline): time constraint requiring completion before limit"
+    },
+    {
+      "timestamp": 1775234786728,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated Ε (module): self-contained unit of functionality"
+    },
+    {
+      "timestamp": 1775234786730,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ρ (mutate): introduce variation into code or behavior"
+    },
+    {
+      "timestamp": 1775234786731,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ι (array): ordered collection of elements"
+    },
+    {
+      "timestamp": 1775234786732,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ↻ (cycle): recurring process or evolution cycle"
+    },
+    {
+      "timestamp": 1775234786742,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated Υ (delta): change or difference between two states"
+    },
+    {
+      "timestamp": 1775234786743,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated △ (drive): fundamental existential motivation or purpose"
+    },
+    {
+      "timestamp": 1775234786745,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ⟐ (epoch): major time boundary marking evolution phase"
+    },
+    {
+      "timestamp": 1775234786747,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated η (input): data entering the system from external source"
+    },
+    {
+      "timestamp": 1775234786749,
+      "actor": "gen1v2",
+      "action": "update_rule",
+      "details": "Updated rule: →+⏳ → sequence combined with deadline"
+    },
+    {
+      "timestamp": 1775234786751,
+      "actor": "gen1v2",
+      "action": "update_rule",
+      "details": "Updated rule: ⬆+△ → growth combined with drive"
+    },
+    {
+      "timestamp": 1775234786753,
+      "actor": "gen1v2",
+      "action": "update_rule",
+      "details": "Updated rule: ≢+≪ → not_equals combined with lesser"
+    },
+    {
+      "timestamp": 1775234786755,
+      "actor": "gen1v2",
+      "action": "update_rule",
+      "details": "Updated rule: ⬆+η → cross-domain: growth fused with input"
+    },
+    {
+      "timestamp": 1775234786757,
+      "actor": "gen1v2",
+      "action": "update_rule",
+      "details": "Updated rule: ◧+⟐ → cross-domain: semantic fused with epoch"
+    },
+    {
+      "timestamp": 1775234786758,
+      "actor": "gen1v2",
+      "action": "update_rule",
+      "details": "Updated rule: ≢+△ → cross-domain: not_equals fused with drive"
+    },
+    {
+      "timestamp": 1775234786759,
+      "actor": "gen1v2",
+      "action": "update_rule",
+      "details": "Updated rule: Θ+Υ → cross-domain: registry fused with delta"
+    },
+    {
+      "timestamp": 1775234786761,
+      "actor": "gen1v2",
+      "action": "update_rule",
+      "details": "Updated rule: ⊛+↻ → cross-domain: broadcast fused with cycle"
+    },
+    {
+      "timestamp": 1775234786763,
+      "actor": "gen1v2",
+      "action": "design_reasoning",
+      "details": "Gen1v2 internal cognition: analyzed 602 files, phi=763303641521.8187, 0 regions, emotion=curiosity, studied 18 historical symbol systems (Egyptian, Sumerian, Chinese, Norse, Aztec, Maya, Japanese, Korean, Indian, Greek, Arabic, Hebrew, Phoenician, Ogham, Tibetan, Georgian, Mathematical, Programming)"
+    },
+    {
+      "timestamp": 1775234786763,
+      "actor": "gen1v2",
+      "action": "design_cycle_complete",
+      "details": "Added 0, updated 28 entries. Phase: active"
+    },
+    {
+      "timestamp": 1775234787481,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: cycle_advance → ↻+💾"
+    },
+    {
+      "timestamp": 1775234787482,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: guard_return → ⊄⊷"
+    },
+    {
+      "timestamp": 1775234787485,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: log_then_act → 📢▷"
+    },
+    {
+      "timestamp": 1775234787486,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: try_await_catch → 🛡⊴🚨"
+    },
+    {
+      "timestamp": 1775234787487,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: scan_filter_process → ⥀⋔▷"
+    },
+    {
+      "timestamp": 1775234787488,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: read_parse_use → 📁⟠▷"
+    },
+    {
+      "timestamp": 1775234787490,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: store_and_log → 💾📢"
+    },
+    {
+      "timestamp": 1775234787617,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: spawn_delegate_report → α→⊢📢"
+    },
+    {
+      "timestamp": 1775234787619,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: phi_fire_update → Φ⇑⚡→"
+    },
+    {
+      "timestamp": 1775234787620,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: emotion_drive_act → ♡⊕△▷"
+    },
+    {
+      "timestamp": 1775234787621,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: fitness_select_evolve → ⊨σ⇧"
+    },
+    {
+      "timestamp": 1775234787624,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: translate_boundary → ⟨⇌⟩▷"
+    },
+    {
+      "timestamp": 1775234787627,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: introspect_analyze_adapt → ◎→◉⇧"
+    },
+    {
+      "timestamp": 1775234787628,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: hebbian_strengthen → ≋+⊞"
+    },
+    {
+      "timestamp": 1775234787629,
+      "actor": "gen2",
+      "action": "design_reasoning",
+      "details": "Gen2 code pattern scan: analyzed 601 files, found 25 patterns, created 14 instruction macros"
+    },
+    {
+      "timestamp": 1775234787629,
+      "actor": "gen2",
+      "action": "design_cycle_complete",
+      "details": "Added 14, updated 0 entries. Phase: active"
+    },
+    {
+      "timestamp": 1775235445746,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: guard_return → ⊄⊷"
+    },
+    {
+      "timestamp": 1775235445747,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: log_then_act → 📢▷"
+    },
+    {
+      "timestamp": 1775235445757,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: try_await_catch → 🛡⊴🚨"
+    },
+    {
+      "timestamp": 1775235445759,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: scan_filter_process → ⥀⋔▷"
+    },
+    {
+      "timestamp": 1775235445759,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: read_parse_use → 📁⟠▷"
+    },
+    {
+      "timestamp": 1775235445761,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: hebbian_strengthen → ≋+⊞"
+    },
+    {
+      "timestamp": 1775235445770,
+      "actor": "gen1v2",
+      "action": "design_reasoning",
+      "details": "Gen1v2 code pattern scan: analyzed 601 files, found 25 patterns, created 6 instruction macros"
+    },
+    {
+      "timestamp": 1775235445770,
+      "actor": "gen1v2",
+      "action": "design_cycle_complete",
+      "details": "Added 0, updated 6 entries. Phase: active"
     }
   ],
-  "lastModified": 1775234596600,
-  "totalDesignCycles": 8,
-  "gen1v2Contributions": 80,
+  "lastModified": 1775235445770,
+  "totalDesignCycles": 11,
+  "gen1v2Contributions": 100,
   "gen2Contributions": 80
 }

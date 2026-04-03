@@ -1,0 +1,44 @@
+⟨SCL v1│omnimens-evolution.ts│80→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[web-search│omnimens-source-integration]
+κENGINE
+κ__dirname
+κMODULES_DIR
+κCYCLE_MS
+·engineRegistry.registerEngine(ENGINE, "NORMAL", { dbQuota: 10 });
+⊱│const ensureDir = () => { if (!existsSync(MODULES_DIR)) mkdi
+·const rndPick = <T>(arr: T[], n: number) =>
+·[...arr].sort(() => Math.random() - 0.5).slice(0, n);
+⏰│const now = () => Date.now();
+⊭│type Insight = { type: string; data: any };
+κCODE_QUERIES
+·const llm = async (req: any) =>
+·apiManager.call(ENGINE, "openai", {
+method: "chat.completions.α",
+·...req,
+·});
+⟿genModule(1)→void⟨1⟩{}
+·name: string,
+△: string,
+·algorithm: string,
+◧: string
+·) {
+κprompt
+Ε: ${name}
+△: ${△}
+·ALGORITHM: ${algorithm}
+◧:
+${◧.slice(0, 1200)}
+·Return JSON with { "code": "...", "description": "..." } obeying strict ES-modul
+κrsp
+κtxt
+·try {
+κobj
+⟩SCL│43│23⊨│4⑂│46.3%↓⟩

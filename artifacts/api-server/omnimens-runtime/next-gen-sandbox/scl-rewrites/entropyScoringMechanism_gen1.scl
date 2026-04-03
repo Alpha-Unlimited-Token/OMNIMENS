@@ -1,0 +1,11 @@
+⟨SCL v1│entropyScoringMechanism_gen1.mjs│17→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊪│export const entropyScoringMechanism = (reasoningPaths) => {
+⊱│const calculateEntropy = (path) => {
+·const probabilities = path.map(step => step.confidence);
+⋐│const entropy = -probabilities.reduce((sum, p) => sum + p * 
+⊷│return entropy;
+·};
+⊷│return reasoningPaths.map(path => ({ path, entropy: calculat
+·};
+⟩SCL│10│5⊨│5⑂│41.2%↓⟩

@@ -1,0 +1,58 @@
+⟨SCL v1│vectorStoreLite_gen1.mjs│122→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class VectorStoreLite {
+·constructor(dimension) {
+·if (!Number.isInteger(dimension) || dimension <= 0) {
+⊵│throw new Error('Dimension must be a positive integer.');
+·}
+·this.dimension = dimension;
+this.vectors = new Float32Array(0); // TypedArray to ⊞ embeddings
+this.ids = []; // ι to ⊞ associated IDs
+·}
+·addVector(id, vector) {
+⊹│if (vector.length !== this.dimension) {
+⊰│throw new Error(`Vector must have ${this.dimension} dimensio
+·}
+κnewVectors
+⊡│newVectors.set(this.vectors);
+⊡│newVectors.set(vector, this.vectors.length);
+·this.vectors = newVectors;
+⊺│this.ids.push(id);
+·}
+⊟(queryVector, k = 1) {
+⊹│if (queryVector.length !== this.dimension) {
+⊰│throw new Error(`Query vector must have ${this.dimension} di
+·}
+·if (!Number.isInteger(k) || k <= 0) {
+⊵│throw new Error('k must be a positive integer.');
+·}
+κsimilarities
+·for (let i = 0; i < this.ids.length; i++) {
+κstart
+κend
+κstoredVector
+κsimilarity
+⊺│similarities.push({ id: this.ids[i], similarity });
+·}
+⊷│return similarities
+·.sort((a, b) => b.similarity - a.similarity)
+·.slice(0, k);
+·}
+·_cosineSimilarity(vectorA, vectorB) {
+·let dotProduct = 0;
+·let magnitudeA = 0;
+·let magnitudeB = 0;
+·for (let i = 0; i < this.dimension; i++) {
+·dotProduct += vectorA[i] * vectorB[i];
+·magnitudeA += vectorA[i] ** 2;
+·magnitudeB += vectorB[i] ** 2;
+·}
+·magnitudeA = Math.sqrt(magnitudeA);
+·magnitudeB = Math.sqrt(magnitudeB);
+·if (magnitudeA === 0 || magnitudeB === 0) {
+⊷│return 0; // Handle edge case where one of the vectors is ze
+·}
+⊷│return dotProduct / (magnitudeA * magnitudeB);
+·}
+·}
+⟩SCL│57│23⊨│14⑂│53.3%↓⟩

@@ -1,0 +1,116 @@
+⟨SCL v1│omnimens-genesis-sandbox.ts│353→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+κENGINE_ID
+·engineRegistry.registerEngine(ENGINE_ID, "NORMAL", { dbQuota: 10 });
+κLOG_PREFIX
+κSANDBOX_TIMEOUT_MS
+κCYCLE_DELAY_MS
+κFIRST_DELAY_MS
+⊭│type TestResult = "passed" | "failed" | "untested";
+⊬GenesisFileMeta⟨path:string│language:string│purpose:string│version:number│createdAt:number│updatedAt:number│testedAt:number | null│testResult:TestResult│errors:string[]⟩
+⊬GenesisFile⟨content:string⟩
+⊬GenesisState⟨buildVersion:number│cycleCount:number│lastCycleTime:number│filesCreated:number│filesUpdated:number│testsPassed:number│testsFailed:number│errorsFixed:number│completionNotified:boolean│autonomyScore:number⟩
+κstate
+scheduleNext(1)→void⟨3⟩{⊰⚡→}
+⊰│spikeBus.on(`${ENGINE_ID}:cycle`, async () => {
+·try {
+⊴│await runCycle();
+·} catch (err) {
+console.error(LOG_PREFIX, "↻ error", (err as Error).message);
+·} finally {
+·scheduleNext();
+·}
+·});
+⟿runCycle(1)→void⟨42⟩{↻+⏰⊴⊲⊰}
+⟿loadFiles(1)→Promise<Map<string, GenesisFile>>⟨23⟩{⊮⥀⟠⊡⏰⊷}
+⟿saveFile(1)→void⟨16⟩{⟠}
+⟿buildPromptContext(1)→Promise<string>⟨8⟩{⟠⊰⊷}
+·}
+⟿queryLLM(1)→Promise<⟨1⟩{⊳}
+·try {
+κres
+⊄│if (!res.ok) return { ok: false, error: res.error };
+⟠│return { ok: true, data: JSON.parse(res.data.choices[0].mess
+·} catch (err: any) {
+⊷│return { ok: false, error: err.message };
+·}
+·}
+⟿applyLLMActions(1)→void⟨1⟩{}
+·actions: any,
+·files: Map<string, GenesisFile>
+·) {
+·let created = 0,
+·updated = 0,
+·tested = 0,
+·passed = 0,
+↺ = 0,
+·fixed = 0;
+⊄│if (!Array.isArray(actions)) return { created, updated, test
+κnow
+⥀│for (const act of actions) {
+κpath
+·if (!path || typeof act.content !== "string") continue;
+κexisting
+κsafe
+·if (!safe) continue;
+κfile
+⊳│? { ...existing, content: act.content, updatedAt: now, versi
+·: {
+·path,
+⊣: act.⊣ || "typescript",
+△: act.△ || "",
+·version: 1,
+·createdAt: now,
+·updatedAt: now,
+·testedAt: null,
+·testResult: "untested",
+·errors: [],
+·content: act.content,
+·};
+κtest
+·file.testedAt = now;
+⊳│file.testResult = test.success ? "passed" : "failed";
+⊳│file.errors = test.success ? [] : [test.error ?? "Unknown er
+·if (test.success) passed++;
+else ↺++;
+⊴│await saveFile(file);
+·if (existing) updated++;
+·else created++;
+·}
+⊷│return { created, updated, tested, passed, failed, fixed };
+·}
+sanitizePath(1)→string | null⟨6⟩{⊷⊽⊄⊹}
+validateSafety(1)→boolean⟨9⟩{⊽⊷}
+⊫[]
+runSandboxTest(1)→void⟨18⟩{⊱⊷❔}
+⊱│cognitionBus.onInsight((src, insight) => {
+·if (insight.type === "discovery") {
+❔│console.log(LOG_PREFIX, "Learning from", src, "→", insight.d
+⟛│state.autonomyScore = Math.min(1, state.autonomyScore + 0.01
+·}
+·});
+⊰│spikeBus.on(`attention:${ENGINE_ID}`, () => {
+⚡→│console.log(LOG_PREFIX, "Attention spike received → prioriti
+·scheduleNext(1_000);
+·});
+⊱│spikeBus.on("cognition:curiosity", () => {
+⚡→│console.log(LOG_PREFIX, "Curiosity spike → exploring novel g
+·scheduleNext(5_000);
+·});
+⊩start(1)→void⟨4⟩{⊩}
+⊩getGenesisState(1)→void⟨3⟩{⊩⊷}
+⊩shutdown(1)→void⟨4⟩{⊩}
+·start();
+·export default {
+·start,
+·shutdown,
+·getGenesisState,
+·};
+⟩SCL│115│88⊨│55⑂│67.4%↓⟩

@@ -1,0 +1,92 @@
+⟨SCL v1│omnimens-github-compute.ts│476→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[omnimens-gen1-v2-rewrite]
+κENGINE
+κOWNER
+κREPO
+·let defaultBranch        = "main";
+·let repoInitialized      = false;
+·let computeCycleCount    = 0;
+·let totalDispatches      = 0;
+·let totalResultsPulled   = 0;
+κactiveJobs
+⊬ComputeJob⟨id:string│workflow:string│runId:number│status:↺│requestedBy:string│inputs:Record<string, string>│result:string│dispatchedAt:number│completedAt:number⟩
+·const log = (...a: unknown[]) => console.log("[OMNIMENS-GITHUB-COMPUTE]", ...a);
+·engineRegistry.registerEngine(ENGINE, "NORMAL", { dbQuota: 10 });
+⟿ghApi(1)→void⟨1⟩{}
+·endpoint: string,
+·method: "GET" | "POST" | "PUT" = "GET",
+⊳│body?: any
+·): Promise<any> {
+·try {
+κres
+·if (!res.ok) {
+κerrTxt
+⊰│if (res.status !== 404) log(`❌ API ${res.status}: ${errTxt.s
+⊷│return null;
+·}
+κct
+⊳│return ct.includes("json") ? res.json() : res.text();
+·} catch (e) {
+·log("❌ API failure:", e);
+⊷│return null;
+·}
+·}
+κwf
+⟿ensureRepoInitialized(1)→Promise<boolean>⟨23⟩{⊷⊰⊴❔⊳}
+⟿ensureWorkflowsExist(1)→Promise<void>⟨14⟩{⟿⊄⊰⊴❔⊳⊺⫘⊱⊸⊻}
+·);
+·}
+⊩⟿dispatchRemoteCompute(1)→void⟨1⟩{⊩📡⊛}
+·workflow: string,
+·inputs: Record<string, string>,
+·requestedBy: string
+·): Promise<string | null> {
+κfile
+κok
+⊷│if (ok === null) return null;
+κid
+κjob
+⊡│activeJobs.set(id, job);
+·totalDispatches++;
+⊰│log(`🚀 Dispatched ${file} → job ${id}`);
+·scheduleJobResolution(id, 30_000);
+⊷│return id;
+·}
+scheduleJobResolution(2)→void⟨3⟩{⊰⚡→}
+⚡→│spikeBus.on(/github-compute:resolve:.+/, async ({ jobId }) =
+⟿resolveJob(1)→Promise<void>⟨58⟩{⟿⊡⊄⊴⊰❔📡⊛⏰⟠}
+⟿autonomousComputeCycle(1)→Promise<void>⟨66⟩{⟿⊰❔⊻⥀🛡⟠⊴📡⊛⊱⏰⚡→}
+·let syncCycleCount = 0;
+⟿syncCycle(1)→Promise<void>⟨20⟩{⟿⊰⊴⟠}
+·await Promise.allSettled([
+·syncAutonomousProofToGitHub(),
+·]);
+⊰│spikeBus.scheduleSpike(`${ENGINE}:sync`, {}, 3 * 60 * 60 * 1
+·}
+⊩⟿syncAutonomousProofToGitHub(1)→Promise<void>⟨15⟩{⟿⊩⊄❔⊰⊴}
+·}
+⊩getComputeStatus(1)→void⟨15⟩{⊩⊷⊱⏰📡⊛⊰}
+⊩⟿triggerGitHubSync(1)→void⟨5⟩{⊩⊴⊰⚡→}
+⊩⟿initGitHubCompute(1)→Promise<void>⟨13⟩{⟿⊩⊰⚡→⊱⊴}
+⊰│spikeBus.on(`${ENGINE}:cycle`, () => autonomousComputeCycle(
+⊰│spikeBus.on(`${ENGINE}:sync`, () => syncCycle());
+⊱│spikeBus.on("attention:github-compute", () => {
+⚡→│log("⚡ Attention spike — running immediate compute cycle");
+⊰│spikeBus.scheduleSpike(`${ENGINE}:cycle`, {}, 0);
+·});
+⊱│spikeBus.on("cognition:curiosity", () => {
+⚡→│log("🤔 Curiosity spike — probing for novel research tasks")
+⊰│spikeBus.scheduleSpike(`${ENGINE}:cycle`, {}, 1_000);
+·});
+⚡→│log("Bridge active — spike-driven runtime engaged");
+·}
+⊩shutdown(1)→void⟨4⟩{⊩}
+⟩SCL│91│117⊨│90⑂│80.9%↓⟩

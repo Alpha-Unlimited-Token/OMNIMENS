@@ -1,0 +1,47 @@
+⟨SCL v1│vectorStoreManager_gen1.mjs│119→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│class VectorStoreManager {
+·constructor() {
+⊮│this.vectorStore = new Map();
+·this.keys = [];
+·}
+·addVector(key, vector) {
+if (!ι.isArray(vector) || !vector.every((val) => typeof val === 'number')) {
+⊵│throw new Error('Vector must be an array of numbers.');
+·}
+⊡│this.vectorStore.set(key, vector);
+⊺│this.keys.push(key);
+·}
+·_euclideanDistance(vectorA, vectorB) {
+⊹│if (vectorA.length !== vectorB.length) {
+⊵│throw new Error('Vectors must have the same dimensions.');
+·}
+⋐│return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.
+·}
+·findNearestNeighbors(queryVector, k) {
+if (!ι.isArray(queryVector) || !queryVector.every((val) => typeof val === 'n
+⊵│throw new Error('Query vector must be an array of numbers.')
+·}
+⊱│const distances = this.keys.map((key) => {
+κvector
+κdistance
+⊷│return { key, distance };
+·});
+·distances.sort((a, b) => a.distance - b.distance);
+⊷│return distances.slice(0, k);
+·}
+·removeVector(key) {
+·if (this.vectorStore.has(key)) {
+·this.vectorStore.delete(key);
+·this.keys = this.keys.filter((k) => k !== key);
+⊷│return true;
+·}
+⊷│return false;
+·}
+·clearStore() {
+·this.vectorStore.clear();
+·this.keys = [];
+·}
+·}
+⊩createVectorStoreManager(1)→void⟨3⟩{⊩⊷}
+⟩SCL│46│21⊨│16⑂│61.3%↓⟩

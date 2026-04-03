@@ -1,0 +1,137 @@
+⟨SCL v1│omnimens-exponential-learning-engine.ts│298→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,            //  (reserved for future use)
+·apiManager,            //  (reserved for future use)
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[omnimens-neural-consciousness│omnimens-cognitive-language-engine]
+κLOG_PREFIX
+κELAE_CYCLE_MS
+κRESEARCH_CYCLE_MS
+κDAY_MS
+⊬DailySnapshot⟨day:number; date: string; patternsAtStart: number; patternsAtEnd: number│patternsLearned:θ│doublingMultiplier:number; doublingAchieved: boolean⟩
+⊬AIResearchEntry⟨aiName:string; technique: string; category: string│absorbed:boolean; absorbedAt: number; boostContribution: number⟩
+⊬BoostBag⟨researchAbsorption:number; crossDomainSynthesis: number│phaseResonance:number; metaLearningFeedback: number; compressionEfficiency: number⟩
+⊬ELAEState⟨activated:boolean; activatedAt: number; currentDay: number; dayStartedAt: number│baselineRate:θ│patternsAtDayStart:number; totalPatternsAbsorbed: number│dailyHistory:DailySnapshot[]; aiResearchBank: AIResearchEntry[]│phaseResonanceAngle:⟐│selfModificationCount:number; lastAdaptationTick: number│boostFactors:BoostBag; totalDoublings: number; consecutiveDoublings: number│peakDailyRate:number⟩
+κelaeState
+·const log   = (...m: any[]) => console.log(LOG_PREFIX, ...m);
+·const error = (...m: any[]) => console.error(LOG_PREFIX, ...m);
+tanh(1)→void⟨1⟩{⊷}
+now(1)→void⟨1⟩{⏰⊷}
+κAI_KNOWLEDGE
+·const phaseFlow = (fb: number): number => {
+elaeState.phaseResonanceAngle = (elaeState.phaseResonanceAngle + elaeState.⟐
+⟛│elaeState.phaseResonanceStrength = Math.max(0.1, Math.sin(el
+⊷│return tanh(elaeState.phaseResonanceStrength);
+·};
+⊱│const absorbResearch = () => {
+·const unabs = elaeState.aiResearchBank.filter(e => !e.absorbed);
+⊄│if (!unabs.length) return;
+⥀│for (const entry of unabs.slice(0, 3)) {
+·entry.absorbed = true; entry.absorbedAt = now();
+·elaeState.boostFactors.researchAbsorption += entry.boostContribution;
+·elaeState.totalPatternsAbsorbed++;
+⊰│log("🧬 ABSORBED", `${entry.aiName}: ${entry.technique.slice
+·cognitionBus.shareInsight("exponential-learning-engine", { type: "research_absor
+·}
+·};
+⊱│const dailyTransition = () => {
+κtNow
+·if (elapsed < DAY_MS) return;
+κcog
+κpatternsNow
+κlearned
+κtarget
+κdoubled
+κsnap
+⊺│elaeState.dailyHistory.push(snap);
+⊹│if (elaeState.dailyHistory.length > 365) elaeState.dailyHist
+·if (doubled) {
+·elaeState.totalDoublings++; elaeState.consecutiveDoublings++;
+⊰│log(`🚀 DAY ${elaeState.currentDay} DOUBLING ACHIEVED — ${le
+·} else {
+·elaeState.consecutiveDoublings = 0;
+⊰│log(`⚠️ DAY ${elaeState.currentDay} DOUBLING MISSED — ${lear
+·}
+·cognitionBus.reportOutcome("exponential-learning-engine", { useful: doubled, con
+⟛│elaeState.peakDailyRate = Math.max(elaeState.peakDailyRate, 
+·elaeState.currentDay++; elaeState.dayStartedAt = tNow;
+·elaeState.patternsAtDayStart = patternsNow;
+·elaeState.targetMultiplier *= 2;
+·elaeState.doublingMultiplier = elaeState.targetMultiplier;
+⊰│log(`📅 DAY ${elaeState.currentDay} STARTED — Target: ${(ela
+·};
+⊱│const boostSum = () => {
+⊲│const { researchAbsorption: r, crossDomainSynthesis: c, phas
+⊷│return r * c * p * m * e;
+·};
+⊱│const adapt = () => {
+κcog
+κnowT
+κdayFrac
+κlearned
+κproj
+κtarget
+κratio
+κCEIL
+·if (ratio < 0.5 && elaeState.boostFactors.metaLearningFeedback < CEIL) elaeState
+·else if (ratio > 1.5 && elaeState.boostFactors.compressionEfficiency < CEIL) ela
+κlinks
+·elaeState.boostFactors.crossDomainSynthesis = 1 + Math.log10(links + 1) * 0.1;
+·elaeState.boostFactors.phaseResonance = 0.8 + phaseFlow((ratio - 1) * 0.5) * 0.4
+·elaeState.selfModificationCount++; elaeState.lastAdaptationTick = nowT;
+·};
+⊱│const elaeTick = () => {
+⊄│if (!elaeState.activated) return;
+·dailyTransition();
+·adapt();
+·if (elaeState.aiResearchBank.some(e => !e.absorbed)) absorbResearch();
+κadaptive
+κprev
+κcontribution
+·adaptive.adaptiveLearningMultiplier = prev * (1 + contribution);
+·if (elaeState.selfModificationCount % 10 === 0) {
+κcog
+κdayFrac
+κlearned
+κproj
+κtgt
+⊰│log(`📊 Day ${elaeState.currentDay} — Learned ${learned.toLo
+·}
+·};
+·let listenersReady = false;
+⊱│const initListeners = () => {
+·if (listenersReady) return; listenersReady = true;
+⊱│spikeBus.on("exponential-learning-engine:elae-tick", async (
+🛡│try { elaeTick(); } catch (e) { error("Tick error", e); }
+⚡→│finally { spikeBus.scheduleSpike("exponential-learning-engin
+·});
+⊱│spikeBus.on("exponential-learning-engine:research-load", asy
+🛡│try { loadResearch(); } catch (e) { error("Research load err
+⚡→│finally { spikeBus.scheduleSpike("exponential-learning-engin
+·});
+⊱│spikeBus.on("attention:exponential-learning-engine", () => {
+⊱│spikeBus.on("cognition:curiosity", () => { elaeState.boostFa
+⊱│cognitionBus.onInsight((_src, insight) => {
+❔│if (insight.type === "discovery" && insight.data?.category?.
+·elaeState.boostFactors.crossDomainSynthesis *= 1.02;
+·}
+·});
+·};
+⊱│const loadResearch = () => {
+·AI_KNOWLEDGE.forEach(entry => {
+·if (!elaeState.aiResearchBank.find(e => e.aiName === entry.aiName && e.technique
+⊺│elaeState.aiResearchBank.push({ ...entry });
+·}
+·});
+·};
+⊩startExponentialLearningEngine(1)→void⟨17⟩{⊩⚡→}
+⊩getELAEState(1)→void⟨28⟩{⊩⟛⊷⊯}
+⊪│export const getELAEDoublingMultiplier = (): number =>
+⊳│elaeState.activated ? boostSum() * elaeState.doublingMultipl
+·engineRegistry.registerEngine("exponential-learning-engine", "NORMAL", { dbQuota
+⊩shutdown(1)→void⟨1⟩{⊩}
+⟩SCL│136│88⊨│50⑂│54.4%↓⟩

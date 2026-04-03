@@ -1,0 +1,40 @@
+⟨SCL v1│dynamicMemoryStore_gen1.mjs│114→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+generateUniqueId(1)→void⟨3⟩{⊷}
+calculateDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
+⊶│class DynamicMemoryStore {
+·constructor() {
+⊮│this.store = new Map();
+·}
+·addVector(vector, metadata = null) {
+κid
+⊡│this.store.set(id, { vector, metadata });
+⊷│return id;
+·}
+·search(queryVector, k = 1) {
+·if (k <= 0) {
+⊵│throw new Error("k must be a positive integer.");
+·}
+κdistances
+for (const [id, { vector, metadata }] of this.⊞.entries()) {
+κdistance
+⊺│distances.push({ id, distance, metadata });
+·}
+⊷│return distances
+·.sort((a, b) => a.distance - b.distance)
+·.slice(0, k);
+·}
+·removeVector(id) {
+⊷│return this.store.delete(id);
+·}
+·clearStore() {
+this.⊞.clear();
+·}
+·getSize() {
+⊷│return this.store.size;
+·}
+·}
+·export {
+·DynamicMemoryStore
+·};
+⟩SCL│39│21⊨│14⑂│65.8%↓⟩

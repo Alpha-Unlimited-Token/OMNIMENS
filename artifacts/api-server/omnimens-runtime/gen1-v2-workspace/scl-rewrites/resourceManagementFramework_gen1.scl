@@ -1,0 +1,15 @@
+⟨SCL v1│resourceManagementFramework_gen1.mjs│26→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊪resourceManagementFramework
+⊷│return moduleUsages.map(usage => {
+·if (usage.cpu > limits.cpu || usage.memory > limits.memory) {
+⊷│return {
+Ε: usage.Ε,
+action: 'Throttle or optimize Ε to prevent resource bottlenecks.'
+·};
+·}
+⊷│return { module: usage.module, action: 'Operating within con
+·});
+·}
+·};
+⟩SCL│14│6⊨│3⑂│46.2%↓⟩

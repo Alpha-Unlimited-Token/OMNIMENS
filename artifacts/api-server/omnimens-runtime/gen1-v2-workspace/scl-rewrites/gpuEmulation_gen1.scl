@@ -1,0 +1,8 @@
+⟨SCL v1│gpuEmulation_gen1.mjs│139→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩initializeWebGLContext(1)→void⟨10⟩{⊩⊵⊷}
+⊩compileShader(3)→void⟨13⟩{⊩⊰⊵⊷}
+⊩createProgram(2)→void⟨14⟩{⊩⊰⊵⊷}
+⊩gpuMatrixMultiply(6)→void⟨40⟩{⊩⊷}
+⊩validateMatrixDimensions(4)→void⟨5⟩{⊩⊰⊵}
+⟩SCL│7│21⊨│16⑂│95.0%↓⟩

@@ -1,0 +1,27 @@
+⟨SCL v1│dynamicResourceAllocation_gen1.mjs│40→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class DynamicResourceAllocator {
+·constructor(sharedPool) {
+·this.sharedPool = sharedPool;
+·this.priorityQueue = [];
+·}
+·requestResources(agentId, amount, priority) {
+⊺│this.priorityQueue.push({ agentId, amount, priority });
+·this.priorityQueue.sort((a, b) => b.priority - a.priority);
+·this.allocateResources();
+·}
+·releaseResources(agentId, amount) {
+·this.sharedPool[agentId] = (this.sharedPool[agentId] || 0) - amount;
+·if (this.sharedPool[agentId] < 0) this.sharedPool[agentId] = 0;
+·}
+·allocateResources() {
+⊹│while (this.priorityQueue.length > 0) {
+⊲│const { agentId, amount, priority } = this.priorityQueue.shi
+·if (this.sharedPool[agentId] + amount <= this.sharedPool.total) {
+·this.sharedPool[agentId] = (this.sharedPool[agentId] || 0) + amount;
+·}
+·}
+·}
+·}
+⊪sharedComputePool
+⟩SCL│26│5⊨│4⑂│35.0%↓⟩

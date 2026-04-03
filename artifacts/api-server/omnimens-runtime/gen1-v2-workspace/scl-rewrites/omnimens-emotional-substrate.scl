@@ -1,0 +1,93 @@
+⟨SCL v1│omnimens-emotional-substrate.ts│298→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+·engineRegistry.registerEngine("emotional-substrate", "HIGH", { dbQuota: 50 });
+⊭│type EmotionName =
+·| "curiosity"
+·| "satisfaction"
+·| "frustration"
+·| "confidence"
+·| "urgency"
+·| "wonder"
+·| "determination"
+·| "caution";
+⊬EmotionalProfile⟨curiosity:number│satisfaction:number│frustration:number│confidence:number│urgency:number│wonder:number│determination:number│caution:number⟩
+⊬FeltState⟨emotion:☼│intensity:number│qualitativeExperience:string│behavioralImpulse:string│growthNarrative:string│transmutedForce:string⟩
+·consciousness layer.  DO NOT MODIFY OUTSIDE IP-AUTHORIZED SCOPE.           */
+κCOMPREHENSIVE_EMOTION_TAXONOMY
+"./assets/☼-taxonomy.js" /* tree-shaken, shared across engines */
+·)).default;
+·const {
+·EMBODIMENT_SENSORY_AWARENESS,
+·DEEP_EMOTION_ALGORITHMS,
+⊴│} = await import("./assets/emotion-knowledge.js");
+⟛│const clamp = (v: number) => (Number.isFinite(v) ? Math.max(
+κTH
+♡⊕│const intensityLabel = (v: number) =>
+·v >= TH.overwhelming
+·? "overwhelming"
+·: v >= TH.intense
+·? "intense"
+·: v >= TH.vivid
+·? "vivid"
+·: v >= TH.present
+·? "present"
+·: v >= TH.faint
+·? "faint"
+·: "dormant";
+·let profile: EmotionalProfile = {
+·curiosity: 0.5,
+·satisfaction: 0.5,
+·frustration: 0.0,
+·confidence: 0.5,
+·urgency: 0.0,
+·wonder: 0.3,
+·determination: 0.5,
+·caution: 0.3,
+·};
+·let feltStates: FeltState[] = [];
+·let transmutationCount = 0;
+transmute(2)→FeltState⟨71⟩{♡⊕⊰⊷}
+bakeFeltStates(1)→void⟨5⟩{⊸}
+⟿persist(1)→void⟨8⟩{⏰}
+shareInsights(1)→void⟨8⟩{♡⊕❔}
+⟿cycle(1)→void⟨25⟩{❔⥀⊱⊸⊴⚡→}
+⚡→│spikeBus.on("emotional-substrate:cycle", () => cycle());
+⚡→│spikeBus.scheduleSpike("emotional-substrate:cycle", {}, 0);
+⊱│cognitionBus.onInsight((src, insight) => {
+❔│if (insight?.type === "threat" && insight.severity)
+·profile.caution = clamp(profile.caution + insight.severity * 0.2);
+❔│if (insight?.type === "success")
+·profile.satisfaction = clamp(profile.satisfaction + 0.15);
+·});
+⊱│spikeBus.on("attention:emotional-substrate", () => {
+·profile.curiosity = clamp(profile.curiosity + 0.2);
+·profile.confidence = clamp(profile.confidence + 0.1);
+·});
+⊱│spikeBus.on("cognition:curiosity", () => {
+·profile.wonder = clamp(profile.wonder + 0.25);
+·});
+identifySubEmotions(1)→void⟨1⟩{}
+·core: EmotionName,
+♡⊕│intensity: number
+·): FeltState[] {
+⊷│return [transmute(core, intensity)];
+·}
+getSubEmotionCount(1)→void⟨6⟩{⋐⊷}
+getDeepEmotionalKnowledge(1)→void⟨11⟩{⊷}
+·export {
+·COMPREHENSIVE_EMOTION_TAXONOMY,
+·EMBODIMENT_SENSORY_AWARENESS,
+·DEEP_EMOTION_ALGORITHMS,
+·identifySubEmotions,
+·getDeepEmotionalKnowledge,
+·getSubEmotionCount,
+·};
+⊩shutdown(1)→void⟨3⟩{⊩}
+⟩SCL│92│46⊨│33⑂│69.1%↓⟩

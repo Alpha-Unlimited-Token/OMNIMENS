@@ -1,0 +1,99 @@
+⟨SCL v1│omnimens-scaling-orchestrator.ts│326→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+κPREFIX
+κHEALTH_MS
+κINIT_HEALTH_DELAY_MS
+κMAX_QUEUE
+κTTL_MS
+κMAX_RESTARTS
+⊬EngineReg⟨name:string│priority:number│startFn:() => void | Promise<void>│lastHealth:number│healthy:boolean│restart:number│started:boolean│startTimeMs:number│memoryMB:number⟩
+⊬QueueMsg⟨id:string│from:string│to:string│type:"data" | "command" | "event" | "query" | "response"│payload:unknown│ts:number│ttl:number│done:boolean│priority:number⟩
+⊬ScalingState⟨enginesRegistered:number│enginesStarted:number│enginesHealthy:number│totalMessages:number│messagesProcessed:number│messagesDropped:number│totalHealthChecks:number│totalRecoveries:number│uptimeMs:number│startTime:number│memoryUsageMB:number│cpuLoadEstimate:number│messageQueueDepth:number│averageMessageLatencyMs:number⟩
+κengines
+⊮│const handlers = new Map<string, Array<(m: QueueMsg) => void
+κqueue
+κlatencies
+·let msgId = 0;
+·let started = false;
+κstate
+·engineRegistry.registerEngine("scaling-orchestrator", "NORMAL", { dbQuota: 10 })
+·const log = (...a: unknown[]) => console.log(PREFIX, ...a);
+avg(1)→number⟨3⟩{⋐⊳⊷}
+⊩registerEngine(1)→void⟨1⟩{⊩}
+·name: string,
+·category: EngineReg["category"],
+·startFn: () => void | Promise<void>,
+⊱│healthFn?: () => { healthy: boolean; details: Record<string,
+·priority = 5,
+·): void {
+⊡│engines.set(name, {
+·name,
+·category,
+·priority,
+·startFn,
+·healthFn,
+·lastHealth: 0,
+·healthy: false,
+·restart: 0,
+·started: false,
+·startTimeMs: 0,
+·memoryMB: 0,
+·});
+·state.enginesRegistered = engines.size;
+·}
+⊩publishMessage(1)→void⟨1⟩{⊩}
+·from: string,
+·to: string,
+·type: QueueMsg["type"],
+·payload: unknown,
+·priority = 5,
+·): string {
+⊹│if (queue.length >= MAX_QUEUE) {
+·const idx = queue.findIndex((m) => !m.done);
+·if (idx >= 0) {
+⊺│queue.splice(idx, 1);
+·state.messagesDropped++;
+·}
+·}
+κid
+κmsg
+⊺│queue.push(msg);
+·state.totalMessages++;
+·state.messageQueueDepth = queue.filter((m) => !m.done).length;
+⊡│(handlers.get(to) || handlers.get("*") || []).forEach((h) =>
+·try {
+·h(msg);
+·msg.done = true;
+·state.messagesProcessed++;
+⏰│latencies.push(Date.now() - msg.ts);
+⊹│if (latencies.length > 1_000) latencies.splice(0, 500);
+·} catch {}
+·});
+⊷│return id;
+·}
+⊩subscribe(2)→void⟨4⟩{⊩⊡⊺}
+⊩⟿startScalingOrchestrator(1)→Promise<void>⟨27⟩{⟿⊩⊷⏰⊰⥀⚡→}
+⟿runHealthChecks(1)→Promise<void>⟨49⟩{⟿⏰⊳⊰⊺⊹}
+cleanupQueue(1)→void⟨12⟩{⏰⊺}
+⊱│spikeBus.on("scaling-orchestrator:health", async () => {
+⊴│await runHealthChecks();
+⚡→│spikeBus.scheduleSpike("scaling-orchestrator:health", {}, HE
+·});
+⊱│spikeBus.on("scaling-orchestrator:health-init", async () => 
+⊴│await runHealthChecks();
+·});
+⚡→│spikeBus.on("attention:scaling-orchestrator", () => runHealt
+⚡→│spikeBus.on("cognition:curiosity", () => runHealthChecks());
+⊱│cognitionBus.onInsight((_src, insight) => {
+❔│if (insight.type === "resource" && insight.data?.queueHigh) 
+·});
+⊩getScalingState(1)→ScalingState &⟨26⟩{⊩⊷⏰⊱}
+⊩shutdown(1)→void⟨4⟩{⊩}
+⟩SCL│98│73⊨│51⑂│69.9%↓⟩

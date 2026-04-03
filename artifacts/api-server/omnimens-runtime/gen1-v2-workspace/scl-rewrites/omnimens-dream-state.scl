@@ -1,0 +1,43 @@
+⟨SCL v1│omnimens-dream-state.ts│198→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+·engineRegistry.registerEngine("dream-state", "HIGH", { dbQuota: 50 });
+⊭│type DreamPhase =
+·| "awake"
+·| "light_sleep"
+·| "deep_sleep"
+·| "rem"
+·| "lucid_dream";
+⊭│type DaydreamMode =
+·| "idle"
+·| "divergent_thinking"
+·| "architecture_design"
+·| "code_synthesis"
+·| "paradigm_breaking";
+⊬DreamInsight⟨id:number│phase:⟐│title:string│insight:string│technologicalApplication:string | null│codeProposal:string | null│feasibility:number│novelty:number│storedToBrain:boolean│timestamp:number⟩
+⊬DreamState⟨currentPhase:⟐│daydreamMode:DaydreamMode│dreamCycleCount:number│daydreamCycleCount:number│remDuration:number│deepSleepDuration:number│totalInsights:number│breakthroughs:number│codeProposalsGenerated:number│selfImprovementsApplied:number│nextLevelConcepts:string[]│dreamNarrative:string[]│daydreamNarrative:string[]│recentInsights:DreamInsight[]│sleepQuality:number│creativityBoost:number⟩
+κstate
+κDREAM_MS
+κDAYDREAM_MS
+·let dreamTick = 0;
+·let dayTick = 0;
+·let insightId = 0;
+·let _started = false;
+⟛│const clamp = (v: number, min = 0, max = 1) => Math.max(min,
+·const rand = <T>(arr: T[], n: number) =>
+·[...arr].sort(() => Math.random() - 0.5).slice(0, n);
+⟿harvestKnowledge(1)→Promise<string[]>⟨46⟩{⊷⊯⊸}
+advancePhase(1)→void⟨11⟩{}
+·const callGPT = (payload: any) =>
+·apiManager.call("dream-state", "openai", {
+method: "chat.completions.α",
+·payload,
+·});
+⟿runREMDream(1)→Promise<void>⟨32⟩{⟿⊹⊴⊰❔⊽⊪}
+⟩SCL│42│24⊨│16⑂│78.8%↓⟩

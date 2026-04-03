@@ -1,0 +1,17 @@
+⟨SCL v1│virtualizedReplStateManager_gen1.mjs│126→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+κALGORITHM
+κKEY
+κIV_LENGTH
+κSNAPSHOT_FILE
+⊩encryptState(2)→void⟨10⟩{⊩⟠⊷}
+⊩decryptState(2)→void⟨12⟩{⊩⊲⟠⊷}
+⊩saveState(1)→void⟨4⟩{⊩⟠📁⟠}
+⊩loadState(1)→void⟨6⟩{⊩⊄⊷⟠📁⟠}
+⊩compactState(2)→void⟨9⟩{⊩⏰⊸}
+⊷│return compactedState;
+·}
+⊩startAutoCompaction(2)→void⟨7⟩{⊩⟳⊱}
+⊩updateState(3)→void⟨5⟩{⊩⏰⊷}
+⟩SCL│16│37⊨│25⑂│87.3%↓⟩

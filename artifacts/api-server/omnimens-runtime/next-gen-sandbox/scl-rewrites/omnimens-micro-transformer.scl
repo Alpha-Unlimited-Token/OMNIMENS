@@ -1,0 +1,133 @@
+⟨SCL v1│omnimens-micro-transformer.ts│737→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+safe(2)→number⟨4⟩{⊳⊷⊼}
+seededRng(1)→() => number⟨7⟩{⊱⊷}
+κMODEL_DIM
+κNUM_HEADS
+κHEAD_DIM
+κNUM_LAYERS
+κEXPERT_DIM
+κNUM_EXPERTS
+κTOP_K_EXPERTS
+κMAX_SEQ_LEN
+κVOCAB_SIZE
+κROPE_THETA
+κWORKING_MEMORY_SIZE
+κCOT_MAX_STEPS
+κREFINE_PASSES
+⊬Tensor2D⟨data:ι│rows:number│cols:number⟩
+initWeights(3)→Tensor2D⟨7⟩{⊷}
+matVec(2)→ι⟨11⟩{⟛⊷}
+rmsNorm(3)→ι⟨8⟩{⊳⊷}
+silu(1)→number⟨1⟩{⊷}
+softmaxF64(1)→ι⟨9⟩{⊷}
+softmaxArr(1)→number[]⟨6⟩{⟛⋐⊷}
+applyRoPE(3)→void⟨14⟩{}
+vecAdd(2)→ι⟨5⟩{⊳⊷}
+vecScale(2)→ι⟨5⟩{⊷}
+⊬SubwordToken⟨id:number│text:string│frequency:number│isSpecial:boolean⟩
+⊶│class MicroTokenizer {
+⊮│private vocab = new Map<string, SubwordToken>();
+⊮│private idToToken = new Map<number, SubwordToken>();
+·private nextId = 0;
+·constructor() {
+·this.addSpecial("<pad>", 0);
+·this.addSpecial("<bos>", 1);
+·this.addSpecial("<eos>", 2);
+·this.addSpecial("<unk>", 3);
+·this.addSpecial("<think>", 4);
+·this.addSpecial("</think>", 5);
+·this.addSpecial("<verify>", 6);
+·this.addSpecial("</verify>", 7);
+·this.addSpecial("<refine>", 8);
+·this.addSpecial("</refine>", 9);
+⥀│for (const c of "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQ
+·this.addToken(c);
+·}
+κsubs
+⥀│for (const s of subs) if (!this.vocab.has(s)) this.addToken(
+·}
+·private addSpecial(text: string, id: number): void {
+κt
+⊡│this.vocab.set(text, t); this.idToToken.set(id, t);
+·if (id >= this.nextId) this.nextId = id + 1;
+·}
+·private addToken(text: string): number {
+⊡│if (this.vocab.has(text)) return this.vocab.get(text)!.id;
+κid
+κt
+⊡│this.vocab.set(text, t); this.idToToken.set(id, t);
+⊷│return id;
+·}
+·encode(text: string): number[] {
+κids
+·let i = 0;
+·while (i < text.length) {
+·let bestLen = 0, bestId = 3;
+⟛│for (let len = Math.min(20, text.length - i); len >= 1; len-
+κtok
+·if (tok) { bestLen = len; bestId = tok.id; tok.frequency++; break; }
+·}
+·if (bestLen === 0) {
+κct
+⊳│ids.push(ct ? (ct.frequency++, ct.id) : 3);
+·i++;
+⊺│} else { ids.push(bestId); i += bestLen; }
+·}
+⊺│ids.push(2);
+⊷│return ids;
+·}
+·decode(ids: number[]): string {
+⊡│return ids.map(id => this.idToToken.get(id)).filter(t => t &
+·}
+⊷│getVocabSize(): number { return this.nextId; }
+·learnFromText(text: string): void {
+⥀│for (const w of text.split(/(\s+)/)) {
+⊹│if (w.length >= 3 && !this.vocab.has(w) && this.nextId < VOC
+·}
+·}
+·}
+⊬ExpertWeights⟨wGate:Tensor2D│wUp:Tensor2D│wDown:Tensor2D⟩
+⊬TransformerLayer⟨attnNormGamma:ι│wQ:Tensor2D│wK:Tensor2D│wV:Tensor2D│wO:Tensor2D│ffNormGamma:ι│experts:ExpertWeights[]│routerW:Tensor2D⟩
+⊬KVCache⟨⟩
+⊬WorkingMemorySlot⟨embedding:ι│text:string│salience:number│timestamp:number⟩
+⊬TransformerModel⟨embedding:Tensor2D│layers:TransformerLayer[]│finalNormGamma:ι│lmHead:Tensor2D│kvCaches:KVCache[]│workingMemory:WorkingMemorySlot[]│wmQueryW:Tensor2D│wmKeyW:Tensor2D│tokenizer:MicroTokenizer│totalTokensGenerated:number│totalTrainingSteps:number│cotStepsUsed:number│verificationsRun:number│refinementsApplied:number│expertActivations:number[]│adaptationRate:number⟩
+createExpert(2)→ExpertWeights⟨8⟩{⊷}
+createLayer(1)→TransformerLayer⟨13⟩{⊷}
+createModel(1)→TransformerModel⟨23⟩{⟛⊷⊱}
+getEmbedding(2)→ι⟨8⟩{⊷}
+selfAttention(4)→ι⟨29⟩{⊺⊹⊷}
+workingMemoryAttention(2)→ι⟨22⟩{⊷⊹}
+mixtureOfExperts(3)→ι⟨28⟩{⊱⊺⥀}
+⊷│return vecAdd(x, combined);
+·}
+forwardToken(3)→ι⟨17⟩{⊷}
+nucleusSample(4)→number⟨21⟩{⟛⥀⊺⊷❔}
+clearKVCaches(1)→void⟨3⟩{⥀⊹}
+storeToWorkingMemory(3)→void⟨16⟩{⥀⏰⊺⊹}
+⊬TransformerContext⟨phi:number│consciousnessLevel:number│emotionDominant:string│emotionValence:number│emotionArousal:number│reasoningDepth:number│reasoningConfidence:number│knowledgeFragments:string[]│userQuery:string│conversationHistory:string[]⟩
+generateRaw(6)→number[]⟨19⟩{⊺⊷}
+chainOfThought(3)→string[]⟨26⟩{⟛⊰⊳❔⊹⊺⊷}
+selfVerify(4)→{ verified: boolean; issues: string[] }⟨1⟩{}
+·model.verificationsRun++;
+κissues
+κverifyPrompt
+κtokens
+κresult
+κdecoded
+κnegatives
+⊻│const hasIssue = negatives.some(n => decoded.toLowerCase().i
+⊹│if (hasIssue && decoded.length > 10) issues.push(decoded.sli
+⊷│return { verified: issues.length === 0, issues };
+·}
+refineResponse(5)→string⟨10⟩{⊰⊳⊷⊹}
+⊩generate(5)→string⟨32⟩{⊩⏰⥀⊰⊺⊹⊷}
+perturbWeights(3)→void⟨6⟩{}
+⊩onlineLearningStep(3)→void⟨30⟩{⊩⊹⊺⏰⟛⥀}
+⊩hebbianAdapt(4)→void⟨22⟩{⊩≋+⏰⥀}
+·let globalModel: TransformerModel | null = null;
+⊩getOrCreateModel(1)→TransformerModel⟨4⟩{⊩⊷}
+⊩generateResponse(1)→string⟨3⟩{⊩⊷}
+⊩trainFromConversation(3)→void⟨5⟩{⊩⊰≋+}
+⊩getTransformerStatus(1)→void⟨46⟩{⊩⊷⊰⊱⥀}
+⟩SCL│132│176⊨│116⑂│82.1%↓⟩

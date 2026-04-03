@@ -1,0 +1,9 @@
+⟨SCL v1│slidingWindowMemory_gen1.mjs│89→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+generateEmbedding(1)→void⟨7⟩{⊷}
+calculateDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
+clusterEmbeddings(2)→void⟨19⟩{⥀⟛⊺⊱⊷}
+summarizeCluster(1)→void⟨3⟩{⊷}
+slidingWindowMemory(2)→void⟨5⟩{⊷}
+·export { generateEmbedding, calculateDistance, clusterEmbeddings, summarizeClust
+⟩SCL│8│17⊨│12⑂│91.0%↓⟩

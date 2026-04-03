@@ -1,0 +1,46 @@
+⟨SCL v1│recursiveScaffolder_gen1.mjs│59→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class RecursiveScaffolder {
+·constructor() {
+·this.taskGraph = {};
+·this.feedbackHandlers = [];
+·}
+·addTask(taskId, dependencies = []) {
+·this.taskGraph[taskId] = { dependencies, status: 'pending' };
+·}
+·updateTaskStatus(taskId, status) {
+·if (this.taskGraph[taskId]) {
+·this.taskGraph[taskId].status = status;
+·this.evaluateGraph();
+·}
+·}
+·registerFeedbackHandler(handler) {
+⊺│this.feedbackHandlers.push(handler);
+·}
+·evaluateGraph() {
+⊸│Object.keys(this.taskGraph).forEach(taskId => {
+κtask
+·if (task.status === 'pending') {
+κallDepsCompleted
+❔│dep => this.taskGraph[dep]?.status === 'completed'
+·);
+·if (allDepsCompleted) {
+·this.executeTask(taskId);
+·}
+·}
+·});
+·}
+·executeTask(taskId) {
+⊰│console.log(`Executing task: ${taskId}`);
+·this.taskGraph[taskId].status = 'completed';
+·this.feedbackHandlers.forEach(handler => handler(taskId));
+·}
+·}
+κscaffolder
+·scaffolder.addTask('task1');
+·scaffolder.addTask('task2', ['task1']);
+·scaffolder.registerFeedbackHandler(taskId => {
+⊰│console.log(`Feedback received for ${taskId}`);
+·});
+·scaffolder.updateTaskStatus('task1', 'completed');
+⟩SCL│45│9⊨│6⑂│23.7%↓⟩

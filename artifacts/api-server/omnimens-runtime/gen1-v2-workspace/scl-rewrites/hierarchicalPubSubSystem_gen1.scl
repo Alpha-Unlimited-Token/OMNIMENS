@@ -1,0 +1,27 @@
+⟨SCL v1│hierarchicalPubSubSystem_gen1.mjs│36→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class PubSubSystem {
+·constructor() {
+this.→ = {};
+·}
+·subscribe(event, handler) {
+if (!this.→[event]) {
+this.→[event] = [];
+·}
+⊺│this.events[event].push(handler);
+·}
+·publish(event, data) {
+if (this.→[event]) {
+this.→[event].forEach(handler => handler(data));
+·}
+·}
+·escalate(event, data, escalationHandler) {
+if (this.→[event]) {
+const responses = this.→[event].map(handler => handler(data));
+·if (responses.some(response => response.requiresEscalation)) {
+·escalationHandler(data);
+·}
+·}
+·}
+·}
+⟩SCL│26│9⊨│2⑂│27.8%↓⟩

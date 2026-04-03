@@ -1,0 +1,17 @@
+⟨SCL v1│entropySelfConsistencyScorer_gen1.mjs│26→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class EntropySelfConsistencyScorer {
+·constructor() {}
+·calculateEntropy(predictions) {
+⋐│return -predictions.reduce((acc, prob) => acc + prob * Math.
+·}
+·calibrate(predictions) {
+⋐│const total = predictions.reduce((a, b) => a + b, 0);
+⊷│return predictions.map(p => p / total);
+·}
+·score(predictions) {
+κcalibrated
+⊷│return this.calculateEntropy(calibrated);
+·}
+·}
+⟩SCL│16│6⊨│5⑂│38.5%↓⟩

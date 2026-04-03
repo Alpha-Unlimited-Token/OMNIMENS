@@ -1,0 +1,11 @@
+⟨SCL v1│chunkedComputationManager_gen1.mjs│90→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩chunkArray(2)→void⟨10⟩{⊩⊵⊺⊷}
+⊩serializeData(1)→void⟨6⟩{⊩⊵⟠⊷}
+⊩deserializeData(1)→void⟨6⟩{⊩⊵⟠⊷}
+⊩processChunks(2)→void⟨6⟩{⊩⊵⊷}
+⊩reassembleResults(1)→void⟨6⟩{⊩⊵⋐⊷}
+⊩hashComputation(1)→void⟨10⟩{⊩⊵⊷}
+⊩chunkedComputationManager(3)→void⟨9⟩{⊩⊵⊷}
+⟩SCL│10│33⊨│25⑂│88.9%↓⟩

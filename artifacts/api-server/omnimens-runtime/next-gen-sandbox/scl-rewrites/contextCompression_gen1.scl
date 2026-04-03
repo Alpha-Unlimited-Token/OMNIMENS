@@ -1,0 +1,10 @@
+⟨SCL v1│contextCompression_gen1.mjs│162→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩compressContext(2)→void⟨23⟩{⊩⊹⊵⊷}
+tokenize(1)→void⟨7⟩{⊷⊽⊹}
+calculateSimilarityMatrix(1)→void⟨12⟩{⊷}
+calculateSimilarity(2)→void⟨9⟩{⊯⊷}
+kMeansClustering(2)→void⟨36⟩{⊺⊱⋐⊷⟛}
+summarizeCluster(2)→void⟨18⟩{⥀⋐⊷}
+·export default { compressContext };
+⟩SCL│9│24⊨│18⑂│94.4%↓⟩

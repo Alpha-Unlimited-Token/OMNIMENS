@@ -1,0 +1,13 @@
+⟨SCL v1│matrixOpsWasmModule_gen1.mjs│113→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊲│const { readFile } = require('fs/promises');
+κpath
+⟿loadWasmModule(1)→void⟨7⟩{⊴⊷}
+⟿multiplyMatrices(6)→void⟨32⟩{⊵⊴⊲⊡⊞⊟⊷}
+formatMatrix(1)→void⟨21⟩{⊹⊵⥀⊷}
+Ε.exports = {
+·loadWasmModule,
+·multiplyMatrices,
+·formatMatrix
+·};
+⟩SCL│12│18⊨│13⑂│89.4%↓⟩

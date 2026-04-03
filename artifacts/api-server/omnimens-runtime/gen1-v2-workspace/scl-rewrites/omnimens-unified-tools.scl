@@ -1,0 +1,145 @@
+⟨SCL v1│omnimens-unified-tools.ts│957→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[web-search]
+⊬ResearchResult⟨query:string│report:string│subQueries:string[]│totalResults:number⟩
+κDECOMPOSE_PROMPT
+·Return JSON only:
+·{ "subQueries": ["query 1", "query 2", "query 3", "query 4"] }
+·Make each sub-query specific and search-engine-friendly. Cover different angles:
+κSYNTHESIZE_PROMPT
+Synthesize these into a comprehensive, well-⋮ research ⊢. Include:
+·- Executive summary (2-3 sentences)
+·- Key findings organized by topic/theme (use headers)
+- Data, statistics, quotes where Θ
+·- Contrasting viewpoints if they exist
+·- Conclusions and implications
+Format with markdown headers. Cite sources inline as [η: title]. Be thoroug
+⊩⟿deepResearch(1)→void⟨1⟩{⊩}
+·question: string,
+⊳│onProgress?: (step: string) => void
+·): Promise<ResearchResult> {
+❔│onProgress?.("decomposing");
+·let subQueries: string[] = [];
+·try {
+κdecompose
+κparsed
+⊳│subQueries = Array.isArray(parsed.subQueries) ? parsed.subQu
+·} catch {
+·subQueries = [question];
+·}
+⊺│if (!subQueries.includes(question)) subQueries.unshift(quest
+·subQueries = subQueries.slice(0, 5);
+❔│onProgress?.("searching");
+κsearchResults
+·subQueries.map((q) => webSearch(q, 5))
+·);
+κallSources
+κseenUrls
+·let combinedContext = "";
+·for (let i = 0; i < searchResults.length; i++) {
+κresult
+⊹│if (result.status === "fulfilled" && result.value.length > 0
+κformatted
+⊰│combinedContext += `\n\n### Sub-query: "${subQueries[i]}"\n$
+⥀│for (const r of result.value) {
+·if (!seenUrls.has(r.url)) {
+·seenUrls.add(r.url);
+⊺│allSources.push({ title: r.title, url: r.url, snippet: r.sni
+·}
+·}
+·}
+·}
+❔│onProgress?.("synthesizing");
+let ⊢ = "";
+·try {
+κsynthesis
+❔│report = synthesis.choices[0]?.message?.content || "Unable t
+·} catch (err) {
+⊰│report = `Research gathered ${allSources.length} sources acr
+·}
+⊷│return {
+·query: question,
+⊢,
+·sources: allSources.slice(0, 20),
+·subQueries,
+·totalResults: allSources.length,
+·};
+·}
+⊫[]
+κ__filename
+κ__dirname
+κPY_DIR
+κPYTHON
+⊩⟿runPythonTool(1)→void⟨1⟩{⊩}
+·scriptName: string,
+η: string | object,
+·timeoutMs = 60_000,
+·): Promise<any> {
+κinputStr
+κscriptPath
+⊱│return new Promise((resolve) => {
+κproc
+·let stdout = "";
+·let stderr = "";
+⏳│const timer = setTimeout(() => {
+·proc.kill("SIGKILL");
+⊰│resolve({ success: false, error: `Tool timeout after ${timeo
+·}, timeoutMs);
+⊱│proc.stdout.on("data", (d: Buffer) => { stdout += d.toString
+⊱│proc.stderr.on("data", (d: Buffer) => { stderr += d.toString
+⊱│proc.on("close", () => {
+·clearTimeout(timer);
+·try {
+⟠│resolve(JSON.parse(stdout.trim()));
+·} catch {
+resolve({ success: false, error: stderr.slice(0, 800) || "No θ from Python 
+·}
+·});
+⊱│proc.on("error", (err) => {
+·clearTimeout(timer);
+·resolve({ success: false, error: err.message });
+·});
+proc.stdin.⊞(inputStr);
+·proc.stdin.end();
+·});
+·}
+⊩⟿generateChart(1)→void⟨9⟩{⊩⊳📢⊰⊷}
+⊩⟿processPDF(1)→void⟨11⟩{⊩⊳📢⊰⊷}
+⊩⟿processDocument(1)→void⟨13⟩{⊩⊳📢⊰⊷}
+⊩⟿runOCR(1)→Promise<⟨11⟩{⊩⊳⊷}
+⊩⟿analyzeText(1)→void⟨8⟩{⊩⊳📢⊰⊷}
+⊩⟿processMedia(1)→void⟨9⟩{⊩⊳📢⊰⊷}
+⊩⟿generateDiagram(1)→void⟨10⟩{⊩⊳📢⊰⊷}
+⊩⟿runDataScience(1)→void⟨12⟩{⊩⊳📢⊰⊷}
+⊩⟿solveMath(1)→void⟨11⟩{⊩⊳📢⊰⊷}
+⊩⟿analyzeAudio(1)→void⟨9⟩{⊩⊳📢⊰⊷}
+⊩⟿runCode(1)→void⟨10⟩{⊩⊳📢⊰⊷}
+⊩⟿fetchWebUrl(1)→void⟨13⟩{⊩⊳📢⊰⊷}
+⊩⟿runGitOp(1)→void⟨13⟩{⊩⊳📢⊰⊷}
+⊩⟿getSystemInfo(1)→void⟨9⟩{⊩⊳📢⊰⊷}
+⊩⟿runFileTool(1)→void⟨22⟩{⊩⊳📢⊰⊷}
+⊩⟿checkAllTools(1)→Promise<Record<string, boolean>>⟨16⟩{⊩⊸❔⊷}
+⊩detectDevToolIntent(1)→ ⟨27⟩{⊩⊷⊽}
+⊫[web-search]
+κWMO_CODES
+⟿geocodeLocation(1)→Promise<⟨1⟩{}
+·try {
+κurl
+κresp
+κdata
+⊄│if (!data.length) return null;
+⊷│return { lat: parseFloat(data[0].lat), lon: parseFloat(data[
+⊷│} catch { return null; }
+·}
+⊩⟿fetchWeather(1)→Promise<string>⟨35⟩{⊩⊴⊄⊰⊷⊱⊳}
+⊩⟿fetchNewsHeadlines(1)→Promise<string>⟨15⟩{⊩⊰⊳⊴⊄⊷❔}
+⊩⟿searchAcademicPapers(2)→Promise<string>⟨23⟩{⊩⊰⊳⊴⊄⊷⊱❔⊽}
+⊩⟿generateQRCode(1)→Promise<string>⟨13⟩{⊩⊷⊵}
+⊩⟿fetchStockData(1)→Promise<string>⟨38⟩{⊩⊰⊴❔⊄⊷⊳}
+⊩⟿fetchCurrencyRate(3)→Promise<string>⟨26⟩{⊩⊰⊴⊷⊄}
+⊩⟿translateText(3)→Promise<string>⟨18⟩{⊩⊳⊰❔⊷}
+⊩⟿analyzeVideoUrl(1)→Promise<string>⟨153⟩{⊩⊳⊽⊄⊰⊷⊴❔⊬}
+⊩⟿fetchUrlContent(1)→Promise<UrlContent>⟨56⟩{⊩⏳⊴⊷⊰⊡⊻⟠}
+⊩extractUrls(1)→string[]⟨5⟩{⊩⊳⊽⊯⊷}
+⊩formatUrlContent(1)→string⟨6⟩{⊩⊰⊷}
+⟩SCL│144│238⊨│175⑂│85.0%↓⟩

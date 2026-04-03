@@ -1,0 +1,38 @@
+⟨SCL v1│coalaMemoryModule_gen1.mjs│51→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class CoALAMemory {
+·constructor() {
+·this.episodicMemory = [];
+·this.semanticMemory = {};
+·this.proceduralMemory = [];
+·}
+·addEpisodicEvent(event) {
+⊺│this.episodicMemory.push(event);
+·}
+·addSemanticConcept(concept, relationships) {
+·this.semanticMemory[concept] = relationships;
+·}
+·addProceduralTask(task) {
+⊺│this.proceduralMemory.push(task);
+·}
+·retrieveMemory(type, query) {
+⑃│switch (type) {
+·case 'episodic':
+⊷│return this.episodicMemory.filter(event => event.includes(qu
+case '◧':
+⊷│return this.semanticMemory[query] || null;
+·case 'procedural':
+⊷│return this.proceduralMemory.filter(task => task.includes(qu
+·default:
+⊷│return null;
+·}
+·}
+·consolidateMemory() {
+⋐│this.semanticMemory = Object.keys(this.semanticMemory).reduc
+·acc[concept] = this.semanticMemory[concept].map(rel => ({ ...rel, strength: rel.
+⊷│return acc;
+·}, {});
+·}
+·}
+⊪coalaMemory
+⟩SCL│37│12⊨│10⑂│27.5%↓⟩

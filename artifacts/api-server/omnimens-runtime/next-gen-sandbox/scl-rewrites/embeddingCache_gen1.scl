@@ -1,0 +1,89 @@
+⟨SCL v1│embeddingCache_gen1.mjs│179→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
+⊶│class HNSW {
+·constructor(maxNeighbors = 5, maxLevels = 3) {
+·this.maxNeighbors = maxNeighbors;
+·this.maxLevels = maxLevels;
+⊮│this.nodes = new Map(); // Map of node ID to Node
+·this.entryPoint = null; // Entry point for the graph
+·}
+·add(vector, id) {
+·if (this.nodes.has(id)) {
+⊵│throw new Error("ID already exists in the graph.");
+·}
+κnewNode
+·for (let level = 0; level < this.maxLevels; level++) {
+⊡│newNode.neighbors.set(level, new Set());
+·}
+⊡│this.nodes.set(id, newNode);
+·if (this.entryPoint === null) {
+·this.entryPoint = id;
+·return;
+·}
+·let currentNodeId = this.entryPoint;
+·for (let level = this.maxLevels - 1; level >= 0; level--) {
+·currentNodeId = this._searchLevel(vector, currentNodeId, level);
+·this._connectNeighbors(newNode, currentNodeId, level);
+·}
+·}
+·search(queryVector, k = 1) {
+·if (this.entryPoint === null) {
+⊷│return [];
+·}
+·let currentNodeId = this.entryPoint;
+·for (let level = this.maxLevels - 1; level >= 0; level--) {
+·currentNodeId = this._searchLevel(queryVector, currentNodeId, level);
+·}
+κvisited
+κcandidates
+⊹│while (candidates.length > 0) {
+⊲│const { id } = candidates.pop();
+·visited.add(id);
+⥀│for (const neighborId of this.nodes.get(id).neighbors.get(0)
+·if (!visited.has(neighborId)) {
+κdistance
+⊺│candidates.push({ id: neighborId, distance });
+·}
+·}
+·candidates.sort((a, b) => a.distance - b.distance);
+⊹│if (candidates.length > k) {
+⊹│candidates.length = k;
+·}
+·}
+⊷│return candidates;
+·}
+·_searchLevel(vector, entryId, level) {
+·let currentId = entryId;
+⊡│let closestDistance = euclideanDistance(vector, this.nodes.g
+·let improved = true;
+·while (improved) {
+·improved = false;
+⥀│for (const neighborId of this.nodes.get(currentId).neighbors
+κdistance
+·if (distance < closestDistance) {
+·closestDistance = distance;
+·currentId = neighborId;
+·improved = true;
+·}
+·}
+·}
+⊷│return currentId;
+·}
+·_connectNeighbors(newNode, closestId, level) {
+κneighbors
+⊺│neighbors.push(closestId);
+⊱│neighbors.sort((a, b) => {
+κdistA
+κdistB
+⊷│return distA - distB;
+·});
+⟛│neighbors.length = Math.min(neighbors.length, this.maxNeighb
+⊡│newNode.neighbors.get(level).add(...neighbors);
+⥀│for (const neighborId of neighbors) {
+⊡│this.nodes.get(neighborId).neighbors.get(level).add(newNode.
+·}
+·}
+·}
+·export { HNSW, euclideanDistance };
+⟩SCL│88│36⊨│27⑂│50.8%↓⟩

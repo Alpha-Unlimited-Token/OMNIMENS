@@ -1,0 +1,17 @@
+⟨SCL v1│formalReasoningVerifier_gen1.mjs│30→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class FormalReasoningVerifier {
+·static entropyScore(chain) {
+⋐│return chain.reduce((acc, step) => acc + (step.confidence ||
+·}
+·static verify(chain) {
+κentropy
+κuncertainty
+⊷│return {
+isValid: entropy > 0.7, // Threshold for ∨ consistency
+·entropy,
+·uncertainty
+·};
+·}
+·}
+⟩SCL│16│6⊨│3⑂│46.7%↓⟩

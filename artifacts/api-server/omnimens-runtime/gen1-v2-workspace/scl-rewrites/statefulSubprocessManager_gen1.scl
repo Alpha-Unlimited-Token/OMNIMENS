@@ -1,0 +1,9 @@
+⟨SCL v1│statefulSubprocessManager_gen1.mjs│103→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩saveStateToCheckpoint(2)→void⟨16⟩{⊩⊵⟠⊰⊷}
+⊩restoreStateFromCheckpoint(1)→void⟨11⟩{⊩⊵⊰⟠⊷}
+⊩generateStateHash(1)→void⟨11⟩{⊩⊵⟠⊷}
+⊩compareStates(2)→void⟨6⟩{⊩⊷}
+⊩mergeStates(2)→void⟨11⟩{⊩⊵⊷}
+⟩SCL│8│25⊨│19⑂│92.2%↓⟩

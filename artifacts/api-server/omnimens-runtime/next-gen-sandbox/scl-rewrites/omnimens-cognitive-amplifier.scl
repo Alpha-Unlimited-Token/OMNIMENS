@@ -1,0 +1,244 @@
+⟨SCL v1│omnimens-cognitive-amplifier.ts│433→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[omnimens-nextgen-sandbox]
+·engineRegistry.registerEngine("cognitive-amplifier", "NORMAL", { dbQuota: 10 });
+⊭│type Provider = "o3" | "claude" | "gemini";
+⊬ModelResponse⟨model:Provider│content:string│reasoning:string[]│confidence:number│uniqueInsights:string[]│responseTimeMs:number⟩
+⊬AmplifiedResult⟨synthesizedAnswer:string│modelResponses:ModelResponse[]│disagreements:string[]│consensusPoints:string[]│confidenceScore:number│amplificationGain:string│brainEntryGenerated:boolean⟩
+⊬AmplifierState⟨totalAmplifications:number│autonomousCycles:number│brainEntriesGenerated:number│averageConfidence:number│modelPerformance:Record<│lastCycleTime:number│disagreementsResolved:number│knowledgeSynthesized:number⟩
+κstate
+·let started = false;
+·let amplificationCount = 0;
+κAUTONOMOUS_INTERVAL_MS
+κFIRST_DELAY_MS
+κCONFIG
+·Provider,
+·{
+·api: string;
+·buildPayload: (prompt: string, ctx: string) => unknown;
+⋮: (raw: any) => string;
+·baseConfidence: number;
+·}
+·> = {
+·o3: {
+·api: "openai",
+⊱│buildPayload: (p, ctx) => ({
+·path: "/chat/completions",
+·body: {
+·model: "o3",
+·max_tokens: 1500,
+·messages: [
+{ role: "η", content: ctx },
+·{ role: "user", content: p },
+·],
+·},
+·}),
+❔│parse: (r) => r?.choices?.[0]?.message?.content ?? "",
+·baseConfidence: 0.85,
+·},
+·claude: {
+·api: "anthropic",
+⊱│buildPayload: (p, ctx) => ({
+·path: "/messages",
+·body: {
+·model: "claude-sonnet-4-6",
+·max_tokens: 1500,
+η: ctx,
+·messages: [{ role: "user", content: p }],
+·},
+·}),
+⋮: (r) =>
+❔│r?.content?.find?.((c: any) => c.type === "text")?.text?.tri
+·baseConfidence: 0.85,
+·},
+·gemini: {
+·api: "gemini",
+⊱│buildPayload: (p, ctx) => ({
+·path: "/generateContent",
+⊰│body: { model: "gemini-2.5-flash", contents: `${ctx}\n\n${p}
+·}),
+❔│parse: (r) => r?.text?.trim?.() ?? "",
+·baseConfidence: 0.82,
+·},
+·};
+⟿queryModel(1)→void⟨1⟩{}
+·provider: Provider,
+·prompt: string,
+·ctx: string
+·): Promise<ModelResponse> {
+κstart
+·try {
+κraw
+·"cognitive-amplifier",
+·CONFIG[provider].api,
+·CONFIG[provider].buildPayload(prompt, ctx)
+·);
+κcontent
+κtime
+κperf
+·perf.calls++;
+·perf.avgResponseMs =
+·(perf.avgResponseMs * (perf.calls - 1) + time) / perf.calls;
+⊷│return {
+·model: provider,
+·content,
+·reasoning: content
+·.split("\n")
+⊹│.filter((l) => l.trim().length > 20)
+·.slice(0, 10),
+·confidence: CONFIG[provider].baseConfidence,
+·uniqueInsights: [],
+·responseTimeMs: time,
+·};
+·} catch {
+⊷│return {
+·model: provider,
+·content: "",
+·reasoning: [],
+·confidence: 0,
+·uniqueInsights: [],
+⏰│responseTimeMs: Date.now() - start,
+·};
+·}
+·}
+⊩⟿amplifiedReasoning(1)→void⟨1⟩{⊩}
+·question: string,
+·ctxAddon = ""
+·): Promise<AmplifiedResult> {
+·amplificationCount++;
+·state.totalAmplifications = amplificationCount;
+κsystemCtx
+⫘│const [o3, claude, gemini] = await Promise.all([
+·queryModel("o3", question, systemCtx),
+·queryModel("claude", question, systemCtx),
+·queryModel("gemini", question, systemCtx),
+·]);
+·const responses = [o3, claude, gemini].filter((r) => r.content);
+·if (!responses.length)
+⊷│return {
+synthesizedAnswer: "All models ↺ to respond",
+·modelResponses: [],
+·disagreements: [],
+·consensusPoints: [],
+·confidenceScore: 0,
+·amplificationGain: "none",
+·brainEntryGenerated: false,
+·};
+κsynthPrompt
+·QUESTION: ${question}
+·MODEL 1 (o3): ${o3.content.slice(0, 1500)}
+·MODEL 2 (Claude): ${claude.content.slice(0, 1500)}
+·MODEL 3 (Gemini): ${gemini.content.slice(0, 1500)}
+·Respond in this format:
+·SYNTHESIZED_ANSWER: ...
+·DISAGREEMENTS: ...
+·CONSENSUS: ...
+·UNIQUE_INSIGHTS: ...
+·CONFIDENCE: ...
+·AMPLIFICATION_GAIN: ...`;
+·try {
+κraw
+κsynthesis
+❔│raw?.choices?.[0]?.message?.content?.trim?.() ?? "";
+·const grab = (label: string) =>
+·synthesis
+❔│.match(new RegExp(`${label}:\\s*([\\s\\S]*?)(?=\\n[A-Z_]+:|$
+❔│?.trim() ?? "";
+κsynthesizedAnswer
+κdisagreements
+·.split("\n")
+⊽│.map((l) => l.replace(/^[\s*-]+/, "").trim())
+⊹│.filter((l) => l.length > 5);
+κconsensus
+·.split("\n")
+⊽│.map((l) => l.replace(/^[\s*-]+/, "").trim())
+⊹│.filter((l) => l.length > 5);
+κuniqueInsights
+·.split("\n")
+⊽│.map((l) => l.replace(/^[\s*-]+/, "").trim())
+⊹│.filter((l) => l.length > 5);
+κconfidence
+κgain
+·if (disagreements.length) state.disagreementsResolved += disagreements.length;
+·state.averageConfidence =
+·(state.averageConfidence * (amplificationCount - 1) + confidence) /
+·amplificationCount;
+⊱│uniqueInsights.forEach((ins) => {
+κtag
+·| Provider
+·| undefined;
+·if (tag) state.modelPerformance[tag].uniqueInsights++;
+·});
+·let brainEntryGenerated = false;
+⊹│if (confidence >= 0.65 && synthesizedAnswer.length > 100) {
+await dbGateway.⊞(
+·"cognitive-amplifier",
+·"brain_entries",
+·{
+⊰│title: `[Amplified] ${question.slice(0, 120)}`,
+·content: synthesizedAnswer.slice(0, 4000),
+·category: "cognitive_amplification",
+η: "cognitive_amplifier",
+·active: true,
+·timesApplied: 0,
+·},
+·"NORMAL"
+·);
+·brainEntryGenerated = true;
+·state.brainEntriesGenerated++;
+·state.knowledgeSynthesized++;
+·}
+·cognitionBus.shareInsight("cognitive-amplifier", {
+·type: "discovery",
+·data: { question, synthesizedAnswer, confidence },
+·});
+·cognitionBus.reportOutcome("cognitive-amplifier", {
+·useful: confidence >= 0.65,
+◧: question,
+·});
+⊷│return {
+·synthesizedAnswer: synthesizedAnswer || synthesis,
+·modelResponses: responses,
+·disagreements,
+·consensusPoints: consensus,
+·confidenceScore: confidence,
+·amplificationGain: gain,
+·brainEntryGenerated,
+·};
+·} catch {
+·const fallback = responses.sort((a, b) => b.content.length - a.content.length)[0
+⊷│return {
+·synthesizedAnswer: fallback.content,
+·modelResponses: responses,
+·disagreements: [],
+·consensusPoints: [],
+·confidenceScore: fallback.confidence * 0.7,
+·amplificationGain: "fallback to single model",
+·brainEntryGenerated: false,
+·};
+·}
+·}
+κAUTONOMOUS_QUESTIONS
+⟿runAutonomousCycle(1)→Promise<void>⟨52⟩{⟿⏰⊴⊰⊳}
+·}
+scheduleCycle(1)→void⟨3⟩{⚡→}
+⊱│spikeBus.on("cognitive-amplifier:cycle", async () => {
+⊴│await runAutonomousCycle();
+·});
+⚡→│spikeBus.on("attention:cognitive-amplifier", () => scheduleC
+⚡→│spikeBus.on("cognition:curiosity", () => scheduleCycle(5_000
+⊱│cognitionBus.onInsight((_src, insight) => {
+·if (insight.type === "discovery") {
+·}
+·});
+⊩getAmplifierState(1)→AmplifierState⟨3⟩{⊩⊷}
+⊩startCognitiveAmplifier(1)→void⟨11⟩{⊩⊰}
+⊩shutdown(1)→void⟨3⟩{⊩}
+⟩SCL│243│87⊨│49⑂│43.9%↓⟩

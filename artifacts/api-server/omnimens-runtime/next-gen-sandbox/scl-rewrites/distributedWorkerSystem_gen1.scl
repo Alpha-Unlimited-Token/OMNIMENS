@@ -1,0 +1,16 @@
+⟨SCL v1│distributedWorkerSystem_gen1.mjs│101→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩createWorkerPool(3)→void⟨40⟩{⊩⊺⊱⊹⊰⥀⊷}
+·if (!isMainThread) {
+⊱│parentPort.on('message', (task) => {
+κresult
+·parentPort.postMessage(result);
+·});
+performTask(1)→void⟨6⟩{⊨σ⊲⋐⊷}
+·}
+⊩saveCheckpoint(3)→void⟨6⟩{⊩⟠📁}
+⊩loadCheckpoint(1)→void⟨6⟩{⊩📁⟠⊷}
+⊩priorityFunction(2)→void⟨3⟩{⊩⊷}
+⊩simulateDistributedComputation(1)→void⟨10⟩{⊩⊷}
+⟩SCL│15│31⊨│23⑂│85.1%↓⟩

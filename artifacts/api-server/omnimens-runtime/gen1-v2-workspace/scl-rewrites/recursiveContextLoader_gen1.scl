@@ -1,0 +1,10 @@
+⟨SCL v1│recursiveContextLoader_gen1.mjs│91→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩generateHash(1)→void⟨3⟩{⊩⊷}
+⊩importanceScore(2)→void⟨6⟩{⊩⊯⊷}
+⊩summarizeContext(2)→void⟨9⟩{⊩⟛⊷}
+⊩⟿recursiveContextLoader(5)→void⟨15⟩{⊩⊷⊻⊴}
+⊩hierarchicalSummarize(2)→void⟨3⟩{⊩⊷}
+⊩⟿exampleUsage(1)→void⟨13⟩{⊩⊴}
+⟩SCL│9│23⊨│16⑂│90.1%↓⟩

@@ -1,0 +1,19 @@
+⟨SCL v1│bayesianUncertaintyModule_gen1.mjs│29→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export default class BayesianUncertainty {
+·constructor() {
+·this.threshold = 0.7; // Default threshold for uncertainty calibration
+·}
+·calculateEntropy(probabilities) {
+⋐│return -probabilities.reduce((sum, p) => sum + (p > 0 ? p * 
+·}
+·assessUncertainty(probabilities) {
+κentropy
+⊳│return entropy < this.threshold ? 'High Confidence' : 'Low C
+·}
+calibrateConfidence(θ, probabilities) {
+κuncertainty
+⊷│return { output, uncertainty };
+·}
+·}
+⟩SCL│18│7⊨│4⑂│37.9%↓⟩

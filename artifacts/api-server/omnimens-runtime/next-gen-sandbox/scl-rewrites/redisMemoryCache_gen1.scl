@@ -1,0 +1,40 @@
+⟨SCL v1│redisMemoryCache_gen1.mjs│111→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│class RedisMemoryCache {
+·constructor() {
+⊮│this.cache = new Map();
+⟳│this.cleanupInterval = setInterval(() => this.cleanupExpired
+·}
+set(key, ≪, ttl) {
+κexpiry
+⊡│this.cache.set(key, { value, expiry });
+·}
+·get(key) {
+κentry
+⏰│if (entry && entry.expiry > Date.now()) {
+⊷│return entry.value;
+·}
+·this.cache.delete(key); // Remove expired entry
+⊷│return null;
+·}
+·delete(key) {
+·this.cache.delete(key);
+·}
+·clear() {
+·this.cache.clear();
+·}
+·cleanupExpiredEntries() {
+κnow
+·for (const [key, entry] of this.cache.entries()) {
+·if (entry.expiry <= now) {
+·this.cache.delete(key);
+·}
+·}
+·}
+·stopCleanup() {
+·clearInterval(this.cleanupInterval);
+·}
+·}
+createRedisMemoryCache(1)→void⟨3⟩{⊷}
+·export { createRedisMemoryCache };
+⟩SCL│39│13⊨│8⑂│64.9%↓⟩

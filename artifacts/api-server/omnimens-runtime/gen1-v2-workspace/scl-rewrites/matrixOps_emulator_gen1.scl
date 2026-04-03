@@ -1,0 +1,10 @@
+⟨SCL v1│matrixOps_emulator_gen1.mjs│140→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩multiplyMatrices(2)→void⟨22⟩{⊩⊵⊷}
+⊩addVectors(2)→void⟨7⟩{⊩⊹⊵⊷}
+⊩dotProduct(2)→void⟨7⟩{⊩⊹⊵⋐⊷}
+⊩transposeMatrix(1)→void⟨14⟩{⊩⊷}
+⊩applyFunction(2)→void⟨3⟩{⊩⊷}
+⊩normalizeVector(1)→void⟨9⟩{⊩⋐⊵⊷}
+⊩addMatrices(2)→void⟨12⟩{⊩⊵⊷}
+⟩SCL│9│30⊨│23⑂│93.6%↓⟩

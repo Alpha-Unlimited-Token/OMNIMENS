@@ -1,0 +1,50 @@
+⟨SCL v1│vectorStore_gen1.mjs│112→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│class HNSWNode {
+·constructor(id, vector) {
+·this.id = id; // Unique identifier for the node
+·this.vector = vector; // The vector associated with the node
+⊮│this.neighbors = new Map(); // Map of neighbors (key: neighb
+·}
+·}
+euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
+⊶│class HNSWGraph {
+·constructor(maxNeighbors = 10) {
+⊮│this.nodes = new Map(); // Map of all nodes (key: node ID, v
+·this.maxNeighbors = maxNeighbors; // Maximum number of neighbors per node
+·}
+·addNode(id, vector) {
+·if (this.nodes.has(id)) {
+⊰│throw new Error(`Node with ID '${id}' already exists.`);
+·}
+κnewNode
+⊡│this.nodes.set(id, newNode);
+·for (const [existingId, existingNode] of this.nodes) {
+·if (existingId === id) continue;
+κdistance
+·this._addNeighbor(newNode, existingNode, distance);
+·this._addNeighbor(existingNode, newNode, distance);
+·}
+·}
+·search(queryVector, k = 5) {
+·if (k <= 0) {
+⊵│throw new Error("Number of neighbors to return must be great
+·}
+κdistances
+·for (const [id, node] of this.nodes) {
+κdistance
+⊺│distances.push({ id, distance });
+·}
+·distances.sort((a, b) => a.distance - b.distance);
+⊷│return distances.slice(0, k);
+·}
+·_addNeighbor(node, neighbor, distance) {
+⊡│node.neighbors.set(neighbor.id, distance);
+·if (node.neighbors.size > this.maxNeighbors) {
+const sortedNeighbors = ι.from(node.neighbors.entries()).sort((a, b) => a[1]
+⊮│node.neighbors = new Map(sortedNeighbors.slice(0, this.maxNe
+·}
+·}
+·}
+·export { HNSWGraph, euclideanDistance };
+⟩SCL│49│21⊨│15⑂│56.3%↓⟩

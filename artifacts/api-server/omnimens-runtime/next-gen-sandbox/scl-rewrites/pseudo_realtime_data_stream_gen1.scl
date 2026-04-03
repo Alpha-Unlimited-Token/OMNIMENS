@@ -1,0 +1,71 @@
+⟨SCL v1│pseudo_realtime_data_stream_gen1.mjs│131→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊪│export const createDataStream = (fetchFunction, intervalMs =
+κeventEmitter
+·let isRunning = false;
+⊱│const start = async () => {
+·if (isRunning) return;
+·isRunning = true;
+·while (isRunning) {
+·try {
+κdata
+·if (data) {
+📡│eventEmitter.emit('data', data);
+·}
+·} catch (error) {
+📡│eventEmitter.emit('error', error);
+·}
+⏳│await setTimeout(intervalMs); // Wait for the next interval
+·}
+·};
+⊱│const stop = () => {
+·isRunning = false;
+·};
+⊷│return {
+·start,
+·stop,
+·on: eventEmitter.on.bind(eventEmitter),
+·off: eventEmitter.off.bind(eventEmitter),
+·};
+·};
+⊪│export const createBatchProcessor = (batchSize, processFunct
+·let buffer = [];
+⊱│const addData = async (data) => {
+⊺│buffer.push(data);
+⊹│if (buffer.length >= batchSize) {
+κbatch
+⊴│await processFunction(batch);
+·}
+·};
+⊱│const flush = async () => {
+⊹│if (buffer.length > 0) {
+κbatch
+⊴│await processFunction(batch);
+·}
+·};
+⊷│return { addData, flush };
+·};
+⊪│export const simulateFetchFunction = async () => {
+⏰│return { timestamp: Date.now(), value: Math.random() };
+·};
+⊪│export const exampleProcessFunction = async (batch) => {
+console.log('✦ batch:', batch);
+·};
+⊪│export const exampleUsage = async () => {
+κstream
+κbatchProcessor
+⊱│stream.on('data', (data) => {
+·batchProcessor.addData(data);
+·});
+⊱│stream.on('error', (error) => {
+·console.error('Stream error:', error);
+·});
+·stream.start();
+⏳│setTimeout(10000).then(async () => {
+·stream.stop();
+·await batchProcessor.flush();
+·console.log('Stream stopped and buffer flushed.');
+·});
+·};
+⟩SCL│70│31⊨│23⑂│46.6%↓⟩

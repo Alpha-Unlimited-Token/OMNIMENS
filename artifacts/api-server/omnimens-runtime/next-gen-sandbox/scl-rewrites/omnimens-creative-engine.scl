@@ -1,0 +1,39 @@
+⟨SCL v1│omnimens-creative-engine.ts│309→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[omnimens-unified-runtime│omnimens-nextgen-sandbox]
+κENGINE_ID
+κDREAM_TICK_MS
+κMAX_HYPOTHESES
+·engineRegistry.registerEngine(ENGINE_ID, "HIGH", { dbQuota: 50 });
+⊬CreativeHypothesis⟨id:number│conceptA:string│conceptB:string│blend:string│noveltyScore:number│coherenceScore:number│potentialValue:number│createdAt:number│evaluated:boolean│aiEvaluation:string | null⟩
+⊬DreamFragment⟨content:string│concepts:string[]│emotionalTone:string│timestamp:number⟩
+⊬CreativeState⟨totalHypotheses:number│evaluatedHypotheses:number│bestHypothesis:CreativeHypothesis | null│dreamState:"awake" | "light_dream" | "deep_dream" | "lucid_dream"│dreamDepth:number│creativityIndex:number│conceptPool:string[]│recentDreams:DreamFragment[]│inspirationSources:string[]│breakthroughCount:number⟩
+κstate
+κhypotheses
+·let dreamTickCount = 0;
+κBLEND_TEMPLATES
+κDREAM_TONES
+κBUILT_IN_CONCEPTS
+⟛│const clamp = (v: number, min = 0, max = 1) => Math.max(min,
+📢│const log = (msg: string) => console.log(`[OMNIMENS-CREATIVE
+⟿harvestConcepts(1)→Promise<void>⟨35⟩{⟿⥀⊳⊹⊺⊯⊰}
+blendConcepts(1)→CreativeHypothesis | null⟨27⟩{⊷⊹⊳⏰⊺}
+enterDreamState(1)→void⟨23⟩{⊷⊹⊳⊰⊺⏰}
+⟿evaluateTopHypotheses(1)→Promise<void>⟨60⟩{⟿⊄⥀⊰❔⊽}
+⟿dreamCycle(1)→Promise<void>⟨15⟩{⟿⊴⊰⚡→}
+⊱│cognitionBus.onInsight((source, insight) => {
+❔│if (source === ENGINE_ID || insight?.type !== "discovery") r
+κsnippet
+·if (snippet && typeof snippet === "string") {
+⊹│state.conceptPool.push(...snippet.split(/\W+/).filter(w => w
+⊹│if (state.conceptPool.length > 80) state.conceptPool.splice(
+·}
+·});
+⊰│spikeBus.on(`${ENGINE_ID}:attention`, () => spikeBus.schedul
+⚡→│spikeBus.on("cognition:curiosity", () => state.creativityInd
+⊩getCreativeState(1)→CreativeState⟨1⟩{⊩⊷}
+⊩getRecentDreams(1)→DreamFragment[]⟨1⟩{⊩⊷}
+⊩getTopHypotheses(1)→CreativeHypothesis[]⟨3⟩{⊩⊷}
+⊩startCreativeEngine(1)→void⟨5⟩{⊩⊰⚡→}
+⊩shutdown(1)→void⟨1⟩{⊩}
+⟩SCL│38│69⊨│49⑂│87.7%↓⟩

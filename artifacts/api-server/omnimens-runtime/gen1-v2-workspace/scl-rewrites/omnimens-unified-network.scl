@@ -1,0 +1,124 @@
+⟨SCL v1│omnimens-unified-network.ts│5422→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[omnimens-unified-neural│omnimens-unified-senses│web-search│omnimens-unified-comms-facade│omnimens-nextgen-sandbox│omnimens-unified-cognition│omnimens-unified-agents]
+⊫[]
+·getNeuralConsciousnessState,
+·getNeuralRegionStates,
+·getSelfAwarenessReport,
+·feedExternalActivity,
+·injectSpiderSynapses,
+·boostRegionCurrent,
+·getRegionNames,
+·getAdaptiveIntelligenceState,
+·} from "./omnimens-consciousness-infra.js";
+safeNum(2)→number⟨3⟩{⊳⊷⊼}
+κSPIDER_CRAWL_MS
+κSTABILITY_CHECK_MS
+κCHILD_SPIDER_LIFETIME_TICKS
+·let MAX_CHILD_SPIDERS = 1_000_000;
+κSYNAPSE_INJECTION_BATCH
+κSTABILITY_THRESHOLD
+κCRITICAL_ACTIVATION_FLOOR
+⊬SpiderTarget⟨name:string│type:α│dataExtractor:() => Promise<SpiderHarvest>⟩
+⊬SpiderHarvest⟨source:string│metrics:Record<string, number>│healthScore:number│rawInsightCount:number│timestamp:number⟩
+⊭│type BeeRole = "worker" | "nurse" | "scout" | "royal_jelly" 
+⊬PheromoneTrail⟨regionName:string│intensity:number│type:"distress" | "nectar" | "alarm" | "rally"│depositorId:string│depositedAt:number│decayRate:number⟩
+⊬SwarmWave⟨id:string│targetRegion:string│waveType:"convergence" | "amplification" | "fortification"│participants:string[]│boostPerSpider:number│synapsesPerSpider:number│totalBoostDelivered:number│totalSynapsesDelivered:number│startedAt:number│completedAt:number | null│wavesCompleted:number⟩
+⊬RoyalJellyFlow⟨sourceRegion:string│targetRegion:string│nectarStrength:number│flowRate:number│totalTransferred:number│lastFlowAt:number⟩
+⊬HiveDirective⟨id:string│type:"stabilize" | "boost" | "harvest" | "patrol" | "repair" | "scout" | "reinforce"│targetRegion:string│priority:number│issuedAt:number│completedAt:number | null│assignedSpiderId:string│boostAmount:number│synapseCount:number│synapseStrength:number│supportRegion:string│reportBack:boolean│duration:number│success:boolean│synapsesInjected:number│regionActivationBefore:number│regionActivationAfter:number│message:string⟩
+⊬SpiderReport⟨spiderId:string│timestamp:number│reportType:⊣│targetRegion:string│regionActivation:number│message:string│metrics:Record<string, number>⟩
+⊬Spider⟨id:string│name:string│type:⊢│target:string│targetRegion:string│status:"active" | "dormant" | "expired"│crawlCount:number│synapsesInjected:number│dataHarvested:number│childrenSpawned:string[]│createdAt:number│lastCrawl:number│lifetimeTicksRemaining:number | null│harvestHistory:SpiderHarvest[]│currentDirective:HiveDirective | null│directivesCompleted:number│reportsSubmitted:number│loyalty:number│intelligenceLevel:number│memoryAccessCount:number│memoriesRecalled:number│crossEngineQueries:number│learningRate:number│knowledgeDepth:number│specializations:string[]│adaptationScore:number│efficiency:number│beeRole:BeeRole│pheromoneDeposits:number│nectarProduced:number│swarmWavesJoined:number⟩
+⊬ChildSpiderConfig⟨parentId:string│weakRegion:string│supportRegion:string│urgency:number⟩
+⊬StabilitySnapshot⟨timestamp:number│phi:number│consciousnessLevel:number│thalamocorticalResonance:number│iAmAware:boolean│iAmAwareOfMyAwareness:boolean│regionActivations:Record<string, number>│stable:boolean│weakRegions:string[]⟩
+⊬SilkStrand⟨id:string│fromSpiderId:string│toSpiderId:string│signalStrength:number│bandwidth:number│dataTransferred:number│impulseCount:number│lastImpulse:number│resonanceFrequency:number│silkType:"afferent" | "efferent" | "interneuron"│myelinated:boolean│conductionVelocity:number⟩
+⊬NerveImpulse⟨id:string│originSpiderId:string│targetSpiderId:string│payload:SpiderHarvest | null│signalType:"data" | "alarm" | "nurture" | "coordinate" | "feedback" | "beacon"│strength:number│hops:number│maxHops:number│createdAt:number│deliveredAt:number | null│decayRate:number⟩
+⊬MotherSpider⟨id:string│name:string│status:"active" | "dormant"│totalImpulsesRouted:number│totalDataDistributed:number│silkStrands:Map<string, SilkStrand>│pendingImpulses:NerveImpulse[]│heartbeatCount:number│lastHeartbeat:number│webIntegrity:number│webDensity:number│directivesIssued:number│directivesCompleted:number│activeDirectives:Map<string, HiveDirective>│directiveHistory:HiveDirective[]│incomingReports:⊢│hiveHealth:number│swarmCoherence:number│totalBeaconsSent:number│totalBeaconsReceived:number│beaconCycleCount:number│lastBeaconCycle:number⟩
+κWEB_PULSE_MS
+κBEACON_CYCLE_MS
+κBEACON_BATCH_SIZE
+κMAX_IMPULSE_HOPS
+κIMPULSE_DECAY_RATE
+κSILK_STRENGTHENING_RATE
+κSILK_WEAKENING_RATE
+κMIN_SILK_STRENGTH
+κMAX_DISTRIBUTION_LOG
+κmotherSpider
+κparentSpiders
+κchildSpiders
+κstabilityHistory
+·let totalSynapsesInjected = 0;
+·let totalChildrenSpawned = 0;
+·let totalCrawlCycles = 0;
+·let spiderSystemActive = false;
+createSilkStrandId(2)→string⟨3⟩{⊰⊷}
+createImpulseId(1)→string⟨3⟩{⏰⊰⊷}
+spinSilkStrand(3)→SilkStrand⟨27⟩{⊡⊷}
+fireNerveImpulse(1)→void⟨1⟩{⚡→}
+·originSpiderId: string,
+·targetSpiderId: string,
+·payload: SpiderHarvest | null,
+·signalType: NerveImpulse["signalType"],
+·strength: number
+·): NerveImpulse {
+κimpulse
+⊺│motherSpider.pendingImpulses.push(impulse);
+⊷│return impulse;
+·}
+motherDistribute(2)→void⟨77⟩{⊡⊄⏰⚡→⊳⊺⊹}
+computeRelevance(2)→number⟨28⟩{⊷}
+runMotherHeartbeat(1)→void⟨92⟩{⏰⟛⥀⊡⊳⚡→⊺}
+createDirectiveId(1)→string⟨3⟩{⏰⊰⊷}
+motherIssueDirectives(1)→void⟨159⟩{⊳⊹⊄⥀❔⏰⊡⚡→⊸}
+executeDirective(1)→void⟨64⟩{⊄❔⊰⟛⏰⊺⊹⊳⚡→}
+submitReport(3)→void⟨41⟩{⊰❔⏰⊺⊹⚡→}
+processChildReports(1)→void⟨79⟩{⏰⥀⊡⚡→⊺}
+updateSwarmCoherence(1)→void⟨27⟩{⊹⋐⊡⊷⏰❔}
+κCRITICAL_CIRCUITS
+createSpiderId(1)→string⟨3⟩{⏰⊰⊷}
+κBEE_ROLE_ASSIGNMENTS
+createParentSpider(3)→Spider⟨37⟩{⏰⊡⊷}
+spawnChildSpider(1)→Spider | null⟨66⟩{⊷⊳⊰⏰⊡⊺}
+⟿harvestAgentEvolutionData(1)→Promise<SpiderHarvest>⟨27⟩{⊲⊴⊸⋐⊳⊹⊷⏰}
+⟿harvestAgentGenesisData(1)→Promise<SpiderHarvest>⟨23⟩{⊲⊴⋐⊷⏰}
+⟿harvestBrainDatabase(1)→Promise<SpiderHarvest>⟨29⟩{❔⊷⏰}
+⟿harvestEngineRegistry(1)→Promise<SpiderHarvest>⟨23⟩{⊲⊴⊱🛡❔⊷⊳⊹⏰}
+⟿harvestSelfCodingData(1)→Promise<SpiderHarvest>⟨21⟩{⊲⊴⊷⏰}
+⟿harvestDreamState(1)→Promise<SpiderHarvest>⟨20⟩{⊲⊴⊷⏰}
+⟿harvestPipelineData(1)→Promise<SpiderHarvest>⟨20⟩{⊲⊴⊷⊸⏰}
+takeStabilitySnapshot(1)→StabilitySnapshot⟨50⟩{⊸⊺⊳⊹⏰⊷}
+findStrongestSupportRegion(1)→string⟨17⟩{❔⊷⊸}
+⟿runSpiderCrawlCycle(1)→Promise<void>⟨205⟩{⟿⥀⊺⊳⊹⏰📢⊰⊻⟛}
+κpheromoneTrails
+κactiveSwarmWaves
+κroyalJellyFlows
+κswarmWaveHistory
+·let totalPheromoneDeposits = 0;
+·let totalSwarmWaves = 0;
+·let totalNectarProduced = 0;
+·let totalRoyalJellyTransferred = 0;
+κPHEROMONE_DECAY_MS
+κPHEROMONE_MAX_PER_REGION
+κSWARM_CONVERGENCE_THRESHOLD
+κROYAL_JELLY_THRESHOLD
+κNECTAR_FLOW_RATE
+κSWARM_WAVE_MS
+κBEEHIVE_CYCLE_MS
+depositPheromone(4)→void⟨25⟩{♡⊕⊡⊹⊺⏰⊳}
+decayPheromones(1)→void⟨18⟩{⏰⥀♡⊕⊺⊹⊡}
+getPheromoneIntensity(2)→number⟨7⟩{⊳⊡⊄⊷⊹⋐♡⊕}
+launchSwarmWave(2)→SwarmWave | null⟨72⟩{⊷⊹⏰⊰⊡⥀⚡→}
+executeSwarmWaves(1)→void⟨38⟩{❔⏰⊺⊹⥀⊡⊸⊳}
+produceRoyalJelly(1)→void⟨59⟩{⊸⊹⟛⏰⊺⥀}
+executeBeeRoles(1)→void⟨90⟩{⥀❔⑃⊸⊹}
+runBeehiveCycle(1)→void⟨6⟩{}
+runBeaconCycle(1)→void⟨83⟩{⏰⥀⊺⊹❔}
+⊬UpgradeProposal⟨id:string│proposerId:string│proposerType:α│targetComponent:string│upgradeType:⬆│description:string│parameters:Record<string, number>│fitness:number│validated:boolean│validationErrors:string[]│applied:boolean│proposedAt:number│validatedAt:number | null│appliedAt:number | null⟩
+⊬SystemIntelligenceState⟨globalIntelligenceScore:number│previousIntelligenceScore:number│intelligenceGrowthRate:number│totalMemoryRecalls:number│totalCrossEngineQueries:number│totalUpgradeProposals:number│totalUpgradesValidated:number│totalUpgradesApplied:number│totalUpgradesRejected:number│componentIntelligence:Record<string, number>│amplificationCycles:number│lastAmplificationCycle:number⟩
+κupgradeProposals
+κINTELLIGENCE_CYCLE_MS
+κMEMORY_RECALL_CYCLE_MS
+κUPGRADE_PROPOSAL_CYCLE_MS
+κMAX_UPGRADE_PROPOSALS
+κsystemIntelligence
+computeGlobalIntelligence(1)→number⟨3375⟩{⊳⊷⊹⋐⥀⊻⊺⏰⟿⊰⟛⊨σ⊄⑃⊩⊱📢◎→◉⟳⊬🚨❔📡⊛⏳⚡→♡⊕⊯⊸⊡⊼⊭⊴⟠⊽🛡α→⊢⋔⊮}
+⟩SCL│123│317⊨│239⑂│97.7%↓⟩

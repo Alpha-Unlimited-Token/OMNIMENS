@@ -1,0 +1,92 @@
+⟨SCL v1│omnimens-causal-reasoning.ts│426→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[omnimens-nextgen-sandbox]
+·engineRegistry.registerEngine("causal-reasoning", "NORMAL", { dbQuota: 10 });
+·let started = false;
+·let cycleCount = 0;
+⊬CausalNode⟨id:string│concept:string│domain:string│nodeType:"cause" | "effect" | "mediator" | "state"⟩
+⊬CausalEdge⟨fromId:string│toId:string│relationship:string│confidence:number│mechanism:string│evidence:string[]│learnedFrom:string│strengthenedCount:number⟩
+⊬CausalChain⟨nodes:string[]│edges:CausalEdge[]│totalConfidence:number│chainLength:number⟩
+⊬CausalState⟨totalNodes:number│totalEdges:number│reasoningCycles:number│predictionsGenerated:number│causalChainsDiscovered:number│domains:string[]│lastCycleTime:number│novelCausationsFound:number⟩
+κnodes
+κedges
+κstate
+κREASONING_INTERVAL_MS
+κCYCLE_SPIKE
+·const nodeId = (concept: string) =>
+⊽│concept.toLowerCase().replace(/[^a-z0-9_]/g, "_").slice(0, 8
+⊱│const safeNum = (v: number, f = 0) => (Number.isFinite(v) ? 
+addNode(1)→void⟨1⟩{}
+·concept: string,
+·domain: string,
+·type: CausalNode["nodeType"] = "state",
+·): CausalNode {
+κid
+⊡│if (nodes.has(id)) return nodes.get(id)!;
+κn
+⊡│nodes.set(id, n);
+·state.totalNodes = nodes.size;
+⊷│return n;
+·}
+addEdge(1)→void⟨1⟩{}
+·fromConcept: string,
+·toConcept: string,
+·relationship: string,
+·confidence: number,
+·mechanism: string,
+·learnedFrom: string,
+·): void {
+κfromId
+κtoId
+·const existing = edges.find((e) => e.fromId === fromId && e.toId === toId);
+·if (existing) {
+·existing.confidence = existing.confidence * 0.7 + confidence * 0.3;
+·existing.strengthenedCount++;
+⊺│existing.evidence.push(learnedFrom);
+⊹│if (existing.evidence.length > 10) existing.evidence.shift()
+·return;
+·}
+⊺│edges.push({
+·fromId,
+·toId,
+·relationship,
+·confidence,
+·mechanism,
+·evidence: [learnedFrom],
+·learnedFrom,
+·strengthenedCount: 1,
+·});
+·state.totalEdges = edges.length;
+·}
+traceCausalChain(2)→CausalChain[]⟨46⟩{⊹⊺⥀⊡❔⊯⊷}
+⊩predictOutcome(1)→void⟨9⟩{⊩⊱⊰⊷}
+·state.predictionsGenerated++;
+⊷│return {
+·predictions,
+⊳│confidence: chains.length ? totalConf / chains.length : 0,
+·chains,
+·};
+·}
+⟿loadExistingGraph(1)→void⟨27⟩{⥀⊰}
+⟿persistNewEdge(2)→void⟨7⟩{}
+⟿discover(1)→void⟨138⟩{↻+⏰⊰⊹❔⥀⊽}
+scheduleNext(1)→void⟨3⟩{⚡→}
+⚡→│spikeBus.on(CYCLE_SPIKE, discover);
+⚡→│spikeBus.on("attention:causal-reasoning", () => scheduleNext
+⚡→│spikeBus.on("cognition:curiosity", () => scheduleNext(2_000)
+⊱│cognitionBus.onInsight((src, insight) => {
+❔│if (src !== "causal-reasoning" && insight?.type === "discove
+·}
+·});
+⊩getCausalState(1)→CausalState⟨3⟩{⊩⊷}
+⊩getCausalGraph(1)→void⟨3⟩{⊩⊷}
+⊩⟿startCausalReasoning(1)→void⟨11⟩{⊩⊰⊴}
+⊩shutdown(1)→void⟨3⟩{⊩}
+⟩SCL│91│72⊨│49⑂│78.6%↓⟩

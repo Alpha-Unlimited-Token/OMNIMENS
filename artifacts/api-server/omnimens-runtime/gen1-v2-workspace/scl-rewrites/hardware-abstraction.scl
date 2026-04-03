@@ -1,0 +1,64 @@
+⟨SCL v1│hardware-abstraction.ts│99→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊭│type SensorType = "vision" | "hearing" | "touch" | "proprioc
+⊭│type ActuatorType = "motor" | "speech" | "display" | "haptic
+⊬SensorReading⟨⟩
+⊬ActuatorCommand⟨⟩
+⊬SensorDriver⟨⟩
+⊬ActuatorDriver⟨⟩
+⊶│export class HardwareAbstraction {
+⊮│private sensors = new Map<SensorType, SensorDriver>();
+⊮│private actuators = new Map<ActuatorType, ActuatorDriver>();
+·private sensorHistory: SensorReading[] = [];
+·private commandHistory: ActuatorCommand[] = [];
+·private _initialized = false;
+·initialize(): void {
+·this._initialized = true;
+·this.registerDigitalSensors();
+·this.registerDigitalActuators();
+·}
+·private registerDigitalSensors(): void {
+·const digitalSensor = (type: SensorType): SensorDriver => ({
+type, Θ: true,
+⏰│read: () => ({ type, value: Math.random(), raw: { digital: t
+·});
+⥀│for (const type of ["vision", "hearing", "touch", "proprioce
+⊡│this.sensors.set(type, digitalSensor(type));
+·}
+·}
+·private registerDigitalActuators(): void {
+·const digitalActuator = (type: ActuatorType): ActuatorDriver => ({
+type, Θ: true,
+⊱│execute: (cmd: ActuatorCommand) => { this.commandHistory.pus
+·});
+⥀│for (const type of ["motor", "speech", "display", "haptic"] 
+⊡│this.actuators.set(type, digitalActuator(type));
+·}
+·}
+·readSensor(type: SensorType): SensorReading | null {
+κdriver
+⊄│if (!driver || !driver.available) return null;
+κreading
+⊺│this.sensorHistory.push(reading);
+⊹│if (this.sensorHistory.length > 500) this.sensorHistory = th
+⊷│return reading;
+·}
+·sendCommand(type: ActuatorType, command: string, parameters: Record<string, unkn
+κdriver
+⊄│if (!driver || !driver.available) return false;
+⊷│return driver.execute({ type, command, parameters, priority 
+·}
+⊡│replaceSensorDriver(type: SensorType, driver: SensorDriver):
+⊡│replaceActuatorDriver(type: ActuatorType, driver: ActuatorDr
+⋔│getAvailableSensors(): SensorType[] { return [...this.sensor
+⋔│getAvailableActuators(): ActuatorType[] { return [...this.ac
+·getState(): Record<string, unknown> {
+⊷│return {
+·initialized: this._initialized, sensors: this.getAvailableSensors(), actuators: 
+·sensorReadings: this.sensorHistory.length, commandsExecuted: this.commandHistory
+·};
+·}
+·shutdown(): void { this._initialized = false; }
+·}
+⊪hardware
+⟩SCL│63│32⊨│26⑂│36.4%↓⟩

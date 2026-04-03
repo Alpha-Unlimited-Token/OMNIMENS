@@ -1,0 +1,25 @@
+⟨SCL v1│adaptivePollingStream_gen1.mjs│122→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+·export async function* adaptivePollingStream(fetchDataFunction, initialIntervalM
+·let interval = initialIntervalMs;
+·let buffer = [];
+·while (true) {
+·try {
+κdata
+⏰│buffer.push({ timestamp: Date.now(), data });
+⊹│if (buffer.length > slidingWindowSize) {
+·buffer = compressSlidingWindow(buffer, slidingWindowSize);
+·}
+·yield buffer;
+·interval = initialIntervalMs;
+·} catch (error) {
+·console.error('Polling error:', error);
+⟛│interval = Math.min(interval * 2, maxIntervalMs);
+·}
+⏳│await setTimeout(interval);
+·}
+·}
+⊩compressSlidingWindow(2)→void⟨17⟩{⊩⊺⊷}
+⊩aggregateData(1)→void⟨43⟩{⊩⋐⊷⊱}
+⟩SCL│24│15⊨│11⑂│80.3%↓⟩

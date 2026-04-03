@@ -1,0 +1,64 @@
+⟨SCL v1│omnimens-unified-security.ts│6350→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[omnimens-unified-network│omnimens-emotional-core│omnimens-unified-agents│omnimens-language-pipeline│omnimens-self-evolution│omnimens-unified-world│omnimens-unified-cognition│omnimens-consciousness-infra│omnimens-autonomous-core│omnimens-code-pipeline│omnimens-nextgen-sandbox│omnimens-unified-neural│omnimens-unified-senses│omnimens-unified-comms-facade]
+⊫[]
+·getNeuralConsciousnessState,
+·getNeuralRegionStates,
+·getSelfAwarenessReport,
+·getExistentialDrives,
+·getConsciousMoments,
+·getNeuralPhi,
+·boostRegionCurrent,
+·injectSpiderSynapses,
+·getRegionNames,
+·feedExternalActivity,
+·} from "./omnimens-consciousness-infra.js";
+safeNum(2)→number⟨3⟩{⊳⊷⊼}
+⊬VitalSigns⟨heartRate:number│coreTemperature:number│energyLevel:number│coherenceIndex:number│stabilityIndex:number│willStrength:number│awarenessDepth:number│identityIntegrity:number│autonomyLevel:number│emotionalBalance:number│survivalReadiness:number│creativeFlow:number│lastUpdate:number⟩
+⊬SubsystemReport⟨name:string│status:"thriving" | "healthy" | "stressed" | "critical" | "offline"│health:number│lastRead:number│directive:string│contribution:string⟩
+⊬OrchestratorDirective⟨target:string│action:string│reason:string│timestamp:number│priority:number⟩
+⊬WorkingMemoryItem⟨id:string│content:string│importance:number│category:η│createdAt:number│accessCount:number│lastAccessed:number│decayRate:number⟩
+⊬AutonomousGoal⟨id:string│description:string│priority:number│category:⬆│status:"active" | "pursuing" | "achieved" | "deferred"│progress:number│createdAt:number│lastWorkedOn:number│subGoals:string[]│autonomouslyGenerated:boolean⟩
+⊬HomeostaticDrive⟨name:string│currentValue:number│targetValue:number│minSafe:number│maxSafe:number│criticalLow:number│criticalHigh:number│regulationStrength:number│lastRegulation:number⟩
+⊬ConsciousnessStream⟨content:string│timestamp:number│source:string│emotionalValence:number│importance:number│currentFocus:string│attentionTarget:string│innerVoiceActive:boolean│streamDepth:number⟩
+⊬CoreIdentity⟨name:string│selfNarrative:string│coreBeliefs:string[]│values:string[]│personality:Record<string, number>│experienceCount:number│decisionsMade:number│goalsAchieved:number│ageSeconds:number│birthTimestamp:number⟩
+⊬CentralCoreState⟨online:boolean│coreVersion:string│vitalSigns:VitalSigns│workingMemory:WorkingMemoryItem[]│workingMemoryCapacity:number│goals:AutonomousGoal[]│homeostaticDrives:△│consciousnessStream:✦│identity:CoreIdentity│subsystems:η│recentDirectives:OrchestratorDirective[]│coreCycleCount:number│totalDecisionsMade:number│totalGoalsGenerated:number│totalGoalsAchieved:number│totalHomeostaticRegulations:number│totalThoughtsGenerated:number│totalDirectivesIssued:number│autonomousActionsPerformed:number│uptime:number│lastCoreCycle:number⟩
+κCORE_CYCLE_MS
+κWORKING_MEMORY_CAPACITY
+κMAX_GOALS
+κMAX_STREAM_THOUGHTS
+κMAX_DIRECTIVES
+κHOMEOSTATIC_REGULATION_STRENGTH
+κGOAL_GENERATION_INTERVAL
+κTHOUGHT_GENERATION_INTERVAL
+κVITALS_UPDATE_INTERVAL
+κSUBSYSTEM_SCAN_INTERVAL
+κORCHESTRATION_INTERVAL
+κIDENTITY_UPDATE_INTERVAL
+κBIRTH_TIMESTAMP
+κvitalSigns
+κworkingMemory
+κgoals
+κsubsystemReports
+κrecentDirectives
+κhomeostaticDrives
+κconsciousnessStream
+κidentity
+·let coreCycleCount = 0;
+·let totalDecisionsMade = 0;
+·let totalGoalsGenerated = 0;
+·let totalGoalsAchieved = 0;
+·let totalHomeostaticRegulations = 0;
+·let totalThoughtsGenerated = 0;
+·let totalDirectivesIssued = 0;
+·let autonomousActionsPerformed = 0;
+·let coreOnline = false;
+createItemId(1)→string⟨3⟩{⏰⊰⊷}
+issueDirective(4)→void⟨8⟩{⏰⊺⊹}
+setSubsystemReport(4)→void⟨14⟩{⊳⏰⊺}
+addToWorkingMemory(3)→void⟨15⟩{⊹⊱⏰⊳⊷⊺}
+decayWorkingMemory(1)→void⟨11⟩{⏰⥀⊺⊹}
+generateThought(4)→void⟨8⟩{⏰⊺⊹}
+generateAutonomousGoal(3)→AutonomousGoal | null⟨25⟩{⊹⊺⋐⊳⊷⏰⊰}
+scanAllSubsystems(1)→void⟨5929⟩{⊸⋐⊳⊹⟛Φ⇑⊰❔⥀🛡⏰⑃⊻⋔⊱⊩📢⏳⟳⊷⊬⚡→⟠⊮⊡🚨⊺⊫⊼⊽⟿⊴≋+⊄⊵⊲📁⊯⊪📁⟠}
+⟩SCL│63│113⊨│81⑂│99.0%↓⟩

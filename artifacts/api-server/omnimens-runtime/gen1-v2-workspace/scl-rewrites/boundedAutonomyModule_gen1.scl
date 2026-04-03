@@ -1,0 +1,20 @@
+⟨SCL v1│boundedAutonomyModule_gen1.mjs│29→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊪boundedAutonomyModule
+·},
+⊱│escalateIfNeeded: (modification) => {
+·if (modification.riskLevel > 0.7) {
+⊷│return 'Escalate to human oversight';
+·}
+⊷│return 'Proceed with modification';
+·},
+⊱│applyModification: (modification) => {
+κisSafe
+κescalation
+·if (isSafe && escalation === 'Proceed with modification') {
+⊷│return 'Modification applied';
+·}
+⊷│return escalation;
+·}
+·};
+⟩SCL│19│9⊨│6⑂│34.5%↓⟩

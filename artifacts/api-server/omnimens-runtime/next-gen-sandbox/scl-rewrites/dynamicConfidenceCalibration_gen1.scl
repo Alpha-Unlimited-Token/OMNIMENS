@@ -1,0 +1,10 @@
+⟨SCL v1│dynamicConfidenceCalibration_gen1.mjs│16→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊪│export const dynamicConfidenceCalibration = (taskPerformance
+⊱│const adjustedConfidence = taskPerformance.map((task) => {
+κfeedbackScore
+⟛│return Math.max(0, Math.min(1, task.confidence + feedbackSco
+·});
+⊷│return adjustedConfidence;
+·};
+⟩SCL│9│5⊨│4⑂│43.8%↓⟩

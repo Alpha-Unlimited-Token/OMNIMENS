@@ -1,0 +1,11 @@
+⟨SCL v1│semanticContextCompressor_gen1.mjs│112→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩semanticHash(1)→void⟨3⟩{⊩⊷}
+⊩clusterTokens(1)→void⟨11⟩{⊩⥀⊺⊷}
+⊩extractDependencies(1)→void⟨21⟩{⊩⊷}
+isNoun(1)→void⟨4⟩{⊷⊻}
+isVerb(1)→void⟨4⟩{⊷⊻}
+⊩compressContext(1)→void⟨10⟩{⊩⊷}
+⊩exampleUsage(1)→void⟨4⟩{⊩}
+⟩SCL│10│23⊨│15⑂│91.1%↓⟩

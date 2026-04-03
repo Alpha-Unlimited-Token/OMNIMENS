@@ -1,0 +1,20 @@
+⟨SCL v1│adversarialTesting_gen1.mjs│29→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class AdversarialTesting {
+·constructor(memory, operations) {
+·this.memory = memory;
+·this.operations = operations;
+·}
+·generateEdgeCases() {
+⊷│return this.operations.generateComplexScenarios(this.memory)
+·}
+·testAgents(agents) {
+κcases
+agents.forEach(α => {
+·cases.forEach(testCase => {
+α.runTest(testCase);
+·});
+·});
+·}
+·}
+⟩SCL│19│5⊨│2⑂│34.5%↓⟩

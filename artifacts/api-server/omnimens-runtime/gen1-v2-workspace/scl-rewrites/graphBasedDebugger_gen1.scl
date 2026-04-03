@@ -1,0 +1,26 @@
+⟨SCL v1│graphBasedDebugger_gen1.mjs│35→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class GraphBasedDebugger {
+·constructor() {
+⊮│this.graph = new Map();
+·}
+addNode(Ε, error, correction) {
+⊡│if (!this.graph.has(module)) this.graph.set(module, []);
+⊡│this.graph.get(module).push({ error, correction });
+·}
+prioritizeCorrections(Ε) {
+κnodes
+⊷│return nodes.sort((a, b) => b.confidence - a.confidence);
+·}
+·refineStrategies(feedback) {
+⊱│feedback.forEach(({ module, error, correction, confidence })
+this.addNode(Ε, error, correction);
+⊡│this.graph.get(module).forEach(node => {
+·if (node.error === error && node.correction === correction) {
+·node.confidence = confidence;
+·}
+·});
+·});
+·}
+·}
+⟩SCL│25│11⊨│7⑂│28.6%↓⟩

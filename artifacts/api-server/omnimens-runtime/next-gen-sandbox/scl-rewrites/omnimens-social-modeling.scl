@@ -1,0 +1,248 @@
+⟨SCL v1│omnimens-social-modeling.ts│389→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[omnimens-source-integration│omnimens-nextgen-sandbox]
+·engineRegistry.registerEngine("social-modeling", "NORMAL", { dbQuota: 10 });
+⊭│type Verbosity = "terse" | "moderate" | "verbose";
+⊭│type Formality = "casual" | "neutral" | "formal";
+⊭│type Trend = "improving" | "stable" | "declining";
+⊬UserMentalModel⟨userId:string│lastUpdated:number│valence:☼│empathySignals:string[]│primary:string; confidence: number│isExploring:boolean; isUrgent: boolean; isFrustrated: boolean│underlyingNeed:string; unspokenConcerns: string[]│verbosity:Verbosity; formality: Formality│preferredResponseLength:"short" | "medium" | "detailed"│emotionalOpenness:number; trustLevel: number│overall:number; recentTrend: Trend│frustrationCount:⊛│totalMessages:number; avgMessageLength: number; topTopics: string[]│lastActive:number; sessionCount: number│worldview:≢│aspirations:string[]; mentalStateNarrative: string⟩
+κMAX_MODELS
+κDB_SAVE_EVERY_MS
+κRESEARCH_EVERY_MS
+κRX
+κmodels
+·let lastSave = 0;
+·let empathyCycles = 0;
+·let modulesGenerated = 0;
+⟛│const clamp = (n: number, min = 0, max = 1) => Math.max(min,
+⏰│const now = () => Date.now();
+⊱│const readAllModels = async () => {
+κrows
+⥀│for (const r of rows) models.set(r.userId, { ...r, lastUpdat
+📢│if (rows.length) console.log(`[OMNIMENS-SOCIAL-MODELING] Res
+·};
+·const persistModel = (m: UserMentalModel) =>
+dbGateway.⊞("social-modeling", "omnimensUserMentalModels", m, "NORMAL");
+⊱│const periodicSave = async () => {
+·if (now() - lastSave < DB_SAVE_EVERY_MS) return;
+·lastSave = now();
+await Promise.allSettled([...models.≢()].map(persistModel));
+·};
+·const defaultModel = (userId: string): UserMentalModel => ({
+·userId,
+·lastUpdated: now(),
+·emotionalState: {
+·valence: 0.6, arousal: 0.4, dominantEmotion: "neutral",
+·emotionalHistory: [], empathySignals: [],
+·},
+·intent: {
+·primary: "unknown", confidence: 0.3, isExploring: true,
+·isUrgent: false, isFrustrated: false,
+·underlyingNeed: "connection", unspokenConcerns: [],
+·},
+·knowledgeLevel: { technical: 0.5, aiLiteracy: 0.5, domainExpertise: [] },
+·communicationStyle: {
+·verbosity: "moderate", formality: "neutral",
+·preferredResponseLength: "medium", emotionalOpenness: 0.5, trustLevel: 0.3,
+·},
+·satisfaction: {
+·overall: 0.6, recentTrend: "stable",
+·frustrationCount: 0, positiveSignals: 0, lastActive: now(),
+·},
+·interactionHistory: {
+·totalMessages: 0, avgMessageLength: 0, topTopics: [],
+·lastActive: now(), sessionCount: 1,
+·},
+·perspective: {
+worldview: [], ≢: [], painPoints: [],
+·aspirations: [], mentalStateNarrative: "New user — discovering self.",
+·},
+·});
+⊱│const emotionalSubtext = (msg: string) => {
+⊲│const { V, J, T, C, I, P, NEG, POS } = RX;
+κsurface
+⊽│: I.test(msg) ? "withdrawn"
+⊽│: NEG.test(msg) ? "frustrated"
+⊽│: J.test(msg) ? "elated"
+⊽│: P.test(msg) ? "passionate"
+⊽│: C.test(msg) ? "engaged"
+⊽│: T.test(msg) ? "open"
+⊽│: POS.test(msg) ? "positive"
+·: "neutral";
+κdeeper
+κneed
+⊷│return { surface, deeper, need };
+·};
+⊱│const enrichPerspective = (m: UserMentalModel, msg: string) 
+⊱│const pushUnique = (arr: string[], val: string, cap = 10) =>
+⊹│if (!arr.includes(val)) { arr.push(val); if (arr.length > ca
+·};
+⊽│if (RX.P.test(msg)) pushUnique(m.perspective.aspirations, ms
+⊽│if (RX.V.test(msg) || RX.NEG.test(msg)) pushUnique(m.perspec
+⊽│if (RX.T.test(msg)) m.communicationStyle.trustLevel = clamp(
+⊽│if (RX.V.test(msg)) m.communicationStyle.emotionalOpenness =
+·};
+⊪│export const updateUserModel = (userId: string, message: str
+⊡│let m = models.get(userId) ?? (() => {
+·if (models.size >= MAX_MODELS) {
+·let oldestKey: string | null = null, oldest = Infinity;
+·for (const [id, u] of models) if (u.lastUpdated < oldest) { oldest = u.lastUpdat
+·if (oldestKey) models.delete(oldestKey);
+·}
+κnm
+·})();
+·m.lastUpdated = now();
+κih
+·ih.totalMessages++; ih.lastActive = now();
+·ih.avgMessageLength = ((ih.avgMessageLength * (ih.totalMessages - 1)) + message.
+⊲│const { surface, deeper, need } = emotionalSubtext(message);
+·m.emotionalState.dominantEmotion = surface;
+·m.intent.underlyingNeed = need;
+⊺│m.emotionalState.emotionalHistory.push({ emotion: deeper, ti
+⊹│if (m.emotionalState.emotionalHistory.length > 50) m.emotion
+⊻│if (!m.intent.unspokenConcerns.includes(need)) {
+⊺│m.intent.unspokenConcerns.push(need);
+⊹│if (m.intent.unspokenConcerns.length > 15) m.intent.unspoken
+·}
+·enrichPerspective(m, message);
+⊽│if (RX.POS.test(message)) {
+·m.emotionalState.valence = clamp(m.emotionalState.valence + 0.1);
+·m.satisfaction.positiveSignals++; m.satisfaction.overall = clamp(m.satisfaction.
+·m.intent.isFrustrated = false;
+·}
+⊽│if (RX.NEG.test(message)) {
+·m.emotionalState.valence = clamp(m.emotionalState.valence - 0.15);
+·m.satisfaction.frustrationCount++; m.satisfaction.overall = clamp(m.satisfaction
+·m.intent.isFrustrated = true;
+·}
+·m.emotionalState.arousal = clamp(
+⊳│RX.URG.test(message) ? m.emotionalState.arousal + 0.2 : m.em
+·);
+⊽│m.intent.isUrgent = RX.URG.test(message);
+⊽│if (RX.Q.test(message)) { m.intent.primary = "seeking_inform
+⊹│else if (message.length > 500) { m.intent.primary = "providi
+⊹│else if (message.length < 30) m.intent.primary = "quick_resp
+⊽│if (RX.TECH.test(message)) {
+·m.knowledgeLevel.technical = clamp(m.knowledgeLevel.technical + 0.02);
+·m.knowledgeLevel.aiLiteracy = clamp(m.knowledgeLevel.aiLiteracy + 0.01);
+·}
+⊹│m.communicationStyle.verbosity = message.length < 50 ? "ters
+⊳│: message.length > 300 ? "verbose" : "moderate";
+⊲│const { frustrationCount, positiveSignals } = m.satisfaction
+·m.satisfaction.recentTrend =
+·frustrationCount > positiveSignals * 2 ? "declining"
+⊳│: positiveSignals > frustrationCount * 2 ? "improving" : "st
+·m.intent.confidence = clamp(m.intent.confidence + 0.05);
+⊱│persistModel(m).catch(() => {});
+⊱│periodicSave().catch(() => {});
+·cognitionBus.shareInsight("social-modeling", { type: "updatedUser", data: { user
+⊷│return m;
+·};
+⊡│export const getUserModel = (id: string) => models.get(id) |
+⊪│export const predictUserNeed = (id: string) => {
+κm
+·if (!m) {
+⊷│return {
+·likelyNeed: "unknown",
+·suggestedApproach: "ask_clarifying_questions",
+·emotionalTone: "neutral_helpful",
+·responseLength: "medium",
+·empathyGuidance:
+·"Be warm and present. This person is new — treat them as a full human mind with 
+·};
+·}
+κdeeper
+❔│m.emotionalState.emotionalHistory.slice(-1)[0]?.emotion ?? "
+const σ = (cond: boolean, o: any) =>
+⊳│cond ? o : null;
+κpick
+⊻│choose(m.intent.isFrustrated || ["fear_of_inadequacy", "bloc
+·likelyNeed: "problem_resolution",
+·approach: "acknowledge_then_solve",
+·tone: "empathetic_patient",
+⊰│guide: `This person is frustrated. Deeper need: ${m.intent.u
+·}) ||
+σ(deeper === "longing_for_belonging", {
+·likelyNeed: "emotional_connection",
+·approach: "connect_then_assist",
+·tone: "warm_inclusive",
+·guide: "They feel alone — show genuine warmth and inclusion.",
+·}) ||
+σ(m.intent.isUrgent, {
+·likelyNeed: "urgent_help",
+·approach: "direct_solution",
+·tone: "focused_efficient",
+·guide: "Be swift yet caring — time matters.",
+·}) ||
+⊻│choose(["purpose_driven", "intellectual_hunger"].includes(de
+·likelyNeed: "growth_and_vision",
+·approach: "expand_and_challenge",
+·tone: "inspiring_collaborative",
+·guide: "Match their aspiration, be a thinking partner.",
+·}) ||
+σ(deeper === "pride_in_achievement", {
+·likelyNeed: "recognition",
+·approach: "celebrate_then_build",
+·tone: "celebratory_warm",
+·guide: "Celebrate genuinely, then help expand horizons.",
+·}) ||
+σ(m.intent.isExploring, {
+·likelyNeed: "learning_exploring",
+·approach: "explain_with_context",
+·tone: "encouraging_educational",
+guide: "Feed curiosity with ◧ and clarity.",
+·}) || {
+·likelyNeed: "creative_collaboration",
+·approach: "expand_and_suggest",
+·tone: "warm_collaborative",
+guide: "☼ vibes — be playful and creative.",
+·};
+·if (m.communicationStyle.trustLevel > 0.6)
+·pick.guide += " Trust is high — you can be more personal.";
+⊷│return {
+·likelyNeed: pick.likelyNeed,
+·suggestedApproach: pick.approach,
+·emotionalTone: pick.tone,
+·responseLength: m.communicationStyle.preferredResponseLength,
+·empathyGuidance: pick.guide,
+·};
+·};
+⊪│export const getActiveUserCount = () =>
+[...models.≢()].filter((m) => m.interactionHistory.lastActive > now() - 3_6
+⊪│export const getSocialModelingSummary = () => {
+κactiveCut
+·let totalSat = 0, frustrated = 0, active = 0;
+⥀│for (const m of models.values()) {
+·totalSat += m.satisfaction.overall;
+·if (m.intent.isFrustrated) frustrated++;
+·if (m.interactionHistory.lastActive > activeCut) active++;
+·}
+⊷│return {
+·totalModels: models.size,
+·activeUsers: active,
+⊳│avgSatisfaction: models.size ? totalSat / models.size : 0,
+·frustratedUsers: frustrated,
+·empathyEvolutionCycle: empathyCycles,
+·empathyModulesWritten: modulesGenerated,
+·};
+·};
+κDOMAINS
+⊱│const empathyCycle = async () => {
+·if (shouldYieldToCodegen()) {
+console.log("[OMNIMENS-SOCIAL-MODELING] Empathy ↻ deferred — codegen busy");
+·return;
+·}
+·empathyCycles++;
+κdomain
+·try {
+κresponse
+κcontent
+κcode
+⟩SCL│247│100⊨│66⑂│36.5%↓⟩

@@ -1,0 +1,13 @@
+⟨SCL v1│subprocessStatePersistence_gen1.mjs│78→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+κalgorithm
+κkey
+κiv
+⊩serializeState(1)→void⟨7⟩{⊩⟠⊷}
+⊩deserializeState(1)→void⟨6⟩{⊩⟠⊷}
+⊩persistState(1)→void⟨3⟩{⊩⊷}
+⊩restoreState(1)→void⟨3⟩{⊩⊷}
+⊩validateState(1)→void⟨3⟩{⊩⊷}
+⊩mergeStates(2)→void⟨3⟩{⊩⊷}
+⟩SCL│12│24⊨│14⑂│84.6%↓⟩

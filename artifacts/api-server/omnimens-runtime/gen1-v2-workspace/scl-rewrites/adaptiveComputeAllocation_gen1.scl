@@ -1,0 +1,23 @@
+⟨SCL v1│adaptiveComputeAllocation_gen1.mjs│33→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class AdaptiveComputeAllocation {
+📡⊛│constructor(eventBus) {
+📡⊛│this.eventBus = eventBus;
+·this.agentResources = {};
+·}
+·allocateResources(agentId, taskPriority) {
+κtotalResources
+κallocation
+·this.agentResources[agentId] = allocation;
+📡⊛│this.eventBus.publish('resourceAllocated', { agentId, alloca
+·}
+·calculateTotalResources() {
+⊷│return 100;
+·}
+·dynamicReallocation() {
+⊱│this.eventBus.subscribe('taskPriorityChanged', ({ agentId, n
+·this.allocateResources(agentId, newPriority);
+·});
+·}
+·}
+⟩SCL│22│8⊨│6⑂│33.3%↓⟩

@@ -1,0 +1,8 @@
+⟨SCL v1│webAssemblyCompute_gen1.mjs│97→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩⟿loadWasmModule(1)→void⟨10⟩{⊩⊴⊷⊰⊵}
+⊩wasmMatrixMultiply(6)→void⟨23⟩{⊩⊹⊵⊲⊷}
+⊩⟿demoMatrixMultiplication(6)→void⟨4⟩{⊩⊴⊷}
+⊩validateMatrixDimensions(3)→void⟨3⟩{⊩⊷}
+⟩SCL│7│20⊨│15⑂│92.8%↓⟩

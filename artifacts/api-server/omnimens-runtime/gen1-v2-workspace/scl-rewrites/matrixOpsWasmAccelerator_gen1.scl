@@ -1,0 +1,12 @@
+⟨SCL v1│matrixOpsWasmAccelerator_gen1.mjs│96→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+κfs
+κpath
+⟿loadWasmModule(1)→void⟨6⟩{📁⊷}
+⟿wasmMatrixMultiply(5)→void⟨20⟩{⊹⊵⊴⊲⊡⊷}
+⟿wasmNeuralPrimitive(5)→void⟨22⟩{⊹⊵⊴⊲⊡⊷}
+Ε.exports = {
+·wasmMatrixMultiply,
+·wasmNeuralPrimitive
+·};
+⟩SCL│11│20⊨│14⑂│88.5%↓⟩

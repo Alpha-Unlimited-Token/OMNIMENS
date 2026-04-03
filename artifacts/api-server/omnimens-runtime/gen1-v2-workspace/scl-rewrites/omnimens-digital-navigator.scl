@@ -1,0 +1,100 @@
+⟨SCL v1│omnimens-digital-navigator.ts│376→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+·DIGITAL NAVIGATOR — event–driven v2.0  (OMNIMENS-DIGITAL-NAVIGATOR)
+·========================================================================== */
+κENGINE_ID
+·engineRegistry.registerEngine(ENGINE_ID, "NORMAL", { dbQuota: 10 });
+⊭│type LocationType =
+·| "api_endpoint" | "database" | "web_service" | "file_system"
+·| "internal_engine" | "external_api" | "web_domain" | "data_stream"
+·| "code_repository" | "network_node" | "cloud_service" | "knowledge_base";
+⊭│type RouteType =
+·| "api_chain" | "data_pipeline" | "dependency" | "discovery_path"
+·| "shortcut" | "fallback" | "redirect" | "proxy";
+⊬DigitalLocation⟨id:string│name:string│locationType:LocationType│domain:string│url:string | null│description:string│accessLatencyMs:number│reliability:number│accessCount:number│lastVisited:number│discoveredAt:number│valueScore:number│tags:string[]│metadata:Record<string, unknown>⟩
+⊬DigitalRoute⟨id:string│from:string│to:string│routeType:RouteType│latencyMs:number│reliability:number│bandwidth:number│timesTraversed:number│lastTraversed:number│discoveredAt:number│notes:string⟩
+⊬DigitalNeighborhood⟨id:string│name:string│description:string│locations:string[]│theme:string│familiarity:number│lastExplored:number│totalVisits:number⟩
+⊭│type NavAction =
+·| "discovered" | "traversed" | "mapped" | "shortcut_found"
+·| "dead_end"   | "rate_limited" | "new_territory";
+⊬NavigationMemory⟨timestamp:number│action:NavAction│location:string│details:string│efficiency:number⟩
+⊬DigitalNavigatorState⟨cycleCount:number│lastCycleTime:number│totalLocationsDiscovered:number│totalRoutesLearned:number│totalNeighborhoodsMapped:number│totalNavigations:number│currentPosition:string│currentNeighborhood:string│explorationFrontier:string[]│navigationEfficiency:number│mapCompleteness:number│shortcutsDiscovered:number│deadEndsFound:number│rateLimitsEncountered:number│longestRoute:number│deepestExploration:number│recentMemory:NavigationMemory[]│topLocations:DigitalLocation[]│topRoutes:DigitalRoute[]│neighborhoods:DigitalNeighborhood[]⟩
+κlocations
+κroutes
+κneighborhoods
+κnavigationMemory
+κstate
+⏰│const now = () => Date.now();
+⊱│const safeNum = (x: number, f = 0) => (Number.isFinite(x) ? 
+κrecordMemory
+·action: NavAction,
+·location: string,
+·details: string,
+·efficiency = 0.5,
+⊱│) => {
+⊺│navigationMemory.push({ timestamp: now(), action, location, 
+⊹│if (navigationMemory.length > 500) navigationMemory.splice(0
+·};
+·const updateReliability = (oldVal: number, newVal: number, alpha = 0.2) =>
+·(oldVal * (1 - alpha)) + (newVal * alpha);
+registerLocation(1)→void⟨1⟩{}
+·loc: Omit<DigitalLocation,
+·| "accessCount" | "lastVisited" | "discoveredAt" | "valueScore">,
+·): DigitalLocation {
+κexisting
+·if (existing) {
+·existing.accessCount++;
+·existing.lastVisited = now();
+·existing.reliability = updateReliability(existing.reliability, loc.reliability, 
+⊷│return existing;
+·}
+κnewLoc
+⊡│locations.set(loc.id, newLoc);
+·state.totalLocationsDiscovered++;
+⊰│recordMemory("discovered", loc.id, `New digital location ${l
+⊷│return newLoc;
+·}
+registerRoute(1)→void⟨1⟩{}
+·route: Omit<DigitalRoute,
+·| "timesTraversed" | "lastTraversed" | "discoveredAt">,
+·): DigitalRoute {
+κexisting
+·if (existing) {
+·existing.timesTraversed++;
+·existing.lastTraversed = now();
+·existing.latencyMs   = updateReliability(existing.latencyMs, route.latencyMs, 0.
+·existing.reliability = updateReliability(existing.reliability, route.reliability
+⊷│return existing;
+·}
+κnewRoute
+⊡│routes.set(route.id, newRoute);
+·state.totalRoutesLearned++;
+·if (route.routeType === "shortcut") state.shortcutsDiscovered++;
+⊷│return newRoute;
+·}
+registerNeighborhood(1)→void⟨1⟩{}
+·hood: Omit<DigitalNeighborhood,
+·| "familiarity" | "lastExplored" | "totalVisits">,
+·): DigitalNeighborhood {
+κexisting
+·if (existing) {
+·existing.totalVisits++;
+·existing.lastExplored = now();
+·existing.familiarity = safeNum(existing.familiarity + 0.05);
+⊺│hood.locations.forEach(l => { if (!existing.locations.includ
+⊷│return existing;
+·}
+κnewHood
+⊡│neighborhoods.set(hood.id, newHood);
+·state.totalNeighborhoodsMapped++;
+⊷│return newHood;
+·}
+⟿mapOwnInfrastructure(1)→void⟨160⟩{⥀⊳⊰❔⊽⊪}
+⟩SCL│99│49⊨│31⑂│73.7%↓⟩

@@ -1,0 +1,160 @@
+⟨SCL v1│omnimens-codegen-engine.ts│272→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+·engineRegistry.registerEngine("codegen-engine", "NORMAL", { dbQuota: 10 });
+κ__filename_local
+κ__dirname_local
+κGEN1_LIBRARY_DIR
+·__dirname_local,
+·"../../omnimens-runtime/next-gen-sandbox/gen1-library",
+·);
+κGEN1_MODULES_DIR
+·__dirname_local,
+·"../../omnimens-runtime/modules",
+·);
+⊬Gen1Module⟨name:string│category:string│purpose:string│code:string│exports:string[]│imports:string[]│patterns:string[]│lineCount:number⟩
+⊬ModuleSpec⟨name:string│purpose:string│requirements:string⟩
+⊬Gen1Analysis⟨relevantModules:Ε│keptPatterns:string[]│adaptedPatterns:string[]│discardedPatterns:string[]⟩
+⊬ThoughtProcess⟨moduleSpec:Ε│gen1Analysis:Gen1Analysis│reasoningChain:string[]│finishedCode:string⟩
+·const readFileSafe = (p: string) =>
+📁│fs.existsSync(p) ? fs.readFileSync(p, "utf-8") : "";
+·const regexMatch = (re: RegExp, src: string) =>
+·[...src.matchAll(re)].map((m) => m[1]).filter(Boolean);
+·const scanPatterns = (code: string): string[] => {
+κchecks
+⋔│return checks.filter(([re]) => re.test(code)).map(([, tag]) 
+·};
+⊪│export const loadGen1Module = (filePath: string): Gen1Module
+·try {
+κfull
+κcode
+⊄│if (!code) return null;
+⊷│return {
+·name: path.basename(full),
+·category: path.basename(path.dirname(full)),
+△:
+❔│(code.match(/\*\s*(?:Purpose|Description):\s*([^\n]+)/)?.[1]
+·code,
+⊳│exports: regexMatch(/export\s+(?:async\s+)?(?:function|class
+·imports: regexMatch(/import\s+.*?from\s+["']([^"']+)["']/g, code),
+·patterns: scanPatterns(code),
+·lineCount: code.split("\n").length,
+·};
+·} catch {
+⊷│return null;
+·}
+·};
+⊪│export const loadGen1Library = (): Map<string, Gen1Module[]>
+κlib
+⊄│if (!fs.existsSync(GEN1_LIBRARY_DIR)) return lib;
+⥀│for (const cat of fs.readdirSync(GEN1_LIBRARY_DIR)) {
+κdir
+·if (!fs.statSync(dir).isDirectory()) continue;
+κmods
+·.readdirSync(dir)
+⊻│.filter((f) => f.endsWith(".mjs"))
+·.map((f) => loadGen1Module(path.join(dir, f)))
+·.filter(Boolean) as Gen1Module[];
+⊡│if (mods.length) lib.set(cat, mods);
+·}
+⊷│return lib;
+·};
+κanalyzeGen1
+·spec: ModuleSpec,
+·lib: Map<string, Gen1Module[]>,
+·): Gen1Analysis => {
+κrelevant
+κtext
+·lib.forEach((mods) =>
+⊱│mods.forEach((m) => {
+κscore
+(m.△ + m.code)
+·.toLowerCase()
+·.split(/\W+/)
+⊻│.filter((w) => text.includes(w)).length + m.patterns.length;
+⊺│if (score > 5) relevant.push(m);
+·}),
+·);
+κkept
+⊻│.filter((m) => !m.patterns.includes("timer-based"))
+·.map((m) => m.name);
+κadapted
+⊻│.filter((m) => m.patterns.includes("timer-based"))
+·.map((m) => m.name);
+κdiscarded
+⊷│return {
+·relevantModules: relevant.slice(0, 12),
+·keptPatterns: kept,
+·adaptedPatterns: adapted,
+·discardedPatterns: discarded,
+·};
+·};
+⊪│export const assembleModuleCode = (tp: ThoughtProcess): stri
+⊲│const { moduleSpec, gen1Analysis, reasoningChain } = tp;
+κheader
+κimpl
+⊰│return `${header}\n\n${impl}\n`;
+·};
+κCYCLE_MS
+·let busy = false;
+⊱│const doWork = async () => {
+·if (busy) return;
+·busy = true;
+·try {
+κnext
+·"codegen-engine",
+·"module_specs",
+{ status: "pending", $⏳: 1 },
+·)) as ModuleSpec | undefined;
+⊄│if (!next) return;
+κlib
+κanalysis
+κreasoning
+κthought
+·thought.finishedCode = assembleModuleCode(thought);
+await dbGateway.⊞(
+·"codegen-engine",
+·"generated_modules",
+⏰│{ name: next.name, code: thought.finishedCode, created: Date
+·"NORMAL",
+·);
+·cognitionBus.shareInsight("codegen-engine", {
+type: "Ε-generated",
+·data: { name: next.name, kept: analysis.keptPatterns.length },
+·});
+await dbGateway.⊞(
+·"codegen-engine",
+·"module_specs",
+⏰│{ ...next, status: "done", finishedAt: Date.now() },
+·"NORMAL",
+·);
+·} catch (err) {
+❔│apiManager.logError?.("codegen-engine", err);
+cognitionBus.reportOutcome("codegen-engine", { useful: false, ◧: String(er
+·} finally {
+·busy = false;
+·}
+·};
+κCYCLE_EVENT
+⊱│spikeBus.on(CYCLE_EVENT, async () => {
+⊴│await doWork();
+⚡→│spikeBus.scheduleSpike(CYCLE_EVENT, {}, CYCLE_MS);
+·});
+⚡→│spikeBus.scheduleSpike(CYCLE_EVENT, {}, 1_000);
+⊱│cognitionBus.onInsight((src, ins) => {
+·if (src !== "codegen-engine" && ins.type === "discovery") {
+·}
+·});
+⚡→│spikeBus.on("attention:codegen-engine", () => spikeBus.sched
+⚡→│spikeBus.on("cognition:curiosity", () => spikeBus.scheduleSp
+⊪│export const requestGeneration = (spec: ModuleSpec) =>
+dbGateway.⊞("codegen-engine", "module_specs", { ...spec, status: "pending" }
+⊩shutdown(1)→void⟨3⟩{⊩}
+⟩SCL│159│79⊨│42⑂│41.5%↓⟩

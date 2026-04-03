@@ -1,0 +1,95 @@
+⟨SCL v1│omnimens-global-workspace.ts│279→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[omnimens-nextgen-sandbox]
+·engineRegistry.registerEngine("global-workspace", "NORMAL", { dbQuota: 10 });
+κWORKSPACE_CAPACITY
+κIGNITION_THRESHOLD
+κBROADCAST_COOLDOWN_MS
+κINTERVAL_MS
+let ↻ = 0;
+·let lastBroadcast = 0;
+⊭│type SaliencePriority = "critical" | "high" | "normal";
+⊬WorkspaceSubmission⟨moduleName:string│content:string│salience:number│metadata:Record<string, unknown>⟩
+⊬BroadcastResult⟨winner:WorkspaceSubmission│integrationInsight:string│receivingModules:string[]│cycleId:number⟩
+⊱│const safe = (n: number, f = 0) => (Number.isFinite(n) ? n :
+·const read = (table: string, query: Record<string, unknown>) =>
+·dbGateway.read("global-workspace", table, query);
+κwrite
+·table: string,
+·data: Record<string, unknown>,
+·pri: "LOW" | "NORMAL" | "HIGH" = "NORMAL"
+) => dbGateway.⊞("global-workspace", table, data, pri);
+κprioMap
+κMODULES
+κmemories
+κconvos
+κlist
+·if (memories.length)
+⊺│list.push({
+·moduleName: "UserExperience",
+⊰│content: `USER SIGNALS: ${memories
+⊰│.map((m: any) => `[${m.category}] ${m.content}`)
+·.join("; ")
+·.slice(0, 400)}`,
+·salience: 0.7,
+·type: "emotional_signal",
+·});
+·if (convos.length)
+⊺│list.push({
+·moduleName: "UserExperience",
+⊰│content: `ACTIVE CONVERSATIONS: ${convos
+·.map((c: any) => c.title ?? "Untitled")
+·.join(", ")}`,
+·salience: 0.65,
+·type: "drive_signal",
+·});
+⊷│return list;
+·},
+·},
+·{
+·name: "InterAgentDialogue",
+·type: "synthesis",
+·get: async () =>
+·(
+⊴│await read("agent_mesh", {
+·where: { messageType: "inter_agent_dialogue" },
+·orderBy: { createdAt: "desc" },
+⏳: 5,
+σ: ["subject", "content", "fromAgent"],
+·})
+·)
+❔│.filter((d: any) => d.content?.includes("NEW IDEA"))
+⊱│.map((d: any) => ({
+·moduleName: "InterAgentDialogue",
+❔│content: `[${d.fromAgent}] ${d.subject}: ${d.content?.slice(
+·salience: 0.8,
+·type: "synthesis" as const,
+·})),
+·},
+·] as const;
+⟿competitionPhase(1)→Promise<WorkspaceSubmission[]>⟨9⟩{⊡⊱⊳⊷}
+⟿ignitionAndBroadcast(1)→void⟨1⟩{}
+·winners: WorkspaceSubmission[]
+·): Promise<BroadcastResult[]> {
+⊄│if (!winners.length) return [];
+κresults
+⥀│for (const winner of winners.slice(0, 3)) {
+⋔│const receiving = MODULES.filter((m) => m.name !== winner.mo
+·(m) => m.name
+·);
+·try {
+κresponse
+κraw
+·let insight = raw;
+·try {
+κparsed
+⊪_v2RewriteModule
+·export {};
+⟩SCL│94│45⊨│22⑂│66.3%↓⟩

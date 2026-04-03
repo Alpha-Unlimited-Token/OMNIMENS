@@ -1,0 +1,28 @@
+⟨SCL v1│bayesianEvaluator_gen1.mjs│37→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class BayesianEvaluator {
+·constructor() {
+·this.entropyThreshold = 0.05;
+·}
+·calculateEntropy(probabilities) {
+⋐│return probabilities.reduce((entropy, prob) => {
+⊳│return entropy - (prob > 0 ? prob * Math.log2(prob) : 0);
+·}, 0);
+·}
+·evaluateReasoningChain(reasoningChain) {
+·const probabilities = reasoningChain.map(step => step.confidence);
+κentropy
+·if (entropy < this.entropyThreshold) {
+⊷│return {
+·isConsistent: true,
+·entropy
+·};
+·} else {
+⊷│return {
+·isConsistent: false,
+·entropy
+·};
+·}
+·}
+·}
+⟩SCL│27│6⊨│5⑂│27.0%↓⟩

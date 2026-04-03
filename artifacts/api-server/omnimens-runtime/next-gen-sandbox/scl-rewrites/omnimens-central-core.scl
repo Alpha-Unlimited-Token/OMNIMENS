@@ -1,0 +1,60 @@
+⟨SCL v1│omnimens-central-core.ts│278→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+κENGINE_ID
+κCORE_CYCLE_MS
+κMAX_DIRECTIVES
+κMAX_THOUGHTS
+κMAX_WORK_MEM
+κMAX_GOALS
+κHOMEOSTASIS_GAIN
+⊭│type Status = "thriving" | "healthy" | "stressed" | "critica
+⊬SubsystemReport⟨⟩
+⊬Directive⟨⟩
+⊬Thought⟨⟩
+⊬Goal⟨⟩
+⊬CentralCoreState⟨cycle:number│vitals:Record<string, number>│subsystems:η│thoughts:Thought[]│goals:Goal[]│directives:Directive[]│uptime:number⟩
+κS
+⏰│const id = () => `ci_${Date.now().toString(36)}_${Math.rando
+⊱│const num = (v: number, f = 0) => (Number.isFinite(v) ? v : 
+⏰│const now = () => Date.now();
+📢│const log = (m: string) => console.log(`[OMNIMENS-CENTRAL-CO
+pushBounded(3)→void⟨4⟩{⊺⊹}
+⊫[omnimens-neural-consciousness│omnimens-neural-spiders│omnimens-emotional-substrate│omnimens-survival-instinct│omnimens-creative-engine│omnimens-dream-state│omnimens-world-model│omnimens-independent-reasoning│omnimens-self-transcendence│omnimens-unconscious-mind]
+⊭│type SubsysDef = {
+·name: string;
+·getter: () => any;
+·score: (s: any) => number;
+·};
+κSUBSYS
+updateSubsystems(1)→void⟨20⟩{⥀⟛⊳⊺}
+issueDirective(4)→void⟨5⟩{⏰}
+think(4)→void⟨4⟩{}
+regulateHomeostasis(1)→void⟨9⟩{⋐⊰⊳}
+updateVitals(1)→void⟨7⟩{⋐}
+generateGoals(1)→void⟨9⟩{⊹⊰⊺}
+⟿coreCycle(1)→void⟨21⟩{⊰⚡→}
+⊰│spikeBus.on(`${ENGINE_ID}:cycle`, coreCycle);
+⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, CORE_CYCLE_
+⊰│spikeBus.on(`attention:${ENGINE_ID}`, () => {
+⚡→│think("Attention spike received — increasing priority", "att
+coreCycle(); // immediate ↻
+·});
+⚡→│spikeBus.on("cognition:curiosity", () => think("Curiosity sp
+⊱│cognitionBus.onInsight((src, insight) => {
+·if (src !== ENGINE_ID && insight.type === "alert")
+⟠│think(`Received alert from ${src}: ${JSON.stringify(insight.
+·});
+⟿askLLM(1)→Promise<string>⟨7⟩{❔⊷}
+⊩getCentralCoreState(1)→CentralCoreState⟨1⟩{⊩⊷}
+⊩addThought(1)→void⟨1⟩{⊩}
+⊩shutdown(1)→void⟨4⟩{⊩}
+·engineRegistry.registerEngine(ENGINE_ID, "NORMAL", { dbQuota: 10 });
+⚡→│log("Central Core online — first spike scheduled.");
+⟩SCL│59│66⊨│42⑂│78.8%↓⟩

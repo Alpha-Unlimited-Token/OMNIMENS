@@ -1,0 +1,24 @@
+⟨SCL v1│unifiedMemoryGraph_gen1.mjs│36→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class UnifiedMemoryGraph {
+·constructor() {
+⊮│this.graph = new Map();
+·}
+·addNode(nodeId, data) {
+·if (!this.graph.has(nodeId)) {
+⊡│this.graph.set(nodeId, { data, edges: [] });
+·}
+·}
+·addEdge(fromNode, toNode, weight = 1) {
+·if (this.graph.has(fromNode) && this.graph.has(toNode)) {
+⊡│this.graph.get(fromNode).edges.push({ toNode, weight });
+·}
+·}
+·getNodeData(nodeId) {
+⊡│return this.graph.has(nodeId) ? this.graph.get(nodeId).data 
+·}
+·resolveConflicts() {
+·console.log("Resolving conflicts across memory domains.");
+·}
+·}
+⟩SCL│23│5⊨│5⑂│36.1%↓⟩

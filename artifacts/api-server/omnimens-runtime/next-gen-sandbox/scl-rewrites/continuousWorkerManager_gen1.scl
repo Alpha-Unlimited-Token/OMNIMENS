@@ -1,0 +1,85 @@
+⟨SCL v1│continuousWorkerManager_gen1.mjs│122→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩chunkArray(2)→void⟨10⟩{⊩⊵⊺⊷}
+⊶│export class PriorityQueue {
+·constructor() {
+·this.queue = [];
+·}
+·enqueue(item, priority = 0) {
+⊺│this.queue.push({ item, priority });
+·this.queue.sort((a, b) => b.priority - a.priority); // Higher priority first
+·}
+·dequeue() {
+❔│return this.queue.shift()?.item;
+·}
+·isEmpty() {
+⊷│return this.queue.length === 0;
+·}
+·}
+⊶│export class ContinuousWorkerManager {
+·constructor(workerScript, maxWorkers = 4) {
+·if (!workerScript) {
+⊵│throw new Error('Worker script path must be provided.');
+·}
+·this.workerScript = workerScript;
+·this.maxWorkers = maxWorkers;
+·this.workers = [];
+·this.taskQueue = new PriorityQueue();
+⊮│this.sharedState = new Map();
+·}
+·startWorker() {
+⊹│if (this.workers.length >= this.maxWorkers) {
+⊵│throw new Error('Maximum workers limit reached.');
+·}
+κworker
+⊱│worker.on('message', (message) => {
+·if (message.type === 'taskComplete') {
+⊡│this.sharedState.set(message.taskId, message.result);
+·this.assignTask(worker);
+·}
+·});
+⊱│worker.on('error', (error) => {
+·console.error('Worker error:', error);
+·});
+⊱│worker.on('exit', (code) => {
+⊰│console.log(`Worker exited with code ${code}`);
+·this.workers = this.workers.filter((w) => w !== worker);
+·});
+⊺│this.workers.push(worker);
+·this.assignTask(worker);
+·}
+·assignTask(worker) {
+·if (this.taskQueue.isEmpty()) {
+·return;
+·}
+κtask
+·worker.postMessage({ type: 'executeTask', task });
+·}
+·addTask(task, priority = 0) {
+·this.taskQueue.enqueue(task, priority);
+·this.workers.forEach((worker) => this.assignTask(worker));
+·}
+·pauseWorkers() {
+·this.workers.forEach((worker) => worker.postMessage({ type: 'pause' }));
+·}
+·resumeWorkers() {
+·this.workers.forEach((worker) => worker.postMessage({ type: 'resume' }));
+·}
+·stopAllWorkers() {
+·this.workers.forEach((worker) => worker.terminate());
+·this.workers = [];
+·}
+·}
+·if (!isMainThread) {
+⊱│parentPort.on('message', (message) => {
+·if (message.type === 'executeTask') {
+⊲│const { task } = message;
+κresult
+·parentPort.postMessage({ type: 'taskComplete', taskId: task.id, result });
+·} else if (message.type === 'pause') {
+·} else if (message.type === 'resume') {
+·}
+·});
+·}
+⟩SCL│84│26⊨│21⑂│31.1%↓⟩

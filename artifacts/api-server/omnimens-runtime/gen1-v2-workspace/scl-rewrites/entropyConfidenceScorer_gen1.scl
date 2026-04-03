@@ -1,0 +1,18 @@
+⟨SCL v1│entropyConfidenceScorer_gen1.mjs│25→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class EntropyConfidenceScorer {
+·static calculateEntropy(probabilities) {
+⋐│return probabilities.reduce((entropy, prob) => {
+·if (prob > 0) {
+·entropy -= prob * Math.log2(prob);
+·}
+⊷│return entropy;
+·}, 0);
+·}
+·static scoreConsistency(reasoningChains) {
+·const chainProbabilities = reasoningChains.map(chain => chain.probability);
+κentropy
+⊷│return 1 - entropy / Math.log2(reasoningChains.length);
+·}
+·}
+⟩SCL│17│5⊨│4⑂│32.0%↓⟩

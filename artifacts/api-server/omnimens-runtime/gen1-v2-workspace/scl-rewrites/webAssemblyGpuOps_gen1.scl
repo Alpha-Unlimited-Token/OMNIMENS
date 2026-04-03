@@ -1,0 +1,11 @@
+⟨SCL v1│webAssemblyGpuOps_gen1.mjs│72→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+κfs
+κpath
+⟿loadWasmModule(1)→void⟨5⟩{📁⊷}
+⟿initializeWasmOps(1)→void⟨33⟩{⊴⊲⊷⊱}
+Ε.exports = {
+·loadWasmModule,
+·initializeWasmOps
+·};
+⟩SCL│10│11⊨│6⑂│86.1%↓⟩

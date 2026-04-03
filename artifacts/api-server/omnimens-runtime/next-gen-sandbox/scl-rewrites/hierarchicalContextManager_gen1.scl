@@ -1,0 +1,11 @@
+⟨SCL v1│hierarchicalContextManager_gen1.mjs│108→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩generateChunkHash(1)→void⟨5⟩{⊩⊷}
+⊩semanticChunking(2)→void⟨19⟩{⊩⥀⊺⊷}
+⊩recursiveSummarization(2)→void⟨11⟩{⊩⊹⊷}
+⊩summarizeChunk(1)→void⟨5⟩{⊩⟛⊷}
+⊩hierarchicalContextManager(3)→void⟨4⟩{⊩⊷}
+⊩compressText(1)→void⟨3⟩{⊩⊷}
+⊩reconstructText(1)→void⟨3⟩{⊩⊷}
+⟩SCL│10│26⊨│18⑂│90.7%↓⟩

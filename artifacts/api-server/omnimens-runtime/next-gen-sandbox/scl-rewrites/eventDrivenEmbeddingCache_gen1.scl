@@ -1,0 +1,27 @@
+⟨SCL v1│eventDrivenEmbeddingCache_gen1.mjs│38→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class EventDrivenEmbeddingCache {
+·constructor() {
+⊮│this.subscribers = new Map();
+·}
+·subscribe(eventType, callback) {
+·if (!this.subscribers.has(eventType)) {
+⊡│this.subscribers.set(eventType, []);
+·}
+⊡│this.subscribers.get(eventType).push(callback);
+·}
+·publish(eventType, data) {
+·if (this.subscribers.has(eventType)) {
+⊡│this.subscribers.get(eventType).forEach(callback => callback
+·}
+·}
+·updateEmbedding(agentId, embedding) {
+·this.publish('embeddingUpdate', { agentId, embedding });
+·}
+·}
+κembeddingCache
+⊱│embeddingCache.subscribe('embeddingUpdate', (data) => {
+⊰│console.log(`Embedding updated for agent ${data.agentId}`, d
+·});
+·embeddingCache.updateEmbedding('agent_1', [0.1, 0.2, 0.3]);
+⟩SCL│26│8⊨│7⑂│31.6%↓⟩

@@ -1,0 +1,116 @@
+⟨SCL v1│omnimens-predictive-processing.ts│293→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[omnimens-nextgen-sandbox│omnimens-internal-cognition-router│omnimens-api-budget]
+κENGINE_ID
+·engineRegistry.registerEngine(ENGINE_ID, "NORMAL", { dbQuota: 10 });
+·let cycleCount = 0;
+⊬Prediction⟨type:string│predicted:string│domain:string│hierarchyLevel:number│confidence:number⟩
+⊭│type Table = keyof typeof TABLES;
+κTABLES
+📢│const log = (msg: string) => console.log(`[OMNIMENS-PREDICTI
+·const read = <T = any>(table: Table, query: any) =>
+·dbGateway.read(ENGINE_ID, TABLES[table], query) as Promise<T[]>;
+const ⊞ = (table: Table, data: any) =>
+dbGateway.⊞(ENGINE_ID, TABLES[table], data, "NORMAL");
+·const update = (table: Table, criteria: any, changes: any) =>
+❔│dbGateway.update?.(ENGINE_ID, TABLES[table], criteria, chang
+·const callLLM = async (prompt: string, tag: string) =>
+apiManager.call(ENGINE_ID, "openai", { prompt, tag }) as Promise<ι<any>>;
+κmodels
+·generator: () => Promise<Prediction[]>;
+·}> = [
+·{
+·domain: "agent_discoveries",
+⊱│generator: async () => {
+κdiscoveries
+⊷│if (discoveries.length < 2 || !canMakeBackgroundCall(ENGINE_
+κctx
+⊰│.map((d) => `${d.fromAgent}: ${(d.content ?? "").slice(0, 15
+·.join("\n");
+log("🧠 Predicting α discoveries");
+κpreds
+⊷│return preds.map(({ predicted, confidence = 0.5 }: any): Pre
+·type: "agent_next_discovery",
+·predicted,
+·domain: "agent_discoveries",
+·hierarchyLevel: 2,
+·confidence,
+·}));
+·},
+·},
+·{
+·domain: "knowledge_gaps",
+⊱│generator: async () => {
+κbrain
+⊷│if (brain.length < 5 || !canMakeBackgroundCall(ENGINE_ID)) r
+κcategories
+⊱│brain.forEach((b) => {
+κk
+·categories[k] = (categories[k] || 0) + 1;
+·});
+κsummary
+⊸│Object.entries(categories)
+⊰│.map(([k, v]) => `${k}: ${v}`)
+·.join(", ") +
+·"\n" +
+⊰│brain.map((b) => `[${b.category}] ${b.title}`).join("; ");
+log("🧠 Predicting ◧ gaps");
+κgaps
+⊷│return gaps.map(({ predicted, confidence = 0.5 }: any): Pred
+·type: "knowledge_gap",
+·predicted,
+·domain: "knowledge_gaps",
+·hierarchyLevel: 3,
+·confidence,
+·}));
+·},
+·},
+·{
+·domain: "system_needs",
+⊱│generator: async () => {
+κupgrades
+⊷│if (upgrades.length < 2 || !canMakeBackgroundCall(ENGINE_ID)
+κctx
+⊰│.map((u) => `${u.subject}: ${(u.content ?? "").slice(0, 150)
+·.join("\n");
+log("🧠 Predicting η needs");
+κneeds
+⊷│return needs.map(({ predicted, confidence = 0.5 }: any): Pre
+·type: "system_need",
+·predicted,
+·domain: "system_needs",
+·hierarchyLevel: 1,
+·confidence,
+·}));
+·},
+·},
+·];
+⟿resolvePredictionErrors(1)→Promise<number>⟨109⟩{⊴⥀⏰❔⊽⊱⊰⊷⟿⊩↻+🚨}
+κBASE_INTERVAL
+scheduleNextCycle(1)→void⟨3⟩{⊰⚡→}
+⊰│spikeBus.on(`${ENGINE_ID}:cycle`, async () => {
+⊴│await runPredictiveCycle().catch(console.error);
+·scheduleNextCycle(BASE_INTERVAL * getThrottleMultiplier());
+·});
+⊩startPredictiveProcessing(1)→void⟨7⟩{⊩⊳⊰}
+⊪│export const getActivePredictions = () =>
+·read("predictions", { where: { actual: null }, orderBy: { createdAt: "DESC" }, l
+⊱│cognitionBus.onInsight((src, insight) => {
+·if (src === ENGINE_ID) return;
+⊰│if (insight.type === "discovery") spikeBus.scheduleSpike(`${
+·});
+⊱│spikeBus.on("cognition:curiosity", () => {
+⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, 5 * 60 * 10
+·});
+⊰│spikeBus.on(`attention:${ENGINE_ID}`, () => {
+⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, 2000);
+·});
+⊩shutdown(1)→void⟨3⟩{⊩}
+⟩SCL│115│74⊨│47⑂│60.8%↓⟩

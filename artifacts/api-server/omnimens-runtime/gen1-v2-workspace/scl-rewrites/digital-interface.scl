@@ -1,0 +1,60 @@
+⟨SCL v1│digital-interface.ts│93→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊬APIEndpoint⟨⟩
+⊬WebSearchResult⟨⟩
+⊶│export class DigitalInterface {
+⊮│private endpoints = new Map<string, APIEndpoint>();
+⊮│private searchCache = new Map<string, WebSearchResult>();
+·private requestLog: { path: string; timestamp: number; status: number }[] = [];
+·private _initialized = false;
+·initialize(): void { this._initialized = true; }
+·registerEndpoint(path: string, method: string, handler: (req: unknown) => Promis
+⊡│this.endpoints.set(`${method}:${path}`, { path, method, hand
+·}
+·async handleRequest(path: string, method: string, body: unknown): Promise<{ stat
+κkey
+κendpoint
+·if (!endpoint) {
+⏰│this.requestLog.push({ path, timestamp: Date.now(), status: 
+⊷│return { status: 404, body: { error: "Not found" } };
+·}
+·if (endpoint.callCount >= endpoint.rateLimit) {
+⏰│this.requestLog.push({ path, timestamp: Date.now(), status: 
+⊷│return { status: 429, body: { error: "Rate limited" } };
+·}
+·try {
+·endpoint.callCount++;
+κresult
+⏰│this.requestLog.push({ path, timestamp: Date.now(), status: 
+⊷│return { status: 200, body: result };
+·} catch (err) {
+⏰│this.requestLog.push({ path, timestamp: Date.now(), status: 
+⊷│return { status: 500, body: { error: "Internal error" } };
+·}
+·}
+cacheSearch(query: string, ⊢: string[]): void {
+⊡│this.searchCache.set(query, { query, results, timestamp: Dat
+·if (this.searchCache.size > 200) {
+·const oldest = [...this.searchCache.entries()].sort((a, b) => a[1].timestamp - b
+·for (let i = 0; i < 50; i++) this.searchCache.delete(oldest[i][0]);
+·}
+·}
+·getCachedSearch(query: string): string[] | null {
+κcached
+⏰│if (cached && Date.now() - cached.timestamp < 300_000) retur
+⊷│return null;
+·}
+·resetRateLimits(): void {
+⥀│for (const endpoint of this.endpoints.values()) endpoint.cal
+·}
+·getState(): Record<string, unknown> {
+⊷│return {
+·initialized: this._initialized, endpoints: this.endpoints.size,
+·totalRequests: this.requestLog.length, searchCacheSize: this.searchCache.size,
+⏰│recentErrors: this.requestLog.filter(r => r.status >= 400 &&
+·};
+·}
+·shutdown(): void { this._initialized = false; }
+·}
+⊪digitalInterface
+⟩SCL│59│26⊨│20⑂│36.6%↓⟩

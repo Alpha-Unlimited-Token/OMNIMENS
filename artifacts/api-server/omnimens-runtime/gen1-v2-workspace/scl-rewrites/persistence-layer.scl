@@ -1,0 +1,71 @@
+⟨SCL v1│persistence-layer.ts│112→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊬StateSnapshot⟨⟩
+⊬AutosaveConfig⟨⟩
+⊶│export class PersistenceLayer {
+·private snapshots: StateSnapshot[] = [];
+·private autosaveConfig: AutosaveConfig = { intervalMs: 60_000, enabled: true };
+·private lastSave = 0;
+·private saveCount = 0;
+·private _initialized = false;
+⊮│private stateCollectors: Map<string, () => Record<string, un
+⏰│initialize(): void { this._initialized = true; this.lastSave
+·registerCollector(subsystem: string, collector: () => Record<string, unknown>): 
+⊡│this.stateCollectors.set(subsystem, collector);
+·}
+·captureState(): StateSnapshot {
+κsubsystems
+·for (const [name, collector] of this.stateCollectors) {
+🛡│try { subsystems.set(name, collector()); } catch { subsystem
+·}
+κsnapshot
+⊺│this.snapshots.push(snapshot);
+⊹│if (this.snapshots.length > 20) this.snapshots = this.snapsh
+⏰│this.lastSave = Date.now();
+⊷│return snapshot;
+·}
+·shouldAutosave(): boolean {
+⏰│return this.autosaveConfig.enabled && (Date.now() - this.las
+·}
+·getSerializableState(): Record<string, unknown> {
+κsnapshot
+κserialized
+κsubsObj
+for (const [key, ≪] of snapshot.⊛) {
+🛡│try { JSON.stringify(value); subsObj[key] = value; } catch {
+·}
+⊷│return serialized;
+·}
+·getLatestSnapshot(): StateSnapshot | null {
+⊳│return this.snapshots.length > 0 ? this.snapshots[this.snaps
+·}
+·restoreFrom(data: Record<string, unknown>): Map<string, unknown> {
+κrestored
+κsubsystems
+⊸│for (const [key, value] of Object.entries(subsystems)) {
+⊡│restored.set(key, value);
+·}
+⊷│return restored;
+·}
+·prepareTransfer(): { generation: number; stateBlob: string; checksum: string } {
+κstate
+κblob
+⊮│return { generation: 2, stateBlob: blob, checksum: this.comp
+·}
+·private computeChecksum(data: Map<string, unknown>): string {
+·let hash = 0;
+κstr
+·for (let i = 0; i < str.length; i++) {
+κchar
+·hash = ((hash << 5) - hash) + char;
+·hash = hash & hash;
+·}
+⊰│return `cksum_${Math.abs(hash).toString(36)}`;
+·}
+·getState(): Record<string, unknown> {
+⊷│return { initialized: this._initialized, snapshots: this.sna
+·}
+·shutdown(): void { this._initialized = false; }
+·}
+⊪persistence
+⟩SCL│70│34⊨│21⑂│37.5%↓⟩

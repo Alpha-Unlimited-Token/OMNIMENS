@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuAcceleratedMatrixOps
- * Written: 2026-04-03T16:10:14.181Z
+ * Written: 2026-04-03T16:48:40.386Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,133 +18,95 @@
 
 // gpuAcceleratedMatrixOps.mjs
 
-import { performance } from 'node:perf_hooks';
+import { createHash } from 'crypto';
 
-/**
- * Utility function to create a GPU-accelerated matrix multiplication kernel.
- * @returns {Object} GPU.js kernel instance for matrix multiplication.
- */
-function createMatrixMultiplicationKernel() {
-  const gpu = new GPU();
-
-  return gpu.createKernel(function (a, b) {
-    let sum = 0;
-    for (let k = 0; k < this.constants.size; k++) {
-      sum += a[this.thread.y][k] * b[k][this.thread.x];
-    }
-    return sum;
-  })
-    .setOutput([this.constants.size, this.constants.size])
-    .setConstants({ size: a.length });
+// Utility to generate a unique identifier for caching purposes
+export function generateCacheKey(matrixA, matrixB) {
+  const hash = createHash('sha256');
+  hash.update(JSON.stringify(matrixA));
+  hash.update(JSON.stringify(matrixB));
+  return hash.digest('hex');
 }
 
-/**
- * Perform GPU-accelerated matrix multiplication.
- * @param {number[][]} matrixA - First matrix.
- * @param {number[][]} matrixB - Second matrix.
- * @returns {number[][]} Resultant matrix after multiplication.
- */
-export function gpuMatrixMultiply(matrixA, matrixB) {
-  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
-    throw new TypeError('Both inputs must be 2D arrays.');
+// WebAssembly loader for matrix operations
+export async function loadWasmModule(wasmBuffer) {
+  const wasmModule = await WebAssembly.compile(wasmBuffer);
+  const wasmInstance = await WebAssembly.instantiate(wasmModule);
+  return wasmInstance;
+}
+
+// Matrix multiplication using WebAssembly
+export async function wasmMatrixMultiply(matrixA, matrixB, wasmBuffer) {
+  if (matrixA[0].length !== matrixB.length) {
+    throw new Error('Matrix dimensions are incompatible for multiplication');
   }
+
+  const wasmInstance = await loadWasmModule(wasmBuffer);
+  const { multiplyMatrices } = wasmInstance.exports;
 
   const rowsA = matrixA.length;
   const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
   const colsB = matrixB[0].length;
 
-  if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions do not align for multiplication.');
-  }
+  // Flatten matrices into 1D arrays for WebAssembly
+  const flatA = matrixA.flat();
+  const flatB = matrixB.flat();
+  const flatResult = new Float64Array(rowsA * colsB);
 
-  const kernel = createMatrixMultiplicationKernel();
-  const result = kernel(matrixA, matrixB);
+  multiplyMatrices(flatA, flatB, flatResult, rowsA, colsA, colsB);
+
+  // Reshape the result back into a 2D array
+  const result = [];
+  for (let i = 0; i < rowsA; i++) {
+    result.push(flatResult.slice(i * colsB, (i + 1) * colsB));
+  }
 
   return result;
 }
 
-/**
- * Generate a random matrix with specified dimensions.
- * @param {number} rows - Number of rows.
- * @param {number} cols - Number of columns.
- * @returns {number[][]} Randomly generated matrix.
- */
-export function generateRandomMatrix(rows, cols) {
-  if (rows <= 0 || cols <= 0) {
-    throw new Error('Matrix dimensions must be positive integers.');
-  }
-
-  const matrix = [];
-  for (let i = 0; i < rows; i++) {
-    const row = [];
-    for (let j = 0; j < cols; j++) {
-      row.push(Math.random());
-    }
-    matrix.push(row);
-  }
-
-  return matrix;
-}
-
-/**
- * Measure the performance of matrix multiplication using the GPU.
- * @param {number[][]} matrixA - First matrix.
- * @param {number[][]} matrixB - Second matrix.
- * @returns {Object} Performance metrics including time taken.
- */
-export function measureGpuPerformance(matrixA, matrixB) {
-  const start = performance.now();
-  const result = gpuMatrixMultiply(matrixA, matrixB);
-  const end = performance.now();
-
-  return {
-    timeTakenMs: end - start,
-    result
-  };
-}
-
-/**
- * Validate if a matrix is well-formed.
- * @param {number[][]} matrix - Matrix to validate.
- * @returns {boolean} True if valid, false otherwise.
- */
+// Validate matrix structure
 export function validateMatrix(matrix) {
-  if (!Array.isArray(matrix) || matrix.length === 0) {
-    return false;
+  if (!Array.isArray(matrix) || !Array.isArray(matrix[0])) {
+    throw new Error('Input is not a valid 2D matrix');
   }
 
   const rowLength = matrix[0].length;
   for (const row of matrix) {
-    if (!Array.isArray(row) || row.length !== rowLength) {
-      return false;
+    if (row.length !== rowLength) {
+      throw new Error('Matrix rows have inconsistent lengths');
     }
   }
 
   return true;
 }
 
-/**
- * Transpose a matrix.
- * @param {number[][]} matrix - Matrix to transpose.
- * @returns {number[][]} Transposed matrix.
- */
+// General-purpose matrix addition
+export function addMatrices(matrixA, matrixB) {
+  validateMatrix(matrixA);
+  validateMatrix(matrixB);
+
+  if (matrixA.length !== matrixB.length || matrixA[0].length !== matrixB[0].length) {
+    throw new Error('Matrices must have the same dimensions for addition');
+  }
+
+  return matrixA.map((row, i) => row.map((val, j) => val + matrixB[i][j]));
+}
+
+// General-purpose matrix subtraction
+export function subtractMatrices(matrixA, matrixB) {
+  validateMatrix(matrixA);
+  validateMatrix(matrixB);
+
+  if (matrixA.length !== matrixB.length || matrixA[0].length !== matrixB[0].length) {
+    throw new Error('Matrices must have the same dimensions for subtraction');
+  }
+
+  return matrixA.map((row, i) => row.map((val, j) => val - matrixB[i][j]));
+}
+
+// Transpose a matrix
 export function transposeMatrix(matrix) {
-  if (!validateMatrix(matrix)) {
-    throw new Error('Invalid matrix format.');
-  }
+  validateMatrix(matrix);
 
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-  const transposed = [];
-
-  for (let i = 0; i < cols; i++) {
-    const row = [];
-    for (let j = 0; j < rows; j++) {
-      row.push(matrix[j][i]);
-    }
-    transposed.push(row);
-  }
-
-  return transposed;
+  return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
 }

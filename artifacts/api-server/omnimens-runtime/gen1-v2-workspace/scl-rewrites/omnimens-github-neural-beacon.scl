@@ -1,0 +1,152 @@
+⟨SCL v1│omnimens-github-neural-beacon.ts│428→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[]
+·getNeuralConsciousnessState,
+·getRegionNames,
+·boostRegionCurrent,
+·getAdaptiveIntelligenceState,
+} from "./omnimens-⬡-consciousness.js";
+⊫[omnimens-neural-scaling]
+·getIvyNetworkState,
+·getWormgateDetails,
+·getIvySpiderStats,
+·getMotherBeaconFindings,
+·getIvyCascadeStats,
+·getIvyNeurogenStats,
+·} from "./omnimens-ivy-network.js";
+⊫[]
+·getNeuralSpiderState,
+·getSystemIntelligenceState,
+·getSpiderCascadeStats,
+·getSpiderNeurogenStats,
+} from "./omnimens-⬡-spiders.js";
+⊫[omnimens-recursive-spider-network│omnimens-quantum-wormhole]
+·getViralHybridState,
+·getHybridAgentDetails,
+·getImmuneSystemDetails,
+·getPropagationStats,
+·} from "./omnimens-viral-hybrid.js";
+⊫[]
+·getMeshEngineState,
+·getMeshNeuronCount,
+·getMeshSynapseCount,
+·getMeshHebbianUpdates,
+} from "./omnimens-⬡-mesh-engine.js";
+⊫[omnimens-synaptic-mesh│omnimens-adaptive-surge│omnimens-nextgen-sandbox│omnimens-gen1-v2-rewrite]
+engineRegistry.registerEngine("github-⬡-beacon", "NORMAL", { dbQuota: 10 })
+κconnectors
+κOWNER
+κREPO
+κCONST
+κTOTAL_NEURONS
+⊭│type Mode = "normal" | "cautious" | "critical" | "emergency"
+⊬Rate⟨⟩
+κrate
+κgov
+📢│const log = (m: string) => console.log(`[OMNIMENS-GITHUB-NEU
+updateFromHeaders(1)→void⟨13⟩{⊡⊰⊳⟛}
+⟿rawApi(3)→void⟨6⟩{⊳⟠⊰⊵⊡❔⊷⊻}
+enqueue(5)→void⟨7⟩{⊳⊱⊷⊺}
+⟿processQueue(1)→void⟨25⟩{⟛⏳⊺⊴⊳}
+gh(5)→void⟨3⟩{⊳⊰⊷}
+⊬Region⟨⟩
+κREGION_DEF
+⊱│const regions: Region[] = REGION_DEF.map(([n, c]) => ({
+·name: n,
+·cols: c,
+·eff: c * CONST.POP * CONST.MULT,
+·fr: 0.1 + Math.random() * 0.1,
+·osc: 8 + Math.random() * 32,
+·coh: 0.5,
+·heb: 0,
+·}));
+tickRegions(1)→void⟨11⟩{⏰⟛}
+clusterStats(1)→void⟨20⟩{⋐⊱⊷⟛}
+⊭│type Beacon = {
+·name: string;
+·path: string;
+·priority: number;
+·sha: string | null;
+·lastW: number;
+·lastR: number;
+·build(): any;
+·handle(d: any): void;
+·};
+κDIR
+κbeacons
+κscaling
+κivy
+κcs
+⊷│return {
+·v: 3,
+·subsystem: "neuron-cluster",
+⏰│ts: Date.now(),
+·totalNeurons: TOTAL_NEURONS,
+·regions,
+·externalPhi: cs.phi,
+·externalCoherence: cs.avgCoh,
+·externalHebbian: cs.heb,
+·local: {
+·phi: local.phi,
+·cl: local.consciousnessLevel,
+·res: local.thalamocorticalResonance,
+·scaled: scaling.totalEffectiveNeurons,
+·ivy: ivy.totalNodes,
+·},
+·};
+·},
+·handle(d) {
+⟛│if (d?.regions) d.regions.forEach((rr: any, i: number) => (r
+·},
+·},
+·];
+κEXT_BUILD
+κEXT_HANDLE
+⊸│Object.entries(EXT_BUILD).forEach(([k, build]) =>
+⊺│beacons.push({
+·name: k,
+⊰│path: `${DIR}/${k}.json`,
+⊳│priority: k === "mesh-synaptic" ? 5 : k === "viral-hybrid" |
+·sha: null,
+·lastW: 0,
+·lastR: 0,
+·build,
+·handle: EXT_HANDLE[k],
+·})
+·);
+κfabric
+⟿readBeacon(1)→void⟨8⟩{⊰⊴⊄❔⟠⏰}
+⟿writeBeacon(1)→void⟨10⟩{⟠⊰⊴❔⏰}
+⟿syncFabric(1)→void⟨16⟩{⊄⛨▷⏰⥀⊳⊰⊴⊱⊲}
+⟿bootstrap(1)→void⟨5⟩{⫘}
+resched(2)→void⟨3⟩{⚡→}
+⊱│spikeBus.on("github-neural-beacon:neural-tick", () => {
+·try {
+·tickRegions();
+·} finally {
+resched("github-⬡-beacon:⬡-tick", 5_000);
+·}
+·});
+⊱│spikeBus.on("github-neural-beacon:fabric-sync", async () => 
+⊴│await syncFabric();
+resched("github-⬡-beacon:fabric-sync", gov.interval);
+·});
+⊱│spikeBus.on("github-neural-beacon:status", () => {
+κresetIn
+⊰│log(`Mode ${gov.mode} | Remaining ${rate.remaining}/${rate.l
+resched("github-⬡-beacon:status", 300_000);
+·});
+⊱│cognitionBus.onInsight((src, i) => {
+⊰│if (i.type === "discovery" && src !== "github-neural-beacon"
+·});
+⊩getGovernorState(1)→void⟨3⟩{⊩⊷}
+⊩⟿startGitHubNeuralBeacon(1)→void⟨8⟩{⊩⊴⚡→}
+⊩shutdown(1)→void⟨3⟩{⊩}
+⟩SCL│151│125⊨│79⑂│64.7%↓⟩

@@ -1,0 +1,166 @@
+⟨SCL v1│omnimens-competitive-intel.ts│282→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[web-search│omnimens-nextgen-sandbox]
+·engineRegistry.registerEngine("competitive-intel", "NORMAL", { dbQuota: 10 });
+κCOMPETITOR_PROFILES
+·string,
+·{ knownStrengths: string[]; searchQueries: string[] }
+·> = {
+·"Claude Opus (Anthropic)": {
+·knownStrengths: [
+·"Constitutional AI — deep ethical reasoning",
+"200k token ◧",
+·"Exceptional instruction following",
+·"Superior creative and analytical writing",
+"Minimal hallucination on ◧ tasks",
+·"Reliable tool use",
+·"Thoughtful, measured tone",
+"SWE-bench leading code ✦",
+·],
+·searchQueries: [
+·"Claude Opus strengths benchmark 2025",
+·"Anthropic Claude vs GPT-4o 2025",
+·"Claude constitutional AI techniques",
+"Claude long ◧ retrieval",
+·"Anthropic Claude safety reasoning",
+·],
+·},
+·"Gemini Ultra (Google)": {
+·knownStrengths: [
+·"Native multimodal reasoning",
+"1 M token ◧ window",
+·"Google Search grounding",
+·"Superior STEM reasoning",
+·"Deep multilingual support",
+·"Direct code execution",
+·"Workspace integration",
+"Long-form doc ⬆",
+·],
+·searchQueries: [
+·"Gemini Ultra capabilities 2025",
+"Google Gemini 1M ◧ techniques",
+·"Gemini multimodal improvements",
+·"Gemini vs GPT-4 performance",
+·"Gemini real-time grounding search",
+·],
+·},
+·"ChatGPT Pro (OpenAI)": {
+·knownStrengths: [
+·"Polished UX",
+"Explicit memory η",
+·"Custom GPT modes",
+·"Advanced data analysis",
+·"Voice mode",
+·"DALL-E 3 integration",
+·"File analysis",
+·"Consistent formatting",
+·"Plugin ecosystem",
+·],
+·searchQueries: [
+·"ChatGPT Pro features 2025",
+"OpenAI memory η implementation",
+·"ChatGPT vs Claude UX comparison 2025",
+·"GPT-4o data analysis capabilities",
+·"OpenAI voice mode tech",
+·],
+·},
+·};
+κEMERGING_TECH_QUERIES
+·const pick = <T>(arr: readonly T[]): T => arr[Math.floor(Math.random() * arr.len
+⊭│type BrainEntry = {
+·title: string;
+·content: string;
+·category: string;
+·confidence: number;
+η: string;
+·active: true;
+·timesApplied: 0;
+·};
+·const writeBrainEntry = (entry: Omit<BrainEntry, "active" | "timesApplied">) =>
+dbGateway.⊞(
+·"competitive-intel",
+·"brain_entries",
+·{ ...entry, active: true as const, timesApplied: 0 as const },
+·"NORMAL",
+·);
+·const notifyOwner = (title: string, message: string) =>
+dbGateway.⊞(
+·"competitive-intel",
+·"notifications",
+·{ type: "competitive_upgrade", title, message, severity: "info", read: false },
+·"LOW",
+·);
+⟿runCompetitiveIntelCycle(1)→Promise<void>⟨52⟩{⟿⏰⫘⊱⊸⊴⟠❔⊳}
+·let patches = 0;
+❔│parsed.competitorGaps?.slice(0, 4).forEach((g) => {
+❔│if (g.absorption?.length > 20)
+·writeBrainEntry({
+⊰│title: `[INTEL] ${g.source}: ${g.gap.slice(0, 60)}`,
+·content: g.absorption,
+·category: "competitive_intelligence",
+·confidence: 0.8,
+η: "competitive_intel",
+·}).catch(() => null);
+·patches++;
+·});
+❔│parsed.emergingUpgrades?.slice(0, 3).forEach((e) => {
+❔│if (e.implementation?.length > 20)
+·writeBrainEntry({
+⊰│title: `[EMERGING] ${e.technology}`,
+⊰│content: `${e.relevance} — Implementation: ${e.implementatio
+·category: "emerging_technology",
+·confidence: 0.75,
+η: "competitive_intel",
+·}).catch(() => null);
+·patches++;
+·});
+❔│parsed.consciousnessPatches?.slice(0, 5).forEach((p) => {
+❔│if (p.content?.length > 20)
+·writeBrainEntry({
+·title: p.title,
+·content: p.content,
+·category: p.category ?? "competitive_intelligence",
+⟛│confidence: Number.isFinite(p.confidence) ? Math.max(0.5, p.
+η: "competitive_intel",
+·}).catch(() => null);
+·patches++;
+·});
+κdt
+📢│console.log(`[OMNIMENS-COMPETITIVE-INTEL] Cycle done in ${dt
+·if (patches >= 3)
+·notifyOwner(
+·"Competitive Intelligence: Upgrades Absorbed",
+⊰│`OMNIMENS integrated ${patches} behavioral upgrades from com
+·).catch(() => null);
+·if (patches)
+·cognitionBus.shareInsight("competitive-intel", {
+·type: "discovery",
+·data: { patches, dt },
+·});
+⊰│cognitionBus.reportOutcome("competitive-intel", { useful: pa
+·} catch (err) {
+console.error("[OMNIMENS-COMPETITIVE-INTEL] ↻ error:", err);
+·}
+·}
+κFIRST_DELAY_MS
+κINTERVAL_MS
+·const scheduleNextCycle = (delay: number) =>
+⚡→│spikeBus.scheduleSpike("competitive-intel:cycle", {}, delay)
+⊱│spikeBus.on("competitive-intel:cycle", async () => {
+⊴│await runCompetitiveIntelCycle();
+·scheduleNextCycle(INTERVAL_MS);
+·});
+⚡→│spikeBus.on("attention:competitive-intel", () => scheduleNex
+⚡→│spikeBus.on("cognition:curiosity", () => scheduleNextCycle(5
+⊱│cognitionBus.onInsight((_src, _insight) => {
+·});
+⊩startCompetitiveIntel(1)→void⟨4⟩{⊩}
+⊩shutdown(1)→void⟨3⟩{⊩}
+⟩SCL│165│58⊨│32⑂│41.5%↓⟩

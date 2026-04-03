@@ -1,0 +1,54 @@
+⟨SCL v1│dynamicVectorSearch_gen1.mjs│130→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│class Node {
+·constructor(vector, id) {
+·this.vector = vector;
+·this.id = id;
+⊯│this.neighbors = new Set(); // Stores connected nodes
+·}
+·}
+⊶│class HNSWGraph {
+·constructor() {
+⊮│this.nodes = new Map(); // Stores all nodes by their ID
+·}
+·addNode(vector, id, maxNeighbors = 10) {
+·if (this.nodes.has(id)) {
+⊰│throw new Error(`Node with ID ${id} already exists.`);
+·}
+κnewNode
+⊡│this.nodes.set(id, newNode);
+κneighbors
+⥀│for (const neighbor of neighbors) {
+·newNode.neighbors.add(neighbor);
+·neighbor.neighbors.add(newNode);
+·}
+·}
+·findNearestNeighbors(vector, maxNeighbors) {
+κdistances
+⥀│for (const node of this.nodes.values()) {
+κdistance
+⊺│distances.push({ node, distance });
+·}
+·distances.sort((a, b) => a.distance - b.distance);
+⊷│return distances.slice(0, maxNeighbors).map(entry => entry.n
+·}
+·search(queryVector, topK = 5) {
+κdistances
+⥀│for (const node of this.nodes.values()) {
+κdistance
+⊺│distances.push({ id: node.id, distance });
+·}
+·distances.sort((a, b) => a.distance - b.distance);
+⊷│return distances.slice(0, topK);
+·}
+·_calculateDistance(vectorA, vectorB) {
+⊹│if (vectorA.length !== vectorB.length) {
+⊵│throw new Error("Vectors must have the same dimensions.");
+·}
+⋐│return Math.sqrt(vectorA.reduce((sum, value, index) => {
+⊷│return sum + Math.pow(value - vectorB[index], 2);
+·}, 0));
+·}
+·}
+⊩createGraph(1)→void⟨3⟩{⊩⊷}
+⟩SCL│53│26⊨│19⑂│59.2%↓⟩

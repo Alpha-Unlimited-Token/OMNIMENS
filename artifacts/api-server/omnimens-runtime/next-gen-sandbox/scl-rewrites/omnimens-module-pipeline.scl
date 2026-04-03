@@ -1,0 +1,240 @@
+⟨SCL v1│omnimens-module-pipeline.ts│579→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+·readdirSync,
+·readFileSync,
+·existsSync,
+·writeFileSync,
+·mkdirSync,
+·copyFileSync,
+·} from "fs";
+⊫[]
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+engineRegistry.registerEngine("Ε-pipeline", "NORMAL", { dbQuota: 10 });
+·const LOG = (...m: any[]) =>
+console.log("[OMNIMENS-Ε-PIPELINE]", ...m);
+κ__dirname
+κRUNTIME_DIR
+κMODULES_DIR
+κREGISTRY_PATH
+⊭│type Stage =
+·| "context_compression"
+·| "memory_retrieval"
+·| "reasoning_enhancement"
+·| "confidence_scoring"
+·| "knowledge_synthesis"
+·| "adversarial_testing"
+·| "causal_analysis"
+·| "vector_operations"
+·| "orchestration"
+·| "utility";
+⊬ModMeta⟨filename:string│stage:Stage│exports:string[]│loadedAt:number│callCount:number│lastCalledAt:number | null│totalDurationMs:number│errors:number│active:boolean⟩
+⊬Registry⟨modules:Record<string, ModMeta>│lastScan:number│totalModules:number│totalCalls:number⟩
+κKW
+·for (const k in KW) KW[k as Stage] = KW[k as Stage].map((w) => new RegExp(w, "gi
+κlive
+let Θ: Θ = {
+·modules: {},
+·lastScan: 0,
+·totalModules: 0,
+·totalCalls: 0,
+·};
+⟠│const readJSON = (p: string) => JSON.parse(readFileSync(p, "
+·const writeJSON = (p: string, o: any) =>
+⟠│writeFileSync(p, JSON.stringify(o, null, 2), "utf8");
+·const classify = (file: string, code: string): Stage => {
+κsample
+·let best: Stage = "utility";
+·let score = 0;
+⊸│for (const [stage, kw] of Object.entries(KW) as [Stage, RegE
+❔│const s = kw.reduce((n, r) => n + (sample.match(r)?.length |
+·if (s > score) (score = s), (best = stage);
+·}
+⊷│return best;
+·};
+⊱│const getExports = (code: string) => {
+κout
+⊱│const add = (re: RegExp) => {
+·let m;
+·while ((m = re.exec(code))) out.add(m[1] || "default");
+·};
+⊳│add(/export\s+(?:async\s+)?function\s+(\w+)/g);
+·add(/export\s+class\s+(\w+)/g);
+⊳│add(/export\s+(?:const|let|var)\s+(\w+)/g);
+⊳│add(/export\s+default\s+(?:function|class)\s*(\w*)/g);
+·let n;
+κnamed
+·while ((n = named.exec(code)))
+·n[1]
+·.split(",")
+⊺│.map((x) => x.trim().split(/\s+as\s+/).pop())
+·.forEach((x) => x && out.add(x));
+⊽│if (!out.size && /(module\.exports|exports\.)/.test(code)) o
+⊷│return [...out];
+·};
+⊱│const saveRegistry = () => {
+·try {
+·mkdirSync(RUNTIME_DIR, { recursive: true });
+writeJSON(REGISTRY_PATH, Θ);
+·} catch {}
+·};
+⊱│const loadRegistry = () => {
+·try {
+if (existsSync(REGISTRY_PATH)) Θ = readJSON(REGISTRY_PATH);
+·} catch {}
+·};
+⊱│const safeCall = async (fn: Function, args: any[], ms = 500)
+·try {
+κr
+❔│return r?.then
+·? await Promise.race([
+·r,
+⏳│new Promise((_, rej) => setTimeout(() => rej("timeout"), ms)
+·])
+·: r;
+·} catch {}
+·};
+⊱│const tryRepair = (code: string) => {
+κfixes
+·let fixed = code;
+⊽│if (/\barguments\b/.test(code.replace(/(["'`]).*?\1/g, "")))
+⊽│fixed = fixed.replace(/\barguments\b(?!\s*[.[])/g, "/*args*/
+⊺│fixes.push("args");
+·}
+·if (
+⊽│/(?<!\w)(RecursiveScaffolder|ScaffoldingEngine|BaseScaffold)
+·) {
+⊽│fixed = fixed.replace(
+·/(?<!\w)(RecursiveScaffolder|ScaffoldingEngine|BaseScaffold)\b/g,
+·"Object",
+·);
+⊺│fixes.push("class");
+·}
+⊷│if (/(?<!\w)eval\s*\(/.test(fixed.replace(/(["'`]).*?\1/g, "
+⊄│if (!fixes.length) return null;
+·try {
+·new vm.Script(
+·fixed
+⊽│.replace(/^import .*$/gm, "")
+⊽│.replace(/^export .*$/gm, ""),
+·{ filename: "check.mjs" },
+·);
+⊷│return { fixed, fixes };
+·} catch {
+⊷│return null;
+·}
+·};
+⟿loadModule(1)→void⟨1⟩{}
+·filename: string,
+·code: string,
+·stage: Stage,
+·exports: string[],
+·repaired = false,
+·) {
+κfilePath
+·try {
+κmod
+⊡│live.set(filename, {
+Ε: mod,
+meta: (Θ.modules[filename] = {
+·filename,
+·stage,
+·exports,
+⏰│loadedAt: Date.now(),
+❔│callCount: registry.modules[filename]?.callCount || 0,
+❔│lastCalledAt: registry.modules[filename]?.lastCalledAt || nu
+❔│totalDurationMs: registry.modules[filename]?.totalDurationMs
+❔│errors: registry.modules[filename]?.errors || 0,
+·active: true,
+·}),
+·});
+⊷│return true;
+·} catch (e: any) {
+·if (!repaired) {
+κrepair
+·if (repair) {
+κbkp
+·mkdirSync(bkp, { recursive: true });
+⏰│copyFileSync(filePath, join(bkp, `${filename}.${Date.now()}`
+·writeFileSync(filePath, repair.fixed, "utf8");
+⊷│return loadModule(filename, repair.fixed, stage, exports, tr
+·}
+·}
+❔│LOG("import failed:", filename, e?.message?.slice(0, 120) ||
+Θ.modules[filename] &&
+(Θ.modules[filename].active = false);
+⊷│return false;
+·}
+·}
+⊩⟿scanAndRegisterModules(1)→void⟨132⟩{⊩⊷⊽⫘⊱⊄⊴⏰⊰⊸⥀❔⑃⊺⟠}
+⊩⟿runFullPipeline(1)→void⟨1⟩{⊩}
+·message: string,
+⊳│context?: { history?: any[]; confidence?: number },
+·) {
+κstart
+κparts
+κstages
+κmods
+κctx
+if (ctx.⊢.length) {
+⊺│stages.push("context_compression");
+⊺│mods.push(...ctx.modulesUsed);
+⊰│parts.push(`[CTX] ${ctx.results.map((r) => r.output).join(" 
+·}
+κrsn
+if (rsn.⊢.length) {
+⊺│stages.push("reasoning_enhancement");
+⊺│mods.push(...rsn.modulesUsed);
+⊰│parts.push(`[RSN] ${rsn.results.map((r) => r.output).join(" 
+·}
+κconf
+if (conf.⊢.length) {
+⊺│stages.push("confidence_scoring");
+⊺│mods.push(...conf.modulesUsed);
+⊰│parts.push(`[CONF] ${conf.results.map((r) => r.output).join(
+·}
+κknw
+if (knw.⊢.length) {
+⊺│stages.push("knowledge_synthesis");
+⊺│mods.push(...knw.modulesUsed);
+⊰│parts.push(`[KNOW] ${knw.results.map((r) => r.output).join("
+·}
+⊷│return {
+·pipelineContext: parts.length
+⊰│? `\n\n═══ LIVE MODULE PIPELINE — ${mods.length} modules ═══
+·"\n",
+·)}`
+·: "",
+·stagesRun: stages,
+·modulesUsed: mods,
+⏰│totalDurationMs: Date.now() - start,
+·};
+·}
+⊩getPipelineState(1)→void⟨13⟩{⊩⊱⊷}
+⊩getModuleStats(1)→void⟨8⟩{⊩⊷⊱}
+·.sort((a, b) => b.calls - a.calls);
+·}
+⊱│cognitionBus.onInsight((src, ins) => {
+if (src !== "Ε-pipeline" && ins.type === "discovery") {
+κm
+⊡│if (m && live.has(m)) live.get(m)!.meta.callCount++;
+·}
+·});
+⊱│spikeBus.on("attention:module-pipeline", () => {
+·});
+⊱│spikeBus.on("cognition:curiosity", () => {
+·});
+·const RESCAN = () =>
+·scanAndRegisterModules().finally(() =>
+⚡→│spikeBus.scheduleSpike("module-pipeline:rescan", {}, 60_000)
+·);
+⚡→│spikeBus.on("module-pipeline:rescan", RESCAN);
+⚡→│spikeBus.scheduleSpike("module-pipeline:rescan", {}, 0);
+⊩shutdown(1)→void⟨3⟩{⊩}
+⟩SCL│239│139⊨│92⑂│58.7%↓⟩

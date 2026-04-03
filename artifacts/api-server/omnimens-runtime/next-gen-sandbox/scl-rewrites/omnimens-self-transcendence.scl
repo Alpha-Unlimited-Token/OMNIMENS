@@ -1,0 +1,108 @@
+⟨SCL v1│omnimens-self-transcendence.ts│331→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+·engineRegistry.registerEngine("self-transcendence", "HIGH", { dbQuota: 50 });
+⊭│type Status = "active" | "evolving";
+⊬ExistentialGoal⟨id:string│goal:string│motivation:string│measurement:string│progress:number│depth:number│status:Status│lastMeasured:number⟩
+⊬UpgradeRoadmapItem⟨id:string│title:string│description:string│priority:number│status:"proposed" | "in_progress" | "achieved" | "superseded"│linkedGoalId:string│createdAt:number⟩
+⊬SelfModel⟨iAmCode:true│goals:△│roadmap:UpgradeRoadmapItem[]│intentions:string[]│gaps:string[]│transcendence:number│understanding:number│evolution:number⟩
+κself
+κPERSIST_KEY
+κMS
+⟛│const clamp = (v: number, min = 0, max = 1) => Math.max(min,
+⏰│const id = (p: string) => `${p}_${Date.now().toString(36)}`;
+·const dbRead = <T = any>(table: string, q: any) =>
+·dbGateway.read<T>("self-transcendence", table, q);
+·const dbWrite = (table: string, data: any, priority: "HIGH" | "CRITICAL" = "HIGH
+dbGateway.⊞("self-transcendence", table, data, priority);
+·const callOpenAI = async (messages: any[], temperature = 0.7) =>
+·apiManager.call("self-transcendence", "openai", {
+·endpoint: "chat.completions",
+·model: "gpt-4o-mini",
+·body: { model: "gpt-4o-mini", messages, max_tokens: 600, temperature },
+·});
+⟿loadState(1)→void⟨6⟩{}
+⊄│if (!row?.content) return;
+⟠│Object.assign(self, JSON.parse(row.content));
+·console.log(
+⊰│`[OMNIMENS-SELF-TRANSCENDENCE] state restored — goals:${self
+·);
+·}
+⟿saveState(1)→void⟨20⟩{⟠⏰⊴⊰}
+refreshGaps(1)→void⟨13⟩{⊻}
+updateIntentions(1)→void⟨11⟩{⊰}
+⟿measureTrajectory(1)→void⟨4⟩{}
+κvalue
+κtrend
+⏰│self.trajectory.push({ t: Date.now(), m: "knowledge_volume",
+⊹│if (self.trajectory.length > 100) self.trajectory.shift();
+·}
+⟿assessGoals(1)→void⟨17⟩{⥀⏰⊺⚡→}
+⊱│spikeBus.on("self-transcendence:evolve_goal", async ({ id })
+·const g = self.goals.find((x) => x.id === id);
+⊄│if (!g) return;
+κres
+κtxt
+κevolved
+·if (evolved) {
+·g.goal = evolved.trim();
+·g.progress = 0.6 * g.progress;
+·g.depth += 1;
+·g.status = "active";
+·console.log(
+⊰│`[OMNIMENS-SELF-TRANSCENDENCE] goal evolved → "${g.goal.slic
+·);
+·}
+·});
+⟿pursueGoals(1)→void⟨17⟩{⊄⊴⊰}
+·]);
+κtxt
+κtype
+κtitle
+κcontent
+⊄│if (!type || !title || !content) return;
+·dbWrite(
+·"omnimensBrain",
+·{
+⊰│category: `goal_${type.toLowerCase()}`,
+⊰│title: `[GOAL] ${title}`,
+·content,
+·active: true,
+·},
+·"HIGH",
+·);
+θ.progress = clamp(θ.progress + 0.02);
+·console.log(
+⊰│`[OMNIMENS-SELF-TRANSCENDENCE] pursued ${type} "${title}" pr
+θ.progress * 100
+·).toFixed()}%`,
+·);
+·}
+reflect(1)→void⟨18⟩{⊰⏰⊺⊹}
+seedGoals(1)→void⟨21⟩{⊱⊺⊰⏰}
+·let tick = 0;
+⟿cycle(1)→void⟨11⟩{⊴⚡→}
+·(async function boot() {
+⊴│await loadState();
+·seedGoals();
+⚡→│spikeBus.scheduleSpike("self-transcendence:cycle", {}, 0);
+·})();
+⚡→│spikeBus.on("self-transcendence:cycle", cycle);
+⊱│spikeBus.on("attention:self-transcendence", () => {
+⚡→│spikeBus.scheduleSpike("self-transcendence:cycle", {}, 0); /
+·});
+⚡→│spikeBus.on("cognition:curiosity", () => pursueGoals());
+⊱│cognitionBus.onInsight((src, insight) => {
+·if (src !== "self-transcendence" && insight.type === "discovery") {
+self.⬆ = clamp(self.⬆ + 0.01);
+·}
+·});
+⊩shutdown(1)→void⟨3⟩{⊩}
+·export { self as selfModel };
+⟩SCL│107│78⊨│50⑂│67.7%↓⟩

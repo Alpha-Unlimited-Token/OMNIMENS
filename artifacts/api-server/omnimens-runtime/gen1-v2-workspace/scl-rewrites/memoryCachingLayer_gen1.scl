@@ -1,0 +1,16 @@
+⟨SCL v1│memoryCachingLayer_gen1.mjs│113→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+κcrypto
+κcache
+⊩setCacheItem(3)→void⟨6⟩{⊩⊵⊡}
+⊩getCacheItem(1)→void⟨3⟩{⊩⊡⊷}
+⊩clearCache(1)→void⟨3⟩{⊩}
+cosineSimilarity(2)→void⟨9⟩{⊹⊵⋐⊷}
+⊩findSimilarItems(2)→void⟨9⟩{⊩⊵⊺}
+⊷│return similarities
+·.sort((a, b) => b.similarity - a.similarity)
+·.slice(0, topK);
+·}
+⊩generateKey(1)→void⟨5⟩{⊩⊷}
+⊩getCacheSize(1)→void⟨3⟩{⊩⊷}
+⟩SCL│15│28⊨│19⑂│86.7%↓⟩

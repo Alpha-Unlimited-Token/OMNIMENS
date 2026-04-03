@@ -1,0 +1,48 @@
+⟨SCL v1│vectorStoreRedis_gen1.mjs│109→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊲│const { createClient } = require('redis');
+⊶│class VectorStoreRedis {
+·constructor(options = {}) {
+⊲│const { url = 'redis://localhost:6379' } = options;
+·this.client = createClient({ url });
+·this.connected = false;
+·}
+·async connect() {
+·if (!this.connected) {
+·await this.client.connect();
+·this.connected = true;
+·}
+·}
+·async disconnect() {
+·if (this.connected) {
+·await this.client.disconnect();
+·this.connected = false;
+·}
+·}
+·async storeVector(key, vector) {
+if (typeof key !== 'string' || !ι.isArray(vector) || vector.some(isNaN)) {
+⊵│throw new Error('Invalid key or vector format. Key must be a
+·}
+κvectorString
+⊡│await this.client.set(key, vectorString);
+·}
+·async getVector(key) {
+·if (typeof key !== 'string') {
+⊵│throw new Error('Key must be a string.');
+·}
+κvectorString
+⟠│return vectorString ? JSON.parse(vectorString) : null;
+·}
+·async deleteVector(key) {
+·if (typeof key !== 'string') {
+⊵│throw new Error('Key must be a string.');
+·}
+κresult
+⊷│return result > 0;
+·}
+·async listKeys() {
+⊷│return await this.client.keys('*');
+·}
+·}
+Ε.exports = { VectorStoreRedis };
+⟩SCL│47│15⊨│10⑂│56.9%↓⟩

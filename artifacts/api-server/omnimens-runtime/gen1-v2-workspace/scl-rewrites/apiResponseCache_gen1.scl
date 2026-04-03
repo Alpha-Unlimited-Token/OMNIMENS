@@ -1,0 +1,58 @@
+⟨SCL v1│apiResponseCache_gen1.mjs│111→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩generateHashKey(1)→void⟨5⟩{⊩⟠⊷}
+⊶│export class LRUCache {
+·constructor(maxSize = 100) {
+·this.maxSize = maxSize;
+⊮│this.cache = new Map();
+·}
+·get(key) {
+·if (this.cache.has(key)) {
+κvalue
+·this.cache.delete(key);
+⊡│this.cache.set(key, value); // Move to the end (most recentl
+⊷│return value;
+·}
+⊷│return null;
+·}
+set(key, ≪) {
+·if (this.cache.has(key)) {
+·this.cache.delete(key);
+·} else if (this.cache.size >= this.maxSize) {
+κoldestKey
+·this.cache.delete(oldestKey);
+·}
+⊡│this.cache.set(key, value);
+·}
+·clear() {
+·this.cache.clear();
+·}
+·}
+⊩cosineSimilarity(2)→void⟨6⟩{⊩⋐⊷}
+⊶│export class NamespaceCacheManager {
+·constructor(maxSizePerNamespace = 100) {
+⊮│this.namespaces = new Map();
+·this.maxSizePerNamespace = maxSizePerNamespace;
+·}
+·get(namespace, key) {
+⊄│if (!this.namespaces.has(namespace)) return null;
+⊡│return this.namespaces.get(namespace).get(key);
+·}
+set(namespace, key, ≪) {
+·if (!this.namespaces.has(namespace)) {
+⊡│this.namespaces.set(namespace, new LRUCache(this.maxSizePerN
+·}
+⊡│this.namespaces.get(namespace).set(key, value);
+·}
+·clearNamespace(namespace) {
+·if (this.namespaces.has(namespace)) {
+⊡│this.namespaces.get(namespace).clear();
+·}
+·}
+·clearAll() {
+·this.namespaces.clear();
+·}
+·}
+⊩findClosestEmbedding(3)→void⟨14⟩{⊩⊸⊷}
+⟩SCL│57│30⊨│22⑂│48.6%↓⟩

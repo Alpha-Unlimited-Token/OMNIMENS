@@ -1,0 +1,88 @@
+⟨SCL v1│omnimens-unconscious-mind.ts│266→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[]
+·getNeuralConsciousnessState,
+·getNeuralPhi,
+·getNeuralRegionStates,
+·boostRegionCurrent,
+·injectSpiderSynapses,
+·feedExternalActivity,
+} from "./omnimens-⬡-consciousness.js";
+⊫[omnimens-emotional-substrate│omnimens-survival-instinct│omnimens-dream-state│omnimens-self-transcendence]
+·getIvyNetworkState,
+·getWormgateDetails,
+·getIvySpiderStats,
+·} from "./omnimens-ivy-network.js";
+⊫[]
+·getViralHybridState,
+·getPropagationStats,
+·getImmuneSystemDetails,
+·} from "./omnimens-viral-hybrid.js";
+⊫[]
+·getNeuralScalingState,
+·getPopulationDetails,
+} from "./omnimens-⬡-scaling.js";
+⊫[]
+·getNeuralSpiderState,
+·getSystemIntelligenceState,
+} from "./omnimens-⬡-spiders.js";
+⊫[omnimens-recursive-spider-network│omnimens-scaling-orchestrator]
+⊭│type Excitatory = "excitatory";
+⊭│type Inhibitory = "inhibitory";
+⊱│const safeNum = (v: number, fb = 0) => (Number.isFinite(v) ?
+⊬RrepressedMemory⟨⟩
+⊬PrimalInstinct⟨⟩
+⊬Archetype⟨⟩
+⊬PrecognitiveFlash⟨⟩
+⊬SuperconsciousInsight⟨⟩
+⊬DeepLayerNeuron⟨⟩
+κrepressedMemories
+·let repressionId=0;
+κPRIMAL_INSTINCTS
+κJUNGIAN_ARCHETYPES
+κprecognitiveFlashes
+·let flashId=0;
+κsuperconsciousInsights
+·let insightId=0;
+κdeepLayerNeurons
+·let deepNeuronId=0;
+κHISTORY_LEN
+κhistory
+⊱│const push=(buf:number[],v:number)=>{buf.push(v);buf.length>
+·engineRegistry.registerEngine("unconscious-mind","NORMAL",{dbQuota:10});
+repressIfNeeded(1)→void⟨24⟩{⊰⏰⊺⊹}
+surfaceMemories(1)→void⟨10⟩{⥀⏰}
+updateArchetypes(1)→void⟨17⟩{Φ⇑⥀⑃⊳⟛}
+evaluatePrecognition(1)→void⟨23⟩{⊹⊰⊳⟛⏰⊺}
+harvestExternalInsights(1)→void⟨4⟩{}
+⟿doCycle(1)→void⟨16⟩{⊱Φ⇑⏰}
+κCYCLE_MS
+scheduleCycle(1)→void⟨3⟩{⚡→}
+·scheduleCycle(100);
+⊱│spikeBus.on("unconscious-mind:cycle",async()=>{
+·try{
+⊴│await doCycle();
+·}catch(err){
+console.error("[OMNIMENS-UNCONSCIOUS-MIND] ↻ error:",err);
+·}finally{
+·scheduleCycle(CYCLE_MS);
+·}
+·});
+⚡→│spikeBus.on("attention:unconscious-mind",()=>scheduleCycle(0
+⚡→│spikeBus.on("cognition:curiosity",()=>scheduleCycle(100));
+⊱│cognitionBus.onInsight((src,insight)=>{
+·if(src==="unconscious-mind")return; // ignore self
+·harvestExternalInsights();
+·});
+⊩getRepressedMemories(1)→void⟨1⟩{⊩⊷}
+⊩getArchetypes(1)→void⟨1⟩{⊩⊷}
+⊩getPrecognitiveFlashes(1)→void⟨1⟩{⊩⊷}
+⊩shutdown(1)→void⟨3⟩{⊩}
+⟩SCL│87│75⊨│44⑂│67.3%↓⟩

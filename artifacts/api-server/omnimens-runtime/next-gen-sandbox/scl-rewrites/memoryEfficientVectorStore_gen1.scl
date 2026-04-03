@@ -1,0 +1,41 @@
+⟨SCL v1│memoryEfficientVectorStore_gen1.mjs│110→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
+⊶│class HNSWVectorStore {
+·constructor(maxLayers = 3, maxNeighbors = 5) {
+·this.maxLayers = maxLayers;
+·this.maxNeighbors = maxNeighbors;
+⊮│this.nodes = new Map();
+⊮│this.layerConnections = new Map();
+·}
+·addVector(vector, id) {
+·if (this.nodes.has(id)) {
+⊵│throw new Error("ID already exists in the store.");
+·}
+κnode
+⊡│this.nodes.set(id, node);
+·for (let layer = 0; layer < this.maxLayers; layer++) {
+·this._connectNode(node, layer);
+·}
+·}
+·searchNearest(queryVector) {
+·let bestMatch = null;
+·let bestDistance = Infinity;
+⥀│for (const node of this.nodes.values()) {
+κdistance
+·if (distance < bestDistance) {
+·bestDistance = distance;
+·bestMatch = node;
+·}
+·}
+⊷│return { id: bestMatch.id, distance: bestDistance };
+·}
+·_connectNode(node, layer) {
+κcandidates
+·candidates.sort((a, b) => euclideanDistance(node.vector, a.vector) - euclideanDi
+·const neighbors = candidates.slice(0, this.maxNeighbors).map(candidate => candid
+⊡│node.neighbors.set(layer, neighbors);
+·}
+·}
+·export { HNSWVectorStore, euclideanDistance };
+⟩SCL│40│16⊨│12⑂│63.6%↓⟩

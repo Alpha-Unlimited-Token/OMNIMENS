@@ -1,0 +1,21 @@
+⟨SCL v1│adversarialSelfPlay_gen1.mjs│32→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class AdversarialSelfPlay {
+·constructor() {
+·this.edgeCases = [];
+·this.counterfactuals = [];
+·}
+·generateEdgeCase(agentOutput) {
+⊰│this.edgeCases.push(`Edge case for ${agentOutput}`);
+·}
+·generateCounterfactual(agentOutput) {
+⊰│this.counterfactuals.push(`Counterfactual for ${agentOutput}
+·}
+testAgent(α, testInput) {
+κoutput
+this.generateEdgeCase(θ);
+this.generateCounterfactual(θ);
+⊷│return { edgeCases: this.edgeCases, counterfactuals: this.co
+·}
+·}
+⟩SCL│20│8⊨│4⑂│37.5%↓⟩

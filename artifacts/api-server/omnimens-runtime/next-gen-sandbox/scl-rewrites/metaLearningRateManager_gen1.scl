@@ -1,0 +1,24 @@
+⟨SCL v1│metaLearningRateManager_gen1.mjs│33→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class MetaLearningRateManager {
+·constructor(metrics) {
+·this.metrics = metrics;
+·this.learningRates = {};
+·}
+·adjustLearningRates() {
+⊸│Object.keys(this.metrics).forEach(module => {
+κperformance
+κresourceUsage
+this.learningRates[Ε] = this.calculateRate(performance, resourceUsage);
+·});
+·}
+·calculateRate(performance, resourceUsage) {
+κbaseRate
+κadjustmentFactor
+⊷│return baseRate * adjustmentFactor * (1 + performance / 100)
+·}
+getLearningRate(Ε) {
+⊷│return this.learningRates[module] || 0.01;
+·}
+·}
+⟩SCL│23│10⊨│4⑂│30.3%↓⟩

@@ -1,0 +1,60 @@
+⟨SCL v1│communication-hub.ts│98→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊭│type EventHandler = (data: unknown) => void | Promise<void>;
+⊬Subscription⟨id:string│topic:string│handler:EventHandler│subsystem:string│priority:number⟩
+⊶│export class CommunicationHub {
+⊮│private subscriptions = new Map<string, Subscription[]>();
+·private messageCount = 0;
+⊮│private topicStats = new Map<string, number>();
+·subscribe(topic: string, handler: EventHandler, subsystem: string, priority = 0)
+κid
+κsub
+κexisting
+⊺│existing.push(sub);
+·existing.sort((a, b) => b.priority - a.priority);
+⊡│this.subscriptions.set(topic, existing);
+⊷│return id;
+·}
+·unsubscribe(id: string): void {
+·for (const [topic, subs] of this.subscriptions) {
+·const filtered = subs.filter(s => s.id !== id);
+⊹│if (filtered.length !== subs.length) {
+⊡│this.subscriptions.set(topic, filtered);
+·return;
+·}
+·}
+·}
+⊳│async publish(topic: string, data: unknown, source?: string)
+κsubs
+⊄│if (!subs || subs.length === 0) return;
+⊡│this.topicStats.set(topic, (this.topicStats.get(topic) || 0)
+⥀│for (const sub of subs) {
+·try {
+·await sub.handler(data);
+·} catch {}
+·}
+·}
+⊳│broadcast(data: unknown, source?: string): void {
+⥀│for (const topic of this.subscriptions.keys()) {
+this.publish(topic, data, η);
+·}
+·}
+·request(topic: string, data: unknown): Promise<unknown> {
+⊱│return new Promise((resolve) => {
+κresponseTopic
+⊱│const subId = this.subscribe(responseTopic, (response) => {
+·this.unsubscribe(subId);
+·resolve(response);
+·}, "request-handler");
+·this.publish(topic, { data, responseTopic }, "request-handler");
+⏳│setTimeout(() => { this.unsubscribe(subId); resolve(undefine
+·});
+·}
+·getStats(): { totalMessages: number; topicCount: number; subscriptionCount: numb
+⋐│const totalSubs = [...this.subscriptions.values()].reduce((s
+·const topTopics = [...this.topicStats.entries()].sort((a, b) => b[1] - a[1]).sli
+⊷│return { totalMessages: this.messageCount, topicCount: this.
+·}
+·}
+⊪hub
+⟩SCL│59│28⊨│21⑂│39.8%↓⟩

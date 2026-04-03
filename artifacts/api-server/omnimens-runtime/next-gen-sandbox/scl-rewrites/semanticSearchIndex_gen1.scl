@@ -1,0 +1,11 @@
+⟨SCL v1│semanticSearchIndex_gen1.mjs│116→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩generateEmbeddingId(1)→void⟨5⟩{⊩⊷}
+⊩normalizeVector(1)→void⟨4⟩{⊩⋐⊷}
+⊩cosineSimilarity(2)→void⟨6⟩{⊩⊹⊵⋐⊷}
+⊩prepareInsertQuery(2)→void⟨4⟩{⊩⟠⊰⊷}
+⊩prepareSearchQuery(2)→void⟨10⟩{⊩⟠⊷}
+⊩validateVector(1)→void⟨8⟩{⊩⊵⊹}
+⊩exampleUsage(1)→void⟨16⟩{⊩}
+⟩SCL│10│29⊨│21⑂│91.4%↓⟩

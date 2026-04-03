@@ -1,0 +1,32 @@
+⟨SCL v1│omnimens-knowledge-graph.ts│52→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊭│type Concept = { concept: string; domain: string; nodeType: 
+κENG
+κNODES
+κEDGES
+κBRAIN
+κMESH
+κNOTES
+·let cycles = 0;
+·engineRegistry.registerEngine(ENG, "NORMAL", { dbQuota: 10 });
+·const read = (tbl: string, q: any) => dbGateway.read(ENG, tbl, q);
+const ⊞ = (tbl: string, data: any, pr: "LOW" | "NORMAL" | "HIGH" = "NORMAL")
+dbGateway.⊞(ENG, tbl, data, pr);
+📢│const log = (msg: string) => console.log(`[OMNIMENS-KNOWLEDG
+⟿extractConcepts(1)→void⟨1⟩{}
+κprompt
+·Respond JSON only as { "concepts":[{ "concept":"","domain":"","nodeType":"" }]}.
+·ENTRY: [${entry.category}] ${entry.title}: ${entry.content}`;
+·try {
+κres
+⟠│return (JSON.parse((res?.choices?.[0]?.message?.content || "
+⊪_v2RewriteModule
+·export {};
+⟩SCL│31│17⊨│4⑂│40.4%↓⟩

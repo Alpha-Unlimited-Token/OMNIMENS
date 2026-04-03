@@ -1,0 +1,17 @@
+⟨SCL v1│parallelTaskExecutor_gen1.mjs│91→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩partitionTasks(2)→void⟨8⟩{⊩⊺⊷}
+workerThread(1)→void⟨5⟩{⊲}
+⊩⟿executeParallel(3)→void⟨29⟩{⊩⊵⥀⊺⊱⊰⫘⊷}
+⊩sumArray(1)→void⟨3⟩{⊩⋐⊷}
+⊩averageArray(1)→void⟨4⟩{⊩⊷⊹}
+⊩squareArray(1)→void⟨3⟩{⊩⊷}
+⊩wordCount(1)→void⟨3⟩{⊩⊷⊹}
+⊩reverseText(1)→void⟨3⟩{⊩⊷}
+⊪MAX_THREADS
+⊪│export const DEFAULT_TASK_FUNCTION = task => task; // Identi
+·if (!isMainThread) {
+·workerThread();
+·}
+⟩SCL│16│36⊨│26⑂│82.4%↓⟩

@@ -1,0 +1,9 @@
+⟨SCL v1│sandboxOptimizer_gen1.mjs│117→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩generateCacheKey(1)→void⟨5⟩{⊩⟠⊷}
+⊩memoize(1)→void⟨12⟩{⊩⊮⊷⊡}
+⊩createDependencyGraph(1)→void⟨43⟩{⊩⊮⊷⊡⊯⊄⥀}
+⊩lazyEvaluate(1)→void⟨12⟩{⊩⊷}
+⊩optimizeFunction(1)→void⟨4⟩{⊩⊷}
+⟩SCL│8│24⊨│18⑂│93.2%↓⟩

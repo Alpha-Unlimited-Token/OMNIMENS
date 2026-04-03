@@ -1,0 +1,10 @@
+⟨SCL v1│adaptivePromptBuilder_gen1.mjs│87→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩hashString(1)→void⟨5⟩{⊩⊷}
+⊩normalizeScores(1)→void⟨5⟩{⊩⟛⊷}
+⊩scorePromptComponents(2)→void⟨6⟩{⊩⊱⊷}
+⊩selectTopComponents(2)→void⟨6⟩{⊩⊷}
+⊩generateAdaptivePrompt(2)→void⟨20⟩{⊩⊲⊷}
+⊩exampleUsage(1)→void⟨15⟩{⊩⊷}
+⟩SCL│9│22⊨│15⑂│89.7%↓⟩

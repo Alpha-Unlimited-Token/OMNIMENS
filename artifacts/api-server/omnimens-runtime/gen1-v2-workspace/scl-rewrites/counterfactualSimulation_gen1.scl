@@ -1,0 +1,18 @@
+⟨SCL v1│counterfactualSimulation_gen1.mjs│27→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class CounterfactualSimulation {
+·constructor() {
+·this.simulations = [];
+·}
+runSimulation(α, scenario) {
+κresult
+⊺│this.simulations.push({ agent, scenario, result });
+⊷│return result;
+·}
+·evaluateRobustness() {
+⊷│return this.simulations.map(sim => {
+⊷│return { scenario: sim.scenario, successRate: sim.result.suc
+·});
+·}
+·}
+⟩SCL│17│7⊨│5⑂│37.0%↓⟩

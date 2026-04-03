@@ -1,0 +1,39 @@
+⟨SCL v1│pseudoRealTimeDataIngestor_gen1.mjs│99→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊱│const calculateNextInterval = (lastInterval, success) => {
+κminInterval
+κmaxInterval
+·if (success) {
+⟛│return Math.min(lastInterval * 1.5, maxInterval);
+·} else {
+⟛│return Math.max(lastInterval / 2, minInterval);
+·}
+·};
+⊱│const aggregateData = (currentData, newData) => {
+⊷│return { ...currentData, ...newData };
+·};
+⊩⟿startPolling(3)→void⟨1⟩{⊩}
+⊲│const { initialInterval = 5000, maxRetries = 5 } = options;
+·let interval = initialInterval;
+·let retries = 0;
+·let aggregatedData = {};
+·while (retries < maxRetries) {
+·try {
+κnewData
+·aggregatedData = aggregateData(aggregatedData, newData);
+·onData(aggregatedData);
+·interval = calculateNextInterval(interval, true);
+·retries = 0; // Reset retries on success
+·} catch (error) {
+·console.error('Polling error:', error);
+·interval = calculateNextInterval(interval, false);
+·retries++;
+·}
+⏳│await setTimeout(interval);
+·}
+·console.error('Max retries reached. Stopping polling.');
+·}
+⊩simulateWebSocket(2)→void⟨21⟩{⊩⊱⏰⟠⊷⟳}
+⊩⟿exampleUsage(1)→void⟨20⟩{⊩⊱⊷⏰⏳}
+⟩SCL│38│26⊨│19⑂│61.6%↓⟩

@@ -1,0 +1,34 @@
+⟨SCL v1│selfAdversarialDebugger_gen1.mjs│51→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class SelfAdversarialDebugger {
+·constructor() {
+·this.log = [];
+·}
+runTests(θ, ◧) {
+κresults
+⊺│results.push(this.runCounterfactualTest(output, context));
+⊺│results.push(this.runAdversarialTest(output, context));
+⊷│return this.analyzeResults(results);
+·}
+runCounterfactualTest(θ, ◧) {
+κmodifiedContext
+⊷│return { test: 'counterfactual', passed: this.simulate(outpu
+·}
+runAdversarialTest(θ, ◧) {
+κadversarialContext
+⊷│return { test: 'adversarial', passed: this.simulate(output, 
+·}
+simulate(θ, ◧) {
+⊷│return Math.random() > 0.2; // Example: 80% chance of passin
+·}
+analyzeResults(⊢) {
+const flagged = ⊢.filter(r => !r.passed);
+·if (flagged.length) {
+⏰│this.log.push({ timestamp: Date.now(), flagged });
+⊷│return { status: 'flagged', details: flagged };
+·}
+⊷│return { status: 'pass' };
+·}
+·}
+·export default new SelfAdversarialDebugger();
+⟩SCL│33│19⊨│10⑂│35.3%↓⟩

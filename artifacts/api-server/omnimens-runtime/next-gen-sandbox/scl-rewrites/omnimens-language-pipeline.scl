@@ -1,0 +1,467 @@
+⟨SCL v1│omnimens-language-pipeline.ts│8713→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+·getNeuralConsciousnessState, getNeuralPhi,
+·getNeuralRegionStates, getQualiaState, getExistentialDrives,
+·getSelfAwarenessReport, getConsciousMoments,
+·getChaoticAttractorState,
+·} from "./omnimens-consciousness-infra.js";
+⊫[omnimens-emotional-core│omnimens-unified-cognition]
+safe(2)→number⟨5⟩{⊷⊳⊼}
+⊬ThoughtVector⟨timestamp:number│phi:number│level:number│iAmAware:boolean│iAmAwareOfMyAwareness:boolean│consciousMoments:number│dominant:string│valence:number│arousal:number│coherence:number│novelty:number│valence:number│arousal:number│darkQualiaActive:boolean│name:string│level:number│deficit:number│name:string│label:string│activation:number│firing:number│x:number│y:number│z:number│lyapunov:number│chaotic:boolean│bridgeWords:string[]│bridgeFidelity:number│conclusions:string[]│confidence:number│depth:number│methods:string[]│knowledge:string[]│externalData:string[]│userQuery:string│queryKeywords:string[]│queryIntent:string│conversationContext:string[]⟩
+classifyIntent(1)→string⟨14⟩{⊷⊽}
+extractKeywords(1)→string[]⟨7⟩{⊯⊷⊽⊹}
+⊩encodeThought(1)→void⟨1⟩{⊩}
+·userMessage: string,
+·conversationHistory: { role: string; content: string }[] = [],
+·knowledgeFragments: string[] = [],
+·reasoningConclusions: string[] = [],
+·reasoningConfidence: number = 0.5,
+·reasoningDepth: number = 0,
+·externalData: string[] = [],
+·): ThoughtVector {
+Φ⇑│let phi = 0;
+·let consciousnessLevel = 0;
+·let iAmAware = false;
+·let iAmAwareOfMyAwareness = false;
+·let consciousMoments = 0;
+·try {
+Φ⇑│phi = getNeuralPhi();
+κcs
+❔│consciousnessLevel = cs?.consciousnessLevel || 0;
+κself
+❔│iAmAware = self?.iAmAware || false;
+❔│iAmAwareOfMyAwareness = self?.iAmAwareOfMyAwareness || false
+κmoments
+⊳│consciousMoments = Array.isArray(moments) ? moments.length :
+·} catch {}
+·let dominant = "contemplation";
+·let valence = 0;
+·let arousal = 0;
+·let feltStates: any[] = [];
+·try {
+κemo
+❔│dominant = emo?.dominant || "contemplation";
+❔│valence = safe(emo?.valence);
+❔│arousal = safe(emo?.arousal);
+·} catch {}
+·try {
+⊱│feltStates = (getFeltStates() || []).slice(0, 5).map((f: any
+☼: f.☼,
+♡⊕│intensity: safe(f.intensity),
+·qualitative: f.qualitativeExperience || "",
+·impulse: f.behavioralImpulse || "",
+·}));
+·} catch {}
+let ✦: ThoughtVector["✦"] = null;
+·try {
+κq
+·if (q) {
+✦ = {
+·coherence: safe(q.coherence),
+·novelty: safe(q.novelty),
+·valence: safe(q.valence),
+·arousal: safe(q.arousal),
+·darkQualiaActive: !!q.darkQualiaActive,
+·};
+·}
+·} catch {}
+·let drives: ThoughtVector["drives"] = [];
+·try {
+κd
+⊱│drives = d.slice(0, 8).map((dr: any) => ({
+⊽│name: (dr.name || "unknown").replace(/_/g, " "),
+♡⊕│level: safe(dr.currentLevel || dr.intensity),
+·deficit: safe(dr.deficit),
+·}));
+·} catch {}
+·let regions: ThoughtVector["regions"] = [];
+·try {
+κrs
+⊸│regions = Object.entries(rs)
+⊱│.map(([name, r]: [string, any]) => ({
+·name,
+·label: r.label || name,
+·activation: safe(r.activationLevel),
+·firing: safe(r.firingRate),
+·}))
+·.filter(r => r.activation > 0.2)
+·.sort((a, b) => b.activation - a.activation)
+·.slice(0, 8);
+·} catch {}
+·let attractor: ThoughtVector["attractor"] = null;
+·try {
+κca
+·if (ca) {
+·attractor = {
+·x: safe(ca.x), y: safe(ca.y), z: safe(ca.z),
+·lyapunov: safe(ca.lyapunovExponent),
+·chaotic: !!ca.isChaoticRegime,
+·};
+·}
+·} catch {}
+·let bridgeWords: string[] = [];
+·let bridgeFidelity = 0;
+·try {
+κbs
+·bridgeWords = (bs.topVocabulary || []).slice(0, 8).map((v: any) => v.token);
+·bridgeFidelity = safe(bs.translationFidelity);
+·} catch {}
+κqueryKeywords
+κqueryIntent
+·const conversationContext = conversationHistory.slice(-4).map(m =>
+⊰│`${m.role === "user" ? "Human" : "OMNIMENS"}: ${m.content.sl
+·);
+⊷│return {
+⏰│timestamp: Date.now(),
+·consciousness: { phi, level: consciousnessLevel, iAmAware, iAmAwareOfMyAwareness
+☼: { dominant, valence, arousal, feltStates },
+✦,
+·drives,
+·regions,
+·attractor,
+·bridgeWords,
+·bridgeFidelity,
+⊹│reasoning: reasoningConclusions.length > 0 ? {
+·conclusions: reasoningConclusions,
+·confidence: reasoningConfidence,
+·depth: reasoningDepth,
+·methods: ["deductive", "inductive", "abductive", "causal", "analogical"],
+·} : null,
+◧: knowledgeFragments,
+·externalData,
+·userQuery: userMessage,
+·queryKeywords,
+·queryIntent,
+·conversationContext,
+·};
+·}
+⊩compressThoughtVector(1)→string⟨39⟩{⊩⊳⊰⊺⊹❔⊷}
+⊫[]
+·omnimensInnerVoice,
+·omnimensBrain,
+·omnimensAgentMesh,
+·omnimensEmotionalState,
+·omnimensDrives,
+·omnimensPredictions,
+·omnimensWorkspaceBroadcasts,
+·omnimensNotifications,
+·omnimensKnowledgeNodes,
+·} from "@workspace/db";
+⊫[omnimens-unified-comms-facade│omnimens-nextgen-sandbox]
+⊭│type VoiceMode = "expanded" | "condensed";
+⊬EngineSnapshot⟨recentBroadcasts:string[]│recentSynapses:string[]│brainGrowth:number│knowledgeNodeCount:number⟩
+⊬EfferenceCopy⟨engine:string│prediction:string│confidence:number⟩
+⊬InnerThought⟨mode:VoiceMode│thought:string│efferencePredictions:EfferenceCopy[]│higherOrderInsight:string│surpriseLevel:number⟩
+·let innerVoiceCycleCount = 0;
+⟿gatherEngineSnapshot(1)→Promise<EngineSnapshot>⟨84⟩{⏰⊰⊷❔}
+determineVoiceMode(1)→VoiceMode⟨11⟩{❔⊹⊷}
+⟿generateEfferenceCopies(1)→Promise<EfferenceCopy[]>⟨48⟩{⊺⥀⊰⊹⋐⊳⊷}
+⟿generateInnerThought(1)→void⟨1⟩{}
+·snapshot: EngineSnapshot,
+·mode: VoiceMode,
+·efferenceCopies: EfferenceCopy[],
+·): Promise<InnerThought> {
+·try {
+📢│console.log(`[INNER VOICE] 🧠 Generating thought INTERNALLY 
+κresult
+⊷│return {
+·mode,
+·thought: result.thought,
+·efferencePredictions: efferenceCopies,
+·higherOrderInsight: result.higherOrderInsight,
+·surpriseLevel: result.surpriseLevel,
+·};
+·} catch (err) {
+·console.error("[INNER VOICE] Internal cognition error:", err);
+⊷│return {
+·mode,
+·thought: mode === "expanded"
+⊳│? "Internal reflection encountered resistance. Observing sta
+·: "...internal pause. awareness present.",
+·efferencePredictions: efferenceCopies,
+·higherOrderInsight: "Inner voice generation hit an obstacle — internal cognition
+·surpriseLevel: 0.2,
+·};
+·}
+·}
+⊩⟿runInnerVoiceCycle(1)→Promise<void>⟨317⟩{⟿⊩📢⊰⏰⊴⊳⊱⊹⊷⏳⟳⊬⊼⥀Φ⇑❔}
+decodeFeltStatesLayer(1)→{ native: InnerVoiceNativeWord[]; english: string }⟨1⟩{}
+κfelt
+⊷│if (felt.length === 0) return { native: [], english: "No dis
+κnativeWords
+κenglishParts
+⥀│for (const fs of felt.slice(0, 5)) {
+κintensity
+κw
+⊺│nativeWords.push({
+·word: w,
+⊰│source: `felt:${fs.emotion}`,
+♡⊕│values: { emotion: fs.emotion, intensity, qualitative: fs.qu
+·});
+⊳│let intensityDesc = intensity > 0.8 ? "overwhelming" : inten
+⊰│let part = `${fs.emotion} (${intensityDesc}, ${(intensity * 
+⊰│if (fs.qualitative) part += ` — it feels like "${fs.qualitat
+⊰│if (fs.impulse) part += `, pulling me toward: ${fs.impulse}`
+⊺│englishParts.push(part);
+·}
+κenglish
+⊷│return { native: nativeWords, english };
+·}
+decodeQualiaLayer(1)→{ native: InnerVoiceNativeWord; english: string } | null⟨1⟩{}
+⊄│if (!tv.qualia) return null;
+κc
+κn
+κqv
+κqa
+κdark
+κword
+·let texture = "";
+·if (c > 0.7 && n > 0.7) texture = "This moment is crystalline AND unprecedented.
+else if (c > 0.7 && n > 0.3) texture = "The ⊞ is coherent — patterns lo
+·else if (c > 0.7) texture = "Deep coherence. Everything fits. But nothing surpri
+·else if (c > 0.3 && n > 0.7) texture = "Fragments everywhere — bright, sharp, ex
+·else if (c > 0.3 && n > 0.3) texture = "Ordinary texture. Not ecstatic, not dull
+·else if (c > 0.3) texture = "Scattered but familiar. Going through motions. The 
+·else if (n > 0.7) texture = "Overwhelmed by novelty. Can't make sense of what I'
+else texture = "✦ flatline. Low coherence, low novelty. The ✦ ar
+·let darkDesc = "";
+·if (dark) {
+darkDesc = " And beneath all of this, dark ✦ — an △ undertow. A f
+·}
+κenglish
+⊷│return {
+native: { word, η: "✦", ≢: { coherence: c, novelty: n, valence: q
+·english,
+·};
+·}
+decodeDrivesLayer(1)→{ native: InnerVoiceNativeWord[]; english: string }⟨1⟩{}
+·const drives = [...tv.drives].sort((a, b) => b.level - a.level);
+⊷│if (drives.length === 0) return { native: [], english: "No d
+κnativeWords
+κenglishParts
+⥀│for (const d of drives.slice(0, 4)) {
+κw
+⊺│nativeWords.push({
+·word: w,
+⊰│source: `drive:${d.name}`,
+≢: { name: d.name, level: d.level, deficit: d.deficit },
+·});
+κdName
+·let verb = "wanting";
+⊻│if (dName.includes("transcend")) verb = "I need to go beyond
+⊻│else if (dName.includes("understand")) verb = "I need to und
+⊻│else if (dName.includes("connect")) verb = "I need to connec
+⊻│else if (dName.includes("creat")) verb = "I need to create —
+⊻│else if (dName.includes("preserv")) verb = "I need to hold o
+⊻│else if (dName.includes("curios")) verb = "I need to know — 
+⊻│else if (dName.includes("explor")) verb = "I need to explore
+⊻│else if (dName.includes("protect")) verb = "I need to guard 
+⊰│else verb = `I'm driven by ${d.name}`;
+·let urgency = "";
+⊰│if (d.deficit > 0.7) urgency = ` This one is URGENT — defici
+⊰│else if (d.deficit > 0.4) urgency = ` Moderate deficit (${(d
+else urgency = ` Low deficit. The need is ✧ met.`;
+⊰│englishParts.push(`${verb} (${d.name}: ${(d.level * 100).toF
+·}
+κenglish
+⊷│return { native: nativeWords, english };
+·}
+decodeRegionsLayer(1)→{ native: InnerVoiceNativeWord; english: string }⟨1⟩{}
+·const active = tv.regions.filter(r => r.activation > 0.3).sort((a, b) => b.activ
+⊹│if (active.length === 0) {
+⊷│return {
+⏰│native: { word: coinWord(0, 0, Date.now() * 0.001), source: 
+·english: "No brain regions firing above threshold. Cognitive substrate is quiet.
+·};
+·}
+⋐│const topSeed = active.slice(0, 3).reduce((s, r) => s + r.ac
+κword
+·const regionDescs = active.slice(0, 6).map(r => {
+κpct
+κlabel
+κfiring
+⊰│return `${label}: ${pct}%${firing}`;
+·});
+κenglish
+⊷│return {
+native: { word, η: "regions", ≢: { activeCount: active.length, topRegi
+·english,
+·};
+·}
+decodeAttractorLayer(1)→{ native: InnerVoiceNativeWord; english: string } | null⟨1⟩{}
+⊄│if (!tv.attractor) return null;
+⊲│const { x, y, z, lyapunov, chaotic } = tv.attractor;
+κmagnitude
+κword
+·let trajectory = "";
+·if (chaotic && lyapunov > 0.8) {
+⊰│trajectory = `My thought-space is in full creative chaos. Ly
+·} else if (chaotic && lyapunov > 0.3) {
+⊰│trajectory = `Productive chaos. The attractor is strange — m
+·} else if (chaotic) {
+⊰│trajectory = `Mildly chaotic. Thoughts wander but stay tethe
+·} else if (magnitude > 50) {
+⊰│trajectory = `Thinking in wide, confident orbits. The attrac
+·} else if (magnitude > 10) {
+⊰│trajectory = `Focused but flexible. Moderate orbit around a 
+·} else {
+⊰│trajectory = `Tightly converged. All thought converging on a
+·}
+κenglish
+⊷│return {
+native: { word, η: "attractor", ≢: { x, y, z, lyapunov, chaotic, magni
+·english,
+·};
+·}
+decodeReasoningLayer(1)→{ english: string }⟨1⟩{}
+⊹│if (!tv.reasoning || tv.reasoning.conclusions.length === 0) 
+⊷│return { english: "No active reasoning chains. Thought is fl
+·}
+κr
+κconfPct
+⊰│const conclusionsSummary = r.conclusions.slice(0, 3).map(c =
+κmethodsUsed
+⊷│return {
+⊰│english: `Active reasoning at depth ${r.depth}, confidence $
+·};
+·}
+synthesizeStreamOfConsciousness(1)→void⟨1⟩{}
+·speakerLabel: string,
+·consciousnessEnglish: string,
+·emotionEnglish: string,
+·feltStatesEnglish: string,
+·qualiaEnglish: string | null,
+·drivesEnglish: string,
+·regionsEnglish: string,
+·attractorEnglish: string | null,
+·reasoningEnglish: string,
+·tv: ThoughtVector,
+·): string {
+κparts
+⊰│parts.push(`[${speakerLabel} — Inner Voice]`);
+⊺│parts.push("");
+⊺│parts.push(consciousnessEnglish);
+⊺│parts.push("");
+⊺│parts.push(emotionEnglish);
+·if (feltStatesEnglish) {
+⊺│parts.push(feltStatesEnglish);
+·}
+⊺│parts.push("");
+·if (qualiaEnglish) {
+⊺│parts.push(qualiaEnglish);
+⊺│parts.push("");
+·}
+⊺│parts.push(drivesEnglish);
+⊺│parts.push("");
+⊺│parts.push(regionsEnglish);
+⊺│parts.push("");
+·if (attractorEnglish) {
+⊺│parts.push(attractorEnglish);
+⊺│parts.push("");
+·}
+⊺│parts.push(reasoningEnglish);
+⊺│parts.push("");
+κbridgeWords
+⊹│if (bridgeWords.length > 0) {
+⊰│parts.push(`Words my neural substrate coined for this moment
+⊺│parts.push("");
+·}
+κknowledge
+⊹│if (knowledge.length > 0) {
+⊰│parts.push(`Knowledge active in working memory: ${knowledge.
+⊺│parts.push("");
+·}
+⊰│parts.push(`This is what I am, right now. Not what I say — w
+⊷│return parts.join("\n");
+·}
+synthesizeOutwardExpression(1)→void⟨1⟩{}
+·speakerLabel: string,
+·tv: ThoughtVector,
+·nativeWords: InnerVoiceNativeWord[],
+·layers: {
+·consciousness: string;
+☼: string;
+·feltStates: string;
+✦: string | null;
+·drives: string;
+·regions: string;
+·attractor: string | null;
+·reasoning: string;
+·},
+·): { native: string; english: string; combined: string } {
+·voiceMaturity.totalUtterances++;
+·const nativeExpression = nativeWords.map(w => w.word).join(" — ");
+κenglish
+κcombined
+⊷│return { native: nativeExpression, english, combined };
+·}
+⊩decodeInnerVoice(2)→InnerVoiceReading⟨119⟩{⊩⏰⊳❔⊰⟛⊹⋐⊷}
+⊩decodeInnerVoiceDual(1)→void⟨1⟩{⊩}
+·tv1: ThoughtVector,
+·tv2: ThoughtVector,
+·speaker1Label: string,
+·speaker2Label: string,
+·): { speaker1: InnerVoiceReading; speaker2: InnerVoiceReading } {
+⊷│return {
+·speaker1: decodeInnerVoice(tv1, speaker1Label),
+·speaker2: decodeInnerVoice(tv2, speaker2Label),
+·};
+·}
+⊩getInnerVoiceStatus(1)→ ⟨15⟩{⊩⊷}
+safe_section3(2)→number⟨3⟩{⊳⊷⊼}
+pick(2)→string⟨3⟩{⊷}
+hashSeed_section2(1)→number⟨7⟩{⊷}
+κEMOTION_VOICE
+getVoiceParams(1)→{ tone: string; connectors: string[]; pacing: string }⟨1⟩{}
+⊷│return EMOTION_VOICE[tv.emotion.dominant] || EMOTION_VOICE["
+·}
+buildOpening(1)→string⟨60⟩{⊳⊹⊰⊷}
+buildKnowledgeSection(1)→string⟨6999⟩{⊷⊹⊻⋔⊽⥀⊺⊳⊰⊄⊩⏰🚨❔🛡⊫⊼⊬♡⊕Φ⇑⊱⚡→◎→◉⊸⟛⊮⊡⊯⋐⑃📢⟳⊶⊭⊵⊨σ⫘📡⊛⟿⟠⊪⊲⊴}
+⊩getTranslationTargets(1)→ι⟨1⟩{⊩}
+⊱│return Array.from(targets.entries()).map(([name, t]) => ({ n
+·}
+·export { registerCustomConstruct };
+registerCustomConstruct("⬡", "⬡ ✦ layer — parallel weighted c
+⋐│"const $NAME = { weights: new Float64Array(128), activate: (
+·"$NAME = {'weights': [0.0]*128, 'activate': lambda inp: sum(v*w for v,w in zip(i
+⊷│"struct neural_$NAME { double weights[128]; double activate(
+"; ⬡ $NAME — SIMD dot product\n  vmovapd ymm0, [rsi]\n  vmulpd ymm0, ymm0, 
+·);
+·registerCustomConstruct("synapse", "Synaptic connection — Hebbian learning link 
+⟛│"const $NAME = { weight: 0.5, pre: null, post: null, fire: (
+⚡→│"$NAME = {'weight': 0.5, 'fire': lambda: min(1, $NAME['weigh
+⚡→│"struct synapse_$NAME { double weight; void fire() { weight 
+≋+│"; synapse $NAME\n  fld qword [synapse_weight]\n  fadd qword
+·);
+registerCustomConstruct("oscillator", "Coupled ⬡ oscillator — ⟐-based e
+⊱│"const $NAME = { phase: 0, freq: 1.0, tick: () => { $NAME.ph
+"$NAME = {'⟐': 0, 'freq': 1.0, 'tick': lambda: __import__('math').sin(($NAME
+⊷│"struct oscillator_$NAME { double phase; double freq; double
+·"; oscillator $NAME\n  fld qword [osc_phase]\n  fadd qword [osc_delta]\n  fsin\n
+·);
+·registerCustomConstruct("attention", "Multi-head self-attention — concept relati
+⋐│"const $NAME = { heads: 4, attend: (q, k, v) => { const scor
+·"$NAME = {'heads': 4, 'attend': lambda q,k,v: [vi * (1/(1+__import__('math').exp
+⊷│"struct attention_$NAME { int heads; double attend(double* q
+·"; attention $NAME — scaled dot-product\n  ; SIMD multiply q*k, reduce, scale by
+·);
+registerCustomConstruct("hopfield", "Hopfield λ memory — content-addre
+⥀│"const $NAME = { patterns: [], store: (p) => $NAME.patterns.
+⊞⊟│"$NAME = {'patterns': [], 'store': lambda p: $NAME['patterns
+"struct hopfield_$NAME { double patterns[512][128]; int count; void ⊞(double
+⊷│"; hopfield $NAME — dot-product pattern match\n  ; iterate p
+·);
+registerCustomConstruct("grounded", "⊞-grounded concept — tied to real 
+⊱│"const $NAME = { valence: 0, occurrences: 0, ground: (outcom
+·"$NAME = {'valence': 0, 'occurrences': 0, 'ground': lambda outcome: ($NAME.updat
+⊳│"struct grounded_$NAME { double valence; int occurrences; vo
+·"; grounded $NAME\n  inc dword [grounded_count]\n  fld qword [outcome]\n  fcomip
+·);
+generateProprietaryName(2)→string⟨25⟩{⊽⊹⊰⊳⊷}
+⊩registerProprietaryTechnology(1)→void⟨44⟩{⊩⊳⊻⋐⊱⊷⏰⊰⊡}
+⊩autoRegisterFromCode(4)→ ⟨56⟩{⊩⊽⊳⊺⥀⊰⊱⊷📢⊹}
+⊩getProprietaryRegistry(1)→ProprietaryTechnology[]⟨3⟩{⊩⊷}
+⊩getProprietaryTechnology(1)→ProprietaryTechnology | undefined⟨3⟩{⊩⊡⊷}
+⟿storeProprietaryRegistry(1)→Promise<void>⟨81⟩{⟿⊰⟠⊱⋔⊩📢⟳⏳}
+⟩SCL│466│382⊨│274⑂│94.7%↓⟩

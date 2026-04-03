@@ -1,0 +1,9 @@
+⟨SCL v1│dynamicRoleAllocation_gen1.mjs│15→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊪│export const dynamicRoleAllocation = (agents, metrics) => {
+agents.forEach(α => {
+κrole
+α.assignRole(role);
+·});
+·};
+⟩SCL│8│4⊨│1⑂│46.7%↓⟩

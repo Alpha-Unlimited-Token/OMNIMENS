@@ -1,0 +1,29 @@
+⟨SCL v1│eventDrivenPubSub_gen1.mjs│42→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class PubSubSystem {
+·constructor() {
+this.→ = {};
+·}
+·publish(event, data) {
+if (this.→[event]) {
+this.→[event].forEach(callback => callback(data));
+·}
+·}
+·subscribe(event, callback) {
+if (!this.→[event]) {
+this.→[event] = [];
+·}
+⊺│this.events[event].push(callback);
+·}
+·unsubscribe(event, callback) {
+if (this.→[event]) {
+this.→[event] = this.→[event].filter(cb => cb !== callback);
+·}
+·}
+·}
+κpubSub
+·pubSub.subscribe('taskCompleted', data => {
+·console.log('Task completed:', data);
+·});
+·pubSub.publish('taskCompleted', { taskId: 123, status: 'success' });
+⟩SCL│28│10⊨│2⑂│33.3%↓⟩

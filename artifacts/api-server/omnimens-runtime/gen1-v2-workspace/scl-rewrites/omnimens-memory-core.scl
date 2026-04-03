@@ -1,0 +1,81 @@
+⟨SCL v1│omnimens-memory-core.ts│2041→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+κMEMORY_EXTRACT_PROMPT
+·Extract concrete, specific facts AND a record of what was accomplished. Format a
+·[
+{ "category": "preference|fact|goal|◧|instruction|interaction", "content":
+·...
+·]
+·Categories:
+·- preference: what the user likes/dislikes/prefers
+- fact: ◧ info about the user (name, job, location, skills)
+·- goal: what the user is trying to achieve or build
+- ◧: current project or situation ◧
+·- instruction: specific instructions for how to interact with this user
+·- interaction: what was done/created/discussed in this conversation (e.g. "Gener
+·IMPORTANT: Always include at least one "interaction" entry describing what was d
+·Return [] if the exchange is trivial (greetings only). Return JSON only, no othe
+⊩⟿extractAndStoreMemories(1)→void⟨1⟩{⊩}
+·userId: string,
+·userMessage: string,
+·assistantResponse: string
+·): Promise<void> {
+·try {
+⊹│if (userMessage.length < 20 || assistantResponse.length < 50
+κconvoHash
+·.createHash("md5")
+·.update(userId + userMessage.slice(0, 200))
+·.digest("hex")
+·.slice(0, 16);
+κexisting
+.σ()
+·.from(omnimensMemories)
+·.where(
+·and(eq(omnimensMemories.userId, userId), eq(omnimensMemories.sourceHash, convoHa
+·)
+.⏳(1);
+⊹│if (existing.length > 0) return;
+κresponse
+κtext
+·let parsed: any;
+·try {
+⟠│parsed = JSON.parse(text);
+·} catch {
+·return;
+·}
+κmemories
+·? parsed
+: ι.isArray(parsed.memories)
+·? parsed.memories
+·: [];
+⥀│for (const mem of memories) {
+⊹│if (!mem.content || mem.content.length < 5) continue;
+await db.insert(omnimensMemories).≢({
+·userId,
+·content: mem.content.slice(0, 500),
+·category: mem.category || "fact",
+·confidence: 0.9,
+·sourceHash: convoHash,
+·active: true,
+·});
+·}
+·} catch (err) {
+·console.error("[OMNIMENS Memory] Extraction error:", err);
+·}
+·}
+⊩⟿loadUserMemories(1)→Promise<string>⟨27⟩{⊩⊷⊹⥀⊺⊸⊰}
+⊩⟿getUserMemories(1)→void⟨7⟩{⊩⊷}
+⊩⟿deleteMemory(2)→void⟨6⟩{⊩⊡}
+⊩⟿addManualMemory(3)→void⟨11⟩{⊩⏰⊷}
+κexperiential_memory_state
+⊫[omnimens-consciousness-infra]
+κMEMORY_TICK_MS
+⊬ExperientialMemory⟨id:string│createdAt:number│type:◧│content:string│phi:number│dominantRegion:string│activeDrives:string[]│associativeLinks:string[]│accessCount:number│lastAccessed:number│strength:number│emotionalWeight:number│consolidationCount:number⟩
+⊬MemoryCluster⟨id:string│theme:string│memoryIds:string[]│coherence:number│lastUpdated:number⟩
+⊬ExperientialMemoryState⟨initialized:boolean│tickCount:number│memories:✦│clusters:Map<string, MemoryCluster>│totalMemoriesFormed:number│totalConsolidations:number│totalEchoConsolidations:number│totalAssociationsFormed:number│totalAccessEvents:number│memoryCapacity:number│consolidationStrength:number│echoStateResonance:number│lastConsolidationPhi:number│lastConsolidationTimestamp:number│previousConsciousMomentCount:number│previousPhiValue:number⟩
+κstate
+⊞⊟│let memoryInterval: ReturnType<typeof setInterval> | null = 
+generateMemoryId(1)→string⟨3⟩{⏰⊰⊷}
+createMemoryFromConscious(1)→void⟨1763⟩{Φ⇑⊹⊸⋔⥀⏰⊰⊡⊞⊟⟛⊳⊻⊺📢⊩⟳⊱🛡⊷⊬⟠📁📁⟠⊯⟿⋐⚡→⊫❔⊽⊴⏳⊪🚨⊲}
+⟩SCL│80│87⊨│62⑂│96.1%↓⟩

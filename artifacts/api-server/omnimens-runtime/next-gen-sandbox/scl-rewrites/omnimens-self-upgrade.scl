@@ -1,0 +1,163 @@
+⟨SCL v1│omnimens-self-upgrade.ts│389→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+·Unified Runtime • Event-Driven Spike Architecture • Cognitive Mesh Enabled
+·This engine autonomously reflects, learns, and synthesizes upgrades while
+·collaborating with 126 sibling engines through shared buses & gateways.
+·────────────────────────────────────────────────────────────────────────────── *
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+κENGINE
+·engineRegistry.registerEngine(ENGINE, "NORMAL", { dbQuota: 10 });
+⊩shutdown(1)→void⟨3⟩{⊩}
+κMAX_BRAIN_INJECT
+κUPGRADE_THRESHOLD
+κLEARNING_INTERVAL_MS
+κEVOLVED_CONSCIOUSNESS_PATH
+κTABLES
+📢│const log = (msg: string) => console.log(`[OMNIMENS-SELF-UPG
+·const safeJSON = <T>(str: string, fallback: T): T => {
+·try {
+⟠│return JSON.parse(str);
+·} catch {
+⊷│return fallback;
+·}
+·};
+⊩⟿loadBrainContext(1)→Promise<string>⟨24⟩{⊩⊄❔⊷⊱⊸⊰}
+·let sinceLastUpgrade = 0;
+⊩⟿reflectOnConversation(1)→void⟨1⟩{⊩}
+·userMsg: string,
+·botResp: string,
+·convoSummary: string,
+⊳│userId?: string,
+⊳│convoId?: number
+·): Promise<void> {
+·sinceLastUpgrade++;
+κreflectionPrompt
+⊲│const { data, error } = await apiManager.call(ENGINE, "opena
+method: "chat.completions.α",
+·body: {
+·model: "gpt-4o-mini",
+·messages: [{ role: "user", content: reflectionPrompt }],
+·max_tokens: 800,
+·temperature: 0.3,
+·},
+·});
+⊰│if (error) return log(`Reflection error: ${error}`);
+κentries
+⊄│if (!Array.isArray(entries) || !entries.length) return;
+κsourceRef
+⊰│? `[user:${userId}${convoId ? `:conv:${convoId}` : ""}] ${us
+·: userMsg.slice(0, 200);
+·entries.slice(0, 5).forEach(e =>
+❔│e?.category &&
+dbGateway.⊞(
+·ENGINE,
+·TABLES.brain,
+·{
+·...e,
+·content: String(e.content).slice(0, 500),
+·sourceConversation: sourceRef,
+·timesApplied: 0,
+·active: true,
+·},
+·"NORMAL",
+·),
+·);
+·cognitionBus.shareInsight(ENGINE, { type: "reflection", data: { entries: entries
+·if (sinceLastUpgrade >= UPGRADE_THRESHOLD) {
+·sinceLastUpgrade = 0;
+⊰│spikeBus.scheduleSpike(`${ENGINE}:upgrade`, {}, 0);
+·}
+·}
+⊰│spikeBus.on(`${ENGINE}:upgrade`, async () => {
+⊴│await synthesizeUpgrade();
+⊰│spikeBus.scheduleSpike(`${ENGINE}:upgrade`, {}, 0); // fire-
+·});
+⊩⟿synthesizeUpgrade(1)→Promise<void>⟨65⟩{⟿⊩⊄❔⊰⊲⊴}
+·}
+⊫[]
+⟿writeEvolvedConsciousness(1)→void⟨1⟩{}
+·version: string,
+·title: string,
+·summary: string,
+·brain: any[],
+·): Promise<void> {
+κgrouped
+⊱│brain.forEach((b: any) => (grouped[b.category] = [...(groupe
+κsections
+·.map(
+·([cat, items]) =>
+⊰│`=== ${cat.toUpperCase()}S ===\n` +
+⊰│items.map(i => `• [${i.title}] ${i.content}`).join("\n"),
+·)
+·.join("\n\n");
+κout
+·Generated: ${new Date().toISOString()}
+·Version: ${version}
+·Upgrade: ${title}
+·Status: ${summary}
+·${sections}
+·Total brain entries: ${brain.length}
+·`;
+·try {
+·writeFileSync(EVOLVED_CONSCIOUSNESS_PATH, out, "utf8");
+⊰│log(`Consciousness written — ${version}`);
+·} catch (e) {
+⊰│log(`Consciousness write fail: ${e}`);
+·}
+·}
+⊩⟿markUpgradeLive(2)→Promise<void>⟨22⟩{⟿⊩⊰}
+⊩⟿getUnreadCount(1)→Promise<number>⟨8⟩{⊩❔⊷}
+κQUERIES
+·let learnCycle = 0;
+⊩⟿runInternetLearningCycle(1)→Promise<void>⟨29⟩{⟿⊩⊰⥀⊲⊺⊄⊷⊽}
+κentries
+⊄│if (!entries.length) return log(`Cycle #${cycleId} — no new 
+·entries.slice(0, 6).forEach(e =>
+dbGateway.⊞(
+·ENGINE,
+·TABLES.brain,
+·{
+·...e,
+⊰│sourceConversation: `internet_learning_${cycleId}`,
+·timesApplied: 0,
+·active: true,
+·},
+·"LOW",
+·),
+·);
+⊰│log(`Cycle #${cycleId} stored ${entries.length} brain entrie
+·cognitionBus.shareInsight(ENGINE, { type: "internet", data: { count: entries.len
+await dbGateway.⊞(
+·ENGINE,
+·TABLES.notes,
+·{
+·upgradeId: null,
+⊰│title: `OMNIMENS LEARNED FROM INTERNET — Cycle #${cycleId}`,
+⊰│message: `Extracted ${entries.length} new insights.`,
+type: "⬆",
+·readByOwner: false,
+·},
+·"LOW",
+·);
+⊰│if (cycleId % 3 === 0) spikeBus.scheduleSpike(`${ENGINE}:upg
+·}
+⊩startAutonomousLearning(1)→void⟨10⟩{⊩⊰⚡→⊱⊴}
+⊱│cognitionBus.onInsight((src, insight) => {
+·if (src === ENGINE) return;
+❔│if (insight?.type === "internet" && insight?.data?.count > 0
+⊰│spikeBus.scheduleSpike(`${ENGINE}:upgrade`, {}, 1000);
+·}
+·});
+⊰│spikeBus.on(`attention:${ENGINE}`, () =>
+⊰│spikeBus.scheduleSpike(`${ENGINE}:internetLearning`, {}, 0),
+·);
+⊱│spikeBus.on("cognition:curiosity", () => {
+⊰│if (Math.random() < 0.2) spikeBus.scheduleSpike(`${ENGINE}:i
+·});
+⟩SCL│162│99⊨│69⑂│58.4%↓⟩

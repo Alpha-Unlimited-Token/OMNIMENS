@@ -1,0 +1,47 @@
+⟨SCL v1│realTimeDataStreamProcessor_gen1.mjs│106→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩generateBatchId(1)→void⟨3⟩{⊩⊷}
+⊩processBatch(2)→void⟨7⟩{⊩⊵⊷}
+⊩adaptivePipeline(2)→void⟨7⟩{⊩⊹⊵⋐⊷}
+⊪│export const createWebSocketServer = (port = 8080, batchInte
+κwss
+·let dataBuffer = [];
+⊱│wss.on('connection', (ws) => {
+⊱│ws.on('message', (message) => {
+·try {
+κparsedData
+⊺│dataBuffer.push(parsedData);
+·} catch (error) {
+⟠│ws.send(JSON.stringify({ error: 'Invalid data format' }));
+·}
+·});
+⟠│ws.send(JSON.stringify({ message: 'Connection established' }
+·});
+⟳│setInterval(() => {
+⊹│if (dataBuffer.length > 0) {
+κbatchId
+κbatch
+·dataBuffer = [];
+⊱│wss.clients.forEach((client) => {
+·if (client.readyState === client.OPEN) {
+·client.send(
+⟠│JSON.stringify({
+·batchId,
+·batch,
+·timestamp: new Date().toISOString(),
+·})
+·);
+·}
+·});
+·}
+·}, batchInterval);
+⊷│return wss;
+·};
+⊩exampleProcessingFunction(1)→void⟨6⟩{⊩⊷}
+⊩stage1(1)→void⟨3⟩{⊩⊷}
+⊩stage2(1)→void⟨3⟩{⊩⊷}
+⊩stage3(1)→void⟨3⟩{⊩⊷}
+⊩examplePipelineUsage(1)→void⟨3⟩{⊩⊷}
+⊪moduleDescription
+⟩SCL│46│45⊨│31⑂│56.6%↓⟩

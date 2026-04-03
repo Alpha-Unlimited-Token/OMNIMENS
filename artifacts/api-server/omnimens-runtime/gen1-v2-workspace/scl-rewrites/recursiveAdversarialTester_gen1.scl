@@ -1,0 +1,18 @@
+⟨SCL v1│recursiveAdversarialTester_gen1.mjs│29→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊪│export const recursiveAdversarialTester = (decisionPaths) =>
+⊱│const generateEdgeCases = (path) => {
+⊰│return [`edge_case_${path}_1`, `edge_case_${path}_2`];
+·};
+⊱│const testPathConsistency = (path, edgeCases) => {
+·const inconsistencies = edgeCases.filter(case => Math.random() > 0.5); // Placeh
+⊷│return inconsistencies;
+·};
+const ⊢ = decisionPaths.map(path => {
+κedgeCases
+κinconsistencies
+⊷│return { path, inconsistencies };
+·});
+⊷│return results;
+·};
+⟩SCL│17│10⊨│7⑂│41.4%↓⟩

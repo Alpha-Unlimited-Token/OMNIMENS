@@ -1,0 +1,16 @@
+⟨SCL v1│counterfactualSimulationModule_gen1.mjs│27→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class CounterfactualSimulationModule {
+·constructor() {}
+·simulate(decisionTree) {
+κalternatives
+⊷│return this.evaluateAlternatives(alternatives);
+·}
+·generateAlternatives(tree) {
+⊷│return tree.map(path => ({ ...path, isAlternative: true }));
+·}
+·evaluateAlternatives(alternatives) {
+⊷│return alternatives.map(alt => ({ ...alt, score: Math.random
+·}
+·}
+⟩SCL│15│5⊨│4⑂│44.4%↓⟩

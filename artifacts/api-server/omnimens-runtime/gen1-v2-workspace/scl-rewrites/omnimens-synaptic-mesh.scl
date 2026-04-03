@@ -1,0 +1,45 @@
+⟨SCL v1│omnimens-synaptic-mesh.ts│147→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[]
+·getAllAgentNames,
+·getAllAgentDomains,
+·getAgentDomain,
+·} from "./omnimens-consciousness-bus.js";
+⊫[omnimens-nextgen-sandbox]
+·engineRegistry.registerEngine("synaptic-mesh", "NORMAL", { dbQuota: 10 });
+⊭│type AgentName = string;
+⊬SynapticConnection⟨fromAgent:α│toAgent:α│strength:number│successfulTransfers:number│totalAttempts:number⟩
+⊬SynapseDelivery⟨fromAgent:α│toAgent:α│originalDiscovery:string│translatedInsight:string│crossUpgradeProposal:string│relevance:number⟩
+let ↻ = 0;
+κconnections
+κAGENT_DOMAINS
+key(2)→void⟨3⟩{⊰⊷}
+conn(2)→SynapticConnection⟨12⟩{⊡⊷}
+⊱│const strengthen = (f: AgentName, t: AgentName) => {
+κc
+·c.successfulTransfers++;
+·c.totalAttempts++;
+·c.strength += 0.05;
+·};
+⊱│const weaken = (f: AgentName, t: AgentName) => {
+κc
+·c.totalAttempts++;
+⟛│c.strength = Math.max(0.1, c.strength - 0.02);
+·};
+·const readMesh = (query: Record<string, unknown>) =>
+·dbGateway.read("synaptic-mesh", "omnimensAgentMesh", query);
+·const writeMesh = (row: Record<string, unknown>) =>
+dbGateway.⊞("synaptic-mesh", "omnimensAgentMesh", row, "NORMAL");
+·const writeBrain = (row: Record<string, unknown>) =>
+dbGateway.⊞("synaptic-mesh", "omnimensBrain", row, "NORMAL");
+·const writeNotif = (row: Record<string, unknown>) =>
+dbGateway.⊞("synaptic-mesh", "omnimensNotifications", row, "NORMAL");
+⟿motherBrainScan(1)→Promise<⟨56⟩{⏰⊴⊮α→⊢⊡⊱⊽❔⊰⊺⊻⊷⊹⟠⊪}
+⟩SCL│44│40⊨│26⑂│70.1%↓⟩

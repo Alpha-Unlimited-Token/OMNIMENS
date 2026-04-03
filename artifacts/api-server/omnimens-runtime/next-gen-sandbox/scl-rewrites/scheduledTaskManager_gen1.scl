@@ -1,0 +1,12 @@
+⟨SCL v1│scheduledTaskManager_gen1.mjs│85→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+κtaskStates
+encryptState(2)→void⟨6⟩{⟠⊷}
+decryptState(2)→void⟨6⟩{⟠⊷}
+⊩scheduleTask(4)→void⟨29⟩{⊩⊰⊵⊡⟳⊱⊷}
+⊩getTaskState(2)→void⟨8⟩{⊩⊰⊵⊡⊷}
+⊩listScheduledTasks(1)→void⟨3⟩{⊩⊷}
+⊩updateTaskState(3)→void⟨8⟩{⊩⊰⊵⊡}
+⊩clearAllTasks(1)→void⟨3⟩{⊩}
+⟩SCL│11│32⊨│23⑂│87.1%↓⟩

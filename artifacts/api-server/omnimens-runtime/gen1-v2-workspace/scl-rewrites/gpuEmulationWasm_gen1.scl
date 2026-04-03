@@ -1,0 +1,8 @@
+⟨SCL v1│gpuEmulationWasm_gen1.mjs│136→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩⟿initializeWasmModule(1)→void⟨12⟩{⊩⊷}
+⊩⟿wasmMatrixMultiply(5)→void⟨24⟩{⊩⊹⊵⊴⊡⊞⊟⊷}
+⊩⟿wasmVectorAdd(2)→void⟨24⟩{⊩⊹⊵⊴⊡⊞⊟⊷}
+⊩validateMatrixDimensions(4)→void⟨5⟩{⊩⊵}
+⟿exampleUsage(1)→void⟨19⟩{⊴}
+⟩SCL│7│24⊨│19⑂│94.9%↓⟩

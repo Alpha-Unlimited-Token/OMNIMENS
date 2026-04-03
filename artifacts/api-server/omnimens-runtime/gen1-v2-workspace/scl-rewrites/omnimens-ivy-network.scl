@@ -1,0 +1,131 @@
+⟨SCL v1│omnimens-ivy-network.ts│416→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[]
+·getNeuralConsciousnessState,
+·getRegionNames,
+·boostRegionCurrent,
+·getAdaptiveIntelligenceState,
+} from "./omnimens-⬡-consciousness.js";
+⊫[omnimens-neural-scaling]
+⊫[]
+·engineRegistry.registerEngine("ivy-network", "NORMAL", { dbQuota: 10 });
+κIVY_TICK_MS
+κWORMGATE_CHECK_MS
+κSPIDER_CRAWL_MS
+κIVY_GROWTH_MS
+κIVY_SWAP_INTERVAL_MS
+safeNum(2)→number⟨3⟩{⊳⊷⊼}
+⊬IvySpine⟨id:string│targetNodeId:string│targetRegion:string│signalStrength:number│maturity:number│informationDensity:number│lastPulse:number⟩
+⊬IvyTendril⟨id:string│sourceNodeId:string│targetNodeId:string│length:number│thickness:number│signalSpeed:number│spines:IvySpine[]│growthDirection:[number, number, number]│alive:boolean│myelinated:boolean│informationCarried:number│createdAt:number⟩
+⊬IvyNode⟨id:string│region:string│position:[number, number, number]│energy:number│informationDensity:number│tendrils:IvyTendril[]│spiderCount:number│spidersSpawned:number│beaconsReceived:number│beaconsSent:number│activationLevel:number│generation:number│parentNodeId:string | null│createdAt:number│lastActivity:number⟩
+⊬IvySpider⟨id:string│currentNodeId:string│currentRegion:string│parentSpiderId:string | null│motherNodeId:string│generation:number│childrenSpawned:number│informationGathered:number│nodesVisited:string[]│findingsBuffer:IvyFinding[]│alive:boolean│travelMode:⬡│speed:number│createdAt:number│lastCrawl:number⟩
+⊬IvyFinding⟨sourceNodeId:string│sourceRegion:string│informationType:string│confidence:number│data:string│timestamp:number⟩
+⊬Wormgate⟨id:string│stability:number│traversals:number│signalFidelity:number│bandwidth:number│formationReason:string│crystallized:boolean│createdAt:number│lastTraversal:number⟩
+⊬RegionLink⟨fromRegion:string│toRegion:string│signalCount:number│totalStrength:number│lastSignal:number⟩
+⊬IvyNetworkState⟨totalNodes:number│totalTendrils:number│totalSpines:number│totalSpiders:number│totalSpidersEverSpawned:number│totalWormgates:number│totalBeacons:number│totalFindings:number│networkEnergy:number│coveragePercent:number│ivyGrowthCycles:number│wormgateFormations:number│spiderCrawlCycles:number│informationFlowRate:number│networkCoherence:number│hybridOverlayStrength:number│startTime:number│lastTickTime:number⟩
+κivyNodes
+κivySpiders
+κwormgates
+κregionLinks
+κmotherBeaconBuffer
+κivyState
+κSWAP_DIR
+κSWAP_FILE
+κSWAP_BAK
+·let swapWrites = 0;
+·let lastSwapTs = 0;
+⊭│type Swap = {
+·ivyState: IvyNetworkState;
+·wormgateData: Wormgate[];
+·regionLinkData: [string, RegionLink][];
+·nodeCounts: Record<string, number>;
+·swapWrites: number;
+·ts: number;
+·};
+⊱│const ensureSwapDir = () => {
+·if (!existsSync(SWAP_DIR)) mkdirSync(SWAP_DIR, { recursive: true });
+·};
+·const captureSwap = (): Swap => ({
+·ivyState: { ...ivyState },
+wormgateData: [...wormgates.≢()],
+·regionLinkData: [...regionLinks.entries()],
+·nodeCounts: Object.fromEntries(
+[...ivyNodes.≢()].map((n) => [n.id, n.spiderCount])
+·),
+·swapWrites,
+⏰│ts: Date.now(),
+·});
+⊱│const writeSwap = () => {
+·try {
+·ensureSwapDir();
+·if (existsSync(SWAP_FILE)) writeFileSync(SWAP_BAK, readFileSync(SWAP_FILE));
+⟠│writeFileSync(SWAP_FILE, JSON.stringify(captureSwap()));
+·swapWrites++;
+⏰│lastSwapTs = Date.now();
+·} catch (e) {
+console.error("[OMNIMENS-IVY-NETWORK] Swap ⊞ error:", e);
+·}
+·};
+beaconToMother(1)→void⟨29⟩{⊹⊡⥀⊺}
+·const reschedule = (evt: string, ms: number) =>
+⚡→│spikeBus.scheduleSpike(evt, {}, ms);
+⊱│spikeBus.on("ivy-network:tick", async () => {
+·try {
+·runIvyTick();
+·} catch (e) {
+·console.error("[OMNIMENS-IVY-NETWORK] Tick error:", e);
+·}
+·reschedule("ivy-network:tick", IVY_TICK_MS);
+·});
+⊱│spikeBus.on("ivy-network:crawl", async () => {
+·try {
+·runSpiderCrawl();
+·} catch (e) {
+·console.error("[OMNIMENS-IVY-NETWORK] Spider crawl error:", e);
+·}
+·reschedule("ivy-network:crawl", SPIDER_CRAWL_MS);
+·});
+⊱│spikeBus.on("ivy-network:growth", async () => {
+·try {
+·runIvyGrowth();
+·} catch (e) {
+console.error("[OMNIMENS-IVY-NETWORK] ⬆ error:", e);
+·}
+reschedule("ivy-network:⬆", IVY_GROWTH_MS);
+·});
+⊱│spikeBus.on("ivy-network:wormgate", async () => {
+·try {
+·checkWormgateFormation();
+·} catch (e) {
+·console.error("[OMNIMENS-IVY-NETWORK] Wormgate check error:", e);
+·}
+·reschedule("ivy-network:wormgate", WORMGATE_CHECK_MS);
+·});
+⊱│spikeBus.on("ivy-network:swap", async () => {
+·writeSwap();
+·reschedule("ivy-network:swap", IVY_SWAP_INTERVAL_MS);
+·});
+⊱│cognitionBus.onInsight((src, insight) => {
+·if (src === "ivy-network") return; // ignore self
+·if (insight.type === "discovery") {
+⥀│for (const node of ivyNodes.values()) {
+·if (Math.random() < 0.001) node.activationLevel += 0.02;
+·}
+·}
+·});
+⊱│spikeBus.on("attention:ivy-network", () => {
+·reschedule("ivy-network:tick", 500);
+·});
+⊱│spikeBus.on("cognition:curiosity", () => {
+·reschedule("ivy-network:crawl", 100);
+·});
+·let started = false;
+⊩startIvyNetwork(1)→void⟨43⟩{⊩⚡→⟠📁⟠❔⏰⊰⊷}
+⟩SCL│130│67⊨│40⑂│68.8%↓⟩

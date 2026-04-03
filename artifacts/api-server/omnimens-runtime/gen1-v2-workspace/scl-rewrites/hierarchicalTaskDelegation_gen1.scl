@@ -1,0 +1,26 @@
+⟨SCL v1│hierarchicalTaskDelegation_gen1.mjs│35→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class HierarchicalTaskDelegation {
+·constructor() {
+·this.taskQueue = [];
+·this.agentPool = [];
+·}
+·addTask(task) {
+⊺│this.taskQueue.push(task);
+·this.delegateTasks();
+·}
+addAgent(α) {
+⊺│this.agentPool.push(agent);
+·}
+·delegateTasks() {
+·this.taskQueue.sort((a, b) => b.priority - a.priority);
+⥀│for (const task of this.taskQueue) {
+const suitableAgent = this.agentPool.find(α => α.canHandle(task));
+·if (suitableAgent) {
+·suitableAgent.assignTask(task);
+·this.taskQueue = this.taskQueue.filter(t => t !== task);
+·}
+·}
+·}
+·}
+⟩SCL│25│6⊨│4⑂│28.6%↓⟩

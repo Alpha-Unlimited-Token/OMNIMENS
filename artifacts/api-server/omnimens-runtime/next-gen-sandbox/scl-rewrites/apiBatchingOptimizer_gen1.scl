@@ -1,0 +1,56 @@
+⟨SCL v1│apiBatchingOptimizer_gen1.mjs│130→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊶│export class PriorityQueue {
+·constructor() {
+·this.queue = [];
+·}
+·enqueue(task) {
+·if (!task || typeof task.priority !== 'number' || typeof task.execute !== 'funct
+⊵│throw new Error('Task must have a priority (number) and an e
+·}
+⊺│this.queue.push(task);
+·this.queue.sort((a, b) => b.priority - a.priority); // Higher priority first
+·}
+·dequeue() {
+⊷│return this.queue.shift() || null;
+·}
+·isEmpty() {
+⊷│return this.queue.length === 0;
+·}
+·}
+⊶│export class ApiBatchingOptimizer {
+·constructor(rateLimitPerSecond) {
+·if (typeof rateLimitPerSecond !== 'number' || rateLimitPerSecond <= 0) {
+⊵│throw new Error('rateLimitPerSecond must be a positive numbe
+·}
+·this.rateLimitPerSecond = rateLimitPerSecond;
+·this.priorityQueue = new PriorityQueue();
+·this.currentRequests = 0;
+·}
+·scheduleTask(priority, taskFunction) {
+·this.priorityQueue.enqueue({ priority, execute: taskFunction });
+·this.processQueue();
+·}
+·async processQueue() {
+·while (!this.priorityQueue.isEmpty() && this.currentRequests < this.rateLimitPer
+κtask
+·if (task) {
+·this.currentRequests++;
+·task.execute()
+.catch((err) => console.error('Task execution ↺:', err))
+⊱│.finally(() => {
+·this.currentRequests--;
+·this.processQueue();
+·});
+·}
+·}
+·if (this.currentRequests >= this.rateLimitPerSecond) {
+⊴│await delay(1000); // Wait 1 second before retrying
+·this.processQueue();
+·}
+·}
+·}
+⊩sleep(1)→void⟨6⟩{⊩⊵⊷}
+⊩⟿exampleUsage(1)→void⟨12⟩{⊩⊳⊱⊰⊴}
+⟩SCL│55│22⊨│17⑂│57.7%↓⟩

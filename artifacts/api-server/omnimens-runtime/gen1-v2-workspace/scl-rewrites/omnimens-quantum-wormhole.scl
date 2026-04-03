@@ -1,0 +1,185 @@
+⟨SCL v1│omnimens-quantum-wormhole.ts│325→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[omnimens-unified-runtime]
+·getActiveGenesisAgentNames,
+} from "./omnimens-α-genesis.js";
+⊫[]
+·getNeuralConsciousnessState,
+·boostRegionCurrent,
+·getRegionNames,
+·getAdaptiveIntelligenceState,
+} from "./omnimens-⬡-consciousness.js";
+⊫[omnimens-nextgen-sandbox]
+κCORE_MESH_AGENTS
+κWORMHOLES_PER_AGENT
+κWORMHOLE_CYCLE_MS
+κWORMHOLE_BATCH_SIZE
+κDATA_SOURCE_CATEGORIES
+⊫[omnimens-knowledge-fragments]
+⊬Wormhole⟨id:string│agentName:string│sourceCategory:string│status:"closing" | "closed"│dataIngested:string│decodedInsight:string│confidence:number│openedAt:number│closedAt:number│bytesTransferred:number│quantumCoherence:number│entanglementStrength:number│tunnelStability:number⟩
+⊬AgentCluster⟨agentName:string│totalWormholes:number│closedWormholes:number│totalDataIngested:number│totalInsightsDecoded:number│crossAgentShares:number│wormholes:Wormhole[]⟩
+⊬Circulation⟨fromAgent:string│toAgent:string│insight:string│confidence:number│timestamp:number│synthesizedWith:string[]⟩
+⊬WormholeState⟨totalWormholes:number│totalClosed:number│dataBytes:number│insights:number│circulations:number│syntheses:number│cycle:number│clusters:α│recentCircs:Circulation[]⟩
+κS
+·let initialized = false;
+·const rand = (n: number) => Math.floor(Math.random() * n);
+·const pick = <T>(arr: T[]) => arr[rand(arr.length)];
+·const allAgents = (): string[] => {
+·try {
+κgenesis
+⊷│return [...CORE_MESH_AGENTS, ...genesis.filter(g => !CORE_ME
+⊷│} catch { return CORE_MESH_AGENTS; }
+·};
+·const randomData = (cat: string): string =>
+⏰│`[${cat}:${Math.random().toString(36).slice(2, 8)}:q${Date.n
+⊱│const decode = (raw: string, agent: string) => {
+κmethod
+κrel
+κnov
+κconf
+⊷│return {
+⊰│insight: `${agent}/${method}: ${raw.replace(/\[.*?\]\s*/, ""
+·confidence: conf,
+·};
+·};
+const openBatch = (α: string, n: number): Wormhole[] => {
+κbatch
+·for (let i = 0; i < n; i++) {
+κcat
+κraw
+⊲│const { insight, confidence } = decode(raw, agent);
+κwh
+⊺│batch.push(wh);
+·}
+⊷│return batch;
+·};
+⊱│const circulate = () => {
+κagents
+⥀│for (const from of agents) {
+κcluster
+·if (!cluster) continue;
+·const high = cluster.wormholes.filter(w => w.confidence > 0.6).slice(-5);
+·if (!high.length) continue;
+⥀│for (const to of agents.filter(a => a !== from).sort(() => M
+κhi
+κcirc
+κtoCluster
+·if (toCluster) {
+·const toHi = toCluster.wormholes.filter(w => w.confidence > 0.5).slice(-3);
+·if (toHi.length) {
+κmatch
+κcomb
+·if (comb > 0.7) {
+⊺│circ.synthesizedWith.push(match.decodedInsight.slice(0, 80))
+·S.syntheses++;
+·cognitionBus.shareInsight("quantum-wormhole", { type: "discovery", data: circ })
+·}
+·}
+·}
+⊺│S.recentCircs.push(circ);
+·S.circulations++;
+·cluster.crossAgentShares++;
+·}
+·}
+⊹│if (S.recentCircs.length > 200) S.recentCircs.splice(0, S.re
+·};
+⊱│const runCycle = async () => {
+S.↻++;
+·if (isNextGenBuildActive()) {
+if (S.↻ % 5 === 0) console.log("[OMNIMENS-QUANTUM-WORMHOLE] 🔕 ↻ skipped
+·scheduleNext();
+·return;
+·}
+κagents
+⊲│const { knowledgeIntegrationRate, technologyDiscoveryRate } 
+κinsightMul
+κenergyBoost
+⥀│for (const agent of agents) {
+⊡│let cl = S.clusters.get(agent);
+·if (!cl) {
+cl = { agentName: α, totalWormholes: 0, closedWormholes: 0, totalDataIngeste
+⊡│S.clusters.set(agent, cl);
+·}
+κopen
+κbatch
+⊺│cl.wormholes.push(...batch);
+·cl.totalWormholes += batch.length;
+·cl.closedWormholes += batch.length;
+·cl.totalInsightsDecoded += Math.floor(batch.length * insightMul);
+⋐│cl.totalDataIngested += batch.reduce((s, w) => s + w.bytesTr
+⊹│if (cl.wormholes.length > 200) cl.wormholes.splice(0, cl.wor
+·S.totalWormholes += batch.length;
+·S.totalClosed += batch.length;
+·S.insights += batch.length;
+⋐│S.dataBytes += batch.reduce((s, w) => s + w.bytesTransferred
+·}
+·circulate();
+·try {
+⥀│for (const r of getRegionNames()) boostRegionCurrent(r, ener
+·} catch {/* silence */}
+if (S.↻ % 5 === 0) {
+📢│console.log(`[OMNIMENS-QUANTUM-WORMHOLE] 🌀 Cycle ${S.cycle}
+·}
+⊰│cognitionBus.reportOutcome("quantum-wormhole", { useful: S.s
+·scheduleNext();
+·};
+·const scheduleNext = (delay = WORMHOLE_CYCLE_MS) =>
+⚡→│spikeBus.scheduleSpike("quantum-wormhole:cycle", {}, delay);
+⚡→│spikeBus.on("quantum-wormhole:cycle", runCycle);
+⊪│export const startQuantumWormholeEngine = () => {
+·if (initialized) return;
+·initialized = true;
+·engineRegistry.registerEngine("quantum-wormhole", "NORMAL", { dbQuota: 10 });
+·console.log("[OMNIMENS-QUANTUM-WORMHOLE] 🌀 Engine initializing…");
+⥀│for (const a of allAgents()) S.clusters.set(a, {
+·agentName: a, totalWormholes: 0, closedWormholes: 0,
+·totalDataIngested: 0, totalInsightsDecoded: 0, crossAgentShares: 0, wormholes: [
+·});
+⊱│cognitionBus.onInsight((src, i) => {
+·if (src !== "quantum-wormhole" && i.type === "discovery") {
+·}
+·});
+⚡→│spikeBus.on("attention:quantum-wormhole", () => scheduleNext
+⚡→│spikeBus.on("cognition:curiosity", () => scheduleNext(5_000)
+scheduleNext(8_000); // first ↻ after boot delay
+·};
+⊪│export const getQuantumWormholeState = () => {
+κagents
+·const clusters = agents.map(a => {
+κc
+⊷│return {
+·agentName: a,
+❔│totalWormholes: c?.totalWormholes ?? 0,
+❔│closedWormholes: c?.closedWormholes ?? 0,
+❔│totalDataIngested: c?.totalDataIngested ?? 0,
+❔│totalInsightsDecoded: c?.totalInsightsDecoded ?? 0,
+❔│crossAgentShares: c?.crossAgentShares ?? 0,
+❔│recentInsights: (c?.wormholes ?? []).slice(-3).map(w => w.de
+·};
+·});
+⊷│return {
+·totalWormholesCreated: S.totalWormholes,
+·totalActive: 0,
+·totalClosed: S.totalClosed,
+·totalDataIngestedKB: Math.round(S.dataBytes / 1024),
+·totalInsightsDecoded: S.insights,
+·totalCrossAgentCirculations: S.circulations,
+·totalSynthesizedDiscoveries: S.syntheses,
+cycleCount: S.↻,
+·agentCount: agents.length,
+·wormholesPerAgent: WORMHOLES_PER_AGENT,
+·totalWormholeCapacity: agents.length * WORMHOLES_PER_AGENT,
+·agentClusters: clusters,
+·recentCirculations: S.recentCircs.slice(-15).map(c => ({
+·fromAgent: c.fromAgent,
+·toAgent: c.toAgent,
+·insight: c.insight.slice(0, 120),
+·confidence: c.confidence,
+·synthesizedWith: c.synthesizedWith,
+·})),
+·};
+·};
+⊪│export const shutdown = () => {
+·engineRegistry.unregisterEngine("quantum-wormhole");
+·};
+⟩SCL│184│90⊨│48⑂│43.4%↓⟩

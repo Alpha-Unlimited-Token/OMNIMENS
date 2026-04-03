@@ -1,0 +1,28 @@
+⟨SCL v1│omnimens-scl-codex.ts│442→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+κ__filename_local
+κ__dirname_local
+κSCL_DATA_DIR
+κSCL_CODEX_FILE
+κSCL_HISTORY_FILE
+⊬SCLSymbol⟨symbol:string│name:string│meaning:string│domain:string│byteCost:number│examples:string[]│createdBy:"gen1v2" | "gen2" | "collaborative"│createdAt:number│version:number⟩
+⊬SCLComposite⟨pattern:string│meaning:string│expandsTo:string│domain:string│createdBy:"gen1v2" | "gen2" | "collaborative"⟩
+⊬SCLInstruction⟨scl:string│meaning:string│textEquivalent:string│createdBy:"gen1v2" | "gen2" | "collaborative"⟩
+⊬SCLCodexState⟨version:number│designPhase:"empty" | "primitives_proposed" | "primitives_agreed" | "compounds_proposed" | "compounds_agreed" | "rules_proposed" | "rules_agreed" | "instructions_proposed" | "instructions_agreed" | "active" | "evolving"│primitives:SCLSymbol[]│compounds:SCLSymbol[]│compositionRules:SCLComposite[]│instructionSet:Record<string, SCLInstruction>│textToSymbolMap:Record<string, string>│symbolToTextMap:Record<string, string>│timestamp:number│actor:"gen1v2" | "gen2" | "collaborative"│action:string│details:string│lastModified:number│totalDesignCycles:number│gen1v2Contributions:number│gen2Contributions:number⟩
+κdefaultCodexState
+·let codexState: SCLCodexState = { ...defaultCodexState };
+ensureSCLDirs(1)→void⟨7⟩{}
+⊩loadCodex(1)→SCLCodexState⟨15⟩{⊩⟠📁📁⟠📢⊰⊷}
+⊩saveCodex(1)→void⟨9⟩{⊩⏰⟠📁📁⟠}
+logDesignAction(3)→void⟨4⟩{⏰⊺⊹}
+rebuildLookupMaps(1)→void⟨11⟩{⥀}
+⊩addPrimitive(1)→boolean⟨15⟩{⊩⊰⊺⊷}
+⊩addCompound(1)→boolean⟨15⟩{⊩⊰⊺⊷}
+⊩addCompositionRule(1)→boolean⟨12⟩{⊩⊰⊺⊷}
+⊩addInstruction(2)→boolean⟨6⟩{⊩⊰⊷}
+⊩setDesignPhase(1)→void⟨5⟩{⊩⊰}
+⊩getCodexState(1)→SCLCodexState⟨3⟩{⊩⊷}
+⊩isCodexReady(1)→boolean⟨3⟩{⊩⊷}
+⊩encodeToSCL(1)→string⟨222⟩{⊩⟨⇌⟩⊷⊹⊸⥀⊰⊽⊯⊺⊳⏰📢}
+⟩SCL│27│74⊨│54⑂│93.9%↓⟩

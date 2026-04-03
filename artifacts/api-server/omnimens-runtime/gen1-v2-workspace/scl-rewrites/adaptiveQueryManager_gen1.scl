@@ -1,0 +1,23 @@
+⟨SCL v1│adaptiveQueryManager_gen1.mjs│146→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+κqueryCache
+⊩calculatePriority(2)→void⟨6⟩{⊩⊵⊷}
+⊩allocateQueryBudget(2)→void⟨17⟩{⊩⊵⋐⊷}
+⊩cacheQueryResult(3)→void⟨4⟩{⊩⏰⊡}
+⊩getCachedResult(1)→void⟨8⟩{⊩⊡⏰⊷}
+⊩batchQueries(2)→void⟨18⟩{⊩⊵⊱⊷⊺}
+⊩generateTaskId(1)→void⟨3⟩{⊩⊷}
+⊩cleanupCache(1)→void⟨8⟩{⊩⏰}
+⊪│export const exampleUsage = () => {
+κtasks
+κtotalBudget
+κallocations
+·console.log('Allocations:', allocations);
+κquery
+κresult
+·cacheQueryResult(query, result, 5000);
+·console.log('Cached result:', getCachedResult(query));
+·cleanupCache();
+·};
+⟩SCL│22│38⊨│24⑂│84.9%↓⟩

@@ -1,0 +1,80 @@
+⟨SCL v1│dream-engine.ts│127→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊬Dream⟨⟩
+⊬DreamAssociation⟨⟩
+⊶│export class DreamEngine {
+·private dreams: Dream[] = [];
+·private associations: DreamAssociation[] = [];
+⊮│private symbolLibrary = new Map<string, { meaning: string; f
+·private dreamIdCounter = 0;
+·private _initialized = false;
+·private isResting = false;
+·initialize(): void { this._initialized = true; }
+·enterRestCycle(): void { this.isResting = true; }
+·exitRestCycle(): void { this.isResting = false; }
+·dream(recentExperiences: string[], emotionalState: Record<string, number>, memor
+⊄│if (!this.isResting && this.dreams.length > 0) return null;
+κsymbols
+κnovelAssociations
+❔│const dominantEmotion = Object.entries(emotionalState).sort(
+κnarrative
+κinsights
+κdream
+⊺│this.dreams.push(dream);
+⊹│if (this.dreams.length > 100) this.dreams = this.dreams.slic
+·for (let i = 0; i < symbols.length - 1; i++) {
+⊺│this.associations.push({
+·symbolA: symbols[i], symbolB: symbols[i + 1],
+·strength: 0.5, discoveredIn: dream.id,
+·});
+·}
+⊹│if (this.associations.length > 500) this.associations = this
+⊷│return dream;
+·}
+·private extractSymbols(experiences: string[]): string[] {
+κsymbols
+⥀│for (const exp of experiences) {
+⊹│const words = exp.split(/\s+/).filter(w => w.length > 3);
+⥀│for (const word of words.slice(0, 5)) {
+·symbols.add(word.toLowerCase());
+κentry
+·if (entry) entry.frequency++;
+⊡│else this.symbolLibrary.set(word.toLowerCase(), { meaning: "
+·}
+·}
+⊷│return [...symbols].slice(0, 10);
+·}
+·private findNovelAssociations(symbols: string[], memories: string[]): string[] {
+κassociations
+⥀│for (const symbol of symbols) {
+⥀│for (const memory of memories) {
+⊻│if (memory.toLowerCase().includes(symbol)) {
+⊰│associations.push(`${symbol} connects to memory: ${memory.sl
+·}
+·}
+·}
+⊹│if (symbols.length >= 2) {
+⊰│associations.push(`Novel bridge: ${symbols[0]} ↔ ${symbols[s
+·}
+⊷│return associations;
+·}
+private weaveNarrative(symbols: string[], associations: string[], ☼: strin
+⊰│return `In a ${emotion} dreamscape, ${symbols.slice(0, 3).jo
+·}
+·private extractInsights(associations: string[]): string[] {
+⋔│return associations.filter(a => a.includes("Novel")).map(a =
+·}
+⊷│getRecentDreams(count = 5): Dream[] { return this.dreams.sli
+⊷│getInsights(): string[] { return this.dreams.flatMap(d => d.
+·getState(): Record<string, unknown> {
+⊷│return {
+·initialized: this._initialized, isResting: this.isResting, totalDreams: this.dre
+·associations: this.associations.length, symbols: this.symbolLibrary.size,
+·lucidDreams: this.dreams.filter(d => d.lucid).length,
+⋐│totalInsights: this.dreams.reduce((sum, d) => sum + d.insigh
+·};
+·}
+·shutdown(): void { this._initialized = false; this.isResting = false; }
+·}
+⊪dreamEngine
+⟩SCL│79│39⊨│29⑂│37.8%↓⟩

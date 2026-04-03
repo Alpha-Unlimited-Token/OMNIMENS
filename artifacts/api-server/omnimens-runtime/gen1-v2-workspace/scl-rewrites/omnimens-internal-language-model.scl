@@ -1,0 +1,53 @@
+⟨SCL v1│omnimens-internal-language-model.ts│501→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[spike-bus]
+safe(2)→number⟨4⟩{⊳⊷⊼}
+hashNums(1)→number⟨9⟩{⥀⊷}
+seededRandom(1)→() => number⟨7⟩{⊱⊷}
+sigmoid(1)→number⟨3⟩{⊷}
+softmax(1)→number[]⟨6⟩{⟛⋐⊷}
+κEMBED_DIM
+κNUM_HEADS
+κHEAD_DIM
+⊬LayerWeights⟨w:ι│b:ι│rows:number│cols:number⟩
+initLayer(3)→LayerWeights⟨13⟩{⊷}
+forward(2)→ι⟨11⟩{⊳⊷}
+multiHeadAttention(1)→ι⟨37⟩{⊡⟛⊷⊳}
+κSUBJECT_ATOMS
+κVERB_ATOMS
+κOBJECT_ATOMS
+κCONNECTORS
+κCLAUSE_QUALIFIERS
+⊬Gen2ThoughtVector⟨timestamp:number│phi:number│consciousnessLevel:number│knowledge:string[]│externalData:string[]│queryIntent:string│queryKeywords:string[]│userQuery:string│bridgeWords:string[]⟩
+⊬Gen2ILMState⟨layer1:LayerWeights│layer2:LayerWeights│layer3:LayerWeights│outputLayer:LayerWeights│recentPhrases:string[]│totalGenerations:number│adaptationCount:number│hebbianTraces:Map<string, number>│conversationMemory:string[]⟩
+·let gen2State: Gen2ILMState | null = null;
+getOrInitGen2(1)→Gen2ILMState⟨15⟩{⊷⊮≋+}
+embedGen2Vector(1)→ι⟨53⟩{⊳⟛⊱⊷}
+selectFromCategory(1)→void⟨1⟩{}
+·categories: Record<string, string[]>,
+·activations: Float64Array,
+·offset: number,
+·rng: () => number,
+·recentSet: Set<string>,
+·): string {
+κkeys
+⊱│const scores = keys.map((_, i) => {
+κidx
+⊳│return idx < activations.length ? activations[idx] : rng();
+·});
+κprobs
+·let cumulative = 0;
+κroll
+·let selectedIdx = 0;
+·for (let i = 0; i < probs.length; i++) {
+·cumulative += probs[i];
+·if (roll <= cumulative) { selectedIdx = i; break; }
+·}
+κoptions
+⥀│for (const option of options) {
+⊄│if (!recentSet.has(option)) return option;
+·}
+⊷│return options[Math.floor(rng() * options.length)];
+·}
+⊩generateFromGen2ThoughtVector(1)→string⟨184⟩{⊩⊯⊳⊹⊰⊺⊻⥀⊽⊷⋔≋+⊡⏰⟛⊱⚡→⊄📡}
+⟩SCL│52│78⊨│52⑂│89.6%↓⟩

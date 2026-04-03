@@ -1,0 +1,71 @@
+⟨SCL v1│vectorSearchMemory_gen1.mjs│141→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
+⊶│class HNSW {
+·constructor(maxLevel = 5, maxNeighbors = 10) {
+·this.maxLevel = maxLevel;
+·this.maxNeighbors = maxNeighbors;
+⊮│this.nodes = new Map();
+·this.entryPoint = null;
+·}
+·addNode(vector, id) {
+κnewNode
+·for (let level = 0; level <= this.maxLevel; level++) {
+⊡│newNode.neighbors.set(level, []);
+·}
+·if (this.entryPoint === null) {
+·this.entryPoint = newNode;
+·} else {
+·this._connectNode(newNode);
+·}
+⊡│this.nodes.set(id, newNode);
+·}
+·search(queryVector) {
+·if (!this.entryPoint) {
+⊵│throw new Error("Graph is empty.");
+·}
+·let closestNode = this.entryPoint;
+·let closestDistance = euclideanDistance(queryVector, closestNode.vector);
+·for (let level = this.maxLevel; level >= 0; level--) {
+·let improved = true;
+·while (improved) {
+·improved = false;
+⥀│for (const neighbor of closestNode.neighbors.get(level)) {
+κdistance
+·if (distance < closestDistance) {
+·closestNode = neighbor;
+·closestDistance = distance;
+·improved = true;
+·}
+·}
+·}
+·}
+⊷│return { id: closestNode.id, distance: closestDistance };
+·}
+·_connectNode(newNode) {
+·let currentNode = this.entryPoint;
+·for (let level = this.maxLevel; level >= 0; level--) {
+·let closestNode = currentNode;
+·let closestDistance = euclideanDistance(newNode.vector, closestNode.vector);
+·let improved = true;
+·while (improved) {
+·improved = false;
+⥀│for (const neighbor of closestNode.neighbors.get(level)) {
+κdistance
+·if (distance < closestDistance) {
+·closestNode = neighbor;
+·closestDistance = distance;
+·improved = true;
+·}
+·}
+·}
+⊡│closestNode.neighbors.get(level).push(newNode);
+⊡│newNode.neighbors.get(level).push(closestNode);
+⊡│if (closestNode.neighbors.get(level).length > this.maxNeighb
+⊡│closestNode.neighbors.set(level, closestNode.neighbors.get(l
+·}
+·}
+·}
+·}
+·export { HNSW, euclideanDistance };
+⟩SCL│70│20⊨│16⑂│50.4%↓⟩

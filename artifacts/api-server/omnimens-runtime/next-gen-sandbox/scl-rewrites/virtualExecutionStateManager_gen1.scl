@@ -1,0 +1,13 @@
+⟨SCL v1│virtualExecutionStateManager_gen1.mjs│106→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+κexecutionStateStore
+⊩generateStateId(1)→void⟨5⟩{⊩⏰⊷}
+⊩serializeState(1)→void⟨7⟩{⊩⊷⊰⊵}
+⊩deserializeState(1)→void⟨7⟩{⊩⊷⊰⊵}
+⊩saveExecutionState(2)→void⟨6⟩{⊩⊵⊡}
+⊩restoreExecutionState(1)→void⟨10⟩{⊩⊵⊡⊷}
+⊩deleteExecutionState(1)→void⟨6⟩{⊩⊵}
+⊩clearAllStates(1)→void⟨3⟩{⊩}
+⊩listStateIds(1)→void⟨3⟩{⊩⊷}
+⟩SCL│12│33⊨│23⑂│88.7%↓⟩

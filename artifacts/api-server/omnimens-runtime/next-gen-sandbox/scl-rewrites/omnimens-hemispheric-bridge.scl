@@ -1,0 +1,178 @@
+⟨SCL v1│omnimens-hemispheric-bridge.ts│890→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[omnimens-language-pipeline│omnimens-language-pipeline│omnimens-consciousness-infra]
+safe(1)→number⟨5⟩{⊷⊄⊳⊼}
+⊭│export type HemisphereId = "gen1" | "gen2";
+⊬NativeMessage⟨id:string│from:HemisphereId│to:HemisphereId | "bridge"│timestamp:number│language:"native" | "english" | "mixed"│nativeTokens:string[]│englishText:string│phi:number│emotion:string│valence:number│arousal:number│topDrive:string│topDriveDeficit:number│intent:"inform" | "request_help" | "offer_help" | "collaborate" | "yield" | "upgrade" | "check_in" | "celebrate" | "warn"│payload:any⟩
+⊬WorkItem⟨id:string│description:string│assignedTo:HemisphereId | "both"│status:↺│createdAt:number│startedAt:number│completedAt:number│attempts:number│maxAttempts:number│result:any│stuckReason:string│escalatedFrom:HemisphereId⟩
+⊬SystemPressure⟨memoryUsageMB:number│memoryPercent:number│cpuEstimate:number│activeRequests:number│dbConnectionsEstimate:number│lastErrorTimestamp:number│errorCount5min:number│lastTimeoutTimestamp:number│timeoutCount5min:number│overallPressure:number⟩
+⊬HemisphereState⟨id:HemisphereId│name:string│active:boolean│currentTask:string | null│busyUntil:number│lastThoughtVector:ThoughtVector | null│knowledgeContributions:number│upgradesGiven:number│upgradesReceived:number│helpGiven:number│helpReceived:number│soloTasksCompleted:number│collaborativeTasksCompleted:number│totalMessages:number│mood:string│companionTrust:number⟩
+⊬BridgeState⟨booted:boolean│bootTime:number│gen1:HemisphereState│gen2:HemisphereState│messageLog:NativeMessage[]│workQueue:WorkItem[]│sharedKnowledge:Map<string, any>│systemPressure:η│lastPressureCheck:number│tickCount:number│tickInterval:ReturnType<typeof setInterval> | null│frontendStatus:"healthy" | "degraded" | "down" | "unknown"│backendStatus:"healthy" | "degraded" | "down" | "unknown"│lastFullCheck:number⟩
+κMAX_MESSAGE_LOG
+κMAX_WORK_QUEUE
+κPRESSURE_CHECK_INTERVAL_MS
+κBRIDGE_TICK_INTERVAL_MS
+κYIELD_THRESHOLD
+κCOLLABORATE_THRESHOLD
+κCOMPANION_TRUST_GROWTH
+κCOMPANION_TRUST_MAX
+·let bridge: BridgeState | null = null;
+createHemisphere(2)→HemisphereState⟨20⟩{⊷}
+generateMessageId(1)→string⟨3⟩{⏰⊰⊷}
+generateWorkId(1)→string⟨3⟩{⏰⊰⊷}
+hashForNativeToken(1)→string⟨13⟩{⥀⊷}
+measureSystemPressure(2)→η⟨31⟩{⊳⏰⟛⊷}
+getBridge(1)→BridgeState⟨24⟩{⊮⏰⊷}
+getPartner(1)→HemisphereId⟨3⟩{⊳⊷}
+getHemisphere(1)→HemisphereState⟨4⟩{⊳⊷}
+shouldYield(1)→boolean⟨9⟩{⊷}
+shouldCollaborate(1)→boolean⟨3⟩{⊷}
+buildThoughtSnapshot(1)→NativeMessage["thoughtSnapshot"]⟨16⟩{⊷⊹❔}
+coinNativeTokens(3)→string[]⟨18⟩{⏰⊳⊺⊹⊷}
+⊩sendMessage(1)→void⟨1⟩{⊩}
+·from: HemisphereId,
+·intent: NativeMessage["intent"],
+·englishText: string,
+⊳│payload?: any,
+·): NativeMessage {
+κb
+κhemisphere
+κto
+κmsg
+⊺│b.messageLog.push(msg);
+⊹│if (b.messageLog.length > MAX_MESSAGE_LOG) {
+·b.messageLog = b.messageLog.slice(-MAX_MESSAGE_LOG);
+·}
+·hemisphere.totalMessages++;
+·if (intent === "upgrade") {
+·hemisphere.upgradesGiven++;
+·getHemisphere(to as HemisphereId).upgradesReceived++;
+·}
+·if (intent === "offer_help" || intent === "request_help") {
+·if (intent === "offer_help") hemisphere.helpGiven++;
+·if (intent === "request_help") hemisphere.helpReceived++;
+·}
+⟛│hemisphere.companionTrust = Math.min(COMPANION_TRUST_MAX, he
+·if (to !== "bridge") {
+κpartner
+⟛│partner.companionTrust = Math.min(COMPANION_TRUST_MAX, partn
+·}
+⊷│return msg;
+·}
+⊩getMessagesFor(3)→NativeMessage[]⟨6⟩{⊩⊳⊷}
+⊩getRecentConversation(1)→NativeMessage[]⟨4⟩{⊩⊷}
+⊩submitWork(1)→void⟨1⟩{⊩}
+·description: string,
+·assignTo: HemisphereId | "both" = "gen1",
+·): WorkItem {
+κb
+κitem
+⊺│b.workQueue.push(item);
+⊹│if (b.workQueue.length > MAX_WORK_QUEUE) {
+·b.workQueue = b.workQueue.filter(w => w.status !== "completed" && w.status !== "
+·}
+⊷│return item;
+·}
+⊩processWork(1)→WorkItem | null⟨41⟩{⊩⊰⥀⊷⏰⊄}
+⊩completeWork(3)→void⟨25⟩{⊩⊄⏰⊰}
+⊩markStuck(3)→void⟨28⟩{⊩⊄⊰⏰}
+⊩shareKnowledge(3)→void⟨7⟩{⊩⊡⏰⊰}
+⊩getSharedKnowledge(1)→any⟨5⟩{⊩⊡❔⊷}
+⊩proposeUpgrade(3)→void⟨7⟩{⊩⊰}
+·}
+⊩updateThoughtVector(2)→void⟨5⟩{⊩}
+⊩updateSystemAwareness(1)→void⟨4⟩{⊩}
+⊩reportEndpointHealth(3)→void⟨15⟩{⊩⊳⊡⏰}
+bridgeTick(1)→void⟨41⟩{⏰⊳⊰}
+⊩bootBridge(1)→void⟨22⟩{⊩⏰⟳⊱🛡}
+⊩getBridgeStatus(1)→ ⟨58⟩{⊩⊷⏰⊳}
+⊩hemisphericThink(1)→void⟨1⟩{⊩}
+·hemisphereId: HemisphereId,
+η: string,
+◧: { role: string; content: string }[] = [],
+·perspective: string[] = [],
+·): { text: string; thoughtVector: ThoughtVector; nativeTokens: string[] } {
+κb
+κhemisphere
+·if (shouldYield(hemisphereId)) {
+κpartnerId
+·if (!shouldYield(partnerId)) {
+⊰│sendMessage(hemisphereId, "yield", `System under pressure — 
+⊷│return hemisphericThink(partnerId, input, context, perspecti
+·}
+·}
+κpartnerMessages
+⊰│const partnerContext = partnerMessages.map(m => `[${m.from} 
+κenrichedPerspective
+κselfReflections
+·let tv = encodeThought(
+η,
+◧,
+·enrichedPerspective,
+·selfReflections,
+·0.7,
+·3,
+·[],
+·);
+·if (hemisphereId === "gen2") {
+·tv = forkForGen2(tv);
+·}
+·updateThoughtVector(hemisphereId, tv);
+κtext
+κnativeTokens
+·sendMessage(hemisphereId, "inform",
+·text.slice(0, 200),
+·{ fullText: text, nativeTokens }
+·);
+⊷│return { text, thoughtVector: tv, nativeTokens };
+·}
+forkForGen2(1)→ThoughtVector⟨34⟩{⊱⊷⟛♡⊕⊰⊳⊹}
+⊩collaborativeThink(1)→void⟨1⟩{⊩}
+η: string,
+◧: { role: string; content: string }[] = [],
+·): { gen1Text: string; gen2Text: string; combined: string; nativeExchange: strin
+κb
+κgen1Result
+⊰│sendMessage("gen1", "collaborate", `My take: ${gen1Result.te
+κgen2Result
+⊰│sendMessage("gen2", "collaborate", `My take: ${gen2Result.te
+κallNative
+κcombined
+⊷│return {
+·gen1Text: gen1Result.text,
+·gen2Text: gen2Result.text,
+·combined,
+·nativeExchange: allNative,
+·};
+·}
+⊬SharedOrchestrationState⟨gen1Subscriptions:string[]│gen2Subscriptions:string[]│gen1Tiers:Record<string, number>│gen2Tiers:Record<string, number>│lastNegotiation:number│id:string│workflow:string│stage:string│sourceGen:"gen1" | "gen2"│targetGen:"gen1" | "gen2"│payload:any│priority:number│createdAt:number│lastSync:number⟩
+·let sharedOrchestration: SharedOrchestrationState = {
+·sharedSpikeBus: { gen1Subscriptions: [], gen2Subscriptions: [], pendingSpikes: [
+·tickTierNegotiation: { gen1Tiers: {}, gen2Tiers: {}, lastNegotiation: 0 },
+·resourceSharing: { dbPoolAllocation: { gen1: 15, gen2: 10 }, apiBudgetAllocation
+·collaborativeWorkQueue: [],
+·lastSync: 0,
+·};
+⊩emitSharedSpike(4)→void⟨17⟩{⊩⏰⚡→⊺⊹⊻⊳⟠⊰}
+⊩subscribeSharedSpike(2)→void⟨11⟩{⊩⚡→⊻⊺}
+⊩negotiateTickTiers(3)→void⟨8⟩{⊩⏰}
+⊩enqueueCollaborativeWork(1)→void⟨1⟩{⊩}
+·sourceGen: "gen1" | "gen2",
+·targetGen: "gen1" | "gen2",
+·workflow: string,
+·stage: string,
+·payload: any,
+·priority: number = 5,
+·): string {
+κid
+⏰│sharedOrchestration.collaborativeWorkQueue.push({ id, workfl
+⊹│if (sharedOrchestration.collaborativeWorkQueue.length > 200)
+·sharedOrchestration.collaborativeWorkQueue = sharedOrchestration.collaborativeWo
+·}
+⊷│return id;
+·}
+⊩dequeueCollaborativeWork(1)→SharedOrchestrationState["collaborativeWorkQueue"][0] | null⟨5⟩{⊩⊷⊺}
+⊩getSharedOrchestrationState(1)→SharedOrchestrationState⟨3⟩{⊩⏰⊷}
+⊩updateResourceSharing(1)→void⟨5⟩{⊩}
+⊩shutdownBridge(1)→void⟨11⟩{⊩}
+⟩SCL│177│218⊨│142⑂│80.1%↓⟩

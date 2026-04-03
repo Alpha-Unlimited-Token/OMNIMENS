@@ -1,0 +1,73 @@
+⟨SCL v1│embeddingSearchCache_gen1.mjs│134→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class EmbeddingSearchCache {
+·constructor(numHashes = 10, numBands = 5) {
+·if (numHashes % numBands !== 0) {
+⊵│throw new Error("numHashes must be divisible by numBands.");
+·}
+·this.numHashes = numHashes;
+·this.numBands = numBands;
+⊮│this.hashTables = Array.from({ length: numBands }, () => new
+⊮│this.embeddings = new Map();
+·}
+·_hashVector(vector) {
+κhashes
+·for (let i = 0; i < this.numHashes; i++) {
+·const randomProjection = vector.map((val, idx) => val * Math.sin((i + 1) * idx))
+⋐│const sum = randomProjection.reduce((acc, val) => acc + val,
+⊳│hashes.push(sum >= 0 ? 1 : 0);
+·}
+⊷│return hashes;
+·}
+·addEmbedding(id, vector) {
+·if (this.embeddings.has(id)) {
+⊰│throw new Error(`Embedding with id '${id}' already exists.`)
+·}
+κhashValues
+κbandSize
+·for (let band = 0; band < this.numBands; band++) {
+κstart
+κend
+κbandHash
+·if (!this.hashTables[band].has(bandHash)) {
+⊡│this.hashTables[band].set(bandHash, new Set());
+·}
+⊡│this.hashTables[band].get(bandHash).add(id);
+·}
+⊡│this.embeddings.set(id, vector);
+·}
+·search(queryVector, maxResults = 10) {
+κhashValues
+κbandSize
+κcandidates
+·for (let band = 0; band < this.numBands; band++) {
+κstart
+κend
+κbandHash
+·if (this.hashTables[band].has(bandHash)) {
+⥀│for (const id of this.hashTables[band].get(bandHash)) {
+·candidates.add(id);
+·}
+·}
+·}
+κresults
+⥀│for (const id of candidates) {
+κstoredVector
+κsimilarity
+⊺│results.push({ id, similarity });
+·}
+⊢.sort((a, b) => b.similarity - a.similarity);
+⊷│return results.slice(0, maxResults);
+·}
+·_cosineSimilarity(vec1, vec2) {
+⋐│const dotProduct = vec1.reduce((sum, val, idx) => sum + val 
+⋐│const magnitude1 = Math.sqrt(vec1.reduce((sum, val) => sum +
+⋐│const magnitude2 = Math.sqrt(vec2.reduce((sum, val) => sum +
+⊷│return dotProduct / (magnitude1 * magnitude2);
+·}
+·clear() {
+·this.hashTables.forEach((table) => table.clear());
+·this.embeddings.clear();
+·}
+·}
+⟩SCL│72│35⊨│19⑂│46.3%↓⟩

@@ -1,0 +1,56 @@
+⟨SCL v1│neuroEvolutionEngine_gen1.mjs│169→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩randomInRange(2)→void⟨3⟩{⊩⊷}
+⊩shuffleArray(1)→void⟨7⟩{⊩⊷}
+⊩sigmoid(1)→void⟨3⟩{⊩⊷}
+⊶│class Node {
+·constructor(id, type = 'hidden') {
+·this.id = id;
+this.type = type; // 'η', 'hidden', or 'θ'
+this.≪ = 0;
+·}
+·}
+⊶│class Connection {
+·constructor(fromNode, toNode, weight = randomInRange(-1, 1), enabled = true) {
+·this.fromNode = fromNode;
+·this.toNode = toNode;
+·this.weight = weight;
+·this.enabled = enabled;
+·}
+·}
+⊶│class Genome {
+·constructor() {
+·this.nodes = [];
+·this.connections = [];
+⊨σ│this.fitness = 0;
+·}
+·addNode(node) {
+⊺│this.nodes.push(node);
+·}
+·addConnection(connection) {
+⊺│this.connections.push(connection);
+·}
+·forward(inputs) {
+const inputNodes = this.nodes.filter(node => node.type === 'η');
+const outputNodes = this.nodes.filter(node => node.type === 'θ');
+⊱│inputNodes.forEach((node, index) => {
+node.≪ = inputs[index] || 0;
+·});
+·this.nodes.forEach(node => {
+if (node.type !== 'η') {
+node.≪ = sigmoid(
+·this.connections
+·.filter(conn => conn.toNode === node.id && conn.enabled)
+⋐│.reduce((sum, conn) => sum + conn.weight * this.nodes.find(n
+·);
+·}
+·});
+⊷│return outputNodes.map(node => node.value);
+·}
+·}
+⊩mutate(1)→void⟨19⟩{⊩⊷}
+⊩crossover(2)→void⟨14⟩{⊩⊳⊷}
+⊩evaluateFitness(2)→void⟨3⟩{⊩⊨σ}
+⊩initializePopulation(3)→void⟨32⟩{⊩⊺⊷}
+⟩SCL│55│40⊨│25⑂│67.5%↓⟩

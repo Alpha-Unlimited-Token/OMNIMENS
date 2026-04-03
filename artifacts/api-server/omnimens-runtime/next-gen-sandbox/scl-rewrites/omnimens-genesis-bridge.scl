@@ -1,0 +1,66 @@
+⟨SCL v1│omnimens-genesis-bridge.ts│359→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+·──  ENGINE REGISTRATION & GLOBAL CONSTANTS
+·───────────────────────────────────────────────────────────────────────────────*
+·engineRegistry.registerEngine("genesis-bridge", "NORMAL", { dbQuota: 10 });
+κSEC
+κBRIDGE_CYCLE_MS
+κCORE_EVAL_MS
+κMESSAGE_CAT
+κCORE_CAT
+κLIB_DIR
+κBACKUP_DIR
+κHMAC_SECRET
+⊭│type Direction = "omnimens_to_genesis" | "genesis_to_omnimen
+⊭│type MsgType =
+·| "knowledge_transfer" | "architectural_insight" | "code_proposal"
+·| "capability_request" | "experience_report"     | "design_feedback"
+·| "breakthrough_notification" | "collaboration_request"
+·| "core_modification_proposal" | "evolution_sync";
+⊬BridgeMsg⟨id:string; direction: Direction; type: MsgType; subject: string│content:◧│response:string | null; metadata: Record<string, any>⟩
+⊬CoreMod⟨id:θ│modificationType:Ζ│source:✦│status:"proposed" | "evaluating" | "approved" | "applied" | "rejected"│safetyScore:Ε│timestamp:number; appliedAt: number | null; rejectionReason: string | null│backupPath:string | null⟩
+⊬BridgeState⟨messagesExchanged:↻│coreModificationsProposed:number; coreModificationsApplied: number│coreModificationsRejected:↻│recentMessages:BridgeMsg[]; pendingModifications: CoreMod[]⟩
+κstate
+·──  UTILITIES
+·───────────────────────────────────────────────────────────────────────────────*
+κMODIFIABLE_CORE_FILES
+📁│fs.readFileSync(new URL("./data/modifiable_core_files.json",
+·) as string[]; /* a tiny json shipped with repo */
+κNEVER_MODIFY
+κFORBIDDEN_PATTERNS
+·const sign   = (payload: string): string => crypto.createHmac("sha256", HMAC_SEC
+·const verify = (payload: string, sig: string): boolean =>
+·crypto.timingSafeEqual(Buffer.from(sign(payload), "hex"), Buffer.from(sig, "hex"
+📢│const log = (msg: string) => console.log(`[OMNIMENS-GENESIS-
+·──  DATABASE HELPERS (Unified Runtime)
+·───────────────────────────────────────────────────────────────────────────────*
+·const writeBrain = (data: Record<string, any>) =>
+dbGateway.⊞("genesis-bridge", "brain_entries", data, "NORMAL");
+·const readBrain = async (filter: Record<string, any>) =>
+·dbGateway.read("genesis-bridge", "brain_entries", filter);
+·──  MESSAGE HANDLING
+·───────────────────────────────────────────────────────────────────────────────*
+κprocessedIds
+⟿sendToGenesis(4)→Promise<BridgeMsg>⟨1⟩{}
+κmsg
+⊴│await writeBrain({
+·category: MESSAGE_CAT,
+⊰│title: `[→GENESIS] ${type}: ${subject}`,
+⟠│content: JSON.stringify({ message: msg, signature: sign(JSON
+·active: true,
+·});
+⊺│state.messagesExchanged++; state.recentMessages.push(msg);
+⊹│if (state.recentMessages.length > 30) state.recentMessages.s
+·cognitionBus.shareInsight("genesis-bridge", { type: "outbound", msg });
+⊷│return msg;
+·}
+⟿fetchGenesisMessages(1)→Promise<BridgeMsg[]>⟨27⟩{⊴⥀⟠⊺⊷⊄⊻⊽⊹}
+backup(1)→string | null⟨188⟩{⏰⊰⊷📁⑃⟿⊄⥀⊲⊱⊳⊽⟛⊯⊺⊴⟠⚡→⊩⊪}
+⟩SCL│65│62⊨│43⑂│81.9%↓⟩

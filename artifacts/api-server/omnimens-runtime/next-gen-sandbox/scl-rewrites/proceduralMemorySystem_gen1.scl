@@ -1,0 +1,16 @@
+⟨SCL v1│proceduralMemorySystem_gen1.mjs│27→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊪proceduralMemorySystem
+·this.confidenceScores[workflowId] = steps.map(() => 0.5);
+·},
+·evaluateStep: function(workflowId, stepIndex, success) {
+κadjustment
+⟛│this.confidenceScores[workflowId][stepIndex] = Math.min(Math
+·},
+·adaptWorkflow: function(workflowId, feedback) {
+·if (feedback === 'escalate') {
+⊺│this.workflows[workflowId].push('Escalation Step');
+·}
+·}
+·};
+⟩SCL│15│4⊨│2⑂│44.4%↓⟩

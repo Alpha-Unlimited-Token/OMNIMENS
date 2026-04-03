@@ -1,0 +1,9 @@
+⟨SCL v1│semanticMemoryCache_gen1.mjs│92→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+κcache
+cosineSimilarity(2)→void⟨7⟩{⋐⊷}
+⊩addEmbedding(2)→void⟨6⟩{⊩⊹⊵⊡}
+⊩getMostSimilar(1)→void⟨18⟩{⊩⊹⊵⊷}
+⊩clearCache(1)→void⟨3⟩{⊩}
+⊩getCacheSize(1)→void⟨3⟩{⊩⊷}
+⟩SCL│8│19⊨│13⑂│91.3%↓⟩

@@ -1,0 +1,144 @@
+⟨SCL v1│unified-neural-fabric.ts│188→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊭│type Topic = string;
+⊭│type Handler = (payload: unknown, from: string) => void;
+⊬Subscription⟨⟩
+⊬TaskItem⟨⟩
+⊬KnowledgeNode⟨⟩
+⊬IntelSweepResult⟨⟩
+⊶│export class UnifiedNeuralFabric {
+⊮│private subscriptions = new Map<Topic, Subscription[]>();
+⊮│private sharedMemory = new Map<string, { value: unknown; own
+·private taskQueue: TaskItem[] = [];
+⊮│private knowledgeGraph = new Map<string, KnowledgeNode>();
+·private sweepResults: IntelSweepResult[] = [];
+·private messageCount = 0;
+·private taskIdCounter = 0;
+·private _initialized = false;
+·initialize(): void { this._initialized = true; }
+·subscribe(topic: Topic, subscriberId: string, handler: Handler, priority = 5): (
+⊡│if (!this.subscriptions.has(topic)) this.subscriptions.set(t
+κsub
+⊡│this.subscriptions.get(topic)!.push(sub);
+⊡│this.subscriptions.get(topic)!.sort((a, b) => a.priority - b
+⊱│return () => {
+κsubs
+·if (subs) {
+κidx
+⊺│if (idx >= 0) subs.splice(idx, 1);
+·}
+·};
+·}
+·publish(topic: Topic, payload: unknown, from: string): number {
+·this.messageCount++;
+κsubs
+·let delivered = 0;
+⥀│for (const sub of subs) {
+🛡│try { sub.handler(payload, from); delivered++; } catch {}
+·}
+κwildcardSubs
+⥀│for (const sub of wildcardSubs) {
+🛡│try { sub.handler({ topic, payload }, from); delivered++; } 
+·}
+⊷│return delivered;
+·}
+⊛(payload: unknown, from: string): number {
+·let delivered = 0;
+·for (const [topic] of this.subscriptions) {
+·delivered += this.publish(topic, payload, from);
+·}
+⊷│return delivered;
+·}
+setShared(key: string, ≪: unknown, owner: string): void {
+⊡│this.sharedMemory.set(key, { value, owner, updatedAt: Date.n
+·}
+·getShared(key: string): unknown | undefined {
+⊡│return this.sharedMemory.get(key)?.value;
+·}
+·getAllSharedByOwner(owner: string): Map<string, unknown> {
+κresult
+·for (const [key, entry] of this.sharedMemory) {
+⊡│if (entry.owner === owner) result.set(key, entry.value);
+·}
+⊷│return result;
+·}
+⊳│enqueueTask(task: string, priority: number, assignee?: strin
+κid
+⏰│this.taskQueue.push({ id, task, priority, assignee: assignee
+·this.taskQueue.sort((a, b) => a.priority - b.priority);
+⊷│return id;
+·}
+·claimTask(workerId: string): TaskItem | null {
+·const task = this.taskQueue.find(t => t.status === "pending" && (!t.assignee || 
+·if (task) { task.status = "running"; task.assignee = workerId; }
+⊷│return task || null;
+·}
+·completeTask(taskId: string): void {
+·const task = this.taskQueue.find(t => t.id === taskId);
+·if (task) task.status = "done";
+⏰│this.taskQueue = this.taskQueue.filter(t => t.status !== "do
+·}
+·addKnowledge(id: string, label: string, data: unknown): void {
+⊡│this.knowledgeGraph.set(id, { id, label, connections: new Se
+·}
+·connectKnowledge(idA: string, idB: string): void {
+κa
+κb
+·if (a && b) { a.connections.add(idB); b.connections.add(idA); }
+·}
+·queryKnowledge(id: string, depth = 2): KnowledgeNode[] {
+κvisited
+κresults
+κqueue
+⊹│while (queue.length > 0) {
+⊲│const { nodeId, d } = queue.shift()!;
+·if (visited.has(nodeId) || d > depth) continue;
+·visited.add(nodeId);
+κnode
+·if (node) {
+⏰│node.lastAccessed = Date.now();
+⟛│node.strength = Math.min(node.strength + 0.1, 10);
+⊺│results.push(node);
+⥀│for (const conn of node.connections) {
+⊺│if (!visited.has(conn)) queue.push({ nodeId: conn, d: d + 1 
+·}
+·}
+·}
+⊷│return results;
+·}
+recordSweep(η: string, insights: string[]): void {
+⏰│this.sweepResults.push({ source, insights, timestamp: Date.n
+⊹│if (this.sweepResults.length > 200) this.sweepResults = this
+·}
+·runIntelSweep(): IntelSweepResult[] {
+⏰│const recent = this.sweepResults.filter(s => Date.now() - s.
+⊷│return recent;
+·}
+·getStats(): { topics: number; subscriptions: number; messages: number; sharedKey
+·let totalSubs = 0;
+⥀│for (const subs of this.subscriptions.values()) totalSubs +=
+·let totalEdges = 0;
+⥀│for (const node of this.knowledgeGraph.values()) totalEdges 
+⊷│return {
+·topics: this.subscriptions.size,
+·subscriptions: totalSubs,
+·messages: this.messageCount,
+·sharedKeys: this.sharedMemory.size,
+·pendingTasks: this.taskQueue.filter(t => t.status === "pending").length,
+·knowledgeNodes: this.knowledgeGraph.size,
+·knowledgeEdges: totalEdges / 2,
+·sweepResults: this.sweepResults.length,
+·};
+·}
+·getState(): Record<string, unknown> {
+⊷│return { initialized: this._initialized, ...this.getStats() 
+·}
+·shutdown(): void {
+·this.subscriptions.clear();
+·this.sharedMemory.clear();
+·this.taskQueue = [];
+·this._initialized = false;
+·}
+·}
+⊪neuralFabric
+⟩SCL│143│64⊨│47⑂│23.9%↓⟩

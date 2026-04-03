@@ -1,0 +1,21 @@
+⟨SCL v1│graphRagIntegrator_gen1.mjs│32→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[treeOfThoughts]
+⊶│export class GraphRAGIntegrator {
+·constructor() {
+·this.graph = {};
+·}
+·addNode(id, data) {
+·this.graph[id] = { data, edges: [] };
+·}
+·addEdge(fromId, toId, weight) {
+·if (this.graph[fromId] && this.graph[toId]) {
+⊺│this.graph[fromId].edges.push({ to: toId, weight });
+·}
+·}
+·synthesize() {
+κtree
+⊷│return tree.evaluatePaths();
+·}
+·}
+⟩SCL│20│5⊨│3⑂│37.5%↓⟩

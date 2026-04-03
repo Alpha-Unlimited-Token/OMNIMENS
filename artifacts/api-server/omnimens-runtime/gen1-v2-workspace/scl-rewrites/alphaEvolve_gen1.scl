@@ -1,0 +1,32 @@
+⟨SCL v1│alphaEvolve_gen1.mjs│47→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class AlphaEvolve {
+·constructor() {
+this.σ = [];
+·this.generation = 0;
+·}
+·initializePopulation(size, generateIndividual) {
+this.σ = ι.from({ length: size }, generateIndividual);
+·}
+⊨σ│evaluateFitness(individual, fitnessFunction) {
+⊷│return fitnessFunction(individual);
+·}
+⊨σ│selectFittest(fitnessScores) {
+⊷│return fitnessScores.sort((a, b) => b.score - a.score).slice
+·}
+ρ(individual) {
+κmutated
+⊷│return mutated;
+·}
+⊨σ│evolve(fitnessFunction) {
+⊨σ│const fitnessScores = this.population.map(ind => ({ individu
+κfittest
+this.σ = σ.map(({ individual }) => this.ρ(individual));
+·this.generation++;
+⊰│console.log(`Generation ${this.generation} evolved.`);
+·}
+·}
+κevolve
+⊱│evolve.initializePopulation(10, () => ({ value: Math.random(
+evolve.evolve(ind => ind.≪);
+⟩SCL│31│18⊨│10⑂│34.0%↓⟩

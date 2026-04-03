@@ -1,0 +1,10 @@
+⟨SCL v1│syntheticStreamSimulator_gen1.mjs│91→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩generateStreamId(1)→void⟨3⟩{⊩⊷}
+⊩calculateRecencyScore(2)→void⟨4⟩{⊩⟛⊷}
+⊩summarizeData(2)→void⟨16⟩{⊩⥀⊺⋐⊷}
+⊩simulateStream(3)→void⟨18⟩{⊩⏰⥀⊺⊷}
+⊩groupByType(1)→void⟨3⟩{⊩⊷}
+⊩exampleUsage(1)→void⟨23⟩{⊩⏰⊷}
+⟩SCL│9│27⊨│20⑂│90.1%↓⟩

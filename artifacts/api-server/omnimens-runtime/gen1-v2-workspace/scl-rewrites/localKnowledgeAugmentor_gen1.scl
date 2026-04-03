@@ -1,0 +1,58 @@
+⟨SCL v1│localKnowledgeAugmentor_gen1.mjs│112→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩cosineSimilarity(2)→void⟨7⟩{⊩⊵⊹⋐⊳⊷}
+⊩lshHash(2)→void⟨6⟩{⊩⊷}
+⊩pruneVectors(3)→void⟨12⟩{⊩⊷⊹⥀⊺}
+⊶│export class VectorIndex {
+·constructor(numBuckets = 10, maxVectors = 1000) {
+·this.numBuckets = numBuckets;
+·this.maxVectors = maxVectors;
+⊮│this.buckets = new Map();
+·}
+·addVector(id, vector) {
+κhashes
+⊱│hashes.forEach((hash) => {
+⊡│if (!this.buckets.has(hash)) this.buckets.set(hash, []);
+⊡│this.buckets.get(hash).push({ id, vector });
+·});
+·this._prune();
+·}
+·query(vector, topK = 5) {
+κhashes
+κcandidates
+⊱│hashes.forEach((hash) => {
+·if (this.buckets.has(hash)) {
+⊡│this.buckets.get(hash).forEach(({ id, vector: candidateVecto
+·if (!candidates.has(id)) {
+⊡│candidates.set(id, { id, vector: candidateVector });
+·}
+·});
+·}
+·});
+κresults
+⊱│.map(({ id, vector: candidateVector }) => ({
+·id,
+·similarity: cosineSimilarity(vector, candidateVector),
+·}))
+·.sort((a, b) => b.similarity - a.similarity)
+·.slice(0, topK);
+⊷│return results;
+·}
+·_prune() {
+⊱│this.buckets.forEach((vectors, hash) => {
+⊹│if (vectors.length > this.maxVectors) {
+κprunedVectors
+·vectors.map((v) => v.vector),
+·this.maxVectors
+·);
+⊡│this.buckets.set(
+·hash,
+⊱│prunedVectors.map((vector, i) => ({ id: vectors[i].id, vecto
+·);
+·}
+·});
+·}
+·}
+⊩exampleUsage(1)→void⟨9⟩{⊩⊷}
+⟩SCL│57│39⊨│29⑂│49.1%↓⟩

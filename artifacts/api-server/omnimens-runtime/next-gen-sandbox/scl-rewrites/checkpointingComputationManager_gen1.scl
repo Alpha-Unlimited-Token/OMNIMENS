@@ -1,0 +1,10 @@
+⟨SCL v1│checkpointingComputationManager_gen1.mjs│96→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+κCHECKPOINT_DIR
+⊩generateCheckpointFilename(1)→void⟨4⟩{⊩⊰⊷}
+⊩⟿saveCheckpoint(2)→void⟨5⟩{⊩⟠⊴}
+⊩⟿loadCheckpoint(1)→void⟨12⟩{⊩⊴⟠⊷}
+⊩⟿manageComputation(4)→void⟨17⟩{⊩⊴⊷}
+⊩⟿exampleComputationStep(1)→void⟨9⟩{⊩⊲⊷}
+⟩SCL│9│23⊨│16⑂│90.6%↓⟩

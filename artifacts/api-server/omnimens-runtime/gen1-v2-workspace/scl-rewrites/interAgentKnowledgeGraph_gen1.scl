@@ -1,0 +1,32 @@
+⟨SCL v1│interAgentKnowledgeGraph_gen1.mjs│44→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class InterAgentKnowledgeGraph {
+·constructor() {
+⊮│this.graph = new Map();
+·}
+·addEntity(entityId, data) {
+·if (!this.graph.has(entityId)) {
+⊡│this.graph.set(entityId, { data, connections: new Map() });
+·}
+·}
+·addConnection(entityId1, entityId2, weight) {
+·if (this.graph.has(entityId1) && this.graph.has(entityId2)) {
+⊡│this.graph.get(entityId1).connections.set(entityId2, weight)
+⊡│this.graph.get(entityId2).connections.set(entityId1, weight)
+·}
+·}
+·resolveConflict(entityId1, entityId2) {
+κweight1
+κweight2
+⊳│return weight1 >= weight2 ? entityId1 : entityId2;
+·}
+·getGraph() {
+⊷│return this.graph;
+·}
+·}
+κknowledgeGraph
+·knowledgeGraph.addEntity('agent_1', { role: 'planner' });
+·knowledgeGraph.addEntity('agent_2', { role: 'critic' });
+·knowledgeGraph.addConnection('agent_1', 'agent_2', 0.9);
+·console.log(knowledgeGraph.getGraph());
+⟩SCL│31│10⊨│7⑂│29.5%↓⟩

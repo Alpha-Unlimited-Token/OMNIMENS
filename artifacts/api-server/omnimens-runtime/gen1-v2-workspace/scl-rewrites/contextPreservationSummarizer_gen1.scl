@@ -1,0 +1,7 @@
+⟨SCL v1│contextPreservationSummarizer_gen1.mjs│106→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩generateHierarchicalSummary(2)→void⟨24⟩{⊩⊹⊵⊺⊷}
+⊩encodeSummaryToVector(1)→void⟨13⟩{⊩⊹⊵⊷}
+⊩compressConversationHistory(2)→void⟨6⟩{⊩⊷}
+⊩retrieveRelevantVector(2)→void⟨23⟩{⊩⊹⊵⥀⋐⊷}
+⟩SCL│6│21⊨│17⑂│94.3%↓⟩

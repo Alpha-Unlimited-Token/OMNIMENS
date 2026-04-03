@@ -1,0 +1,64 @@
+⟨SCL v1│inMemoryVectorSearch_gen1.mjs│134→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│class HNSWNode {
+·constructor(vector, id) {
+·this.vector = vector;
+·this.id = id;
+this.neighbors = []; // ι of neighboring nodes
+·}
+·}
+euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
+⊶│class HNSWGraph {
+·constructor(maxNeighbors = 10) {
+this.nodes = []; // ι of all nodes in the graph
+·this.maxNeighbors = maxNeighbors;
+·}
+·addVector(vector) {
+κid
+κnewNode
+⊹│if (this.nodes.length > 0) {
+κneighbors
+·newNode.neighbors = neighbors;
+⥀│for (const neighbor of neighbors) {
+⊺│neighbor.neighbors.push(newNode);
+⊹│if (neighbor.neighbors.length > this.maxNeighbors) {
+·neighbor.neighbors.sort((a, b) => euclideanDistance(neighbor.vector, a.vector) -
+⊺│neighbor.neighbors.pop();
+·}
+·}
+·}
+⊺│this.nodes.push(newNode);
+⊷│return id;
+·}
+·search(queryVector, k = 1) {
+⊹│if (this.nodes.length === 0) {
+⊷│return [];
+·}
+κvisited
+κcandidates
+κresults
+⊹│while (candidates.length > 0) {
+κcurrent
+·if (visited.has(current.id)) {
+·continue;
+·}
+·visited.add(current.id);
+κdistance
+⊺│results.push({ id: current.id, distance });
+⥀│for (const neighbor of current.neighbors) {
+·if (!visited.has(neighbor.id)) {
+⊺│candidates.push(neighbor);
+·}
+·}
+·}
+⊢.sort((a, b) => a.distance - b.distance);
+⊷│return results.slice(0, k);
+·}
+·_findNearestNeighbors(vector, k) {
+·const distances = this.nodes.map(node => ({ node, distance: euclideanDistance(ve
+·distances.sort((a, b) => a.distance - b.distance);
+⊷│return distances.slice(0, k).map(entry => entry.node);
+·}
+·}
+·export { HNSWGraph, euclideanDistance };
+⟩SCL│63│33⊨│21⑂│53.0%↓⟩

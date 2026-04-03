@@ -1,0 +1,13 @@
+⟨SCL v1│matrixOpsOptimization_gen1.mjs│105→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊲│const { readFileSync } = require('fs');
+⊲│const { join } = require('path');
+⟿loadWasmModule(1)→void⟨5⟩{⊷}
+⟿wasmMatrixMultiply(5)→void⟨26⟩{⊹⊵⊴⊲⊡⊷⊞⊟}
+⟿wasmMatrixTranspose(3)→void⟨24⟩{⊹⊵⊴⊲⊡⊷⊞⊟}
+Ε.exports = {
+·loadWasmModule,
+·wasmMatrixMultiply,
+·wasmMatrixTranspose
+·};
+⟩SCL│12│21⊨│17⑂│88.6%↓⟩

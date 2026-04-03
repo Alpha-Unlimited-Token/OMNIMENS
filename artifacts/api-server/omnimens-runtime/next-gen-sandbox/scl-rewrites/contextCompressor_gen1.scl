@@ -1,0 +1,9 @@
+⟨SCL v1│contextCompressor_gen1.mjs│124→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩generateEmbedding(3)→void⟨27⟩{⊩⊹⊵⊷⊺}
+tokenizeText(1)→void⟨3⟩{⊷⊽}
+summarizeTokens(1)→void⟨14⟩{⊱⊷⊸⊰}
+hashSummary(2)→void⟨10⟩{⊷}
+averageEmbeddings(2)→void⟨15⟩{⊱⊷}
+⊫[]
+⟩SCL│8│20⊨│14⑂│93.5%↓⟩

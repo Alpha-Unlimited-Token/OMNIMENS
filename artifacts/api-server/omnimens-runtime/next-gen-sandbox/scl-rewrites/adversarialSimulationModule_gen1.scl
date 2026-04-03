@@ -1,0 +1,5 @@
+⟨SCL v1│adversarialSimulationModule_gen1.mjs│20→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩simulateCounterfactuals(2)→void⟨7⟩{⊩⊷}
+⊩testCooperativeStrategies(2)→void⟨3⟩{⊩⊷}
+⟩SCL│4│6⊨│4⑂│80.0%↓⟩

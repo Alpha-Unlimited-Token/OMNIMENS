@@ -1,0 +1,22 @@
+⟨SCL v1│graphRagConflictResolver_gen1.mjs│35→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊶│export class GraphRAGConflictResolver {
+·constructor() {
+⊮│this.knowledgeGraph = new Map();
+·}
+addAgentOutput(agentId, θ, confidence) {
+⊡│this.knowledgeGraph.set(agentId, { output, confidence });
+·}
+·resolveConflicts() {
+κaggregatedResults
+⊱│this.knowledgeGraph.forEach((value, agentId) => {
+⊲│const { output, confidence } = value;
+if (!aggregatedResults[θ]) {
+aggregatedResults[θ] = 0;
+·}
+aggregatedResults[θ] += confidence;
+·});
+⊷│return Object.entries(aggregatedResults).sort((a, b) => b[1]
+·}
+·}
+⟩SCL│21│11⊨│6⑂│40.0%↓⟩

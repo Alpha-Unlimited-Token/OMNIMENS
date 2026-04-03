@@ -1,0 +1,7 @@
+⟨SCL v1│rollingContextSummarizer_gen1.mjs│101→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩summarizeContext(2)→void⟨25⟩{⊩⊵⊹⊷⊺}
+summarizePair(3)→void⟨7⟩{⊰⊷}
+⊩retainRollingContext(2)→void⟨10⟩{⊩⊵⊷}
+⊩updateRollingContext(3)→void⟨15⟩{⊩⊵⊺⊷}
+⟩SCL│6│18⊨│14⑂│94.1%↓⟩

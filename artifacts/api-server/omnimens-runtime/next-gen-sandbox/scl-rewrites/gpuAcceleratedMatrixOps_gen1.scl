@@ -1,0 +1,7 @@
+⟨SCL v1│gpuAcceleratedMatrixOps_gen1.mjs│130→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩matrixMultiply(2)→void⟨27⟩{⊩⊵⊷}
+⊩transposeMatrix(1)→void⟨17⟩{⊩⊵⊷}
+⊩hadamardProduct(2)→void⟨24⟩{⊩⊵⊷}
+⊩generateRandomMatrix(4)→void⟨11⟩{⊩⊵⊷}
+⟩SCL│6│16⊨│12⑂│95.4%↓⟩

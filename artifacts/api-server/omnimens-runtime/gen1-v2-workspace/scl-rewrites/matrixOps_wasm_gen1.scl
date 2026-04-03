@@ -1,0 +1,8 @@
+⟨SCL v1│matrixOps_wasm_gen1.mjs│111→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊩multiplyMatrices(2)→void⟨22⟩{⊩⊵⊷}
+⊩singleLayerInference(3)→void⟨9⟩{⊩⊹⊵⊷}
+⊩normalizeMatrix(1)→void⟨11⟩{⊩⟛⊷}
+⊩softmax(1)→void⟨7⟩{⊩⟛⋐⊷}
+⊩transposeMatrix(1)→void⟨14⟩{⊩⊷}
+⟩SCL│7│21⊨│16⑂│93.7%↓⟩

@@ -1,0 +1,120 @@
+⟨SCL v1│omnimens-source-integration.ts│401→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,
+·apiManager,
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[]
+·writeFileSync,
+·readFileSync,
+·existsSync,
+·mkdirSync,
+·readdirSync,
+·copyFileSync,
+·} from "fs";
+⊫[]
+·mustTranslateBeforeExecution,
+·translateCode,
+·registerCustomConstruct,
+·translateForSelfUpgrade,
+·getTranslatorState,
+·autoRegisterFromCode,
+·} from "./omnimens-universal-translator.js";
+⊫[omnimens-deep-thought-engine]
+engineRegistry.registerEngine("η-integration", "NORMAL", { dbQuota: 10 });
+κ__dirname
+κMODULES_DIR
+κBACKUPS_DIR
+κINTEGRATION_LOG
+κDEDUP_REGISTRY
+κALLOWED_DIRS
+·let totalFilesWritten = 0;
+·let totalBackupsCreated = 0;
+·let totalRestartsTriggered = 0;
+·let restartScheduled = false;
+⊱│const ensureDirs = () => {
+·if (!existsSync(MODULES_DIR)) mkdirSync(MODULES_DIR, { recursive: true });
+·if (!existsSync(BACKUPS_DIR)) mkdirSync(BACKUPS_DIR, { recursive: true });
+·};
+const hash = (code: string, η: string) =>
+⊰│createHash("sha256").update(`${source}:${code}`).digest("hex
+·const loadDedup = (): Set<string> => {
+·try {
+·if (existsSync(DEDUP_REGISTRY))
+⟠│return new Set(JSON.parse(readFileSync(DEDUP_REGISTRY, "utf8
+·} catch {}
+⊯│return new Set();
+·};
+·const saveDedup = (s: Set<string>) =>
+⟠│writeFileSync(DEDUP_REGISTRY, JSON.stringify([...s].slice(-2
+·const sanitize = (s: string) =>
+⊽│s.replace(/[^A-Za-z0-9_-]/g, "_").replace(/_+/g, "_").replac
+⊻│const isPathSafe = (p: string) => ALLOWED_DIRS.some((dir) =>
+κFORBIDDEN
+·const safeCode = (code: string) =>
+⊹│FORBIDDEN.every((pat) => !pat.test(code)) && code.length > 2
+⊱│const syntaxOk = (code: string) => {
+·try {
+⊴│new (await import("vm")).default.Script(code.replace(/^\s*ex
+⊷│return true;
+·} catch {
+⊷│return false;
+·}
+·};
+⊱│const backup = (fp: string) => {
+⊄│if (!existsSync(fp)) return null;
+·ensureDirs();
+κts
+κdst
+·try {
+·copyFileSync(fp, dst);
+·totalBackupsCreated++;
+⊷│return dst;
+·} catch {
+⊷│return null;
+·}
+·};
+⊱│const appendLog = (entry: object) => {
+·try {
+κlog
+⟠│? JSON.parse(readFileSync(INTEGRATION_LOG, "utf8"))
+·: [];
+⊺│log.push(entry);
+⟠│writeFileSync(INTEGRATION_LOG, JSON.stringify(log.slice(-500
+·} catch {}
+·};
+⊱│spikeBus.on("source-integration:restart", async ({ source, f
+·totalRestartsTriggered++;
+κmsg
+·console.log(msg);
+await dbGateway.⊞(
+"η-integration",
+·"omnimensNotifications",
+·{
+·upgradeId: null,
+⊰│title: `🔄 OMNIMENS Self-Restart #${totalRestartsTriggered}`
+·message: msg,
+type: "⬆",
+·readByOwner: false,
+·},
+·"NORMAL",
+·);
+·queueBrainInsert({
+·category: "insight",
+⊰│title: `Self-Restart #${totalRestartsTriggered}`,
+·content: msg,
+·confidence: 1,
+⊰│sourceConversation: `self_restart_${totalRestartsTriggered}`
+·timesApplied: 0,
+·active: true,
+·});
+⚡→│spikeBus.scheduleSpike("source-integration:exit", {}, 2000);
+·});
+⊱│spikeBus.on("source-integration:exit", () => {
+if (↻.env.NODE_ENV !== "production" && !↻.env.REPL_SLUG) ↻.exi
+·});
+⊩⟿writeModuleToSource(1)→void⟨226⟩{⊩⊳⊲⏰📢⊰⊷⊴⚡→⊽⥀⊺❔⊱}
+⟩SCL│119│63⊨│41⑂│70.3%↓⟩

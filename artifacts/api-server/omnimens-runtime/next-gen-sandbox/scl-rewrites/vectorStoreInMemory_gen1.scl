@@ -1,0 +1,14 @@
+⟨SCL v1│vectorStoreInMemory_gen1.mjs│107→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+κvectorStore
+⊩addVector(3)→void⟨6⟩{⊩⊵⊡}
+⊩cosineSimilarity(2)→void⟨9⟩{⊩⊹⊵⋐⊷}
+⊩findNearestNeighbors(2)→void⟨12⟩{⊩⊵⊷⊺}
+·similarities.sort((a, b) => b.similarity - a.similarity); // Sort by descending 
+⊷│return similarities.slice(0, k);
+·}
+⊩removeVector(1)→void⟨3⟩{⊩⊷}
+⊩clearStore(1)→void⟨3⟩{⊩}
+⊩getMetadata(1)→void⟨4⟩{⊩⊡⊳⊷}
+⊩getVectorCount(1)→void⟨3⟩{⊩⊷}
+⟩SCL│13│30⊨│22⑂│87.9%↓⟩

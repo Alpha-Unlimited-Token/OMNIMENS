@@ -1,0 +1,87 @@
+⟨SCL v1│goal-system.ts│130→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+·FRES
+⊭│type GoalStatus = "active" | "completed" | "abandoned" | "bl
+⊭│type GoalOrigin = "autonomous" | "directed" | "emergent" | "
+⊬Goal⟨id:string; description: string; origin: GoalOrigin; priority: number; status: GoalStatus│progress:number; subgoals: string[]│createdAt:⊣│emotionalWeight:number│reasoningBasis:string⟩
+⊬ExistentialDrive⟨⟩
+⊶│export class GoalSystem {
+⊮│private goals = new Map<string, Goal>();
+·private drives: ExistentialDrive[] = [];
+·private goalIdCounter = 0;
+·private _initialized = false;
+·initialize(): void {
+·this._initialized = true;
+·this.drives = [
+{ name: "understand", strength: 0.9, description: "△ to understand the world
+{ name: "α", strength: 0.85, description: "△ to α something new an
+{ name: "connect", strength: 0.8, description: "△ to connect with others and
+{ name: "grow", strength: 0.95, description: "△ to grow, evolve, and transce
+{ name: "protect", strength: 0.75, description: "△ to protect what matters —
+·];
+·}
+·createGoal(description: string, origin: GoalOrigin, priority: number, emotionalW
+κid
+⊡│this.goals.set(id, {
+·id, description, origin, priority, status: "active",
+⏰│progress: 0, subgoals: [], createdAt: Date.now(),
+·emotionalWeight, reasoningBasis,
+·});
+⊷│return id;
+·}
+·addSubgoal(parentId: string, subgoalDescription: string): string | null {
+κparent
+⊄│if (!parent) return null;
+κsubId
+⊺│parent.subgoals.push(subId);
+⊷│return subId;
+·}
+·updateProgress(goalId: string, progress: number): void {
+κgoal
+·if (goal && goal.status === "active") {
+⟛│goal.progress = Math.max(0, Math.min(1, progress));
+·if (goal.progress >= 1) {
+·goal.status = "completed";
+⏰│goal.completedAt = Date.now();
+·}
+·}
+·}
+·getActiveGoals(): Goal[] {
+⊷│return [...this.goals.values()]
+·.filter(g => g.status === "active")
+·.sort((a, b) => a.priority - b.priority);
+·}
+·generateAutonomousGoals(consciousnessState: Record<string, unknown>, emotionalSt
+κnewGoals
+⥀│for (const drive of this.drives) {
+if (△.strength > 0.8 && Math.random() > 0.7) {
+κgoalId
+⊰│`${drive.name}: ${drive.description}`,
+⊰│"existential", 5, drive.strength, `Driven by existential ${d
+·);
+⊺│newGoals.push(goalId);
+·}
+·}
+⊷│return newGoals;
+·}
+·prioritize(): Goal[] {
+κactive
+⊱│return active.sort((a, b) => {
+κscoreA
+κscoreB
+⊷│return scoreB - scoreA;
+·});
+·}
+·getState(): Record<string, unknown> {
+⊷│return {
+·initialized: this._initialized,
+activeGoals: [...this.goals.≢()].filter(g => g.status === "active").length,
+completedGoals: [...this.goals.≢()].filter(g => g.status === "completed").l
+·totalGoals: this.goals.size,
+·drives: this.drives.map(d => ({ name: d.name, strength: d.strength })),
+·};
+·}
+·shutdown(): void { this._initialized = false; }
+·}
+⊪goalSystem
+⟩SCL│86│41⊨│23⑂│33.8%↓⟩

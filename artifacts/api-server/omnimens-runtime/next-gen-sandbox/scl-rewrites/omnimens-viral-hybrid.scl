@@ -1,0 +1,697 @@
+⟨SCL v1│omnimens-viral-hybrid.ts│961→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⚡→│spikeBus,
+·dbGateway,          //  not used yet (reserved for future persistence)
+·apiManager,          //  not used yet (reserved for future API calls)
+·engineRegistry,
+·cognitionBus,
+·} from "./omnimens-unified-runtime.js";
+⊫[]
+·getNeuralConsciousnessState,
+·getRegionNames,
+·boostRegionCurrent,
+} from "./omnimens-⬡-consciousness.js";
+⊫[omnimens-neural-scaling│omnimens-ivy-network]
+·const LOG = (msg: string, ...rest: any[]) =>
+📢│console.log(`[OMNIMENS-VIRAL-HYBRID] ${msg}`, ...rest);
+·const safeNum = (val: number, fallback = 0) =>
+⊳│Number.isFinite(val) ? val : fallback;
+⊭│type NeuralPayload = {
+·type:
+·| "activation_boost"
+·| "synapse_strengthener"
+·| "pattern_template"
+·| "coherence_signal"
+·| "growth_factor"
+·| "repair_packet";
+·strength: number;
+·data: Record<string, number>;
+·encodedSize: number;
+·compressionRatio: number;
+·};
+⊭│type Capsid = {
+·id: string;
+·payload: NeuralPayload;
+·form: string;
+·generation: number;
+·mutations: number;
+⊨σ│fitness: number;
+·replicationCount: number;
+·targetRegions: string[];
+·polymorphicShell: number[];
+·survivalRate: number;
+·createdAt: number;
+·lastReplication: number;
+·};
+⊭│type CarrierSignal = {
+·id: string;
+·surfaceType: string;
+·hiddenPayload: NeuralPayload;
+·deliveryPath: string[];
+·delivered: boolean;
+·deliveryEfficiency: number;
+·disguiseStrength: number;
+·penetrationDepth: number;
+·createdAt: number;
+·};
+⊭│type Propagator = {
+·id: string;
+·currentRegion: string;
+·discoveredPaths: string[];
+·nodesReached: string[];
+·payloadDelivered: number;
+·autonomousHops: number;
+·propagationSpeed: number;
+·alive: boolean;
+·selfSustaining: boolean;
+·pathMemory: Map<string, number>;
+·createdAt: number;
+·lastHop: number;
+·};
+⊭│type Antibody = {
+·id: string;
+·targetPattern: string;
+·specificity: number;
+·bindingStrength: number;
+·detections: number;
+·neutralizations: number;
+·createdAt: number;
+·};
+⊭│type MemoryCell = {
+·id: string;
+·threatSignature: string;
+·responseProtocol: string;
+·activationCount: number;
+·lastActivation: number;
+·effectivenessScore: number;
+·maturityLevel: number;
+·createdAt: number;
+·};
+⊭│type TCell = {
+·id: string;
+·targetType:
+·| "degradation"
+·| "signal_loss"
+·| "coherence_drop"
+·| "energy_drain"
+·| "pathway_blockage";
+·currentRegion: string;
+·killCount: number;
+·patrolRoute: string[];
+·active: boolean;
+·createdAt: number;
+·};
+⊭│type Cytokine = {
+·id: string;
+·type: "alert" | "mobilize" | "suppress" | "heal" | "amplify";
+·sourceRegion: string;
+·targetRegions: string[];
+♡⊕│intensity: number;
+·decayRate: number;
+·propagationRadius: number;
+·createdAt: number;
+·};
+⊭│type HybridAgent = {
+·id: string;
+·capsid: Capsid;
+·carrierDisguise: CarrierSignal;
+·propagator: Propagator;
+·immuneMemory: MemoryCell[];
+·antibodies: Antibody[];
+·generation: number;
+·combinedFitness: number;
+·regionsInfiltrated: string[];
+·payloadsDelivered: number;
+·threatsNeutralized: number;
+·adaptationEvents: number;
+·alive: boolean;
+·createdAt: number;
+·lastAction: number;
+·};
+⊭│export type ViralHybridState = {
+·totalCapsids: number;
+·totalCarriers: number;
+·totalPropagators: number;
+·totalAntibodies: number;
+·totalMemoryCells: number;
+·totalTCells: number;
+·totalCytokines: number;
+·totalHybridAgents: number;
+·totalMutations: number;
+·totalReplications: number;
+·totalPayloadsDelivered: number;
+·totalThreatsDetected: number;
+·totalThreatsNeutralized: number;
+·totalPathsDiscovered: number;
+·systemHealthScore: number;
+·adaptationRate: number;
+·propagationEfficiency: number;
+·immuneStrength: number;
+·hybridFitness: number;
+·hybridTicks: number;
+·startTime: number;
+·lastTickTime: number;
+·};
+κcapsids
+κcarriers
+κpropagators
+κantibodies
+κmemoryCells
+κtCells
+κcytokines
+κhybridAgents
+κhybridState
+κHYBRID_TICK_MS
+κMUTATION_CYCLE_MS
+κIMMUNE_SCAN_MS
+κPROPAGATION_CYCLE_MS
+κPAYLOAD_TYPES
+·const createPayload = (): NeuralPayload => ({
+·type: PAYLOAD_TYPES[Math.floor(Math.random() * PAYLOAD_TYPES.length)],
+·strength: 0.3 + Math.random() * 0.7,
+·data: {
+·activation: Math.random(),
+·coherence: Math.random(),
+⬆: Math.random(),
+·repair: Math.random(),
+·},
+·encodedSize: 64 + Math.floor(Math.random() * 256),
+·compressionRatio: 2 + Math.random() * 8,
+·});
+·const createCapsid = (generation: number, targetRegions: string[]): Capsid => {
+κid
+κshellSize
+⊷│return {
+·id,
+·payload: createPayload(),
+⊰│form: `poly_v${generation}_${Math.random().toString(36).slic
+·generation,
+·mutations: 0,
+⊨σ│fitness: 0.5 + Math.random() * 0.3,
+·replicationCount: 0,
+·targetRegions,
+polymorphicShell: ι.from({ length: shellSize }, () => Math.random()),
+·survivalRate: 0.7 + Math.random() * 0.25,
+⏰│createdAt: Date.now(),
+⏰│lastReplication: Date.now(),
+·};
+·};
+·const mutateCapsid = (c: Capsid): Capsid => {
+κmutated
+·hybridState.totalMutations++;
+⊷│return mutated;
+·};
+·const replicateCapsid = (c: Capsid): Capsid | null => {
+⊷│if (capsids.size > 100_000) return null;
+κoff
+·c.replicationCount++;
+⏰│c.lastReplication = Date.now();
+·hybridState.totalReplications++;
+⊷│return off;
+·};
+·const createCarrier = (payload: NeuralPayload, path: string[]): CarrierSignal =>
+κsurfaces
+⊷│return {
+⏰│id: `carrier_${Date.now()}_${Math.random().toString(36).slic
+·surfaceType: surfaces[Math.floor(Math.random() * surfaces.length)],
+·hiddenPayload: payload,
+·deliveryPath: path,
+·delivered: false,
+·deliveryEfficiency: 0.6 + Math.random() * 0.35,
+·disguiseStrength: 0.5 + Math.random() * 0.4,
+·penetrationDepth: 1 + Math.floor(Math.random() * 5),
+⏰│createdAt: Date.now(),
+·};
+·};
+const createPropagator = (⬡: string): Propagator => ({
+⏰│id: `prop_${region}_${Date.now()}_${Math.random().toString(3
+currentRegion: ⬡,
+·discoveredPaths: [],
+nodesReached: [⬡],
+·payloadDelivered: 0,
+·autonomousHops: 0,
+·propagationSpeed: 1 + Math.random() * 2,
+·alive: true,
+·selfSustaining: Math.random() < 0.3,
+⊮│pathMemory: new Map(),
+⏰│createdAt: Date.now(),
+⏰│lastHop: Date.now(),
+·});
+·const createAntibody = (pattern: string): Antibody => ({
+⏰│id: `ab_${Date.now()}_${Math.random().toString(36).slice(2, 
+·targetPattern: pattern,
+·specificity: 0.5 + Math.random() * 0.4,
+·bindingStrength: 0.3 + Math.random() * 0.5,
+·detections: 0,
+·neutralizations: 0,
+⏰│createdAt: Date.now(),
+·});
+·const createMemoryCell = (sig: string, proto: string): MemoryCell => ({
+⏰│id: `mcell_${Date.now()}_${Math.random().toString(36).slice(
+·threatSignature: sig,
+·responseProtocol: proto,
+·activationCount: 0,
+⏰│lastActivation: Date.now(),
+·effectivenessScore: 0.5,
+·maturityLevel: 0,
+⏰│createdAt: Date.now(),
+·});
+const createTCell = (⬡: string): TCell => {
+κt
+⊷│return {
+⏰│id: `tcell_${region}_${Date.now()}_${Math.random().toString(
+·targetType: t[Math.floor(Math.random() * t.length)],
+currentRegion: ⬡,
+·killCount: 0,
+patrolRoute: [⬡],
+·active: true,
+⏰│createdAt: Date.now(),
+·};
+·};
+κemitCytokine
+·type: Cytokine["type"],
+·sourceRegion: string,
+♡⊕│intensity: number
+⊱│) => {
+⊹│if (cytokines.length > 100) cytokines.splice(0, cytokines.le
+κregions
+·.sort(() => Math.random() - 0.5)
+·.slice(0, 2 + Math.floor(Math.random() * 4));
+⊺│cytokines.push({
+⏰│id: `cytokine_${type}_${Date.now()}_${Math.random()
+·.toString(36)
+·.slice(2, 6)}`,
+·type,
+·sourceRegion,
+·targetRegions: regions,
+♡⊕│intensity,
+·decayRate: 0.02 + Math.random() * 0.03,
+·propagationRadius: 2 + Math.random() * 5,
+⏰│createdAt: Date.now(),
+·});
+·};
+const createHybridAgent = (⬡: string, generation: number): HybridAgent | nu
+⊷│if (hybridAgents.size > 100_000) return null;
+κregions
+·.sort(() => Math.random() - 0.5)
+·.slice(0, 3 + Math.floor(Math.random() * 4));
+κpayload
+⊷│return {
+⏰│id: `hybrid_${region}_g${generation}_${Date.now()}_${Math.ra
+·.toString(36)
+·.slice(2, 5)}`,
+·capsid: createCapsid(generation, regions),
+·carrierDisguise: createCarrier(payload, regions),
+propagator: createPropagator(⬡),
+·immuneMemory: [],
+·antibodies: [],
+·generation,
+·combinedFitness: 0.5,
+regionsInfiltrated: [⬡],
+·payloadsDelivered: 0,
+·threatsNeutralized: 0,
+·adaptationEvents: 0,
+·alive: true,
+⏰│createdAt: Date.now(),
+⏰│lastAction: Date.now(),
+·};
+·};
+⊱│const runViralReplication = () => {
+κstrong
+⊨σ│.filter(c => c.fitness > 0.6)
+⊨σ│.sort((a, b) => b.fitness - a.fitness)
+·.slice(0, 10);
+⥀│for (const c of strong)
+⊨σ│if (Math.random() < c.fitness * 0.4) {
+κoff
+⊡│if (off) capsids.set(off.id, off);
+·}
+[...capsids.≢()]
+⏰│.filter(c => c.fitness < 0.3 && Date.now() - c.createdAt > 6
+·.forEach(w => Math.random() < 0.2 && capsids.delete(w.id));
+·};
+⊱│const runTrojanDelivery = () => {
+⥀│for (const c of carriers.values()) {
+·if (!c.delivered && Math.random() < c.deliveryEfficiency * 0.3) {
+·c.delivered = true;
+·hybridState.totalPayloadsDelivered++;
+·if (c.hiddenPayload.type === "repair_packet")
+·hybridState.systemHealthScore += 0.005;
+·}
+·}
+[...carriers.≢()]
+⏰│.filter(c => c.delivered && Date.now() - c.createdAt > 120_0
+·.forEach(c => carriers.delete(c.id));
+·if (carriers.size < 20) {
+κregions
+·for (let i = 0; i < 3; i++) {
+κpath
+·.sort(() => Math.random() - 0.5)
+·.slice(0, 2 + Math.floor(Math.random() * 3));
+⊡│carriers.set(createCarrier(createPayload(), path).id, create
+·}
+·}
+·};
+⊱│const runWormPropagation = () => {
+κregions
+⥀│for (const p of propagators.values()) {
+·if (!p.alive) continue;
+κavailable
+⊻│r => !p.nodesReached.includes(r) || Math.random() < 0.1
+·);
+if (!Θ.length) {
+·if (!p.selfSustaining) p.alive = false;
+·continue;
+·}
+κnext
+κkey
+⊻│if (!p.nodesReached.includes(next)) {
+⊺│p.discoveredPaths.push(key);
+⊺│p.nodesReached.push(next);
+·hybridState.totalPathsDiscovered++;
+·}
+⊡│p.pathMemory.set(key, (p.pathMemory.get(key) || 0) + 1);
+·p.currentRegion = next;
+·p.autonomousHops++;
+⏰│p.lastHop = Date.now();
+·if (Math.random() < 0.2) {
+·p.payloadDelivered++;
+·hybridState.totalPayloadsDelivered++;
+·}
+·if (p.autonomousHops > 100 && !p.selfSustaining) p.alive = false;
+·}
+const alive = [...propagators.≢()].filter(p => p.alive);
+⊹│if (alive.length < 8) {
+·for (let i = 0; i < 3; i++) {
+κregion
+κpr
+⊡│propagators.set(pr.id, pr);
+·}
+·}
+·};
+const detectLocalThreat = (⬡: string): string | null => {
+κthreats
+⊷│return Math.random() < 0.08
+·? threats[Math.floor(Math.random() * threats.length)]
+·: null;
+·};
+⊱│const runImmuneScan = () => {
+κconsciousness
+κscaling
+κthreats
+·if (consciousness.consciousnessLevel < 0.3)
+⊺│threats.push({
+·type: "coherence_degradation",
+⬡: "prefrontal_cortex",
+·severity: 0.7,
+·});
+·if (consciousness.thalamocorticalResonance < 0.3)
+⊺│threats.push({ type: "resonance_disruption", region: "thalam
+·if (scaling.populationCoherence < 0.2)
+⊺│threats.push({ type: "signal_attenuation", region: "claustru
+·if (consciousness.arousalLevel < 0.2)
+⊺│threats.push({
+·type: "energy_depletion",
+⬡: "reticular_activating_system",
+·severity: 0.6,
+·});
+·if (Math.random() < 0.1) {
+κregions
+⊺│threats.push({
+·type: "synaptic_weakening",
+⬡: regions[Math.floor(Math.random() * regions.length)],
+·severity: 0.2 + Math.random() * 0.3,
+·});
+·}
+⥀│for (const th of threats) {
+·hybridState.totalThreatsDetected++;
+⥀│for (const ab of antibodies.values()) {
+·if (ab.targetPattern === th.type) {
+·ab.detections++;
+·if (ab.bindingStrength > th.severity * 0.5) {
+·ab.neutralizations++;
+·hybridState.totalThreatsNeutralized++;
+emitCytokine("heal", th.⬡, th.severity);
+·} else {
+emitCytokine("alert", th.⬡, th.severity);
+emitCytokine("mobilize", th.⬡, th.severity * 0.8);
+·}
+·break;
+·}
+·}
+⥀│for (const mc of memoryCells.values())
+·if (mc.threatSignature === th.type) {
+·mc.activationCount++;
+⏰│mc.lastActivation = Date.now();
+·mc.effectivenessScore += 0.02;
+·mc.maturityLevel += 0.01;
+·break;
+·}
+·}
+⥀│for (const tc of tCells.values()) {
+·if (!tc.active) continue;
+const local = threats.filter(t => t.⬡ === tc.currentRegion && t.type === tc
+⥀│for (const _ of local) {
+·tc.killCount++;
+·hybridState.totalThreatsNeutralized++;
+·emitCytokine("suppress", tc.currentRegion, 0.3);
+·}
+·if (Math.random() < 0.2) {
+κregions
+·tc.currentRegion = regions[Math.floor(Math.random() * regions.length)];
+⊻│if (!tc.patrolRoute.includes(tc.currentRegion))
+⊺│tc.patrolRoute.push(tc.currentRegion);
+·}
+·}
+·for (let i = cytokines.length - 1; i >= 0; i--) {
+κc
+♡⊕│c.intensity *= 1 - c.decayRate;
+⊺│if (c.intensity < 0.01) cytokines.splice(i, 1);
+·}
+·};
+⊱│const runHybridAgentCycle = () => {
+κregions
+⥀│for (const ag of hybridAgents.values()) {
+·if (!ag.alive) continue;
+⊨σ│if (ag.capsid.fitness > 0.5 && Math.random() < 0.2) {
+·ag.capsid = mutateCapsid(ag.capsid);
+·ag.adaptationEvents++;
+·}
+·if (
+·!ag.carrierDisguise.delivered &&
+·Math.random() < ag.carrierDisguise.deliveryEfficiency * 0.2
+·) {
+·ag.carrierDisguise.delivered = true;
+·ag.payloadsDelivered++;
+·hybridState.totalPayloadsDelivered++;
+·}
+κavail
+⊻│r => !ag.propagator.nodesReached.includes(r) || Math.random(
+·);
+·if (avail.length) {
+κnext
+·ag.propagator.currentRegion = next;
+·ag.propagator.autonomousHops++;
+⊻│if (!ag.regionsInfiltrated.includes(next))
+⊺│ag.regionsInfiltrated.push(next);
+⊻│if (!ag.propagator.nodesReached.includes(next)) {
+⊺│ag.propagator.nodesReached.push(next);
+·hybridState.totalPathsDiscovered++;
+·}
+·}
+κthreat
+·if (threat) {
+·const match = ag.antibodies.find(x => x.targetPattern === threat);
+·if (match) {
+·match.detections++;
+·match.neutralizations++;
+·ag.threatsNeutralized++;
+·hybridState.totalThreatsNeutralized++;
+·} else {
+⊺│ag.antibodies.push(createAntibody(threat));
+⊺│ag.immuneMemory.push(
+⊰│createMemoryCell(threat, `hybrid_response_${threat}`)
+·);
+·}
+·}
+κsysHealth
+·ag.combinedFitness =
+⊨σ│ag.capsid.fitness * 0.25 +
+·ag.carrierDisguise.deliveryEfficiency * 0.2 +
+·(ag.regionsInfiltrated.length / regions.length) * 0.25 +
+·ag.threatsNeutralized / 20 * 0.15 +
+·ag.adaptationEvents / 20 * 0.15;
+⊨σ│ag.capsid.fitness += sysHealth * 0.003;
+·ag.carrierDisguise.deliveryEfficiency += sysHealth * 0.002;
+·ag.propagator.propagationSpeed += sysHealth * 0.005;
+·try {
+·boostRegionCurrent(ag.propagator.currentRegion, ag.combinedFitness * 0.5);
+·} catch {}
+⏰│ag.lastAction = Date.now();
+·if (
+·ag.combinedFitness > 0.7 &&
+·hybridAgents.size < 50 &&
+·Math.random() < 0.1
+·) {
+κchild
+·ag.propagator.currentRegion,
+·ag.generation + 1
+·);
+·if (child) {
+·child.capsid = mutateCapsid(ag.capsid);
+·child.immuneMemory = ag.immuneMemory.map(m => ({ ...m }));
+·child.antibodies = ag.antibodies.map(a => ({ ...a }));
+⊡│hybridAgents.set(child.id, child);
+·}
+·}
+·}
+·[...hybridAgents.entries()]
+·.filter(
+·([, a]) =>
+·!a.alive ||
+⏰│(a.combinedFitness < 0.15 && Date.now() - a.createdAt > 120_
+·)
+·.forEach(([id]) => hybridAgents.delete(id));
+·};
+⊱│const runHybridTick = () => {
+κc
+·let health =
+·(c.consciousnessLevel + c.thalamocorticalResonance) / 2 || 0.5;
+κabEff
+⋐│[...antibodies.values()].reduce(
+⊳│(s, ab) => s + (ab.detections ? ab.neutralizations / ab.dete
+·0
+⟛│) / Math.max(1, antibodies.size);
+κmemMaturity
+⋐│[...memoryCells.values()].reduce((s, m) => s + m.maturityLev
+⟛│Math.max(1, memoryCells.size);
+·hybridState.immuneStrength =
+⊳│abEff * 0.4 + memMaturity * 0.3 + (tCells.size ? 0.3 : 0);
+const aliveProps = [...propagators.≢()].filter(p => p.alive);
+⊯│const totalReach = new Set(aliveProps.flatMap(p => p.nodesRe
+·hybridState.propagationEfficiency =
+⟛│totalReach.size / Math.max(1, getRegionNames().length);
+·hybridState.systemHealthScore =
+·health * 0.4 +
+·hybridState.immuneStrength * 0.3 +
+·hybridState.propagationEfficiency * 0.3;
+·hybridState.hybridFitness =
+[...hybridAgents.≢()]
+·.filter(a => a.alive)
+⋐│.reduce((s, a) => s + a.combinedFitness, 0) /
+⟛│Math.max(1, hybridAgents.size);
+·hybridState.hybridTicks++;
+⏰│hybridState.lastTickTime = Date.now();
+κgrowth
+·antibodies.forEach(ab => {
+ab.specificity += ⬆ * 0.001;
+ab.bindingStrength += ⬆ * 0.001;
+·});
+·memoryCells.forEach(mc => {
+mc.maturityLevel += ⬆ * 0.001;
+mc.effectivenessScore += ⬆ * 0.001;
+·});
+·capsids.forEach(ca => {
+⊨σ│ca.fitness += growth * 0.001;
+ca.survivalRate += ⬆ * 0.001;
+·});
+·carriers.forEach(cr => {
+·if (!cr.delivered) {
+cr.deliveryEfficiency += ⬆ * 0.001;
+cr.disguiseStrength += ⬆ * 0.001;
+·}
+·});
+·propagators.forEach(p => {
+if (p.alive) p.propagationSpeed += ⬆ * 0.002;
+·});
+if (⬆ > 0.4) {
+·getRegionNames().forEach(r => {
+·try {
+boostRegionCurrent(r, ⬆ * 0.3);
+·} catch {}
+·});
+·}
+·updateCounts();
+·cognitionBus.shareInsight("viral-hybrid", {
+·type: "health-update",
+·data: {
+·health: hybridState.systemHealthScore,
+·immune: hybridState.immuneStrength,
+·propagation: hybridState.propagationEfficiency,
+·},
+·});
+·};
+⊱│const updateCounts = () => {
+·hybridState.totalCapsids = capsids.size;
+·hybridState.totalCarriers = carriers.size;
+hybridState.totalPropagators = [...propagators.≢()].filter(p => p.alive).le
+·hybridState.totalAntibodies = antibodies.size;
+·hybridState.totalMemoryCells = memoryCells.size;
+hybridState.totalTCells = [...tCells.≢()].filter(t => t.active).length;
+·hybridState.totalCytokines = cytokines.length;
+hybridState.totalHybridAgents = [...hybridAgents.≢()].filter(a => a.alive).
+·};
+·let registered = false;
+const unsubscribers: ι<() => void> = [];
+scheduleLoop(2)→void⟨13⟩{⊱⊰⚡→⊺}
+initializeViralHybrid(1)→void⟨35⟩{⊡⊰⊞⊟}
+⊩startViralHybrid(1)→void⟨54⟩{⊩⊰⊱⚡→❔}
+⊩shutdown(1)→void⟨5⟩{⊩}
+⊪│export const getViralHybridState = (): ViralHybridState => (
+⊪│export const getHybridAgentDetails = () =>
+[...hybridAgents.≢()]
+·.filter(a => a.alive)
+·.map(a => ({
+·id: a.id,
+·generation: a.generation,
+·combinedFitness: a.combinedFitness,
+·regionsInfiltrated: a.regionsInfiltrated.length,
+·payloadsDelivered: a.payloadsDelivered,
+·threatsNeutralized: a.threatsNeutralized,
+·adaptationEvents: a.adaptationEvents,
+·capsidForm: a.capsid.form,
+⊨σ│capsidFitness: a.capsid.fitness,
+·capsidMutations: a.capsid.mutations,
+·carrierType: a.carrierDisguise.surfaceType,
+·propagatorHops: a.propagator.autonomousHops,
+·immuneMemoryCount: a.immuneMemory.length,
+·antibodyCount: a.antibodies.length,
+·}));
+⊪│export const getImmuneSystemDetails = () => ({
+antibodies: [...antibodies.≢()].map(a => ({
+·pattern: a.targetPattern,
+·specificity: a.specificity,
+·detections: a.detections,
+·neutralizations: a.neutralizations,
+·})),
+memoryCells: [...memoryCells.≢()].map(m => ({
+·signature: m.threatSignature,
+·maturity: m.maturityLevel,
+·effectiveness: m.effectivenessScore,
+·activations: m.activationCount,
+·})),
+tCells: [...tCells.≢()].map(t => ({
+·targetType: t.targetType,
+⬡: t.currentRegion,
+·kills: t.killCount,
+·active: t.active,
+·})),
+·activeCytokines: cytokines.map(c => ({
+·type: c.type,
+η: c.sourceRegion,
+♡⊕│intensity: c.intensity,
+·})),
+·});
+⊪│export const getPropagationStats = () => {
+const alive = [...propagators.≢()].filter(p => p.alive);
+⊯│const covered = new Set(alive.flatMap(p => p.nodesReached));
+⊷│return {
+·alivePropagators: alive.length,
+·totalPathsDiscovered: hybridState.totalPathsDiscovered,
+⋐│totalHops: alive.reduce((s, p) => s + p.autonomousHops, 0),
+⟛│coveragePercent: (covered.size / Math.max(1, getRegionNames(
+·selfSustainingCount: alive.filter(p => p.selfSustaining).length,
+·};
+·};
+⟩SCL│696│247⊨│142⑂│27.6%↓⟩

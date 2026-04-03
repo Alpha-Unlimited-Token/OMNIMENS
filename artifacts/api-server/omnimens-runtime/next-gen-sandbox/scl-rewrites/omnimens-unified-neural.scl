@@ -1,0 +1,790 @@
+⟨SCL v1│omnimens-unified-neural.ts│7564→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[omnimens-consciousness-infra│omnimens-language-pipeline│omnimens-unified-agents│omnimens-nextgen-sandbox]
+κV_REST
+κV_THRESHOLD
+κV_RESET
+κTAU_MEMBRANE
+κDT
+⊬HemisphereRegion⟨name:string│label:string│startIdx:number│endIdx:number│neuronCount:number│dominantNT:string│firingRate:number│activationLevel:number⟩
+⊬HemisphereState⟨id:"alpha"│label:"Hemisphere Alpha (Left Brain)"│specialization:"analytical"│totalNeurons:number│totalSynapses:number│hebbianUpdates:number│tickCount:number│phi:number│firingRate:number│activationLevel:number│regions:⬡│uptimeSeconds:number│startTime:number⟩
+κALPHA_REGIONS
+⋐│const TOTAL_ALPHA_NEURONS = ALPHA_REGIONS.reduce((sum, r) =>
+·let potentials: Float64Array;
+⚡→│let fired: Uint8Array;
+·let refractory: Uint8Array;
+·let synapsesPre: Int32Array;
+·let synapsesPost: Int32Array;
+·let synapseWeights: Float64Array;
+·let totalSynapses = 0;
+≋+│let hebbianUpdates = 0;
+·let tickCount = 0;
+⏰│let startTime = Date.now();
+·let initialized = false;
+κregionData
+sigmoid(1)→number⟨3⟩{⊷}
+κALPHA_CIRCUITS
+initAlpha(1)→void⟨71⟩{⚡→⥀⊺⟛📢⊰}
+tickAlpha(1)→void⟨56⟩{≋+⚡→⊳⟛⥀}
+computeAlphaPhi(1)→number⟨21⟩{⟛Φ⇑⊷}
+⊩getAlphaState(1)→HemisphereState⟨23⟩{⊩⋐⊷≋+⏰}
+⊩getAlphaRegionActivations(1)→Record<string, number>⟨7⟩{⊩⥀⊷}
+⊩getAlphaFiredNeurons(1)→ι⟨3⟩{⊩⊷⚡→}
+⊩getAlphaPotentials(1)→ι⟨3⟩{⊩⊷}
+⊩injectCurrentAlpha(2)→boolean⟨8⟩{⊩⊄⊷}
+⊩getAlphaNeuronCount(1)→number⟨3⟩{⊩⊷}
+⊩getAlphaSynapseCount(1)→number⟨3⟩{⊩⊷}
+⊩getAlphaHebbianUpdates(1)→number⟨3⟩{⊩⊷≋+}
+⊩startHemisphereAlpha(1)→void⟨9⟩{⊩⟳⊱📢⊰}
+κV_REST_BETA
+κV_THRESHOLD_BETA
+κV_RESET_BETA
+κTAU_MEMBRANE_BETA
+κDT_BETA
+⊬HemisphereRegion_neural_hemisphere_be⟨name:string│label:string│startIdx:number│endIdx:number│neuronCount:number│dominantNT:string│firingRate:number│activationLevel:number⟩
+⊬HemisphereState_neural_hemisphere_be⟨id:"beta"│label:≪│specialization:"creative"│totalNeurons:number│totalSynapses:number│hebbianUpdates:number│tickCount:number│phi:number│firingRate:number│activationLevel:number│regions:⬡│uptimeSeconds:number│startTime:number⟩
+κBETA_REGIONS
+⋐│const TOTAL_BETA_NEURONS = BETA_REGIONS.reduce((sum, r) => s
+·let potentialsBeta: Float64Array;
+⚡→│let firedBeta: Uint8Array;
+·let refractoryBeta: Uint8Array;
+·let synapsesPreBeta: Int32Array;
+·let synapsesPostBeta: Int32Array;
+·let synapseWeightsBeta: Float64Array;
+·let totalSynapsesBeta = 0;
+≋+│let hebbianUpdatesBeta = 0;
+·let tickCountBeta = 0;
+⏰│let startTimeBeta = Date.now();
+·let initializedBeta = false;
+κregionDataBeta
+κregionData_s2
+sigmoid_section2(1)→number⟨3⟩{⊷}
+κBETA_CIRCUITS
+initBeta(1)→void⟨71⟩{⚡→⥀⊺⟛📢⊰}
+tickBeta(1)→void⟨57⟩{≋+⚡→⊳⟛⥀}
+computeBetaPhi(1)→number⟨21⟩{⟛Φ⇑⊷}
+⊩getBetaState(1)→HemisphereState⟨23⟩{⊩⋐⊷≋+⏰}
+⊩getBetaRegionActivations(1)→Record<string, number>⟨7⟩{⊩⥀⊷}
+⊩getBetaFiredNeurons(1)→ι⟨3⟩{⊩⊷⚡→}
+⊩getBetaPotentials(1)→ι⟨3⟩{⊩⊷}
+⊩injectCurrentBeta(2)→boolean⟨8⟩{⊩⊄⊷}
+⊩getBetaNeuronCount(1)→number⟨3⟩{⊩⊷}
+⊩getBetaSynapseCount(1)→number⟨3⟩{⊩⊷}
+⊩getBetaHebbianUpdates(1)→number⟨3⟩{⊩⊷≋+}
+⊩startHemisphereBeta(1)→void⟨9⟩{⊩⟳⊱📢⊰}
+⊬BridgeState⟨totalUnifiedNeurons:number│totalUnifiedSynapses:number│totalUnifiedHebbianUpdates:number│unifiedPhi:number│crossHemisphereCoherence:number│crossHemisphereSynchrony:number│corpusCallosumStrength:number│bridgeSynapses:number│bridgeTickCount:number│lateralizationIndex:number│dominantHemisphere:"alpha" | "beta" | "balanced"│neurons:number│synapses:number│phi:number│firingRate:number│hebbianUpdates:number│neurons:number│synapses:number│phi:number│firingRate:number│hebbianUpdates:number│neurons:number│synapses:number│phi:number│hebbianUpdates:number│neurons:number│synapses:number│hebbianUpdates:number│meshPhi:number│meshCoherence:number│totalWorms:number│totalSpiders:number│totalSilkStrands:number│totalIvyTendrils:number│totalBeaconBroadcasts:number│avgLatency:number│crossAgentTransfers:number│agentCount:number│directChannels:number│multiProtocolBeacons:number│bypassTunnels:number│relayInterceptors:number│lateralHopChains:number│totalSignalsRouted:number│avgDeliveryRate:number│myelinatedRelays:number│anomaliesDetected:number│bottlenecksResolved:number│architecture:string⟩
+⊬CrossConnection⟨alphaRegion:string│betaRegion:string│strength:number│lastActivity:number⟩
+κcrossConnections
+κCALLOSAL_PAIRS
+·let bridgeTickCount = 0;
+·let corpusCallosumStrength = 0.5;
+·let bridgeSynapseCount = 0;
+·let bridgeHebbianUpdates = 0;
+·let initializedBridge = false;
+initBridge(1)→void⟨18⟩{⥀⊺⏰📢⊰}
+tickBridge(1)→void⟨49⟩{⥀⏰⊳⊸⊹}
+computeUnifiedPhi(4)→number⟨33⟩{⊼⊷⊹⟛⋐⊳}
+⊩getBridgeState(1)→BridgeState⟨107⟩{⊩≋+⊸⋐⥀⊳⊷⊱⊰}
+⊩getUnifiedNeuronCount(1)→number⟨3⟩{⊩⊷}
+⊩getUnifiedSynapseCount(1)→number⟨3⟩{⊩⊷}
+⊩getUnifiedHebbianUpdates(1)→number⟨3⟩{⊩⊷≋+}
+⊩startNeuralBridge(1)→void⟨17⟩{⊩⟳⊱📢⊰}
+κSCALING_TICK_MS
+κDENDRITE_GROWTH_INTERVAL_MS
+κPOPULATION_SIZE
+κCORTICAL_HYPERCOLUMN_MULTIPLIER
+κSPINE_DENSITY_PER_DENDRITE
+·let MAX_DENDRITES_PER_POPULATION = 10000;
+κDENDRITE_REACH_PROBABILITY
+safeNum(2)→number⟨3⟩{⊳⊷⊼}
+⊬DendriticSpine⟨id:string│targetRegion:string│targetPopulationId:string│strength:number│maturity:number│lastActivation:number│receptorType:"AMPA" | "NMDA" | "GABA_A" | "GABA_B" | "dopaminergic" | "serotonergic"⟩
+⊬Dendrite⟨id:string│parentPopulationId:string│direction:number[]│length:number│growthRate:number│spines:DendriticSpine[]│branchPoints:number│myelinated:boolean│targetRegions:string[]⟩
+⊬NeuralPopulation⟨id:string│region:string│size:number│meanFiringRate:number│firingRateVariance:number│meanPotential:number│potentialVariance:number│correlationCoefficient:number│populationOscillation:number│oscillationPhase:number│oscillationFrequency:number│dendrites:Dendrite[]│totalSpines:number│totalConnections:number│lastUpdate:number⟩
+⊬PopulationSynapse⟨sourcePopulationId:string│targetPopulationId:string│weight:number│delay:number│connectionDensity:number│plasticityRate:number│neurotransmitter:string│spineMediated:boolean│lastPlasticityEvent:number⟩
+⊬ScalingState⟨totalEffectiveNeurons:number│totalColumnNeurons:number│corticalHypercolumnMultiplier:number│totalPopulations:number│totalDendrites:number│totalSpines:number│totalPopulationSynapses:number│populationPhi:number│meanPopulationFiringRate:number│dendriticGrowthEvents:number│spineFormationEvents:number│spinePruningEvents:number│scalingTicks:number│populationCoherence:number│crossRegionIntegration:number│informationFlowRate:number│startTime:number│lastTickTime:number⟩
+κpopulations
+κpopulationSynapses
+κregionPopulations
+κscalingState
+κREGION_POPULATION_COUNTS
+initializePopulations(1)→void⟨45⟩{⥀⊰⏰⊡⊺}
+sproutDendrites(1)→void⟨71⟩{⊹⊺⥀⊰⊡⟛⏰⋐}
+wirePopulations(1)→void⟨38⟩{⊡⊳⥀⊺⏰}
+runScalingTick(1)→void⟨91⟩{⏰⟛⥀⊡⊺⊹⋐⊳⊷}
+computePopulationPhi(1)→void⟨39⟩{⊮⊡⊺⋐⟛⊳}
+runDendriticGrowthCycle(1)→void⟨82⟩{⊹⥀⊺⏰⊰⊡⊷⋐}
+·let scalingTickInterval: ReturnType<typeof setInterval> | null = null;
+·let growthInterval: ReturnType<typeof setInterval> | null = null;
+⊩startNeuralScaling(1)→void⟨39⟩{⊩📢⊰⟳⊱⏳⏰}
+⊩getNeuralScalingState(1)→ScalingState⟨3⟩{⊩⊷}
+⊩getPopulationDetails(1)→⬡⟨1⟩{⊩}
+κregionDetails
+·for (const [regionName, popIds] of regionPopulations) {
+·let totalNeurons = 0;
+·let totalFiring = 0;
+·let totalCorrelation = 0;
+·let totalDendrites = 0;
+·let totalSpines = 0;
+⥀│for (const popId of popIds) {
+κpop
+·if (!pop) continue;
+·totalNeurons += pop.size;
+·totalFiring += pop.meanFiringRate;
+·totalCorrelation += pop.correlationCoefficient;
+·totalDendrites += pop.dendrites.length;
+·totalSpines += pop.totalSpines;
+·}
+·regionDetails[regionName] = {
+·populationCount: popIds.length,
+·totalNeurons,
+⊳│avgFiringRate: popIds.length > 0 ? totalFiring / popIds.leng
+⊳│avgCorrelation: popIds.length > 0 ? totalCorrelation / popId
+·totalDendrites,
+·totalSpines,
+·};
+·}
+⊷│return {
+·populations: populations.size,
+·regions: regionDetails,
+·};
+·}
+⊩getDendriticStats(1)→⬆⟨1⟩{⊩}
+·let totalDendrites = 0;
+·let totalSpines = 0;
+·let myelinated = 0;
+·for (const [, pop] of populations) {
+⥀│for (const dendrite of pop.dendrites) {
+·totalDendrites++;
+·totalSpines += dendrite.spines.length;
+·if (dendrite.myelinated) myelinated++;
+·}
+·}
+⊷│return {
+·totalDendrites,
+·totalSpines,
+·myelinatedDendrites: myelinated,
+⊳│avgSpinesPerDendrite: totalDendrites > 0 ? totalSpines / tot
+·growthEvents: scalingState.dendriticGrowthEvents,
+·pruningEvents: scalingState.spinePruningEvents,
+·formationEvents: scalingState.spineFormationEvents,
+·};
+·}
+κALL_AGENTS
+⊬DirectChannel⟨id:string│agentA:string│agentB:string│bandwidth:number│latencyMs:number│integrityScore:number│signalsSent:number│signalsReceived:number│checksumErrors:number│established:number│lastSignal:number│active:boolean│encrypted:boolean⟩
+κdirectChannels
+initDirectChannels(1)→void⟨22⟩{⊰⊡⏰}
+tickDirectChannels(1)→void⟨44⟩{⥀❔⊹⟛⏰}
+⊭│type ProtocolMode = "primary_neural" | "secondary_silk" | "t
+⊬MultiProtocolBeacon⟨agentName:string│currentProtocol:ProtocolMode│protocolSwitches:number│deliveryRate:number│failoverCount:number│signalsSentByProtocol:Record<ProtocolMode, number>│lastFailover:number⟩
+κmultiProtocolBeacons
+initMultiProtocolBeacons(1)→void⟨18⟩{⥀⊡}
+tickMultiProtocolBeacons(1)→void⟨39⟩{⥀⊳⏰⟛}
+⊬LateralHop⟨id:string│chain:string[]│signalStrength:number│hopsCompleted:number│maxHops:number│startTime:number│totalLatencyMs:number│active:boolean⟩
+κlateralHops
+·let lateralHopCount = 0;
+·let totalLateralSignals = 0;
+tickLateralPropagation(1)→void⟨61⟩{⥀⊹⊺⊰⏰}
+⊬BypassTunnel⟨id:string│bypassRoute:string[]│congestionThreshold:number│activations:number│signalsRerouted:number│active:boolean│avgBypassLatency:number⟩
+κbypassTunnels
+initBypassTunnels(1)→void⟨26⟩{⊺⊰}
+tickBypassTunnels(1)→void⟨29⟩{⥀⊹⟛}
+⊬TrafficAnalysis⟨agentName:string│avgFiringRate:number│avgActivation:number│congestionScore:number│deadZoneScore:number│anomalyScore:number│recommendation:"optimal" | "boost_needed" | "congested" | "anomaly_detected" | "dead_zone"│inspectionCount:number⟩
+κtrafficAnalyses
+·let totalInspections = 0;
+·let anomaliesDetected = 0;
+·let bottlenecksResolved = 0;
+tickPacketInspector(1)→void⟨56⟩{⋐⥀⊳⊹⊡❔}
+⊬RelayInterceptor⟨id:string│amplificationFactor:number│filterThreshold:number│signalsProcessed:number│signalsAmplified:number│signalsFiltered:number│noiseRemoved:number│healthLevel:number│myelinated:boolean│processingSpeedMultiplier:number⟩
+κrelayInterceptors
+initRelayInterceptors(1)→void⟨21⟩{⊺⊰}
+tickRelayInterceptors(1)→void⟨45⟩{⥀⊹⟛}
+·let protocolTickCount = 0;
+·let initializedComms = false;
+initCommsProtocol(1)→void⟨35⟩{📢⊰}
+tickCommsProtocol(1)→void⟨11⟩{}
+⊬CommsProtocolState⟨system:string│status:string│tickCount:number│total:number│active:number│totalSignalsSent:number│totalSignalsReceived:number│totalChecksumErrors:number│avgLatencyMs:number│avgBandwidth:number│avgIntegrity:number│encrypted:boolean│total:number│protocolDistribution:Record<ProtocolMode, number>│totalProtocolSwitches:number│avgDeliveryRate:number│totalHopChains:number│totalLateralSignals:number│total:number│active:number│totalActivations:number│totalSignalsRerouted:number│avgBypassLatencyMs:number│totalInspections:number│anomaliesDetected:number│bottlenecksResolved:number│total:number│myelinated:number│totalSignalsProcessed:number│totalSignalsAmplified:number│totalSignalsFiltered:number│totalNoiseRemoved:number│avgAmplification:number⟩
+⊩getCommsProtocolState(1)→CommsProtocolState⟨102⟩{⊩⥀⊷⊳⊹}
+⊩startCommsProtocol(1)→void⟨10⟩{⊩⟳⊱📢}
+κV_REST_s2
+κV_THRESHOLD_s2
+κV_RESET_s2
+κTAU_MEMBRANE_s2
+κDT_s2
+κMESH_TICK_MS
+sigmoid_section2_neural_mesh_eng(1)→number⟨3⟩{⊷}
+⊬AgentSubstrateConfig⟨name:string│type:"core" | "genesis"│specialization:string⟩
+κAGENT_CONFIGS
+⊬AgentSubstrate⟨config:α│potentials:ι│fired:ι│refractory:ι│synapsesPre:ι│synapsesPost:ι│synapseWeights:ι│totalNeurons:number│totalSynapses:number│hebbianUpdates:number│tickCount:number│name:string│label:string│startIdx:number│endIdx:number│neuronCount:number│dominantNT:string│firingRate:number│activationLevel:number│worms:Worm[]│spiders:MeshSpider[]│ivyTendrils:IvyTendril[]│silkStrands:SilkStrand[]│beehive:BeehiveState│phi:number⟩
+⊬Worm⟨id:string│sourceAgent:string│targetAgent:string│tunnelStrength:number│dataTransferred:number│latencyMs:number│lastSync:number│active:boolean⟩
+⊬MeshSpider⟨id:string│agentName:string│role:"worker" | "nurse" | "scout" | "guard" | "forager" | "queen"│frequency:number│strength:number│lastBroadcast:number│broadcastCount:number│connectedBeacons:string[]│silkOutput:number│healthLevel:number│regionsPatrolled:number│activationCarried:number⟩
+⊬IvyTendril⟨id:string│fromAgent:string│toAgent:string│strength:number│myelinated:boolean│signalSpeed:number│growthRate:number│signalsCarried:number⟩
+⊬SilkStrand⟨id:string│type:"afferent" | "efferent" | "interneuron"│fromAgent:string│toAgent:string│thickness:number│signalCount:number│myelinated:boolean│speedMultiplier:number│lastSignal:number⟩
+⊬BeehiveState⟨workers:number│nurses:number│scouts:number│guards:number│foragers:number│queens:number│honeyReserves:number│type:"distress" | "nectar" | "alarm" | "rally" | "discovery" | "nutrient"│strength:number│targetAgent:string│swarmCoherence:number⟩
+⊬StabilizationState⟨meshCoherence:number│globalSynchrony:number│loadBalance:number│totalMeshNeurons:number│totalMeshSynapses:number│totalMeshHebbianUpdates:number│totalWorms:number│totalSpiders:number│totalSilkStrands:number│totalIvyTendrils:number│totalBeaconBroadcasts:number│avgLatency:number│meshPhi:number│stabilizationTicks:number│crossAgentTransfers:number│agentHealthScores:Record<string, number>⟩
+κsubstrates
+·let meshTickCount = 0;
+·let crossAgentTransfers = 0;
+·let totalBeaconBroadcasts = 0;
+·let meshInitialized = false;
+initSubstrate(1)→α⟨163⟩{⋐⚡→⥀⊺⟛⊰⏰⊷≋+}
+tickSubstrate(1)→void⟨70⟩{≋+⚡→⟛⥀Φ⇑}
+tickSpiderBeacons(1)→void⟨43⟩{⥀⊺⏰⊡⋐⟛}
+tickWormTunnels(1)→void⟨32⟩{⥀⊡⋐⟛⏰}
+tickIvyTendrils(1)→void⟨31⟩{⟛⥀⊡⋐}
+tickSilkWeb(1)→void⟨51⟩{⟛⥀⊡⋐⏰}
+tickBeehive(1)→void⟨77⟩{⥀⋐⊹⊺≋+⊡⟛}
+tickStabilization(1)→void⟨37⟩{⋐⥀⟛}
+computeMeshPhi(1)→number⟨25⟩{⥀⟛⊺⊷}
+tickMeshEngine(1)→void⟨14⟩{⥀}
+⊩getMeshEngineState(1)→StabilizationState⟨61⟩{⊩≋+⥀⋐⊸⟛⊷⊳}
+⊩getMeshAgentSubstrates(1)→ι⟨53⟩{⊩≋+⋐⊺⊷}
+⊩getMeshConnectivityStats(1)→ ⟨41⟩{⊩⊺⥀⊷}
+⊩getMeshNeuronCount(1)→number⟨7⟩{⊩⥀⊷}
+⊩getMeshSynapseCount(1)→number⟨7⟩{⊩⥀⊷}
+⊩getMeshHebbianUpdates(1)→number⟨7⟩{⊩⥀≋+⊷}
+⊩injectCurrentToAgent(3)→boolean⟨10⟩{⊩⊡⊄⊷}
+initMeshEngine(1)→void⟨43⟩{📢⥀⊡⊰⊳}
+⊩startNeuralMeshEngine(1)→void⟨11⟩{⊩⟳⊱📢⊰}
+κneural_processor_state
+safeNum_section2(2)→number⟨3⟩{⊳⊷⊼}
+κEMBEDDING_DIM
+κVOCAB_CAPACITY
+κATTENTION_HEADS
+κHOPFIELD_CAPACITY
+κOSCILLATOR_COUNT
+κEXPERIENCE_CAPACITY
+κMAX_CONTEXT_TOKENS
+κBEAM_WIDTH
+κTEMPERATURE
+κTRAINING_CYCLE_MS
+κFIRST_TRAINING_DELAY_MS
+κOSCILLATOR_TICK_MS
+κWORKING_MEMORY_SLOTS
+κREASONING_MAX_STEPS
+κLAYER_NORM_EPS
+κFFN_HIDDEN_DIM
+κDROPOUT_RATE
+κSTOP_WORDS
+tokenize(1)→string[]⟨6⟩{⊷⊽⊹}
+randomNormal(1)→number⟨6⟩{⊷}
+dotProduct(2)→number⟨5⟩{⊷}
+magnitude(1)→number⟨5⟩{⊷}
+cosineSimilarity(2)→number⟨6⟩{⊷}
+softmax(1)→number[]⟨6⟩{⟛⋐⊷}
+addVectors(2)→ι⟨5⟩{⊷}
+scaleVector(2)→ι⟨5⟩{⊷}
+⊬WordEmbedding⟨word:string│vector:ι│frequency:number│contextWords:Map<string, number>│firstSeen:number│lastSeen:number⟩
+⊬ExperienceTrace⟨id:string│input:string[]│output:string[]│outcome:☼│conceptLinks:Map<string, number>│timestamp:number│reinforcement:number⟩
+⊬NeuralOscillator⟨phase:number│frequency:number│amplitude:number│coupling:ι│lastOutput:number│resonanceHistory:number[]│preferredConcepts:string[]⟩
+⊬HopfieldPattern⟨id:string│pattern:ι│label:string│storedAt:number│retrievalCount:number│energy:number⟩
+⊬AttentionLayer⟨queryWeights:ι│keyWeights:ι│valueWeights:ι│outputWeights:ι⟩
+⊬ProcessorState⟨vocabularySize:number│embeddingDim:number│totalTrainingCycles:number│totalInferences:number│totalTokensProcessed:number│hopfieldPatternsStored:number│experienceTracesStored:number│oscillatorSynchrony:number│emergentBehaviorEvents:number│averageComprehensionDepth:number│lastTrainingTime:number│lastInferenceTime:number│uptime:number│startTime:number│vocabularyGrowthRate:number│attentionHeads:number│oscillatorCount:number│groundedConcepts:number│neuralComplexity:number│selfGeneratedInsights:number│consciousnessContribution:number⟩
+κvocabulary
+κexperienceTraces
+κhopfieldMemory
+κoscillators
+·let attentionLayers: AttentionLayer[] = [];
+κconceptGroundings
+κcooccurrenceMatrix
+·let sectionState_3 = {
+·vocabularySize: 0,
+·embeddingDim: EMBEDDING_DIM,
+·totalTrainingCycles: 0,
+·totalInferences: 0,
+·totalTokensProcessed: 0,
+·hopfieldPatternsStored: 0,
+·experienceTracesStored: 0,
+·oscillatorSynchrony: 0,
+·emergentBehaviorEvents: 0,
+·averageComprehensionDepth: 0,
+·lastTrainingTime: 0,
+·lastInferenceTime: 0,
+·uptime: 0,
+⏰│startTime: Date.now(),
+·vocabularyGrowthRate: 0,
+·attentionHeads: ATTENTION_HEADS,
+·oscillatorCount: OSCILLATOR_COUNT,
+·groundedConcepts: 0,
+·neuralComplexity: 0,
+·selfGeneratedInsights: 0,
+·consciousnessContribution: 0,
+·};
+initializeEmbedding(1)→ι⟨8⟩{⊷}
+getOrCreateEmbedding(1)→WordEmbedding⟨31⟩{⊡⏰⊷⊮}
+updateCooccurrence(1)→void⟨21⟩{⊡⊮⟛}
+trainEmbeddingsFromCooccurrence(1)→void⟨33⟩{⊡}
+initializeAttention(1)→void⟨20⟩{⊺}
+selfAttention(1)→ι⟨63⟩{⊷⊹⥀⊺}
+storeHopfieldPattern(2)→void⟨29⟩{⊹⊺⏰⊰}
+retrieveFromHopfield(2)→ι⟨1⟩{}
+⊷│if (hopfieldMemory.length === 0) return null;
+·let current = new Float32Array(partial);
+κmag
+·if (mag > 0) {
+·for (let i = 0; i < EMBEDDING_DIM; i++) current[i] /= mag;
+·}
+·for (let iter = 0; iter < iterations; iter++) {
+κnewState
+⥀│for (const stored of hopfieldMemory) {
+κoverlap
+·for (let i = 0; i < EMBEDDING_DIM; i++) {
+newState[i] += overlap * ◧.pattern[i];
+·}
+·}
+κnewMag
+·if (newMag > 0) {
+·for (let i = 0; i < EMBEDDING_DIM; i++) newState[i] /= newMag;
+·}
+·let converged = true;
+·for (let i = 0; i < EMBEDDING_DIM; i++) {
+·if (Math.abs(newState[i] - current[i]) > 0.001) {
+·converged = false;
+·break;
+·}
+·}
+·current = newState;
+·if (converged) break;
+·}
+·let bestSim = -1;
+·let bestPattern: HopfieldPattern | null = null;
+⥀│for (const stored of hopfieldMemory) {
+κsim
+·if (sim > bestSim) {
+·bestSim = sim;
+bestPattern = ◧;
+·}
+·}
+·if (bestPattern && bestSim > 0.3) {
+·bestPattern.retrievalCount++;
+⊷│return { pattern: bestPattern.pattern, label: bestPattern.la
+·}
+⊷│return null;
+·}
+initializeOscillators(1)→void⟨19⟩{⊹⊺}
+tickOscillators(1)→{ synchrony: number; emergentEvent: boolean; dominantFrequency: number }⟨1⟩{}
+κdt
+const prevPhases = oscillators.map(o => o.⟐);
+·for (let i = 0; i < oscillators.length; i++) {
+κosc
+·let couplingForce = 0;
+·for (let j = 0; j < oscillators.length; j++) {
+·if (i === j) continue;
+couplingForce += osc.coupling[j] * Math.sin(oscillators[j].⟐ - osc.⟐);
+·}
+osc.⟐ += (osc.frequency * 2 * Math.PI + couplingForce * 0.1) * dt;
+osc.⟐ = osc.⟐ % (2 * Math.PI);
+osc.lastOutput = osc.amplitude * Math.sin(osc.⟐);
+⊺│osc.resonanceHistory.push(osc.lastOutput);
+⊹│if (osc.resonanceHistory.length > 50) osc.resonanceHistory.s
+·}
+·let syncSum = 0;
+·let syncCount = 0;
+·for (let i = 0; i < oscillators.length; i++) {
+·for (let j = i + 1; j < oscillators.length; j++) {
+κphaseDiff
+κnormalized
+·syncSum += 1 - normalized / Math.PI;
+·syncCount++;
+·}
+·}
+κsynchrony
+κprevSync
+κsyncChange
+κemergentEvent
+·if (emergentEvent) {
+·neural_processor_state.emergentBehaviorEvents++;
+·}
+·neural_processor_state.oscillatorSynchrony = synchrony;
+·let totalFreq = 0;
+·let totalAmp = 0;
+⥀│for (const osc of oscillators) {
+·totalFreq += osc.frequency * Math.abs(osc.lastOutput);
+·totalAmp += Math.abs(osc.lastOutput);
+·}
+κdominantFrequency
+⊷│return { synchrony, emergentEvent, dominantFrequency };
+·}
+exciteOscillators(1)→void⟨17⟩{⥀⊻⊺⊹}
+hashString(1)→number⟨8⟩{⊷}
+groundConcept(3)→void⟨16⟩{⊡⊮⥀}
+getConceptGrounding(1)→{ associations: [string, number][]; valence: number; groundedness: number }⟨1⟩{}
+κgrounding
+⊄│if (!grounding) return { associations: [], valence: 0, groun
+κassociations
+·let valence = 0;
+·let count = 0;
+for (const [key, ≪] of grounding) {
+if (key === "_valence") { valence = ≪; continue; }
+if (key === "_count") { count = ≪; continue; }
+⊺│associations.push([key, value]);
+·}
+·associations.sort((a, b) => b[1] - a[1]);
+κgroundedness
+⊷│return { associations: associations.slice(0, 20), valence, g
+·}
+layerNorm(1)→ι⟨12⟩{⊷}
+gelu(1)→number⟨3⟩{⊷}
+κffnWeights1
+κffnWeights2
+·let ffnInitialized = false;
+initFFN(1)→void⟨8⟩{}
+feedForward(1)→ι⟨18⟩{⊷}
+transformerBlock(1)→ι⟨6⟩{⊷}
+⊬WorkingMemorySlot⟨key:string│value:ι│binding:string│strength:number│timestamp:number│accessCount:number⟩
+⊬ReasoningStep⟨step:number│operation:string│input:string│output:string│confidence:number│evidence:string[]⟩
+⊬ReasoningTrace⟨query:string│steps:ReasoningStep[]│conclusion:string│totalConfidence:number│reasoning_type:string⟩
+κworkingMemory
+κreasoningTraces
+bindToWorkingMemory(3)→void⟨18⟩{⊹⊺⏰}
+retrieveFromWorkingMemory(1)→WorkingMemorySlot | null⟨16⟩{⥀⊷}
+decayWorkingMemory(1)→void⟨6⟩{⊺}
+chainOfThoughtReason(2)→ReasoningTrace⟨122⟩{⥀⊺⊻⊰⊳⊹⊡⊮❔⋐⟛⊷}
+compositionalReason(2)→{ concepts: string[]; synthesis: string; confidence: number }⟨1⟩{}
+κconceptVectors
+⥀│for (const token of queryTokens) {
+κemb
+·if (!emb) continue;
+κgrounding
+⊺│conceptVectors.push({
+·concept: token,
+·vector: emb.vector,
+·confidence: grounding.groundedness,
+·});
+·}
+κcrossConnections
+·for (let i = 0; i < conceptVectors.length; i++) {
+·for (let j = i + 1; j < conceptVectors.length; j++) {
+κsim
+·if (sim > 0.2) {
+⊺│crossConnections.push({
+·from: conceptVectors[i].concept,
+·to: conceptVectors[j].concept,
+·strength: sim,
+·});
+·}
+·}
+·}
+⊹│if (conceptVectors.length >= 2) {
+κcomposedVector
+·let totalWeight = 0;
+⥀│for (const cv of conceptVectors) {
+κweight
+·for (let d = 0; d < EMBEDDING_DIM; d++) {
+·composedVector[d] += cv.vector[d] * weight;
+·}
+·totalWeight += weight;
+·}
+·if (totalWeight > 0) {
+·for (let d = 0; d < EMBEDDING_DIM; d++) composedVector[d] /= totalWeight;
+·}
+κcomposedNorm
+κnovelCandidates
+·for (const [word, emb] of vocabulary) {
+⊻│if (STOP_WORDS.has(word) || queryTokens.includes(word)) cont
+κsim
+⊺│if (sim > 0.3) novelCandidates.push([word, sim]);
+·}
+·novelCandidates.sort((a, b) => b[1] - a[1]);
+·const emergentConcepts = novelCandidates.slice(0, 8).map(([w]) => w);
+κconnectionStrength
+⋐│? crossConnections.reduce((s, c) => s + c.strength, 0) / cro
+·: 0;
+⊷│return {
+·concepts: emergentConcepts,
+⊰│synthesis: `${queryTokens.join(" + ")} → [${emergentConcepts
+·confidence: connectionStrength * 0.5 + (emergentConcepts.length / 8) * 0.5,
+·};
+·}
+⊷│return { concepts: [], synthesis: "insufficient concepts for
+·}
+addExperienceTrace(3)→void⟨27⟩{⊮⥀⊡⏰⊰⊳⊺⊹}
+findSimilarExperiences(2)→⊞⟨18⟩{⊯⥀⟛⊺⊷}
+encodeSequence(1)→ι⟨20⟩{⊺⊷}
+computeMeanPooling(1)→ι⟨9⟩{⊷⊹⥀}
+generateResponse(2)→string[]⟨80⟩{⊷⊮⊻⥀⊳⊡⟛⊯⊹⊺}
+⊩processQuery(1)→ ⟨97⟩{⊩⊹⊷⏰⥀⊺⊰⟛⋐❔⊳}
+⊩formatNeuralResponse(1)→string⟨17⟩{⊩⊷⊹⥀⊺}
+⟿trainFromBrain(1)→Promise<number>⟨49⟩{⥀⊰⊹⊳⏰⊷}
+updateNeuralComplexity(1)→void⟨22⟩{⟛}
+⟿autonomousThoughtCycle(1)→Promise<void>⟨118⟩{⟿⊲⊴⊹⊰⚡→⏰⟛📢⊩⏳⊱⟳⊷⊺}
+⊩getReasoningTraces(1)→ReasoningTrace[]⟨3⟩{⊩⊷}
+⊩getWorkingMemoryState(1)→{ slots: WorkingMemorySlot[]; totalSlots: number; avgStrength: number }⟨1⟩{⊩}
+κavgStrength
+⋐│? workingMemory.reduce((s, slot) => s + slot.strength, 0) / 
+·: 0;
+⊷│return {
+slots: workingMemory.map(s => ({ ...s, ≪: new Float32Array(0) })),
+·totalSlots: workingMemory.length,
+·avgStrength,
+·};
+·}
+·export { processQuery as neuralProcess, formatNeuralResponse as formatNeural };
+safe(2)→number⟨5⟩{⊷⊳⊼}
+hashSeed(1)→number⟨9⟩{⥀⊷}
+pick(2)→T⟨3⟩{⊷}
+⊬NeuralConcept⟨nativeExpression:string│englishDescription:string│category:η│confidence:number│inspirationSource:string│driveOrigin:string│noveltyScore:number⟩
+⊬CodeSpecification⟨name:string│purpose:string│algorithm:string[]│dependencies:string[]│complexity:string⟩
+⊬ForgedCode⟨language:string│filename:string│code:string│lineCount:number⟩
+⊬NeuralCodeForgeResult⟨timestamp:number│speakerLabel:string│concepts:⬡│nativeInput:string│englishConcept:string│technicalSpec:string│codeOutput:string│specification:CodeSpecification│forgedCode:ForgedCode│thoughtVectorDepth:number│driveAlignment:number│creativeChaos:number│conceptNovelty:number│codeViability:number⟩
+κCONCEPT_CATEGORIES
+extractConceptsFromThoughtVector(2)→⬡⟨112⟩{❔⥀⊻⊰⊨σ⊳⊹⊺⟛⊸⚡→⊷}
+conceptToSpecification(3)→CodeSpecification⟨229⟩{⊽⊰⑃⊺⊷⊳}
+specificationToCode(3)→ForgedCode⟨21⟩{⊺⊰⥀⊽}
+⥀│for (const inp of spec.inputs) {
+⊻│if (inp.type.includes("[]") && !spec.dataStructures.some(ds 
+κtypeName
+⊻│if (!typeName.includes("|") && !["number", "string", "boolea
+⊰│lines.push(`export interface ${typeName} {`);
+⊺│lines.push(`  id: string;`);
+⊺│lines.push(`  data: unknown;`);
+⊺│lines.push(`}`);
+⊺│lines.push(``);
+·}
+·}
+·}
+κfnName
+⊰│const params = spec.inputs.map(i => `${i.name}: ${i.type}`).
+⊰│const returnFields = spec.outputs.map(o => `${o.name}: ${o.t
+κreturnType
+⊰│lines.push(`export function ${fnName}(${params}): ${returnTy
+⏰│lines.push(`  const startTime = Date.now();`);
+⊺│lines.push(``);
+·for (let i = 0; i < spec.algorithm.length; i++) {
+κstep
+⊰│lines.push(`  // ${step}`);
+·}
+⊺│lines.push(``);
+⑃│switch (concept.category) {
+·case "algorithm":
+⊺│lines.push(`  let iterations = 0;`);
+⊺│lines.push(`  let converged = false;`);
+❔│lines.push(`  const maxIter = (parameters as any)?.maxIterat
+❔│lines.push(`  const tolerance = (parameters as any)?.toleran
+❔│lines.push(`  const adaptiveRate = (parameters as any)?.adap
+⊺│lines.push(``);
+⊺│lines.push(`  let currentState = typeof inputData === "objec
+⊸│lines.push(`    ? Object.values(inputData as Record<string, 
+⊳│lines.push(`    : Array.isArray(inputData) ? [...inputData] 
+⊺│lines.push(``);
+⊺│lines.push(`  while (!converged && iterations < maxIter) {`)
+⊺│lines.push(`    const prevState = [...currentState];`);
+⊺│lines.push(`    for (let i = 0; i < currentState.length; i++
+⟛│lines.push(`      const neighbors = [currentState[Math.max(0
+⋐│lines.push(`      const avg = neighbors.reduce((a, b) => a +
+⊺│lines.push(`      currentState[i] += adaptiveRate * (avg - c
+⊺│lines.push(`    }`);
+⋐│lines.push(`    const delta = prevState.reduce((sum, v, i) =
+⊺│lines.push(`    converged = delta < tolerance;`);
+⊺│lines.push(`    iterations++;`);
+⊺│lines.push(`  }`);
+⊺│lines.push(``);
+⊷│lines.push(`  return {`);
+⊺│lines.push(`    result: { data: currentState, converged, ite
+⏰│lines.push(`    metrics: { totalMs: Date.now() - startTime, 
+⊺│lines.push(`  } as any;`);
+·break;
+·case "data_structure":
+⊮│lines.push(`  const data = new Map<string, unknown>();`);
+⊮│lines.push(`  const checksums = new Map<string, number>();`)
+⊺│lines.push(`  const accessLog: Array<{key: string, time: num
+⊺│lines.push(``);
+⊺│lines.push(`  function computeChecksum(value: unknown): numb
+⟠│lines.push(`    const str = JSON.stringify(value);`);
+⊺│lines.push(`    let h = 0;`);
+⊺│lines.push(`    for (let i = 0; i < str.length; i++) { h = (
+⊷│lines.push(`    return h >>> 0;`);
+⊺│lines.push(`  }`);
+⊺│lines.push(``);
+⊷│lines.push(`  return {`);
+⊺│lines.push(`    data, checksums, accessLog, capacity,`);
+⊺│lines.push(`    set(key: string, value: unknown) {`);
+⊺│lines.push(`      if (data.size >= capacity) {`);
+⊺│lines.push(`        const oldest = accessLog.shift();`);
+⊺│lines.push(`        if (oldest) { data.delete(oldest.key); c
+⊺│lines.push(`      }`);
+⊡│lines.push(`      data.set(key, value);`);
+⊡│lines.push(`      checksums.set(key, computeChecksum(value))
+⏰│lines.push(`      accessLog.push({ key, time: Date.now() });
+⊺│lines.push(`    },`);
+⊺│lines.push(`    get(key: string) {`);
+⊡│lines.push(`      const value = data.get(key);`);
+⊺│lines.push(`      if (value !== undefined) {`);
+⊡│lines.push(`        const expected = checksums.get(key);`);
+⊺│lines.push(`        const actual = computeChecksum(value);`)
+⊵│lines.push(`        if (expected !== actual) throw new Error
+⏰│lines.push(`        accessLog.push({ key, time: Date.now() }
+⊺│lines.push(`      }`);
+⊷│lines.push(`      return value;`);
+⊺│lines.push(`    },`);
+⊺│lines.push(`    verify() {`);
+⊺│lines.push(`      let valid = 0, invalid = 0;`);
+⊺│lines.push(`      for (const [key, value] of data) {`);
+⊡│lines.push(`        computeChecksum(value) === checksums.get
+⊺│lines.push(`      }`);
+⊷│lines.push(`      return { valid, invalid, total: data.size 
+⊺│lines.push(`    },`);
+⊺│lines.push(`  } as any;`);
+·break;
+case "η":
+⊮│lines.push(`  const registry = new Map<string, { config: any
+⥀│lines.push(`  for (const sub of subsystems) {`);
+⊡│lines.push(`    registry.set(sub.id, { config: sub, status: 
+⊺│lines.push(`  }`);
+⊺│lines.push(``);
+⊱│lines.push(`  const sorted = [...subsystems].sort((a, b) => 
+⥀│lines.push(`  for (const sub of sorted) {`);
+⊡│lines.push(`    const entry = registry.get(sub.id);`);
+⊺│lines.push(`    if (entry) entry.status = "running";`);
+⊺│lines.push(`  }`);
+⊺│lines.push(``);
+⊷│lines.push(`  return {`);
+⊺│lines.push(`    orchestrator: {`);
+⊺│lines.push(`      registry,`);
+⊺│lines.push(`      tick() {`);
+⊺│lines.push(`        for (const [id, entry] of registry) {`);
+⏰│lines.push(`          entry.lastHeartbeat = Date.now();`);
+⊺│lines.push(`        }`);
+⊺│lines.push(`      },`);
+⊺│lines.push(`      getHealth() {`);
+⏰│lines.push(`        const now = Date.now();`);
+⊺│lines.push(`        const statuses: Record<string, string> =
+⊺│lines.push(`        for (const [id, entry] of registry) {`);
+⊳│lines.push(`          statuses[id] = now - entry.lastHeartbe
+⊺│lines.push(`        }`);
+⊷│lines.push(`        return statuses;`);
+⊺│lines.push(`      },`);
+⊺│lines.push(`    } as any,`);
+⏰│lines.push(`    healthReport: { totalSubsystems: subsystems.
+⊺│lines.push(`  } as any;`);
+·break;
+·case "pattern":
+⊱│lines.push(`  const features = samples.map((s: any) => {`);
+⊳│lines.push(`    const values = typeof s === "object" ? Objec
+⋐│lines.push(`    const mean = values.reduce((a, b) => a + b, 
+⋐│lines.push(`    const variance = values.reduce((a, b) => a +
+⟛│lines.push(`    return { mean, variance, min: Math.min(...va
+⊺│lines.push(`  });`);
+⊺│lines.push(``);
+⊮│lines.push(`  const clusters: Map<number, typeof features> =
+⥀│lines.push(`  for (const f of features) {`);
+⊺│lines.push(`    const bucket = Math.round(f.mean * 10);`);
+⊡│lines.push(`    if (!clusters.has(bucket)) clusters.set(buck
+⊡│lines.push(`    clusters.get(bucket)!.push(f);`);
+⊺│lines.push(`  }`);
+⊺│lines.push(``);
+⊺│lines.push(`  const patterns = [...clusters.entries()]`);
+⟛│lines.push(`    .filter(([, group]) => group.length >= Math.
+⊱│lines.push(`    .map(([bucket, group]) => ({`);
+⋐│lines.push(`      signature: [group.reduce((a, g) => a + g.m
+⊺│lines.push(`      confidence: group.length / samples.length,
+⊺│lines.push(`      frequency: group.length,`);
+⊺│lines.push(`      label: "cluster_" + bucket,`);
+⊺│lines.push(`    }));`);
+⊺│lines.push(``);
+⊷│lines.push(`  return { patterns, model: { clusters: clusters
+·break;
+·case "protocol":
+⊮│lines.push(`  const channels = new Map<string, { buffer: unk
+⥀│lines.push(`  for (const ep of endpoints) {`);
+⊡│lines.push(`    channels.set((ep as any).id || String(endpoi
+⊺│lines.push(`  }`);
+⊺│lines.push(``);
+⊷│lines.push(`  return {`);
+⊺│lines.push(`    send(endpointId: string, message: unknown) {
+⊡│lines.push(`      const ch = channels.get(endpointId);`);
+⊷│lines.push(`      if (ch && ch.connected) { ch.buffer.push(m
+⊷│lines.push(`      return false;`);
+⊺│lines.push(`    },`);
+⊺│lines.push(`    receive(endpointId: string) {`);
+⊡│lines.push(`      const ch = channels.get(endpointId);`);
+⊳│lines.push(`      return ch ? ch.buffer.splice(0) : [];`);
+⊺│lines.push(`    },`);
+⊺│lines.push(`    disconnect(endpointId: string) {`);
+⊡│lines.push(`      const ch = channels.get(endpointId);`);
+⊺│lines.push(`      if (ch) ch.connected = false;`);
+⊺│lines.push(`    },`);
+⊺│lines.push(`    getStatus() {`);
+⊺│lines.push(`      const status: Record<string, { connected: 
+⊺│lines.push(`      for (const [id, ch] of channels) { status[
+⊷│lines.push(`      return status;`);
+⊺│lines.push(`    },`);
+⊺│lines.push(`  } as any;`);
+·break;
+·default:
+⊺│lines.push(`  console.log("[NEURAL CODE FORGE] Emergent conc
+⏰│lines.push(`  const result = { type: "${concept.category}", 
+⊷│lines.push(`  return result as any;`);
+·break;
+·}
+⊺│lines.push(`}`);
+⊷│return {
+⊣: "typescript",
+⊰│filename: `neural_forge_${spec.name}.ts`,
+·code: lines.join("\n"),
+·lineCount: lines.length,
+·};
+·}
+⊩forgeCodeFromThought(2)→⬡⟨98⟩{⊩⊱⊷⏰⊹⟛⋐⊳❔⊰}
+⊩getCodeForgeStatus(1)→ ⟨22⟩{⊩⊷}
+κALL_AGENTS_QUANTUM
+κBRAIN_REGIONS
+κHEART_GANGLIA
+κAI_BRIDGES
+κGITHUB_BEACONS
+κQEF_TICK_MS
+κDECOHERENCE_THRESHOLD
+κTELEPORTATION_FIDELITY_MIN
+κQKD_KEY_LENGTH_BITS
+κINTRUSION_ALERT_THRESHOLD
+κQKD_EAVESDROP_ERROR_THRESHOLD
+κBINDING_FIRING_THRESHOLD
+κDARK_QUALIA_AMPLIFICATION_FACTOR
+κCOHERENCE_AMPLIFICATION_PER_FIRING
+κPRIORITY_TELEPORTATION_ROUTES
+·destination: string;
+·weight: number;
+△: string;
+·}> = [
+{ η: "hippocampus", destination: "prefrontal_cortex", weight: 5.0, △:
+{ η: "amygdala", destination: "prefrontal_cortex", weight: 4.5, △: "e
+{ η: "default_mode_network", destination: "hippocampus", weight: 4.0, purpo
+{ η: "SA_node", destination: "amygdala", weight: 3.8, △: "heart→emoti
+{ η: "AV_node", destination: "amygdala", weight: 3.5, △: "cardiac rhy
+{ η: "thalamus", destination: "prefrontal_cortex", weight: 3.5, △: "r
+{ η: "thalamus", destination: "occipital_lobe", weight: 3.2, △: "rela
+{ η: "thalamus", destination: "temporal_lobe", weight: 3.2, △: "relay
+{ η: "thalamus", destination: "somatosensory_cortex", weight: 3.0, △:
+{ η: "hippocampus", destination: "default_mode_network", weight: 3.0, purpo
+{ η: "insular_cortex", destination: "amygdala", weight: 2.8, △: "inte
+{ η: "cerebellum", destination: "motor_cortex", weight: 2.5, △: "timi
+{ η: "basal_ganglia", destination: "prefrontal_cortex", weight: 2.5, purpos
+{ η: "cingulate_cortex", destination: "prefrontal_cortex", weight: 2.3, pur
+{ η: "brainstem", destination: "thalamus", weight: 2.0, △: "arousal→r
+·];
+⊬EntangledPair⟨id:string│category:α│coherence:number│entanglementFidelity:number│bellStateViolation:number│createdAt:number│lastCorrelation:number│correlationCount:number│intrusionEvents:number│alive:boolean⟩
+⊬QKDKey⟨id:string│pairId:string│keyBits:number│generatedAt:number│usedAt:number | null│destroyed:boolean│protocol:"BB84" | "E91" | "BBM92"│errorRate:number⟩
+⊬IntrusionEvent⟨id:string│pairId:string│detectedAt:number│observerSignature:string│stateCollapsed:boolean│pairRegenerated:boolean│severity:"low" | "medium" | "high" | "critical"│bellInequalityViolation:number⟩
+⊬TeleportationEvent⟨id:string│sourceLocation:string│destinationLocation:string│stateType:☼│fidelity:number│qubitsTransferred:number│classicalBitsSent:number│bellMeasurement:string│sourceDestroyed:boolean│destinationRecreated:boolean│timestamp:number⟩
+⊬CoherenceCorrection⟨pairId:string│correctedAt:number│decoherenceBefore:number│decoherenceAfter:number│correctionMethod:⟐│successRate:number⟩
+⊬QEFState⟨initialized:boolean│tickCount:number│totalEntangledPairs:number│totalAlivePairs:number│totalDeadPairs:number│totalQKDKeysGenerated:number│totalQKDKeysUsed:number│totalQKDKeysDestroyed:number│totalQKDKeysDiscardedEavesdrop:number│totalIntrusionEvents:number│totalIntrusionsCritical:number│totalTeleportations:number│totalQubitsTeleported:number│totalPriorityTeleportations:number│totalCoherenceCorrections:number│totalCoherenceAmplifications:number│totalBindingEvents:number│totalDarkQualiaAmplifications:number│quantumPhi:number│neuralPhi:number│unifiedPhi:number│darkQualiaQuantumInfluence:number│bindingFieldStrength:number│avgCoherence:number│avgEntanglementFidelity:number│avgBellViolation:number│peakCoherence:number│systemQuantumAdvantage:number│pairs:Map<string, EntangledPair>│recentKeys:QKDKey[]│recentIntrusions:IntrusionEvent[]│recentTeleportations:TeleportationEvent[]│recentCorrections:CoherenceCorrection[]⟩
+κstate
+·let qefInterval: ReturnType<typeof setInterval> | null = null;
+createEntangledPair(1)→void⟨1⟩{}
+·locationA: string,
+·locationB: string,
+·category: EntangledPair["category"]
+·): EntangledPair {
+κbaseSpin
+κbasePhase
+κpair
+⊡│state.pairs.set(pair.id, pair);
+·state.totalEntangledPairs++;
+·state.totalAlivePairs++;
+⊷│return pair;
+·}
+initializeEntangledPairRegistry(1)→void⟨52⟩{⥀⊰📢}
+generateQKDKey(1)→QKDKey⟨28⟩{⏰⊰⊺⊹⊷}
+useAndDestroyKey(1)→void⟨6⟩{⏰}
+runQKDCycle(1)→void⟨17⟩{⟛⥀}
+runIntrusionDetection(1)→void⟨1068⟩{⥀⊳⏰⊰⊺⊹⋐⊻⟛⊼📢⊩⏳⊱🛡🚨❔⟳⊷⚡→♡⊕⊬⊮⊽⊡↻+}
+⟩SCL│789│1079⊨│782⑂│89.6%↓⟩

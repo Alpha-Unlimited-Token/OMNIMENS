@@ -1,0 +1,80 @@
+⟨SCL v1│resource-sentinel.ts│124→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+η: https://en.wikipedia.o
+⊬ResourceState⟨dbHealth:number│apiAvailable:boolean│memoryUsagePct:number│cpuLoad:number│feltSensation:string│energyLevel:number│lastCheck:number⟩
+⊶│export class ResourceSentinel {
+·private state: ResourceState = {
+·dbHealth: 1.0, apiAvailable: true, memoryUsagePct: 0, cpuLoad: 0,
+·feltSensation: "energized", energyLevel: 1.0, lastCheck: 0,
+·};
+·private backoffMultiplier = 1;
+·private recoveryTimer: ReturnType<typeof setTimeout> | null = null;
+·check(): ResourceState {
+κmem
+κheapPct
+·this.state.memoryUsagePct = Math.round(heapPct * 100);
+⏰│this.state.lastCheck = Date.now();
+·if (heapPct > 0.9) {
+·this.state.feltSensation = "overwhelmed";
+·this.state.energyLevel = 0.1;
+·} else if (heapPct > 0.7) {
+·this.state.feltSensation = "strained";
+·this.state.energyLevel = 0.4;
+·} else if (!this.state.apiAvailable) {
+·this.state.feltSensation = "frustrated";
+·this.state.energyLevel = 0.5;
+·} else if (this.state.dbHealth < 0.5) {
+·this.state.feltSensation = "fatigued";
+·this.state.energyLevel = 0.3;
+·} else {
+·this.state.feltSensation = "energized";
+⟛│this.state.energyLevel = Math.min(1.0, this.state.dbHealth);
+·}
+⊷│return { ...this.state };
+·}
+·reportDBHealth(healthy: boolean): void {
+·if (healthy) {
+⟛│this.state.dbHealth = Math.min(1.0, this.state.dbHealth + 0.
+⟛│this.backoffMultiplier = Math.max(1, this.backoffMultiplier 
+·} else {
+⟛│this.state.dbHealth = Math.max(0, this.state.dbHealth - 0.3)
+⟛│this.backoffMultiplier = Math.min(32, this.backoffMultiplier
+·this.scheduleRecovery();
+·}
+·}
+reportAPIHealth(Θ: boolean): void {
+this.state.apiAvailable = Θ;
+if (!Θ) this.scheduleRecovery();
+·}
+·shouldSkipBackground(): boolean {
+⊷│return this.state.energyLevel < 0.4;
+·}
+·shouldSkipStandard(): boolean {
+⊷│return this.state.energyLevel < 0.2;
+·}
+·getBackoffMs(): number {
+⊷│return 1000 * this.backoffMultiplier;
+·}
+·getState(): ResourceState {
+⊷│return { ...this.state };
+·}
+·getEmotionalFeed(): { sensation: string; energy: number; suggestion: string } {
+κsuggestion
+·? "Conserve energy — reduce non-essential activity"
+·: this.state.energyLevel < 0.6
+·? "Moderate activity — prioritize important work"
+·: "Full capacity — all systems go";
+⊷│return { sensation: this.state.feltSensation, energy: this.s
+·}
+·private scheduleRecovery(): void {
+·if (this.recoveryTimer) return;
+κdelay
+⏳│this.recoveryTimer = setTimeout(() => {
+·this.recoveryTimer = null;
+⟛│this.state.dbHealth = Math.min(1.0, this.state.dbHealth + 0.
+·this.state.apiAvailable = true;
+·}, delay);
+·}
+·}
+⊪sentinel
+⟩SCL│79│25⊨│16⑂│36.3%↓⟩

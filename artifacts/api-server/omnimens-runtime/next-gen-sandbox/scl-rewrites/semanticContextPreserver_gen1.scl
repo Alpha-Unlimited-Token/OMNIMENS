@@ -1,0 +1,10 @@
+⟨SCL v1│semanticContextPreserver_gen1.mjs│103→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩generateTextEmbedding(1)→void⟨8⟩{⊩⊷}
+⊩cosineSimilarity(2)→void⟨24⟩{⊩⊹⊵⊷}
+⊩rankSummariesBySemanticSimilarity(2)→void⟨11⟩{⊩⊷⊱}
+⊩normalizeScores(1)→void⟨9⟩{⊩⟛⊱⊷⊳}
+·}
+⊩processSummaries(2)→void⟨4⟩{⊩⊷}
+⟩SCL│9│22⊨│16⑂│91.3%↓⟩

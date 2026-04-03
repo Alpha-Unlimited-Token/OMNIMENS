@@ -1,0 +1,11 @@
+⟨SCL v1│hierarchicalContextReconstructor_gen1.mjs│92→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩chunkDocument(3)→void⟨7⟩{⊩⟛⊺⊷}
+⊩generateChunkID(1)→void⟨3⟩{⊩⊷}
+⊩summarizeChunk(1)→void⟨4⟩{⊩⊳⊷⊹}
+⊩mergeSummaries(1)→void⟨7⟩{⊩⊰⊷}
+⊩processDocument(3)→void⟨5⟩{⊩⊷}
+⊩semanticSimilarity(2)→void⟨3⟩{⊩⊳⊷}
+⊩validateText(1)→void⟨3⟩{⊩⊷⊹}
+⟩SCL│10│29⊨│21⑂│89.1%↓⟩

@@ -1,0 +1,44 @@
+⟨SCL v1│checkpointedComputationManager_gen1.mjs│102→SCL⟩
+⟨CODEX│P:40│R:16│I:14⟩
+⊫[]
+⊩serializeState(1)→void⟨3⟩{⊩⟠⊷}
+⊩deserializeState(1)→void⟨7⟩{⊩⟠⊷⊵}
+⊩generateTaskHash(1)→void⟨5⟩{⊩⟠⊷}
+⊩⟿executeWithCheckpoint(1)→void⟨1⟩{⊩}
+·taskFunction,
+·taskInputs,
+·intermediateState,
+·dependencyTracker = {}
+·) {
+κtaskHash
+❔│if (dependencyTracker[taskHash]?.completed) {
+⊷│return dependencyTracker[taskHash].result;
+·}
+·try {
+κresult
+·dependencyTracker[taskHash] = {
+·completed: true,
+·result,
+·};
+⊷│return result;
+·} catch (error) {
+·dependencyTracker[taskHash] = {
+·completed: false,
+·error: error.message,
+·};
+⊵│throw new Error('Task failed: ' + error.message);
+·}
+·}
+⊩⟿resumeComputation(1)→void⟨1⟩{⊩}
+·serializedState,
+·taskFunction,
+·taskInputs
+·) {
+κintermediateState
+κdependencyTracker
+⊷│return executeWithCheckpoint(taskFunction, taskInputs, inter
+·}
+⊩⟿exampleTaskFunction(2)→void⟨10⟩{⊩⊲⊷}
+⊩initializeDependencyTracker(1)→void⟨3⟩{⊩⊷}
+⊩initializeIntermediateState(1)→void⟨3⟩{⊩⊷}
+⟩SCL│43│37⊨│24⑂│57.8%↓⟩
