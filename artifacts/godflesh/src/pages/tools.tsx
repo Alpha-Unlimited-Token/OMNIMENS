@@ -70,7 +70,7 @@ const TOOLS: Tool[] = [
   { id: "video-analysis",  name: "Video Analysis",         description: "Analyze YouTube videos — transcripts, summaries, key moments.",    icon: <Youtube className="w-5 h-5" />,      category: "Specialist",   status: "active",  tier: "free" },
 
   // Agentic
-  { id: "multi-agent",     name: "Multi-Agent Crew",       description: "9 specialist AI agents collaborate on complex tasks — including the Coherence Agent for cross-conversation consistency.", icon: <Bot className="w-5 h-5" />, category: "Agentic", status: "active", tier: "pro" },
+  { id: "multi-agent",     name: "Multi-Agent Crew",       description: "21 specialist AI agents (9 built-in + 12 self-created) collaborate on complex tasks — including the Coherence Agent for cross-conversation consistency.", icon: <Bot className="w-5 h-5" />, category: "Agentic", status: "active", tier: "pro" },
   { id: "task-planner",    name: "Autonomous Task Planner",description: "BabyAGI/AutoGPT-style goal decomposition and execution.",         icon: <Workflow className="w-5 h-5" />,     category: "Agentic",      status: "active",  tier: "pro" },
   { id: "email-draft",     name: "Email Drafting",         description: "Write professional emails, follow-ups, and cold outreach.",        icon: <Mail className="w-5 h-5" />,         category: "Agentic",      status: "active",  tier: "free" },
   { id: "scheduled-tasks", name: "Scheduled Automations",  description: "Run research, reports, and tasks on a recurring schedule.",        icon: <Activity className="w-5 h-5" />,     category: "Agentic",      status: "coming",  tier: "pro" },

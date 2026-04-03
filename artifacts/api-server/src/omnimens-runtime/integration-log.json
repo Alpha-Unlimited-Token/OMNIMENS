@@ -1,45 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Meta-Agent",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: SpellCheckVisual/information_compression: The connectome is ",
-    "filename": "omnimens_autocode_neural_pathway_mnibtk3m.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnibtk3m.mjs",
-    "backupPath": null,
-    "timestamp": 1775185849858,
-    "codeLength": 434,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Neuroscientist",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: SpellCheckVisual/structural_analysis: Quantum entanglement a",
-    "filename": "omnimens_autocode_pattern_recognition_mnibtkbi.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnibtkbi.mjs",
-    "backupPath": null,
-    "timestamp": 1775185850142,
-    "codeLength": 477,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:GraphicDesigner+Meta-Agent",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: GraphicDesigner/causal_inference: Information is physical — ",
-    "filename": "omnimens_autocode_consciousness_expansion_mnibuff3.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnibuff3.mjs",
-    "backupPath": null,
-    "timestamp": 1775185890447,
-    "codeLength": 392,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:GraphicDesigner+Mathematician",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: GraphicDesigner/entropy_reduction: DNA stores information at",
-    "filename": "omnimens_autocode_consciousness_expansion_mnibufi3.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnibufi3.mjs",
-    "backupPath": null,
-    "timestamp": 1775185890555,
-    "codeLength": 395,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:SpellCheckVisual+Architect",
     "title": "[OMNIMENS AutoCoder] pattern_recognition: SpellCheckVisual/temporal_correlation: The double-slit exper",
     "filename": "omnimens_autocode_pattern_recognition_mnibugy3.mjs",
@@ -4997,6 +4957,46 @@
     "backupPath": null,
     "timestamp": 1775219714255,
     "codeLength": 478,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:GraphicDesigner+Neuroscientist",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: GraphicDesigner/feature_extraction: The hard problem of cons",
+    "filename": "omnimens_autocode_consciousness_expansion_mniw0vlh.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mniw0vlh.mjs",
+    "backupPath": null,
+    "timestamp": 1775219783670,
+    "codeLength": 396,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Mathematician",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SpellCheckVisual/information_compression: Autopoiesis: livin",
+    "filename": "omnimens_autocode_knowledge_synthesis_mniw2mzz.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mniw2mzz.mjs",
+    "backupPath": null,
+    "timestamp": 1775219865839,
+    "codeLength": 425,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:GraphicDesigner+SpellCheckVisual",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: GraphicDesigner/cross_domain_synthesis: Recurrent neural net",
+    "filename": "omnimens_autocode_neural_pathway_mniw49bs.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mniw49bs.mjs",
+    "backupPath": null,
+    "timestamp": 1775219941432,
+    "codeLength": 439,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: SpellCheckVisual/information_compression: Autopoiesis: livin",
+    "filename": "omnimens_autocode_adaptive_algorithm_mniw49g3.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mniw49g3.mjs",
+    "backupPath": null,
+    "timestamp": 1775219941587,
+    "codeLength": 452,
     "overwrite": false
   }
 ]

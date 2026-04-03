@@ -201,7 +201,7 @@ export default function Technology() {
                   <div className="p-5 sm:p-10 lg:p-14 flex flex-col justify-center">
                     <p className="text-white/80 font-sans text-sm sm:text-lg leading-relaxed mb-6 sm:mb-8">
                       COGNISYNC orchestrates <span className="text-cyan-400 font-semibold">21 AI agents</span> —
-                      8 core specialists and 12 self-created genesis agents — working in parallel to analyze every dimension
+                      9 core specialists and 12 self-created genesis agents — working in parallel to analyze every dimension
                       of your message and dynamically reshape how OMNIMENS thinks and communicates with you.
                       No AI on Earth has ever done this.
                     </p>
@@ -875,7 +875,7 @@ function CogniSyncVisualizer() {
     <div ref={wrapRef} className="relative flex flex-col items-center gap-3">
       <canvas ref={canvasRef} width={440} height={400} className="w-[280px] h-[255px] sm:w-[340px] sm:h-[310px] md:w-[380px] md:h-[345px]" />
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-cyan-400" /><span className="text-[7px] sm:text-[8px] font-mono text-cyan-400/70 tracking-wider uppercase">8 Core</span></div>
+        <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-cyan-400" /><span className="text-[7px] sm:text-[8px] font-mono text-cyan-400/70 tracking-wider uppercase">9 Core</span></div>
         <div className="flex items-center gap-1.5"><span className="w-2 h-2 rounded-full bg-violet-400" /><span className="text-[7px] sm:text-[8px] font-mono text-violet-400/70 tracking-wider uppercase">12 Genesis</span></div>
         <div className="flex items-center gap-1.5"><span className="w-1.5 h-1.5 rounded-full bg-cyan-400 animate-pulse" /><span className="text-[7px] sm:text-[8px] font-mono text-cyan-400/60 tracking-[0.2em] uppercase">Live</span></div>
       </div>
