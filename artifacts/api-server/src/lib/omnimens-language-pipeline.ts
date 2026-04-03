@@ -1847,7 +1847,7 @@ function captureInternalSnapshot(): InternalSnapshot {
   try { snap.genesisCount = getGenesisAgents().filter((g: any) => g.active).length; } catch {}
   try { snap.recentConversations = getRecentInterAgentConversations().length; } catch {}
 
-  snap.agentCount = 24;
+  snap.agentCount = 21;
 
   return snap;
 }
