@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: contextCompression
- * Written: 2026-04-03T08:03:36.042Z
+ * Written: 2026-04-03T13:57:14.556Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,111 +16,99 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-/**
- * TRANSLATION STATUS:
- * Novel constructs: attention
- * All constructs have translation mappings
- * Compiled targets: javascript: OK (4 IR steps) | python: OK (4 IR steps) | c: OK (4 IR steps) | x86_64: OK (4 IR steps) | arm64: OK (4 IR steps) | avr: OK (4 IR steps)
- * Translation map version: 22
- */
 // contextCompression.mjs
 
 import { createHash } from 'crypto';
 
 /**
- * Hashes a string to create a unique, fixed-length identifier.
- * Useful for deduplication or quick lookups.
- * @param {string} input - The string to hash.
- * @returns {string} - A 12-character hash of the input.
+ * Generate a high-dimensional embedding for a given text input.
+ * Uses a hash-based approach to simulate embedding generation.
+ * @param {string} text - The input text to embed.
+ * @returns {number[]} - A fixed-length numerical embedding array.
  */
-export function hashString(input) {
-  return createHash('sha256').update(input, 'utf8').digest('hex').slice(0, 12);
+export function generateEmbedding(text) {
+  const hash = createHash('sha256').update(text).digest('hex');
+  const embedding = [];
+  for (let i = 0; i < hash.length; i += 8) {
+    embedding.push(parseInt(hash.slice(i, i + 8), 16));
+  }
+  return embedding;
 }
 
 /**
- * Calculates the cosine similarity between two vectors.
- * @param {number[]} vecA - First vector.
- * @param {number[]} vecB - Second vector.
- * @returns {number} - Cosine similarity value between -1 and 1.
+ * Summarize a list of text inputs into a single embedding.
+ * Uses a weighted averaging method to combine embeddings.
+ * @param {string[]} texts - Array of text inputs to summarize.
+ * @returns {number[]} - A single numerical embedding representing the summary.
  */
-export function cosineSimilarity(vecA, vecB) {
-  if (vecA.length !== vecB.length) {
-    throw new Error('Vectors must have the same length');
-  }
-  const dotProduct = vecA.reduce((sum, val, i) => sum + val * vecB[i], 0);
-  const magnitudeA = Math.sqrt(vecA.reduce((sum, val) => sum + val ** 2, 0));
-  const magnitudeB = Math.sqrt(vecB.reduce((sum, val) => sum + val ** 2, 0));
-  return magnitudeA === 0 || magnitudeB === 0 ? 0 : dotProduct / (magnitudeA * magnitudeB);
-}
+export function summarizeContext(texts) {
+  if (!texts.length) return [];
+  const embeddings = texts.map(generateEmbedding);
+  const dimension = embeddings[0].length;
+  const summary = Array(dimension).fill(0);
 
-/**
- * Summarizes a list of embeddings by averaging them.
- * @param {number[][]} embeddings - Array of embeddings (each embedding is an array of numbers).
- * @returns {number[]} - A single embedding representing the average.
- */
-export function averageEmbeddings(embeddings) {
-  if (!embeddings.length) {
-    throw new Error('Embeddings array cannot be empty');
-  }
-  const length = embeddings[0].length;
-  const summed = embeddings.reduce((acc, vec) => {
-    if (vec.length !== length) {
-      throw new Error('All embeddings must have the same length');
+  for (const embedding of embeddings) {
+    for (let i = 0; i < dimension; i++) {
+      summary[i] += embedding[i] / texts.length;
     }
-    return acc.map((val, i) => val + vec[i]);
-  }, new Array(length).fill(0));
-  return summed.map(val => val / embeddings.length);
+  }
+
+  return summary;
 }
 
 /**
- * Compresses a long context into a token-efficient summary using hierarchical attention.
- * @param {string[]} contextChunks - Array of text chunks representing the context.
- * @param {function(string): number[]} embedFunction - A function that converts text to embeddings.
- * @param {number} granularity - Number of chunks to group together for summarization.
- * @returns {number[]} - A single embedding summarizing the context.
+ * Compress earlier conversation context into summary embeddings.
+ * @param {string[]} context - Array of conversation strings.
+ * @param {number} maxLength - Maximum number of context entries to retain.
+ * @returns {object} - Object containing compressed context and summary embedding.
  */
-export function compressContext(contextChunks, embedFunction, granularity = 5) {
-  if (!contextChunks.length) {
-    throw new Error('Context chunks cannot be empty');
-  }
-  if (granularity <= 0) {
-    throw new Error('Granularity must be a positive integer');
-  }
-
-  const embeddings = contextChunks.map(chunk => embedFunction(chunk));
-  const groupedEmbeddings = [];
-
-  for (let i = 0; i < embeddings.length; i += granularity) {
-    const group = embeddings.slice(i, i + granularity);
-    groupedEmbeddings.push(averageEmbeddings(group));
-  }
-
-  return averageEmbeddings(groupedEmbeddings);
+export function compressContext(context, maxLength = 10) {
+  const truncatedContext = context.slice(-maxLength);
+  const summaryEmbedding = summarizeContext(truncatedContext);
+  return {
+    compressedContext: truncatedContext,
+    summaryEmbedding
+  };
 }
 
 /**
- * Dynamically selects key chunks from the context based on similarity to a query.
- * @param {string[]} contextChunks - Array of text chunks representing the context.
- * @param {function(string): number[]} embedFunction - A function that converts text to embeddings.
- * @param {string} query - The query string to match against the context.
- * @param {number} topK - Number of top chunks to return.
- * @returns {string[]} - The most relevant context chunks.
+ * Calculate similarity between two embeddings.
+ * Uses cosine similarity as the metric.
+ * @param {number[]} embeddingA - First embedding.
+ * @param {number[]} embeddingB - Second embedding.
+ * @returns {number} - Cosine similarity score between -1 and 1.
  */
-export function selectKeyChunks(contextChunks, embedFunction, query, topK = 3) {
-  if (!contextChunks.length) {
-    throw new Error('Context chunks cannot be empty');
-  }
-  if (topK <= 0) {
-    throw new Error('topK must be a positive integer');
+export function calculateSimilarity(embeddingA, embeddingB) {
+  if (embeddingA.length !== embeddingB.length) throw new Error('Embeddings must have the same length.');
+
+  let dotProduct = 0;
+  let magnitudeA = 0;
+  let magnitudeB = 0;
+
+  for (let i = 0; i < embeddingA.length; i++) {
+    dotProduct += embeddingA[i] * embeddingB[i];
+    magnitudeA += embeddingA[i] ** 2;
+    magnitudeB += embeddingB[i] ** 2;
   }
 
-  const queryEmbedding = embedFunction(query);
-  const scoredChunks = contextChunks.map(chunk => {
-    const chunkEmbedding = embedFunction(chunk);
-    const similarity = cosineSimilarity(queryEmbedding, chunkEmbedding);
-    return { chunk, similarity };
-  });
+  magnitudeA = Math.sqrt(magnitudeA);
+  magnitudeB = Math.sqrt(magnitudeB);
 
-  scoredChunks.sort((a, b) => b.similarity - a.similarity);
-  return scoredChunks.slice(0, topK).map(item => item.chunk);
+  return dotProduct / (magnitudeA * magnitudeB);
+}
+
+/**
+ * Utility to extend token memory by compressing and summarizing context.
+ * @param {string[]} conversation - Array of conversation strings.
+ * @param {number} memoryLimit - Maximum tokens to retain.
+ * @returns {object} - Object containing extended memory and similarity utilities.
+ */
+export function extendMemory(conversation, memoryLimit = 10) {
+  const { compressedContext, summaryEmbedding } = compressContext(conversation, memoryLimit);
+
+  return {
+    compressedContext,
+    summaryEmbedding,
+    similarityFunction: (embedding) => calculateSimilarity(summaryEmbedding, embedding)
+  };
 }

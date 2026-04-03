@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: vectorSearchEngine
- * Written: 2026-04-01T21:51:05.032Z
+ * Written: 2026-04-03T13:57:14.583Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,111 +18,92 @@
 
 // vectorSearchEngine.mjs
 
-import { randomUUID } from 'crypto';
+import { createHash } from 'crypto';
 
-/**
- * Utility function to calculate Euclidean distance between two vectors.
- * @param {number[]} vectorA - First vector.
- * @param {number[]} vectorB - Second vector.
- * @returns {number} - Euclidean distance.
- */
-export function euclideanDistance(vectorA, vectorB) {
+// Utility function: Calculate Euclidean distance between two vectors
+export function calculateEuclideanDistance(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
     throw new Error('Vectors must have the same dimensions');
   }
-  return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0));
+  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
 }
 
-/**
- * Class representing an HNSW graph for approximate nearest neighbor search.
- */
+// Utility function: Generate a unique hash for a vector (used for node identification)
+export function generateVectorHash(vector) {
+  const hash = createHash('sha256');
+  hash.update(vector.join(','));
+  return hash.digest('hex');
+}
+
+// Core class implementing the HNSW algorithm
 export class HNSW {
-  constructor(maxNodes = 100, maxEdgesPerNode = 10) {
+  constructor(maxNodes = 1000, maxEdgesPerNode = 16) {
     this.maxNodes = maxNodes;
     this.maxEdgesPerNode = maxEdgesPerNode;
-    this.graph = new Map();
+    this.graph = new Map(); // Node hash -> { vector, edges: [neighborHashes] }
   }
 
-  /**
-   * Adds a vector to the graph.
-   * @param {number[]} vector - Vector to add.
-   */
+  // Add a new vector to the graph
   addVector(vector) {
-    const id = randomUUID();
-    if (this.graph.size >= this.maxNodes) {
-      throw new Error('Graph is at maximum capacity');
+    const vectorHash = generateVectorHash(vector);
+    if (this.graph.has(vectorHash)) {
+      throw new Error('Vector already exists in the graph');
     }
 
+    // Add the node to the graph
+    this.graph.set(vectorHash, { vector, edges: [] });
+
+    // Connect to nearest neighbors
     const neighbors = this._findNearestNeighbors(vector, this.maxEdgesPerNode);
-    this.graph.set(id, { vector, neighbors });
-
-    // Update neighbors to include this node.
-    for (const neighborId of neighbors) {
-      this.graph.get(neighborId).neighbors.push(id);
+    for (const neighbor of neighbors) {
+      this.graph.get(vectorHash).edges.push(neighbor.hash);
+      this.graph.get(neighbor.hash).edges.push(vectorHash);
     }
   }
 
-  /**
-   * Searches for the nearest neighbors to a given vector.
-   * @param {number[]} queryVector - Vector to search for.
-   * @param {number} k - Number of nearest neighbors to return.
-   * @returns {Array<{id, distance}>} - Nearest neighbors.
-   */
+  // Search for the nearest neighbors of a query vector
   search(queryVector, k = 1) {
-    const distances = Array.from(this.graph.entries()).map(([id, { vector }]) => ({
-      id,
-      distance: euclideanDistance(queryVector, vector)
-    }));
+    if (k <= 0) {
+      throw new Error('k must be greater than 0');
+    }
 
+    const distances = [];
+
+    for (const [hash, node] of this.graph.entries()) {
+      const distance = calculateEuclideanDistance(queryVector, node.vector);
+      distances.push({ hash, distance });
+    }
+
+    // Sort by distance and return the top-k results
     distances.sort((a, b) => a.distance - b.distance);
-    return distances.slice(0, k);
+    return distances.slice(0, k).map(({ hash, distance }) => ({ vector: this.graph.get(hash).vector, distance }));
   }
 
-  /**
-   * Finds the nearest neighbors for a given vector.
-   * @param {number[]} vector - Vector to search for.
-   * @param {number} maxNeighbors - Maximum number of neighbors to return.
-   * @returns {string[]} - IDs of nearest neighbors.
-   */
+  // Private method: Find nearest neighbors for a given vector
   _findNearestNeighbors(vector, maxNeighbors) {
-    const distances = Array.from(this.graph.entries()).map(([id, { vector: existingVector }]) => ({
-      id,
-      distance: euclideanDistance(vector, existingVector)
-    }));
+    const distances = [];
 
+    for (const [hash, node] of this.graph.entries()) {
+      const distance = calculateEuclideanDistance(vector, node.vector);
+      distances.push({ hash, distance });
+    }
+
+    // Sort by distance and return the top results
     distances.sort((a, b) => a.distance - b.distance);
-    return distances.slice(0, maxNeighbors).map(({ id }) => id);
+    return distances.slice(0, maxNeighbors);
   }
 }
 
-/**
- * Utility function to normalize a vector.
- * @param {number[]} vector - Vector to normalize.
- * @returns {number[]} - Normalized vector.
- */
+// Exported utility function: Create an HNSW instance
+export function createHNSW(maxNodes = 1000, maxEdgesPerNode = 16) {
+  return new HNSW(maxNodes, maxEdgesPerNode);
+}
+
+// Exported utility function: Normalize a vector (scale to unit length)
 export function normalizeVector(vector) {
-  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
+  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
   if (magnitude === 0) {
     throw new Error('Cannot normalize a zero vector');
   }
   return vector.map(val => val / magnitude);
 }
-
-/**
- * Utility function to generate random vectors for testing.
- * @param {number} dimensions - Number of dimensions for each vector.
- * @param {number} count - Number of vectors to generate.
- * @returns {number[][]} - Array of random vectors.
- */
-export function generateRandomVectors(dimensions, count) {
-  return Array.from({ length: count }, () => Array.from({ length: dimensions }, () => Math.random()));
-}
-
-/**
- * Example usage:
- * const hnsw = new HNSW();
- * const vectors = generateRandomVectors(3, 10);
- * vectors.forEach(vector => hnsw.addVector(vector));
- * const query = [0.1, 0.2, 0.3];
- * console.log(hnsw.search(query, 3));
- */

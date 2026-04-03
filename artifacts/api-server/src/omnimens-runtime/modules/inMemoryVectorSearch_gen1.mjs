@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorSearch
- * Written: 2026-04-03T08:37:15.727Z
+ * Written: 2026-04-03T13:56:52.672Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,120 +18,171 @@
 
 // inMemoryVectorSearch.mjs
 
-import { createHash } from 'crypto';
+import { randomUUID } from 'crypto';
 
 /**
- * Computes the Euclidean distance between two vectors.
- * @param {number[]} vec1 - First vector.
- * @param {number[]} vec2 - Second vector.
+ * Calculate the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
  * @returns {number} - Euclidean distance.
  */
-export function euclideanDistance(vec1, vec2) {
-  if (vec1.length !== vec2.length) {
-    throw new Error('Vectors must have the same dimensions.');
+export function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same dimensions');
   }
-  return Math.sqrt(vec1.reduce((sum, val, i) => sum + Math.pow(val - vec2[i], 2), 0));
+  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + (val - vectorB[i]) ** 2, 0));
 }
 
 /**
- * Generates a deterministic hash for a vector for indexing purposes.
- * @param {number[]} vector - Input vector.
- * @returns {string} - Hash string.
+ * Node in the HNSW graph.
+ * @typedef {Object} HNSWNode
+ * @property {string} id - Unique identifier for the node.
+ * @property {number[]} vector - The embedding vector.
+ * @property {Map<number, Set<string>>} neighbors - Map of layer to neighbors.
  */
-export function hashVector(vector) {
-  const hash = createHash('sha256');
-  hash.update(vector.join(','));
-  return hash.digest('hex');
-}
 
 /**
- * Class representing an HNSW graph for fast similarity search.
+ * HNSW Graph class for in-memory vector search.
  */
 export class HNSWGraph {
-  constructor(maxNeighbors = 10) {
-    this.maxNeighbors = maxNeighbors; // Maximum neighbors per node
-    this.nodes = new Map(); // Map of node hashes to their data
-    this.edges = new Map(); // Map of node hashes to their neighbors
+  constructor(maxLayers = 5, maxNeighbors = 10) {
+    this.maxLayers = maxLayers;
+    this.maxNeighbors = maxNeighbors;
+    this.nodes = new Map();
+    this.entryPoint = null;
   }
 
   /**
-   * Adds a vector to the graph.
-   * @param {number[]} vector - Vector to add.
+   * Add a new vector to the graph.
+   * @param {number[]} vector - The embedding vector to add.
    */
   addVector(vector) {
-    const vectorHash = hashVector(vector);
-    if (this.nodes.has(vectorHash)) {
-      throw new Error('Vector already exists in the graph.');
-    }
-    this.nodes.set(vectorHash, vector);
-    this.edges.set(vectorHash, []);
+    const id = randomUUID();
+    const node = {
+      id,
+      vector,
+      neighbors: new Map()
+    };
 
-    // Connect to nearest neighbors
-    const neighbors = this.findNearestNeighbors(vector, this.maxNeighbors);
-    for (const neighbor of neighbors) {
-      this.edges.get(vectorHash).push(neighbor.hash);
-      this.edges.get(neighbor.hash).push(vectorHash);
+    for (let layer = 0; layer < this.maxLayers; layer++) {
+      node.neighbors.set(layer, new Set());
     }
+
+    this.nodes.set(id, node);
+
+    if (!this.entryPoint) {
+      this.entryPoint = id;
+      return;
+    }
+
+    let currentNodeId = this.entryPoint;
+
+    for (let layer = this.maxLayers - 1; layer >= 0; layer--) {
+      currentNodeId = this._searchLayer(vector, currentNodeId, layer);
+    }
+
+    this._connectNeighbors(node, currentNodeId, 0);
   }
 
   /**
-   * Finds the nearest neighbors to a given vector.
-   * @param {number[]} vector - Query vector.
-   * @param {number} k - Number of neighbors to find.
-   * @returns {Array<{hash, distance}>} - Array of nearest neighbors.
-   */
-  findNearestNeighbors(vector, k) {
-    const distances = [];
-
-    for (const [hash, nodeVector] of this.nodes.entries()) {
-      const distance = euclideanDistance(vector, nodeVector);
-      distances.push({ hash, distance });
-    }
-
-    distances.sort((a, b) => a.distance - b.distance);
-    return distances.slice(0, k);
-  }
-
-  /**
-   * Searches for the most similar vector to the query vector.
-   * @param {number[]} queryVector - Query vector.
-   * @param {number} k - Number of closest matches to return.
-   * @returns {number[][]} - Array of closest vectors.
+   * Search for the nearest neighbors of a query vector.
+   * @param {number[]} queryVector - The query embedding vector.
+   * @param {number} k - Number of nearest neighbors to return.
+   * @returns {Array<{ id, distance}>} - Nearest neighbors.
    */
   search(queryVector, k) {
-    const nearestNeighbors = this.findNearestNeighbors(queryVector, k);
-    return nearestNeighbors.map(neighbor => this.nodes.get(neighbor.hash));
+    if (!this.entryPoint) {
+      return [];
+    }
+
+    let currentNodeId = this.entryPoint;
+
+    for (let layer = this.maxLayers - 1; layer >= 0; layer--) {
+      currentNodeId = this._searchLayer(queryVector, currentNodeId, layer);
+    }
+
+    const candidates = new Set([currentNodeId]);
+    const results = [];
+
+    for (const candidateId of candidates) {
+      const candidateNode = this.nodes.get(candidateId);
+      const distance = euclideanDistance(queryVector, candidateNode.vector);
+      results.push({ id: candidateId, distance });
+    }
+
+    return results
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, k);
+  }
+
+  /**
+   * Search within a specific layer for the closest node.
+   * @* @param {number[]} queryVector - The query vector.
+   * @param {string} entryNodeId - Starting node ID.
+   * @param {number} layer - The layer to search.
+   * @returns {string} - ID of the closest node.
+   */
+  _searchLayer(queryVector, entryNodeId, layer) {
+    let closestNodeId = entryNodeId;
+    let closestDistance = euclideanDistance(queryVector, this.nodes.get(entryNodeId).vector);
+
+    let changed = true;
+    while (changed) {
+      changed = false;
+      for (const neighborId of this.nodes.get(closestNodeId).neighbors.get(layer)) {
+        const neighborNode = this.nodes.get(neighborId);
+        const distance = euclideanDistance(queryVector, neighborNode.vector);
+        if (distance < closestDistance) {
+          closestDistance = distance;
+          closestNodeId = neighborId;
+          changed = true;
+        }
+      }
+    }
+
+    return closestNodeId;
+  }
+
+  /**
+   * Connect a new node to its nearest neighbors in the graph.
+   * @* @param {HNSWNode} newNode - The new node to connect.
+   * @param {string} entryNodeId - Starting node ID.
+   * @param {number} layer - The layer to connect.
+   */
+  _connectNeighbors(newNode, entryNodeId, layer) {
+    const neighbors = Array.from(this.nodes.values())
+      .map(node => ({
+        id: node.id,
+        distance: euclideanDistance(newNode.vector, node.vector)
+      }))
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, this.maxNeighbors);
+
+    for (const neighbor of neighbors) {
+      newNode.neighbors.get(layer).add(neighbor.id);
+      this.nodes.get(neighbor.id).neighbors.get(layer).add(newNode.id);
+    }
   }
 }
 
 /**
- * Utility function to normalize a vector to unit length.
- * @param {number[]} vector - Input vector.
+ * Utility function to normalize a vector.
+ * @param {number[]} vector - The vector to normalize.
  * @returns {number[]} - Normalized vector.
  */
 export function normalizeVector(vector) {
-  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
+  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
   if (magnitude === 0) {
-    throw new Error('Cannot normalize a zero vector.');
+    throw new Error('Cannot normalize a zero vector');
   }
   return vector.map(val => val / magnitude);
 }
 
 /**
- * Example usage of the module.
+ * Utility function to generate random vectors for testing.
+ * @param {number} dimensions - Number of dimensions for the vector.
+ * @returns {number[]} - Random vector.
  */
-export function exampleUsage() {
-  const graph = new HNSWGraph(3);
-
-  const vec1 = normalizeVector([1, 2, 3]);
-  const vec2 = normalizeVector([4, 5, 6]);
-  const vec3 = normalizeVector([7, 8, 9]);
-  const query = normalizeVector([1, 2, 2.5]);
-
-  graph.addVector(vec1);
-  graph.addVector(vec2);
-  graph.addVector(vec3);
-
-  const results = graph.search(query, 2);
-  return results;
+export function generateRandomVector(dimensions) {
+  return Array.from({ length: dimensions }, () => Math.random());
 }

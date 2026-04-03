@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-04-01T22:21:27.565Z
+ * Written: 2026-04-03T13:56:55.911Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -21,118 +21,99 @@
 import { createHash } from 'crypto';
 
 /**
- * In-memory vector store for fast embedding retrieval with automatic expiration.
- * Provides a lightweight, efficient cache for embedding vectors.
+ * Hashes a vector to a bucket using a locality-sensitive hashing (LSH) mechanism.
+ * @param {Array<number>} vector - The high-dimensional vector to hash.
+ * @param {number} numBuckets - Number of buckets for hashing.
+ * @returns {string} - The hash bucket identifier.
  */
-
-const store = new Map();
-const expirationTimes = new Map();
-
-/**
- * Generates a unique hash key for a given embedding ID.
- * @param {string} id - The embedding ID.
- * @returns {string} - A hashed key.
- */
-export function generateKey(id) {
-  const hash = createHash('sha256');
-  hash.update(id);
-  return hash.digest('hex');
+export function hashVector(vector, numBuckets) {
+  if (!Array.isArray(vector) || vector.some(isNaN)) {
+    throw new Error('Input vector must be an array of numbers.');
+  }
+  const hashInput = vector.map((val) => Math.floor(val * 1e6)).join(',');
+  const hash = createHash('sha256').update(hashInput).digest('hex');
+  const bucket = parseInt(hash.slice(0, 8), 16) % numBuckets;
+  return bucket.toString();
 }
 
 /**
- * Adds a vector to the in-memory store with an optional expiration time.
- * @param {string} id - The embedding ID.
- * @param {Array<number>} vector - The embedding vector.
- * @param {number} ttl - Time-to-live in milliseconds (default: 60000 ms).
+ * Stores high-dimensional vectors in memory using LSH for efficient retrieval.
+ * @class
  */
-export function setVector(id, vector, ttl = 60000) {
-  const key = generateKey(id);
-  const expiration = Date.now() + ttl;
-
-  store.set(key, vector);
-  expirationTimes.set(key, expiration);
-
-  // Schedule cleanup for expired entries
-  setTimeout(() => {
-    if (Date.now() >= expiration) {
-      store.delete(key);
-      expirationTimes.delete(key);
-    }
-  }, ttl);
-}
-
-/**
- * Retrieves a vector from the in-memory store by its embedding ID.
- * @param {string} id - The embedding ID.
- * @returns {Array<number>|null} - The embedding vector or null if not found or expired.
- */
-export function getVector(id) {
-  const key = generateKey(id);
-  const expiration = expirationTimes.get(key);
-
-  if (!expiration || Date.now() > expiration) {
-    store.delete(key);
-    expirationTimes.delete(key);
-    return null;
+export class InMemoryVectorStore {
+  constructor(numBuckets = 128) {
+    this.numBuckets = numBuckets;
+    this.buckets = new Map();
   }
 
-  return store.get(key) || null;
+  /**
+   * Adds a vector and its associated metadata to the store.
+   * @param {Array<number>} vector - High-dimensional vector.
+   * @param {any} metadata - Metadata associated with the vector.
+   */
+  add(vector, metadata) {
+    const bucket = hashVector(vector, this.numBuckets);
+    if (!this.buckets.has(bucket)) {
+      this.buckets.set(bucket, []);
+    }
+    this.buckets.get(bucket).push({ vector, metadata });
+  }
+
+  /**
+   * Retrieves the nearest neighbors to a query vector.
+   * @param {Array<number>} queryVector - The vector to search for.
+   * @param {number} k - Number of nearest neighbors to retrieve.
+   * @returns {Array<{vector, metadata}>} - Nearest neighbors.
+   */
+  search(queryVector, k = 1) {
+    const bucket = hashVector(queryVector, this.numBuckets);
+    const candidates = this.buckets.get(bucket) || [];
+
+    // Compute distances and sort by proximity
+    const distanceFunction = (v1, v2) => {
+      return Math.sqrt(v1.reduce((sum, val, i) => sum + Math.pow(val - v2[i], 2), 0));
+    };
+
+    const sortedCandidates = candidates
+      .map((entry) => ({
+        vector: entry.vector,
+        metadata: entry.metadata,
+        distance: distanceFunction(queryVector, entry.vector)
+      }))
+      .sort((a, b) => a.distance - b.distance);
+
+    return sortedCandidates.slice(0, k).map(({ vector, metadata }) => ({ vector, metadata }));
+  }
 }
 
 /**
- * Deletes a vector from the in-memory store by its embedding ID.
- * @param {string} id - The embedding ID.
- * @returns {boolean} - True if the vector was deleted, false otherwise.
+ * Utility function to normalize vectors to unit length.
+ * @param {Array<number>} vector - The vector to normalize.
+ * @returns {Array<number>} - Normalized vector.
  */
-export function deleteVector(id) {
-  const key = generateKey(id);
-  const existed = store.delete(key);
-  expirationTimes.delete(key);
-  return existed;
+export function normalizeVector(vector) {
+  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
+  if (magnitude === 0) {
+    throw new Error('Cannot normalize a zero vector.');
+  }
+  return vector.map((val) => val / magnitude);
 }
 
 /**
- * Clears all vectors and expiration times from the in-memory store.
- */
-export function clearStore() {
-  store.clear();
-  expirationTimes.clear();
-}
-
-/**
- * Retrieves the current size of the in-memory store.
- * @returns {number} - The number of stored vectors.
- */
-export function getStoreSize() {
-  return store.size;
-}
-
-/**
- * Retrieves all keys currently in the store (for debugging or inspection).
- * @returns {Array<string>} - List of all embedding IDs (hashed).
- */
-export function getAllKeys() {
-  return Array.from(store.keys());
-}
-
-/**
- * Calculates the cosine similarity between two vectors.
- * @param {Array<number>} vectorA - The first vector.
- * @param {Array<number>} vectorB - The second vector.
- * @returns {number} - The cosine similarity (range: -1 to 1).
+ * Utility function to calculate cosine similarity between two vectors.
+ * @param {Array<number>} vectorA - First vector.
+ * @param {Array<number>} vectorB - Second vector.
+ * @returns {number} - Cosine similarity score.
  */
 export function cosineSimilarity(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must have the same length');
+    throw new Error('Vectors must be of the same length.');
   }
-
   const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
   const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
   const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
-
   if (magnitudeA === 0 || magnitudeB === 0) {
-    return 0; // Avoid division by zero
+    return 0;
   }
-
   return dotProduct / (magnitudeA * magnitudeB);
 }

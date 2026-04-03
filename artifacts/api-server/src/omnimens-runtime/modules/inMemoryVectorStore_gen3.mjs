@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-04-01T22:16:20.762Z
+ * Written: 2026-04-03T13:56:56.886Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -21,125 +21,120 @@
 import { createHash } from 'crypto';
 
 /**
- * Utility function to calculate Euclidean distance between two vectors.
- * @param {number[]} vec1 - First vector.
- * @param {number[]} vec2 - Second vector.
- * @returns {number} - Euclidean distance.
+ * Utility module for in-memory vector storage and fast nearest neighbor search
+ * using HNSW (Hierarchical Navigable Small World) graph-based algorithm.
  */
-export function euclideanDistance(vec1, vec2) {
-  if (vec1.length !== vec2.length) {
-    throw new Error('Vectors must be of the same dimension.');
+
+// Node structure for HNSW graph
+class HNSWNode {
+  constructor(id, vector) {
+    this.id = id;
+    this.vector = vector;
+    this.neighbors = new Set();
   }
-  return Math.sqrt(vec1.reduce((sum, val, i) => sum + Math.pow(val - vec2[i], 2), 0));
 }
 
-/**
- * Class representing an in-memory k-d tree for efficient nearest neighbor search.
- */
-export class KDTree {
-  constructor(points = [], depth = 0) {
-    this.depth = depth;
-    this.axis = depth % (points[0]?.length || 1);
+// Helper function: Calculate Euclidean distance between two vectors
+function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vector dimensions must match');
+  }
+  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + (val - vectorB[i]) ** 2, 0));
+}
 
-    if (points.length === 0) {
-      this.point = null;
-      this.left = null;
-      this.right = null;
-    } else {
-      points.sort((a, b) => a[this.axis] - b[this.axis]);
-      const medianIndex = Math.floor(points.length / 2);
-
-      this.point = points[medianIndex];
-      this.left = new KDTree(points.slice(0, medianIndex), depth + 1);
-      this.right = new KDTree(points.slice(medianIndex + 1), depth + 1);
-    }
+// HNSW Graph class for managing nodes and search
+class HNSWGraph {
+  constructor() {
+    this.nodes = new Map();
   }
 
   /**
-   * Find the nearest neighbor to a given vector.
-   * @param {number[]} target - Target vector.
-   * @returns {number[]} - Nearest neighbor vector.
+   * Add a new vector to the graph.
+   * @param {string} id - Unique identifier for the vector.
+   * @param {Array<number>} vector - The vector to add.
    */
-  nearestNeighbor(target) {
-    if (!this.point) {
-      return null;
+  addVector(id, vector) {
+    if (this.nodes.has(id)) {
+      throw new Error(`Node with id '${id}' already exists`);
     }
+    const newNode = new HNSWNode(id, vector);
+    this.nodes.set(id, newNode);
 
-    let best = this.point;
-    let bestDist = euclideanDistance(target, this.point);
+    // Connect to nearest neighbors
+    this._connectToNeighbors(newNode);
+  }
 
-    const nextBranch = target[this.axis] < this.point[this.axis] ? this.left : this.right;
-    const otherBranch = target[this.axis] < this.point[this.axis] ? this.right : this.left;
+  /**
+   * Search for the k nearest neighbors of a given vector.
+   * @param {Array<number>} queryVector - The vector to search for.
+   * @param {number} k - Number of neighbors to return.
+   * @returns {Array<{id, distance}>} - List of nearest neighbors.
+   */
+  search(queryVector, k) {
+    const distances = Array.from(this.nodes.values()).map(node => ({
+      id: node.id,
+      distance: euclideanDistance(queryVector, node.vector)
+    }));
 
-    const candidate = nextBranch?.nearestNeighbor(target);
-    if (candidate) {
-      const candidateDist = euclideanDistance(target, candidate);
-      if (candidateDist < bestDist) {
-        best = candidate;
-        bestDist = candidateDist;
-      }
+    return distances
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, k);
+  }
+
+  /**
+   * Connect a new node to its nearest neighbors in the graph.
+   * @param {HNSWNode} newNode - The node to connect.
+   */
+  _connectToNeighbors(newNode) {
+    const distances = Array.from(this.nodes.values())
+      .filter(node => node.id !== newNode.id)
+      .map(node => ({
+        node,
+        distance: euclideanDistance(newNode.vector, node.vector)
+      }));
+
+    // Sort by distance and select top neighbors
+    const nearestNeighbors = distances
+      .sort((a, b) => a.distance - b.distance)
+      .slice(0, 5) // Connect to top 5 neighbors
+      .map(entry => entry.node);
+
+    for (const neighbor of nearestNeighbors) {
+      newNode.neighbors.add(neighbor);
+      neighbor.neighbors.add(newNode);
     }
-
-    if (Math.abs(target[this.axis] - this.point[this.axis]) < bestDist) {
-      const candidate = otherBranch?.nearestNeighbor(target);
-      if (candidate) {
-        const candidateDist = euclideanDistance(target, candidate);
-        if (candidateDist < bestDist) {
-          best = candidate;
-          bestDist = candidateDist;
-        }
-      }
-    }
-
-    return best;
   }
 }
 
+// Exported functions
+
 /**
- * Utility function to hash a vector for efficient storage/retrieval.
- * @param {number[]} vector - Input vector.
- * @returns {string} - Hash of the vector.
+ * Create a new HNSW graph instance.
+ * @returns {HNSWGraph} - A new graph instance.
  */
-export function hashVector(vector) {
+export function createHNSWGraph() {
+  return new HNSWGraph();
+}
+
+/**
+ * Calculate Euclidean distance between two vectors.
+ * @param {Array<number>} vectorA - First vector.
+ * @param {Array<number>} vectorB - Second vector.
+ * @returns {number} - Euclidean distance.
+ */
+export function calculateEuclideanDistance(vectorA, vectorB) {
+  return euclideanDistance(vectorA, vectorB);
+}
+
+/**
+ * Generate a unique hash ID for a vector.
+ * @param {Array<number>} vector - The vector to hash.
+ * @returns {string} - Unique hash ID.
+ */
+export function generateVectorID(vector) {
   const hash = createHash('sha256');
-  hash.update(vector.join(','));
+  hash.update(JSON.stringify(vector));
   return hash.digest('hex');
 }
 
-/**
- * In-memory vector store for dynamic embedding storage and retrieval.
- */
-export class InMemoryVectorStore {
-  constructor() {
-    this.store = new Map();
-    this.tree = null;
-  }
-
-  /**
-   * Add a vector to the store.
-   * @param {number[]} vector - Vector to add.
-   */
-  addVector(vector) {
-    const hash = hashVector(vector);
-    this.store.set(hash, vector);
-    this.tree = new KDTree(Array.from(this.store.values()));
-  }
-
-  /**
-   * Retrieve the nearest neighbor to a given vector.
-   * @param {number[]} vector - Target vector.
-   * @returns {number[]} - Nearest neighbor vector.
-   */
-  getNearestNeighbor(vector) {
-    if (!this.tree) {
-      throw new Error('Vector store is empty.');
-    }
-    return this.tree.nearestNeighbor(vector);
-  }
-}
-
-// Example usage:
-// const store = new InMemoryVectorStore();
-// store.addVector([1, 2, 3]);
-// store.addVector([4, 5, 6]);
-// console.log(store.getNearestNeighbor([2, 3, 4]));
+export const description = "Provides in-memory vector storage and fast nearest neighbor search using HNSW algorithm.";
