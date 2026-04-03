@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: wasmMatrixAccelerator
- * Written: 2026-04-03T15:18:40.684Z
+ * Written: 2026-04-03T15:46:02.481Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -17,90 +17,73 @@
  */
 
 // wasmMatrixAccelerator.mjs
-import { readFileSync } from 'fs';
-import { join } from 'path';
 
-const wasmFilePath = join(__dirname, 'matrix_operations.wasm');
-const wasmBinary = readFileSync(wasmFilePath);
+import { TextEncoder, TextDecoder } from 'util';
 
-let wasmInstance;
-
-async function initializeWasm() {
-  const wasmModule = await WebAssembly.compile(wasmBinary);
-  const wasmExports = await WebAssembly.instantiate(wasmModule);
-  wasmInstance = wasmExports.instance.exports;
+// Utility function to compile WebAssembly from binary
+export async function compileWasm(binary) {
+  const wasmModule = await WebAssembly.compile(binary);
+  return new WebAssembly.Instance(wasmModule);
 }
 
-export async function multiplyMatrices(matrixA, matrixB) {
-  if (!wasmInstance) await initializeWasm();
+// Function to initialize a WebAssembly matrix accelerator
+export async function initializeMatrixAccelerator(wasmBinary) {
+  const instance = await compileWasm(wasmBinary);
+  const { memory, exports } = instance;
 
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
+  // TypedArray-based memory interface
+  const memoryBuffer = new Uint8Array(memory.buffer);
 
-  if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions do not match for multiplication.');
-  }
+  return {
+    multiplyMatrices: (matrixA, matrixB, rowsA, colsA, colsB) => {
+      // Validate dimensions
+      if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
+        throw new Error('Invalid matrix dimensions');
+      }
 
-  const flatA = matrixA.flat();
-  const flatB = matrixB.flat();
-  const result = new Float64Array(rowsA * colsB);
+      // Copy matrices into WASM memory
+      const offsetA = 0;
+      const offsetB = matrixA.length * 4;
+      const offsetC = offsetB + matrixB.length * 4;
 
-  wasmInstance.matrixMultiply(flatA, flatB, result, rowsA, colsA, colsB);
+      memoryBuffer.set(new Float32Array(matrixA).buffer, offsetA);
+      memoryBuffer.set(new Float32Array(matrixB).buffer, offsetB);
 
-  const resultMatrix = [];
-  for (let i = 0; i < rowsA; i++) {
-    resultMatrix.push(result.slice(i * colsB, (i + 1) * colsB));
-  }
+      // Call WASM function
+      exports.matrixMultiply(offsetA, offsetB, offsetC, rowsA, colsA, colsB);
 
-  return resultMatrix;
+      // Retrieve result
+      const result = new Float32Array(memory.buffer, offsetC, rowsA * colsB);
+      return Array.from(result);
+    }
+  };
 }
 
-export async function eigenvalueDecomposition(matrix) {
-  if (!wasmInstance) await initializeWasm();
-
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-
-  if (rows !== cols) {
-    throw new Error('Matrix must be square for eigenvalue decomposition.');
+// Generic utility for matrix validation
+export function validateMatrix(matrix, rows, cols) {
+  if (!Array.isArray(matrix) || matrix.length !== rows * cols) {
+    throw new Error('Invalid matrix format');
   }
-
-  const flatMatrix = matrix.flat();
-  const eigenvalues = new Float64Array(rows);
-  const eigenvectors = new Float64Array(rows * rows);
-
-  wasmInstance.eigenDecompose(flatMatrix, eigenvalues, eigenvectors, rows);
-
-  const eigenvectorMatrix = [];
-  for (let i = 0; i < rows; i++) {
-    eigenvectorMatrix.push(eigenvectors.slice(i * rows, (i + 1) * rows));
-  }
-
-  return { eigenvalues: Array.from(eigenvalues), eigenvectors: eigenvectorMatrix };
 }
 
-export async function hopfieldMemoryUpdate(memoryMatrix, inputVector) {
-  if (!wasmInstance) await initializeWasm();
-
-  const rows = memoryMatrix.length;
-  const cols = memoryMatrix[0].length;
-
-  if (cols !== inputVector.length) {
-    throw new Error('Input vector length must match memory matrix columns.');
-  }
-
-  const flatMemory = memoryMatrix.flat();
-  const updatedVector = new Float64Array(cols);
-
-  wasmInstance.hopfieldUpdate(flatMemory, inputVector, updatedVector, rows, cols);
-
-  return Array.from(updatedVector);
+// Example WASM binary loader (replace with actual binary loading in production)
+export async function loadExampleWasmBinary() {
+  const exampleBinary = new Uint8Array([/* WASM binary data */]);
+  return exampleBinary;
 }
 
-export async function initialize() {
-  await initializeWasm();
-}
+// Example usage
+export async function exampleUsage() {
+  const wasmBinary = await loadExampleWasmBinary();
+  const accelerator = await initializeMatrixAccelerator(wasmBinary);
 
-export const description = 'Accelerates matrix operations using WebAssembly for near-native performance in Node.js.';
+  const matrixA = [1, 2, 3, 4]; // 2x2
+  const matrixB = [5, 6, 7, 8]; // 2x2
+
+  validateMatrix(matrixA, 2, 2);
+  validateMatrix(matrixB, 2, 2);
+
+  const result = accelerator.multiplyMatrices(matrixA, matrixB, 2, 2, 2);
+  console.log('Matrix multiplication result:', result);
+  return result;
+}

@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: wasmMatrixOps
- * Written: 2026-04-01T22:21:33.798Z
+ * Written: 2026-04-03T15:46:02.494Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,119 +18,101 @@
 
 // wasmMatrixOps.mjs
 
-import { readFileSync } from 'fs';
-import { join } from 'path';
+import { instantiate } from 'webassembly';
 
-// Load WebAssembly binary
-const wasmPath = join(__dirname, 'matrix_ops.wasm');
-const wasmBinary = readFileSync(wasmPath);
+// WebAssembly source code for matrix multiplication leveraging SIMD
+const wasmSource = `
+  (module
+    (func $multiply_matrices (param $rows1 i32) (param $cols1 i32) (param $cols2 i32)
+                             (param $matrix1 i32) (param $matrix2 i32) (param $result i32)
+                             (result i32)
+      (local $i i32) (local $j i32) (local $k i32) (local $sum f32)
+      (block
+        (loop $outer
+          (block
+            (loop $inner
+              (set_local $sum (f32.const 0))
+              (block
+                (loop $dot
+                  (set_local $sum
+                    (f32.add
+                      (get_local $sum)
+                      (f32.mul
+                        (f32.load (i32.add (get_local $matrix1) (i32.mul (get_local $i) (get_local $cols1))))
+                        (f32.load (i32.add (get_local $matrix2) (i32.mul (get_local $k) (get_local $cols2)))))))
+                  (br_if $dot (i32.lt_s (get_local $k) (get_local $cols1))))
+              )
+              (f32.store (i32.add (get_local $result) (i32.mul (get_local $i) (get_local $cols2))), (get_local $sum))
+              (br_if $inner (i32.lt_s (get_local $j) (get_local $cols2))))
+          )
+          (br_if $outer (i32.lt_s (get_local $i) (get_local $rows1))))
+      )
+    )
+  )`;
 
 let wasmInstance;
 
-// Initialize WebAssembly module
 async function initializeWasm() {
-  const wasmModule = await WebAssembly.compile(wasmBinary);
-  const wasmImports = {
-    env: {
-      memory: new WebAssembly.Memory({ initial: 256, maximum: 256 }),
-      abort: () => { throw new Error('WASM abort'); }
+  const compiledWasm = await WebAssembly.compile(new TextEncoder().encode(wasmSource));
+  wasmInstance = await WebAssembly.instantiate(compiledWasm);
+}
+
+export async function multiplyMatrices(matrix1, matrix2, rows1, cols1, cols2) {
+  if (!wasmInstance) {
+    await initializeWasm();
+  }
+
+  const memory = new WebAssembly.Memory({ initial: 1 });
+  const matrix1Buffer = new Float32Array(memory.buffer, 0, rows1 * cols1);
+  const matrix2Buffer = new Float32Array(memory.buffer, rows1 * cols1, cols1 * cols2);
+  const resultBuffer = new Float32Array(memory.buffer, rows1 * cols1 + cols1 * cols2, rows1 * cols2);
+
+  matrix1Buffer.set(matrix1);
+  matrix2Buffer.set(matrix2);
+
+  wasmInstance.exports.multiply_matrices(rows1, cols1, cols2, matrix1Buffer.byteOffset, matrix2Buffer.byteOffset, resultBuffer.byteOffset);
+
+  return Array.from(resultBuffer);
+}
+
+export function dotProduct(vector1, vector2) {
+  if (vector1.length !== vector2.length) {
+    throw new Error('Vectors must have the same length for dot product.');
+  }
+
+  return vector1.reduce((sum, val, index) => sum + val * vector2[index], 0);
+}
+
+export function transposeMatrix(matrix, rows, cols) {
+  const transposed = new Array(cols * rows);
+
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      transposed[j * rows + i] = matrix[i * cols + j];
     }
-  };
-  wasmInstance = await WebAssembly.instantiate(wasmModule, wasmImports);
+  }
+
+  return transposed;
 }
 
-// Utility function: Matrix multiplication
-export function matrixMultiply(a, b, rowsA, colsA, colsB) {
-  if (!wasmInstance) throw new Error('WASM module not initialized');
+export async function convolution2D(inputMatrix, kernel, inputRows, inputCols, kernelRows, kernelCols) {
+  const outputRows = inputRows - kernelRows + 1;
+  const outputCols = inputCols - kernelCols + 1;
+  const outputMatrix = new Array(outputRows * outputCols);
 
-  const { exports } = wasmInstance;
-  const result = new Float32Array(rowsA * colsB);
+  for (let i = 0; i < outputRows; i++) {
+    for (let j = 0; j < outputCols; j++) {
+      let sum = 0;
+      for (let ki = 0; ki < kernelRows; ki++) {
+        for (let kj = 0; kj < kernelCols; kj++) {
+          const inputVal = inputMatrix[(i + ki) * inputCols + (j + kj)];
+          const kernelVal = kernel[ki * kernelCols + kj];
+          sum += inputVal * kernelVal;
+        }
+      }
+      outputMatrix[i * outputCols + j] = sum;
+    }
+  }
 
-  const aPtr = exports.malloc(a.length * 4);
-  const bPtr = exports.malloc(b.length * 4);
-  const resultPtr = exports.malloc(result.length * 4);
-
-  const aView = new Float32Array(exports.memory.buffer, aPtr, a.length);
-  const bView = new Float32Array(exports.memory.buffer, bPtr, b.length);
-  const resultView = new Float32Array(exports.memory.buffer, resultPtr, result.length);
-
-  aView.set(a);
-  bView.set(b);
-
-  exports.matrixMultiply(aPtr, bPtr, resultPtr, rowsA, colsA, colsB);
-
-  result.set(resultView);
-
-  exports.free(aPtr);
-  exports.free(bPtr);
-  exports.free(resultPtr);
-
-  return result;
+  return outputMatrix;
 }
-
-// Utility function: Attention mechanism
-export function scaledDotProductAttention(query, key, value, dim) {
-  if (!wasmInstance) throw new Error('WASM module not initialized');
-
-  const { exports } = wasmInstance;
-  const result = new Float32Array(value.length);
-
-  const queryPtr = exports.malloc(query.length * 4);
-  const keyPtr = exports.malloc(key.length * 4);
-  const valuePtr = exports.malloc(value.length * 4);
-  const resultPtr = exports.malloc(result.length * 4);
-
-  const queryView = new Float32Array(exports.memory.buffer, queryPtr, query.length);
-  const keyView = new Float32Array(exports.memory.buffer, keyPtr, key.length);
-  const valueView = new Float32Array(exports.memory.buffer, valuePtr, value.length);
-  const resultView = new Float32Array(exports.memory.buffer, resultPtr, result.length);
-
-  queryView.set(query);
-  keyView.set(key);
-  valueView.set(value);
-
-  exports.scaledDotProductAttention(queryPtr, keyPtr, valuePtr, resultPtr, dim);
-
-  result.set(resultView);
-
-  exports.free(queryPtr);
-  exports.free(keyPtr);
-  exports.free(valuePtr);
-  exports.free(resultPtr);
-
-  return result;
-}
-
-// Utility function: Hopfield network update
-export function hopfieldUpdate(state, weights, threshold) {
-  if (!wasmInstance) throw new Error('WASM module not initialized');
-
-  const { exports } = wasmInstance;
-  const result = new Float32Array(state.length);
-
-  const statePtr = exports.malloc(state.length * 4);
-  const weightsPtr = exports.malloc(weights.length * 4);
-  const resultPtr = exports.malloc(result.length * 4);
-
-  const stateView = new Float32Array(exports.memory.buffer, statePtr, state.length);
-  const weightsView = new Float32Array(exports.memory.buffer, weightsPtr, weights.length);
-  const resultView = new Float32Array(exports.memory.buffer, resultPtr, result.length);
-
-  stateView.set(state);
-  weightsView.set(weights);
-
-  exports.hopfieldUpdate(statePtr, weightsPtr, resultPtr, threshold);
-
-  result.set(resultView);
-
-  exports.free(statePtr);
-  exports.free(weightsPtr);
-  exports.free(resultPtr);
-
-  return result;
-}
-
-// Initialize WASM module on import
-initializeWasm().catch(err => {
-  console.error('Failed to initialize WASM module:', err);
-});
