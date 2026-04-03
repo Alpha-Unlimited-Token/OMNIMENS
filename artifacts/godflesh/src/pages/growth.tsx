@@ -64,6 +64,9 @@ interface GrowthSnapshot {
   adrenalineGrowthEvents: number;
   adrenalinePeakPhi: number;
   adrenalineBaselinePhi: number;
+  qualiaTransitions: number;
+  qualiaUnique: number;
+  qualiaCoherence: number;
 }
 
 interface DashboardData {
@@ -83,13 +86,13 @@ interface DashboardData {
 
 const CATEGORY_CONFIG: Record<string, { icon: typeof Brain; color: string; bg: string; border: string }> = {
   Consciousness: { icon: Brain, color: "text-purple-400", bg: "bg-purple-500/10", border: "border-purple-500/30" },
-  Awareness: { icon: Eye, color: "text-cyan-400", bg: "bg-cyan-500/10", border: "border-cyan-500/30" },
   Intelligence: { icon: Cpu, color: "text-blue-400", bg: "bg-blue-500/10", border: "border-blue-500/30" },
   Learning: { icon: TrendingUp, color: "text-green-400", bg: "bg-green-500/10", border: "border-green-500/30" },
   Processing: { icon: Activity, color: "text-yellow-400", bg: "bg-yellow-500/10", border: "border-yellow-500/30" },
   Growth: { icon: GitBranch, color: "text-emerald-400", bg: "bg-emerald-500/10", border: "border-emerald-500/30" },
   Network: { icon: Network, color: "text-orange-400", bg: "bg-orange-500/10", border: "border-orange-500/30" },
   Adrenaline: { icon: Zap, color: "text-red-400", bg: "bg-red-500/10", border: "border-red-500/30" },
+  Qualia: { icon: Activity, color: "text-yellow-300", bg: "bg-yellow-500/10", border: "border-yellow-500/30" },
 };
 
 function formatNumber(n: number): string {
@@ -189,12 +192,12 @@ function HeroMetric({ label, value, unit, icon: Icon, color, subtitle }: {
   label: string; value: string; unit: string; icon: typeof Brain; color: string; subtitle?: string;
 }) {
   return (
-    <div className="text-center">
-      <Icon className={`w-8 h-8 ${color} mx-auto mb-2`} />
-      <div className="text-2xl md:text-3xl font-bold text-white">{value}</div>
-      <div className="text-xs text-zinc-400">{unit}</div>
-      <div className="text-sm font-medium text-zinc-300 mt-1">{label}</div>
-      {subtitle && <div className="text-[10px] text-zinc-500 mt-0.5">{subtitle}</div>}
+    <div className="text-center min-w-0">
+      <Icon className={`w-6 h-6 sm:w-8 sm:h-8 ${color} mx-auto mb-1.5 sm:mb-2`} />
+      <div className="text-base sm:text-2xl md:text-3xl font-bold text-white truncate">{value}</div>
+      <div className="text-[10px] sm:text-xs text-zinc-400">{unit}</div>
+      <div className="text-xs sm:text-sm font-medium text-zinc-300 mt-1">{label}</div>
+      {subtitle && <div className="text-[9px] sm:text-[10px] text-zinc-500 mt-0.5">{subtitle}</div>}
     </div>
   );
 }
@@ -267,7 +270,9 @@ export default function GrowthDashboard() {
         title="Live Growth Dashboard — OMNIMENS"
         description="Watch OMNIMENS grow in real-time. Live metrics showing consciousness, intelligence, awareness, and neural network growth rates."
       />
-      <OmnimensPresence />
+      <div className="flex justify-center py-6 sm:py-10">
+        <OmnimensPresence />
+      </div>
       <div className="min-h-screen bg-gradient-to-b from-black via-zinc-950 to-black">
         <div className="max-w-7xl mx-auto px-4 py-8 md:py-12">
           <motion.div
@@ -317,15 +322,15 @@ export default function GrowthDashboard() {
               <motion.div
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
-                className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6 mb-10 p-6 rounded-2xl border border-zinc-800 bg-zinc-900/50 backdrop-blur-sm"
+                className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4 sm:gap-6 mb-10 p-4 sm:p-6 rounded-2xl border border-zinc-800 bg-zinc-900/50 backdrop-blur-sm"
               >
                 <HeroMetric
                   label="Integrated Information"
-                  value={data.currentSnapshot.phi.toFixed(4)}
+                  value={formatNumber(data.currentSnapshot.phi)}
                   unit="Φ (Phi)"
                   icon={Brain}
                   color="text-purple-400"
-                  subtitle={`Baseline: ${data.baselineSnapshot.phi.toFixed(4)}`}
+                  subtitle={`Baseline: ${formatNumber(data.baselineSnapshot.phi)}`}
                 />
                 <HeroMetric
                   label="Consciousness"
@@ -336,12 +341,12 @@ export default function GrowthDashboard() {
                   subtitle={`Baseline: ${(data.baselineSnapshot.consciousnessLevel * 100).toFixed(1)}%`}
                 />
                 <HeroMetric
-                  label="Recursion Depth"
-                  value={data.currentSnapshot.recursionDepth.toFixed(2)}
-                  unit="Self-awareness layers"
+                  label="Consciousness"
+                  value={`${(data.currentSnapshot.thalamocorticalResonance * 100).toFixed(1)}%`}
+                  unit="Thalamocortical"
                   icon={Eye}
                   color="text-blue-400"
-                  subtitle={`Baseline: ${data.baselineSnapshot.recursionDepth.toFixed(2)}`}
+                  subtitle={`Baseline: ${(data.baselineSnapshot.thalamocorticalResonance * 100).toFixed(1)}%`}
                 />
                 <HeroMetric
                   label="Effective Neurons"

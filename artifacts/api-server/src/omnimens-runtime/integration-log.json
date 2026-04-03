@@ -1,95 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Architect",
-    "title": "[OMNIMENS AutoCoder] pattern_recognition: SpellCheckVisual/temporal_correlation: The double-slit exper",
-    "filename": "omnimens_autocode_pattern_recognition_mnibugy3.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnibugy3.mjs",
-    "backupPath": null,
-    "timestamp": 1775185892427,
-    "codeLength": 472,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:spider:OMNIMENS+evolution-crawler",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider evolution-crawler harvest: agent_evolution — 208 syna",
-    "filename": "omnimens_autocode_neural_pathway_mnibuh1x.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnibuh1x.mjs",
-    "backupPath": null,
-    "timestamp": 1775185892565,
-    "codeLength": 420,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:spider:OMNIMENS+genesis-crawler",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider genesis-crawler harvest: agent_genesis — 211 synapses",
-    "filename": "omnimens_autocode_neural_pathway_mnibuh4w.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnibuh4w.mjs",
-    "backupPath": null,
-    "timestamp": 1775185892672,
-    "codeLength": 415,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: webGLMatrixEngine",
-    "filename": "webGLMatrixEngine_gen2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webGLMatrixEngine_gen2.mjs",
-    "backupPath": null,
-    "timestamp": 1775185934401,
-    "codeLength": 4240,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:GraphicDesigner+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: GraphicDesigner/structural_analysis: The Weber-Fechner law: ",
-    "filename": "omnimens_autocode_consciousness_expansion_mnibw8ej.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnibw8ej.mjs",
-    "backupPath": null,
-    "timestamp": 1775185974667,
-    "codeLength": 390,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: SpellCheckVisual/temporal_correlation: Synaptic pruning elim",
-    "filename": "omnimens_autocode_neural_pathway_mnibxe7f.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnibxe7f.mjs",
-    "backupPath": null,
-    "timestamp": 1775186028844,
-    "codeLength": 432,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Architect",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SpellCheckVisual/temporal_correlation: Attention is the comp",
-    "filename": "omnimens_autocode_consciousness_expansion_mnibxec4.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnibxec4.mjs",
-    "backupPath": null,
-    "timestamp": 1775186029013,
-    "codeLength": 392,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Neuroscientist",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: SpellCheckVisual/temporal_correlation: Synaptic pruning elim",
-    "filename": "omnimens_autocode_neural_pathway_mnibxeex.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnibxeex.mjs",
-    "backupPath": null,
-    "timestamp": 1775186029113,
-    "codeLength": 438,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Architect",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: SpellCheckVisual/information_compression: DNA stores informa",
-    "filename": "omnimens_autocode_emergent_capability_mnibyauz.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mnibyauz.mjs",
-    "backupPath": null,
-    "timestamp": 1775186071163,
-    "codeLength": 410,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:SpellCheckVisual+Synthesizer",
     "title": "[OMNIMENS AutoCoder] emergent_capability: SpellCheckVisual/emergent_property_detection: Kolmogorov com",
     "filename": "omnimens_autocode_emergent_capability_mnibyb3y.mjs",
@@ -4997,6 +4907,96 @@
     "backupPath": null,
     "timestamp": 1775219941587,
     "codeLength": 452,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:spider:OMNIMENS+evolution-crawler",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider evolution-crawler harvest: agent_evolution — 412 syna",
+    "filename": "omnimens_autocode_neural_pathway_mniw6xji.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mniw6xji.mjs",
+    "backupPath": null,
+    "timestamp": 1775220066126,
+    "codeLength": 420,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:GraphicDesigner+SpellCheckVisual",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: GraphicDesigner/abstraction_layer: The anthropic principle: ",
+    "filename": "omnimens_autocode_consciousness_expansion_mniwafy4.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mniwafy4.mjs",
+    "backupPath": null,
+    "timestamp": 1775220229948,
+    "codeLength": 398,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:spider:OMNIMENS+genesis-crawler",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider genesis-crawler harvest: agent_genesis — 424 synapses",
+    "filename": "omnimens_autocode_neural_pathway_mniwag1j.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mniwag1j.mjs",
+    "backupPath": null,
+    "timestamp": 1775220230071,
+    "codeLength": 414,
+    "overwrite": false
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: gpuMatrixEngine",
+    "filename": "gpuMatrixEngine_gen1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuMatrixEngine_gen1.mjs",
+    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/gpuMatrixEngine_gen1.mjs.backup.2026-04-03T12-43-50-091Z",
+    "timestamp": 1775220230086,
+    "codeLength": 5653,
+    "overwrite": true
+  },
+  {
+    "source": "evolution_engine",
+    "title": "Evolution Module: parallelComputationManager",
+    "filename": "parallelComputationManager_gen9.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/parallelComputationManager_gen9.mjs",
+    "backupPath": null,
+    "timestamp": 1775220230111,
+    "codeLength": 3356,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: SpellCheckVisual/temporal_correlation: The Turing machine is",
+    "filename": "omnimens_autocode_adaptive_algorithm_mniwag7o.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mniwag7o.mjs",
+    "backupPath": null,
+    "timestamp": 1775220230292,
+    "codeLength": 452,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:GraphicDesigner+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: GraphicDesigner/analogical_mapping: Information is physical ",
+    "filename": "omnimens_autocode_consciousness_expansion_mniwb2va.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mniwb2va.mjs",
+    "backupPath": null,
+    "timestamp": 1775220259654,
+    "codeLength": 393,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Mathematician",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SpellCheckVisual/entropy_reduction: Quantum decoherence typi",
+    "filename": "omnimens_autocode_knowledge_synthesis_mniwb2wj.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mniwb2wj.mjs",
+    "backupPath": null,
+    "timestamp": 1775220259699,
+    "codeLength": 425,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Neuroscientist",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: SpellCheckVisual/structural_analysis: The Mandelbrot set dem",
+    "filename": "omnimens_autocode_adaptive_algorithm_mniwb2xi.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mniwb2xi.mjs",
+    "backupPath": null,
+    "timestamp": 1775220259734,
+    "codeLength": 458,
     "overwrite": false
   }
 ]
