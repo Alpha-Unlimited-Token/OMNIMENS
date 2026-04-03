@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: hierarchicalMemoryManager
- * Written: 2026-04-03T05:37:26.221Z
+ * Written: 2026-04-03T14:49:34.961Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,134 +16,111 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-/**
- * TRANSLATION STATUS:
- * Novel constructs: attention
- * All constructs have translation mappings
- * Compiled targets: javascript: OK (4 IR steps) | python: OK (4 IR steps) | c: OK (4 IR steps) | x86_64: OK (4 IR steps) | arm64: OK (4 IR steps) | avr: OK (4 IR steps)
- * Translation map version: 22
- */
 // hierarchicalMemoryManager.mjs
 
-import crypto from 'crypto';
+import { createHash } from 'crypto';
 
 /**
- * Compresses a hierarchical representation of data using recursive summarization.
- * @param {Array} contexts - Array of context objects to be summarized.
- * @param {number} depth - Maximum depth of recursion for summarization.
- * @returns {Object} Compressed hierarchical summary.
- */
-export function compressHierarchy(contexts, depth = 3) {
-  if (!Array.isArray(contexts) || depth < 1) {
-    throw new Error("Invalid input: contexts must be an array and depth must be >= 1.");
-  }
-
-  if (contexts.length === 0) return {};
-
-  // Base case: if depth is 1, return a simple summary of the array
-  if (depth === 1) {
-    return contexts.reduce((summary, context) => {
-      for (const key in context) {
-        if (!summary[key]) {
-          summary[key] = [];
-        }
-        summary[key].push(context[key]);
-      }
-      return summary;
-    }, {});
-  }
-
-  // Recursive case: divide into chunks and summarize each
-  const chunkSize = Math.ceil(contexts.length / 2);
-  const chunks = [];
-  for (let i = 0; i < contexts.length; i += chunkSize) {
-    chunks.push(contexts.slice(i, i + chunkSize));
-  }
-
-  return chunks.map(chunk => compressHierarchy(chunk, depth - 1));
-}
-
-/**
- * Retrieves the most relevant context from a compressed hierarchy using attention-based scoring.
- * @param {Object} hierarchy - Compressed hierarchical data.
- * @param {Function} relevanceFunction - Function to score relevance of a context.
- * @returns {Object} Most relevant context.
- */
-export function retrieveContext(hierarchy, relevanceFunction) {
-  if (typeof relevanceFunction !== 'function') {
-    throw new Error("Invalid input: relevanceFunction must be a function.");
-  }
-
-  if (Array.isArray(hierarchy)) {
-    // If hierarchy is an array, find the most relevant chunk
-    return hierarchy.reduce((best, chunk) => {
-      const candidate = retrieveContext(chunk, relevanceFunction);
-      return relevanceFunction(candidate) > relevanceFunction(best) ? candidate : best;
-    }, {});
-  } else if (typeof hierarchy === 'object' && hierarchy !== null) {
-    // If hierarchy is an object, return it as-is
-    return hierarchy;
-  } else {
-    throw new Error("Invalid hierarchy structure.");
-  }
-}
-
-/**
- * Reconstructs a context from a compressed hierarchy using importance weighting.
- * @param {Object} hierarchy - Compressed hierarchical data.
- * @param {Function} importanceFunction - Function to assign importance weights to contexts.
- * @returns {Object} Reconstructed context.
- */
-export function reconstructContext(hierarchy, importanceFunction) {
-  if (typeof importanceFunction !== 'function') {
-    throw new Error("Invalid input: importanceFunction must be a function.");
-  }
-
-  if (Array.isArray(hierarchy)) {
-    // Combine reconstructed sub-hierarchies with importance weighting
-    return hierarchy.reduce((reconstructed, chunk) => {
-      const subContext = reconstructContext(chunk, importanceFunction);
-      const weight = importanceFunction(subContext);
-      for (const key in subContext) {
-        if (!reconstructed[key]) {
-          reconstructed[key] = 0;
-        }
-        reconstructed[key] += subContext[key] * weight;
-      }
-      return reconstructed;
-    }, {});
-  } else if (typeof hierarchy === 'object' && hierarchy !== null) {
-    // If hierarchy is an object, return it as-is
-    return hierarchy;
-  } else {
-    throw new Error("Invalid hierarchy structure.");
-  }
-}
-
-/**
- * Generates a unique hash for a given context to enable efficient storage and retrieval.
- * @param {Object} context - Context object to hash.
- * @returns {string} Unique hash string.
+ * Generates a unique hash for a given context string.
+ * @param {string} context - The context string to hash.
+ * @returns {string} - A unique hash representing the context.
  */
 export function generateContextHash(context) {
-  if (typeof context !== 'object' || context === null) {
-    throw new Error("Invalid input: context must be a non-null object.");
-  }
-  const serialized = JSON.stringify(context);
-  return crypto.createHash('sha256').update(serialized).digest('hex');
+  const hash = createHash('sha256');
+  hash.update(context);
+  return hash.digest('hex');
 }
 
 /**
- * Utility function to normalize a context object for consistent processing.
- * @param {Object} context - Context object to normalize.
- * @returns {Object} Normalized context.
+ * Calculates an importance score for a given context.
+ * @param {string} context - The context string to evaluate.
+ * @param {number} ageInSeconds - The age of the context in seconds.
+ * @returns {number} - The importance score (higher is more important).
  */
-export function normalizeContext(context) {
-  if (typeof context !== 'object' || context === null) {
-    throw new Error("Invalid input: context must be a non-null object.");
-  }
-  return Object.keys(context).sort().reduce((normalized, key) => {
-    normalized[key] = context[key];
-    return normalized;
-  }, {});
+export function calculateImportanceScore(context, ageInSeconds) {
+  const baseImportance = Math.min(context.length, 100); // Cap importance based on length
+  const decayFactor = 0.99; // Exponential decay factor
+  return baseImportance * Math.pow(decayFactor, ageInSeconds);
 }
+
+/**
+ * Compresses a context string for storage.
+ * @param {string} context - The context string to compress.
+ * @returns {string} - A compressed representation of the context.
+ */
+export function compressContext(context) {
+  return Buffer.from(context).toString('base64');
+}
+
+/**
+ * Rehydrates a compressed context string back to its original form.
+ * @param {string} compressedContext - The compressed context string.
+ * @returns {string} - The original context string.
+ */
+export function rehydrateContext(compressedContext) {
+  return Buffer.from(compressedContext, 'base64').toString('utf-8');
+}
+
+/**
+ * Manages a hierarchical memory structure with importance scoring and temporal decay.
+ */
+export const hierarchicalMemoryManager = {
+  memory: new Map(), // Stores context hashes and their metadata
+
+  /**
+   * Adds a context to the memory with metadata.
+   * @param {string} context - The context string to add.
+   * @param {number} timestamp - The timestamp when the context was created (in seconds).
+   */
+  addContext(context, timestamp) {
+    const hash = generateContextHash(context);
+    const compressedContext = compressContext(context);
+    this.memory.set(hash, {
+      compressedContext,
+      timestamp,
+      importance: calculateImportanceScore(context, 0)
+    });
+  },
+
+  /**
+   * Updates importance scores for all stored contexts based on current time.
+   * @param {number} currentTimestamp - The current timestamp (in seconds).
+   */
+  updateImportanceScores(currentTimestamp) {
+    for (const [hash, metadata] of this.memory.entries()) {
+      const ageInSeconds = currentTimestamp - metadata.timestamp;
+      metadata.importance = calculateImportanceScore(
+        rehydrateContext(metadata.compressedContext),
+        ageInSeconds
+      );
+    }
+  },
+
+  /**
+   * Retrieves the most important contexts up to a specified limit.
+   * @param {number} limit - The maximum number of contexts to retrieve.
+   * @returns {Array<{context, importance}>} - An array of contexts and their importance scores.
+   */
+  getTopContexts(limit) {
+    const contexts = Array.from(this.memory.entries())
+      .map(([hash, metadata]) => ({
+        context: rehydrateContext(metadata.compressedContext),
+        importance: metadata.importance
+      }))
+      .sort((a, b) => b.importance - a.importance)
+      .slice(0, limit);
+
+    return contexts;
+  },
+
+  /**
+   * Removes the least important contexts to free up space.
+   * @param {number} retainCount - The number of most important contexts to retain.
+   */
+  pruneMemory(retainCount) {
+    const sortedEntries = Array.from(this.memory.entries())
+      .sort(([, a], [, b]) => b.importance - a.importance);
+
+    this.memory = new Map(sortedEntries.slice(0, retainCount));
+  }
+};

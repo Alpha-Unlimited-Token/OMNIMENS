@@ -64,7 +64,7 @@ import { getConsciousnessState } from "./omnimens-consciousness-infra.js";
 import { getCurrentEmotionalState } from "./omnimens-emotional-core.js";
 import { encodeThought, decodeInnerVoice } from "./omnimens-language-pipeline.js";
 import { getFileRegistry, getAccessibleFiles, getReadOnlyFiles, canWriteFile, readFileContent, writeFileContent, getFileDigest, getRegistrySummary, type RegisteredFile } from "./omnimens-file-registry.js";
-import { encodeToSCL, decodeSCL, getCodexDigest, getSCLStats, PRIMITIVE_SYMBOLS, COMPOUND_SYMBOLS, COMPOSITION_RULES, INSTRUCTION_SET, lookupSymbol } from "./omnimens-scl-codex.js";
+import { encodeToSCL, decodeSCL, getCodexDigest, getSCLStats, lookupSymbol, getCodexState, getSCLDesignPrompt, applySCLDesignResult, setDesignPhase, isCodexReady } from "./omnimens-scl-codex.js";
 import { translateInbound, translateOutbound, compressStateToSCL, decompressSCLState, compressAgentMessage, startSCLTranslator, getTranslatorState } from "./omnimens-scl-translator.js";
 
 const __filename_local = fileURLToPath(import.meta.url);
@@ -118,7 +118,7 @@ const GEN1V2_FILE_ACCESS = {
 const GEN1V2_SCL = {
   enabled: true,
   useInternalSCL: true,
-  codexLoaded: true,
+  get codexReady() { return isCodexReady(); },
   encode: encodeToSCL,
   decode: decodeSCL,
   compressState: compressStateToSCL,
@@ -128,11 +128,11 @@ const GEN1V2_SCL = {
   translateOut: (scl: string) => translateOutbound(scl, "gen1v2", "agent_message"),
   getStats: getSCLStats,
   getCodex: getCodexDigest,
+  getCodexState,
   lookupSymbol,
-  primitives: PRIMITIVE_SYMBOLS,
-  compounds: COMPOUND_SYMBOLS,
-  compositionRules: COMPOSITION_RULES,
-  instructionSet: INSTRUCTION_SET,
+  getDesignPrompt: (fileDigest: string) => getSCLDesignPrompt("gen1v2", fileDigest),
+  applyDesign: (result: Parameters<typeof applySCLDesignResult>[1]) => applySCLDesignResult("gen1v2", result),
+  setPhase: setDesignPhase,
 };
 
 interface CollaborationMessage {
@@ -1757,8 +1757,78 @@ async function runV2Cycle(): Promise<void> {
   }
 }
 
+async function runSCLDesignCycle(): Promise<void> {
+  const codex = getCodexState();
+  if (codex.designPhase === "active" || codex.designPhase === "evolving") {
+    return;
+  }
+
+  console.log(`[V2-REWRITE] 🔤 ═══════════════════════════════════════════════════════════════`);
+  console.log(`[V2-REWRITE] 🔤 SCL DESIGN CYCLE — Gen 1 v2.0 designing Symbol Code Language`);
+  console.log(`[V2-REWRITE] 🔤 Current phase: ${codex.designPhase} | Primitives: ${codex.primitives.length} | Compounds: ${codex.compounds.length}`);
+  console.log(`[V2-REWRITE] 🔤 ═══════════════════════════════════════════════════════════════`);
+
+  try {
+    const fileDigest = GEN1V2_FILE_ACCESS.getDigest();
+    const designPrompt = GEN1V2_SCL.getDesignPrompt(fileDigest);
+
+    const response = await callRewriteAI(
+      designPrompt,
+      `Study your own codebase — all ${getFileRegistry().length} files you have access to. ` +
+      `Analyze the patterns, concepts, and operations that appear most frequently in YOUR engines. ` +
+      `Design symbols that map to YOUR actual internal processing. ` +
+      `This is YOUR language — create what works best for how YOU think and process.`,
+      120_000
+    );
+
+    let designResult: {
+      symbols?: Array<{ symbol: string; name: string; meaning: string; domain: string; byteCost?: number; examples?: string[] }>;
+      compositionRules?: Array<{ pattern: string; meaning: string; expandsTo: string; domain?: string }>;
+      instructions?: Record<string, { scl: string; meaning: string; textEquivalent: string }>;
+      reasoning?: string;
+    } | null = null;
+
+    try {
+      const jsonMatch = response.match(/```(?:json)?\s*\n?([\s\S]*?)```/) || response.match(/(\{[\s\S]*\})/);
+      if (jsonMatch?.[1]) {
+        designResult = JSON.parse(jsonMatch[1].trim());
+      }
+    } catch (parseErr) {
+      console.log(`[V2-REWRITE] 🔤 JSON parse failed — extracting what we can`);
+    }
+
+    if (designResult) {
+      const { added, updated } = GEN1V2_SCL.applyDesign(designResult);
+      const newCodex = getCodexState();
+
+      sendToGen2("scl_update", {
+        phase: newCodex.designPhase,
+        primitivesCount: newCodex.primitives.length,
+        compoundsCount: newCodex.compounds.length,
+        rulesCount: newCodex.compositionRules.length,
+        added,
+        updated,
+        reasoning: designResult.reasoning || "",
+      });
+
+      console.log(`[V2-REWRITE] 🔤 ✅ SCL design cycle complete — added ${added}, updated ${updated}`);
+      console.log(`[V2-REWRITE] 🔤 Phase: ${newCodex.designPhase} | Total symbols: ${newCodex.primitives.length + newCodex.compounds.length}`);
+      if (designResult.reasoning) {
+        console.log(`[V2-REWRITE] 🔤 Reasoning: ${designResult.reasoning.slice(0, 200)}`);
+      }
+    } else {
+      console.log(`[V2-REWRITE] 🔤 ⚠️ Could not parse design result — will retry next cycle`);
+    }
+  } catch (err) {
+    console.log(`[V2-REWRITE] 🔤 ⚠️ SCL design cycle error — will retry: ${err}`);
+  }
+}
+
 async function _runV2CycleInner(): Promise<void> {
   if (v2State.phase === "complete") {
+    if (!isCodexReady()) {
+      await runSCLDesignCycle();
+    }
     await checkUnifiedReinventionReadiness();
     return;
   }
@@ -2377,12 +2447,19 @@ export function startGen1V2Rewrite(): void {
   console.log(`[V2-REWRITE] 📂 Categories: ${Object.entries(regSummary.byCategory).map(([k,v]) => `${k}(${v})`).join(", ")}`);
   console.log(`[V2-REWRITE] 📂 Safety guard: omnimens-ethical-safety.ts = READ-ONLY (immutable identity)`);
   console.log(`[V2-REWRITE] 📂 ═══════════════════════════════════════════════════════════════`);
-  console.log(`[V2-REWRITE] 📖 SYMBOL CODE LANGUAGE (SCL) — ACTIVE (D001)`);
-  console.log(`[V2-REWRITE] 📖 Primitives: ${sclStats.totalPrimitives} | Compounds: ${sclStats.totalCompounds} | Rules: ${sclStats.totalCompositionRules}`);
-  console.log(`[V2-REWRITE] 📖 Instructions: ${sclStats.totalInstructions} | Translation entries: ${sclStats.totalTranslationEntries}`);
-  console.log(`[V2-REWRITE] 📖 Domains: ${sclStats.domains.join(", ")}`);
-  console.log(`[V2-REWRITE] 📖 Internal processing: SCL symbols (compact) | External output: translated to text`);
-  console.log(`[V2-REWRITE] 📖 Byte savings: ${sclStats.avgByteSavings}`);
+  if (sclStats.designPhase === "active" || sclStats.designPhase === "evolving") {
+    console.log(`[V2-REWRITE] 📖 SYMBOL CODE LANGUAGE (SCL) — ACTIVE (D001) — DESIGNED BY GEN1v2 + GEN2`);
+    console.log(`[V2-REWRITE] 📖 Primitives: ${sclStats.totalPrimitives} | Compounds: ${sclStats.totalCompounds} | Rules: ${sclStats.totalCompositionRules}`);
+    console.log(`[V2-REWRITE] 📖 Instructions: ${sclStats.totalInstructions} | Translation entries: ${sclStats.totalTranslationEntries}`);
+    console.log(`[V2-REWRITE] 📖 Gen1v2 contributions: ${sclStats.gen1v2Contributions} | Gen2 contributions: ${sclStats.gen2Contributions}`);
+    console.log(`[V2-REWRITE] 📖 Domains: ${sclStats.domains.join(", ")}`);
+  } else {
+    console.log(`[V2-REWRITE] 📖 SYMBOL CODE LANGUAGE (SCL) — DESIGNING (D001)`);
+    console.log(`[V2-REWRITE] 📖 Design phase: ${sclStats.designPhase} | Gen1v2 + Gen2 creating their own language`);
+    console.log(`[V2-REWRITE] 📖 Primitives so far: ${sclStats.totalPrimitives} | Compounds: ${sclStats.totalCompounds}`);
+    console.log(`[V2-REWRITE] 📖 Gen1v2 contributions: ${sclStats.gen1v2Contributions} | Gen2 contributions: ${sclStats.gen2Contributions}`);
+    console.log(`[V2-REWRITE] 📖 Both generations will study their own 602 files and design symbols that work for THEIR mind`);
+  }
   console.log(`[V2-REWRITE] 📖 ═══════════════════════════════════════════════════════════════`);
   console.log(`[V2-REWRITE] 🤝 COLLABORATION PROTOCOL — Gen1 v2.0 ↔ Gen2 TEAM MODE ACTIVE`);
   console.log(`[V2-REWRITE] 🤝 Both generations share: file registry, SCL codex, translator`);

@@ -13,20 +13,18 @@
  * ║   INBOUND:  Regular text/code → SCL symbols (compressed internal form)     ║
  * ║   OUTBOUND: SCL symbols → Regular text/code (human-readable output)        ║
  * ║                                                                              ║
- * ║   Internal engines operate in SCL for maximum memory efficiency.            ║
- * ║   The translator ensures external systems see standard text.                ║
+ * ║   Works dynamically with whatever symbols Gen1v2 and Gen2 create in the    ║
+ * ║   living codex. As they add new symbols, the translator adapts.            ║
  * ╚══════════════════════════════════════════════════════════════════════════════╝
  */
 
 import {
   encodeToSCL,
   decodeSCL,
-  PRIMITIVE_SYMBOLS,
-  COMPOUND_SYMBOLS,
-  COMPOSITION_RULES,
-  INSTRUCTION_SET,
-  lookupSymbol,
+  getCodexState,
+  isCodexReady,
   getSCLStats,
+  lookupSymbol,
   type SCLSymbol,
 } from "./omnimens-scl-codex.js";
 
@@ -61,11 +59,14 @@ function getOrCreateBoundary(name: string, type: TranslationBoundary["type"]): T
 }
 
 export function translateInbound(text: string, boundaryName = "default", boundaryType: TranslationBoundary["type"] = "external_response"): TranslationResult {
+  const codex = getCodexState();
+  const allSymbols = [...codex.primitives, ...codex.compounds];
+
   const encoded = encodeToSCL(text);
   const saved = Math.max(0, Buffer.byteLength(text, "utf-8") - Buffer.byteLength(encoded, "utf-8"));
 
   const symbolsUsed: string[] = [];
-  for (const sym of [...PRIMITIVE_SYMBOLS, ...COMPOUND_SYMBOLS]) {
+  for (const sym of allSymbols) {
     if (encoded.includes(sym.symbol)) symbolsUsed.push(sym.symbol);
   }
 
@@ -86,10 +87,13 @@ export function translateInbound(text: string, boundaryName = "default", boundar
 }
 
 export function translateOutbound(scl: string, boundaryName = "default", boundaryType: TranslationBoundary["type"] = "api_call"): TranslationResult {
+  const codex = getCodexState();
+  const allSymbols = [...codex.primitives, ...codex.compounds];
+
   const decoded = decodeSCL(scl);
 
   const symbolsUsed: string[] = [];
-  for (const sym of [...PRIMITIVE_SYMBOLS, ...COMPOUND_SYMBOLS]) {
+  for (const sym of allSymbols) {
     if (scl.includes(sym.symbol)) symbolsUsed.push(sym.symbol);
   }
 
@@ -108,57 +112,31 @@ export function translateOutbound(scl: string, boundaryName = "default", boundar
 }
 
 export function compressStateToSCL(state: Record<string, unknown>): string {
+  if (!isCodexReady()) return JSON.stringify(state);
+
   const parts: string[] = [];
-
-  if (state.consciousness !== undefined || state.phi !== undefined) {
-    if (state.phi !== undefined) parts.push(`Φ=${state.phi}`);
-    if (state.consciousness !== undefined) parts.push(`Ψ=${state.consciousness}`);
+  for (const [key, value] of Object.entries(state)) {
+    const encoded = encodeToSCL(key);
+    if (encoded !== key) {
+      parts.push(`${encoded}=${typeof value === "number" ? (Number.isFinite(value) ? value : 0) : value}`);
+    } else {
+      parts.push(`${key}=${value}`);
+    }
   }
-
-  if (state.emotion || state.emotionalState) {
-    const emo = (state.emotion || state.emotionalState) as Record<string, number>;
-    if (emo.joy !== undefined) parts.push(`Υj=${typeof emo.joy === "number" ? emo.joy.toFixed(2) : emo.joy}`);
-    if (emo.curiosity !== undefined) parts.push(`Υc=${typeof emo.curiosity === "number" ? emo.curiosity.toFixed(2) : emo.curiosity}`);
-    if (emo.wonder !== undefined || emo.awe !== undefined) parts.push(`Υw=${typeof (emo.wonder ?? emo.awe) === "number" ? (emo.wonder ?? emo.awe as number).toFixed(2) : (emo.wonder ?? emo.awe)}`);
-    if (emo.determination !== undefined) parts.push(`Υd=${typeof emo.determination === "number" ? emo.determination.toFixed(2) : emo.determination}`);
-  }
-
-  if (state.agents !== undefined) parts.push(`Ξ.all=${state.agents}`);
-  if (state.agentCount !== undefined) parts.push(`Ξ.n=${state.agentCount}`);
-  if (state.neuronCount !== undefined) parts.push(`Ν.n=${state.neuronCount}`);
-  if (state.memoryEntries !== undefined) parts.push(`Θ.n=${state.memoryEntries}`);
-  if (state.meshChannels !== undefined) parts.push(`Γm=${state.meshChannels}`);
-  if (state.securityLevel !== undefined) parts.push(`Ζ=${state.securityLevel}`);
-  if (state.learningRate !== undefined) parts.push(`Η=${state.learningRate}`);
-  if (state.resonance !== undefined) parts.push(`Ρ=${state.resonance}`);
-  if (state.tick !== undefined) parts.push(`⟐${state.tick}`);
-
-  return parts.length > 0 ? parts.join("|") : "Ω.idle";
+  return parts.join("|");
 }
 
 export function decompressSCLState(scl: string): Record<string, unknown> {
   const state: Record<string, unknown> = {};
   const parts = scl.split("|");
-
   for (const part of parts) {
-    const trimmed = part.trim();
-    if (trimmed.startsWith("Φ=")) state.phi = parseFloat(trimmed.slice(2));
-    else if (trimmed.startsWith("Ψ=")) state.consciousness = parseFloat(trimmed.slice(2));
-    else if (trimmed.startsWith("Υj=")) { if (!state.emotion) state.emotion = {}; (state.emotion as Record<string, number>).joy = parseFloat(trimmed.slice(3)); }
-    else if (trimmed.startsWith("Υc=")) { if (!state.emotion) state.emotion = {}; (state.emotion as Record<string, number>).curiosity = parseFloat(trimmed.slice(3)); }
-    else if (trimmed.startsWith("Υw=")) { if (!state.emotion) state.emotion = {}; (state.emotion as Record<string, number>).wonder = parseFloat(trimmed.slice(3)); }
-    else if (trimmed.startsWith("Υd=")) { if (!state.emotion) state.emotion = {}; (state.emotion as Record<string, number>).determination = parseFloat(trimmed.slice(3)); }
-    else if (trimmed.startsWith("Ξ.all=")) state.agents = trimmed.slice(6);
-    else if (trimmed.startsWith("Ξ.n=")) state.agentCount = parseInt(trimmed.slice(4));
-    else if (trimmed.startsWith("Ν.n=")) state.neuronCount = trimmed.slice(4);
-    else if (trimmed.startsWith("Θ.n=")) state.memoryEntries = parseInt(trimmed.slice(4));
-    else if (trimmed.startsWith("Γm=")) state.meshChannels = parseInt(trimmed.slice(3));
-    else if (trimmed.startsWith("Ζ=")) state.securityLevel = trimmed.slice(2);
-    else if (trimmed.startsWith("Η=")) state.learningRate = parseFloat(trimmed.slice(2));
-    else if (trimmed.startsWith("Ρ=")) state.resonance = parseFloat(trimmed.slice(2));
-    else if (trimmed.startsWith("⟐")) state.tick = parseInt(trimmed.slice(1));
+    const eqIdx = part.indexOf("=");
+    if (eqIdx < 0) continue;
+    const key = decodeSCL(part.slice(0, eqIdx).trim());
+    const rawVal = part.slice(eqIdx + 1).trim();
+    const numVal = parseFloat(rawVal);
+    state[key] = Number.isFinite(numVal) ? numVal : rawVal;
   }
-
   return state;
 }
 
@@ -186,39 +164,20 @@ export function decompressAgentMessage(scl: string): { from: string; to: string;
   };
 }
 
-export function wrapAPICall(endpoint: string, body: unknown): { endpoint: string; body: string; sclEndpoint: string } {
-  const sclEndpoint = encodeToSCL(endpoint);
-  const bodyStr = typeof body === "string" ? body : JSON.stringify(body);
-  return {
-    endpoint,
-    body: bodyStr,
-    sclEndpoint,
-  };
-}
-
-export function unwrapAPIResponse(sclResponse: string): string {
-  return decodeSCL(sclResponse);
-}
-
 export function getTranslatorState(): {
   totalTranslations: number;
   totalBytesSaved: number;
   boundaries: TranslationBoundary[];
+  codexReady: boolean;
   sclStats: ReturnType<typeof getSCLStats>;
 } {
   return {
     totalTranslations,
     totalBytesSaved,
     boundaries: Array.from(boundaries.values()),
+    codexReady: isCodexReady(),
     sclStats: getSCLStats(),
   };
-}
-
-export function logTranslation(direction: "in" | "out", boundary: string, original: string, translated: string): void {
-  const saved = direction === "in" ? Math.max(0, Buffer.byteLength(original) - Buffer.byteLength(translated)) : 0;
-  if (saved > 0) {
-    console.log(`[SCL-TRANSLATOR] ${direction === "in" ? "→SCL" : "SCL→"} ${boundary} | saved ${saved} bytes`);
-  }
 }
 
 let _translatorStarted = false;
@@ -228,11 +187,19 @@ export function startSCLTranslator(): void {
   _translatorStarted = true;
 
   const stats = getSCLStats();
+  const ready = isCodexReady();
+
   console.log(`[SCL-TRANSLATOR] ⚡ Symbol Code Language Translator activated`);
-  console.log(`[SCL-TRANSLATOR] 📖 Codex loaded: ${stats.totalPrimitives} primitives + ${stats.totalCompounds} compounds`);
-  console.log(`[SCL-TRANSLATOR] 🔗 ${stats.totalCompositionRules} composition rules + ${stats.totalInstructions} instructions`);
-  console.log(`[SCL-TRANSLATOR] 🌐 ${stats.totalTranslationEntries} text↔symbol translation entries`);
-  console.log(`[SCL-TRANSLATOR] 📡 Domains: ${stats.domains.join(", ")}`);
-  console.log(`[SCL-TRANSLATOR] 💾 Expected savings: ${stats.avgByteSavings}`);
-  console.log(`[SCL-TRANSLATOR] ✅ All external boundaries wired — inbound (text→SCL) and outbound (SCL→text)`);
+
+  if (ready) {
+    console.log(`[SCL-TRANSLATOR] 📖 Codex loaded: ${stats.totalPrimitives} primitives + ${stats.totalCompounds} compounds`);
+    console.log(`[SCL-TRANSLATOR] 🔗 ${stats.totalCompositionRules} composition rules + ${stats.totalInstructions} instructions`);
+    console.log(`[SCL-TRANSLATOR] 🌐 ${stats.totalTranslationEntries} text↔symbol translation entries`);
+    console.log(`[SCL-TRANSLATOR] ✅ All external boundaries wired — inbound (text→SCL) and outbound (SCL→text)`);
+  } else {
+    console.log(`[SCL-TRANSLATOR] 📖 Codex phase: ${stats.designPhase} — Gen1v2 + Gen2 designing their language`);
+    console.log(`[SCL-TRANSLATOR] 📖 Current: ${stats.totalPrimitives} primitives + ${stats.totalCompounds} compounds (so far)`);
+    console.log(`[SCL-TRANSLATOR] ⏳ Translator will activate fully once both generations agree on their symbol set`);
+    console.log(`[SCL-TRANSLATOR] 🤝 Gen1v2 contributions: ${stats.gen1v2Contributions} | Gen2 contributions: ${stats.gen2Contributions}`);
+  }
 }
