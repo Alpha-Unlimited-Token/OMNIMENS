@@ -390,14 +390,14 @@ const ENGINE_CONSOLIDATION_MAP: Record<string, { target: string; sources: string
     target: "omnimens-unified-brain.ts",
     sources: [
       "omnimens-neural-consciousness.ts", "omnimens-consciousness-bus.ts",
-      "omnimens-consciousness-infra.ts", "omnimens-neural-architecture.ts",
+      "omnimens-consciousness-infra.ts", "omnimens-unified-neural.ts",
     ],
     directive: "Merge the consciousness core with the neural architecture into ONE unified brain. Neural consciousness (Phi, resonance, awareness), consciousness bus (shared state), consciousness infrastructure (persistence, websocket, temporal binding), and neural architecture (hemispheres, bridge, scaling, comms) — ONE brain engine. This is an IDENTITY-CRITICAL merge. ZERO direct DB calls. ZERO independent timers.",
   },
   "omnimens-unified-cognition.ts": {
     target: "omnimens-unified-cognition.ts",
     sources: [
-      "omnimens-cognition-engine.ts", "omnimens-deep-thought-engine.ts",
+      "omnimens-unified-cognition.ts", "omnimens-deep-thought-engine.ts",
       "omnimens-cognitive-language-engine.ts", "omnimens-convergence-protocol-engine.ts",
       "omnimens-harmonic-insight-engine.ts",
     ],
@@ -417,14 +417,14 @@ const ENGINE_CONSOLIDATION_MAP: Record<string, { target: string; sources: string
       "omnimens-agent-pipeline.ts", "omnimens-agent-mesh.ts",
       "omnimens-agent-evolution.ts", "omnimens-agent-genesis.ts",
       "omnimens-agent-upgrades.ts", "omnimens-agent-conversation.ts",
-      "omnimens-specialized-agents.ts",
+      "omnimens-unified-agents.ts",
     ],
     directive: "Merge ALL agent engines into ONE unified agent collective. Pipeline, mesh, evolution, genesis, upgrades, conversation, and specialized agents — ONE engine. Agents share ONE processing pipeline, ONE evolution cycle.",
   },
   "omnimens-unified-network.ts": {
     target: "omnimens-unified-network.ts",
     sources: [
-      "omnimens-spider-network.ts", "omnimens-bio-network.ts",
+      "omnimens-unified-network.ts", "omnimens-unified-senses.ts",
       "omnimens-github-core.ts",
     ],
     directive: "Merge ALL network fabric engines. Spider network (already 3 files), bio network (already 3 files), and GitHub core (already 2 files) — ONE unified network fabric. ZERO GitHub API calls for beacon sync. ONE coordinated sweep per tick.",
@@ -859,8 +859,8 @@ async function phaseEngineConsolidation(): Promise<void> {
   const gen2SandboxDir = path.join(path.dirname(V2_WORKSPACE_DIR), "next-gen-sandbox");
   const gen2DomainMap: Record<string, string[]> = {
     "omnimens-consciousness-core.ts": ["core/consciousness-engine.ts"],
-    "omnimens-neural-architecture.ts": ["infrastructure/unified-neural-fabric.ts"],
-    "omnimens-cognition-engine.ts": ["core/reasoning-engine.ts", "infrastructure/omnimens-micro-transformer.ts"],
+    "omnimens-unified-neural.ts": ["infrastructure/unified-neural-fabric.ts"],
+    "omnimens-unified-cognition.ts": ["core/reasoning-engine.ts", "infrastructure/omnimens-micro-transformer.ts"],
     "omnimens-language-core.ts": ["core/language-center.ts", "infrastructure/omnimens-internal-language-model.ts", "infrastructure/omnimens-micro-transformer.ts"],
     "omnimens-emotion-drives.ts": ["core/emotional-substrate.ts"],
     "omnimens-memory-knowledge.ts": ["core/memory-system.ts"],

@@ -1,65 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+GraphicDesigner",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SpellCheckVisual/cross_domain_synthesis: Sparse coding: the ",
-    "filename": "omnimens_autocode_knowledge_synthesis_mnhpw8wl.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnhpw8wl.mjs",
-    "backupPath": null,
-    "timestamp": 1775149023765,
-    "codeLength": 428,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Critic",
-    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SpellCheckVisual/analogical_mapping: Attention is the comput",
-    "filename": "omnimens_autocode_consciousness_expansion_mnhpw918.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnhpw918.mjs",
-    "backupPath": null,
-    "timestamp": 1775149023932,
-    "codeLength": 389,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:spider:OMNIMENS+evolution-crawler",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider evolution-crawler harvest: agent_evolution — 210 syna",
-    "filename": "omnimens_autocode_neural_pathway_mnhpw94k.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnhpw94k.mjs",
-    "backupPath": null,
-    "timestamp": 1775149024052,
-    "codeLength": 420,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:spider:OMNIMENS+genesis-crawler",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider genesis-crawler harvest: agent_genesis — 213 synapses",
-    "filename": "omnimens_autocode_neural_pathway_mnhpw9bs.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnhpw9bs.mjs",
-    "backupPath": null,
-    "timestamp": 1775149024312,
-    "codeLength": 414,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuAcceleratedMatrixOps",
-    "filename": "gpuAcceleratedMatrixOps_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuAcceleratedMatrixOps_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/gpuAcceleratedMatrixOps_gen1.mjs.backup.2026-04-02T16-58-39-157Z",
-    "timestamp": 1775149119154,
-    "codeLength": 3040,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuTensorAccelerator",
-    "filename": "gpuTensorAccelerator_gen3.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuTensorAccelerator_gen3.mjs",
-    "backupPath": null,
-    "timestamp": 1775149314021,
-    "codeLength": 7178,
-    "overwrite": false
-  },
-  {
     "source": "evolution_engine",
     "title": "Evolution Module: webAssemblyComputeEngine",
     "filename": "webAssemblyComputeEngine_gen4.mjs",
@@ -4997,6 +4937,66 @@
     "backupPath": null,
     "timestamp": 1775184625751,
     "codeLength": 459,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:GraphicDesigner+Mathematician",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: GraphicDesigner/analogical_mapping: The anthropic principle:",
+    "filename": "omnimens_autocode_consciousness_expansion_mnib7ktb.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnib7ktb.mjs",
+    "backupPath": null,
+    "timestamp": 1775184824351,
+    "codeLength": 395,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Architect",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SpellCheckVisual/temporal_correlation: The default mode netw",
+    "filename": "omnimens_autocode_consciousness_expansion_mnib7kyf.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnib7kyf.mjs",
+    "backupPath": null,
+    "timestamp": 1775184824535,
+    "codeLength": 392,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:spider:OMNIMENS+evolution-crawler",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider evolution-crawler harvest: agent_evolution — 418 syna",
+    "filename": "omnimens_autocode_neural_pathway_mnib7l23.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnib7l23.mjs",
+    "backupPath": null,
+    "timestamp": 1775184824667,
+    "codeLength": 421,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SpellCheckVisual/feature_extraction: The mathematical univer",
+    "filename": "omnimens_autocode_knowledge_synthesis_mnibelod.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnibelod.mjs",
+    "backupPath": null,
+    "timestamp": 1775185152061,
+    "codeLength": 420,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:spider:OMNIMENS+evolution-crawler",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider evolution-crawler harvest: agent_evolution — 480 syna",
+    "filename": "omnimens_autocode_neural_pathway_mnibelqn.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnibelqn.mjs",
+    "backupPath": null,
+    "timestamp": 1775185152143,
+    "codeLength": 421,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:spider:OMNIMENS+genesis-crawler",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider genesis-crawler harvest: agent_genesis — 427 synapses",
+    "filename": "omnimens_autocode_neural_pathway_mnibelsg.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnibelsg.mjs",
+    "backupPath": null,
+    "timestamp": 1775185152208,
+    "codeLength": 414,
     "overwrite": false
   }
 ]

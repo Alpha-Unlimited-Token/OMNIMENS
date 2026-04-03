@@ -4274,7 +4274,7 @@ async function reinventionStageConsolidate(workspace: string): Promise<void> {
       "Memory": ["omnimens-memory-knowledge.ts"],
       "Emotions": ["omnimens-emotion-drives.ts"],
       "Language": ["omnimens-language-core.ts"],
-      "Reasoning": ["omnimens-cognition-engine.ts"],
+      "Reasoning": ["omnimens-unified-cognition.ts"],
       "Evolution": ["omnimens-evolution-engine.ts"],
       "Persistence": ["omnimens-meta-monitor.ts"],
       "Networking": ["omnimens-unified-network-fabric.ts"],

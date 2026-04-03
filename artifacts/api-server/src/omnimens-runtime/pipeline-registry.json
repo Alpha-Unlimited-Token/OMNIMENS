@@ -253263,9 +253263,74 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "omnimens_autocode_adaptive_algorithm_mnib3bkn.mjs": {
+      "filename": "omnimens_autocode_adaptive_algorithm_mnib3bkn.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "adaptiveAlgorithm_mnib3bkn"
+      ],
+      "loadedAt": 1775184824395,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnib3bir.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnib3bir.mjs",
+      "stage": "context_compression",
+      "exports": [
+        "newNeuralPathway_mnib3bir"
+      ],
+      "loadedAt": 1775184824545,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnib7ktb.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnib7ktb.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnib7ktb"
+      ],
+      "loadedAt": 1775185151958,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnib7kyf.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnib7kyf.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnib7kyf"
+      ],
+      "loadedAt": 1775185152076,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnib7l23.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnib7l23.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnib7l23"
+      ],
+      "loadedAt": 1775185152149,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1775184195032,
-  "totalModules": 18586,
+  "totalModules": 18591,
   "totalCalls": 0
 }
