@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: multimodalReasoningEngine
- * Written: 2026-04-02T20:35:11.523Z
+ * Written: 2026-04-03T14:25:39.460Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,114 +18,87 @@
 
 /**
  * TRANSLATION STATUS:
- * Novel constructs: neural
+ * Novel constructs: attention
  * All constructs have translation mappings
- * Compiled targets: javascript: OK (10 IR steps) | python: OK (10 IR steps) | c: OK (10 IR steps) | x86_64: OK (10 IR steps) | arm64: OK (10 IR steps) | avr: OK (10 IR steps)
+ * Compiled targets: javascript: OK (4 IR steps) | python: OK (4 IR steps) | c: OK (4 IR steps) | x86_64: OK (4 IR steps) | arm64: OK (4 IR steps) | avr: OK (4 IR steps)
  * Translation map version: 22
  */
 // multimodalReasoningEngine.mjs
 
-import { createHash } from 'crypto';
+import { EventEmitter } from 'events';
 
-/**
- * Generates a consistent hash for a given input to create embeddings.
- * @param {string} input - The input string to hash.
- * @returns {string} - A hex string representing the hash.
- */
-export function generateEmbedding(input) {
-  const hash = createHash('sha256');
-  hash.update(input);
-  return hash.digest('hex');
+// Utility function: Normalize numerical data
+export function normalizeData(data, min = 0, max = 1) {
+  const range = Math.max(...data) - Math.min(...data);
+  return data.map(val => ((val - Math.min(...data)) / range) * (max - min) + min);
 }
 
-/**
- * Combines multiple embeddings into a unified representation.
- * @param {Array<string>} embeddings - Array of hex strings representing embeddings.
- * @returns {string} - A single hex string representing the combined embedding.
- */
-export function combineEmbeddings(embeddings) {
-  const combined = embeddings.join('');
-  return generateEmbedding(combined);
+// Utility function: Compute weighted attention across modalities
+export function computeAttention(weights, modalities) {
+  const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+  return modalities.map((modality, index) => {
+    return modality.map(value => value * (weights[index] / totalWeight));
+  });
 }
 
-/**
- * Creates a symbolic graph representation from multimodal embeddings.
- * @param {Array<{ id, embedding}>} nodes - Nodes with unique IDs and embeddings.
- * @param {Array<{ source, target, weight}>} edges - Weighted edges between nodes.
- * @returns {Object} - A graph object with nodes and adjacency list.
- */
-export function createSymbolicGraph(nodes, edges) {
-  const graph = { nodes: {}, adjacencyList: {} };
+// Utility function: Fuse multimodal data streams
+export function fuseDataStreams(modalities) {
+  const fused = [];
+  for (let i = 0; i < modalities[0].length; i++) {
+    fused.push(modalities.reduce((sum, modality) => sum + modality[i], 0));
+  }
+  return fused;
+}
 
-  for (const node of nodes) {
-    graph.nodes[node.id] = node.embedding;
-    graph.adjacencyList[node.id] = [];
+// Main Engine Class
+class MultimodalReasoningEngine {
+  constructor() {
+    this.eventEmitter = new EventEmitter();
+    this.modalities = {};
   }
 
-  for (const edge of edges) {
-    if (graph.adjacencyList[edge.source]) {
-      graph.adjacencyList[edge.source].push({ target: edge.target, weight: edge.weight });
+  // Register a new modality
+  registerModality(name, dataStream) {
+    if (!Array.isArray(dataStream)) {
+      throw new Error(`Data stream for modality '${name}' must be an array.`);
     }
+    this.modalities[name] = normalizeData(dataStream);
   }
 
-  return graph;
-}
-
-/**
- * Performs symbolic-neural reasoning by traversing the graph and aggregating embeddings.
- * @param {Object} graph - The graph object created by createSymbolicGraph().
- * @param {string} startNode - The ID of the starting node.
- * @param {number} depth - The maximum depth to traverse.
- * @returns {string} - An aggregated embedding representing the reasoning result.
- */
-export function symbolicNeuralReasoning(graph, startNode, depth) {
-  const visited = new Set();
-  let aggregatedEmbedding = '';
-
-  function traverse(node, currentDepth) {
-    if (currentDepth > depth || visited.has(node)) return;
-    visited.add(node);
-
-    aggregatedEmbedding += graph.nodes[node] || '';
-
-    for (const neighbor of graph.adjacencyList[node] || []) {
-      traverse(neighbor.target, currentDepth + 1);
+  // Process and fuse data streams
+  processStreams(weights) {
+    const modalityNames = Object.keys(this.modalities);
+    if (modalityNames.length !== weights.length) {
+      throw new Error('Weights array length must match the number of modalities.');
     }
+
+    const modalitiesData = modalityNames.map(name => this.modalities[name]);
+    const attentionApplied = computeAttention(weights, modalitiesData);
+    return fuseDataStreams(attentionApplied);
   }
 
-  traverse(startNode, 0);
+  // Event-driven reasoning
+  onEvent(eventName, callback) {
+    this.eventEmitter.on(eventName, callback);
+  }
 
-  return generateEmbedding(aggregatedEmbedding);
+  emitEvent(eventName, data) {
+    this.eventEmitter.emit(eventName, data);
+  }
 }
 
-/**
- * Computes similarity between two embeddings using Hamming distance.
- * @param {string} embeddingA - First hex string embedding.
- * @param {string} embeddingB - Second hex string embedding.
- * @returns {number} - A similarity score (lower is more similar).
- */
-export function computeSimilarity(embeddingA, embeddingB) {
-  if (embeddingA.length !== embeddingB.length) {
-    throw new Error('Embeddings must have the same length');
-  }
-
-  let distance = 0;
-  for (let i = 0; i < embeddingA.length; i++) {
-    if (embeddingA[i] !== embeddingB[i]) {
-      distance++;
-    }
-  }
-
-  return distance;
+// Export the engine and utility functions
+export const multimodalEngine = new MultimodalReasoningEngine();
+export function createEngineInstance() {
+  return new MultimodalReasoningEngine();
 }
 
-/**
- * Integrates text, image, and audio embeddings into a unified representation.
- * @param {Object} inputs - An object containing text, image, and audio embeddings.
- * @returns {string} - A unified embedding representing the multimodal data.
- */
-export function integrateMultimodalData(inputs) {
-  const { text, image, audio } = inputs;
-  const embeddings = [text, image, audio].filter(Boolean);
-  return combineEmbeddings(embeddings);
+export function validateDataStream(dataStream) {
+  if (!Array.isArray(dataStream)) {
+    throw new Error('Data stream must be an array.');
+  }
+  if (dataStream.some(val => typeof val !== 'number')) {
+    throw new Error('Data stream must contain only numerical values.');
+  }
+  return true;
 }

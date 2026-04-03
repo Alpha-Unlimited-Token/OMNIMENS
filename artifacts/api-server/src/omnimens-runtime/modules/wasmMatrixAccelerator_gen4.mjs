@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: wasmMatrixAccelerator
- * Written: 2026-04-01T22:10:43.582Z
+ * Written: 2026-04-03T14:26:02.987Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,21 +18,18 @@
 
 // wasmMatrixAccelerator.mjs
 
-import { readFile } from 'fs/promises';
-import { resolve } from 'path';
+import { instantiate } from 'webassembly';
 
-// Utility function to load WebAssembly binary and instantiate it
-async function loadWasmModule(wasmPath) {
-  const filePath = resolve(wasmPath);
-  const wasmBinary = await readFile(filePath);
-  const wasmModule = await WebAssembly.instantiate(wasmBinary);
-  return wasmModule.instance.exports;
+// WebAssembly binary loader utility
+export async function loadWasmModule(wasmBinary) {
+  const { instance } = await WebAssembly.instantiate(wasmBinary);
+  return instance.exports;
 }
 
-// Matrix multiplication using WebAssembly
-export async function wasmMatrixMultiply(matrixA, matrixB, wasmPath) {
+// Accelerates matrix multiplication using WebAssembly
+export async function wasmMatrixMultiply(wasmBinary, matrixA, matrixB) {
   if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
-    throw new Error('Both inputs must be 2D arrays.');
+    throw new Error('Both inputs must be 2D arrays');
   }
 
   const rowsA = matrixA.length;
@@ -41,71 +38,46 @@ export async function wasmMatrixMultiply(matrixA, matrixB, wasmPath) {
   const colsB = matrixB[0].length;
 
   if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions do not allow multiplication.');
+    throw new Error('Matrix dimensions do not match for multiplication');
   }
 
-  const wasmExports = await loadWasmModule(wasmPath);
+  const wasmModule = await loadWasmModule(wasmBinary);
 
-  const flatMatrixA = matrixA.flat();
-  const flatMatrixB = matrixB.flat();
+  // Flatten matrices for WebAssembly
+  const flatA = matrixA.flat();
+  const flatB = matrixB.flat();
   const result = new Float64Array(rowsA * colsB);
 
-  wasmExports.matrixMultiply(flatMatrixA, rowsA, colsA, flatMatrixB, rowsB, colsB, result);
+  // Call WebAssembly function
+  wasmModule.matrixMultiply(flatA, rowsA, colsA, flatB, rowsB, colsB, result);
 
   // Reshape result back into 2D array
-  const resultMatrix = [];
+  const outputMatrix = [];
   for (let i = 0; i < rowsA; i++) {
-    resultMatrix.push(result.slice(i * colsB, (i + 1) * colsB));
+    outputMatrix.push(result.slice(i * colsB, (i + 1) * colsB));
   }
 
-  return resultMatrix;
+  return outputMatrix;
 }
 
-// Generic utility for validating matrix dimensions
+// Generic utility to validate matrix dimensions
 export function validateMatrix(matrix) {
   if (!Array.isArray(matrix) || matrix.length === 0 || !Array.isArray(matrix[0])) {
-    throw new Error('Input must be a non-empty 2D array.');
+    throw new Error('Input must be a 2D array');
   }
 
   const rowLength = matrix[0].length;
   for (const row of matrix) {
     if (row.length !== rowLength) {
-      throw new Error('All rows in the matrix must have the same length.');
+      throw new Error('All rows in the matrix must have the same length');
     }
   }
 
   return true;
 }
 
-// Example: Generate an identity matrix of size n
-export function generateIdentityMatrix(n) {
-  if (n <= 0 || !Number.isInteger(n)) {
-    throw new Error('Matrix size must be a positive integer.');
-  }
-
-  const identityMatrix = Array.from({ length: n }, (_, i) => {
-    return Array.from({ length: n }, (_, j) => (i === j ? 1 : 0));
-  });
-
-  return identityMatrix;
-}
-
-// Example: Transpose a matrix
-export function transposeMatrix(matrix) {
-  validateMatrix(matrix);
-
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-
-  const transposed = Array.from({ length: cols }, (_, i) => {
-    return Array.from({ length: rows }, (_, j) => matrix[j][i]);
-  });
-
-  return transposed;
-}
-
-// Example: Multiply matrices without WebAssembly (fallback)
-export function matrixMultiplyFallback(matrixA, matrixB) {
+// Generic utility for matrix addition
+export function matrixAdd(matrixA, matrixB) {
   validateMatrix(matrixA);
   validateMatrix(matrixB);
 
@@ -114,19 +86,37 @@ export function matrixMultiplyFallback(matrixA, matrixB) {
   const rowsB = matrixB.length;
   const colsB = matrixB[0].length;
 
-  if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions do not allow multiplication.');
+  if (rowsA !== rowsB || colsA !== colsB) {
+    throw new Error('Matrix dimensions must match for addition');
   }
 
-  const resultMatrix = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
-
+  const result = [];
   for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      for (let k = 0; k < colsA; k++) {
-        resultMatrix[i][j] += matrixA[i][k] * matrixB[k][j];
-      }
+    const row = [];
+    for (let j = 0; j < colsA; j++) {
+      row.push(matrixA[i][j] + matrixB[i][j]);
     }
+    result.push(row);
   }
 
-  return resultMatrix;
+  return result;
+}
+
+// Generic utility for matrix transposition
+export function transposeMatrix(matrix) {
+  validateMatrix(matrix);
+
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+
+  const transposed = [];
+  for (let i = 0; i < cols; i++) {
+    const row = [];
+    for (let j = 0; j < rows; j++) {
+      row.push(matrix[j][i]);
+    }
+    transposed.push(row);
+  }
+
+  return transposed;
 }

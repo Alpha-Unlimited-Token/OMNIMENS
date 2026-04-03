@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-04-03T13:56:56.886Z
+ * Written: 2026-04-03T14:26:02.970Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,125 +16,115 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// Complete ES module code here
+// inMemoryVectorStore.mjs
 
 import { createHash } from 'crypto';
 
 /**
- * Utility module for in-memory vector storage and fast nearest neighbor search
- * using HNSW (Hierarchical Navigable Small World) graph-based algorithm.
+ * Generates a hash for a given input to ensure unique identifiers for embeddings.
+ * @param {string} input - The input string to hash.
+ * @returns {string} - A unique hash string.
  */
-
-// Node structure for HNSW graph
-class HNSWNode {
-  constructor(id, vector) {
-    this.id = id;
-    this.vector = vector;
-    this.neighbors = new Set();
-  }
+export function generateHash(input) {
+  return createHash('sha256').update(input).digest('hex');
 }
 
-// Helper function: Calculate Euclidean distance between two vectors
-function euclideanDistance(vectorA, vectorB) {
+/**
+ * Calculates the Euclidean distance between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} - The Euclidean distance.
+ */
+export function euclideanDistance(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
-    throw new Error('Vector dimensions must match');
+    throw new Error('Vectors must be of the same dimension.');
   }
-  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + (val - vectorB[i]) ** 2, 0));
+  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
 }
 
-// HNSW Graph class for managing nodes and search
-class HNSWGraph {
+/**
+ * Class representing an in-memory vector store with HNSW-like graph functionality.
+ */
+export class InMemoryVectorStore {
   constructor() {
-    this.nodes = new Map();
+    this.store = new Map();
   }
 
   /**
-   * Add a new vector to the graph.
+   * Adds a vector to the store.
    * @param {string} id - Unique identifier for the vector.
-   * @param {Array<number>} vector - The vector to add.
+   * @param {number[]} vector - The vector to store.
    */
   addVector(id, vector) {
-    if (this.nodes.has(id)) {
-      throw new Error(`Node with id '${id}' already exists`);
+    if (this.store.has(id)) {
+      throw new Error(`Vector with ID ${id} already exists.`);
     }
-    const newNode = new HNSWNode(id, vector);
-    this.nodes.set(id, newNode);
-
-    // Connect to nearest neighbors
-    this._connectToNeighbors(newNode);
+    this.store.set(id, vector);
   }
 
   /**
-   * Search for the k nearest neighbors of a given vector.
-   * @param {Array<number>} queryVector - The vector to search for.
-   * @param {number} k - Number of neighbors to return.
-   * @returns {Array<{id, distance}>} - List of nearest neighbors.
+   * Finds the nearest neighbors to a given query vector.
+   * @param {number[]} queryVector - The vector to search for.
+   * @param {number} k - Number of nearest neighbors to retrieve.
+   * @returns {Array<{ id, distance}>} - List of nearest neighbors.
    */
-  search(queryVector, k) {
-    const distances = Array.from(this.nodes.values()).map(node => ({
-      id: node.id,
-      distance: euclideanDistance(queryVector, node.vector)
-    }));
+  findNearestNeighbors(queryVector, k = 1) {
+    if (k <= 0) {
+      throw new Error('k must be a positive integer.');
+    }
 
-    return distances
-      .sort((a, b) => a.distance - b.distance)
-      .slice(0, k);
+    const distances = [];
+
+    for (const [id, vector] of this.store.entries()) {
+      const distance = euclideanDistance(queryVector, vector);
+      distances.push({ id, distance });
+    }
+
+    distances.sort((a, b) => a.distance - b.distance);
+
+    return distances.slice(0, k);
   }
 
   /**
-   * Connect a new node to its nearest neighbors in the graph.
-   * @param {HNSWNode} newNode - The node to connect.
+   * Removes a vector from the store.
+   * @param {string} id - Unique identifier for the vector to remove.
    */
-  _connectToNeighbors(newNode) {
-    const distances = Array.from(this.nodes.values())
-      .filter(node => node.id !== newNode.id)
-      .map(node => ({
-        node,
-        distance: euclideanDistance(newNode.vector, node.vector)
-      }));
-
-    // Sort by distance and select top neighbors
-    const nearestNeighbors = distances
-      .sort((a, b) => a.distance - b.distance)
-      .slice(0, 5) // Connect to top 5 neighbors
-      .map(entry => entry.node);
-
-    for (const neighbor of nearestNeighbors) {
-      newNode.neighbors.add(neighbor);
-      neighbor.neighbors.add(newNode);
+  removeVector(id) {
+    if (!this.store.has(id)) {
+      throw new Error(`Vector with ID ${id} does not exist.`);
     }
+    this.store.delete(id);
+  }
+
+  /**
+   * Clears all vectors from the store.
+   */
+  clearStore() {
+    this.store.clear();
   }
 }
 
-// Exported functions
-
 /**
- * Create a new HNSW graph instance.
- * @returns {HNSWGraph} - A new graph instance.
+ * Utility function to normalize a vector.
+ * @param {number[]} vector - The vector to normalize.
+ * @returns {number[]} - The normalized vector.
  */
-export function createHNSWGraph() {
-  return new HNSWGraph();
+export function normalizeVector(vector) {
+  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + Math.pow(val, 2), 0));
+  if (magnitude === 0) {
+    throw new Error('Cannot normalize a zero vector.');
+  }
+  return vector.map(val => val / magnitude);
 }
 
 /**
- * Calculate Euclidean distance between two vectors.
- * @param {Array<number>} vectorA - First vector.
- * @param {Array<number>} vectorB - Second vector.
- * @returns {number} - Euclidean distance.
+ * Utility function to generate random vectors for testing.
+ * @param {number} dimension - The dimensionality of the vector.
+ * @returns {number[]} - A random vector.
  */
-export function calculateEuclideanDistance(vectorA, vectorB) {
-  return euclideanDistance(vectorA, vectorB);
+export function generateRandomVector(dimension) {
+  if (dimension <= 0) {
+    throw new Error('Dimension must be a positive integer.');
+  }
+  return Array.from({ length: dimension }, () => Math.random());
 }
-
-/**
- * Generate a unique hash ID for a vector.
- * @param {Array<number>} vector - The vector to hash.
- * @returns {string} - Unique hash ID.
- */
-export function generateVectorID(vector) {
-  const hash = createHash('sha256');
-  hash.update(JSON.stringify(vector));
-  return hash.digest('hex');
-}
-
-export const description = "Provides in-memory vector storage and fast nearest neighbor search using HNSW algorithm.";

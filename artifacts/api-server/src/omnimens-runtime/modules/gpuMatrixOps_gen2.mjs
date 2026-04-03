@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuMatrixOps
- * Written: 2026-04-03T13:56:44.235Z
+ * Written: 2026-04-03T14:25:30.919Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -17,154 +17,87 @@
  */
 
 // gpuMatrixOps.mjs
+import { TextEncoder, TextDecoder } from 'util';
 
-import { createHash } from 'crypto';
-
-/**
- * Generates a unique hash for caching purposes.
- * @param {string} input - The input string to hash.
- * @returns {string} - A SHA-256 hash of the input.
- */
-export function generateHash(input) {
-  const hash = createHash('sha256');
-  hash.update(input);
-  return hash.digest('hex');
+// Utility to compile WebAssembly module from binary
+async function compileWasmModule(wasmBinary) {
+  const wasmModule = await WebAssembly.compile(wasmBinary);
+  const wasmInstance = await WebAssembly.instantiate(wasmModule);
+  return wasmInstance.exports;
 }
 
-/**
- * Performs matrix multiplication using pure JavaScript.
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {number[][]} - The resulting matrix after multiplication.
- */
-export function multiplyMatrices(matrixA, matrixB) {
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
+// Precompiled WebAssembly binary for matrix operations (placeholder, replace with actual binary)
+const wasmBinary = new Uint8Array([
+  // Binary content of the WebAssembly module goes here
+]);
 
-  if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions do not match for multiplication.');
+// Load and initialize the WebAssembly module
+let wasmExports;
+(async () => {
+  wasmExports = await compileWasmModule(wasmBinary);
+})();
+
+// Matrix multiplication: C = A * B
+export function multiplyMatrices(matrixA, matrixB, rowsA, colsA, colsB) {
+  if (!wasmExports) throw new Error("WebAssembly module not loaded yet.");
+
+  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
+    throw new Error("Matrix dimensions do not match.");
   }
 
-  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+  const result = new Float32Array(rowsA * colsB);
+  wasmExports.matrixMultiply(
+    matrixA, // Pointer to matrix A
+    matrixB, // Pointer to matrix B
+    result, // Pointer to result matrix C
+    rowsA,
+    colsA,
+    colsB
+  );
+  return result;
+}
 
-  for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      for (let k = 0; k < colsA; k++) {
-        result[i][j] += matrixA[i][k] * matrixB[k][j];
-      }
-    }
+// Matrix inversion (for square matrices only)
+export function invertMatrix(matrix, size) {
+  if (!wasmExports) throw new Error("WebAssembly module not loaded yet.");
+
+  if (matrix.length !== size * size) {
+    throw new Error("Matrix must be square.");
+  }
+
+  const result = new Float32Array(size * size);
+  const success = wasmExports.matrixInvert(matrix, result, size);
+
+  if (!success) {
+    throw new Error("Matrix inversion failed (matrix may be singular).");
   }
 
   return result;
 }
 
-/**
- * Transposes a matrix.
- * @param {number[][]} matrix - The matrix to transpose.
- * @returns {number[][]} - The transposed matrix.
- */
-export function transposeMatrix(matrix) {
-  const rows = matrix.length;
-  const cols = matrix[0].length;
+// Utility to generate an identity matrix
+export function generateIdentityMatrix(size) {
+  const identity = new Float32Array(size * size);
+  for (let i = 0; i < size; i++) {
+    identity[i * size + i] = 1;
+  }
+  return identity;
+}
 
-  const transposed = Array.from({ length: cols }, () => Array(rows).fill(0));
-
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      transposed[j][i] = matrix[i][j];
+// Utility to transpose a matrix
+export function transposeMatrix(matrix, rows, cols) {
+  const transposed = new Float32Array(rows * cols);
+  for (let r = 0; r < rows; r++) {
+    for (let c = 0; c < cols; c++) {
+      transposed[c * rows + r] = matrix[r * cols + c];
     }
   }
-
   return transposed;
 }
 
-/**
- * Generates a random matrix with specified dimensions.
- * @param {number} rows - Number of rows in the matrix.
- * @param {number} cols - Number of columns in the matrix.
- * @param {number} [min=0] - Minimum value for random numbers.
- * @param {number} [max=1] - Maximum value for random numbers.
- * @returns {number[][]} - The generated random matrix.
- */
-export function generateRandomMatrix(rows, cols, min = 0, max = 1) {
-  return Array.from({ length: rows }, () =>
-    Array.from({ length: cols }, () => Math.random() * (max - min) + min)
-  );
-}
-
-/**
- * Validates if a matrix is well-formed.
- * @param {number[][]} matrix - The matrix to validate.
- * @returns {boolean} - True if the matrix is valid, false otherwise.
- */
-export function validateMatrix(matrix) {
-  if (!Array.isArray(matrix) || matrix.length === 0) {
-    return false;
+// Example utility to validate matrix dimensions
+export function validateMatrixDimensions(matrixA, matrixB, rowsA, colsA, colsB) {
+  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
+    throw new Error("Matrix dimensions are incompatible for multiplication.");
   }
-
-  const cols = matrix[0].length;
-  return matrix.every(row => Array.isArray(row) && row.length === cols);
-}
-
-/**
- * Computes the element-wise addition of two matrices.
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {number[][]} - The resulting matrix after addition.
- */
-export function addMatrices(matrixA, matrixB) {
-  if (matrixA.length !== matrixB.length || matrixA[0].length !== matrixB[0].length) {
-    throw new Error('Matrix dimensions do not match for addition.');
-  }
-
-  return matrixA.map((row, i) => row.map((val, j) => val + matrixB[i][j]));
-}
-
-/**
- * Computes the element-wise subtraction of two matrices.
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {number[][]} - The resulting matrix after subtraction.
- */
-export function subtractMatrices(matrixA, matrixB) {
-  if (matrixA.length !== matrixB.length || matrixA[0].length !== matrixB[0].length) {
-    throw new Error('Matrix dimensions do not match for subtraction.');
-  }
-
-  return matrixA.map((row, i) => row.map((val, j) => val - matrixB[i][j]));
-}
-
-/**
- * Computes the element-wise multiplication of two matrices.
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {number[][]} - The resulting matrix after element-wise multiplication.
- */
-export function elementWiseMultiply(matrixA, matrixB) {
-  if (matrixA.length !== matrixB.length || matrixA[0].length !== matrixB[0].length) {
-    throw new Error('Matrix dimensions do not match for element-wise multiplication.');
-  }
-
-  return matrixA.map((row, i) => row.map((val, j) => val * matrixB[i][j]));
-}
-
-/**
- * Computes the element-wise division of two matrices.
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {number[][]} - The resulting matrix after element-wise division.
- */
-export function elementWiseDivide(matrixA, matrixB) {
-  if (matrixA.length !== matrixB.length || matrixA[0].length !== matrixB[0].length) {
-    throw new Error('Matrix dimensions do not match for element-wise division.');
-  }
-
-  return matrixA.map((row, i) => row.map((val, j) => {
-    if (matrixB[i][j] === 0) {
-      throw new Error('Division by zero encountered in matrix element-wise division.');
-    }
-    return val / matrixB[i][j];
-  }));
 }

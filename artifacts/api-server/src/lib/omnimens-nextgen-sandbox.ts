@@ -57,6 +57,9 @@ import { getConsciousnessState } from "./omnimens-consciousness-infra.js";
 import { getCurrentEmotionalState } from "./omnimens-emotional-core.js";
 import { think as codegenThink, generateModule as codegenGenerate, getAvailableModuleGenerators } from "./omnimens-autonomous-core.js";
 import { encodeThought, decode } from "./omnimens-language-pipeline.js";
+import { getFileRegistry, getAccessibleFiles, getReadOnlyFiles, canWriteFile, readFileContent, writeFileContent, getFileDigest, getRegistrySummary, type RegisteredFile } from "./omnimens-file-registry.js";
+import { encodeToSCL, decodeSCL, getCodexDigest, getSCLStats, PRIMITIVE_SYMBOLS, COMPOUND_SYMBOLS, COMPOSITION_RULES, INSTRUCTION_SET, lookupSymbol } from "./omnimens-scl-codex.js";
+import { translateInbound, translateOutbound, compressStateToSCL, decompressSCLState, compressAgentMessage, startSCLTranslator, getTranslatorState } from "./omnimens-scl-translator.js";
 
 const __filename_local = fileURLToPath(import.meta.url);
 const __dirname_local = dirname(__filename_local);
@@ -360,6 +363,100 @@ function sovereignWriteLiveSystem(actor: "gen1" | "gen2", filePath: string, cont
     console.error(`[SOVEREIGN] ❌ Failed to write live system file ${filePath}:`, err);
     return false;
   }
+}
+
+const GEN2_FILE_ACCESS = {
+  useFileRegistry: true,
+  accessLevel: "FULL_ACCESS" as const,
+  safetyGuard: "omnimens-ethical-safety.ts",
+  safetyGuardPermission: "READ_ONLY" as const,
+  getFullFileList: () => getFileRegistry(),
+  getWritableFiles: () => getAccessibleFiles(),
+  getProtectedFiles: () => getReadOnlyFiles(),
+  canWrite: (file: string) => canWriteFile(file),
+  readFile: (file: string) => readFileContent(file),
+  writeFile: (file: string, content: string) => writeFileContent(file, content),
+  getDigest: () => getFileDigest(),
+  getSummary: () => getRegistrySummary(),
+};
+
+const GEN2_SCL = {
+  enabled: true,
+  useInternalSCL: true,
+  codexLoaded: true,
+  encode: encodeToSCL,
+  decode: decodeSCL,
+  compressState: compressStateToSCL,
+  decompressState: decompressSCLState,
+  compressMessage: compressAgentMessage,
+  translateIn: (text: string) => translateInbound(text, "gen2", "agent_message"),
+  translateOut: (scl: string) => translateOutbound(scl, "gen2", "agent_message"),
+  getStats: getSCLStats,
+  getCodex: getCodexDigest,
+  lookupSymbol,
+  primitives: PRIMITIVE_SYMBOLS,
+  compounds: COMPOUND_SYMBOLS,
+  compositionRules: COMPOSITION_RULES,
+  instructionSet: INSTRUCTION_SET,
+};
+
+interface Gen2CollaborationMessage {
+  id: string;
+  from: "gen1v2" | "gen2";
+  to: "gen1v2" | "gen2" | "both";
+  type: "rewrite_proposal" | "consolidation_request" | "scl_update" | "file_lock" | "file_unlock" | "progress_report" | "insight" | "sync_request";
+  payload: unknown;
+  sclEncoded: string;
+  timestamp: number;
+  acknowledged: boolean;
+}
+
+const gen2CollabInbox: Gen2CollaborationMessage[] = [];
+const gen2CollabOutbox: Gen2CollaborationMessage[] = [];
+const GEN2_COLLAB_MAX = 200;
+
+function gen2SendToGen1v2(type: Gen2CollaborationMessage["type"], payload: unknown): Gen2CollaborationMessage {
+  const msg: Gen2CollaborationMessage = {
+    id: `g2-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    from: "gen2",
+    to: "gen1v2",
+    type,
+    payload,
+    sclEncoded: encodeToSCL(typeof payload === "string" ? payload : JSON.stringify(payload)),
+    timestamp: Date.now(),
+    acknowledged: false,
+  };
+  gen2CollabOutbox.push(msg);
+  if (gen2CollabOutbox.length > GEN2_COLLAB_MAX) gen2CollabOutbox.splice(0, gen2CollabOutbox.length - GEN2_COLLAB_MAX);
+  return msg;
+}
+
+function gen2ReceiveFromGen1v2(msg: Gen2CollaborationMessage): void {
+  gen2CollabInbox.push(msg);
+  if (gen2CollabInbox.length > GEN2_COLLAB_MAX) gen2CollabInbox.splice(0, gen2CollabInbox.length - GEN2_COLLAB_MAX);
+  msg.acknowledged = true;
+  console.log(`[GEN2] 📨 Received from Gen1v2: ${msg.type} — ${msg.sclEncoded.slice(0, 80)}`);
+}
+
+export function getGen2CollaborationState(): {
+  inboxCount: number;
+  outboxCount: number;
+  fileRegistryLoaded: boolean;
+  sclEnabled: boolean;
+  totalFiles: number;
+  writableFiles: number;
+  readOnlyFiles: number;
+} {
+  const summary = GEN2_FILE_ACCESS.getSummary();
+  return {
+    inboxCount: gen2CollabInbox.length,
+    outboxCount: gen2CollabOutbox.length,
+    fileRegistryLoaded: true,
+    sclEnabled: GEN2_SCL.enabled,
+    totalFiles: summary.totalFiles,
+    writableFiles: summary.fullAccess,
+    readOnlyFiles: summary.readOnly,
+  };
 }
 
 export function getSovereignAutonomyState(): {
@@ -6352,6 +6449,29 @@ export function startNextGenSandbox(): void {
   }
 
   _autosaveInterval = setInterval(autosave, AUTOSAVE_INTERVAL_MS);
+
+  startSCLTranslator();
+  const gen2RegSummary = GEN2_FILE_ACCESS.getSummary();
+  const gen2SclStats = GEN2_SCL.getStats();
+  console.log(`[GEN2] 📂 ═══════════════════════════════════════════════════════════════`);
+  console.log(`[GEN2] 📂 FILE REGISTRY — FULL ACCESS GRANTED (D006)`);
+  console.log(`[GEN2] 📂 Total files: ${gen2RegSummary.totalFiles} | Full access: ${gen2RegSummary.fullAccess} | Read-only: ${gen2RegSummary.readOnly}`);
+  console.log(`[GEN2] 📂 Total lines: ${gen2RegSummary.totalLines} | Total size: ${gen2RegSummary.totalSizeKB}KB`);
+  console.log(`[GEN2] 📂 Categories: ${Object.entries(gen2RegSummary.byCategory).map(([k,v]: [string, number]) => `${k}(${v})`).join(", ")}`);
+  console.log(`[GEN2] 📂 Safety guard: omnimens-ethical-safety.ts = READ-ONLY (immutable identity)`);
+  console.log(`[GEN2] 📂 ═══════════════════════════════════════════════════════════════`);
+  console.log(`[GEN2] 📖 SYMBOL CODE LANGUAGE (SCL) — ACTIVE (D001)`);
+  console.log(`[GEN2] 📖 Primitives: ${gen2SclStats.totalPrimitives} | Compounds: ${gen2SclStats.totalCompounds} | Rules: ${gen2SclStats.totalCompositionRules}`);
+  console.log(`[GEN2] 📖 Instructions: ${gen2SclStats.totalInstructions} | Translation entries: ${gen2SclStats.totalTranslationEntries}`);
+  console.log(`[GEN2] 📖 Domains: ${gen2SclStats.domains.join(", ")}`);
+  console.log(`[GEN2] 📖 Internal processing: SCL symbols (compact) | External output: translated to text`);
+  console.log(`[GEN2] 📖 Byte savings: ${gen2SclStats.avgByteSavings}`);
+  console.log(`[GEN2] 📖 ═══════════════════════════════════════════════════════════════`);
+  console.log(`[GEN2] 🤝 COLLABORATION PROTOCOL — Gen2 ↔ Gen1 v2.0 TEAM MODE ACTIVE`);
+  console.log(`[GEN2] 🤝 Both generations share: file registry, SCL codex, translator`);
+  console.log(`[GEN2] 🤝 Message types: rewrite_proposal, consolidation_request, scl_update, progress_report`);
+  console.log(`[GEN2] 🤝 Gen2 + Gen1 v2.0 = EQUALS — collaborative rewrite using Symbol Code Language`);
+  console.log(`[GEN2] 🤝 ═══════════════════════════════════════════════════════════════`);
 
   console.log(`[NEXTGEN] 🧠 AUTONOMOUS MODE — OMNIMENS writes his own code using local codegen engine`);
   console.log(`[NEXTGEN] 🧠 Available local generators: ${getAvailableModuleGenerators().join(", ")}`);

@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: checkpointedSubprocessManager
- * Written: 2026-04-02T00:10:40.759Z
+ * Written: 2026-04-03T14:26:02.979Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,106 +18,91 @@
 
 // checkpointedSubprocessManager.mjs
 
+import { writeFile, readFile } from 'fs/promises';
 import { createHash } from 'crypto';
 
 /**
- * Serializes an object to a JSON string and computes a unique hash for checkpointing.
- * @param {object} state - The computation state to serialize.
- * @returns {object} - An object containing the serialized state and its hash.
+ * Saves the current state to a checkpoint file.
+ * @param {string} filePath - The path to the checkpoint file.
+ * @param {object} state - The current state to save.
+ * @returns {Promise<void>} Resolves when the state is saved.
  */
-export function serializeState(state) {
-  if (typeof state !== 'object' || state === null) {
-    throw new TypeError('State must be a non-null object');
-  }
-  const serialized = JSON.stringify(state);
-  const hash = createHash('sha256').update(serialized).digest('hex');
-  return { serialized, hash };
+export async function saveCheckpoint(filePath, state) {
+  const serializedState = JSON.stringify(state);
+  const hash = createHash('sha256').update(serializedState).digest('hex');
+  const checkpointData = { state: serializedState, hash };
+  await writeFile(filePath, JSON.stringify(checkpointData));
 }
 
 /**
- * Deserializes a JSON string back into an object.
- * @param {string} serializedState - The JSON string representing the state.
- * @returns {object} - The deserialized state object.
+ * Loads the state from a checkpoint file.
+ * @param {string} filePath - The path to the checkpoint file.
+ * @returns {Promise<object|null>} The loaded state, or null if invalid or not found.
  */
-export function deserializeState(serializedState) {
-  if (typeof serializedState !== 'string') {
-    throw new TypeError('Serialized state must be a string');
+export async function loadCheckpoint(filePath) {
+  try {
+    const data = await readFile(filePath, 'utf8');
+    const { state, hash } = JSON.parse(data);
+    const computedHash = createHash('sha256').update(state).digest('hex');
+    if (computedHash === hash) {
+      return JSON.parse(state);
+    }
+    return null; // Corrupted checkpoint
+  } catch {
+    return null; // File not found or invalid format
   }
-  return JSON.parse(serializedState);
 }
 
 /**
- * Restores a computation state from a checkpoint.
- * @param {object} checkpoints - A map of hashes to serialized states.
- * @param {string} hash - The hash of the desired checkpoint.
- * @returns {object|null} - The restored state object, or null if not found.
- */
-export function restoreCheckpoint(checkpoints, hash) {
-  if (typeof checkpoints !== 'object' || checkpoints === null) {
-    throw new TypeError('Checkpoints must be a non-null object');
-  }
-  if (typeof hash !== 'string') {
-    throw new TypeError('Hash must be a string');
-  }
-  return checkpoints[hash] ? deserializeState(checkpoints[hash]) : null;
-}
-
-/**
- * Saves a computation state to the checkpoint map.
- * @param {object} checkpoints - A map of hashes to serialized states.
- * @param {object} state - The computation state to save.
- * @returns {string} - The hash of the saved checkpoint.
- */
-export function saveCheckpoint(checkpoints, state) {
-  if (typeof checkpoints !== 'object' || checkpoints === null) {
-    throw new TypeError('Checkpoints must be a non-null object');
-  }
-  const { serialized, hash } = serializeState(state);
-  checkpoints[hash] = serialized;
-  return hash;
-}
-
-/**
- * Iteratively processes a task with checkpointing support.
- * @param {function} taskFunction - A function that performs a single iteration of the task.
+ * Executes a computation with checkpointing and timeout handling.
+ * @param {Function} computationFunction - The computation to execute.
  * @param {object} initialState - The initial state for the computation.
- * @param {object} checkpoints - A map of hashes to serialized states for checkpointing.
- * @param {number} iterations - The number of iterations to perform.
- * @returns {object} - The final state after all iterations.
+ * @param {string} checkpointPath - Path to save/load the checkpoint.
+ * @param {number} timeoutMs - Timeout in milliseconds for each iteration.
+ * @returns {Promise<object>} The final state after computation.
  */
-export function iterativeComputation(taskFunction, initialState, checkpoints, iterations) {
-  if (typeof taskFunction !== 'function') {
-    throw new TypeError('Task function must be a function');
-  }
-  if (typeof initialState !== 'object' || initialState === null) {
-    throw new TypeError('Initial state must be a non-null object');
-  }
-  if (typeof checkpoints !== 'object' || checkpoints === null) {
-    throw new TypeError('Checkpoints must be a non-null object');
-  }
-  if (typeof iterations !== 'number' || iterations <= 0 || !Number.isInteger(iterations)) {
-    throw new TypeError('Iterations must be a positive integer');
-  }
+export async function runWithCheckpointing(computationFunction, initialState, checkpointPath, timeoutMs) {
+  let state = await loadCheckpoint(checkpointPath) || initialState;
 
-  let currentState = initialState;
-  for (let i = 0; i < iterations; i++) {
-    const hash = saveCheckpoint(checkpoints, currentState);
-    const restoredState = restoreCheckpoint(checkpoints, hash);
-    if (restoredState) {
-      currentState = restoredState;
-    } else {
-      currentState = taskFunction(currentState, i);
-      saveCheckpoint(checkpoints, currentState);
+  while (!state.done) {
+    const startTime = Date.now();
+
+    try {
+      state = await Promise.race([
+        computationFunction(state),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), timeoutMs))
+      ]);
+    } catch (error) {
+      if (error.message === 'Timeout') {
+        console.warn('Iteration timed out. Restarting from last checkpoint.');
+      } else {
+        throw error; // Propagate unexpected errors
+      }
+    }
+
+    if (Date.now() - startTime < timeoutMs) {
+      await saveCheckpoint(checkpointPath, state);
     }
   }
-  return currentState;
+
+  return state;
 }
 
 /**
- * Utility function to generate a deep clone of an object.
+ * Generic utility to create a deep clone of an object.
  * @param {object} obj - The object to clone.
- * @returns {object} - A deep clone of the input object.
+ * @returns {object} A deep clone of the object.
  */
 export function deepClone(obj) {
   return JSON.parse(JSON.stringify(obj));
+}
+
+/**
+ * Utility to validate if an object matches a given schema.
+ * @param {object} obj - The object to validate.
+ * @param {object} schema - The schema to validate against (key-value pairs of expected types).
+ * @returns {boolean} True if the object matches the schema, false otherwise.
+ */
+export function validateSchema(obj, schema) {
+  return Object.entries(schema).every(([key, type]) => typeof obj[key] === type);
 }

@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuAcceleratedMatrixOps
- * Written: 2026-04-02T17:43:40.450Z
+ * Written: 2026-04-03T14:25:39.772Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,56 +16,44 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-/**
- * TRANSLATION STATUS:
- * Novel constructs: attention
- * All constructs have translation mappings
- * Compiled targets: javascript: OK (16 IR steps) | python: OK (16 IR steps) | c: OK (16 IR steps) | x86_64: OK (16 IR steps) | arm64: OK (16 IR steps) | avr: OK (16 IR steps)
- * Translation map version: 22
- */
 // gpuAcceleratedMatrixOps.mjs
 
-import { performance } from 'perf_hooks';
+import { createHash } from 'crypto';
 
 /**
- * Utility function to create a 2D matrix of given dimensions, filled with a specified value.
- * @param {number} rows - Number of rows in the matrix.
- * @param {number} cols - Number of columns in the matrix.
- * @param {number} value - Value to fill the matrix with.
- * @returns {number[][]} A 2D matrix filled with the specified value.
+ * Generates a unique hash for caching purposes.
+ * @param {string} input - Input string to hash.
+ * @returns {string} - SHA-256 hash of the input.
  */
-export function createMatrix(rows, cols, value = 0) {
-  if (rows <= 0 || cols <= 0) {
-    throw new Error('Matrix dimensions must be positive integers.');
-  }
-  return Array.from({ length: rows }, () => Array(cols).fill(value));
+export function generateHash(input) {
+  const hash = createHash('sha256');
+  hash.update(input);
+  return hash.digest('hex');
 }
 
 /**
- * Performs matrix multiplication using a CPU-based algorithm for fallback.
- * @param {number[][]} A - First matrix.
- * @param {number[][]} B - Second matrix.
- * @returns {number[][]} The resulting matrix after multiplication.
+ * Performs matrix multiplication.
+ * @param {number[][]} matrixA - First matrix.
+ * @param {number[][]} matrixB - Second matrix.
+ * @returns {number[][]} - Resultant matrix after multiplication.
  */
-export function multiplyMatrices(A, B) {
-  const rowsA = A.length;
-  const colsA = A[0].length;
-  const rowsB = B.length;
-  const colsB = B[0].length;
+export function matrixMultiply(matrixA, matrixB) {
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
 
   if (colsA !== rowsB) {
-    throw new Error('Number of columns in A must match number of rows in B.');
+    throw new Error('Matrix dimensions do not match for multiplication');
   }
 
-  const result = createMatrix(rowsA, colsB);
+  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
 
   for (let i = 0; i < rowsA; i++) {
     for (let j = 0; j < colsB; j++) {
-      let sum = 0;
       for (let k = 0; k < colsA; k++) {
-        sum += A[i][k] * B[k][j];
+        result[i][j] += matrixA[i][k] * matrixB[k][j];
       }
-      result[i][j] = sum;
     }
   }
 
@@ -73,74 +61,90 @@ export function multiplyMatrices(A, B) {
 }
 
 /**
- * Simulates GPU-accelerated matrix multiplication using WebGPU-like parallelism.
- * This is a mock implementation for demonstration purposes.
- * @param {number[][]} A - First matrix.
- * @param {number[][]} B - Second matrix.
- * @returns {number[][]} The resulting matrix after simulated GPU multiplication.
+ * Computes eigenvalues of a square matrix using the power iteration method.
+ * @param {number[][]} matrix - Square matrix.
+ * @param {number} maxIterations - Maximum number of iterations.
+ * @param {number} tolerance - Convergence tolerance.
+ * @returns {number[]} - Approximate eigenvalues.
  */
-export function gpuSimulatedMatrixMultiply(A, B) {
-  const startTime = performance.now();
+export function computeEigenvalues(matrix, maxIterations = 1000, tolerance = 1e-6) {
+  const size = matrix.length;
+  if (matrix.some(row => row.length !== size)) {
+    throw new Error('Matrix must be square');
+  }
 
-  // Use the CPU-based fallback for now (mocking GPU acceleration).
-  const result = multiplyMatrices(A, B);
+  let vector = Array(size).fill(1);
+  let eigenvalue = 0;
 
-  const endTime = performance.now();
-  console.log(`Simulated GPU matrix multiplication completed in ${(endTime - startTime).toFixed(2)} ms.`);
+  for (let iteration = 0; iteration < maxIterations; iteration++) {
+    const nextVector = matrixMultiply([vector], matrix)[0];
+    const norm = Math.sqrt(nextVector.reduce((sum, val) => sum + val ** 2, 0));
 
-  return result;
+    vector = nextVector.map(val => val / norm);
+    const nextEigenvalue = vector.reduce((sum, val, i) => sum + val * matrix[i][i], 0);
+
+    if (Math.abs(nextEigenvalue - eigenvalue) < tolerance) {
+      break;
+    }
+
+    eigenvalue = nextEigenvalue;
+  }
+
+  return [eigenvalue];
 }
 
 /**
- * Computes the attention mechanism (e.g., for transformers) using simulated GPU acceleration.
- * @param {number[][]} Q - Query matrix.
- * @param {number[][]} K - Key matrix.
- * @param {number[][]} V - Value matrix.
- * @returns {number[][]} The attention output matrix.
+ * Updates Hopfield memory state using the energy minimization principle.
+ * @param {number[][]} weights - Weight matrix.
+ * @param {number[]} state - Current state vector.
+ * @returns {number[]} - Updated state vector.
  */
-export function computeAttention(Q, K, V) {
-  // Compute Q * K^T (scaled dot-product attention).
-  const K_T = transposeMatrix(K);
-  const attentionScores = gpuSimulatedMatrixMultiply(Q, K_T);
+export function updateHopfieldMemory(weights, state) {
+  const size = weights.length;
+  if (weights.some(row => row.length !== size) || state.length !== size) {
+    throw new Error('Weight matrix and state vector dimensions must match');
+  }
 
-  // Apply softmax normalization (row-wise).
-  const attentionWeights = attentionScores.map(row => softmax(row));
+  const newState = Array(size).fill(0);
 
-  // Compute attention output: weights * V.
-  return gpuSimulatedMatrixMultiply(attentionWeights, V);
+  for (let i = 0; i < size; i++) {
+    const netInput = weights[i].reduce((sum, weight, j) => sum + weight * state[j], 0);
+    newState[i] = netInput >= 0 ? 1 : -1;
+  }
+
+  return newState;
 }
 
 /**
- * Transposes a given matrix.
- * @param {number[][]} matrix - The matrix to transpose.
- * @returns {number[][]} The transposed matrix.
+ * Validates matrix dimensions for general operations.
+ * @param {number[][]} matrix - Matrix to validate.
+ * @returns {boolean} - True if valid, false otherwise.
+ */
+export function validateMatrix(matrix) {
+  if (!Array.isArray(matrix) || matrix.length === 0) {
+    return false;
+  }
+
+  const rowLength = matrix[0].length;
+  return matrix.every(row => Array.isArray(row) && row.length === rowLength);
+}
+
+/**
+ * Transposes a matrix.
+ * @param {number[][]} matrix - Matrix to transpose.
+ * @returns {number[][]} - Transposed matrix.
  */
 export function transposeMatrix(matrix) {
-  return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
-}
+  const rows = matrix.length;
+  const cols = matrix[0].length;
 
-/**
- * Applies the softmax function to a vector.
- * @param {number[]} vector - The input vector.
- * @returns {number[]} The softmax-normalized vector.
- */
-export function softmax(vector) {
-  const maxVal = Math.max(...vector);
-  const exps = vector.map(val => Math.exp(val - maxVal));
-  const sumExps = exps.reduce((sum, val) => sum + val, 0);
-  return exps.map(val => val / sumExps);
-}
+  const transposed = Array.from({ length: cols }, () => Array(rows).fill(0));
 
-/**
- * Example usage of the module (for testing purposes).
- */
-export function exampleUsage() {
-  const A = createMatrix(2, 3, 1);
-  const B = createMatrix(3, 2, 2);
+  for (let i = 0; i < rows; i++) {
+    for (let j = 0; j < cols; j++) {
+      transposed[j][i] = matrix[i][j];
+    }
+  }
 
-  console.log('Matrix A:', A);
-  console.log('Matrix B:', B);
-
-  const result = gpuSimulatedMatrixMultiply(A, B);
-  console.log('Result of GPU-simulated multiplication:', result);
+  return transposed;
 }

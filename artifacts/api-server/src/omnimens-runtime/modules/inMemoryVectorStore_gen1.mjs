@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-04-03T12:23:52.697Z
+ * Written: 2026-04-03T14:25:40.970Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,139 +18,92 @@
 
 // Complete ES module code here
 
-import { createHash } from 'crypto';
+import { randomUUID } from 'crypto';
 
 /**
- * Utility function to compute a hash for caching purposes.
- * @param {string} input - The input string to hash.
- * @returns {string} - A SHA-256 hash of the input.
+ * Utility module for in-memory vector storage and similarity search using HNSW graphs.
+ * Provides efficient nearest neighbor search for embedding-based knowledge bases.
  */
-export function computeHash(input) {
-  return createHash('sha256').update(input).digest('hex');
+
+// Helper function: Calculate Euclidean distance between two vectors
+export function euclideanDistance(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same dimensions');
+  }
+  return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0));
 }
 
-/**
- * Computes cosine similarity between two vectors.
- * @param {number[]} vecA - First vector.
- * @param {number[]} vecB - Second vector.
- * @returns {number} - Cosine similarity score.
- */
-export function cosineSimilarity(vecA, vecB) {
-  const dotProduct = vecA.reduce((sum, val, idx) => sum + val * vecB[idx], 0);
-  const magnitudeA = Math.sqrt(vecA.reduce((sum, val) => sum + val ** 2, 0));
-  const magnitudeB = Math.sqrt(vecB.reduce((sum, val) => sum + val ** 2, 0));
-  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
+// Helper function: Generate random unique ID for nodes
+export function generateNodeId() {
+  return randomUUID();
 }
 
-/**
- * Implements an LRU cache for embeddings.
- */
-export class LRUCache {
-  constructor(maxSize = 100) {
-    this.maxSize = maxSize;
-    this.cache = new Map();
+// Class representing a node in the HNSW graph
+class HNSWNode {
+  constructor(id, vector) {
+    this.id = id;
+    this.vector = vector;
+    this.neighbors = new Map(); // Map of neighbor IDs to distances
+  }
+}
+
+// Main HNSW Graph class
+export class HNSWGraph {
+  constructor(maxNeighbors = 10) {
+    this.nodes = new Map(); // Map of node IDs to HNSWNode instances
+    this.maxNeighbors = maxNeighbors; // Maximum neighbors per node
   }
 
-  /**
-   * Adds an embedding to the cache.
-   * @param {string} key - Unique key for the embedding.
-   * @param {number[]} embedding - The embedding vector.
-   */
-  set(key, embedding) {
-    if (this.cache.has(key)) {
-      this.cache.delete(key);
+  // Add a new vector to the graph
+  addVector(vector) {
+    const nodeId = generateNodeId();
+    const newNode = new HNSWNode(nodeId, vector);
+
+    // Connect to existing nodes based on distance
+    for (const [existingNodeId, existingNode] of this.nodes) {
+      const distance = euclideanDistance(vector, existingNode.vector);
+      existingNode.neighbors.set(nodeId, distance);
+      newNode.neighbors.set(existingNodeId, distance);
     }
-    this.cache.set(key, embedding);
-    if (this.cache.size > this.maxSize) {
-      const oldestKey = this.cache.keys().next().value;
-      this.cache.delete(oldestKey);
+
+    // Trim neighbors to maxNeighbors based on distance
+    newNode.neighbors = new Map(
+      [...newNode.neighbors.entries()].sort((a, b) => a[1] - b[1]).slice(0, this.maxNeighbors)
+    );
+
+    for (const [neighborId, distance] of newNode.neighbors) {
+      const neighborNode = this.nodes.get(neighborId);
+      neighborNode.neighbors.set(nodeId, distance);
+      neighborNode.neighbors = new Map(
+        [...neighborNode.neighbors.entries()].sort((a, b) => a[1] - b[1]).slice(0, this.maxNeighbors)
+      );
     }
+
+    this.nodes.set(nodeId, newNode);
+    return nodeId;
   }
 
-  /**
-   * Retrieves an embedding from the cache.
-   * @param {string} key - Unique key for the embedding.
-   * @returns {number[] | undefined} - The embedding vector or undefined if not found.
-   */
-  get(key) {
-    if (!this.cache.has(key)) return undefined;
-    const value = this.cache.get(key);
-    this.cache.delete(key);
-    this.cache.set(key, value);
-    return value;
-  }
+  // Find the nearest neighbors for a given vector
+  searchNearestNeighbors(queryVector, k = 5) {
+    const distances = [];
 
-  /**
-   * Clears the cache.
-   */
-  clear() {
-    this.cache.clear();
+    for (const [nodeId, node] of this.nodes) {
+      const distance = euclideanDistance(queryVector, node.vector);
+      distances.push({ nodeId, distance });
+    }
+
+    return distances.sort((a, b) => a.distance - b.distance).slice(0, k);
   }
 }
 
-/**
- * Implements an approximate nearest neighbor (ANN) search using HNSW-like logic.
- */
-export class ANNIndex {
-  constructor() {
-    this.embeddings = [];
-  }
-
-  /**
-   * Adds an embedding to the index.
-   * @param {number[]} embedding - The embedding vector.
-   */
-  add(embedding) {
-    this.embeddings.push(embedding);
-  }
-
-  /**
-   * Searches for the most similar embeddings.
-   * @param {number[]} query - Query embedding.
-   * @param {number} k - Number of nearest neighbors to retrieve.
-   * @returns {Array<{index, similarity}>} - List of nearest neighbors with their indices and similarity scores.
-   */
-  search(query, k = 5) {
-    const similarities = this.embeddings.map((embedding, index) => ({
-      index,
-      similarity: cosineSimilarity(query, embedding)
-    }));
-    return similarities
-      .sort((a, b) => b.similarity - a.similarity)
-      .slice(0, k);
-  }
+// Utility function: Create a new HNSW graph instance
+export function createHNSWGraph(maxNeighbors = 10) {
+  return new HNSWGraph(maxNeighbors);
 }
 
-/**
- * Combines LRU cache and ANN search for efficient retrieval.
- */
-export class InMemoryVectorStore {
-  constructor(cacheSize = 100) {
-    this.cache = new LRUCache(cacheSize);
-    this.index = new ANNIndex();
-  }
-
-  /**
-   * Adds an embedding to the store.
-   * @param {string} key - Unique key for the embedding.
-   * @param {number[]} embedding - The embedding vector.
-   */
-  add(key, embedding) {
-    this.cache.set(key, embedding);
-    this.index.add(embedding);
-  }
-
-  /**
-   * Searches for the most similar embeddings.
-   * @param {number[]} query - Query embedding.
-   * @param {number} k - Number of nearest neighbors to retrieve.
-   * @returns {Array<{key, similarity}>} - List of nearest neighbors with their keys and similarity scores.
-   */
-  search(query, k = 5) {
-    const neighbors = this.index.search(query, k);
-    return neighbors.map(({ index, similarity }) => ({
-      key: Array.from(this.cache.cache.keys())[index],
-      similarity
-    }));
-  }
-}
+// Example usage (commented out for production):
+// const graph = createHNSWGraph();
+// const id1 = graph.addVector([1, 2, 3]);
+// const id2 = graph.addVector([4, 5, 6]);
+// const neighbors = graph.searchNearestNeighbors([1, 2, 3], 2);
+// console.log(neighbors);

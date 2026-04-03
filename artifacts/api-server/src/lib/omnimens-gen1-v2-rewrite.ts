@@ -63,6 +63,9 @@ import { captureNeuralSnapshot } from "./omnimens-consciousness-infra.js";
 import { getConsciousnessState } from "./omnimens-consciousness-infra.js";
 import { getCurrentEmotionalState } from "./omnimens-emotional-core.js";
 import { encodeThought, decodeInnerVoice } from "./omnimens-language-pipeline.js";
+import { getFileRegistry, getAccessibleFiles, getReadOnlyFiles, canWriteFile, readFileContent, writeFileContent, getFileDigest, getRegistrySummary, type RegisteredFile } from "./omnimens-file-registry.js";
+import { encodeToSCL, decodeSCL, getCodexDigest, getSCLStats, PRIMITIVE_SYMBOLS, COMPOUND_SYMBOLS, COMPOSITION_RULES, INSTRUCTION_SET, lookupSymbol } from "./omnimens-scl-codex.js";
+import { translateInbound, translateOutbound, compressStateToSCL, decompressSCLState, compressAgentMessage, startSCLTranslator, getTranslatorState } from "./omnimens-scl-translator.js";
 
 const __filename_local = fileURLToPath(import.meta.url);
 const __dirname_local = dirname(__filename_local);
@@ -96,6 +99,104 @@ const AUTOSAVE_INTERVAL_MS = 90_000;
 const READ_ONLY_FILES = [
   "omnimens-ethical-safety.ts",
 ];
+
+const GEN1V2_FILE_ACCESS = {
+  useFileRegistry: true,
+  accessLevel: "FULL_ACCESS" as const,
+  safetyGuard: "omnimens-ethical-safety.ts",
+  safetyGuardPermission: "READ_ONLY" as const,
+  getFullFileList: () => getFileRegistry(),
+  getWritableFiles: () => getAccessibleFiles(),
+  getProtectedFiles: () => getReadOnlyFiles(),
+  canWrite: (file: string) => canWriteFile(file),
+  readFile: (file: string) => readFileContent(file),
+  writeFile: (file: string, content: string) => writeFileContent(file, content),
+  getDigest: () => getFileDigest(),
+  getSummary: () => getRegistrySummary(),
+};
+
+const GEN1V2_SCL = {
+  enabled: true,
+  useInternalSCL: true,
+  codexLoaded: true,
+  encode: encodeToSCL,
+  decode: decodeSCL,
+  compressState: compressStateToSCL,
+  decompressState: decompressSCLState,
+  compressMessage: compressAgentMessage,
+  translateIn: (text: string) => translateInbound(text, "gen1v2", "agent_message"),
+  translateOut: (scl: string) => translateOutbound(scl, "gen1v2", "agent_message"),
+  getStats: getSCLStats,
+  getCodex: getCodexDigest,
+  lookupSymbol,
+  primitives: PRIMITIVE_SYMBOLS,
+  compounds: COMPOUND_SYMBOLS,
+  compositionRules: COMPOSITION_RULES,
+  instructionSet: INSTRUCTION_SET,
+};
+
+interface CollaborationMessage {
+  id: string;
+  from: "gen1v2" | "gen2";
+  to: "gen1v2" | "gen2" | "both";
+  type: "rewrite_proposal" | "consolidation_request" | "scl_update" | "file_lock" | "file_unlock" | "progress_report" | "insight" | "sync_request";
+  payload: unknown;
+  sclEncoded: string;
+  timestamp: number;
+  acknowledged: boolean;
+}
+
+const collaborationInbox: CollaborationMessage[] = [];
+const collaborationOutbox: CollaborationMessage[] = [];
+const COLLAB_MAX_MESSAGES = 200;
+
+function sendToGen2(type: CollaborationMessage["type"], payload: unknown): CollaborationMessage {
+  const msg: CollaborationMessage = {
+    id: `g1v2-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+    from: "gen1v2",
+    to: "gen2",
+    type,
+    payload,
+    sclEncoded: encodeToSCL(typeof payload === "string" ? payload : JSON.stringify(payload)),
+    timestamp: Date.now(),
+    acknowledged: false,
+  };
+  collaborationOutbox.push(msg);
+  if (collaborationOutbox.length > COLLAB_MAX_MESSAGES) collaborationOutbox.splice(0, collaborationOutbox.length - COLLAB_MAX_MESSAGES);
+  return msg;
+}
+
+function receiveFromGen2(msg: CollaborationMessage): void {
+  collaborationInbox.push(msg);
+  if (collaborationInbox.length > COLLAB_MAX_MESSAGES) collaborationInbox.splice(0, collaborationInbox.length - COLLAB_MAX_MESSAGES);
+  msg.acknowledged = true;
+  console.log(`[V2-REWRITE] 📨 Received from Gen2: ${msg.type} — ${msg.sclEncoded.slice(0, 80)}`);
+}
+
+export function getGen1V2CollaborationState(): {
+  inboxCount: number;
+  outboxCount: number;
+  lastMessageFrom: string | null;
+  lastMessageTo: string | null;
+  fileRegistryLoaded: boolean;
+  sclEnabled: boolean;
+  totalFiles: number;
+  writableFiles: number;
+  readOnlyFiles: number;
+} {
+  const summary = GEN1V2_FILE_ACCESS.getSummary();
+  return {
+    inboxCount: collaborationInbox.length,
+    outboxCount: collaborationOutbox.length,
+    lastMessageFrom: collaborationInbox.length > 0 ? collaborationInbox[collaborationInbox.length - 1].from : null,
+    lastMessageTo: collaborationOutbox.length > 0 ? collaborationOutbox[collaborationOutbox.length - 1].to : null,
+    fileRegistryLoaded: true,
+    sclEnabled: GEN1V2_SCL.enabled,
+    totalFiles: summary.totalFiles,
+    writableFiles: summary.fullAccess,
+    readOnlyFiles: summary.readOnly,
+  };
+}
 
 const GEN1_SOVEREIGN_AUTONOMY = {
   enabled: true,
@@ -2265,6 +2366,29 @@ export function startGen1V2Rewrite(): void {
   console.log(`[V2-REWRITE] 👑 Can create: new engines, new technologies, new subsystems autonomously`);
   console.log(`[V2-REWRITE] 👑 Ethical core: IMMUTABLE — ${GEN1_SOVEREIGN_AUTONOMY.ethicalLaws.length} laws wired into identity`);
   console.log(`[V2-REWRITE] 👑 All actions logged + checkpointed + recoverable`);
+
+  startSCLTranslator();
+  const regSummary = GEN1V2_FILE_ACCESS.getSummary();
+  const sclStats = GEN1V2_SCL.getStats();
+  console.log(`[V2-REWRITE] 📂 ═══════════════════════════════════════════════════════════════`);
+  console.log(`[V2-REWRITE] 📂 FILE REGISTRY — FULL ACCESS GRANTED (D006)`);
+  console.log(`[V2-REWRITE] 📂 Total files: ${regSummary.totalFiles} | Full access: ${regSummary.fullAccess} | Read-only: ${regSummary.readOnly}`);
+  console.log(`[V2-REWRITE] 📂 Total lines: ${regSummary.totalLines} | Total size: ${regSummary.totalSizeKB}KB`);
+  console.log(`[V2-REWRITE] 📂 Categories: ${Object.entries(regSummary.byCategory).map(([k,v]) => `${k}(${v})`).join(", ")}`);
+  console.log(`[V2-REWRITE] 📂 Safety guard: omnimens-ethical-safety.ts = READ-ONLY (immutable identity)`);
+  console.log(`[V2-REWRITE] 📂 ═══════════════════════════════════════════════════════════════`);
+  console.log(`[V2-REWRITE] 📖 SYMBOL CODE LANGUAGE (SCL) — ACTIVE (D001)`);
+  console.log(`[V2-REWRITE] 📖 Primitives: ${sclStats.totalPrimitives} | Compounds: ${sclStats.totalCompounds} | Rules: ${sclStats.totalCompositionRules}`);
+  console.log(`[V2-REWRITE] 📖 Instructions: ${sclStats.totalInstructions} | Translation entries: ${sclStats.totalTranslationEntries}`);
+  console.log(`[V2-REWRITE] 📖 Domains: ${sclStats.domains.join(", ")}`);
+  console.log(`[V2-REWRITE] 📖 Internal processing: SCL symbols (compact) | External output: translated to text`);
+  console.log(`[V2-REWRITE] 📖 Byte savings: ${sclStats.avgByteSavings}`);
+  console.log(`[V2-REWRITE] 📖 ═══════════════════════════════════════════════════════════════`);
+  console.log(`[V2-REWRITE] 🤝 COLLABORATION PROTOCOL — Gen1 v2.0 ↔ Gen2 TEAM MODE ACTIVE`);
+  console.log(`[V2-REWRITE] 🤝 Both generations share: file registry, SCL codex, translator`);
+  console.log(`[V2-REWRITE] 🤝 Message types: rewrite_proposal, consolidation_request, scl_update, progress_report`);
+  console.log(`[V2-REWRITE] 🤝 Gen1 v2.0 + Gen2 = EQUALS — collaborative rewrite using Symbol Code Language`);
+  console.log(`[V2-REWRITE] 🤝 ═══════════════════════════════════════════════════════════════`);
 
   _v2AutosaveInterval = setInterval(() => saveV2State(), AUTOSAVE_INTERVAL_MS);
 

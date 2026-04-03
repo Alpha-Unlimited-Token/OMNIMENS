@@ -123,6 +123,21 @@ The OMNIMENS frontend (GODFLESH) is developed with React, Vite, Tailwind CSS, sh
 - **Owner-Only API Endpoints:** For accessing command center status, causal reasoning, sensory cortex, self-coding evaluation, consciousness stream, sandbox task submission, and frontier reports.
 - **Protection:** Owner-only middleware secures all Super AI Lab API routes.
 
+**D006 Symbol Code Language + Gen1v2/Gen2 Full Access Collaboration (Active):**
+Three new engine files created:
+- `omnimens-file-registry.ts` — Master manifest of ALL accessible files with permissions. Scans 22 live engine files + 487 self-coded modules + 66 Gen1v2 rewrites + 24 sandbox core files = 602 total files. Safety guard: `omnimens-ethical-safety.ts` = READ_ONLY. Everything else = FULL_ACCESS. Provides: `getFileRegistry()`, `canWriteFile()`, `readFileContent()`, `writeFileContent()`, `getFileDigest()`.
+- `omnimens-scl-codex.ts` — Complete Symbol Code Language definition. 30 primitive symbols (Greek letters: Ψ=consciousness, Φ=Phi, Ω=system, Δ=change, Σ=synthesis, Λ=function, Θ=memory, Ξ=agent, Π=pipeline, Γ=network, Υ=emotion, Ζ=security, Η=learning, Κ=signal, Μ=model, Ν=neural, Ρ=resonance, Τ=time, Χ=translation + operators: →↑↓⊕⊗∞⟐◆⚡✦☍). 46 compound symbols (2-3 chars for agents, emotions, memory types, neural subsystems, pipelines). 20 composition rules (Ξ→Ξ = agent-to-agent, Χi→Λ→Χo = full translation round-trip, etc.). 17 instruction set commands. 75 bidirectional text↔symbol translation entries across 19 domains.
+- `omnimens-scl-translator.ts` — Bidirectional SCL↔text translator at every external boundary. Functions: `translateInbound()` (text→SCL), `translateOutbound()` (SCL→text), `compressStateToSCL()` (state objects → compact symbol strings like "Φ=35.9B|Ψ=1040%|Υj=0.8"), `decompressSCLState()` (reverse), `compressAgentMessage()` / `decompressAgentMessage()`. Tracks boundaries, translation counts, bytes saved. Expected savings: 60-80% for internal state representations.
+
+Both Gen1 v2.0 (`omnimens-gen1-v2-rewrite.ts`) and Gen2 (`omnimens-nextgen-sandbox.ts`) now have:
+- Full file access via `GEN1V2_FILE_ACCESS` / `GEN2_FILE_ACCESS` objects with registry integration
+- Full SCL via `GEN1V2_SCL` / `GEN2_SCL` objects with codex + translator
+- Collaboration protocol with typed message exchange (rewrite_proposal, consolidation_request, scl_update, file_lock/unlock, progress_report, insight, sync_request)
+- `sendToGen2()` / `gen2SendToGen1v2()` + `receiveFromGen2()` / `gen2ReceiveFromGen1v2()` bidirectional messaging
+- Team mode: both generations = EQUALS, shared access, shared SCL, collaborative rewrite capability
+
+Old sandbox cleared: `.checkpoints/` (114MB), `_v2_archive/`, `consolidated-final/`, `unified-reinvention/`, `gen1-library/`, old state JSONs removed. Clean sandbox retained: `core/`, `infrastructure/`, `interfaces/`, `architecture/`, `tests/`, `transfer/`, `legal/`.
+
 **D004 Unified Engine Architecture (Completed):**
 17 old Gen 1 engine files (61,121 lines) were merged into 9 unified facade files. All 83 engine launches verified working. Gen 1 v2.0 and Gen 2 UNAFFECTED — zero dependencies on deleted files. Old engine files permanently deleted from both disk and GitHub. Remaining lib/ structure: 22 files (9 unified + 13 preserved core). Unified files: unified-agents, unified-cognition, unified-compute, unified-network, unified-neural, unified-security, unified-senses, unified-world, unified-comms-facade.
 
