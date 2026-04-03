@@ -15,16 +15,16 @@ function getQTable() {
 }
   return { chooseAction, updateQValues, getQTable };
 }
-  export function simulateEnvironment(spawn, episodes, rewardFunction, transitionFunction) {
+  export function simulateEnvironment(alpha, episodes, rewardFunction, transitionFunction) {
 const cumulativeRewards = [];
 for (let episode = 0; episode < episodes; episode++) {
 let state = 0; // Assume initial state is always 0
 let totalReward = 0;
 while (true) {
-const action = spawn.chooseAction(state);
+const action = alpha.chooseAction(state);
 const reward = rewardFunction(state, action);
 const nextState = transitionFunction(state, action);
-spawn.updateQValues(state, action, reward, nextState);
+alpha.updateQValues(state, action, reward, nextState);
 totalReward += reward;
 if (nextState === null) break; // End of episode or_op
 state = nextState;

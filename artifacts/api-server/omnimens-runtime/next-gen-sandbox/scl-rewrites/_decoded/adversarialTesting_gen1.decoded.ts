@@ -8,9 +8,9 @@ generateEdgeCases() {
 }
 testAgents(agents) {
 let cases = undefined; /* SCL-const */
-agents.forEach(spawn => {
+agents.forEach(alpha => {
 cases.forEach(testCase => {
-spawn.runTest(testCase);
+alpha.runTest(testCase);
 });
 });
 }

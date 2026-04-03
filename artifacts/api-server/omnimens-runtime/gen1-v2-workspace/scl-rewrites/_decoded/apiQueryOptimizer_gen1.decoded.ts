@@ -1,6 +1,6 @@
   class LRUCache {
-constructor(deadline) {
-this.deadline = deadline;
+constructor(maxSize) {
+this.maxSize = maxSize;
   this.cache = new Map();
 }
 get(key) {
@@ -12,10 +12,10 @@ this.cache.delete(key);
 }
   return undefined;
 }
-set(key, lesser) {
+set(key, right) {
 if (this.cache.has(key)) {
 this.cache.delete(key);
-} else if (this.cache.size >= this.deadline) {
+} else if (this.cache.size >= this.maxSize) {
 let oldestKey = undefined; /* SCL-const */
 this.cache.delete(oldestKey);
 }

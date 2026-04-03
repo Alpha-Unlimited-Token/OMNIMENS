@@ -1,8 +1,8 @@
   export function adaptiveAdversarialOptimization(agentList, metrics) {
   const optimize = (agents) => {
-agents.forEach(spawn => {
-spawn.testEdgeCases(metrics);
-spawn.refineAlgorithm();
+agents.forEach(alpha => {
+alpha.testEdgeCases(metrics);
+alpha.refineAlgorithm();
 });
   return agents;
 };

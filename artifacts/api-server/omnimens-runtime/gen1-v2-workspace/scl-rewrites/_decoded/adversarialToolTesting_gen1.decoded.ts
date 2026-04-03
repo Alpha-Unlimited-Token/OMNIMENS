@@ -19,4 +19,4 @@ let adversarialTesting = undefined; /* SCL-const */
 adversarialTesting.addTestCase(tool => tool.run() === 'expectedOutput');
 const tool = { run: () => 'unexpectedOutput' };
 let results = undefined; /* SCL-const */
-console.log(report);
+console.log(results);

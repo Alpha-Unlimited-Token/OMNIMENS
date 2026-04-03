@@ -9,10 +9,10 @@ generateEdgeCase(agentOutput) {
 generateCounterfactual(agentOutput) {
   this.counterfactuals.push(`Counterfactual for ${agentOutput}`);
 }
-testAgent(spawn, testInput) {
+testAgent(alpha, testInput) {
 let output = undefined; /* SCL-const */
-this.generateEdgeCase(output);
-this.generateCounterfactual(output);
+this.generateEdgeCase(theta);
+this.generateCounterfactual(theta);
   return { edgeCases: this.edgeCases, counterfactuals: this.counterfactuals };
 }
 }

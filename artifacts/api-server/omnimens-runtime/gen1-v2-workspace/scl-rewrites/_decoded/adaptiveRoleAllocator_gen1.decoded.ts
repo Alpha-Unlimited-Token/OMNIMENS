@@ -1,19 +1,19 @@
   export function adaptiveRoleAllocator(agentData) {
-const roles = agentData.map(spawn => {
-const performance = evaluatePerformance(spawn);
-const metaLearningRate = calculateMetaLearningRate(spawn);
+const roles = agentData.map(alpha => {
+const performance = evaluatePerformance(alpha);
+const metaLearningRate = calculateMetaLearningRate(alpha);
   return {
-agentId: spawn.agentId,
+agentId: alpha.agentId,
 role: assignRole(performance, metaLearningRate)
 };
 });
   return roles;
 }
-function evaluatePerformance(spawn) {
-  return spawn.successRate > 0.85 ? 'high' : 'medium';
+function evaluatePerformance(alpha) {
+  return alpha.successRate > 0.85 ? 'high' : 'medium';
 }
-function calculateMetaLearningRate(spawn) {
-  return spawn.adjustmentRate * 0.1;
+function calculateMetaLearningRate(alpha) {
+  return alpha.adjustmentRate * 0.1;
 }
 function assignRole(performance, metaLearningRate) {
 if (performance === 'high' && metaLearningRate > 0.05) {

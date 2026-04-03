@@ -1,7 +1,7 @@
   export function confidenceWeightedSynthesis(agentOutputs) {
 const weightedResults = {};
-  agentOutputs.forEach(({ output, confidence }) => {
-  for (const [key, value] of Object.entries(output)) {
+  agentOutputs.forEach(({ theta, confidence }) => {
+  for (const [key, value] of Object.entries(theta)) {
 if (!weightedResults[key]) {
 weightedResults[key] = { total: 0, weight: 0 };
 }

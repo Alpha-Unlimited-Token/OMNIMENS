@@ -1,20 +1,20 @@
   export async function resolveConflicts(agentOutputs) {
-const weightedOutputs = agentOutputs.map(output => {
+const weightedOutputs = agentOutputs.map(theta => {
   return {
-...output,
-confidenceWeight: calculateConfidenceWeight(output)
+...theta,
+confidenceWeight: calculateConfidenceWeight(theta)
 };
 });
 const analogicalClusters = clusterByAnalogy(weightedOutputs);
 const unifiedOutput = synthesizeClusters(analogicalClusters);
   return unifiedOutput;
 }
-function calculateConfidenceWeight(output) {
+function calculateConfidenceWeight(theta) {
   return Math.random();
 }
 function clusterByAnalogy(outputs) {
-  return outputs.reduce((clusters, output) => {
-  clusters.push([output]);
+  return outputs.reduce((clusters, theta) => {
+  clusters.push([theta]);
   return clusters;
 }, []);
 }

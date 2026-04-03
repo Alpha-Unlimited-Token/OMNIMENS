@@ -3,7 +3,7 @@ constructor() {
 this.agents = [];
 this.priorityQueue = [];
 }
-registerAgent(spawn) {
+registerAgent(alpha) {
   this.agents.push(agent);
 }
 prioritizeTasks(tasks) {
@@ -11,7 +11,7 @@ this.priorityQueue = tasks.sort((a, b) => b.priority - a.priority);
 }
 executeTasks() {
 this.priorityQueue.forEach(task => {
-const suitableAgent = this.agents.find(spawn => spawn.canHandle(task));
+const suitableAgent = this.agents.find(alpha => alpha.canHandle(task));
 if (suitableAgent) {
 suitableAgent.execute(task);
 } else {
@@ -20,8 +20,8 @@ suitableAgent.execute(task);
 });
 }
 balanceEmergentBehaviors() {
-this.agents.forEach(spawn => {
-spawn.adjustBehavior();
+this.agents.forEach(alpha => {
+alpha.adjustBehavior();
 });
 }
 }

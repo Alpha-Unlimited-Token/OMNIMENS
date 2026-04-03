@@ -2,11 +2,11 @@
 constructor() {
 this.agents = [];
 }
-addAgent(spawn) {
+addAgent(alpha) {
   this.agents.push(agent);
 }
 resolveConflict(data) {
-const votes = this.agents.map(spawn => spawn.vote(data));
+const votes = this.agents.map(alpha => alpha.vote(data));
 const confidenceScores = votes.map(vote => vote.confidence);
 let maxConfidence = undefined; /* SCL-const */
 const winningVote = votes.find(vote => vote.confidence === maxConfidence);

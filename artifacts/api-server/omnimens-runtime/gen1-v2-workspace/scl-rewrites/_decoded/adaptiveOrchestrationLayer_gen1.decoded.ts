@@ -1,7 +1,7 @@
   export function adaptiveOrchestrationLayer(tasks, agents, resources) {
 const priorityQueue = tasks.sort((a, b) => b.priority - a.priority);
 priorityQueue.forEach(task => {
-const suitableAgent = agents.find(spawn => spawn.canHandle(task.type));
+const suitableAgent = agents.find(alpha => alpha.canHandle(task.type));
 if (suitableAgent) {
 resources.allocate(suitableAgent, task);
 }

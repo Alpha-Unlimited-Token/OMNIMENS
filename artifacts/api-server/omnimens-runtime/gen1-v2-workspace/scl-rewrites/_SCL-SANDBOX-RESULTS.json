@@ -1,62 +1,22 @@
 {
-  "timestamp": 1775242405597,
+  "timestamp": 1775247206587,
   "generator": "gen1v2",
   "totalFiles": 100,
   "decoded": 100,
-  "syntaxValid": 82,
+  "syntaxValid": 94,
   "transpiled": 100,
-  "executed": 79,
-  "failed": 21,
+  "executed": 92,
+  "failed": 8,
   "errors": [
-    {
-      "file": "adaptiveRateLimitedCaching_gen1.scl",
-      "stage": "syntax",
-      "error": "Malformed arrow function parameter list"
-    },
-    {
-      "file": "adversarialCounterfactualGenerator_gen1.scl",
-      "stage": "syntax",
-      "error": "Unexpected token '...'"
-    },
     {
       "file": "adversarialDefenseMechanism_gen1.scl",
       "stage": "syntax",
-      "error": "Illegal return statement"
-    },
-    {
-      "file": "adversarialEdgeCaseTester_gen1.scl",
-      "stage": "syntax",
-      "error": "Unexpected token ':'"
-    },
-    {
-      "file": "adversarialSelfTest_gen1.scl",
-      "stage": "syntax",
-      "error": "Unexpected token ':'"
-    },
-    {
-      "file": "adversarialSentinel_gen1.scl",
-      "stage": "syntax",
-      "error": "Unexpected token ':'"
-    },
-    {
-      "file": "adversarialToolTesting_gen1.scl",
-      "stage": "execute",
-      "error": "report is not defined"
+      "error": "Unexpected token ','"
     },
     {
       "file": "alphaEvolve_gen1.scl",
       "stage": "execute",
       "error": "array is not defined"
-    },
-    {
-      "file": "attention-system.scl",
-      "stage": "syntax",
-      "error": "Unexpected identifier 'focus'"
-    },
-    {
-      "file": "bayesianCalibrationModule_gen1.scl",
-      "stage": "syntax",
-      "error": "Unexpected token ':'"
     },
     {
       "file": "bayesianUncertaintyQuantification_gen1.scl",
@@ -72,31 +32,6 @@
       "file": "checkpointedComputationManager_gen1.scl",
       "stage": "syntax",
       "error": "Unexpected token ')'"
-    },
-    {
-      "file": "coalaMemoryModule_gen1.scl",
-      "stage": "syntax",
-      "error": "Unexpected token ':'"
-    },
-    {
-      "file": "communication-hub.scl",
-      "stage": "syntax",
-      "error": "Unexpected token ':'"
-    },
-    {
-      "file": "confidenceInformedSelfConsistency_gen1.scl",
-      "stage": "syntax",
-      "error": "Unexpected token ':'"
-    },
-    {
-      "file": "consciousness-engine.scl",
-      "stage": "syntax",
-      "error": "Unexpected identifier 'state'"
-    },
-    {
-      "file": "contextCompression_gen1.scl",
-      "stage": "syntax",
-      "error": "Unexpected token '{'"
     },
     {
       "file": "contextSummarization_gen1.scl",

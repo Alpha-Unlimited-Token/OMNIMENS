@@ -43,7 +43,7 @@ constraintPerformance: [0.9, 0.8, 0.7]
 const historicalData = {
 examples: ['Example 1', 'Example 2', 'Example 3'],
 instructions: ['Instruction A', 'Instruction B', 'Instruction C'],
-constraints: ['deadline X', 'deadline Y', 'deadline Z']
+constraints: ['maxSize X', 'maxSize Y', 'maxSize Z']
 };
   return generateAdaptivePrompt(taskContext, historicalData);
 }

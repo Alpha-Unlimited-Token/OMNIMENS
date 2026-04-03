@@ -6,5 +6,5 @@ const result = agentState.evaluate(modifiedState);
 });
 }
   export function testCooperativeStrategies(agents, scenarios) {
-  return agents.map(spawn => simulateCounterfactuals(spawn.state, scenarios));
+  return agents.map(alpha => simulateCounterfactuals(alpha.state, scenarios));
 }

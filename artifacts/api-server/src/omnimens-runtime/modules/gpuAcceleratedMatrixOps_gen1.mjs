@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuAcceleratedMatrixOps
- * Written: 2026-04-03T16:15:46.513Z
+ * Written: 2026-04-03T19:12:21.437Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,115 +18,98 @@
 
 // gpuAcceleratedMatrixOps.mjs
 
-import { Worker, isMainThread, parentPort, workerData } from 'worker_threads';
-import { resolve } from 'path';
+import { createHash } from 'crypto';
 
 /**
- * Utility function to perform GPU-accelerated matrix multiplication using parallel computation via Worker Threads.
- * @param {number[][]} matrixA - First matrix.
- * @param {number[][]} matrixB - Second matrix.
- * @returns {Promise<number[][]>} - Resulting matrix after multiplication.
+ * Generates a unique hash for TypedArray data to ensure matrix integrity.
+ * @param {TypedArray} typedArray - The input TypedArray (e.g., Float32Array).
+ * @returns {string} - A SHA-256 hash of the array data.
  */
-export function gpuMatrixMultiply(matrixA, matrixB) {
-  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
-    throw new TypeError('Inputs must be 2D arrays (matrices).');
-  }
-
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
-
-  if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions do not align for multiplication.');
-  }
-
-  return new Promise((resolve, reject) => {
-    const workerPath = resolve(__dirname, './gpuAcceleratedMatrixOpsWorker.mjs');
-    const worker = new Worker(workerPath, {
-      workerData: { matrixA, matrixB, rowsA, colsB, colsA }
-    });
-
-    worker.on('message', (result) => resolve(result));
-    worker.on('error', (err) => reject(err));
-    worker.on('exit', (code) => {
-      if (code !== 0) {
-        reject(new Error(`Worker stopped with exit code ${code}`));
-      }
-    });
-  });
-}
-
-/**
- * Utility function to compute the dot product of two vectors.
- * @param {number[]} vectorA - First vector.
- * @param {number[]} vectorB - Second vector.
- * @returns {number} - Dot product of the two vectors.
- */
-export function gpuVectorDotProduct(vectorA, vectorB) {
-  if (!Array.isArray(vectorA) || !Array.isArray(vectorB)) {
-    throw new TypeError('Inputs must be arrays (vectors).');
-  }
-
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vector lengths must match for dot product computation.');
-  }
-
-  return vectorA.reduce((sum, val, index) => sum + val * vectorB[index], 0);
-}
-
-/**
- * Utility function to compute the similarity between two vectors using cosine similarity.
- * @param {number[]} vectorA - First vector.
- * @param {number[]} vectorB - Second vector.
- * @returns {number} - Cosine similarity between the two vectors.
- */
-export function gpuVectorCosineSimilarity(vectorA, vectorB) {
-  const dotProduct = gpuVectorDotProduct(vectorA, vectorB);
-  const magnitudeA = Math.sqrt(gpuVectorDotProduct(vectorA, vectorA));
-  const magnitudeB = Math.sqrt(gpuVectorDotProduct(vectorB, vectorB));
-
-  if (magnitudeA === 0 || magnitudeB === 0) {
-    throw new Error('Vector magnitude cannot be zero for cosine similarity computation.');
-  }
-
-  return dotProduct / (magnitudeA * magnitudeB);
-}
-
-/**
- * Utility function to create a zero-filled matrix of specified dimensions.
- * @param {number} rows - Number of rows.
- * @param {number} cols - Number of columns.
- * @returns {number[][]} - Zero-filled matrix.
- */
-export function createZeroMatrix(rows, cols) {
-  if (!Number.isInteger(rows) || !Number.isInteger(cols) || rows <= 0 || cols <= 0) {
-    throw new TypeError('Rows and columns must be positive integers.');
-  }
-
-  return new Array(rows).fill(null).map(() => new Array(cols).fill(0));
-}
-
-/**
- * Utility function to transpose a matrix.
- * @param {number[][]} matrix - Matrix to transpose.
- * @returns {number[][]} - Transposed matrix.
- */
-export function transposeMatrix(matrix) {
-  if (!Array.isArray(matrix) || !Array.isArray(matrix[0])) {
-    throw new TypeError('Input must be a 2D array (matrix).');
-  }
-
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-
-  const transposed = createZeroMatrix(cols, rows);
-
-  for (let i = 0; i < rows; i++) {
-    for (let j = 0; j < cols; j++) {
-      transposed[j][i] = matrix[i][j];
+export function hashTypedArray(typedArray) {
+    if (!(typedArray instanceof TypedArray)) {
+        throw new TypeError('Input must be a TypedArray.');
     }
-  }
-
-  return transposed;
+    const hash = createHash('sha256');
+    hash.update(new Uint8Array(typedArray.buffer));
+    return hash.digest('hex');
 }
+
+/**
+ * Performs matrix multiplication using TypedArrays.
+ * @param {Float32Array} matrixA - The first matrix (m x n).
+ * @param {Float32Array} matrixB - The second matrix (n x p).
+ * @param {number} m - Rows in matrixA.
+ * @param {number} n - Columns in matrixA and rows in matrixB.
+ * @param {number} p - Columns in matrixB.
+ * @returns {Float32Array} - The resulting matrix (m x p).
+ */
+export function matrixMultiply(matrixA, matrixB, m, n, p) {
+    if (matrixA.length !== m * n || matrixB.length !== n * p) {
+        throw new Error('Matrix dimensions do not match the provided sizes.');
+    }
+
+    const result = new Float32Array(m * p);
+
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < p; j++) {
+            let sum = 0;
+            for (let k = 0; k < n; k++) {
+                sum += matrixA[i * n + k] * matrixB[k * p + j];
+            }
+            result[i * p + j] = sum;
+        }
+    }
+
+    return result;
+}
+
+/**
+ * Transposes a matrix represented as a TypedArray.
+ * @param {Float32Array} matrix - The input matrix (m x n).
+ * @param {number} m - Rows in the matrix.
+ * @param {number} n - Columns in the matrix.
+ * @returns {Float32Array} - The transposed matrix (n x m).
+ */
+export function transposeMatrix(matrix, m, n) {
+    if (matrix.length !== m * n) {
+        throw new Error('Matrix dimensions do not match the provided sizes.');
+    }
+
+    const transposed = new Float32Array(n * m);
+
+    for (let i = 0; i < m; i++) {
+        for (let j = 0; j < n; j++) {
+            transposed[j * m + i] = matrix[i * n + j];
+        }
+    }
+
+    return transposed;
+}
+
+/**
+ * Initializes a matrix with random values for testing purposes.
+ * @param {number} rows - Number of rows in the matrix.
+ * @param {number} cols - Number of columns in the matrix.
+ * @returns {Float32Array} - A matrix filled with random values.
+ */
+export function randomMatrix(rows, cols) {
+    const matrix = new Float32Array(rows * cols);
+    for (let i = 0; i < matrix.length; i++) {
+        matrix[i] = Math.random();
+    }
+    return matrix;
+}
+
+/**
+ * Validates if two matrices can be multiplied.
+ * @param {number} mA - Rows in the first matrix.
+ * @param {number} nA - Columns in the first matrix.
+ * @param {number} mB - Rows in the second matrix.
+ * @param {number} nB - Columns in the second matrix.
+ * @returns {boolean} - True if multiplication is valid, false otherwise.
+ */
+export function validateMatrixMultiplication(mA, nA, mB, nB) {
+    return nA === mB;
+}
+
+const TypedArray = Object.getPrototypeOf(Float32Array);

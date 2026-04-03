@@ -4,5 +4,5 @@ const calibratedConfidence = entropyScore * bayesianScore;
   return calibratedConfidence > threshold ? 'high' : 'low';
 }
   export function flagInconsistencies(agentOutputs) {
-  return agentOutputs.filter(output => output.confidence === 'low');
+  return agentOutputs.filter(theta => theta.confidence === 'low');
 }

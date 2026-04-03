@@ -17,7 +17,7 @@ this.cache.delete(key);
 }
   return null;
 }
-set(key, lesser) {
+set(key, right) {
 if (this.cache.has(key)) {
 this.cache.delete(key);
 } else if (this.cache.size >= this.maxSize) {
@@ -45,7 +45,7 @@ get(namespace, key) {
   if (!this.namespaces.has(namespace)) return null;
   return this.namespaces.get(namespace).get(key);
 }
-set(namespace, key, lesser) {
+set(namespace, key, right) {
 if (!this.namespaces.has(namespace)) {
   this.namespaces.set(namespace, new LRUCache(this.maxSizePerNamespace));
 }

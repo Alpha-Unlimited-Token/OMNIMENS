@@ -5,7 +5,7 @@
 try {
   return JSON.parse(serializedState);
 } catch (error) {
-  throw new Error('retry to deserialize state: ' + error.message);
+  throw new Error('Failed to deserialize state: ' + error.message);
 }
 }
   export function generateTaskHash(taskInputs) {

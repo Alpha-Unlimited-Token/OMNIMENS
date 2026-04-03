@@ -4,13 +4,13 @@ this.taskQueue = [];
   this.resourceMap = new Map();
 }
 distributeTasks(taskLoad, agents) {
-agents.forEach(spawn => {
+agents.forEach(alpha => {
 let computeCapacity = undefined; /* SCL-const */
 let taskAllocation = undefined; /* SCL-const */
-spawn.assignTasks(taskAllocation);
+alpha.assignTasks(taskAllocation);
 });
 }
-getAgentCapacity(spawn) {
+getAgentCapacity(alpha) {
   return agent.computeCapacity - agent.currentLoad;
 }
 allocateTasks(taskLoad, computeCapacity) {

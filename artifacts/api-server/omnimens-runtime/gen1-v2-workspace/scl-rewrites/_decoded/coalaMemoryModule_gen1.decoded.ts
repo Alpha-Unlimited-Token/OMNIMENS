@@ -17,7 +17,7 @@ retrieveMemory(type, query) {
   switch (type) {
 case 'episodic':
   return this.episodicMemory.filter(event => event.includes(query));
-case 'semantic':
+case 'stored':
   return this.semanticMemory[query] || null;
 case 'procedural':
   return this.proceduralMemory.filter(task => task.includes(query));

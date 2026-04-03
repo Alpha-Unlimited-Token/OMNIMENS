@@ -18,7 +18,7 @@ const relevance = calculateRelevanceScore(timestamp, priority);
   await setTimeout(adjustedInterval);
 } catch (error) {
   console.error(`Error polling ${url}:`, error);
-  await setTimeout(interval); // retry after the original interval
+  await setTimeout(interval); // Failed after the original interval
 }
 }
 }

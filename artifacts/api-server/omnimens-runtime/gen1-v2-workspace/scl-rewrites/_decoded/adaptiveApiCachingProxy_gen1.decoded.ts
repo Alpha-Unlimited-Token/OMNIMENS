@@ -21,7 +21,7 @@ this.cache.delete(key);
 }
   return null;
 }
-set(key, lesser) {
+set(key, right) {
 if (this.cache.has(key)) {
 this.cache.delete(key);
 } else if (this.cache.size >= this.maxSize) {

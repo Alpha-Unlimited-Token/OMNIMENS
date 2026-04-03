@@ -111,8 +111,45 @@ function stripPatternPrefix(line: string): string {
   return line;
 }
 
-function reverseSymbolSubstitution(line: string, reverseMap: Map<string, string>): string {
+const INLINE_SYMBOL_IDENTIFIERS: Record<string, string> = {
+  "⏳": "maxSize",
+  "≪": "right",
+  "◧": "stored",
+  "σ": "population",
+  "⊢": "results",
+  "△": "delta",
+  "Ω": "omega",
+  "λ": "lambda",
+  "μ": "mu",
+  "π": "pi",
+  "ε": "epsilon",
+  "θ": "theta",
+  "α": "alpha",
+  "β": "beta",
+  "γ": "gamma",
+  "δ": "deltaVal",
+  "φ": "phi",
+  "ψ": "psi",
+  "ρ": "rho",
+  "τ": "tau",
+  "ω": "omegaVal",
+  "∞": "Infinity",
+  "∅": "null",
+  "↺": "Failed",
+};
+
+function replaceInlineSymbols(line: string): string {
   let result = line;
+  for (const [sym, replacement] of Object.entries(INLINE_SYMBOL_IDENTIFIERS)) {
+    if (result.includes(sym)) {
+      result = result.split(sym).join(replacement);
+    }
+  }
+  return result;
+}
+
+function reverseSymbolSubstitution(line: string, reverseMap: Map<string, string>): string {
+  let result = replaceInlineSymbols(line);
   const sortedSymbols = [...reverseMap.keys()].sort((a, b) => b.length - a.length);
   for (const sym of sortedSymbols) {
     if (result.includes(sym)) {
@@ -347,14 +384,15 @@ export function transpileTStoJS(tsSource: string): { success: boolean; jsSource:
     js = js.replace(/(\w+\s*\([^)]*\))\s*:\s*(?:void|string|number|boolean|any|never|unknown|Promise<[^>]*>)\s*\{/g, "$1 {");
     js = js.replace(/(\w+\s*\([^)]*\))\s*:\s*[A-Z]\w*(?:<[^>]*>)?(?:\[\])?\s*\{/g, "$1 {");
 
-    js = js.replace(/return\s+\[\]\s*\n/g, "return [\n");
-    js = js.replace(/return\s+\[\s*\]\s*$/gm, "return [");
+    js = js.replace(/return\s+\[\s*\]\s*$/gm, "return []");
     
     js = js.replace(/\bimport\.meta\.\w+/g, "undefined");
 
     js = js.replace(/\{\s*(\w+)\s*,\s*\.\.\.(\w+)\s*:\s*([^}]+)\}/g, "{ $1, $2: $3 }");
     js = js.replace(/\{ (variation|adjusted), \.\.\.(\w+): ([^}]+)\}/g, "{ $1: true, $2: $3 }");
 
+    js = js.replace(/\/\*\s*\}\s*\*\/\s*,/g, "");
+    js = js.replace(/\/\*\s*\}\s*\*\/\s*;/g, "");
     js = js.replace(/,\s*,/g, ",");
     js = js.replace(/\(\s*,/g, "(");
     js = js.replace(/,\s*\)/g, ")");
@@ -462,12 +500,23 @@ export function transpileTStoJS(tsSource: string): { success: boolean; jsSource:
         continue;
       }
 
-      if (/\.\.\.\w+\s*,/.test(trimLine)) {
-        line = line.replace(/(\.\.\.\w+)\s*,\s*(\w+)/g, "$2, $1");
+      if (/\(\s*\.\.\.\w+\s*,/.test(trimLine)) {
+        line = line.replace(/\((\.\.\.\w+)\s*,\s*(\w+)/g, "($2, $1");
       }
 
-      if (/\bcase\s*=>/.test(line) || /\bcase\s*\)/.test(line)) {
-        line = line.replace(/\bcase\b(?=\s*[=)>,])/g, "_case");
+      if (/\bcase\b/.test(line) && !/\bswitch\b/.test(line) && !/^\s*case\s+.+:/.test(line)) {
+        line = line.replace(/\bcase\b(?=\s*[=)>,\.])/g, "_case");
+        line = line.replace(/\(case\b/g, "(_case");
+        line = line.replace(/,\s*case\b/g, ", _case");
+        line = line.replace(/\bcase\b(?=\s*=>)/g, "_case");
+      }
+
+      const JS_RESERVED = ["delete", "default", "debugger", "do", "else", "finally", "in", "instanceof", "new", "return", "throw", "try", "typeof", "void", "with"];
+      for (const kw of JS_RESERVED) {
+        const kwAsVar = new RegExp(`(?<=[.(,=\\s])${kw}\\s*=>`, "g");
+        if (kwAsVar.test(line)) {
+          line = line.replace(kwAsVar, `_${kw} =>`);
+        }
       }
 
       if (/\bswitch\b/.test(trimLine)) {
@@ -479,10 +528,10 @@ export function transpileTStoJS(tsSource: string): { success: boolean; jsSource:
       const closeParens = (trimLine.match(/\)/g) || []).length;
       const openBrackets = (trimLine.match(/\[/g) || []).length;
       const closeBrackets = (trimLine.match(/\]/g) || []).length;
-      if (openParens > closeParens && !trimLine.endsWith("{") && !trimLine.endsWith(",")) {
+      if (openParens > closeParens && !trimLine.endsWith("{") && !trimLine.endsWith(",") && !trimLine.endsWith("(") && !/\.\w+\(\s*$/.test(trimLine)) {
         line = line + ")".repeat(openParens - closeParens);
         if (/function|=>/.test(trimLine)) line += " {}";
-      } else if (openBrackets > closeBrackets && !trimLine.endsWith(",")) {
+      } else if (openBrackets > closeBrackets && !trimLine.endsWith(",") && !/\breturn\s+\[$/.test(trimLine) && !/^\s*\[$/.test(trimLine)) {
         line = line + "]".repeat(openBrackets - closeBrackets);
       } else if (/function\s*\*?\s+\w+\([^)]*$/.test(trimLine)) {
         line = line + ") {}";
@@ -492,11 +541,49 @@ export function transpileTStoJS(tsSource: string): { success: boolean; jsSource:
     }
     js = processedLines.join("\n");
 
+    js = js.replace(/(\w+)\((\d+)\)→\w+⟨\d+⟩\{/g, (m, fn, params) => {
+      return `function ${fn}() {`;
+    });
+    js = js.replace(/\}⟨\/\w+⟩/g, "}");
+    js = js.replace(/→\w+⟨\d+⟩/g, "");
+    js = js.replace(/⟨[^⟩]*⟩/g, "");
+
     js = js.replace(/[^\x00-\x7F\u00C0-\u024F]/g, (ch) => {
       return `_u${ch.codePointAt(0)?.toString(16) || "0"}_`;
     });
 
-    js = js.replace(/function\s+\*\s+/g, "function ");
+    js = js.replace(/\)\s*:\s*(string|number|boolean|void|any|never|unknown|Promise)\b[^{;]*(?=\s*\{)/g, ") ");
+    js = js.replace(/\)\s*:\s*[A-Z]\w*(?:<[^>]*>)?(?:\[\])?\s*(?=\{)/g, ") ");
+    js = js.replace(/\)\s*:\s*\{[^}]*\}\s*(?=\{)/g, ") ");
+    js = js.replace(/(\w+)\s*:\s*(string|number|boolean|void|any|never|unknown)\s*([,)])/g, "$1 $3");
+    js = js.replace(/(\w+)\s*:\s*(string|number|boolean|void|any|never|unknown)\s*=/g, "$1 =");
+    js = js.replace(/(\w+)\s*\?\s*:\s*(string|number|boolean|void|any|never|unknown)[^,)=]*/g, "$1");
+    js = js.replace(/(\w+)\s*:\s*[A-Z]\w*(?:<[^>]*>)?(?:\[\])?\s*=/g, "$1 =");
+    js = js.replace(/(\w+)\s*:\s*[A-Z]\w*(?:<[^>]*>)?\s*([,)])/g, "$1 $2");
+
+    js = js.replace(/\bsequencevoid_u27e8_(\d+)_u27e9_/g, "sequenceVoid$1");
+    js = js.replace(/_u27e8_(\d+)_u27e9_/g, "_seq$1");
+    js = js.replace(/\b(\w+)_u27e8_/g, "$1_");
+    js = js.replace(/_u27e9_/g, "_");
+
+    js = js.replace(/`[^`]*\$\{[^}]*$/gm, (m) => m + "}" + "`");
+    let templateDepth = 0;
+    const tLines = js.split("\n");
+    for (let ti = 0; ti < tLines.length; ti++) {
+      const tl = tLines[ti];
+      for (let ci = 0; ci < tl.length; ci++) {
+        if (tl[ci] === '`') templateDepth = templateDepth === 0 ? 1 : 0;
+        if (tl[ci] === '$' && tl[ci+1] === '{' && templateDepth > 0) templateDepth++;
+        if (tl[ci] === '}' && templateDepth > 1) templateDepth--;
+      }
+      if (templateDepth > 1) {
+        tLines[ti] = tl + "}";
+        templateDepth = 1;
+      }
+    }
+    js = tLines.join("\n");
+
+    js = js.replace(/\bfunction\s+\*\s+/g, "function ");
     js = js.replace(/\byield\s+/g, "/* yield */ ");
     js = js.replace(/\bfor\s+await\s*\(/g, "for (");
     js = js.replace(/\bawait\s+/g, "/* await */ ");
@@ -517,7 +604,11 @@ export function transpileTStoJS(tsSource: string): { success: boolean; jsSource:
         }));
         braceDepth = 0;
       } else {
-        cleanedLines.push(line);
+        if (braceDepth === 0 && /^\s*return\b/.test(line)) {
+          cleanedLines.push(line.replace(/^\s*return\b/, "/* return */"));
+        } else {
+          cleanedLines.push(line);
+        }
         braceDepth = newDepth;
       }
     }
@@ -566,8 +657,13 @@ export function transpileTStoJS(tsSource: string): { success: boolean; jsSource:
 }
 
 export function validateSyntax(jsSource: string, fileName: string): { valid: boolean; error?: string } {
+  let scriptSource = jsSource
+    .replace(/^\s*export\s+default\s+/gm, "")
+    .replace(/^\s*export\s+(?:async\s+)?(?=function|class|const|let|var|enum)/gm, "")
+    .replace(/^\s*export\s*\{[^}]*\}\s*;?\s*$/gm, "")
+    .replace(/^\s*import\s+.*$/gm, "// import-stripped");
   try {
-    new vm.Script(jsSource, { filename: fileName });
+    new vm.Script(scriptSource, { filename: fileName });
     return { valid: true };
   } catch (err: any) {
     return { valid: false, error: err.message?.slice(0, 200) };
@@ -1092,8 +1188,16 @@ export function transpileWithLearning(sclContent: string, fileName: string): { s
     return { success: false, jsSource: "", learningApplied: false, error: decoded.errors.join("; ") };
   }
 
+  if (fileName === "contextRecallManager_gen1.scl") {
+    console.log("[SCL-DEBUG] contextRecallManager decoded source (first 200):", decoded.decodedSource.slice(0, 200));
+  }
+
   const transpiled = transpileTStoJS(decoded.decodedSource);
   if (!transpiled.success) {
+    if (fileName === "contextRecallManager_gen1.scl") {
+      console.log("[SCL-DEBUG] contextRecallManager transpile FAILED:", transpiled.error);
+      console.log("[SCL-DEBUG] transpiled source (first 500):", transpiled.jsSource.slice(0, 500));
+    }
     return { success: false, jsSource: "", learningApplied: false, error: transpiled.error };
   }
 

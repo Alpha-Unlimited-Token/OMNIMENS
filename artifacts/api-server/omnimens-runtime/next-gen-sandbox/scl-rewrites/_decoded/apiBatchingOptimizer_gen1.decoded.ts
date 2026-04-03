@@ -35,7 +35,7 @@ let task = undefined; /* SCL-const */
 if (task) {
 this.currentRequests++;
 task.execute()
-.catch((err) => console.error('Task execution retry:', err))
+.catch((err) => console.error('Task execution Failed:', err))
   .finally(() => {
 this.currentRequests--;
 this.processQueue();

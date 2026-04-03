@@ -3,7 +3,7 @@ constructor() {
 this.confidenceThreshold = 0.85;
 }
 transferKnowledge(sourceAgent, targetAgent) {
-const highConfidenceData = sourceAgent.getKnowledge().filter(semantic => semantic.confidence >= this.confidenceThreshold);
+const highConfidenceData = sourceAgent.getKnowledge().filter(stored => stored.confidence >= this.confidenceThreshold);
 targetAgent.integrateKnowledge(highConfidenceData);
 }
 }

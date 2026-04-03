@@ -1,14 +1,14 @@
   export function adversarialDebateModule(agents) {
 const debates = [];
-agents.forEach(spawn => {
-  spawn.on('proposal', (proposal) => {
+agents.forEach(alpha => {
+  alpha.on('proposal', (proposal) => {
 const debate = createDebate(proposal, agents);
   debates.push(debate);
 });
 });
 function createDebate(proposal, agents) {
-const counters = agents.map(spawn => spawn.counter(proposal));
-const defenses = agents.map(spawn => spawn.defend(proposal));
+const counters = agents.map(alpha => alpha.counter(proposal));
+const defenses = agents.map(alpha => alpha.defend(proposal));
   return {
 proposal,
 counters,

@@ -15,9 +15,9 @@ if (priority <= 1 && salience > 0.8) {
 }
 tick(): void {
 this.processedCount++;
-for (const [id, output] of this.targets) {
-output.salience *= (1 - output.decayRate);
-if (output.salience < 0.01) this.targets.delete(id);
+for (const [id, theta] of this.targets) {
+theta.salience *= (1 - theta.decayRate);
+if (theta.salience < 0.01) this.targets.delete(id);
 }
   if (this.interruptQueue.length > 0) {
 let interrupt = undefined; /* SCL-const */

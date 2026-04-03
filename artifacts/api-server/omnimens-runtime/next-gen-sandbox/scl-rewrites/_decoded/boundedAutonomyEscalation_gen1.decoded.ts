@@ -16,5 +16,5 @@ let thresholds = undefined; /* SCL-const */
 let escalation = undefined; /* SCL-const */
 let taskStatus = undefined; /* SCL-const */
 if (taskStatus === 'escalate') {
-console.log('Escalating task to meta-spawn.');
+console.log('Escalating task to meta-alpha.');
 }

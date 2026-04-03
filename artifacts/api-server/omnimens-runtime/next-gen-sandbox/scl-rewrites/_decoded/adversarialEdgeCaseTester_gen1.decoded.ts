@@ -1,7 +1,7 @@
   export function simulateAdversarialCases(agentOutputs) {
 const edgeCases = generateEdgeCases();
-const report = edgeCases.map(case => testAgentOutput(agentOutputs, case));
-  return analyzeResults(report);
+const results = edgeCases.map(case => testAgentOutput(agentOutputs, case));
+  return analyzeResults(results);
 }
 function generateEdgeCases() {
   return [
@@ -19,9 +19,9 @@ actualOutput,
 passed: actualOutput === expectedOutput
 };
 }
-function analyzeResults(report) {
-const passed = report.filter(r => r.passed).length;
-const total = report.length;
+function analyzeResults(results) {
+const passed = results.filter(r => r.passed).length;
+const total = results.length;
   return {
 passed,
 total,

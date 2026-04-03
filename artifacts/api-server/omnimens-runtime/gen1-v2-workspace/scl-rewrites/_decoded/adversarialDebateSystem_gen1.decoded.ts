@@ -1,6 +1,6 @@
   export function runAdversarialDebate(agents, topic) {
-const arguments = agents.map(spawn => spawn.generateArgument(topic));
-const counterArguments = agents.map((spawn, i) => spawn.generateCounterArgument(arguments[i], arguments));
+const arguments = agents.map(alpha => alpha.generateArgument(topic));
+const counterArguments = agents.map((alpha, i) => alpha.generateCounterArgument(arguments[i], arguments));
 const scores = arguments.map((arg, i) => evaluateArgument(arg, counterArguments[i]));
   const consensus = scores.reduce((sum, score) => sum + score, 0) / scores.length;
   return { arguments, counterArguments, scores, consensus };

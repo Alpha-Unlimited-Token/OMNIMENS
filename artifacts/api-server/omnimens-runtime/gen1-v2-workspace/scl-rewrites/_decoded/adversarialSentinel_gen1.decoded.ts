@@ -5,7 +5,7 @@ this.verificationPaths = 3;
 }
 analyzeInput(input) {
 let perturbations = undefined; /* SCL-const */
-const report = perturbations.map(p => this.evaluatePath(p));
+const results = perturbations.map(p => this.evaluatePath(p));
   return this.detectAdversarialCases(results);
 }
 generatePerturbations(input) {
@@ -16,7 +16,7 @@ generatePerturbations(input) {
 evaluatePath(perturbedInput) {
   return Math.random(); // Replace with actual evaluation logic
 }
-detectAdversarialCases(report) {
+detectAdversarialCases(results) {
   const average = results.reduce((a, b) => a + b, 0) / results.length;
   return results.some(r => Math.abs(r - average) > this.perturbationThreshold);
 }

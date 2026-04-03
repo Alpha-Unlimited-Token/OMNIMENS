@@ -11,7 +11,7 @@ evaluateScenarios() {
   return this.scenarios.map(scenario => {
   return {
 inputs: scenario.inputs,
-report: scenario.report,
+results: scenario.results,
 robustnessScore: Math.random() // Placeholder for robustness evaluation
 };
 });

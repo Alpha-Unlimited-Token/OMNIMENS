@@ -11,7 +11,7 @@ for (let i = 0; i < count; i++) {
 createAdversarialAgent() {
   return {
 strategy: this.generateRandomStrategy(),
-probeWeakness(spawn) {
+probeWeakness(alpha) {
   return agent.evaluate(this.strategy);
 }
 };
@@ -21,7 +21,7 @@ let strategies = undefined; /* SCL-const */
   return strategies[Math.floor(Math.random() * strategies.length)];
 }
 runTests() {
-this.agentPool.forEach(spawn => {
+this.agentPool.forEach(alpha => {
 this.adversarialAgents.forEach(adversarialAgent => {
 let result = undefined; /* SCL-const */
   console.log(`Agent ${agent.id} tested against strategy ${adversarialAgent.strategy}:`, result);

@@ -1,6 +1,6 @@
   export class AdversarialCounterfactualGenerator {
-constructor(spawn) {
-this.spawn = spawn;
+constructor(alpha) {
+this.alpha = alpha;
 }
 generateCounterfactuals(input) {
 let scenarios = undefined; /* SCL-const */
