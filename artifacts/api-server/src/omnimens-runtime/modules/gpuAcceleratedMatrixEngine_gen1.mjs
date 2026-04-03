@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuAcceleratedMatrixEngine
- * Written: 2026-04-03T04:12:09.895Z
+ * Written: 2026-04-03T16:08:20.664Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,139 +18,165 @@
 
 // gpuAcceleratedMatrixEngine.mjs
 
+'use strict';
+
 import { createHash } from 'crypto';
 
 /**
- * Creates a WebGL context for GPU-accelerated computations.
- * @returns {WebGLRenderingContext} WebGL context
+ * Generates a unique hash for caching purposes.
+ * Useful for identifying matrix operations.
  */
-export function createWebGLContext() {
-  const canvas = new OffscreenCanvas(1, 1);
-  const gl = canvas.getContext('webgl');
-  if (!gl) throw new Error('WebGL not supported.');
-  return gl;
+export function generateHash(input) {
+    const hash = createHash('sha256');
+    hash.update(JSON.stringify(input));
+    return hash.digest('hex');
 }
 
 /**
- * Compiles a WebGL shader.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {string} source - The GLSL source code.
- * @param {number} type - The type of shader (vertex or fragment).
- * @returns {WebGLShader} Compiled shader.
+ * Validates a matrix structure to ensure it is a proper 2D array.
+ * Throws an error if validation fails.
  */
-export function compileShader(gl, source, type) {
-  const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    const error = gl.getShaderInfoLog(shader);
-    gl.deleteShader(shader);
-    throw new Error(`Shader compilation failed: ${error}`);
-  }
-  return shader;
-}
-
-/**
- * Creates a WebGL program from vertex and fragment shaders.
- * @param {WebGLRenderingContext} gl - The WebGL context.
- * @param {string} vertexSource - Vertex shader source code.
- * @param {string} fragmentSource - Fragment shader source code.
- * @returns {WebGLProgram} Linked WebGL program.
- */
-export function createProgram(gl, vertexSource, fragmentSource) {
-  const vertexShader = compileShader(gl, vertexSource, gl.VERTEX_SHADER);
-  const fragmentShader = compileShader(gl, fragmentSource, gl.FRAGMENT_SHADER);
-  const program = gl.createProgram();
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-  gl.linkProgram(program);
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    const error = gl.getProgramInfoLog(program);
-    gl.deleteProgram(program);
-    throw new Error(`Program linking failed: ${error}`);
-  }
-  return program;
-}
-
-/**
- * Performs GPU-accelerated matrix multiplication.
- * @param {Float32Array} A - First matrix (flattened).
- * @param {Float32Array} B - Second matrix (flattened).
- * @param {number} rowsA - Number of rows in A.
- * @param {number} colsA - Number of columns in A (and rows in B).
- * @param {number} colsB - Number of columns in B.
- * @returns {Float32Array} Resulting matrix (flattened).
- */
-export function gpuMatrixMultiply(A, B, rowsA, colsA, colsB) {
-  const gl = createWebGLContext();
-
-  const vertexSource = `
-    attribute vec2 position;
-    void main() {
-      gl_Position = vec4(position, 0.0, 1.0);
+export function validateMatrix(matrix) {
+    if (!Array.isArray(matrix) || matrix.length === 0 || !Array.isArray(matrix[0])) {
+        throw new Error('Invalid matrix: Must be a non-empty 2D array.');
     }
-  `;
+}
 
-  const fragmentSource = `
-    precision highp float;
-    uniform sampler2D A;
-    uniform sampler2D B;
-    uniform int rowsA;
-    uniform int colsA;
-    uniform int colsB;
-    void main() {
-      ivec2 coords = ivec2(gl_FragCoord.xy);
-      float sum = 0.0;
-      for (int i = 0; i < 1024; i++) {
-        if (i >= colsA) break;
-        float a = texture2D(A, vec2(float(coords.y) / float(rowsA), float(i) / float(colsA))).r;
-        float b = texture2D(B, vec2(float(i) / float(colsA), float(coords.x) / float(colsB))).r;
-        sum += a * b;
-      }
-      gl_FragColor = vec4(sum, 0.0, 0.0, 1.0);
+/**
+ * Performs matrix multiplication using pure JavaScript.
+ * This is a fallback method if GPU acceleration is unavailable.
+ */
+export function multiplyMatrices(matrixA, matrixB) {
+    validateMatrix(matrixA);
+    validateMatrix(matrixB);
+
+    const rowsA = matrixA.length;
+    const colsA = matrixA[0].length;
+    const rowsB = matrixB.length;
+    const colsB = matrixB[0].length;
+
+    if (colsA !== rowsB) {
+        throw new Error('Matrix multiplication error: Number of columns in matrixA must equal number of rows in matrixB.');
     }
-  `;
 
-  const program = createProgram(gl, vertexSource, fragmentSource);
-  gl.useProgram(program);
+    const result = Array(rowsA).fill(null).map(() => Array(colsB).fill(0));
 
-  // Texture setup and data upload omitted for brevity.
-  // This would involve creating textures for A and B, uploading their data,
-  // and rendering to a framebuffer to extract the result.
+    for (let i = 0; i < rowsA; i++) {
+        for (let j = 0; j < colsB; j++) {
+            for (let k = 0; k < colsA; k++) {
+                result[i][j] += matrixA[i][k] * matrixB[k][j];
+            }
+        }
+    }
 
-  // Placeholder: Return a zero matrix for now.
-  return new Float32Array(rowsA * colsB).fill(0);
+    return result;
 }
 
 /**
- * Hashes a matrix to ensure integrity or for caching purposes.
- * @param {Float32Array} matrix - The matrix to hash.
- * @returns {string} SHA-256 hash of the matrix.
+ * Computes the inverse of a matrix using Gaussian elimination.
+ * Only works for square matrices.
  */
-export function hashMatrix(matrix) {
-  const hash = createHash('sha256');
-  hash.update(new Uint8Array(matrix.buffer));
-  return hash.digest('hex');
+export function invertMatrix(matrix) {
+    validateMatrix(matrix);
+
+    const size = matrix.length;
+    if (matrix.some(row => row.length !== size)) {
+        throw new Error('Matrix inversion error: Matrix must be square.');
+    }
+
+    // Create augmented matrix
+    const augmented = matrix.map((row, i) => (
+        [...row, ...Array(size).fill(0).map((_, j) => (i === j ? 1 : 0))]
+    ));
+
+    // Perform Gaussian elimination
+    for (let i = 0; i < size; i++) {
+        // Pivot
+        let maxRow = i;
+        for (let k = i + 1; k < size; k++) {
+            if (Math.abs(augmented[k][i]) > Math.abs(augmented[maxRow][i])) {
+                maxRow = k;
+            }
+        }
+        [augmented[i], augmented[maxRow]] = [augmented[maxRow], augmented[i]];
+
+        // Normalize row
+        const divisor = augmented[i][i];
+        if (divisor === 0) {
+            throw new Error('Matrix inversion error: Matrix is singular and cannot be inverted.');
+        }
+        for (let j = 0; j < 2 * size; j++) {
+            augmented[i][j] /= divisor;
+        }
+
+        // Eliminate other rows
+        for (let k = 0; k < size; k++) {
+            if (k !== i) {
+                const factor = augmented[k][i];
+                for (let j = 0; j < 2 * size; j++) {
+                    augmented[k][j] -= factor * augmented[i][j];
+                }
+            }
+        }
+    }
+
+    // Extract inverse matrix
+    return augmented.map(row => row.slice(size));
 }
 
 /**
- * Computes eigenvalues of a matrix (CPU fallback for now).
- * @param {Float32Array} matrix - The input matrix (flattened).
- * @param {number} size - The size of the square matrix.
- * @returns {Float32Array} Eigenvalues of the matrix.
+ * Placeholder for GPU-accelerated eigenvalue decomposition.
+ * Currently not implemented due to lack of GPU.js support in Node.js.
  */
-export function computeEigenvalues(matrix, size) {
-  // Placeholder: Return a zero vector for now.
-  return new Float32Array(size).fill(0);
+export function eigenDecomposition(matrix) {
+    throw new Error('Eigenvalue decomposition is currently not implemented.');
 }
 
 /**
- * Updates a Hopfield network pattern (CPU fallback for now).
- * @param {Float32Array} weights - Weight matrix (flattened).
- * @param {Float32Array} state - Current state vector.
- * @returns {Float32Array} Updated state vector.
+ * Utility function to check if GPU acceleration is available.
+ * Returns false since GPU.js is not supported in Node.js environments.
  */
-export function hopfieldUpdate(weights, state) {
-  // Placeholder: Return the input state for now.
-  return state;
+export function isGPUAvailable() {
+    return false; // Placeholder for future GPU.js integration.
 }
+
+/**
+ * Computes the determinant of a square matrix recursively.
+ */
+export function determinant(matrix) {
+    validateMatrix(matrix);
+
+    const size = matrix.length;
+    if (matrix.some(row => row.length !== size)) {
+        throw new Error('Determinant error: Matrix must be square.');
+    }
+
+    if (size === 1) {
+        return matrix[0][0];
+    }
+
+    if (size === 2) {
+        return matrix[0][0] * matrix[1][1] - matrix[0][1] * matrix[1][0];
+    }
+
+    let det = 0;
+    for (let i = 0; i < size; i++) {
+        const subMatrix = matrix.slice(1).map(row => row.filter((_, colIndex) => colIndex !== i));
+        det += matrix[0][i] * determinant(subMatrix) * (i % 2 === 0 ? 1 : -1);
+    }
+
+    return det;
+}
+
+/**
+ * Exports utility functions for matrix operations.
+ */
+export const matrixUtils = {
+    validateMatrix,
+    multiplyMatrices,
+    invertMatrix,
+    determinant,
+    eigenDecomposition,
+    isGPUAvailable,
+    generateHash
+};

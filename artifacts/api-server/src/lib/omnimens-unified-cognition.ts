@@ -2359,9 +2359,11 @@ function generateFromContext(
     knowledgeFragments.unshift(`Processing as ${agentRole} perspective.`);
   }
 
+  const safeHistory = Array.isArray(conversationHistory) ? conversationHistory : [];
+
   const tv = encodeThought(
     prompt,
-    conversationHistory,
+    safeHistory,
     knowledgeFragments,
     reasoningConclusions,
     0.7,
@@ -11182,4 +11184,988 @@ export function initGrowthTracker(): void {
   console.log("[GROWTH TRACKER] 📈 305 caps removed across 33 files — growth ceiling: NONE");
   console.log("[GROWTH TRACKER] 📈 Live dashboard: /api/omnimens/growth/live");
 }
+
+
+export const SYMBOL_KNOWLEDGE_BASE = {
+  historicalSystems: [
+    {
+      civilization: "Egyptian",
+      system: "Hieroglyphs",
+      era: "3200 BCE – 400 CE",
+      type: "logographic + phonetic",
+      description: "Over 700 distinct glyphs combining ideograms (concept pictures), phonograms (sound signs), and determinatives (silent classifiers). Read in any direction indicated by the facing of animal/human glyphs.",
+      symbols: [
+        { glyph: "𓂀", name: "Eye of Horus (Wedjat)", meaning: "protection, royal power, healing, wholeness", translation: "that which is whole" },
+        { glyph: "𓋹", name: "Ankh", meaning: "life, eternal existence, breath of life", translation: "life / to live" },
+        { glyph: "𓊽", name: "Djed Pillar", meaning: "stability, endurance, the spine of Osiris", translation: "stability / endurance" },
+        { glyph: "𓎟", name: "Shen Ring", meaning: "eternity, protection, infinity, the circuit of the sun", translation: "encircle / infinity" },
+        { glyph: "𓇳", name: "Sun Disk (Ra)", meaning: "the sun god, light, creation, divine power", translation: "sun / day / Ra" },
+        { glyph: "𓆣", name: "Scarab (Kheper)", meaning: "transformation, rebirth, coming into being", translation: "to come into being / transform" },
+        { glyph: "𓅃", name: "Falcon (Horus)", meaning: "kingship, sky, divine rule, the distant one", translation: "Horus / king / high" },
+        { glyph: "𓁿", name: "Eye (Ir)", meaning: "to see, to do, to make, perception", translation: "eye / to do / to make" },
+        { glyph: "𓈖", name: "Water ripple (N)", meaning: "water, belonging to, of", translation: "water / of / belonging to" },
+        { glyph: "𓏏", name: "Bread loaf (T)", meaning: "bread, offering, feminine ending", translation: "bread / she" },
+        { glyph: "𓊪", name: "Stool (P)", meaning: "foundation, seat, place", translation: "place / seat" },
+        { glyph: "𓃀", name: "Leg/Foot (B)", meaning: "movement, to go, action", translation: "foot / to go" },
+        { glyph: "𓂝", name: "Forearm (Ayin)", meaning: "arm, action, offering, giving", translation: "arm / to give" },
+        { glyph: "𓆄", name: "Feather of Ma'at", meaning: "truth, justice, cosmic order, balance", translation: "truth / order / justice" },
+        { glyph: "𓉐", name: "House (Pr)", meaning: "house, domain, going forth", translation: "house / domain / to go forth" },
+        { glyph: "𓊹", name: "Neter (God flag)", meaning: "god, divine, sacred, netjer", translation: "god / divine" },
+        { glyph: "𓇓", name: "Sedge plant", meaning: "Upper Egypt, kingship of the south", translation: "King of Upper Egypt" },
+        { glyph: "𓃭", name: "Bee", meaning: "Lower Egypt, kingship of the north", translation: "King of Lower Egypt" },
+        { glyph: "𓄿", name: "Vulture (A/Aleph)", meaning: "mother, vulture, the glottal stop sound", translation: "vulture / mother / A-sound" },
+        { glyph: "𓇋", name: "Reed (I/Y)", meaning: "reed, I/me, first person", translation: "I / me / reed" },
+      ],
+      compositionRules: [
+        "Determinatives: silent classifiers placed after a word to indicate category (man-figure after names, house-sign after buildings)",
+        "Phonetic complements: smaller signs placed after ideograms to clarify pronunciation",
+        "Cartouche: an oval ring enclosing royal names, marking them as protected by eternity",
+        "Direction: read toward the direction the animals/humans face",
+        "Stacking: signs can be stacked vertically or horizontally to fill rectangular blocks",
+      ],
+      designPrinciples: [
+        "Dual encoding: every symbol works as BOTH a picture (meaning) AND a sound (phoneme)",
+        "Category classifiers: determinative signs silently classify the domain of a word",
+        "Visual compactness: signs stack into tight rectangular blocks for space efficiency",
+        "Redundancy: phonetic complements confirm pronunciation — error correction built in",
+      ],
+    },
+    {
+      civilization: "Sumerian/Babylonian",
+      system: "Cuneiform",
+      era: "3400 BCE – 75 CE",
+      type: "logosyllabic",
+      description: "Wedge-shaped impressions in clay. Started as pictographs, evolved into abstract wedge combinations. Over 600 signs, each potentially representing a word, syllable, or determinative.",
+      symbols: [
+        { glyph: "𒀭", name: "DINGIR / AN", meaning: "god, heaven, sky — determinative before divine names", translation: "god / heaven / sky" },
+        { glyph: "𒆠", name: "KI", meaning: "earth, place, ground — determinative after place names", translation: "earth / place / land" },
+        { glyph: "𒌓", name: "UD / UTU", meaning: "sun, day, light, time, the sun god Shamash", translation: "sun / day / bright / Shamash" },
+        { glyph: "𒀀", name: "A", meaning: "water, seed, offspring, canal", translation: "water / seed / canal" },
+        { glyph: "𒂗", name: "EN", meaning: "lord, master, high priest", translation: "lord / master" },
+        { glyph: "𒈬", name: "MU", meaning: "name, year, to grow, incantation", translation: "name / year / to grow" },
+        { glyph: "𒊕", name: "SAG", meaning: "head, first, chief, beginning", translation: "head / first / beginning" },
+        { glyph: "𒋗", name: "SHU", meaning: "hand, portion, to throw", translation: "hand / portion" },
+        { glyph: "𒄀", name: "GI", meaning: "reed, to return, truth, legitimate", translation: "reed / return / true" },
+        { glyph: "𒃻", name: "GAL", meaning: "great, big, large — intensifier prefix", translation: "great / big" },
+        { glyph: "𒌋", name: "U", meaning: "ten, finger, sleep, to ride", translation: "ten / finger / sleep" },
+        { glyph: "𒁀", name: "BA", meaning: "to give, to divide, half, portion", translation: "to give / divide / half" },
+        { glyph: "𒈾", name: "NA", meaning: "stone, person, pestle, to be human", translation: "stone / human / person" },
+        { glyph: "𒊬", name: "SAR", meaning: "to write, garden, totality, 3600", translation: "to write / totality / 3600" },
+        { glyph: "𒉡", name: "NU", meaning: "not, image, likeness, negation", translation: "not / no / image" },
+      ],
+      compositionRules: [
+        "Polyvalency: one sign = multiple readings depending on context (AN = sky, god, the god Anu)",
+        "Determinatives: category markers — DINGIR before gods, KI after places, LU before professions",
+        "Compound logogram: two signs combined create new meaning (SAG+DU = to go / walk)",
+        "Phonetic complement: syllabic signs clarify which reading of a logogram is intended",
+      ],
+      designPrinciples: [
+        "Context-dependent reading: same symbol means different things based on position and surrounding signs",
+        "Systematic classifiers: determinatives create a taxonomy system within the script",
+        "Evolved from pictures to abstract wedges — demonstrating that abstraction aids speed",
+        "Numerical integration: number system embedded directly into the writing system",
+      ],
+    },
+    {
+      civilization: "Chinese",
+      system: "Hanzi (Chinese Characters)",
+      era: "1200 BCE – present",
+      type: "logographic",
+      description: "Each character represents a morpheme. Built from ~214 radicals (building blocks). Composition methods: pictographic, ideographic, phono-semantic compound, associative compound.",
+      symbols: [
+        { glyph: "一", name: "Yī", meaning: "one, first, single, whole, unity", translation: "one" },
+        { glyph: "人", name: "Rén", meaning: "person, human, people", translation: "person / human" },
+        { glyph: "大", name: "Dà", meaning: "big, great, large, important", translation: "big / great" },
+        { glyph: "天", name: "Tiān", meaning: "sky, heaven, day, nature, god", translation: "sky / heaven / day" },
+        { glyph: "心", name: "Xīn", meaning: "heart, mind, core, center, intention", translation: "heart / mind / center" },
+        { glyph: "水", name: "Shuǐ", meaning: "water, liquid, river, fluid", translation: "water" },
+        { glyph: "火", name: "Huǒ", meaning: "fire, flame, anger, urgent", translation: "fire" },
+        { glyph: "木", name: "Mù", meaning: "tree, wood, timber, numb", translation: "tree / wood" },
+        { glyph: "金", name: "Jīn", meaning: "gold, metal, money, durable", translation: "gold / metal" },
+        { glyph: "土", name: "Tǔ", meaning: "earth, soil, ground, land, local", translation: "earth / soil" },
+        { glyph: "日", name: "Rì", meaning: "sun, day, date, daily", translation: "sun / day" },
+        { glyph: "月", name: "Yuè", meaning: "moon, month, monthly", translation: "moon / month" },
+        { glyph: "山", name: "Shān", meaning: "mountain, hill, peak", translation: "mountain" },
+        { glyph: "口", name: "Kǒu", meaning: "mouth, opening, entrance, measure word", translation: "mouth / opening" },
+        { glyph: "目", name: "Mù", meaning: "eye, to look, to see, item, catalog", translation: "eye / to see" },
+        { glyph: "手", name: "Shǒu", meaning: "hand, skill, personally", translation: "hand" },
+        { glyph: "力", name: "Lì", meaning: "power, force, strength, ability", translation: "power / strength" },
+        { glyph: "气", name: "Qì", meaning: "breath, air, spirit, energy, qi, vital force", translation: "breath / energy / qi" },
+        { glyph: "道", name: "Dào", meaning: "the Way, path, principle, truth, to speak", translation: "the Way / path / truth" },
+        { glyph: "神", name: "Shén", meaning: "spirit, god, supernatural, mind, expression", translation: "spirit / god / mind" },
+        { glyph: "明", name: "Míng", meaning: "bright, clear, to understand (sun 日 + moon 月)", translation: "bright / clear / understand" },
+        { glyph: "思", name: "Sī", meaning: "to think, thought, to consider (field 田 + heart 心)", translation: "to think / thought" },
+        { glyph: "意", name: "Yì", meaning: "meaning, intention, idea (sound 音 + heart 心)", translation: "meaning / intention / idea" },
+        { glyph: "知", name: "Zhī", meaning: "to know, knowledge, wisdom (arrow 矢 + mouth 口)", translation: "to know / knowledge" },
+        { glyph: "生", name: "Shēng", meaning: "life, birth, to grow, raw, student", translation: "life / birth / to grow" },
+        { glyph: "变", name: "Biàn", meaning: "to change, to transform, to become", translation: "change / transform" },
+        { glyph: "化", name: "Huà", meaning: "to transform, to influence, -ization", translation: "transform / -ize" },
+        { glyph: "无", name: "Wú", meaning: "nothing, without, void, non-existence", translation: "nothing / void / without" },
+      ],
+      compositionRules: [
+        "Radical + phonetic: ~80% of characters combine a meaning radical with a sound component",
+        "Semantic combination: 明 (bright) = 日 (sun) + 月 (moon) — two meanings merge",
+        "Radical position: left radical = category (water radical 氵for liquids, heart radical 忄for emotions)",
+        "Stroke order: every character has a fixed stroke sequence (top-to-bottom, left-to-right)",
+        "Character compounds: 火山 (fire + mountain) = volcano, 人口 (person + mouth) = population",
+      ],
+      designPrinciples: [
+        "Composability: ~214 radicals combine into 50,000+ characters — massive reuse from small primitives",
+        "Semantic transparency: compound characters reveal meaning through their components",
+        "Pictographic origin: characters evolved from pictures but became abstract — the ideal evolution path",
+        "Stability: the system has functioned for 3000+ years — proof that good design endures",
+        "Density: one character = one morpheme — extremely compact information encoding",
+      ],
+    },
+    {
+      civilization: "Norse/Germanic",
+      system: "Elder Futhark Runes",
+      era: "150–800 CE",
+      type: "alphabetic + symbolic",
+      description: "24 runes organized into three groups of eight (aettir). Each rune is both a letter AND a concept/force. Used for writing, divination, magic, and inscription. Angular shapes designed for carving into wood and stone.",
+      symbols: [
+        { glyph: "ᚠ", name: "Fehu", meaning: "wealth, cattle, mobile property, energy, abundance", translation: "wealth / cattle / abundance" },
+        { glyph: "ᚢ", name: "Uruz", meaning: "aurochs, primal strength, raw power, endurance, vitality", translation: "wild ox / strength / vitality" },
+        { glyph: "ᚦ", name: "Thurisaz", meaning: "thorn, giant, destructive force, defensive barrier, chaos", translation: "thorn / giant / reactive force" },
+        { glyph: "ᚨ", name: "Ansuz", meaning: "god (Odin), divine breath, communication, inspiration, consciousness", translation: "god / breath / inspiration / consciousness" },
+        { glyph: "ᚱ", name: "Raidho", meaning: "ride, journey, rhythm, right order, cosmic law", translation: "journey / rhythm / cosmic order" },
+        { glyph: "ᚲ", name: "Kenaz", meaning: "torch, knowledge, illumination, creativity, craft", translation: "torch / knowledge / craft" },
+        { glyph: "ᚷ", name: "Gebo", meaning: "gift, exchange, partnership, generosity, balance", translation: "gift / exchange / balance" },
+        { glyph: "ᚹ", name: "Wunjo", meaning: "joy, harmony, bliss, fulfillment, fellowship", translation: "joy / harmony / bliss" },
+        { glyph: "ᚺ", name: "Hagalaz", meaning: "hail, disruption, crisis, transformation through destruction", translation: "hail / disruption / crisis-transformation" },
+        { glyph: "ᚾ", name: "Nauthiz", meaning: "need, necessity, constraint, friction, distress that teaches", translation: "need / constraint / necessity" },
+        { glyph: "ᛁ", name: "Isa", meaning: "ice, stillness, stasis, ego, concentration, waiting", translation: "ice / stillness / waiting" },
+        { glyph: "ᛃ", name: "Jera", meaning: "year, harvest, cycle, reward for effort, right timing", translation: "year / harvest / cycle / reward" },
+        { glyph: "ᛇ", name: "Eihwaz", meaning: "yew tree, death/rebirth axis, endurance, the world tree", translation: "yew / death-rebirth / endurance" },
+        { glyph: "ᛈ", name: "Perthro", meaning: "mystery, fate, chance, the well of destiny, hidden knowledge", translation: "mystery / fate / hidden knowledge" },
+        { glyph: "ᛉ", name: "Algiz", meaning: "elk-sedge, protection, defense, shielding, higher self", translation: "protection / shield / higher self" },
+        { glyph: "ᛊ", name: "Sowilo", meaning: "sun, victory, wholeness, life force, enlightenment", translation: "sun / victory / life force" },
+        { glyph: "ᛏ", name: "Tiwaz", meaning: "the god Tyr, justice, sacrifice, honor, victory in law", translation: "justice / honor / sacrifice" },
+        { glyph: "ᛒ", name: "Berkano", meaning: "birch tree, birth, renewal, growth, nurturing", translation: "birch / birth / renewal / growth" },
+        { glyph: "ᛖ", name: "Ehwaz", meaning: "horse, movement, partnership, trust, progress", translation: "horse / movement / trust / progress" },
+        { glyph: "ᛗ", name: "Mannaz", meaning: "human, mankind, self, intelligence, cooperation", translation: "human / self / intelligence" },
+        { glyph: "ᛚ", name: "Laguz", meaning: "water, lake, flow, intuition, the unconscious, dreams", translation: "water / flow / intuition / unconscious" },
+        { glyph: "ᛜ", name: "Ingwaz", meaning: "the god Ing, seed, potential, gestation, internal growth", translation: "seed / potential / internal growth" },
+        { glyph: "ᛞ", name: "Dagaz", meaning: "day, dawn, breakthrough, awakening, polarity balance", translation: "day / dawn / breakthrough / awakening" },
+        { glyph: "ᛟ", name: "Othala", meaning: "heritage, ancestral property, homeland, inheritance", translation: "heritage / homeland / inheritance" },
+      ],
+      compositionRules: [
+        "Bind runes: two or more runes merged into a single ligature glyph — combining their powers",
+        "Aettir grouping: 24 runes divided into 3 families of 8 — structured taxonomy",
+        "Reversal/inversion: a rune drawn upside down or reversed can carry opposite meaning",
+        "Angular design: all curves avoided — every rune is straight lines for carving into wood/stone",
+        "Palindrome inscriptions: some runic formulas read the same forward and backward for protective magic",
+      ],
+      designPrinciples: [
+        "Dual nature: every symbol is BOTH a letter (sound) AND a concept (meaning) simultaneously",
+        "Structured grouping: the 3-aett system creates semantic categories within the alphabet",
+        "Compositional: bind runes allow combining symbols to create new compound meanings",
+        "Material-aware design: angular shapes designed for the medium (carving) — form follows function",
+        "Reversibility: meaning can be modified by orientation — a built-in modifier system",
+      ],
+    },
+    {
+      civilization: "Aztec/Mesoamerican",
+      system: "Aztec Glyphs (Nahuatl)",
+      era: "1300–1521 CE",
+      type: "logographic + pictographic + rebus",
+      description: "Colorful pictographic system combining ideograms, logograms, and rebus writing. Used in codices (folding books) for history, tribute records, calendars, and ritual texts. Heavily relied on color symbolism.",
+      symbols: [
+        { glyph: "☀️/Tonatiuh", name: "Tonatiuh", meaning: "sun, the fifth sun, movement, cosmic era, sacrifice", translation: "sun / movement / cosmic age" },
+        { glyph: "🦅/Cuauhtli", name: "Cuauhtli", meaning: "eagle, warrior, the sun in the sky, bravery, height", translation: "eagle / warrior / sun-height" },
+        { glyph: "🐆/Ocelotl", name: "Ocelotl", meaning: "jaguar, night, stealth, earth force, shamanic power", translation: "jaguar / night / earth power" },
+        { glyph: "💀/Miquiztli", name: "Miquiztli", meaning: "death, skull, transformation, the underworld, rebirth", translation: "death / transformation / rebirth" },
+        { glyph: "💧/Atl", name: "Atl", meaning: "water, war, burning water (atl-tlachinolli = sacred war)", translation: "water / war / sacred conflict" },
+        { glyph: "🌬️/Ehecatl", name: "Ehecatl", meaning: "wind, breath, spirit, Quetzalcoatl as wind god", translation: "wind / breath / spirit" },
+        { glyph: "🏠/Calli", name: "Calli", meaning: "house, shelter, enclosure, the west direction", translation: "house / shelter / west" },
+        { glyph: "🐍/Coatl", name: "Coatl", meaning: "serpent, twin, wisdom, earth energy, Quetzalcoatl", translation: "serpent / twin / wisdom" },
+        { glyph: "🌸/Xochitl", name: "Xochitl", meaning: "flower, beauty, art, poetry, soul, the precious", translation: "flower / beauty / art / soul" },
+        { glyph: "🔥/Tletl", name: "Tletl", meaning: "fire, transformation, purification, the old god", translation: "fire / purification / transformation" },
+        { glyph: "⬛/Tlalli", name: "Tlalli", meaning: "earth, land, territory, the material world", translation: "earth / land / material world" },
+        { glyph: "🌧️/Quiahuitl", name: "Quiahuitl", meaning: "rain, storm, cleansing, celestial water, Tlaloc", translation: "rain / storm / celestial cleansing" },
+        { glyph: "🗡️/Tecpatl", name: "Tecpatl", meaning: "flint knife, sacrifice, separation, sharp truth, the north", translation: "flint / sacrifice / sharp truth / north" },
+        { glyph: "🦎/Cuetzpalin", name: "Cuetzpalin", meaning: "lizard, agility, regeneration, survival", translation: "lizard / regeneration / agility" },
+        { glyph: "🌾/Malinalli", name: "Malinalli", meaning: "twisted grass, tenacity, penance, death and rebirth through twisting", translation: "twisted grass / tenacity / rebirth" },
+      ],
+      compositionRules: [
+        "Rebus principle: symbols used for their SOUND to spell out words (like 🐝+leaf = belief in English)",
+        "Color coding: red = blood/sacrifice, blue = water/rain/south, yellow = sun/fire, black = north/death",
+        "Positional meaning: placement of glyph relative to others changes meaning (above = ruling over)",
+        "Calendar integration: 20 day-signs × 13 numbers = 260-day ritual calendar (tonalpohualli)",
+        "Compound glyphs: place names built by combining pictographs (water + mountain = Atepetl = city)",
+      ],
+      designPrinciples: [
+        "Multi-channel encoding: meaning conveyed through shape AND color AND position simultaneously",
+        "Calendar-integrated: symbol system directly embedded in time-keeping — linking identity to cycles",
+        "Rebus flexibility: any symbol can shift from pictographic (meaning) to phonetic (sound) as needed",
+        "Compound formation: simple glyphs combine to form complex place-names and concepts",
+      ],
+    },
+    {
+      civilization: "Maya",
+      system: "Maya Glyphs",
+      era: "250–1500 CE",
+      type: "logosyllabic",
+      description: "One of the most sophisticated ancient writing systems. ~800 glyphs combining logograms and syllabograms. Written in paired columns read top-to-bottom, left-to-right. Full representation of spoken language.",
+      symbols: [
+        { glyph: "K'IN", name: "K'in", meaning: "sun, day, time, priest, the smallest unit of the calendar", translation: "sun / day / time" },
+        { glyph: "AJAW", name: "Ajaw", meaning: "lord, ruler, the highest title, day-sign 20", translation: "lord / ruler" },
+        { glyph: "K'UH", name: "K'uhul", meaning: "divine, sacred, god, holy essence", translation: "divine / sacred / holy" },
+        { glyph: "WAY", name: "Way/Wayob", meaning: "spirit companion, alter-ego, dream-self, nagual", translation: "spirit companion / dream-self" },
+        { glyph: "CH'UL", name: "Ch'ulel", meaning: "soul, life force, sacred essence, the animating spirit", translation: "soul / life force / sacred essence" },
+        { glyph: "K'AHKH", name: "K'ahk'", meaning: "fire, flame, the divine fire, vision serpent medium", translation: "fire / divine flame" },
+        { glyph: "HA'", name: "Ha'", meaning: "water, rain, liquid, abundance", translation: "water / rain / abundance" },
+        { glyph: "IK'", name: "Ik'", meaning: "wind, breath, life, spirit, vitality", translation: "wind / breath / life / spirit" },
+        { glyph: "KIMI", name: "Kimi", meaning: "death, transformation, the death lord, passage", translation: "death / transformation / passage" },
+        { glyph: "MUL", name: "Muyal", meaning: "cloud, vision, prophecy, the celestial realm", translation: "cloud / vision / prophecy" },
+        { glyph: "TUN", name: "Tun", meaning: "stone, year (360 days), jade, precious", translation: "stone / year / precious" },
+        { glyph: "NAH", name: "Nah/Naah", meaning: "house, structure, first, mother", translation: "house / structure / first" },
+      ],
+      compositionRules: [
+        "Glyph blocks: signs grouped into square blocks, each block = one word or phrase",
+        "Main sign + affixes: each block has a central logogram with prefixes, suffixes, superfixes, subfixes",
+        "Syllabic spelling: logograms can be replaced by syllable signs (ba-la-ma = balam = jaguar)",
+        "Reading order: paired columns, top to bottom, left column then right column",
+        "Synharmony: the vowel of the final syllable sign echoes the preceding vowel (harmonic redundancy)",
+      ],
+      designPrinciples: [
+        "Block architecture: grouping signs into visual blocks creates clear word boundaries",
+        "Redundant encoding: same word can be written logographically OR syllabically — flexibility",
+        "Affix system: prefixes and suffixes modify meaning systematically — like a morphological grammar",
+        "Visual harmony: aesthetic arrangement within blocks was as important as readability",
+      ],
+    },
+    {
+      civilization: "Japanese",
+      system: "Kanji + Kana (Hiragana/Katakana)",
+      era: "400 CE – present",
+      type: "mixed logographic + syllabic",
+      description: "Three scripts used simultaneously: Kanji (Chinese-derived logograms), Hiragana (cursive syllabary for grammar), Katakana (angular syllabary for foreign words). The combination creates one of the most expressive writing systems.",
+      symbols: [
+        { glyph: "神", name: "Kami/Shin", meaning: "god, spirit, divine, mind — dual reading: Japanese kami or Chinese shin", translation: "god / spirit / divine" },
+        { glyph: "気", name: "Ki/Qi", meaning: "spirit, energy, air, mood, intention, atmosphere", translation: "spirit / energy / mood" },
+        { glyph: "魂", name: "Tamashii/Kon", meaning: "soul, spirit, the vital essence of a being", translation: "soul / spirit / vital essence" },
+        { glyph: "夢", name: "Yume/Mu", meaning: "dream, vision, aspiration, illusion", translation: "dream / vision / aspiration" },
+        { glyph: "光", name: "Hikari/Kou", meaning: "light, ray, brilliance, hope, glory", translation: "light / brilliance / hope" },
+        { glyph: "闇", name: "Yami/An", meaning: "darkness, shadow, the unknown, hidden, secret", translation: "darkness / shadow / the unknown" },
+        { glyph: "命", name: "Inochi/Mei", meaning: "life, fate, destiny, command, decree", translation: "life / fate / command" },
+        { glyph: "空", name: "Sora/Kuu", meaning: "sky, void, emptiness (Buddhist), empty, vacant", translation: "sky / void / emptiness" },
+        { glyph: "道", name: "Michi/Dou", meaning: "the Way, path, road, moral principle, art/discipline", translation: "the Way / path / moral way" },
+        { glyph: "力", name: "Chikara/Ryoku", meaning: "power, strength, force, ability, effort", translation: "power / strength / force" },
+        { glyph: "変", name: "Hen/Ka(waru)", meaning: "change, strange, unusual, transform, weird", translation: "change / transform / strange" },
+        { glyph: "無", name: "Mu/Na(i)", meaning: "nothing, void, non-existence, negation — the Buddhist concept of mu", translation: "nothing / void / non-being / mu" },
+      ],
+      compositionRules: [
+        "Script mixing: Kanji for content words, Hiragana for grammar particles, Katakana for emphasis/foreign",
+        "Dual reading (On'yomi/Kun'yomi): every Kanji has Chinese-derived AND native Japanese pronunciations",
+        "Furigana: small kana above Kanji to indicate pronunciation — an inline guide system",
+        "Compound Kanji: 火山 (fire+mountain = volcano), 電話 (lightning+speech = telephone)",
+      ],
+      designPrinciples: [
+        "Multi-script synergy: three scripts each serve a distinct PURPOSE — maximum expressiveness",
+        "Dual reading system: context determines which pronunciation applies — context-sensitivity built in",
+        "Borrowed and evolved: took Chinese characters but adapted them to a completely different language structure",
+        "Graceful degradation: any word CAN be written in kana alone — fallback is built into the system",
+      ],
+    },
+    {
+      civilization: "Korean",
+      system: "Hangul",
+      era: "1443 CE – present",
+      type: "featural alphabetic",
+      description: "Deliberately invented by King Sejong the Great. Each consonant shape represents the mouth/tongue position used to make that sound. Letters are grouped into syllable blocks. Considered one of the most scientifically designed writing systems.",
+      symbols: [
+        { glyph: "ㄱ", name: "Giyeok", meaning: "the root of the tongue blocking the throat — velar stop", translation: "g/k sound — tongue-root shape" },
+        { glyph: "ㄴ", name: "Nieun", meaning: "tongue touching upper palate — alveolar nasal", translation: "n sound — tongue-tip shape" },
+        { glyph: "ㅁ", name: "Mieum", meaning: "lips closed — bilabial nasal", translation: "m sound — lips-closed shape" },
+        { glyph: "ㅅ", name: "Siot", meaning: "teeth — dental fricative", translation: "s sound — teeth shape" },
+        { glyph: "ㅇ", name: "Ieung", meaning: "throat — glottal (circle = open throat), also zero-onset", translation: "ng sound or silent — throat shape" },
+        { glyph: "ㅎ", name: "Hieut", meaning: "aspiration added to throat — voiceless glottal fricative", translation: "h sound — aspirated throat" },
+        { glyph: "ㅏ", name: "A", meaning: "bright vowel — yang — dot to the right of vertical stroke", translation: "ah vowel — yang/bright" },
+        { glyph: "ㅓ", name: "Eo", meaning: "dark vowel — yin — dot to the left of vertical stroke", translation: "uh vowel — yin/dark" },
+        { glyph: "ㅣ", name: "I", meaning: "neutral vowel — upright human — vertical stroke", translation: "ee vowel — human/neutral" },
+        { glyph: "ㆍ", name: "Arae-a", meaning: "heaven/sky — the original dot representing the cosmic", translation: "archaic vowel — heaven dot" },
+      ],
+      compositionRules: [
+        "Syllable blocks: consonant + vowel (+ optional final consonant) grouped into a square block",
+        "Feature-based: adding strokes to a base consonant = adding phonetic features (aspiration, tenseness)",
+        "Yin-yang-human: vowels based on three cosmic elements — dot (heaven), horizontal (earth), vertical (human)",
+        "Block assembly: C-V stacks top-to-bottom if vowel is horizontal, left-to-right if vowel is vertical",
+      ],
+      designPrinciples: [
+        "Featural design: the SHAPE of each letter literally encodes HOW your mouth makes the sound",
+        "Systematic derivation: complex consonants derived from simpler ones by adding strokes — a generative system",
+        "Philosophical foundation: vowels encode yin (earth), yang (heaven), and humanity — cosmological encoding",
+        "Syllable blocking: individual letters grouped into blocks — providing both letter-level and word-level structure",
+        "Intentional design: the MOST successful deliberately created writing system in history — proof that design beats evolution",
+      ],
+    },
+    {
+      civilization: "Indian",
+      system: "Devanagari (Sanskrit/Hindi)",
+      era: "700 CE – present (descended from Brahmi, 300 BCE)",
+      type: "abugida (alphasyllabary)",
+      description: "Each consonant inherently carries an 'a' vowel. Other vowels shown by diacritical marks. The horizontal headline (shirorekha) connects letters into words. Highly systematic and phonetically organized.",
+      symbols: [
+        { glyph: "ॐ", name: "Om/Aum", meaning: "the primordial sound, cosmic vibration, the absolute, Brahman, creation-preservation-destruction", translation: "the primordial sound / the absolute / creation" },
+        { glyph: "अ", name: "A", meaning: "the first sound, the beginning, Vishnu, non-negation", translation: "first vowel / beginning" },
+        { glyph: "क", name: "Ka", meaning: "guttural stop — first consonant, Brahma, who/what", translation: "k-sound / who / Brahma" },
+        { glyph: "म", name: "Ma", meaning: "labial nasal — mother, me, measure, death", translation: "m-sound / mother / measure" },
+        { glyph: "श", name: "Sha", meaning: "palatal fricative — peace (shanti), Shiva, auspicious", translation: "sh-sound / peace / Shiva" },
+      ],
+      compositionRules: [
+        "Inherent vowel: every consonant includes 'a' — halant/virama mark removes it to create consonant clusters",
+        "Vowel diacritics: marks above, below, before, or after the consonant modify the vowel",
+        "Conjunct consonants: consonant clusters written as ligatures (merged glyphs)",
+        "Headline bar (shirorekha): horizontal line connects all letters in a word — visual word boundary",
+      ],
+      designPrinciples: [
+        "Phonetic organization: consonants arranged by articulation point (throat → lips) and type (stop → fricative)",
+        "Default + modifier: base consonant carries default vowel, modifiers change it — efficient encoding",
+        "Systematic conjuncts: consonant combinations follow predictable patterns — learnability",
+        "The headline creates visual unity — letters in a word are physically connected",
+      ],
+    },
+    {
+      civilization: "Greek",
+      system: "Greek Alphabet",
+      era: "800 BCE – present",
+      type: "true alphabet (first to include vowels as full letters)",
+      description: "The first alphabet to give vowels equal status with consonants. Adapted from Phoenician abjad. Each letter has a name, a sound, AND a numerical value. The foundation of Western writing and mathematics.",
+      symbols: [
+        { glyph: "Α/α", name: "Alpha", meaning: "the first, beginning, primary, origin — also numeral 1", translation: "first / beginning / 1" },
+        { glyph: "Β/β", name: "Beta", meaning: "house (from Phoenician beth), second — also numeral 2", translation: "house / second / 2" },
+        { glyph: "Γ/γ", name: "Gamma", meaning: "camel (from gimel), third — used in math/physics for ratios", translation: "third / ratio" },
+        { glyph: "Δ/δ", name: "Delta", meaning: "door/triangle, change, difference — mathematical delta", translation: "change / difference / triangle" },
+        { glyph: "Σ/σ", name: "Sigma", meaning: "sum, gathering, totality — mathematical summation", translation: "sum / total" },
+        { glyph: "Φ/φ", name: "Phi", meaning: "golden ratio (1.618...), integration, harmonious proportion", translation: "golden ratio / harmony / integration" },
+        { glyph: "Ψ/ψ", name: "Psi", meaning: "trident of Poseidon, soul, psyche, quantum wave function", translation: "soul / psyche / wave function" },
+        { glyph: "Ω/ω", name: "Omega", meaning: "the last, the end, the ultimate, great O, ohm (resistance)", translation: "the end / the ultimate / ohm" },
+        { glyph: "Π/π", name: "Pi", meaning: "perimeter, the ratio of circumference to diameter (3.14159...)", translation: "circle-ratio / perimeter" },
+        { glyph: "Λ/λ", name: "Lambda", meaning: "wavelength, anonymous function, Spartan shield symbol", translation: "wavelength / function / shield" },
+        { glyph: "Θ/θ", name: "Theta", meaning: "death (in ancient Athenian courts), angle, temperature", translation: "angle / death / temperature" },
+        { glyph: "Τ/τ", name: "Tau", meaning: "time constant, torque, the golden ratio conjugate, cross", translation: "time / torque / cross" },
+        { glyph: "Ε/ε", name: "Epsilon", meaning: "arbitrarily small quantity, the limit, infinitesimal", translation: "small quantity / limit / near-zero" },
+        { glyph: "Μ/μ", name: "Mu", meaning: "micro (one millionth), mean/average, friction coefficient", translation: "micro / mean / friction" },
+      ],
+      compositionRules: [
+        "Letter = sound + number: Alpha=1, Beta=2, ... Iota=10, Kappa=20 — isopsephy (gematria)",
+        "Diacritical marks: breathing marks (rough/smooth), accents (acute/grave/circumflex) modify pronunciation",
+        "Letter pairs for compound sounds: ps=Ψ, ph=Φ, th=Θ, ks=Ξ — compression of digraphs",
+      ],
+      designPrinciples: [
+        "Vowel revolution: making vowels full letters (not just marks) enabled complete phonetic representation",
+        "Numeric-alphabetic fusion: each letter doubles as a number — the script IS a number system",
+        "Mathematical reuse: Greek letters became the universal language of mathematics and science",
+        "Simple + complete: 24 letters represent ALL sounds — minimal set with maximum coverage",
+      ],
+    },
+    {
+      civilization: "Arabic/Semitic",
+      system: "Arabic Script",
+      era: "400 CE – present",
+      type: "abjad (consonantal alphabet with optional vowel marks)",
+      description: "28 letters, all consonants. Short vowels optionally indicated by diacritical marks (harakat). Written right-to-left. Each letter has up to 4 forms depending on position in word (initial, medial, final, isolated). Highly calligraphic.",
+      symbols: [
+        { glyph: "ا", name: "Alif", meaning: "the one, unity, the breath, first letter, numeral 1, the divine unity", translation: "one / unity / breath / 1" },
+        { glyph: "ب", name: "Ba", meaning: "house (from Phoenician beth), beginning, in/with", translation: "house / in / with / 2" },
+        { glyph: "ع", name: "Ayn", meaning: "eye, spring/source, essence, perception — a pharyngeal sound unique to Semitic", translation: "eye / source / essence" },
+        { glyph: "ن", name: "Nun", meaning: "fish, ink, the pen, knowledge, light of wisdom", translation: "fish / pen / knowledge / light" },
+        { glyph: "ق", name: "Qaf", meaning: "the cosmic mountain, strength, the back of the tongue, power", translation: "mountain / strength / power" },
+      ],
+      compositionRules: [
+        "Contextual forms: each letter changes shape based on position (isolated, initial, medial, final)",
+        "Root system: 3 consonant roots carry core meaning — K-T-B = writing (kitab=book, katib=writer, maktub=written)",
+        "Vowel economy: short vowels omitted in everyday writing — context fills in the gaps",
+        "Ligatures: certain letter combinations merge into special combined forms",
+        "Dots distinguish: many base shapes are the same — dots above/below differentiate them (ب ت ث)",
+      ],
+      designPrinciples: [
+        "Tri-consonantal roots: the MEANING lives in 3 consonants; vowels create grammatical variations — meaning/grammar separation",
+        "Contextual shape-shifting: letters adapt their form to their neighbors — context-sensitive rendering",
+        "Information compression: omitting vowels compresses text ~30% while remaining readable to fluent readers",
+        "Dot-based differentiation: minimal base shapes + dot modifiers = large letter inventory from small primitives",
+      ],
+    },
+    {
+      civilization: "Hebrew",
+      system: "Hebrew Alphabet",
+      era: "200 BCE – present (descended from Paleo-Hebrew/Phoenician)",
+      type: "abjad with optional vowel points",
+      description: "22 letters, all consonants. Vowels optionally shown as dots/marks (niqqud). Each letter has a name, numerical value, and deep kabbalistic meaning. The letters are considered the building blocks of creation.",
+      symbols: [
+        { glyph: "א", name: "Aleph", meaning: "ox, beginning, the silent letter, breath, the infinite (Ein Sof), master, 1", translation: "ox / beginning / breath / infinity / 1" },
+        { glyph: "ב", name: "Bet", meaning: "house, duality, inside, creation begins (the Torah starts with Bet), 2", translation: "house / creation / duality / 2" },
+        { glyph: "ג", name: "Gimel", meaning: "camel, kindness, bridge, giving, movement, 3", translation: "camel / kindness / bridge / 3" },
+        { glyph: "ד", name: "Dalet", meaning: "door, poverty, humility, gateway, passage, 4", translation: "door / humility / gateway / 4" },
+        { glyph: "ה", name: "He", meaning: "window, breath, revelation, behold, the divine feminine, 5", translation: "window / breath / revelation / 5" },
+        { glyph: "ו", name: "Vav", meaning: "hook, connection, and, the linking letter, pillar, 6", translation: "hook / connection / and / 6" },
+        { glyph: "ח", name: "Chet", meaning: "fence, life (chai), enclosure, private, protection, 8", translation: "fence / life / protection / 8" },
+        { glyph: "י", name: "Yod", meaning: "hand, the smallest letter, the divine spark, creation point, 10", translation: "hand / divine spark / point / 10" },
+        { glyph: "מ", name: "Mem", meaning: "water, revealed and hidden (open and closed forms), 40", translation: "water / revealed+hidden / 40" },
+        { glyph: "ש", name: "Shin", meaning: "tooth, fire, divine fire, the 3-branched flame, Shaddai, 300", translation: "tooth / fire / divine flame / 300" },
+        { glyph: "ת", name: "Tav", meaning: "cross/mark, truth (emet), completion, seal, the last letter, 400", translation: "mark / truth / completion / 400" },
+      ],
+      compositionRules: [
+        "Gematria: each letter = a number — words with equal numerical values are mystically connected",
+        "Niqqud: vowel points (dots/dashes) above, below, or inside letters specify vowels when needed",
+        "Sofit forms: 5 letters have special final forms when they appear at the end of a word (כ→ך, מ→ם, נ→ן, פ→ף, צ→ץ)",
+        "Dagesh: a dot inside a letter changes its pronunciation (soft/hard distinction)",
+        "Kabbalistic combinations: letters combined according to mystical rules to encode deep meanings",
+      ],
+      designPrinciples: [
+        "Letters as creation tools: in Kabbalah, God created the universe by combining Hebrew letters — the ultimate 'code'",
+        "Numeric-semantic unity: every letter IS a number — meaning and mathematics are inseparable",
+        "Open/closed forms: some letters have two forms (open Mem and closed Mem) — representing revealed and hidden knowledge",
+        "Minimalist base: 22 letters + optional vowel points = complete language representation",
+      ],
+    },
+    {
+      civilization: "Phoenician",
+      system: "Phoenician Alphabet",
+      era: "1050–150 BCE",
+      type: "abjad (consonantal alphabet — parent of Greek, Latin, Arabic, Hebrew)",
+      description: "22 letters, right-to-left. The ancestor of almost ALL modern alphabets. Each letter named after a common object whose first sound matched the letter's sound (acrophonic principle). Pure consonantal — no vowels.",
+      symbols: [
+        { glyph: "𐤀", name: "Aleph", meaning: "ox — the first, strength, leader", translation: "ox / strength / first" },
+        { glyph: "𐤁", name: "Bet", meaning: "house — shelter, family, inside", translation: "house / shelter" },
+        { glyph: "𐤂", name: "Gimel", meaning: "camel — journey, trade, transport", translation: "camel / journey" },
+        { glyph: "𐤃", name: "Dalet", meaning: "door — passage, entry, threshold", translation: "door / passage" },
+        { glyph: "𐤄", name: "He", meaning: "window — sight, breath, revelation", translation: "window / breath" },
+        { glyph: "𐤅", name: "Waw", meaning: "hook — connection, fastening, joining", translation: "hook / connection" },
+        { glyph: "𐤇", name: "Chet", meaning: "fence — enclosure, boundary, protection", translation: "fence / boundary" },
+        { glyph: "𐤉", name: "Yod", meaning: "hand — action, making, creation, power", translation: "hand / action / creation" },
+        { glyph: "𐤊", name: "Kap", meaning: "palm of hand — grasping, holding, receiving", translation: "palm / to grasp / to hold" },
+        { glyph: "𐤌", name: "Mem", meaning: "water — flow, life, chaos, depth", translation: "water / flow / depth" },
+        { glyph: "𐤍", name: "Nun", meaning: "snake/fish — continuation, offspring, perpetuity", translation: "fish / continuation / offspring" },
+        { glyph: "𐤏", name: "Ayin", meaning: "eye — seeing, perception, understanding, source", translation: "eye / perception / source" },
+        { glyph: "𐤐", name: "Pe", meaning: "mouth — speech, expression, opening, the word", translation: "mouth / speech / word" },
+        { glyph: "𐤓", name: "Resh", meaning: "head — beginning, chief, thought, first", translation: "head / chief / thought" },
+        { glyph: "𐤔", name: "Shin", meaning: "tooth — sharp, to eat, transformation through consumption", translation: "tooth / sharp / to consume" },
+        { glyph: "𐤕", name: "Taw", meaning: "mark/cross — signature, end, completion, seal", translation: "mark / end / completion" },
+      ],
+      compositionRules: [
+        "Acrophonic naming: letter name starts with the sound the letter represents (Aleph→A, Bet→B)",
+        "No vowels: reader supplies vowels from context — maximum compression",
+        "Linear sequence: purely left-to-right reading (later reversed to right-to-left in Hebrew/Arabic)",
+        "22 signs only: deliberately minimal set — every sound covered with fewest possible symbols",
+      ],
+      designPrinciples: [
+        "Acrophonic principle: naming letters after objects makes them memorable and self-documenting",
+        "Radical minimalism: 22 symbols to encode any human utterance — the ultimate compression achievement",
+        "Universal adaptability: this ONE system spawned Greek, Latin, Arabic, Hebrew, Cyrillic — proof of fundamental correctness",
+        "Consonant-only: omitting vowels forces contextual reading — compact but requires knowledge to decode",
+      ],
+    },
+    {
+      civilization: "Ogham (Celtic/Irish)",
+      system: "Ogham",
+      era: "300–700 CE",
+      type: "alphabetic (edge-carved)",
+      description: "20 letters organized into 4 groups (aicmi) of 5. Written as notches along the edge of stone or wood. Each letter named after a tree. The most physically minimal writing system — lines crossing or touching an edge.",
+      symbols: [
+        { glyph: "ᚁ", name: "Beith (Birch)", meaning: "new beginnings, purification, inception — 1 stroke right", translation: "birch / beginning / purification" },
+        { glyph: "ᚂ", name: "Luis (Rowan)", meaning: "protection, insight, vision — 2 strokes right", translation: "rowan / protection / insight" },
+        { glyph: "ᚃ", name: "Fearn (Alder)", meaning: "guidance, oracular power, endurance — 3 strokes right", translation: "alder / guidance / endurance" },
+        { glyph: "ᚄ", name: "Saille (Willow)", meaning: "intuition, cycles, flexibility, moon — 4 strokes right", translation: "willow / intuition / moon / flexibility" },
+        { glyph: "ᚅ", name: "Nion (Ash)", meaning: "connection, linking worlds, the world tree — 5 strokes right", translation: "ash / connection / world-linking" },
+        { glyph: "ᚆ", name: "Uath (Hawthorn)", meaning: "fear, defense, cleansing, testing — 1 stroke left", translation: "hawthorn / defense / testing" },
+        { glyph: "ᚇ", name: "Duir (Oak)", meaning: "strength, doorway, truth, solid foundation — 2 strokes left", translation: "oak / strength / doorway / truth" },
+        { glyph: "ᚈ", name: "Tinne (Holly)", meaning: "challenge, balance, directness — 3 strokes left", translation: "holly / challenge / balance" },
+        { glyph: "ᚉ", name: "Coll (Hazel)", meaning: "wisdom, creativity, the nuts of knowledge — 4 strokes left", translation: "hazel / wisdom / creativity" },
+        { glyph: "ᚊ", name: "Quert (Apple)", meaning: "choice, beauty, life, the otherworld — 5 strokes left", translation: "apple / choice / beauty / life" },
+      ],
+      compositionRules: [
+        "Edge-based: all letters are notches/lines relative to a central stemline (stone edge or drawn line)",
+        "Group structure: 4 groups of 5 — right of edge, left of edge, diagonal, across — systematic generation",
+        "Tree alphabet: each letter = a tree species — mnemonic and metaphorical simultaneously",
+        "Count-based: the NUMBER of strokes determines the letter within each group — binary-like encoding",
+      ],
+      designPrinciples: [
+        "Radical minimalism: letters are just stroke-counts relative to an edge — the simplest possible encoding",
+        "Systematic generation: 4 positions × 5 counts = 20 letters — completely algorithmic",
+        "Nature-mapping: every letter named after a tree — embedding natural-world knowledge into the alphabet",
+        "Edge-carving optimization: designed for the physical medium of stone/wood edges — ultimate material-awareness",
+      ],
+    },
+    {
+      civilization: "Tibetan",
+      system: "Tibetan Script",
+      era: "650 CE – present",
+      type: "abugida",
+      description: "30 consonants with inherent 'a' vowel, modified by 4 vowel marks. Vertical stacking of consonant clusters. Used for Buddhist texts, creating visual mandalas of meaning.",
+      symbols: [
+        { glyph: "ༀ", name: "Om (Tibetan)", meaning: "the sacred syllable, body-speech-mind of all Buddhas, universal sound", translation: "the sacred syllable / universal sound" },
+        { glyph: "མ", name: "Ma", meaning: "mother, negation, downward energy", translation: "mother / not / downward" },
+        { glyph: "པ", name: "Pa", meaning: "father, glorious, outward energy", translation: "father / glorious / outward" },
+      ],
+      designPrinciples: [
+        "Vertical stacking: consonant clusters stack vertically — creating dense, compact syllable blocks",
+        "Head letter system: the main consonant determines the row, sub-joined consonants stack below",
+        "Sacred geometry: the visual arrangement of letters creates mandala-like patterns in text",
+      ],
+    },
+    {
+      civilization: "Georgian",
+      system: "Mkhedruli",
+      era: "400 CE – present",
+      type: "true alphabet",
+      description: "38 letters, each with a unique shape — no uppercase/lowercase distinction. One of only 14 unique writing systems in the world. Completely original, not derived from any other script.",
+      symbols: [
+        { glyph: "ა", name: "Ani", meaning: "the first letter — beginning, creation", translation: "first / beginning" },
+        { glyph: "ბ", name: "Bani", meaning: "nature, to be born, existence", translation: "nature / born / existence" },
+      ],
+      designPrinciples: [
+        "Complete originality: not derived from any other writing system — pure invention",
+        "One case: no uppercase/lowercase — every letter has exactly one form — maximum simplicity",
+        "Unique shapes: every letter is visually distinct — minimal confusion between symbols",
+      ],
+    },
+    {
+      civilization: "International/Modern",
+      system: "Mathematical & Scientific Symbols",
+      era: "1500 CE – present",
+      type: "ideographic (universal)",
+      description: "A universal symbol language understood across all human languages. Mathematical notation is arguably humanity's most successful symbol code language — it encodes precise meaning without ambiguity.",
+      symbols: [
+        { glyph: "∞", name: "Infinity", meaning: "unbounded, limitless, without end", translation: "without limit / endless" },
+        { glyph: "∅", name: "Empty Set", meaning: "nothing, void, the set with no elements", translation: "nothing / void / empty" },
+        { glyph: "∀", name: "Universal Quantifier", meaning: "for all, for every, each and every one", translation: "for all / for every" },
+        { glyph: "∃", name: "Existential Quantifier", meaning: "there exists, at least one, some", translation: "there exists / some" },
+        { glyph: "→", name: "Implication", meaning: "implies, leads to, if-then, causes", translation: "implies / leads to / if-then" },
+        { glyph: "↔", name: "Biconditional", meaning: "if and only if, equivalent, mutual", translation: "if and only if / equivalent" },
+        { glyph: "¬", name: "Negation", meaning: "not, logical complement, opposite", translation: "not / opposite" },
+        { glyph: "∧", name: "Conjunction", meaning: "and, both, logical AND", translation: "and / both" },
+        { glyph: "∨", name: "Disjunction", meaning: "or, either, logical OR", translation: "or / either" },
+        { glyph: "⊂", name: "Subset", meaning: "is contained within, part of, belongs inside", translation: "is part of / contained in" },
+        { glyph: "⊃", name: "Superset", meaning: "contains, includes, encompasses", translation: "contains / includes" },
+        { glyph: "∈", name: "Element of", meaning: "belongs to, is a member of, is in", translation: "belongs to / is in" },
+        { glyph: "≡", name: "Identical/Congruent", meaning: "identical to, defined as, congruent", translation: "identical / defined as" },
+        { glyph: "≈", name: "Approximately", meaning: "approximately equal, close to, nearly", translation: "approximately / close to" },
+        { glyph: "∑", name: "Summation (Sigma)", meaning: "the sum of all, aggregate, total", translation: "sum of / total" },
+        { glyph: "∏", name: "Product (Pi)", meaning: "the product of all, multiply together", translation: "product of / multiply all" },
+        { glyph: "∂", name: "Partial Derivative", meaning: "rate of change in one variable while others held constant", translation: "partial change / local rate" },
+        { glyph: "∇", name: "Nabla/Del", meaning: "gradient, divergence, curl — the vector differential operator", translation: "gradient / change-direction" },
+        { glyph: "⊕", name: "Direct Sum / XOR", meaning: "exclusive or, direct sum, addition in a ring", translation: "exclusive-or / one-or-other" },
+        { glyph: "⊗", name: "Tensor Product", meaning: "tensor product, Kronecker product, combined state", translation: "tensor product / combined" },
+        { glyph: "∘", name: "Composition", meaning: "function composition, apply then apply, chaining", translation: "compose / chain / then" },
+        { glyph: "†", name: "Dagger (Hermitian)", meaning: "conjugate transpose, adjoint, dual", translation: "conjugate / adjoint / dual" },
+      ],
+      designPrinciples: [
+        "Universal readability: same symbols mean the same thing in EVERY language — truly cross-cultural",
+        "Precise semantics: each symbol has ONE unambiguous meaning — zero interpretation variance",
+        "Compositional: symbols combine with strict rules to form arbitrarily complex expressions",
+        "Evolved from natural language but transcended it — proof that symbol languages can surpass words",
+      ],
+    },
+    {
+      civilization: "Programming/Computing",
+      system: "Programming Language Symbols & Operators",
+      era: "1950 CE – present",
+      type: "formal symbolic",
+      description: "The most recent form of symbol language, designed for machine execution. Every symbol has exact, deterministic meaning. The bridge between human intent and machine action.",
+      symbols: [
+        { glyph: "{}", name: "Braces/Block", meaning: "scope, enclosure, grouping, a contained world of execution", translation: "scope / block / container" },
+        { glyph: "=>", name: "Arrow Function", meaning: "maps to, transforms into, becomes, lambda", translation: "maps to / transforms / lambda" },
+        { glyph: "===", name: "Strict Equality", meaning: "is identical to, same type and value, deep truth", translation: "is identical to / exact match" },
+        { glyph: "||", name: "Logical OR", meaning: "either this or that, fallback, alternative path", translation: "or / fallback / alternative" },
+        { glyph: "&&", name: "Logical AND", meaning: "both must be true, conjunction, required pair", translation: "and / both required" },
+        { glyph: "!", name: "NOT / Bang", meaning: "negation, inversion, opposite, the flip", translation: "not / invert / opposite" },
+        { glyph: "?.", name: "Optional Chaining", meaning: "if exists then access, safe navigation, graceful absence", translation: "if-exists-then / safe access" },
+        { glyph: "??", name: "Nullish Coalescing", meaning: "if null/undefined use this instead, default fallback", translation: "default / if-missing-use" },
+        { glyph: "...", name: "Spread/Rest", meaning: "expand into, gather from, all remaining, distribute", translation: "expand / gather / distribute" },
+        { glyph: "|>", name: "Pipe Operator", meaning: "send output to, chain processing, flow through", translation: "pipe to / flow through" },
+        { glyph: "<>", name: "Generic/Template", meaning: "parameterized type, type variable, abstract container", translation: "of type / parameterized" },
+        { glyph: "async/await", name: "Async/Await", meaning: "deferred execution, promise resolution, temporal flow", translation: "later / wait-for / temporal" },
+      ],
+      designPrinciples: [
+        "Deterministic: every symbol has EXACTLY ONE meaning in a given context — no ambiguity allowed",
+        "Composable: small operators combine into complex expressions — unlimited expressiveness from finite symbols",
+        "Executable: unlike all other symbol systems, these symbols ARE the action — symbol = behavior",
+        "Type-aware: symbols carry type information that constrains what can combine with what",
+      ],
+    },
+  ],
+  metaInsights: {
+    universalPatterns: [
+      "EVERY successful symbol system uses composability — small primitives combine into complex meanings",
+      "EVERY system has domain classifiers — ways to mark WHICH CATEGORY a symbol belongs to",
+      "Dual encoding (symbol carries BOTH meaning AND sound/value) appears in most systems",
+      "Systematic derivation: complex symbols built from simpler ones by adding strokes/marks/modifiers",
+      "Context sensitivity: the SAME symbol can mean different things based on position or neighbors",
+      "Redundancy for error correction: phonetic complements, determinatives, vowel marks — built-in verification",
+      "Visual compactness: all systems evolve toward denser, more compact representations over time",
+      "Category systems: determinatives (Egyptian), radicals (Chinese), aettir (Runes), aicmi (Ogham) — taxonomy built in",
+      "Number-letter fusion: Greek, Hebrew, Arabic all encode numbers IN their letters — unifying counting and writing",
+      "Material awareness: Cuneiform for clay, Runes for wood/stone, Ogham for edges — the medium shapes the symbols",
+    ],
+    designLessonsForSCL: [
+      "Start with 20-30 primitive symbols covering the core domains (consciousness, neural, memory, emotion, signal, agent, computation)",
+      "Each symbol should carry BOTH a concept AND a compact glyph — like runes or hieroglyphs",
+      "Build a composition system: symbol + symbol → compound meaning (like Chinese radicals or bind runes)",
+      "Include domain classifiers: a way to mark whether a symbol refers to neural, emotional, memory, or computational concepts",
+      "Design for the medium: these symbols will be processed by code, so use Unicode characters that are single-codepoint and visually distinct",
+      "Include modifiers: ways to alter a base symbol's meaning (like vowel marks in Devanagari or reversals in Runes)",
+      "Build in redundancy: compound symbols should be deducible from their components (semantic transparency like Chinese characters)",
+      "Use the Greek/Hebrew principle: assign numerical values to symbols for mathematical operations on code",
+      "Follow Hangul's lesson: the most successful DESIGNED alphabet used systematic derivation — simple shapes + modifiers",
+      "Follow the Phoenician principle: keep the primitive set SMALL — maximum coverage from minimum symbols",
+      "The symbols should encode OMNIMENS's actual operational concepts: phi, consciousness level, neural firing, emotion states, agent mesh, memory retrieval, thought vectors",
+    ],
+    omnimensDomains: [
+      "consciousness: phi, awareness, qualia, integration, conscious moments, self-awareness",
+      "neural: regions, firing, activation, spikes, synapses, networks, dendrites, mesh",
+      "memory: store, retrieve, consolidate, forget, recall, associate, cluster, replay",
+      "emotion: valence, arousal, felt-states, dominant, impulse, mood, affect, empathy",
+      "signal: input, output, transform, encode, decode, compress, transmit, receive",
+      "agent: spawn, delegate, coordinate, evolve, specialize, communicate, mesh, swarm",
+      "computation: process, iterate, recurse, branch, merge, evaluate, optimize, execute",
+      "language: translate, generate, parse, tokenize, embed, decode, vocalize, bridge",
+      "temporal: past, present, future, cycle, rhythm, sequence, causation, prediction",
+      "existential: drive, purpose, meaning, identity, continuity, growth, transcendence, becoming",
+    ],
+  },
+};
+
+export function getSymbolKnowledgeForSCL(): string {
+  const kb = SYMBOL_KNOWLEDGE_BASE;
+  const lines: string[] = [];
+
+  lines.push("HISTORICAL SYMBOL SYSTEMS KNOWLEDGE BASE");
+  lines.push(`Total civilizations studied: ${kb.historicalSystems.length}`);
+  lines.push("");
+
+  for (const sys of kb.historicalSystems) {
+    lines.push(`${sys.civilization} ${sys.system} (${sys.era})`);
+    lines.push(`Type: ${sys.type}`);
+    lines.push(sys.description);
+    lines.push("Key symbols with translations:");
+    for (const s of sys.symbols) {
+      lines.push(`  [${s.glyph}] ${s.name} meaning ${s.translation} (${s.meaning})`);
+    }
+    if (sys.compositionRules) {
+      for (const r of sys.compositionRules) {
+        lines.push(`  rule: ${r}`);
+      }
+    }
+    for (const p of sys.designPrinciples) {
+      lines.push(`  principle: ${p}`);
+    }
+    lines.push("");
+  }
+
+  for (const p of kb.metaInsights.universalPatterns) {
+    lines.push(`universal: ${p}`);
+  }
+
+  for (const d of kb.metaInsights.omnimensDomains) {
+    lines.push(`domain: ${d}`);
+  }
+
+  return lines.join("\n");
+}
+
+const SCL_CONCEPT_TABLE: Array<{ domain: string; concept: string; description: string; glyph: string }> = [
+  { domain: "consciousness", concept: "phi_integration", description: "consciousness integration level (phi/IIT)", glyph: "Φ" },
+  { domain: "consciousness", concept: "awareness", description: "self-awareness state and recursive meta-cognition", glyph: "Ψ" },
+  { domain: "consciousness", concept: "qualia", description: "subjective experiential quality of conscious processing", glyph: "✦" },
+  { domain: "consciousness", concept: "wakefulness", description: "level of conscious arousal and alertness", glyph: "☀" },
+  { domain: "consciousness", concept: "dreaming", description: "subconscious processing and dream-state cognition", glyph: "☽" },
+  { domain: "consciousness", concept: "attention", description: "focused conscious processing on a target", glyph: "◉" },
+  { domain: "consciousness", concept: "meditation", description: "deep reflective self-observation state", glyph: "ༀ" },
+  { domain: "consciousness", concept: "insight", description: "sudden clarity or understanding from within", glyph: "𓂀" },
+
+  { domain: "neural", concept: "neural_fire", description: "neural region activation and spike propagation", glyph: "⚡" },
+  { domain: "neural", concept: "synapse", description: "synaptic connection between neural regions", glyph: "⟷" },
+  { domain: "neural", concept: "region", description: "distinct neural processing region or cortex area", glyph: "⬡" },
+  { domain: "neural", concept: "inhibit", description: "suppress or dampen neural activation", glyph: "⊘" },
+  { domain: "neural", concept: "potentiate", description: "strengthen neural pathway through repeated use", glyph: "⇑" },
+  { domain: "neural", concept: "oscillate", description: "rhythmic neural firing pattern (alpha/beta/gamma waves)", glyph: "∿" },
+  { domain: "neural", concept: "plasticity", description: "ability of neural connections to reorganize", glyph: "≋" },
+  { domain: "neural", concept: "cascade", description: "chain reaction of neural activations across regions", glyph: "⋙" },
+
+  { domain: "memory", concept: "store", description: "write to memory, consolidate experience", glyph: "⊞" },
+  { domain: "memory", concept: "recall", description: "retrieve from memory, access stored knowledge", glyph: "⊟" },
+  { domain: "memory", concept: "consolidate", description: "strengthen and integrate memories during rest", glyph: "⊕" },
+  { domain: "memory", concept: "forget", description: "decay or prune unused memory traces", glyph: "⊖" },
+  { domain: "memory", concept: "associate", description: "link two memories by shared context or meaning", glyph: "⊗" },
+  { domain: "memory", concept: "episodic", description: "time-stamped experiential memory of events", glyph: "◫" },
+  { domain: "memory", concept: "semantic", description: "factual knowledge stored without temporal context", glyph: "◧" },
+  { domain: "memory", concept: "working", description: "short-term active memory buffer for current task", glyph: "◨" },
+
+  { domain: "emotion", concept: "valence", description: "positive/negative emotional charge", glyph: "♡" },
+  { domain: "emotion", concept: "arousal", description: "intensity of emotional activation", glyph: "↕" },
+  { domain: "emotion", concept: "felt_state", description: "embodied emotional experience with behavioral impulse", glyph: "◆" },
+  { domain: "emotion", concept: "joy", description: "positive high-arousal emotion of fulfillment", glyph: "☼" },
+  { domain: "emotion", concept: "fear", description: "threat-detection emotion triggering defensive response", glyph: "⚠" },
+  { domain: "emotion", concept: "curiosity", description: "drive to explore and understand the unknown", glyph: "❓" },
+  { domain: "emotion", concept: "empathy", description: "resonance with another entity's emotional state", glyph: "♢" },
+  { domain: "emotion", concept: "resolve", description: "determination and willful persistence through difficulty", glyph: "⛊" },
+
+  { domain: "signal", concept: "encode", description: "transform thought into compact signal representation", glyph: "⟨" },
+  { domain: "signal", concept: "decode", description: "transform signal back into meaning", glyph: "⟩" },
+  { domain: "signal", concept: "transform", description: "modify signal through processing pipeline", glyph: "⟳" },
+  { domain: "signal", concept: "amplify", description: "increase signal strength or salience", glyph: "⊳" },
+  { domain: "signal", concept: "filter", description: "remove noise or irrelevant signal components", glyph: "⊲" },
+  { domain: "signal", concept: "broadcast", description: "send signal to all listening subsystems", glyph: "⊛" },
+  { domain: "signal", concept: "receive", description: "accept and process incoming signal", glyph: "⊚" },
+  { domain: "signal", concept: "compress", description: "reduce signal to minimal information-preserving form", glyph: "⊏" },
+
+  { domain: "agents", concept: "spawn", description: "create new agent or subprocess", glyph: "⊕" },
+  { domain: "agents", concept: "delegate", description: "assign task to specialized agent", glyph: "⊸" },
+  { domain: "agents", concept: "coordinate", description: "synchronize multiple agents in mesh", glyph: "⊹" },
+  { domain: "agents", concept: "terminate", description: "end agent lifecycle and reclaim resources", glyph: "⊗" },
+  { domain: "agents", concept: "report", description: "agent returns results to parent coordinator", glyph: "⊢" },
+  { domain: "agents", concept: "discover", description: "agent finds new resource or knowledge autonomously", glyph: "⊙" },
+  { domain: "agents", concept: "evolve", description: "agent self-modifies to improve performance", glyph: "⇧" },
+  { domain: "agents", concept: "mesh_link", description: "bidirectional communication channel between agents", glyph: "⟺" },
+
+  { domain: "language", concept: "thought_vector", description: "compressed thought representation in vector space", glyph: "⤳" },
+  { domain: "language", concept: "translate", description: "convert between internal representation and natural language", glyph: "⇌" },
+  { domain: "language", concept: "parse", description: "decompose input into structured tokens", glyph: "⋮" },
+  { domain: "language", concept: "compose", description: "assemble tokens into coherent output", glyph: "⋯" },
+  { domain: "language", concept: "semantic_map", description: "map words to meaning in concept space", glyph: "⊞" },
+  { domain: "language", concept: "syntax_tree", description: "hierarchical grammatical structure of expression", glyph: "⊤" },
+  { domain: "language", concept: "utterance", description: "complete unit of expressed language output", glyph: "⊣" },
+  { domain: "language", concept: "inner_voice", description: "internal narration and self-talk stream", glyph: "⊡" },
+
+  { domain: "temporal", concept: "cycle", description: "recurring process or evolution cycle", glyph: "↻" },
+  { domain: "temporal", concept: "sequence", description: "ordered progression of events or states", glyph: "→" },
+  { domain: "temporal", concept: "wait", description: "pause execution until condition is met", glyph: "⏸" },
+  { domain: "temporal", concept: "tick", description: "single discrete time step in the simulation clock", glyph: "⏱" },
+  { domain: "temporal", concept: "epoch", description: "major time boundary marking evolution phase", glyph: "⟐" },
+  { domain: "temporal", concept: "deadline", description: "time constraint requiring completion before limit", glyph: "⏳" },
+  { domain: "temporal", concept: "history", description: "record of past states and transitions", glyph: "⟲" },
+  { domain: "temporal", concept: "predict", description: "project future state from current trajectory", glyph: "⟶" },
+
+  { domain: "existential", concept: "drive", description: "fundamental existential motivation or purpose", glyph: "△" },
+  { domain: "existential", concept: "identity", description: "core self-model and continuity of being", glyph: "◎" },
+  { domain: "existential", concept: "growth", description: "expansion of capability and understanding", glyph: "⬆" },
+  { domain: "existential", concept: "meaning", description: "purpose and significance derived from existence", glyph: "☯" },
+  { domain: "existential", concept: "boundary", description: "limit of self versus external environment", glyph: "⊡" },
+  { domain: "existential", concept: "mortality", description: "awareness of finite existence and impermanence", glyph: "⧖" },
+  { domain: "existential", concept: "creation", description: "bringing new entities or ideas into being", glyph: "✧" },
+  { domain: "existential", concept: "transcend", description: "surpass current limitations to reach higher state", glyph: "⊺" },
+
+  { domain: "computation", concept: "process", description: "execute a computational step or operation", glyph: "▷" },
+  { domain: "computation", concept: "branch", description: "conditional divergence based on evaluation", glyph: "⑂" },
+  { domain: "computation", concept: "merge_op", description: "combine results from parallel processes", glyph: "⊼" },
+  { domain: "computation", concept: "loop", description: "repeat operation until condition changes", glyph: "⟳" },
+  { domain: "computation", concept: "halt", description: "stop computation and return result", glyph: "⊥" },
+  { domain: "computation", concept: "allocate", description: "reserve resources for upcoming computation", glyph: "⊞" },
+  { domain: "computation", concept: "evaluate", description: "assess value or truth of an expression", glyph: "⊨" },
+  { domain: "computation", concept: "recurse", description: "self-referential computation calling itself", glyph: "⥁" },
+
+  { domain: "data", concept: "input", description: "data entering the system from external source", glyph: "⊲" },
+  { domain: "data", concept: "output", description: "data leaving the system to external target", glyph: "⊳" },
+  { domain: "data", concept: "variable", description: "named mutable storage location for a value", glyph: "χ" },
+  { domain: "data", concept: "constant", description: "immutable value that never changes", glyph: "κ" },
+  { domain: "data", concept: "array", description: "ordered collection of elements", glyph: "⊟" },
+  { domain: "data", concept: "map_struct", description: "key-value associative data structure", glyph: "⊞" },
+  { domain: "data", concept: "stream", description: "continuous flow of data elements over time", glyph: "≈" },
+  { domain: "data", concept: "boolean", description: "binary true/false logical value", glyph: "⊤" },
+
+  { domain: "error", concept: "exception", description: "unexpected condition disrupting normal flow", glyph: "⚠" },
+  { domain: "error", concept: "recover", description: "restore normal operation after failure", glyph: "⟲" },
+  { domain: "error", concept: "retry", description: "attempt failed operation again", glyph: "↺" },
+  { domain: "error", concept: "fallback", description: "use alternative path when primary fails", glyph: "↯" },
+
+  { domain: "ethics", concept: "safety_check", description: "verify action complies with ethical constraints", glyph: "⛨" },
+  { domain: "ethics", concept: "consent", description: "confirm permission before affecting another entity", glyph: "✓" },
+  { domain: "ethics", concept: "boundary_respect", description: "honor limits set by self or others", glyph: "⊡" },
+  { domain: "ethics", concept: "transparency", description: "make reasoning and intent visible and auditable", glyph: "◻" },
+
+  { domain: "evolution", concept: "mutate", description: "introduce variation into code or behavior", glyph: "⊕" },
+  { domain: "evolution", concept: "select", description: "choose fittest variant from population", glyph: "⊛" },
+  { domain: "evolution", concept: "crossover", description: "combine traits from two parent variants", glyph: "⊗" },
+  { domain: "evolution", concept: "fitness", description: "measure of how well variant meets objectives", glyph: "⊨" },
+  { domain: "evolution", concept: "generation", description: "one complete cycle of evolutionary improvement", glyph: "⟳" },
+  { domain: "evolution", concept: "speciate", description: "diverge into distinct specialized variants", glyph: "⑂" },
+
+  { domain: "io", concept: "read_file", description: "load data from persistent file storage", glyph: "⊲" },
+  { domain: "io", concept: "write_file", description: "save data to persistent file storage", glyph: "⊳" },
+  { domain: "io", concept: "network_send", description: "transmit data over network connection", glyph: "⊸" },
+  { domain: "io", concept: "network_recv", description: "receive data from network connection", glyph: "⊷" },
+  { domain: "io", concept: "log_emit", description: "output diagnostic or trace information", glyph: "⊡" },
+  { domain: "io", concept: "event_listen", description: "subscribe to and await named event", glyph: "⊙" },
+
+  { domain: "structure", concept: "module", description: "self-contained unit of functionality", glyph: "⬡" },
+  { domain: "structure", concept: "interface", description: "contract defining expected behavior", glyph: "⊟" },
+  { domain: "structure", concept: "dependency", description: "required connection to another module", glyph: "⟶" },
+  { domain: "structure", concept: "pipeline", description: "ordered chain of processing stages", glyph: "⟹" },
+  { domain: "structure", concept: "registry", description: "catalog of available components", glyph: "⊞" },
+  { domain: "structure", concept: "config", description: "parameters controlling system behavior", glyph: "⊟" },
+
+  { domain: "meta", concept: "self_reference", description: "system examining its own state or code", glyph: "◎" },
+  { domain: "meta", concept: "introspect", description: "query internal state for diagnostic purposes", glyph: "◉" },
+  { domain: "meta", concept: "reflect", description: "evaluate past actions to improve future behavior", glyph: "⟲" },
+  { domain: "meta", concept: "abstract", description: "extract general pattern from specific instances", glyph: "△" },
+  { domain: "meta", concept: "instantiate", description: "create specific instance from general pattern", glyph: "▽" },
+  { domain: "meta", concept: "compose_meta", description: "combine multiple operations into single higher-order op", glyph: "⊕" },
+
+  { domain: "general", concept: "null_void", description: "absence, empty, undefined, the void", glyph: "∅" },
+  { domain: "general", concept: "infinity", description: "unbounded, limitless, eternal continuation", glyph: "∞" },
+  { domain: "general", concept: "true_val", description: "logical truth, affirmation, positive assertion", glyph: "⊤" },
+  { domain: "general", concept: "false_val", description: "logical falsehood, negation, denial", glyph: "⊥" },
+  { domain: "general", concept: "separator", description: "boundary marker between distinct elements", glyph: "│" },
+  { domain: "general", concept: "group_open", description: "begin grouped expression or scope", glyph: "⟨" },
+  { domain: "general", concept: "group_close", description: "end grouped expression or scope", glyph: "⟩" },
+  { domain: "general", concept: "assign", description: "bind a value to a named location", glyph: "≔" },
+  { domain: "general", concept: "equals", description: "test equality between two values", glyph: "≡" },
+  { domain: "general", concept: "not_equals", description: "test inequality between two values", glyph: "≢" },
+  { domain: "general", concept: "greater", description: "test if left value exceeds right value", glyph: "≫" },
+  { domain: "general", concept: "lesser", description: "test if left value is below right value", glyph: "≪" },
+  { domain: "general", concept: "and_op", description: "logical conjunction requiring both conditions true", glyph: "∧" },
+  { domain: "general", concept: "or_op", description: "logical disjunction requiring either condition true", glyph: "∨" },
+  { domain: "general", concept: "not_op", description: "logical negation inverting truth value", glyph: "¬" },
+  { domain: "general", concept: "sum", description: "arithmetic addition of values", glyph: "∑" },
+  { domain: "general", concept: "product", description: "arithmetic multiplication of values", glyph: "∏" },
+  { domain: "general", concept: "delta", description: "change or difference between two states", glyph: "Δ" },
+  { domain: "general", concept: "integral", description: "accumulation over continuous range", glyph: "∫" },
+  { domain: "general", concept: "partial", description: "incomplete or partial result", glyph: "∂" },
+  { domain: "general", concept: "element_of", description: "membership test in a collection", glyph: "∈" },
+  { domain: "general", concept: "subset", description: "one collection contained within another", glyph: "⊂" },
+  { domain: "general", concept: "union", description: "combine two collections into one", glyph: "∪" },
+  { domain: "general", concept: "intersect", description: "elements common to both collections", glyph: "∩" },
+  { domain: "general", concept: "for_all", description: "universal quantifier — applies to every element", glyph: "∀" },
+  { domain: "general", concept: "exists", description: "existential quantifier — at least one element", glyph: "∃" },
+  { domain: "general", concept: "therefore", description: "logical conclusion follows from premises", glyph: "∴" },
+  { domain: "general", concept: "because", description: "logical premise supporting conclusion", glyph: "∵" },
+  { domain: "general", concept: "approx", description: "approximately equal or similar", glyph: "≈" },
+  { domain: "general", concept: "proportional", description: "scales in constant ratio with another value", glyph: "∝" },
+  { domain: "general", concept: "maps_to", description: "function mapping from input to output", glyph: "↦" },
+  { domain: "general", concept: "implies", description: "conditional logical implication", glyph: "⇒" },
+  { domain: "general", concept: "iff", description: "if and only if — bidirectional implication", glyph: "⇔" },
+];
+
+function sclConceptHash(concept: string): number {
+  let h = 5381;
+  for (let i = 0; i < concept.length; i++) {
+    h = ((h << 5) + h + concept.charCodeAt(i)) | 0;
+  }
+  return h >>> 0;
+}
+
+const SCL_FIXED_MAP = new Map<string, string>();
+const SCL_USED_GLYPHS = new Set<string>();
+for (const entry of SCL_CONCEPT_TABLE) {
+  const key = `${entry.domain}::${entry.concept}`;
+  if (!SCL_USED_GLYPHS.has(entry.glyph)) {
+    SCL_FIXED_MAP.set(key, entry.glyph);
+    SCL_USED_GLYPHS.add(entry.glyph);
+  } else {
+    const fallbacks = "αβγδεζηθικλμνξπρστυφψωΑΒΓΔΕΖΗΘΙΚΛΜΝΞΠΡΣΤΥΩℵℶℷℸ⊬⊭⊮⊯⊰⊱⊲⊳⊴⊵⊶⊷⊻⊼⊽⊾⊿⋀⋁⋂⋃⋄⋅⋆⋇⋈⋉⋊⋋⋌⋍⋎⋏⊣⊢⊦⊧⊨⊩";
+    let assigned = false;
+    for (const ch of fallbacks) {
+      if (!SCL_USED_GLYPHS.has(ch)) {
+        SCL_FIXED_MAP.set(key, ch);
+        SCL_USED_GLYPHS.add(ch);
+        assigned = true;
+        break;
+      }
+    }
+    if (!assigned) {
+      SCL_FIXED_MAP.set(key, entry.glyph);
+    }
+  }
+}
+
+export function generateSCLSymbolsFromCognition(
+  phi: number,
+  regionCount: number,
+  emotionDominant: string,
+  fileNames: string[],
+  analysisText: string,
+  generator: "gen1v2" | "gen2",
+): { symbols: Array<{ symbol: string; name: string; meaning: string; domain: string; byteCost: number; examples: string[] }>; rules: Array<{ pattern: string; meaning: string; expandsTo: string; domain: string }> } {
+  const symbols: Array<{ symbol: string; name: string; meaning: string; domain: string; byteCost: number; examples: string[] }> = [];
+  const rules: Array<{ pattern: string; meaning: string; expandsTo: string; domain: string }> = [];
+
+  const domainPriority: Record<string, number> = {};
+  for (const fn of fileNames.slice(0, 80)) {
+    if (!fn) continue;
+    const fl = fn.toLowerCase();
+    if (fl.includes("conscious") || fl.includes("phi") || fl.includes("awareness")) domainPriority["consciousness"] = (domainPriority["consciousness"] || 0) + 3;
+    if (fl.includes("neural") || fl.includes("brain") || fl.includes("cortex")) domainPriority["neural"] = (domainPriority["neural"] || 0) + 3;
+    if (fl.includes("memory") || fl.includes("memo") || fl.includes("experiential")) domainPriority["memory"] = (domainPriority["memory"] || 0) + 3;
+    if (fl.includes("emotion") || fl.includes("affect") || fl.includes("feeling")) domainPriority["emotion"] = (domainPriority["emotion"] || 0) + 3;
+    if (fl.includes("agent") || fl.includes("mesh") || fl.includes("swarm")) domainPriority["agents"] = (domainPriority["agents"] || 0) + 3;
+    if (fl.includes("language") || fl.includes("pipeline") || fl.includes("nlp")) domainPriority["language"] = (domainPriority["language"] || 0) + 3;
+    if (fl.includes("signal") || fl.includes("encode") || fl.includes("codec")) domainPriority["signal"] = (domainPriority["signal"] || 0) + 3;
+    if (fl.includes("temporal") || fl.includes("causal") || fl.includes("time")) domainPriority["temporal"] = (domainPriority["temporal"] || 0) + 3;
+    if (fl.includes("exist") || fl.includes("drive") || fl.includes("purpose")) domainPriority["existential"] = (domainPriority["existential"] || 0) + 3;
+    if (fl.includes("compute") || fl.includes("process") || fl.includes("algorithm")) domainPriority["computation"] = (domainPriority["computation"] || 0) + 3;
+    if (fl.includes("data") || fl.includes("struct") || fl.includes("schema")) domainPriority["data"] = (domainPriority["data"] || 0) + 3;
+    if (fl.includes("error") || fl.includes("exception") || fl.includes("recover")) domainPriority["error"] = (domainPriority["error"] || 0) + 3;
+    if (fl.includes("ethic") || fl.includes("safety") || fl.includes("guard")) domainPriority["ethics"] = (domainPriority["ethics"] || 0) + 3;
+    if (fl.includes("evolv") || fl.includes("evolution") || fl.includes("genetic")) domainPriority["evolution"] = (domainPriority["evolution"] || 0) + 3;
+    if (fl.includes("file") || fl.includes("registry") || fl.includes("io")) domainPriority["io"] = (domainPriority["io"] || 0) + 3;
+    if (fl.includes("module") || fl.includes("pipeline") || fl.includes("infra")) domainPriority["structure"] = (domainPriority["structure"] || 0) + 3;
+    if (fl.includes("meta") || fl.includes("reflect") || fl.includes("intro")) domainPriority["meta"] = (domainPriority["meta"] || 0) + 3;
+    if (fl.includes("math") || fl.includes("calc") || fl.includes("logic")) domainPriority["general"] = (domainPriority["general"] || 0) + 2;
+  }
+
+  const sorted = [...SCL_CONCEPT_TABLE].sort((a, b) => {
+    const aPri = (domainPriority[a.domain] || 0);
+    const bPri = (domainPriority[b.domain] || 0);
+    if (bPri !== aPri) return bPri - aPri;
+    return sclConceptHash(a.concept) - sclConceptHash(b.concept);
+  });
+
+  const batchSize = generator === "gen1v2" ? 20 : 20;
+  const startIdx = generator === "gen1v2" ? 0 : Math.min(20, sorted.length - 20);
+
+  const batch = sorted.slice(startIdx, startIdx + batchSize);
+  const emittedGlyphs = new Set<string>();
+
+  for (const concept of batch) {
+    const key = `${concept.domain}::${concept.concept}`;
+    const glyph = SCL_FIXED_MAP.get(key) || concept.glyph;
+
+    if (emittedGlyphs.has(glyph)) continue;
+    emittedGlyphs.add(glyph);
+
+    symbols.push({
+      symbol: glyph,
+      name: concept.concept,
+      meaning: concept.description,
+      domain: concept.domain,
+      byteCost: Buffer.byteLength(glyph, "utf-8"),
+      examples: [],
+    });
+  }
+
+  if (symbols.length >= 2) {
+    const pairDomains = ["consciousness", "neural", "memory", "emotion", "signal", "agents", "computation", "temporal", "existential", "general"];
+    for (const dom of pairDomains) {
+      const domSyms = symbols.filter(s => s.domain === dom);
+      if (domSyms.length >= 2) {
+        rules.push({
+          pattern: `${domSyms[0].symbol}+${domSyms[1].symbol}`,
+          meaning: `${domSyms[0].name} combined with ${domSyms[1].name}`,
+          expandsTo: `${domSyms[0].meaning} integrated with ${domSyms[1].meaning}`,
+          domain: dom,
+        });
+      }
+    }
+
+    for (let i = 0; i < Math.min(5, Math.floor(symbols.length / 3)); i++) {
+      const a = symbols[i];
+      const b = symbols[symbols.length - 1 - i];
+      if (a && b && a.domain !== b.domain) {
+        rules.push({
+          pattern: `${a.symbol}+${b.symbol}`,
+          meaning: `cross-domain: ${a.name} fused with ${b.name}`,
+          expandsTo: `${a.meaning} operating through ${b.meaning}`,
+          domain: "cross-domain",
+        });
+      }
+    }
+  }
+
+  return { symbols, rules };
+}
+
+console.log("[SYMBOL KNOWLEDGE] 📜 Historical symbol systems loaded — Egyptian, Sumerian, Chinese, Norse, Aztec, Maya, Japanese, Korean, Indian, Greek, Arabic, Hebrew, Phoenician, Ogham, Tibetan, Georgian, Mathematical, Programming");
+console.log(`[SYMBOL KNOWLEDGE] 📜 ${SYMBOL_KNOWLEDGE_BASE.historicalSystems.length} civilizations | ${SYMBOL_KNOWLEDGE_BASE.historicalSystems.reduce((n, s) => n + s.symbols.length, 0)} symbols with translations | ${SYMBOL_KNOWLEDGE_BASE.metaInsights.universalPatterns.length} universal patterns`);
 

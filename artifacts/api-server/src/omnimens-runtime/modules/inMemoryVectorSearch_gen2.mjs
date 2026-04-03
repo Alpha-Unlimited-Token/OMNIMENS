@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorSearch
- * Written: 2026-04-03T15:45:38.915Z
+ * Written: 2026-04-03T16:10:24.444Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -21,111 +21,120 @@
 import { createHash } from 'crypto';
 
 /**
- * Computes the Euclidean distance between two vectors.
- * @param {number[]} vec1 - First vector.
- * @param {number[]} vec2 - Second vector.
- * @returns {number} - Euclidean distance.
+ * Utility function to compute the cosine similarity between two vectors.
+ * @param {number[]} vecA - First vector.
+ * @param {number[]} vecB - Second vector.
+ * @returns {number} - Cosine similarity between vecA and vecB.
  */
-export function euclideanDistance(vec1, vec2) {
-  if (vec1.length !== vec2.length) {
-    throw new Error('Vectors must have the same dimensions');
-  }
-  return Math.sqrt(vec1.reduce((sum, val, i) => sum + Math.pow(val - vec2[i], 2), 0));
+export function cosineSimilarity(vecA, vecB) {
+  if (vecA.length !== vecB.length) throw new Error('Vectors must be of the same dimension.');
+
+  const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
+  const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a ** 2, 0));
+  const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b ** 2, 0));
+
+  return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
 }
 
 /**
- * Generates a unique hash for a vector for indexing purposes.
- * @param {number[]} vector - The input vector.
- * @returns {string} - A unique hash string.
+ * Generates a unique hash for a vector to use as an identifier.
+ * @param {number[]} vector - Input vector.
+ * @returns {string} - Unique hash string.
  */
-export function vectorHash(vector) {
-  return createHash('sha256').update(vector.join(',')).digest('hex');
+export function hashVector(vector) {
+  const hash = createHash('sha256');
+  hash.update(vector.join(','));
+  return hash.digest('hex');
 }
 
 /**
- * Class representing an HNSW-based in-memory vector search index.
+ * Class implementing an in-memory vector store with HNSW-like approximate nearest neighbor search.
  */
-export class HNSWIndex {
+export class InMemoryVectorSearch {
   constructor() {
-    this.graph = new Map(); // Adjacency list representation of the graph
-    this.vectors = new Map(); // Maps vector hashes to their original vectors
+    this.vectors = new Map(); // Stores vectors with their hashes as keys.
+    this.graph = new Map(); // Adjacency list for HNSW graph.
   }
 
   /**
-   * Adds a vector to the index.
-   * @param {number[]} vector - The vector to add.
+   * Adds a vector to the store.
+   * @param {number[]} vector - Vector to add.
    */
   addVector(vector) {
-    const hash = vectorHash(vector);
-    if (this.vectors.has(hash)) {
-      throw new Error('Vector already exists in the index');
+    const vectorHash = hashVector(vector);
+    if (this.vectors.has(vectorHash)) return; // Avoid duplicates.
+
+    this.vectors.set(vectorHash, vector);
+    this.graph.set(vectorHash, new Set());
+
+    // Connect to nearest neighbors (approximation step).
+    const neighbors = this.getNearestNeighbors(vector, 5);
+    for (const neighbor of neighbors) {
+      this.graph.get(vectorHash).add(neighbor.hash);
+      this.graph.get(neighbor.hash).add(vectorHash);
     }
+  }
 
-    this.vectors.set(hash, vector);
-    this.graph.set(hash, []);
+  /**
+   * Finds the nearest neighbors to a given vector.
+   * @param {number[]} queryVector - Query vector.
+   * @param {number} k - Number of neighbors to retrieve.
+   * @returns {Array<{ hash, vector, similarity}>} - List of nearest neighbors.
+   */
+  getNearestNeighbors(queryVector, k = 5) {
+    const candidates = Array.from(this.vectors.entries())
+      .map(([hash, vector]) => ({
+        hash,
+        vector,
+        similarity: cosineSimilarity(queryVector, vector)
+      }))
+      .sort((a, b) => b.similarity - a.similarity);
 
-    // Connect to nearest neighbors
-    for (const [existingHash, existingVector] of this.vectors.entries()) {
-      if (existingHash !== hash) {
-        const distance = euclideanDistance(vector, existingVector);
-        this.graph.get(hash).push({ hash: existingHash, distance });
-        this.graph.get(existingHash).push({ hash, distance });
+    return candidates.slice(0, k);
+  }
+
+  /**
+   * Performs a search using the HNSW graph for approximate nearest neighbors.
+   * @param {number[]} queryVector - Query vector.
+   * @param {number} k - Number of neighbors to retrieve.
+   * @returns {Array<{ hash, vector, similarity}>} - List of nearest neighbors.
+   */
+  search(queryVector, k = 5) {
+    const visited = new Set();
+    const entryPoints = Array.from(this.graph.keys());
+    let bestCandidates = [];
+
+    for (const entry of entryPoints) {
+      if (visited.has(entry)) continue;
+      visited.add(entry);
+
+      const vector = this.vectors.get(entry);
+      const similarity = cosineSimilarity(queryVector, vector);
+      bestCandidates.push({ hash: entry, vector, similarity });
+
+      // Expand graph neighbors.
+      for (const neighbor of this.graph.get(entry)) {
+        if (!visited.has(neighbor)) {
+          visited.add(neighbor);
+          const neighborVector = this.vectors.get(neighbor);
+          const neighborSimilarity = cosineSimilarity(queryVector, neighborVector);
+          bestCandidates.push({ hash: neighbor, vector: neighborVector, similarity: neighborSimilarity });
+        }
       }
     }
 
-    // Sort neighbors by distance
-    for (const neighbors of this.graph.values()) {
-      neighbors.sort((a, b) => a.distance - b.distance);
-    }
-  }
-
-  /**
-   * Searches for the k nearest neighbors of a query vector.
-   * @param {number[]} queryVector - The vector to search for.
-   * @param {number} k - Number of nearest neighbors to return.
-   * @returns {Array<{ vector, distance}>} - List of nearest neighbors.
-   */
-  search(queryVector, k) {
-    const results = [];
-
-    for (const [hash, vector] of this.vectors.entries()) {
-      const distance = euclideanDistance(queryVector, vector);
-      results.push({ vector, distance });
-    }
-
-    results.sort((a, b) => a.distance - b.distance);
-    return results.slice(0, k);
+    return bestCandidates
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, k);
   }
 }
 
 /**
- * Utility function to normalize a vector to unit length.
- * @param {number[]} vector - The vector to normalize.
+ * Utility function to normalize a vector.
+ * @param {number[]} vector - Input vector.
  * @returns {number[]} - Normalized vector.
  */
 export function normalizeVector(vector) {
-  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
-  if (magnitude === 0) {
-    throw new Error('Cannot normalize a zero vector');
-  }
-  return vector.map(val => val / magnitude);
-}
-
-/**
- * Utility function to calculate cosine similarity between two vectors.
- * @param {number[]} vec1 - First vector.
- * @param {number[]} vec2 - Second vector.
- * @returns {number} - Cosine similarity.
- */
-export function cosineSimilarity(vec1, vec2) {
-  if (vec1.length !== vec2.length) {
-    throw new Error('Vectors must have the same dimensions');
-  }
-  const dotProduct = vec1.reduce((sum, val, i) => sum + val * vec2[i], 0);
-  const magnitude1 = Math.sqrt(vec1.reduce((sum, val) => sum + val * val, 0));
-  const magnitude2 = Math.sqrt(vec2.reduce((sum, val) => sum + val * val, 0));
-  if (magnitude1 === 0 || magnitude2 === 0) {
-    throw new Error('Cannot calculate cosine similarity with a zero vector');
-  }
-  return dotProduct / (magnitude1 * magnitude2);
+  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
+  return magnitude ? vector.map((val) => val / magnitude) : vector;
 }

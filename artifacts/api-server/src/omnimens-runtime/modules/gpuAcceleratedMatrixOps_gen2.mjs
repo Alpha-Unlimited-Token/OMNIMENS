@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuAcceleratedMatrixOps
- * Written: 2026-04-03T15:45:19.357Z
+ * Written: 2026-04-03T16:10:14.181Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,108 +16,135 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-/**
- * TRANSLATION STATUS:
- * Novel constructs: attention
- * All constructs have translation mappings
- * Compiled targets: javascript: OK (16 IR steps) | python: OK (16 IR steps) | c: OK (16 IR steps) | x86_64: OK (16 IR steps) | arm64: OK (16 IR steps) | avr: OK (16 IR steps)
- * Translation map version: 22
- */
 // gpuAcceleratedMatrixOps.mjs
 
-import { createHash } from 'crypto';
+import { performance } from 'node:perf_hooks';
 
-// Utility function to validate input matrices
-export function validateMatrices(a, b) {
-  if (!Array.isArray(a) || !Array.isArray(b)) {
-    throw new Error('Both inputs must be 2D arrays.');
-  }
-  if (a.length === 0 || b.length === 0) {
-    throw new Error('Input matrices must not be empty.');
-  }
-  if (!Array.isArray(a[0]) || !Array.isArray(b[0])) {
-    throw new Error('Matrices must be 2D arrays.');
-  }
-  if (a[0].length !== b.length) {
-    throw new Error('Matrix multiplication not possible: columns of A must match rows of B.');
-  }
+/**
+ * Utility function to create a GPU-accelerated matrix multiplication kernel.
+ * @returns {Object} GPU.js kernel instance for matrix multiplication.
+ */
+function createMatrixMultiplicationKernel() {
+  const gpu = new GPU();
+
+  return gpu.createKernel(function (a, b) {
+    let sum = 0;
+    for (let k = 0; k < this.constants.size; k++) {
+      sum += a[this.thread.y][k] * b[k][this.thread.x];
+    }
+    return sum;
+  })
+    .setOutput([this.constants.size, this.constants.size])
+    .setConstants({ size: a.length });
 }
 
-// GPU-accelerated matrix multiplication
-export function gpuMatrixMultiply(a, b) {
-  validateMatrices(a, b);
-
-  const result = Array(a.length)
-    .fill(0)
-    .map(() => Array(b[0].length).fill(0));
-
-  for (let i = 0; i < a.length; i++) {
-    for (let j = 0; j < b[0].length; j++) {
-      for (let k = 0; k < b.length; k++) {
-        result[i][j] += a[i][k] * b[k][j];
-      }
-    }
+/**
+ * Perform GPU-accelerated matrix multiplication.
+ * @param {number[][]} matrixA - First matrix.
+ * @param {number[][]} matrixB - Second matrix.
+ * @returns {number[][]} Resultant matrix after multiplication.
+ */
+export function gpuMatrixMultiply(matrixA, matrixB) {
+  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
+    throw new TypeError('Both inputs must be 2D arrays.');
   }
+
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
+
+  if (colsA !== rowsB) {
+    throw new Error('Matrix dimensions do not align for multiplication.');
+  }
+
+  const kernel = createMatrixMultiplicationKernel();
+  const result = kernel(matrixA, matrixB);
 
   return result;
 }
 
-// Scaled dot-product attention mechanism
-export function scaledDotProductAttention(query, key, value, scaleFactor = 1) {
-  validateMatrices(query, key);
-  validateMatrices(key, value);
+/**
+ * Generate a random matrix with specified dimensions.
+ * @param {number} rows - Number of rows.
+ * @param {number} cols - Number of columns.
+ * @returns {number[][]} Randomly generated matrix.
+ */
+export function generateRandomMatrix(rows, cols) {
+  if (rows <= 0 || cols <= 0) {
+    throw new Error('Matrix dimensions must be positive integers.');
+  }
 
-  const keyTranspose = key[0].map((_, colIndex) => key.map(row => row[colIndex]));
-  const scores = gpuMatrixMultiply(query, keyTranspose);
+  const matrix = [];
+  for (let i = 0; i < rows; i++) {
+    const row = [];
+    for (let j = 0; j < cols; j++) {
+      row.push(Math.random());
+    }
+    matrix.push(row);
+  }
 
-  const scaledScores = scores.map(row => row.map(val => val / scaleFactor));
-  const softmax = scaledScores.map(row => {
-    const maxVal = Math.max(...row);
-    const exps = row.map(val => Math.exp(val - maxVal));
-    const sumExps = exps.reduce((acc, val) => acc + val, 0);
-    return exps.map(val => val / sumExps);
-  });
-
-  return gpuMatrixMultiply(softmax, value);
+  return matrix;
 }
 
-// Hopfield network memory update
-export function hopfieldUpdate(memoryMatrix, inputVector) {
-  if (!Array.isArray(memoryMatrix) || !Array.isArray(inputVector)) {
-    throw new Error('Memory matrix and input vector must be arrays.');
-  }
-  if (memoryMatrix.length === 0 || inputVector.length === 0) {
-    throw new Error('Memory matrix and input vector must not be empty.');
-  }
-  if (memoryMatrix[0].length !== inputVector.length) {
-    throw new Error('Input vector length must match memory matrix column count.');
+/**
+ * Measure the performance of matrix multiplication using the GPU.
+ * @param {number[][]} matrixA - First matrix.
+ * @param {number[][]} matrixB - Second matrix.
+ * @returns {Object} Performance metrics including time taken.
+ */
+export function measureGpuPerformance(matrixA, matrixB) {
+  const start = performance.now();
+  const result = gpuMatrixMultiply(matrixA, matrixB);
+  const end = performance.now();
+
+  return {
+    timeTakenMs: end - start,
+    result
+  };
+}
+
+/**
+ * Validate if a matrix is well-formed.
+ * @param {number[][]} matrix - Matrix to validate.
+ * @returns {boolean} True if valid, false otherwise.
+ */
+export function validateMatrix(matrix) {
+  if (!Array.isArray(matrix) || matrix.length === 0) {
+    return false;
   }
 
-  const inputTranspose = [inputVector];
-  const weightUpdate = gpuMatrixMultiply(inputTranspose, [inputVector]);
-
-  for (let i = 0; i < memoryMatrix.length; i++) {
-    for (let j = 0; j < memoryMatrix[i].length; j++) {
-      memoryMatrix[i][j] += weightUpdate[i][j];
+  const rowLength = matrix[0].length;
+  for (const row of matrix) {
+    if (!Array.isArray(row) || row.length !== rowLength) {
+      return false;
     }
   }
 
-  return memoryMatrix;
+  return true;
 }
 
-// Hashing utility for matrix integrity checks
-export function hashMatrix(matrix) {
-  if (!Array.isArray(matrix) || !Array.isArray(matrix[0])) {
-    throw new Error('Input must be a 2D array.');
+/**
+ * Transpose a matrix.
+ * @param {number[][]} matrix - Matrix to transpose.
+ * @returns {number[][]} Transposed matrix.
+ */
+export function transposeMatrix(matrix) {
+  if (!validateMatrix(matrix)) {
+    throw new Error('Invalid matrix format.');
   }
 
-  const flatMatrix = matrix.flat().join(',');
-  return createHash('sha256').update(flatMatrix).digest('hex');
-}
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+  const transposed = [];
 
-// Example export for testing purposes
-export const exampleMatrix = [
-  [1, 2, 3],
-  [4, 5, 6],
-  [7, 8, 9]
-];
+  for (let i = 0; i < cols; i++) {
+    const row = [];
+    for (let j = 0; j < rows; j++) {
+      row.push(matrix[j][i]);
+    }
+    transposed.push(row);
+  }
+
+  return transposed;
+}

@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-04-03T14:25:40.970Z
+ * Written: 2026-04-03T16:10:48.512Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,92 +18,106 @@
 
 // Complete ES module code here
 
-import { randomUUID } from 'crypto';
+import { createHash } from 'crypto';
 
-/**
- * Utility module for in-memory vector storage and similarity search using HNSW graphs.
- * Provides efficient nearest neighbor search for embedding-based knowledge bases.
- */
-
-// Helper function: Calculate Euclidean distance between two vectors
-export function euclideanDistance(vectorA, vectorB) {
+// Utility to compute cosine similarity between two vectors
+export function cosineSimilarity(vectorA, vectorB) {
   if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must have the same dimensions');
-  }
-  return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0));
-}
-
-// Helper function: Generate random unique ID for nodes
-export function generateNodeId() {
-  return randomUUID();
-}
-
-// Class representing a node in the HNSW graph
-class HNSWNode {
-  constructor(id, vector) {
-    this.id = id;
-    this.vector = vector;
-    this.neighbors = new Map(); // Map of neighbor IDs to distances
-  }
-}
-
-// Main HNSW Graph class
-export class HNSWGraph {
-  constructor(maxNeighbors = 10) {
-    this.nodes = new Map(); // Map of node IDs to HNSWNode instances
-    this.maxNeighbors = maxNeighbors; // Maximum neighbors per node
+    throw new Error('Vectors must be of the same length');
   }
 
-  // Add a new vector to the graph
+  const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a * a, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b * b, 0));
+
+  if (magnitudeA === 0 || magnitudeB === 0) {
+    return 0; // Avoid division by zero
+  }
+
+  return dotProduct / (magnitudeA * magnitudeB);
+}
+
+// Generate a unique hash for a vector to use as an identifier
+export function vectorHash(vector) {
+  const hash = createHash('sha256');
+  hash.update(vector.join(','));
+  return hash.digest('hex');
+}
+
+// Class to manage an in-memory vector store with HNSW-like approximate nearest neighbor search
+export class InMemoryVectorStore {
+  constructor() {
+    this.vectors = new Map(); // Store vectors by their hash
+    this.index = new Map(); // Store adjacency list for HNSW graph
+  }
+
+  // Add a vector to the store
   addVector(vector) {
-    const nodeId = generateNodeId();
-    const newNode = new HNSWNode(nodeId, vector);
-
-    // Connect to existing nodes based on distance
-    for (const [existingNodeId, existingNode] of this.nodes) {
-      const distance = euclideanDistance(vector, existingNode.vector);
-      existingNode.neighbors.set(nodeId, distance);
-      newNode.neighbors.set(existingNodeId, distance);
+    const id = vectorHash(vector);
+    if (this.vectors.has(id)) {
+      throw new Error('Vector already exists in the store');
     }
 
-    // Trim neighbors to maxNeighbors based on distance
-    newNode.neighbors = new Map(
-      [...newNode.neighbors.entries()].sort((a, b) => a[1] - b[1]).slice(0, this.maxNeighbors)
-    );
+    this.vectors.set(id, vector);
 
-    for (const [neighborId, distance] of newNode.neighbors) {
-      const neighborNode = this.nodes.get(neighborId);
-      neighborNode.neighbors.set(nodeId, distance);
-      neighborNode.neighbors = new Map(
-        [...neighborNode.neighbors.entries()].sort((a, b) => a[1] - b[1]).slice(0, this.maxNeighbors)
-      );
-    }
+    // Update HNSW graph connections
+    this.updateGraph(id, vector);
 
-    this.nodes.set(nodeId, newNode);
-    return nodeId;
+    return id;
   }
 
-  // Find the nearest neighbors for a given vector
-  searchNearestNeighbors(queryVector, k = 5) {
-    const distances = [];
+  // Update the graph with a new vector
+  updateGraph(id, vector) {
+    const neighbors = [...this.vectors.entries()]
+      .map(([neighborId, neighborVector]) => ({
+        id: neighborId,
+        similarity: cosineSimilarity(vector, neighborVector)
+      }))
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, 5); // Keep top 5 neighbors
 
-    for (const [nodeId, node] of this.nodes) {
-      const distance = euclideanDistance(queryVector, node.vector);
-      distances.push({ nodeId, distance });
+    this.index.set(id, neighbors.map((n) => n.id));
+  }
+
+  // Search for the nearest neighbors to a query vector
+  search(queryVector, k = 5) {
+    const visited = new Set();
+    const candidates = [...this.vectors.entries()]
+      .map(([id, vector]) => ({
+        id,
+        similarity: cosineSimilarity(queryVector, vector)
+      }))
+      .sort((a, b) => b.similarity - a.similarity);
+
+    const results = [];
+
+    for (const candidate of candidates) {
+      if (visited.has(candidate.id)) {
+        continue;
+      }
+
+      visited.add(candidate.id);
+      results.push(candidate);
+
+      if (results.length >= k) {
+        break;
+      }
     }
 
-    return distances.sort((a, b) => a.distance - b.distance).slice(0, k);
+    return results.map((r) => ({ id: r.id, similarity: r.similarity }));
   }
 }
 
-// Utility function: Create a new HNSW graph instance
-export function createHNSWGraph(maxNeighbors = 10) {
-  return new HNSWGraph(maxNeighbors);
+// Example utility function to normalize a vector
+export function normalizeVector(vector) {
+  const magnitude = Math.sqrt(vector.reduce((sum, v) => sum + v * v, 0));
+  if (magnitude === 0) {
+    return vector.map(() => 0);
+  }
+  return vector.map((v) => v / magnitude);
 }
 
-// Example usage (commented out for production):
-// const graph = createHNSWGraph();
-// const id1 = graph.addVector([1, 2, 3]);
-// const id2 = graph.addVector([4, 5, 6]);
-// const neighbors = graph.searchNearestNeighbors([1, 2, 3], 2);
-// console.log(neighbors);
+// Example utility function to generate random vectors (useful for testing)
+export function generateRandomVector(size, range = 1) {
+  return Array.from({ length: size }, () => Math.random() * range * 2 - range);
+}

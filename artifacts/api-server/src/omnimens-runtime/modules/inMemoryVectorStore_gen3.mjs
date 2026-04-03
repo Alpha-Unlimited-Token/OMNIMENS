@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryVectorStore
- * Written: 2026-04-03T15:45:38.893Z
+ * Written: 2026-04-03T16:16:10.366Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -21,114 +21,138 @@
 import { createHash } from 'crypto';
 
 /**
- * Generate a hash-based unique ID for vectors to ensure efficient storage and retrieval.
- * @param {Array<number>} vector - The input vector.
- * @returns {string} - A unique hash ID for the vector.
+ * Utility module for in-memory storage and retrieval of high-dimensional embeddings
+ * using the HNSW (Hierarchical Navigable Small World) graph algorithm for efficient
+ * approximate nearest neighbor search.
  */
-export function generateVectorId(vector) {
+
+// Node representing a single point in the HNSW graph
+class HNSWNode {
+  constructor(id, vector) {
+    this.id = id; // Unique identifier for the vector
+    this.vector = vector; // High-dimensional vector
+    this.neighbors = new Map(); // Neighbors at different layers
+  }
+}
+
+/**
+ * Compute Euclidean distance between two vectors.
+ * @param {number[]} vec1 - First vector.
+ * @param {number[]} vec2 - Second vector.
+ * @returns {number} - Euclidean distance.
+ */
+export function euclideanDistance(vec1, vec2) {
+  if (vec1.length !== vec2.length) {
+    throw new Error('Vectors must have the same dimension');
+  }
+  return Math.sqrt(vec1.reduce((sum, val, i) => sum + (val - vec2[i]) ** 2, 0));
+}
+
+/**
+ * Generate a hash for a vector to ensure unique IDs.
+ * @param {number[]} vector - High-dimensional vector.
+ * @returns {string} - Hash string.
+ */
+export function hashVector(vector) {
   const hash = createHash('sha256');
   hash.update(vector.join(','));
   return hash.digest('hex');
 }
 
 /**
- * Calculate the Euclidean distance between two vectors.
- * @param {Array<number>} vectorA - The first vector.
- * @param {Array<number>} vectorB - The second vector.
- * @returns {number} - The Euclidean distance.
- */
-export function calculateEuclideanDistance(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must have the same length');
-  }
-  return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
-}
-
-/**
- * In-memory vector store using a KD-tree-like structure for fast nearest neighbor search.
+ * Class implementing the in-memory HNSW graph.
  */
 export class InMemoryVectorStore {
-  constructor() {
-    this.vectors = new Map(); // Store vectors with their unique IDs.
+  constructor(maxNeighbors = 16, efConstruction = 200) {
+    this.maxNeighbors = maxNeighbors; // Maximum neighbors per layer
+    this.efConstruction = efConstruction; // Search breadth during construction
+    this.nodes = new Map(); // Map of ID -> HNSWNode
   }
 
   /**
-   * Add a vector to the store.
-   * @param {Array<number>} vector - The vector to add.
+   * Add a vector to the HNSW graph.
+   * @param {number[]} vector - High-dimensional vector to add.
    */
   addVector(vector) {
-    const id = generateVectorId(vector);
-    this.vectors.set(id, vector);
-  }
-
-  /**
-   * Find the nearest neighbors to a given vector.
-   * @param {Array<number>} queryVector - The vector to search for.
-   * @param {number} k - The number of nearest neighbors to retrieve.
-   * @returns {Array<{id, vector, distance}>} - The nearest neighbors.
-   */
-  findNearestNeighbors(queryVector, k = 1) {
-    if (k <= 0) {
-      throw new Error('k must be greater than 0');
+    const id = hashVector(vector);
+    if (this.nodes.has(id)) {
+      throw new Error('Vector already exists in the store');
     }
 
-    const neighbors = [];
+    const newNode = new HNSWNode(id, vector);
+    this.nodes.set(id, newNode);
 
-    for (const [id, vector] of this.vectors.entries()) {
-      const distance = calculateEuclideanDistance(queryVector, vector);
-      neighbors.push({ id, vector, distance });
+    if (this.nodes.size === 1) return; // First node, no neighbors to connect
+
+    // Find nearest neighbors and connect
+    const neighbors = this._searchNearest(vector, this.efConstruction);
+    neighbors.forEach((neighbor) => {
+      this._connectNodes(newNode, neighbor);
+    });
+  }
+
+  /**
+   * Search for the nearest neighbors of a given vector.
+   * @param {number[]} queryVector - Query vector.
+   * @param {number} k - Number of nearest neighbors to retrieve.
+   * @returns {Array<{ id, distance}>} - List of nearest neighbors.
+   */
+  search(queryVector, k = 1) {
+    const nearest = this._searchNearest(queryVector, k);
+    return nearest.map((node) => ({
+      id: node.id,
+      distance: euclideanDistance(queryVector, node.vector)
+    }));
+  }
+
+  /**
+   * Internal method to search for nearest neighbors.
+   * @param {number[]} queryVector - Query vector.
+   * @param {number} ef - Search breadth.
+   * @returns {HNSWNode[]} - List of nearest neighbor nodes.
+   */
+  _searchNearest(queryVector, ef) {
+    const candidates = Array.from(this.nodes.values());
+    candidates.sort((a, b) =>
+      euclideanDistance(queryVector, a.vector) - euclideanDistance(queryVector, b.vector)
+    );
+    return candidates.slice(0, ef);
+  }
+
+  /**
+   * Connect two nodes in the graph.
+   * @param {HNSWNode} nodeA - First node.
+   * @param {HNSWNode} nodeB - Second node.
+   */
+  _connectNodes(nodeA, nodeB) {
+    if (!nodeA.neighbors.has(0)) nodeA.neighbors.set(0, new Set());
+    if (!nodeB.neighbors.has(0)) nodeB.neighbors.set(0, new Set());
+
+    nodeA.neighbors.get(0).add(nodeB);
+    nodeB.neighbors.get(0).add(nodeA);
+
+    // Prune neighbors if exceeding maxNeighbors
+    if (nodeA.neighbors.get(0).size > this.maxNeighbors) {
+      this._pruneNeighbors(nodeA);
     }
-
-    // Sort by distance and return the top k neighbors.
-    return neighbors.sort((a, b) => a.distance - b.distance).slice(0, k);
+    if (nodeB.neighbors.get(0).size > this.maxNeighbors) {
+      this._pruneNeighbors(nodeB);
+    }
   }
 
   /**
-   * Remove a vector from the store.
-   * @param {Array<number>} vector - The vector to remove.
+   * Prune neighbors to enforce maxNeighbors limit.
+   * @param {HNSWNode} node - Node to prune neighbors for.
    */
-  removeVector(vector) {
-    const id = generateVectorId(vector);
-    this.vectors.delete(id);
-  }
-
-  /**
-   * Get the total number of vectors in the store.
-   * @returns {number} - The count of stored vectors.
-   */
-  getVectorCount() {
-    return this.vectors.size;
+  _pruneNeighbors(node) {
+    const neighbors = Array.from(node.neighbors.get(0));
+    neighbors.sort((a, b) =>
+      euclideanDistance(node.vector, a.vector) - euclideanDistance(node.vector, b.vector)
+    );
+    node.neighbors.set(0, new Set(neighbors.slice(0, this.maxNeighbors)));
   }
 }
 
-/**
- * Normalize a vector to unit length.
- * @param {Array<number>} vector - The vector to normalize.
- * @returns {Array<number>} - The normalized vector.
- */
-export function normalizeVector(vector) {
-  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
-  if (magnitude === 0) {
-    throw new Error('Cannot normalize a zero vector');
-  }
-  return vector.map(val => val / magnitude);
-}
-
-/**
- * Compute the cosine similarity between two vectors.
- * @param {Array<number>} vectorA - The first vector.
- * @param {Array<number>} vectorB - The second vector.
- * @returns {number} - The cosine similarity.
- */
-export function calculateCosineSimilarity(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must have the same length');
-  }
-  const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
-  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
-  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
-  if (magnitudeA === 0 || magnitudeB === 0) {
-    throw new Error('Cannot calculate cosine similarity with a zero vector');
-  }
-  return dotProduct / (magnitudeA * magnitudeB);
-}
+export const createVectorStore = (maxNeighbors, efConstruction) => {
+  return new InMemoryVectorStore(maxNeighbors, efConstruction);
+};

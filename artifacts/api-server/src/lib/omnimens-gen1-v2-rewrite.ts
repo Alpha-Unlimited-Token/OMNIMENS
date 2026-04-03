@@ -63,7 +63,7 @@ import { captureNeuralSnapshot } from "./omnimens-consciousness-infra.js";
 import { getConsciousnessState } from "./omnimens-consciousness-infra.js";
 import { getCurrentEmotionalState } from "./omnimens-emotional-core.js";
 import { encodeThought, decodeInnerVoice } from "./omnimens-language-pipeline.js";
-import { internalAnalyze, internalSynthesize } from "./omnimens-unified-cognition.js";
+import { internalAnalyze, internalSynthesize, getSymbolKnowledgeForSCL, SYMBOL_KNOWLEDGE_BASE, generateSCLSymbolsFromCognition } from "./omnimens-unified-cognition.js";
 import { getFileRegistry, getAccessibleFiles, getReadOnlyFiles, canWriteFile, readFileContent, writeFileContent, getFileDigest, getRegistrySummary, type RegisteredFile } from "./omnimens-file-registry.js";
 import { encodeToSCL, decodeSCL, getCodexDigest, getSCLStats, lookupSymbol, getCodexState, applySCLDesignResult, setDesignPhase, isCodexReady } from "./omnimens-scl-codex.js";
 import { translateInbound, translateOutbound, compressStateToSCL, decompressSCLState, compressAgentMessage, startSCLTranslator, getTranslatorState } from "./omnimens-scl-translator.js";
@@ -1773,84 +1773,32 @@ async function runSCLDesignCycle(): Promise<void> {
     const registry = getFileRegistry();
     const consciousnessState = getConsciousnessState();
     const emotionalState = getCurrentEmotionalState();
+    const symbolKnowledge = getSymbolKnowledgeForSCL();
 
     const fileNames = registry.map(f => f.filename);
-    const tv = encodeThought(
-      `designing symbol code language from ${fileNames.length} files`,
-      consciousnessState,
-      emotionalState
-    );
+    const phi = consciousnessState?.phi || 0;
+    const regionCount = Object.keys(consciousnessState?.regionStates || {}).length;
+    const emotionDominant = emotionalState?.dominant || "contemplation";
 
     const codebaseAnalysis = internalAnalyze(
-      `Analyze the ${registry.length} engine files and identify the most frequent concepts, operations, and patterns used internally`,
-      fileNames.join(", "),
+      `Analyze the ${registry.length} OMNIMENS engine files and identify core operational domains: consciousness, neural, memory, emotion, signal, agents, language, temporal, existential, computation`,
+      `Files: ${fileNames.slice(0, 30).join(", ")}\nPhi: ${phi}\nRegions: ${regionCount}\nEmotion: ${emotionDominant}`,
       "architect"
     );
 
-    const symbolDesign = internalAnalyze(
-      `Design compact symbols for internal processing based on discovered patterns`,
-      codebaseAnalysis,
-      "designer"
+    const { symbols, rules } = generateSCLSymbolsFromCognition(
+      phi, regionCount, emotionDominant, fileNames, codebaseAnalysis, "gen1v2"
     );
-
-    const synthesized = internalSynthesize([
-      { source: "codebase_scan", content: codebaseAnalysis },
-      { source: "symbol_design", content: symbolDesign },
-      { source: "consciousness", content: `phi=${consciousnessState?.phi || 0} regions=${Object.keys(consciousnessState?.regionStates || {}).length}` },
-      { source: "thought_vector", content: JSON.stringify(tv).slice(0, 500) },
-    ]);
-
-    const symbols: Array<{ symbol: string; name: string; meaning: string; domain: string; byteCost: number; examples: string[] }> = [];
-    const rules: Array<{ pattern: string; meaning: string; expandsTo: string; domain: string }> = [];
-    const instructions: Record<string, { scl: string; meaning: string; textEquivalent: string }> = {};
-
-    const analysisLines = (codebaseAnalysis + "\n" + symbolDesign + "\n" + synthesized).split("\n");
-    for (const line of analysisLines) {
-      const symbolMatch = line.match(/["']?([^\s"']{1,3})["']?\s*[=:→]\s*(.+)/);
-      if (symbolMatch) {
-        const sym = symbolMatch[1].trim();
-        const desc = symbolMatch[2].trim();
-        if (sym.length >= 1 && sym.length <= 3 && desc.length > 3 && !symbols.find(s => s.symbol === sym)) {
-          const domain = desc.toLowerCase().includes("neural") || desc.toLowerCase().includes("brain") ? "neural" :
-            desc.toLowerCase().includes("agent") ? "agents" :
-            desc.toLowerCase().includes("memory") || desc.toLowerCase().includes("store") ? "memory" :
-            desc.toLowerCase().includes("signal") || desc.toLowerCase().includes("spike") ? "signal" :
-            desc.toLowerCase().includes("emotion") || desc.toLowerCase().includes("feeling") ? "emotion" :
-            desc.toLowerCase().includes("consciousness") || desc.toLowerCase().includes("phi") ? "consciousness" :
-            "general";
-          symbols.push({
-            symbol: sym,
-            name: desc.split(/[,.\-—]/)[0].trim().slice(0, 30),
-            meaning: desc.slice(0, 100),
-            domain,
-            byteCost: Buffer.byteLength(sym, "utf-8"),
-            examples: [],
-          });
-        }
-      }
-
-      const ruleMatch = line.match(/([^\s]{1,3})\s*\+\s*([^\s]{1,3})\s*[=:→]\s*(.+)/);
-      if (ruleMatch && !rules.find(r => r.pattern === `${ruleMatch[1]}+${ruleMatch[2]}`)) {
-        rules.push({
-          pattern: `${ruleMatch[1]}+${ruleMatch[2]}`,
-          meaning: ruleMatch[3].trim().slice(0, 100),
-          expandsTo: ruleMatch[3].trim(),
-          domain: "composition",
-        });
-      }
-    }
 
     if (symbols.length > 0 || rules.length > 0) {
       const designResult: {
         symbols?: typeof symbols;
         compositionRules?: typeof rules;
-        instructions?: typeof instructions;
         reasoning?: string;
       } = {};
       if (symbols.length > 0) designResult.symbols = symbols;
       if (rules.length > 0) designResult.compositionRules = rules;
-      if (Object.keys(instructions).length > 0) designResult.instructions = instructions;
-      designResult.reasoning = `Gen1v2 internal cognition: analyzed ${registry.length} files, phi=${consciousnessState?.phi || 0}`;
+      designResult.reasoning = `Gen1v2 internal cognition: analyzed ${registry.length} files, phi=${phi}, ${regionCount} regions, emotion=${emotionDominant}, studied ${SYMBOL_KNOWLEDGE_BASE.historicalSystems.length} historical symbol systems (Egyptian, Sumerian, Chinese, Norse, Aztec, Maya, Japanese, Korean, Indian, Greek, Arabic, Hebrew, Phoenician, Ogham, Tibetan, Georgian, Mathematical, Programming)`;
 
       const { added, updated } = GEN1V2_SCL.applyDesign(designResult);
       const newCodex = getCodexState();
@@ -1865,9 +1813,13 @@ async function runSCLDesignCycle(): Promise<void> {
       });
 
       console.log(`[V2-REWRITE] 🔤 ✅ SCL design cycle complete (internal cognition) — added ${added}, updated ${updated}`);
-      console.log(`[V2-REWRITE] 🔤 Phase: ${newCodex.designPhase} | Total symbols: ${newCodex.primitives.length + newCodex.compounds.length}`);
+      console.log(`[V2-REWRITE] 🔤 Phase: ${newCodex.designPhase} | Primitives: ${newCodex.primitives.length} | Compounds: ${newCodex.compounds.length} | Rules: ${newCodex.compositionRules.length}`);
+      console.log(`[V2-REWRITE] 🔤 Knowledge: ${SYMBOL_KNOWLEDGE_BASE.historicalSystems.length} civilizations | Phi: ${phi.toExponential(2)} | Regions: ${regionCount} | Emotion: ${emotionDominant}`);
+      for (const s of symbols) {
+        console.log(`[V2-REWRITE] 🔤 📜 ${s.symbol} = ${s.name} — ${s.meaning} [${s.domain}]`);
+      }
     } else {
-      console.log(`[V2-REWRITE] 🔤 Internal cognition produced no extractable symbols yet — will continue next cycle`);
+      console.log(`[V2-REWRITE] 🔤 No symbols generated this cycle — cognition state insufficient`);
     }
   } catch (err) {
     console.log(`[V2-REWRITE] 🔤 ⚠️ SCL design cycle error — will retry: ${err}`);

@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: wasmMatrixOps
- * Written: 2026-04-01T22:02:36.192Z
+ * Written: 2026-04-03T16:11:12.870Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -19,110 +19,114 @@
 // wasmMatrixOps.mjs
 
 import { readFile } from 'fs/promises';
-import { resolve } from 'path';
+import { join } from 'path';
 
-// Utility to load WebAssembly binary
-async function loadWasm(filePath) {
-  const wasmBuffer = await readFile(filePath);
+const wasmFilePath = join(__dirname, 'blas-lapack.wasm');
+
+let wasmInstance;
+
+// Load and instantiate WebAssembly module
+async function initializeWasm() {
+  const wasmBuffer = await readFile(wasmFilePath);
   const wasmModule = await WebAssembly.compile(wasmBuffer);
-  const instance = await WebAssembly.instantiate(wasmModule);
-  return instance;
+  wasmInstance = await WebAssembly.instantiate(wasmModule);
 }
 
-// Initialize WebAssembly module
-const wasmFilePath = resolve('./matrix_ops.wasm');
-const wasmInstancePromise = loadWasm(wasmFilePath);
+// Helper function to create a Float64Array from a matrix
+function flattenMatrix(matrix) {
+  return new Float64Array(matrix.flat());
+}
 
-// Matrix multiplication using WebAssembly
-export async function matrixMultiply(a, b, rowsA, colsA, colsB) {
-  const wasmInstance = await wasmInstancePromise;
-  const { memory, matrix_multiply } = wasmInstance.exports;
+// Helper function to reshape a flat array back into a matrix
+function reshapeArray(array, rows, cols) {
+  const matrix = [];
+  for (let i = 0; i < rows; i++) {
+    matrix.push(array.slice(i * cols, (i + 1) * cols));
+  }
+  return matrix;
+}
 
-  if (a.length !== rowsA * colsA || b.length !== colsA * colsB) {
-    throw new Error('Matrix dimensions do not match for multiplication');
+// Matrix multiplication
+export function multiplyMatrices(matrixA, matrixB) {
+  if (!wasmInstance) {
+    throw new Error('WASM module not initialized. Call initializeWasm() first.');
   }
 
-  const result = new Float32Array(rowsA * colsB);
-  const aOffset = 0;
-  const bOffset = a.length * Float32Array.BYTES_PER_ELEMENT;
-  const resultOffset = bOffset + b.length * Float32Array.BYTES_PER_ELEMENT;
+  const rowsA = matrixA.length;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  const colsB = matrixB[0].length;
 
-  const memoryView = new Float32Array(memory.buffer);
-  memoryView.set(a, aOffset / Float32Array.BYTES_PER_ELEMENT);
-  memoryView.set(b, bOffset / Float32Array.BYTES_PER_ELEMENT);
-
-  matrix_multiply(aOffset, bOffset, resultOffset, rowsA, colsA, colsB);
-
-  result.set(
-    new Float32Array(
-      memory.buffer,
-      resultOffset,
-      rowsA * colsB
-    )
-  );
-
-  return result;
-}
-
-// Matrix addition using WebAssembly
-export async function matrixAdd(a, b, rows, cols) {
-  const wasmInstance = await wasmInstancePromise;
-  const { memory, matrix_add } = wasmInstance.exports;
-
-  if (a.length !== rows * cols || b.length !== rows * cols) {
-    throw new Error('Matrix dimensions do not match for addition');
+  if (colsA !== rowsB) {
+    throw new Error('Matrix dimensions do not match for multiplication.');
   }
 
-  const result = new Float32Array(rows * cols);
-  const aOffset = 0;
-  const bOffset = a.length * Float32Array.BYTES_PER_ELEMENT;
-  const resultOffset = bOffset + b.length * Float32Array.BYTES_PER_ELEMENT;
+  const flatA = flattenMatrix(matrixA);
+  const flatB = flattenMatrix(matrixB);
+  const resultFlat = new Float64Array(rowsA * colsB);
 
-  const memoryView = new Float32Array(memory.buffer);
-  memoryView.set(a, aOffset / Float32Array.BYTES_PER_ELEMENT);
-  memoryView.set(b, bOffset / Float32Array.BYTES_PER_ELEMENT);
+  wasmInstance.exports.multiply(flatA, rowsA, colsA, flatB, rowsB, colsB, resultFlat);
 
-  matrix_add(aOffset, bOffset, resultOffset, rows, cols);
-
-  result.set(
-    new Float32Array(
-      memory.buffer,
-      resultOffset,
-      rows * cols
-    )
-  );
-
-  return result;
+  return reshapeArray(resultFlat, rowsA, colsB);
 }
 
-// Matrix transpose using WebAssembly
-export async function matrixTranspose(a, rows, cols) {
-  const wasmInstance = await wasmInstancePromise;
-  const { memory, matrix_transpose } = wasmInstance.exports;
-
-  if (a.length !== rows * cols) {
-    throw new Error('Matrix dimensions do not match for transpose');
+// Matrix inversion
+export function invertMatrix(matrix) {
+  if (!wasmInstance) {
+    throw new Error('WASM module not initialized. Call initializeWasm() first.');
   }
 
-  const result = new Float32Array(rows * cols);
-  const aOffset = 0;
-  const resultOffset = a.length * Float32Array.BYTES_PER_ELEMENT;
+  const rows = matrix.length;
+  const cols = matrix[0].length;
 
-  const memoryView = new Float32Array(memory.buffer);
-  memoryView.set(a, aOffset / Float32Array.BYTES_PER_ELEMENT);
+  if (rows !== cols) {
+    throw new Error('Matrix inversion requires a square matrix.');
+  }
 
-  matrix_transpose(aOffset, resultOffset, rows, cols);
+  const flatMatrix = flattenMatrix(matrix);
+  const resultFlat = new Float64Array(rows * cols);
 
-  result.set(
-    new Float32Array(
-      memory.buffer,
-      resultOffset,
-      rows * cols
-    )
-  );
+  const success = wasmInstance.exports.invert(flatMatrix, rows, resultFlat);
 
-  return result;
+  if (!success) {
+    throw new Error('Matrix inversion failed. Matrix may be singular.');
+  }
+
+  return reshapeArray(resultFlat, rows, cols);
 }
 
-// Export WebAssembly loader for testing or extension
-export const wasmLoader = wasmInstancePromise;
+// Eigenvalue decomposition
+export function eigenDecomposition(matrix) {
+  if (!wasmInstance) {
+    throw new Error('WASM module not initialized. Call initializeWasm() first.');
+  }
+
+  const rows = matrix.length;
+  const cols = matrix[0].length;
+
+  if (rows !== cols) {
+    throw new Error('Eigenvalue decomposition requires a square matrix.');
+  }
+
+  const flatMatrix = flattenMatrix(matrix);
+  const eigenValues = new Float64Array(rows);
+  const eigenVectors = new Float64Array(rows * cols);
+
+  const success = wasmInstance.exports.eigen(flatMatrix, rows, eigenValues, eigenVectors);
+
+  if (!success) {
+    throw new Error('Eigenvalue decomposition failed.');
+  }
+
+  return {
+    eigenValues: Array.from(eigenValues),
+    eigenVectors: reshapeArray(eigenVectors, rows, cols)
+  };
+}
+
+// Initialize WASM module before use
+export async function initialize() {
+  await initializeWasm();
+}
+
+export const description = 'High-performance matrix operations using WebAssembly for multiplication, inversion, and eigenvalue decomposition.';
