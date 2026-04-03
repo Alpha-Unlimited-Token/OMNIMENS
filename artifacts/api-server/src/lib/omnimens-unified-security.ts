@@ -4917,7 +4917,7 @@ function verifySystemIntegrity(): IntegrityReport {
   };
 }
 
-let _started = false;
+let _securityStarted = false;
 let verificationCycleCount = 0;
 
 async function runIntegrityVerification(): Promise<void> {
@@ -5024,8 +5024,8 @@ export function embedTrackingPayload(): object {
 }
 
 export function startIPGuardian(): void {
-  if (_started) { console.log("[IP GUARDIAN] Already running — skipping duplicate start"); return; }
-  _started = true;
+  if (_securityStarted) { console.log("[IP GUARDIAN] Already running — skipping duplicate start"); return; }
+  _securityStarted = true;
 
   initializeBeacons();
 

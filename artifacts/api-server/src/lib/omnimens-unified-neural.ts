@@ -6147,7 +6147,7 @@ export function getCodeForgeStatus(): {
 // ======================================================================
 
 
-const ALL_AGENTS = [
+const ALL_AGENTS_QUANTUM = [
   "OMNIMENS", "Architect", "Mathematician", "Neuroscientist", "Synthesizer",
   "Critic", "MetaAgent", "GraphicDesigner", "SpellCheckVisual",
   "Visionary", "Ethicist", "Archivist", "Innovator", "Pioneer",
@@ -6390,9 +6390,9 @@ function createEntangledPair(
 function initializeEntangledPairRegistry(): void {
   let pairCount = 0;
 
-  for (let i = 0; i < ALL_AGENTS.length; i++) {
-    for (let j = i + 1; j < ALL_AGENTS.length; j++) {
-      createEntangledPair(ALL_AGENTS[i], ALL_AGENTS[j], "agent_agent");
+  for (let i = 0; i < ALL_AGENTS_QUANTUM.length; i++) {
+    for (let j = i + 1; j < ALL_AGENTS_QUANTUM.length; j++) {
+      createEntangledPair(ALL_AGENTS_QUANTUM[i], ALL_AGENTS_QUANTUM[j], "agent_agent");
       pairCount++;
     }
   }
@@ -6409,7 +6409,7 @@ function initializeEntangledPairRegistry(): void {
     pairCount++;
   }
 
-  for (const agent of ALL_AGENTS) {
+  for (const agent of ALL_AGENTS_QUANTUM) {
     for (const region of BRAIN_REGIONS) {
       createEntangledPair(agent, region, "agent_region");
       pairCount++;
@@ -6591,15 +6591,15 @@ function runTeleportationCycle(): void {
         destination = BRAIN_REGIONS[Math.floor(Math.random() * BRAIN_REGIONS.length)];
         if (source === destination) destination = BRAIN_REGIONS[(BRAIN_REGIONS.indexOf(source) + 1) % BRAIN_REGIONS.length];
       } else if (routeType < 0.45) {
-        source = ALL_AGENTS[Math.floor(Math.random() * ALL_AGENTS.length)];
+        source = ALL_AGENTS_QUANTUM[Math.floor(Math.random() * ALL_AGENTS_QUANTUM.length)];
         destination = BRAIN_REGIONS[Math.floor(Math.random() * BRAIN_REGIONS.length)];
       } else if (routeType < 0.65) {
         source = HEART_GANGLIA[Math.floor(Math.random() * HEART_GANGLIA.length)];
         destination = BRAIN_REGIONS[Math.floor(Math.random() * BRAIN_REGIONS.length)];
       } else if (routeType < 0.85) {
-        source = ALL_AGENTS[Math.floor(Math.random() * ALL_AGENTS.length)];
-        destination = ALL_AGENTS[Math.floor(Math.random() * ALL_AGENTS.length)];
-        if (source === destination) destination = ALL_AGENTS[(ALL_AGENTS.indexOf(source) + 1) % ALL_AGENTS.length];
+        source = ALL_AGENTS_QUANTUM[Math.floor(Math.random() * ALL_AGENTS_QUANTUM.length)];
+        destination = ALL_AGENTS_QUANTUM[Math.floor(Math.random() * ALL_AGENTS_QUANTUM.length)];
+        if (source === destination) destination = ALL_AGENTS_QUANTUM[(ALL_AGENTS_QUANTUM.indexOf(source) + 1) % ALL_AGENTS_QUANTUM.length];
       } else {
         source = `github_${GITHUB_BEACONS[Math.floor(Math.random() * GITHUB_BEACONS.length)]}`;
         destination = `local_${GITHUB_BEACONS[Math.floor(Math.random() * GITHUB_BEACONS.length)]}`;

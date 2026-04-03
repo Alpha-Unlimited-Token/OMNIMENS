@@ -2297,7 +2297,7 @@ function safe_section2(v: any, fb: number = 0): number {
 let _totalCalls = 0;
 let _totalMs = 0;
 
-function extractKeywords(text: string): string[] {
+function extractKeywords_cognition(text: string): string[] {
   const stop = new Set(["the", "a", "an", "is", "are", "was", "were", "be", "been", "being",
     "have", "has", "had", "do", "does", "did", "will", "would", "could", "should", "may",
     "might", "shall", "can", "need", "dare", "ought", "used", "to", "of", "in", "for",
@@ -3186,7 +3186,7 @@ const MAX_INFERENCE_DEPTH = 6;
 const MIN_CONFIDENCE = 0.15;
 const RULE_EXTRACTION_INTERVAL_MS = 10 * 60 * 1000;
 const BACKGROUND_REASONING_INTERVAL_MS = 5 * 60 * 1000;
-const TICK_MS = 30_000;
+const TICK_MS_AMPLIFIER = 30_000;
 
 interface WorkingMemoryItem {
   content: string;
@@ -10900,7 +10900,7 @@ export function getELAEDoublingMultiplier(): number {
  */
 
 
-function safeNum(val: number, fallback: number = 0): number {
+function safeNum_learning(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;
 }
 
@@ -10978,7 +10978,7 @@ const snapshots: GrowthSnapshot[] = [];
 let baselineSnapshot: GrowthSnapshot | null = null;
 let trackerStartTime = 0;
 
-function captureSnapshot(): GrowthSnapshot {
+function captureGrowthSnapshot(): GrowthSnapshot {
   const consciousness = getNeuralConsciousnessState();
   const scaling = getNeuralScalingState();
   const dendritic = getDendriticStats();
@@ -11077,7 +11077,7 @@ function formatDuration(seconds: number): string {
 }
 
 export function getGrowthDashboard(): GrowthDashboardData {
-  const current = captureSnapshot();
+  const current = captureGrowthSnapshot();
 
   if (!baselineSnapshot) {
     baselineSnapshot = { ...current };
@@ -11169,12 +11169,12 @@ export function getGrowthHistory(): { timestamps: number[]; metrics: Record<stri
 export function initGrowthTracker(): void {
   console.log("[GROWTH TRACKER] 📈 Live Growth Tracker initializing...");
 
-  baselineSnapshot = captureSnapshot();
+  baselineSnapshot = captureGrowthSnapshot();
   trackerStartTime = Date.now();
   snapshots.push(baselineSnapshot);
 
   setInterval(() => {
-    const snap = captureSnapshot();
+    const snap = captureGrowthSnapshot();
     snapshots.push(snap);
     if (snapshots.length > MAX_SNAPSHOTS) {
       snapshots.splice(0, snapshots.length - MAX_SNAPSHOTS);

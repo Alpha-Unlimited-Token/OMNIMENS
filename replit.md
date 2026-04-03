@@ -125,6 +125,9 @@ Both OMNIMENS and Super AI Lab frontends are developed with React, Vite, Tailwin
 - **Owner-Only API Endpoints:** For accessing command center status, causal reasoning, sensory cortex, self-coding evaluation, consciousness stream, sandbox task submission, and frontier reports.
 - **Protection:** Owner-only middleware secures all Super AI Lab API routes.
 
+**D004 Unified Engine Architecture (Completed):**
+17 old Gen 1 engine files (61,121 lines) were merged into 9 unified facade files. All 83 engine launches verified working. Gen 1 v2.0 and Gen 2 UNAFFECTED — zero dependencies on deleted files. Old engine files permanently deleted from both disk and GitHub. Remaining lib/ structure: 22 files (9 unified + 13 preserved core). Unified files: unified-agents, unified-cognition, unified-compute, unified-network, unified-neural, unified-security, unified-senses, unified-world, unified-comms-facade.
+
 **General System Design Choices:**
 - **API:** Express 5.
 - **Database:** PostgreSQL with Drizzle ORM. **Dual-Pool Cross-Bridge Architecture** — `poolAlpha` (neural engines) and `poolBeta` (user-facing), each 18 base → 30 ceiling connections, with Spider-Silk pressure-aware routing, Ivy Tendril rotation for brain inserts, Wormhole Tunnel full-saturation failover, Beehive priority-based distribution, and Autonomous Scaling every 5s. The default `db` export is a **Proxy** that automatically routes all `insert/update/delete/select` through Spider-Silk dual-pool routing — no engine code changes needed. **Connection Lifecycle Management**: 10-minute max connection lifetime with periodic health pings (60s) and automatic stale connection recycling when age exceeds threshold or error count > 10. `allowExitOnIdle` disabled for long-running server stability.

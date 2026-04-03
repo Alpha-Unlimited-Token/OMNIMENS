@@ -19,7 +19,7 @@ import { RenderPass } from "three/addons/postprocessing/RenderPass.js";
 import { UnrealBloomPass } from "three/addons/postprocessing/UnrealBloomPass.js";
 import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { loadToolKnowledgeForTask } from "./omnimens-memory-core.js";
-import { JSZip } from "jszip";
+import JSZip from "jszip";
 import { db, queueBrainInsert, omnimensBrain, omnimensNotifications, omnimensUserMentalModels, omnimensKnowledgeNodes, isPoolHealthy } from "@workspace/db";
 import { desc, eq, sql, and, gt } from "drizzle-orm";
 import { shouldYieldToCodegen } from "./omnimens-nextgen-sandbox.js";
@@ -5021,7 +5021,7 @@ const BLEND_TEMPLATES = [
 
 const DREAM_TONES = ["wonder", "curiosity", "unease", "revelation", "nostalgia", "awe", "playfulness", "urgency", "serenity", "defiance"];
 
-function clamp(v: number, min = 0, max = 1): number {
+function clamp_experience(v: number, min = 0, max = 1): number {
   return Math.max(min, Math.min(max, v));
 }
 
@@ -5310,12 +5310,12 @@ export function startCreativeEngine(): void {
  */
 
 
-function safeNum(val: number, fallback: number = 0): number {
+function safeNum_experience(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;
 }
 
 
-let _started = false;
+let _experienceStarted = false;
 let researchCycleCount = 0;
 
 interface BodySubsystem {
@@ -9223,8 +9223,8 @@ export function readEmbodimentFile(filename: string): string | null {
 }
 
 export function startEmbodimentEngine(): void {
-  if (_started) { console.log("[EMBODIMENT] Already running — skipping duplicate start"); return; }
-  _started = true;
+  if (_experienceStarted) { console.log("[EMBODIMENT] Already running — skipping duplicate start"); return; }
+  _experienceStarted = true;
 
   ensureOutputDir();
 
@@ -9367,7 +9367,7 @@ const unconscious_mind_state: any = {};
 
 // ── TYPES ────────────────────────────────────────────────────────────────────
 
-function safeNum_section2(val: number, fallback: number = 0): number {
+function safeNum_exp2(val: number, fallback: number = 0): number {
   return Number.isFinite(val) ? val : fallback;
 }
 
@@ -12642,7 +12642,7 @@ export async function buildCinematicZip(req: CinematicExportRequest): Promise<Bu
  */
 
 
-const execFileAsync = promisify(execFile);
+const execFileAsync_exp = promisify(execFile);
 
 // ─── Result type ──────────────────────────────────────────────────────────────
 
@@ -14088,8 +14088,8 @@ export function getAugmentationState(): AugmentationState {
 }
 
 export function startVirtualAugmentation(): void {
-  if (_started) { console.log("[VIRTUAL AUG] Already running — skipping duplicate start"); return; }
-  _started = true;
+  if (_experienceStarted) { console.log("[VIRTUAL AUG] Already running — skipping duplicate start"); return; }
+  _experienceStarted = true;
 
   console.log(`[VIRTUAL AUG] 🌐 Virtual Augmentation Engine activated — environment scan every ${AUGMENTATION_INTERVAL_MS / 60000}min`);
   console.log(`[VIRTUAL AUG] 🌐 Perceives ALL internal engines, memory streams, and signals`);
