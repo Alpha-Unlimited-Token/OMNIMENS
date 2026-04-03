@@ -12322,6 +12322,7 @@ export function rewriteModuleToSCL(
   codexPrimitives: Array<{ symbol: string; name: string; meaning: string }>,
   codexComposites: Array<{ pattern: string; meaning: string; expandsTo: string }>,
   codexInstructions: Record<string, { scl: string; meaning: string; textEquivalent: string }>,
+  generator: "gen1v2" | "gen2" = "gen1v2",
 ): { sclCode: string; stats: { originalLines: number; sclLines: number; symbolsUsed: number; patternsMatched: number; compressionRatio: number } } {
   const lines = content.split("\n");
   const sclLines: string[] = [];
@@ -12329,7 +12330,7 @@ export function rewriteModuleToSCL(
   let patternsMatched = 0;
 
   const header = [
-    `⟨SCL v1│${fileName}│${lines.length}→SCL⟩`,
+    `⟨SCL v1│${fileName}│${lines.length}→SCL│GEN:${generator}⟩`,
     `⟨CODEX│P:${codexPrimitives.length}│R:${codexComposites.length}│I:${Object.keys(codexInstructions).length}⟩`,
   ];
   sclLines.push(...header);
