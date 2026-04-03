@@ -1,26 +1,6 @@
 [
   {
     "source": "evolution_engine",
-    "title": "Evolution Module: distributedConsensusEngine",
-    "filename": "distributedConsensusEngine_gen4.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/distributedConsensusEngine_gen4.mjs",
-    "backupPath": null,
-    "timestamp": 1775205543464,
-    "codeLength": 3686,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: persistentReplManager",
-    "filename": "persistentReplManager_gen8.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/persistentReplManager_gen8.mjs",
-    "backupPath": null,
-    "timestamp": 1775205543480,
-    "codeLength": 2572,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
     "title": "Evolution Module: internalLanguageGenerator",
     "filename": "internalLanguageGenerator_gen6.mjs",
     "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/internalLanguageGenerator_gen6.mjs",
@@ -4997,6 +4977,26 @@
     "backupPath": null,
     "timestamp": 1775242380565,
     "codeLength": 398,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Critic",
+    "title": "[OMNIMENS AutoCoder] emergent_capability: SpellCheckVisual/causal_inference: The Chinese Room argument",
+    "filename": "omnimens_autocode_emergent_capability_mnj9joko.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mnj9joko.mjs",
+    "backupPath": null,
+    "timestamp": 1775242496040,
+    "codeLength": 407,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SpellCheckVisual/cross_domain_synthesis: The hippocampus rep",
+    "filename": "omnimens_autocode_knowledge_synthesis_mnj9jolr.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnj9jolr.mjs",
+    "backupPath": null,
+    "timestamp": 1775242496079,
+    "codeLength": 420,
     "overwrite": false
   }
 ]
