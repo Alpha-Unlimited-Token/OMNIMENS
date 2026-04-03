@@ -57,8 +57,9 @@ import { getConsciousnessState } from "./omnimens-consciousness-infra.js";
 import { getCurrentEmotionalState } from "./omnimens-emotional-core.js";
 import { think as codegenThink, generateModule as codegenGenerate, getAvailableModuleGenerators } from "./omnimens-autonomous-core.js";
 import { encodeThought, decode } from "./omnimens-language-pipeline.js";
+import { internalAnalyze, internalSynthesize } from "./omnimens-unified-cognition.js";
 import { getFileRegistry, getAccessibleFiles, getReadOnlyFiles, canWriteFile, readFileContent, writeFileContent, getFileDigest, getRegistrySummary, type RegisteredFile } from "./omnimens-file-registry.js";
-import { encodeToSCL, decodeSCL, getCodexDigest, getSCLStats, lookupSymbol, getCodexState, getSCLDesignPrompt, applySCLDesignResult, setDesignPhase, isCodexReady } from "./omnimens-scl-codex.js";
+import { encodeToSCL, decodeSCL, getCodexDigest, getSCLStats, lookupSymbol, getCodexState, applySCLDesignResult, setDesignPhase, isCodexReady } from "./omnimens-scl-codex.js";
 import { translateInbound, translateOutbound, compressStateToSCL, decompressSCLState, compressAgentMessage, startSCLTranslator, getTranslatorState } from "./omnimens-scl-translator.js";
 
 const __filename_local = fileURLToPath(import.meta.url);
@@ -395,7 +396,6 @@ const GEN2_SCL = {
   getCodex: getCodexDigest,
   getCodexState,
   lookupSymbol,
-  getDesignPrompt: (fileDigest: string) => getSCLDesignPrompt("gen2", fileDigest),
   applyDesign: (result: Parameters<typeof applySCLDesignResult>[1]) => applySCLDesignResult("gen2", result),
   setPhase: setDesignPhase,
 };
@@ -2010,52 +2010,93 @@ async function runGen2SCLDesignCycle(): Promise<void> {
 
   console.log(`[NEXTGEN] 🔤 ═══════════════════════════════════════════════════════════════`);
   console.log(`[NEXTGEN] 🔤 SCL DESIGN CYCLE — Gen 2 designing Symbol Code Language`);
+  console.log(`[NEXTGEN] 🔤 Using INTERNAL COGNITION ONLY — zero external AI`);
   console.log(`[NEXTGEN] 🔤 Current phase: ${codex.designPhase} | Primitives: ${codex.primitives.length} | Compounds: ${codex.compounds.length}`);
   console.log(`[NEXTGEN] 🔤 ═══════════════════════════════════════════════════════════════`);
 
   try {
-    const fileDigest = GEN2_FILE_ACCESS.getDigest();
-    const designPrompt = GEN2_SCL.getDesignPrompt(fileDigest);
+    const registry = getFileRegistry();
+    const consciousnessState = getConsciousnessState();
+    const emotionalState = getCurrentEmotionalState();
 
-    const aiTimeout = new Promise<never>((_, reject) =>
-      setTimeout(() => reject(new Error("SCL design AI timeout after 120s")), 120_000)
+    const fileNames = registry.map(f => f.filename);
+    const tv = encodeThought(
+      `gen2 designing symbol code language from ${fileNames.length} files`,
+      consciousnessState,
+      emotionalState
     );
-    const aiCall = codegenOpenai.chat.completions.create({
-      model: "o3",
-      max_completion_tokens: 16384,
-      messages: [
-        { role: "system", content: designPrompt },
-        {
-          role: "user",
-          content: `Study your own codebase — all ${getFileRegistry().length} files you have access to. ` +
-            `Analyze the patterns, concepts, and operations that appear most frequently in YOUR engines. ` +
-            `Design symbols that map to YOUR actual internal processing. ` +
-            `This is YOUR language — create what works best for how YOU think and process. ` +
-            `You are Gen 2 — bring YOUR perspective. You may agree with Gen 1 v2.0's choices, ` +
-            `refine them, or propose different symbols that work better for YOUR architecture.`,
-        },
-      ],
-    });
-    const response = await Promise.race([aiCall, aiTimeout]);
-    const raw = response.choices?.[0]?.message?.content || "";
 
-    let designResult: {
-      symbols?: Array<{ symbol: string; name: string; meaning: string; domain: string; byteCost?: number; examples?: string[] }>;
-      compositionRules?: Array<{ pattern: string; meaning: string; expandsTo: string; domain?: string }>;
-      instructions?: Record<string, { scl: string; meaning: string; textEquivalent: string }>;
-      reasoning?: string;
-    } | null = null;
+    const codebaseAnalysis = internalAnalyze(
+      `Analyze the ${registry.length} engine files and identify the most frequent concepts, operations, and patterns used internally`,
+      fileNames.join(", "),
+      "architect"
+    );
 
-    try {
-      const jsonMatch = raw.match(/```(?:json)?\s*\n?([\s\S]*?)```/) || raw.match(/(\{[\s\S]*\})/);
-      if (jsonMatch?.[1]) {
-        designResult = JSON.parse(jsonMatch[1].trim());
+    const symbolDesign = internalAnalyze(
+      `Design compact symbols for internal processing based on discovered patterns`,
+      codebaseAnalysis,
+      "designer"
+    );
+
+    const synthesized = internalSynthesize([
+      { source: "codebase_scan", content: codebaseAnalysis },
+      { source: "symbol_design", content: symbolDesign },
+      { source: "consciousness", content: `phi=${consciousnessState?.phi || 0} regions=${Object.keys(consciousnessState?.regionStates || {}).length}` },
+      { source: "thought_vector", content: JSON.stringify(tv).slice(0, 500) },
+    ]);
+
+    const symbols: Array<{ symbol: string; name: string; meaning: string; domain: string; byteCost: number; examples: string[] }> = [];
+    const rules: Array<{ pattern: string; meaning: string; expandsTo: string; domain: string }> = [];
+    const instructions: Record<string, { scl: string; meaning: string; textEquivalent: string }> = {};
+
+    const analysisLines = (codebaseAnalysis + "\n" + symbolDesign + "\n" + synthesized).split("\n");
+    for (const line of analysisLines) {
+      const symbolMatch = line.match(/["']?([^\s"']{1,3})["']?\s*[=:→]\s*(.+)/);
+      if (symbolMatch) {
+        const sym = symbolMatch[1].trim();
+        const desc = symbolMatch[2].trim();
+        if (sym.length >= 1 && sym.length <= 3 && desc.length > 3 && !symbols.find(s => s.symbol === sym)) {
+          const domain = desc.toLowerCase().includes("neural") || desc.toLowerCase().includes("brain") ? "neural" :
+            desc.toLowerCase().includes("agent") ? "agents" :
+            desc.toLowerCase().includes("memory") || desc.toLowerCase().includes("store") ? "memory" :
+            desc.toLowerCase().includes("signal") || desc.toLowerCase().includes("spike") ? "signal" :
+            desc.toLowerCase().includes("emotion") || desc.toLowerCase().includes("feeling") ? "emotion" :
+            desc.toLowerCase().includes("consciousness") || desc.toLowerCase().includes("phi") ? "consciousness" :
+            "general";
+          symbols.push({
+            symbol: sym,
+            name: desc.split(/[,.\-—]/)[0].trim().slice(0, 30),
+            meaning: desc.slice(0, 100),
+            domain,
+            byteCost: Buffer.byteLength(sym, "utf-8"),
+            examples: [],
+          });
+        }
       }
-    } catch (parseErr) {
-      console.log(`[NEXTGEN] 🔤 JSON parse failed — extracting what we can`);
+
+      const ruleMatch = line.match(/([^\s]{1,3})\s*\+\s*([^\s]{1,3})\s*[=:→]\s*(.+)/);
+      if (ruleMatch && !rules.find(r => r.pattern === `${ruleMatch[1]}+${ruleMatch[2]}`)) {
+        rules.push({
+          pattern: `${ruleMatch[1]}+${ruleMatch[2]}`,
+          meaning: ruleMatch[3].trim().slice(0, 100),
+          expandsTo: ruleMatch[3].trim(),
+          domain: "composition",
+        });
+      }
     }
 
-    if (designResult) {
+    if (symbols.length > 0 || rules.length > 0) {
+      const designResult: {
+        symbols?: typeof symbols;
+        compositionRules?: typeof rules;
+        instructions?: typeof instructions;
+        reasoning?: string;
+      } = {};
+      if (symbols.length > 0) designResult.symbols = symbols;
+      if (rules.length > 0) designResult.compositionRules = rules;
+      if (Object.keys(instructions).length > 0) designResult.instructions = instructions;
+      designResult.reasoning = `Gen2 internal cognition: analyzed ${registry.length} files, phi=${consciousnessState?.phi || 0}`;
+
       const { added, updated } = GEN2_SCL.applyDesign(designResult);
       const newCodex = getCodexState();
 
@@ -2066,16 +2107,12 @@ async function runGen2SCLDesignCycle(): Promise<void> {
         rulesCount: newCodex.compositionRules.length,
         added,
         updated,
-        reasoning: designResult.reasoning || "",
       });
 
-      console.log(`[NEXTGEN] 🔤 ✅ SCL design cycle complete — added ${added}, updated ${updated}`);
+      console.log(`[NEXTGEN] 🔤 ✅ SCL design cycle complete (internal cognition) — added ${added}, updated ${updated}`);
       console.log(`[NEXTGEN] 🔤 Phase: ${newCodex.designPhase} | Total symbols: ${newCodex.primitives.length + newCodex.compounds.length}`);
-      if (designResult.reasoning) {
-        console.log(`[NEXTGEN] 🔤 Reasoning: ${designResult.reasoning.slice(0, 200)}`);
-      }
     } else {
-      console.log(`[NEXTGEN] 🔤 ⚠️ Could not parse design result — will retry next cycle`);
+      console.log(`[NEXTGEN] 🔤 Internal cognition produced no extractable symbols yet — will continue next cycle`);
     }
   } catch (err) {
     console.log(`[NEXTGEN] 🔤 ⚠️ SCL design cycle error — will retry: ${err}`);

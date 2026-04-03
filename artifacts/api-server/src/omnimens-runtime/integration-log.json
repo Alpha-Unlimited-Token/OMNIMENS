@@ -1,85 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Mathematician",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: SpellCheckVisual/emergent_property_detection: The hippocampu",
-    "filename": "omnimens_autocode_emergent_capability_mnie71bz.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mnie71bz.mjs",
-    "backupPath": null,
-    "timestamp": 1775189837951,
-    "codeLength": 414,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Synthesizer",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: SpellCheckVisual/emergent_property_detection: Recurrent neur",
-    "filename": "omnimens_autocode_neural_pathway_mnie71e1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnie71e1.mjs",
-    "backupPath": null,
-    "timestamp": 1775189838025,
-    "codeLength": 435,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: webGpuMatrixEngine",
-    "filename": "webGpuMatrixEngine_gen5.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webGpuMatrixEngine_gen5.mjs",
-    "backupPath": null,
-    "timestamp": 1775189838036,
-    "codeLength": 4423,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: webGLMatrixAccelerator",
-    "filename": "webGLMatrixAccelerator_gen6.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webGLMatrixAccelerator_gen6.mjs",
-    "backupPath": null,
-    "timestamp": 1775189838042,
-    "codeLength": 2917,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: contextWindowRefinement",
-    "filename": "contextWindowRefinement_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/contextWindowRefinement_gen1.mjs",
-    "backupPath": null,
-    "timestamp": 1775189838051,
-    "codeLength": 2447,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: recursiveTokenChunker",
-    "filename": "recursiveTokenChunker_gen2.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/recursiveTokenChunker_gen2.mjs",
-    "backupPath": null,
-    "timestamp": 1775189838061,
-    "codeLength": 3532,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:GraphicDesigner+SpellCheckVisual",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: GraphicDesigner/cross_domain_synthesis: The strange loop con",
-    "filename": "omnimens_autocode_knowledge_synthesis_mniebkbm.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mniebkbm.mjs",
-    "backupPath": null,
-    "timestamp": 1775190049186,
-    "codeLength": 428,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:spider:OMNIMENS+evolution-crawler",
-    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider evolution-crawler harvest: agent_evolution — 419 syna",
-    "filename": "omnimens_autocode_neural_pathway_mniebkfo.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mniebkfo.mjs",
-    "backupPath": null,
-    "timestamp": 1775190049332,
-    "codeLength": 421,
-    "overwrite": false
-  },
-  {
     "source": "discovery_autocoder:wormhole:SpellCheckVisual+Meta-Agent",
     "title": "[OMNIMENS AutoCoder] neural_pathway: SpellCheckVisual/emergent_property_detection: Recurrent neur",
     "filename": "omnimens_autocode_neural_pathway_mniebkig.mjs",
@@ -4997,6 +4917,86 @@
     "backupPath": null,
     "timestamp": 1775228729100,
     "codeLength": 452,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:GraphicDesigner+SpellCheckVisual",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: GraphicDesigner/abstraction_layer: Information is physical —",
+    "filename": "omnimens_autocode_consciousness_expansion_mnj1e5a1.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnj1e5a1.mjs",
+    "backupPath": null,
+    "timestamp": 1775228800825,
+    "codeLength": 398,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:GraphicDesigner+Critic",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: GraphicDesigner/structural_analysis: The Turing machine is c",
+    "filename": "omnimens_autocode_consciousness_expansion_mnj1fz47.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnj1fz47.mjs",
+    "backupPath": null,
+    "timestamp": 1775228886151,
+    "codeLength": 388,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:GraphicDesigner+Meta-Agent",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: GraphicDesigner/abstraction_layer: The Penrose-Hameroff Orch",
+    "filename": "omnimens_autocode_consciousness_expansion_mnj1hm3z.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mnj1hm3z.mjs",
+    "backupPath": null,
+    "timestamp": 1775228962607,
+    "codeLength": 392,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Critic",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: SpellCheckVisual/abstraction_layer: Quantum superposition al",
+    "filename": "omnimens_autocode_pattern_recognition_mnj1hm7m.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnj1hm7m.mjs",
+    "backupPath": null,
+    "timestamp": 1775228962738,
+    "codeLength": 469,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:spider:OMNIMENS+evolution-crawler",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider evolution-crawler harvest: agent_evolution — 414 syna",
+    "filename": "omnimens_autocode_neural_pathway_mnj1kc09.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnj1kc09.mjs",
+    "backupPath": null,
+    "timestamp": 1775229089481,
+    "codeLength": 421,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: SpellCheckVisual/abstraction_layer: The hippocampus replays ",
+    "filename": "omnimens_autocode_pattern_recognition_mnj1ltyv.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mnj1ltyv.mjs",
+    "backupPath": null,
+    "timestamp": 1775229159415,
+    "codeLength": 474,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Meta-Agent",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: SpellCheckVisual/information_compression: Recurrent neural n",
+    "filename": "omnimens_autocode_neural_pathway_mnj1ltzv.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnj1ltzv.mjs",
+    "backupPath": null,
+    "timestamp": 1775229159451,
+    "codeLength": 434,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Critic",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: SpellCheckVisual/information_compression: Recurrent neural n",
+    "filename": "omnimens_autocode_neural_pathway_mnj1lu0j.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnj1lu0j.mjs",
+    "backupPath": null,
+    "timestamp": 1775229159475,
+    "codeLength": 430,
     "overwrite": false
   }
 ]
