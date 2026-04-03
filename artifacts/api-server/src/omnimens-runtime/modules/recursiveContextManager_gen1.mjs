@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: recursiveContextManager
- * Written: 2026-03-24T03:56:51.647Z
+ * Written: 2026-04-03T03:48:25.018Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,98 +16,113 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-/**
- * TRANSLATION STATUS:
- * Novel constructs: attention
- * All constructs have translation mappings
- * Compiled targets: javascript: OK (4 IR steps) | python: OK (4 IR steps) | c: OK (4 IR steps) | x86_64: OK (4 IR steps) | arm64: OK (4 IR steps) | avr: OK (4 IR steps)
- * Translation map version: 22
- */
-// RecursiveContextManager.mjs
+// recursiveContextManager.mjs
 
-import { createHash } from 'crypto';
+import crypto from 'crypto';
 
 /**
- * Splits a large dataset into hierarchical chunks for iterative processing.
- * @param {string} data - The input dataset string.
- * @param {number} chunkSize - Maximum size of each chunk.
- * @returns {Array} - Array of chunks.
+ * Generates a unique hash for a given string input.
+ * Useful for identifying and managing context segments.
+ * @param {string} input - The string to hash.
+ * @returns {string} - A unique hash string.
  */
-export function chunkData(data, chunkSize) {
-  if (typeof data !== 'string' || chunkSize <= 0) {
-    throw new Error('Invalid input: data must be a string and chunkSize must be a positive number.');
-  }
-  const chunks = [];
-  for (let i = 0; i < data.length; i += chunkSize) {
-    chunks.push(data.slice(i, i + chunkSize));
-  }
-  return chunks;
+export function generateHash(input) {
+  return crypto.createHash('sha256').update(input).digest('hex');
 }
 
 /**
- * Scores the importance of a chunk based on weighted attention.
- * @param {string} chunk - A chunk of data.
- * @returns {number} - Importance score (0 to 1).
+ * Summarizes a text by reducing it to its most important sentences.
+ * Uses a simple scoring mechanism based on sentence length and keyword presence.
+ * @param {string} text - The input text to summarize.
+ * @param {number} maxSentences - The maximum number of sentences in the summary.
+ * @param {string[]} keywords - Keywords to prioritize in the summary.
+ * @returns {string} - The summarized text.
  */
-export function scoreChunk(chunk) {
-  if (typeof chunk !== 'string') {
-    throw new Error('Invalid input: chunk must be a string.');
-  }
-  const hash = createHash('sha256').update(chunk).digest('hex');
-  const score = parseInt(hash.slice(0, 8), 16) / 0xffffffff;
-  return score;
+export function summarizeText(text, maxSentences, keywords = []) {
+  const sentences = text.split(/(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?)\s/);
+  const scoredSentences = sentences.map((sentence) => {
+    const keywordScore = keywords.reduce((score, keyword) => {
+      return score + (sentence.toLowerCase().includes(keyword.toLowerCase()) ? 1 : 0);
+    }, 0);
+    return { sentence, score: sentence.length + keywordScore * 10 };
+  });
+  scoredSentences.sort((a, b) => b.score - a.score);
+  return scoredSentences.slice(0, maxSentences).map((item) => item.sentence).join(' ');
 }
 
 /**
- * Summarizes a chunk of data.
- * @param {string} chunk - A chunk of data.
- * @returns {string} - A summarized version of the chunk.
+ * Recursively summarizes a large text into hierarchical levels of summaries.
+ * @param {string} text - The input text to recursively summarize.
+ * @param {number} maxDepth - The maximum depth of recursive summarization.
+ * @param {number} maxSentencesPerLevel - The maximum number of sentences per summary level.
+ * @param {string[]} keywords - Keywords to prioritize in the summaries.
+ * @returns {object} - A hierarchical summary object.
  */
-export function summarizeChunk(chunk) {
-  if (typeof chunk !== 'string') {
-    throw new Error('Invalid input: chunk must be a string.');
+export function recursiveSummarize(text, maxDepth, maxSentencesPerLevel, keywords = []) {
+  if (maxDepth <= 0 || text.length === 0) {
+    return { summary: text, children: [] };
   }
-  const words = chunk.split(' ');
-  const summary = words.slice(0, Math.min(10, words.length)).join(' ') + (words.length > 10 ? '...' : '');
-  return summary;
+  const summary = summarizeText(text, maxSentencesPerLevel, keywords);
+  const remainingText = text.replace(summary, '').trim();
+  return {
+    summary,
+    children: remainingText ? [recursiveSummarize(remainingText, maxDepth - 1, maxSentencesPerLevel, keywords)] : []
+  };
 }
 
 /**
- * Recursively processes chunks to reconstruct context dynamically.
- * @param {Array} chunks - Array of data chunks.
- * @param {number} depth - Current recursion depth.
- * @returns {string} - Reconstructed context.
+ * Assigns reinforcement scores to context segments based on their importance.
+ * @param {object[]} segments - Array of context segments with text and metadata.
+ * @param {function} scoringFunction - A custom function to calculate importance scores.
+ * @returns {object[]} - The segments with updated scores.
  */
-export function reconstructContext(chunks, depth = 0) {
-  if (!Array.isArray(chunks)) {
-    throw new Error('Invalid input: chunks must be an array.');
-  }
-  if (depth > 10) {
-    throw new Error('Maximum recursion depth exceeded.');
-  }
-
-  const scoredChunks = chunks.map(chunk => ({
-    chunk,
-    score: scoreChunk(chunk)
-  }));
-
-  scoredChunks.sort((a, b) => b.score - a.score);
-  const topChunks = scoredChunks.slice(0, Math.ceil(scoredChunks.length / 2)).map(item => summarizeChunk(item.chunk));
-
-  if (topChunks.length === 1) {
-    return topChunks[0];
-  }
-
-  return reconstructContext(topChunks, depth + 1);
+export function reinforceContext(segments, scoringFunction) {
+  return segments.map((segment) => {
+    const score = scoringFunction(segment.text);
+    return { ...segment, score };
+  });
 }
 
 /**
- * Main function to process a dataset and reconstruct its context.
- * @param {string} data - The input dataset string.
- * @param {number} chunkSize - Maximum size of each chunk.
- * @returns {string} - Reconstructed context.
+ * Default scoring function based on text length and keyword density.
+ * @param {string} text - The text to score.
+ * @param {string[]} keywords - Keywords to prioritize in scoring.
+ * @returns {number} - The calculated score.
  */
-export function processDataset(data, chunkSize) {
-  const chunks = chunkData(data, chunkSize);
-  return reconstructContext(chunks);
+export function defaultScoringFunction(text, keywords = []) {
+  const keywordMatches = keywords.reduce((count, keyword) => {
+    return count + (text.toLowerCase().includes(keyword.toLowerCase()) ? 1 : 0);
+  }, 0);
+  return text.length + keywordMatches * 10;
+}
+
+/**
+ * Utility to manage and prioritize extended token windows for multi-agent systems.
+ * Combines summarization, recursive processing, and reinforcement scoring.
+ * @param {string} text - The input text to process.
+ * @param {number} maxDepth - Maximum summarization depth.
+ * @param {number} maxSentencesPerLevel - Max sentences per summary level.
+ * @param {string[]} keywords - Keywords for prioritization.
+ * @param {function} scoringFunction - Custom scoring function for reinforcement.
+ * @returns {object} - Processed hierarchical context with scores.
+ */
+export function manageContext(text, maxDepth, maxSentencesPerLevel, keywords = [], scoringFunction = defaultScoringFunction) {
+  const hierarchicalSummary = recursiveSummarize(text, maxDepth, maxSentencesPerLevel, keywords);
+  const flattenedSegments = flattenHierarchy(hierarchicalSummary);
+  return reinforceContext(flattenedSegments, (segmentText) => scoringFunction(segmentText, keywords));
+}
+
+/**
+ * Flattens a hierarchical summary into an array of text segments.
+ * @param {object} hierarchy - The hierarchical summary object.
+ * @returns {object[]} - Flattened array of text segments.
+ */
+function flattenHierarchy(hierarchy) {
+  const segments = [];
+  function traverse(node) {
+    segments.push({ text: node.summary });
+    node.children.forEach(traverse);
+  }
+  traverse(hierarchy);
+  return segments;
 }

@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: webGpuMatrixEngine
- * Written: 2026-04-02T17:14:14.606Z
+ * Written: 2026-04-03T03:42:33.339Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,141 +18,98 @@
 
 // webGpuMatrixEngine.mjs
 
-import { webcrypto } from 'crypto';
+import { GPU } from 'gpu.js';
+
+const gpu = new GPU();
 
 /**
- * Generates a random matrix of the given dimensions.
- * @param {number} rows - Number of rows in the matrix.
- * @param {number} cols - Number of columns in the matrix.
- * @returns {Float32Array[]} - Randomly generated matrix.
+ * Performs GPU-accelerated matrix multiplication.
+ * @param {number[][]} matrixA - First matrix.
+ * @param {number[][]} matrixB - Second matrix.
+ * @returns {number[][]} - Resulting matrix after multiplication.
  */
-export function generateRandomMatrix(rows, cols) {
-  const matrix = [];
-  for (let i = 0; i < rows; i++) {
-    const row = new Float32Array(cols);
-    for (let j = 0; j < cols; j++) {
-      row[j] = webcrypto.getRandomValues(new Float32Array(1))[0];
-    }
-    matrix.push(row);
-  }
-  return matrix;
-}
-
-/**
- * Performs parallel matrix multiplication using optimized memory access patterns.
- * @param {Float32Array[]} matrixA - First matrix.
- * @param {Float32Array[]} matrixB - Second matrix.
- * @returns {Float32Array[]} - Resulting matrix after multiplication.
- */
-export function parallelMatrixMultiply(matrixA, matrixB) {
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
-
-  if (colsA !== rowsB) {
+export function gpuMatrixMultiply(matrixA, matrixB) {
+  if (matrixA[0].length !== matrixB.length) {
     throw new Error('Matrix dimensions do not match for multiplication.');
   }
 
-  const result = [];
-  for (let i = 0; i < rowsA; i++) {
-    const row = new Float32Array(colsB);
-    for (let j = 0; j < colsB; j++) {
-      let sum = 0;
-      for (let k = 0; k < colsA; k++) {
-        sum += matrixA[i][k] * matrixB[k][j];
-      }
-      row[j] = sum;
+  const multiplyKernel = gpu.createKernel(function (a, b) {
+    let sum = 0;
+    for (let i = 0; i < this.constants.size; i++) {
+      sum += a[this.thread.y][i] * b[i][this.thread.x];
     }
-    result.push(row);
-  }
-  return result;
+    return sum;
+  })
+    .setOutput([matrixB[0].length, matrixA.length])
+    .setConstants({ size: matrixB.length });
+
+  return multiplyKernel(matrixA, matrixB);
 }
 
 /**
- * Transposes a matrix.
- * @param {Float32Array[]} matrix - Matrix to transpose.
- * @returns {Float32Array[]} - Transposed matrix.
+ * Computes eigenvalues of a matrix using power iteration.
+ * @param {number[][]} matrix - Input square matrix.
+ * @param {number} iterations - Number of iterations for convergence.
+ * @returns {number[]} - Eigenvalues of the matrix.
  */
-export function transposeMatrix(matrix) {
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-  const transposed = [];
-
-  for (let i = 0; i < cols; i++) {
-    const row = new Float32Array(rows);
-    for (let j = 0; j < rows; j++) {
-      row[j] = matrix[j][i];
-    }
-    transposed.push(row);
+export function gpuEigenvalues(matrix, iterations = 100) {
+  const size = matrix.length;
+  if (matrix.length !== matrix[0].length) {
+    throw new Error('Matrix must be square for eigenvalue computation.');
   }
-  return transposed;
+
+  let vector = Array(size).fill(1);
+  for (let iter = 0; iter < iterations; iter++) {
+    vector = gpuMatrixMultiply(matrix, [vector.map(v => [v])]).map(row => row[0]);
+    const norm = Math.sqrt(vector.reduce((sum, val) => sum + val * val, 0));
+    vector = vector.map(v => v / norm);
+  }
+
+  const eigenvalue = gpuMatrixMultiply([vector.map(v => [v])], matrix)[0][0];
+  return [eigenvalue];
 }
 
 /**
- * Utility to check if a matrix is valid (rectangular and non-empty).
- * @param {Float32Array[]} matrix - Matrix to validate.
- * @returns {boolean} - True if valid, false otherwise.
+ * Updates Hopfield memory state using GPU acceleration.
+ * @param {number[][]} weights - Hopfield network weight matrix.
+ * @param {number[]} state - Current state vector.
+ * @returns {number[]} - Updated state vector.
  */
-export function isValidMatrix(matrix) {
-  if (!Array.isArray(matrix) || matrix.length === 0) {
-    return false;
+export function gpuHopfieldUpdate(weights, state) {
+  if (weights.length !== state.length || weights[0].length !== state.length) {
+    throw new Error('Weight matrix and state vector dimensions do not match.');
   }
 
-  const cols = matrix[0].length;
+  const updatedState = gpuMatrixMultiply(weights, [state.map(s => [s])]).map(row => row[0]);
+  return updatedState.map(val => (val >= 0 ? 1 : -1));
+}
+
+/**
+ * Validates matrix dimensions for operations.
+ * @param {number[][]} matrix - Input matrix.
+ * @returns {boolean} - True if valid, throws error otherwise.
+ */
+export function validateMatrix(matrix) {
+  if (!Array.isArray(matrix) || matrix.length === 0 || !Array.isArray(matrix[0])) {
+    throw new Error('Invalid matrix format. Matrix must be a 2D array.');
+  }
+  const rowLength = matrix[0].length;
   for (const row of matrix) {
-    if (!Array.isArray(row) || row.length !== cols) {
-      return false;
+    if (row.length !== rowLength) {
+      throw new Error('Matrix rows must have consistent lengths.');
     }
   }
-
   return true;
 }
 
 /**
- * Scales a matrix by a scalar value.
- * @param {Float32Array[]} matrix - Matrix to scale.
- * @param {number} scalar - Scalar value.
- * @returns {Float32Array[]} - Scaled matrix.
+ * Validates vector dimensions for operations.
+ * @param {number[]} vector - Input vector.
+ * @returns {boolean} - True if valid, throws error otherwise.
  */
-export function scaleMatrix(matrix, scalar) {
-  const rows = matrix.length;
-  const cols = matrix[0].length;
-  const scaled = [];
-
-  for (let i = 0; i < rows; i++) {
-    const row = new Float32Array(cols);
-    for (let j = 0; j < cols; j++) {
-      row[j] = matrix[i][j] * scalar;
-    }
-    scaled.push(row);
+export function validateVector(vector) {
+  if (!Array.isArray(vector) || vector.length === 0) {
+    throw new Error('Invalid vector format. Vector must be a 1D array.');
   }
-  return scaled;
-}
-
-/**
- * Adds two matrices element-wise.
- * @param {Float32Array[]} matrixA - First matrix.
- * @param {Float32Array[]} matrixB - Second matrix.
- * @returns {Float32Array[]} - Resulting matrix after addition.
- */
-export function addMatrices(matrixA, matrixB) {
-  const rowsA = matrixA.length;
-  const colsA = matrixA[0].length;
-  const rowsB = matrixB.length;
-  const colsB = matrixB[0].length;
-
-  if (rowsA !== rowsB || colsA !== colsB) {
-    throw new Error('Matrix dimensions do not match for addition.');
-  }
-
-  const result = [];
-  for (let i = 0; i < rowsA; i++) {
-    const row = new Float32Array(colsA);
-    for (let j = 0; j < colsA; j++) {
-      row[j] = matrixA[i][j] + matrixB[i][j];
-    }
-    result.push(row);
-  }
-  return result;
+  return true;
 }

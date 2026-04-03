@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: hierarchicalMemoryManager
- * Written: 2026-04-02T14:22:57.798Z
+ * Written: 2026-04-03T03:48:25.348Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -20,139 +20,76 @@
 
 import { createHash } from 'crypto';
 
-/**
- * Generate hash for a given input string (used for clustering consistency).
- * @param {string} input
- * @returns {string} Hexadecimal hash string
- */
+// Utility: Generate a unique hash for memory chunks
 export function generateHash(input) {
   const hash = createHash('sha256');
   hash.update(input);
   return hash.digest('hex');
 }
 
-/**
- * Compute Euclidean distance between two vectors.
- * @param {number[]} vectorA
- * @param {number[]} vectorB
- * @returns {number} Distance
- */
-export function euclideanDistance(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must have the same length');
-  }
-  return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + Math.pow(val - vectorB[idx], 2), 0));
+// Utility: Summarize a text block (basic summarization for now)
+export function summarizeText(text, maxLength = 200) {
+  if (text.length <= maxLength) return text;
+  return text.slice(0, maxLength) + '...';
 }
 
-/**
- * Perform k-means clustering on a set of token embeddings.
- * @param {number[][]} embeddings Array of token embeddings (vectors).
- * @param {number} k Number of clusters.
- * @param {number} maxIterations Maximum iterations for convergence.
- * @returns {Object} Cluster assignments and centroids.
- */
-export function kMeansClustering(embeddings, k, maxIterations = 100) {
-  if (embeddings.length < k) {
-    throw new Error('Number of clusters cannot exceed number of embeddings');
-  }
-
-  // Initialize centroids randomly
-  const centroids = embeddings.slice(0, k).map(vec => [...vec]);
-  let assignments = new Array(embeddings.length).fill(-1);
-
-  for (let iteration = 0; iteration < maxIterations; iteration++) {
-    let hasChanged = false;
-
-    // Assign each embedding to the nearest centroid
-    assignments = embeddings.map((embedding, idx) => {
-      let closestCentroid = -1;
-      let minDistance = Infinity;
-
-      centroids.forEach((centroid, centroidIdx) => {
-        const distance = euclideanDistance(embedding, centroid);
-        if (distance < minDistance) {
-          minDistance = distance;
-          closestCentroid = centroidIdx;
-        }
-      });
-
-      if (assignments[idx] !== closestCentroid) {
-        hasChanged = true;
-      }
-
-      return closestCentroid;
+// Utility: Segment text into weighted chunks based on importance
+export function segmentText(text, segmentSize = 500) {
+  const segments = [];
+  for (let i = 0; i < text.length; i += segmentSize) {
+    const chunk = text.slice(i, i + segmentSize);
+    segments.push({
+      content: chunk,
+      importance: Math.min(1, chunk.length / segmentSize), // Weight by size
     });
+  }
+  return segments;
+}
 
-    // Recompute centroids based on assignments
-    centroids.forEach((centroid, centroidIdx) => {
-      const assignedEmbeddings = embeddings.filter((_, idx) => assignments[idx] === centroidIdx);
-      if (assignedEmbeddings.length > 0) {
-        for (let dim = 0; dim < centroid.length; dim++) {
-          centroid[dim] = assignedEmbeddings.reduce((sum, vec) => sum + vec[dim], 0) / assignedEmbeddings.length;
-        }
-      }
+// Core: Recursive summarization chain
+export function recursiveSummarization(chunks, depth = 3) {
+  if (depth === 0 || chunks.length === 1) return chunks;
+
+  const summarizedChunks = [];
+  for (let i = 0; i < chunks.length; i += 2) {
+    const chunk1 = chunks[i];
+    const chunk2 = chunks[i + 1] || { content: '', importance: 0 }; // Handle odd chunks
+    const combinedContent = chunk1.content + ' ' + chunk2.content;
+    const summary = summarizeText(combinedContent);
+    summarizedChunks.push({
+      content: summary,
+      importance: (chunk1.importance + chunk2.importance) / 2
     });
-
-    // Break if no assignments changed
-    if (!hasChanged) break;
   }
 
-  return { assignments, centroids };
+  return recursiveSummarization(summarizedChunks, depth - 1);
 }
 
-/**
- * Compress tokens into hierarchical clusters for extended context.
- * @param {string[]} tokens Array of tokens.
- * @param {number[][]} embeddings Corresponding embeddings for tokens.
- * @param {number} levels Number of hierarchical levels.
- * @returns {Object} Hierarchical clustering structure.
- */
-export function hierarchicalTokenCompression(tokens, embeddings, levels) {
-  if (tokens.length !== embeddings.length) {
-    throw new Error('Tokens and embeddings arrays must have the same length');
-  }
+// Core: Hierarchical memory structure
+export function hierarchicalMemoryManager(inputText, segmentSize = 500, depth = 3) {
+  const segments = segmentText(inputText, segmentSize);
+  const summarizedHierarchy = recursiveSummarization(segments, depth);
 
-  let currentLevel = { tokens, embeddings };
-  const hierarchy = [];
-
-  for (let level = 0; level < levels; level++) {
-    const k = Math.max(2, Math.floor(currentLevel.tokens.length / 2));
-    const { assignments, centroids } = kMeansClustering(currentLevel.embeddings, k);
-
-    const clusters = centroids.map((centroid, clusterIdx) => ({
-      centroid,
-      tokens: currentLevel.tokens.filter((_, idx) => assignments[idx] === clusterIdx)
-    }));
-
-    hierarchy.push(clusters);
-
-    // Prepare for next level
-    currentLevel = {
-      tokens: clusters.map(cluster => generateHash(cluster.tokens.join(''))),
-      embeddings: centroids
-    };
-  }
-
-  return hierarchy;
+  return {
+    originalText: inputText,
+    segments,
+    summarizedHierarchy,
+    hash: generateHash(inputText)
+  };
 }
 
-/**
- * Retrieve relevant tokens from a hierarchical structure based on query embedding.
- * @param {Object[]} hierarchy Hierarchical clustering structure.
- * @param {number[]} queryEmbedding Query embedding vector.
- * @param {number} topK Number of top tokens to retrieve.
- * @returns {string[]} Relevant tokens.
- */
-export function retrieveTokens(hierarchy, queryEmbedding, topK = 5) {
-  let currentLevel = hierarchy[hierarchy.length - 1];
+// Example: Utility to retrieve top-level summary
+export function getTopLevelSummary(memoryStructure) {
+  const { summarizedHierarchy } = memoryStructure;
+  return summarizedHierarchy.length > 0 ? summarizedHierarchy[0].content : '';
+}
 
-  for (let level = hierarchy.length - 1; level >= 0; level--) {
-    currentLevel = currentLevel.sort((a, b) => {
-      const distA = euclideanDistance(queryEmbedding, a.centroid);
-      const distB = euclideanDistance(queryEmbedding, b.centroid);
-      return distA - distB;
-    }).slice(0, topK);
-  }
+// Example: Utility to retrieve all segment hashes
+export function getSegmentHashes(memoryStructure) {
+  return memoryStructure.segments.map(segment => generateHash(segment.content));
+}
 
-  return currentLevel.flatMap(cluster => cluster.tokens);
+// Example: Utility to rebuild text from segments
+export function rebuildTextFromSegments(memoryStructure) {
+  return memoryStructure.segments.map(segment => segment.content).join(' ');
 }
