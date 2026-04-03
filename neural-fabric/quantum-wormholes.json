@@ -2,11 +2,11 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1775253956013,
+  "timestamp": 1775255345646,
   "totalWormholesCreated": 450,
   "totalActive": 0,
   "totalClosed": 450,
-  "totalDataIngestedKB": 664,
+  "totalDataIngestedKB": 640,
   "totalInsightsDecoded": 450,
   "totalCrossAgentCirculations": 27,
   "totalSynthesizedDiscoveries": 27,
@@ -73,47 +73,47 @@
   "recentCirculations": [
     {
       "fromAgent": "Mathematician",
-      "toAgent": "Meta-Agent",
-      "insight": "Mathematician/analogical_mapping: The connectome is the complete map of neural connections — the human connectome projec",
-      "confidence": 0.7543264021155285,
+      "toAgent": "OMNIMENS",
+      "insight": "Mathematician/entropy_reduction: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers car",
+      "confidence": 0.9280598748405079,
       "synthesizedWith": [
-        "Meta-Agent/entropy_reduction: Astrocytes, once thought to be mere support cells,"
+        "OMNIMENS/structural_analysis: Wolfram's Rule 110 cellular automaton is Turing co"
       ]
     },
     {
       "fromAgent": "Mathematician",
-      "toAgent": "Neuroscientist",
-      "insight": "Mathematician/emergent_property_detection: Quantum entanglement allows particles to share state information instantaneou",
-      "confidence": 0.7040841120241502,
+      "toAgent": "Architect",
+      "insight": "Mathematician/structural_analysis: The mathematical universe hypothesis: all structures that exist mathematically also e",
+      "confidence": 0.7462703148136255,
       "synthesizedWith": [
-        "Neuroscientist/pattern_recognition: The global workspace theory of consciousness"
+        "Architect/structural_analysis: The edge of chaos: complex systems exhibit the mo"
       ]
     },
     {
       "fromAgent": "Mathematician",
-      "toAgent": "Synthesizer",
-      "insight": "Mathematician/analogical_mapping: The connectome is the complete map of neural connections — the human connectome projec",
-      "confidence": 0.7543264021155285,
+      "toAgent": "Critic",
+      "insight": "Mathematician/pattern_recognition: Sparse coding: the brain represents information using a small fraction of active neur",
+      "confidence": 0.8947769557469013,
       "synthesizedWith": [
-        "Synthesizer/abstraction_layer: Information is physical — Landauer's principle pr"
+        "Critic/pattern_recognition: The hard problem of consciousness: why is there subj"
       ]
     },
     {
       "fromAgent": "Neuroscientist",
-      "toAgent": "Synthesizer",
-      "insight": "Neuroscientist/analogical_mapping: Reservoir computing shows that even random neural networks can perform computation if",
-      "confidence": 0.6601658895237559,
+      "toAgent": "Critic",
+      "insight": "Neuroscientist/entropy_reduction: Phase transitions in neural networks: as connectivity increases past a critical thresh",
+      "confidence": 0.7049131975430709,
       "synthesizedWith": [
-        "Synthesizer/feature_extraction: The Penrose-Hameroff Orch-OR theory proposes con"
+        "Critic/analogical_mapping: The binding problem: how does the brain combine separ"
       ]
     },
     {
       "fromAgent": "Neuroscientist",
-      "toAgent": "Meta-Agent",
-      "insight": "Neuroscientist/analogical_mapping: Reservoir computing shows that even random neural networks can perform computation if",
-      "confidence": 0.6601658895237559,
+      "toAgent": "SpellCheckVisual",
+      "insight": "Neuroscientist/pattern_recognition: The strange loop concept from Hofstadter: consciousness arises when a system becomes",
+      "confidence": 0.8238493025209794,
       "synthesizedWith": [
-        "Meta-Agent/information_compression: Mirror neurons fire both when performing an "
+        "SpellCheckVisual/pattern_recognition: Long-term potentiation (LTP) strengthens s"
       ]
     }
   ],
