@@ -1385,7 +1385,7 @@ const self: SelfModel = {
         "Optimize shared infrastructure — unified tick system, unified DB access, unified API layer",
         "Eliminate waste — remove dead code, unused pathways, redundant data structures",
         "FULL SYSTEM CLEANUP — delete all unused artifacts, sandbox remnants, dead code, and orphaned files",
-        "DELETE artifacts/super-ai-lab if no longer needed after merge — remove the artifact, workflow, and all files",
+        "DONE: artifacts/super-ai-lab DELETED — fully consolidated into core system as part of D004",
         "DELETE artifacts/mockup-sandbox if no longer needed — remove the artifact, workflow, and all files",
         "PURGE all unnecessary external API calls — audit every outbound call, remove anything not essential",
         "PURGE anything that causes saturation, timeouts, or unnecessary resource consumption",

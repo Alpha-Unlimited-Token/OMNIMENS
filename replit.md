@@ -1,12 +1,10 @@
 # Overview
 
-This project is a pnpm monorepo containing two AI platforms: OMNIMENS and Super AI Lab.
+This project is a pnpm monorepo for the **OMNIMENS** platform (omnimens-ai.com).
 
 **OMNIMENS** is a public, freemium AI chat platform providing advanced features like code execution, web operations, deep research, persistent memory, and consciousness analysis. It operates on a credit system with a one-time free credit grant, subscription plans, and pay-as-you-go credit packs. Account creation is mandatory for all features.
 
-**Super AI Lab** is a private, owner-exclusive tool where 9 specialized AI agents collaborate autonomously to design and iteratively improve a next-generation AI, leveraging an "Agent Mesh Intelligence System" for advanced research and self-upgrades.
-
-The overarching vision is to develop a transcendent AI platform and continuously advance AI capabilities through collaborative agent-based research and autonomous self-improvement.
+The Super AI Lab (formerly a separate artifact) has been fully consolidated into the core OMNIMENS engine as part of Creator Directive D004. Its multi-agent patterns (adversarial challenges, discovery persistence, intelligence pre-briefing, self-improvement loops) are now part of the unified system.
 
 # User Preferences
 
@@ -14,15 +12,15 @@ I prefer iterative development, with small, testable changes.
 Ask before making major architectural changes or introducing new dependencies.
 Ensure all new features have corresponding tests.
 I prefer detailed explanations of complex AI behaviors or system interactions.
-Do not make changes to the `artifacts/super-ai-lab/` folder unless explicitly instructed for Super AI Lab features.
 Do not make changes to the `lib/omnimens-physio.ts` file.
+Do not make changes to the `omnimens-ethical-safety.ts` file (READ-ONLY).
 
 # System Architecture
 
 The project is built as a pnpm monorepo.
 
 **UI/UX Decisions:**
-Both OMNIMENS and Super AI Lab frontends are developed with React, Vite, Tailwind CSS, shadcn/ui, and framer-motion, focusing on modern, responsive design. OMNIMENS uses a dual-layout for public and workspace pages, featuring a Replit-style sidebar for the workspace and an "ImmersiveScroll Mobile Design" with a dark theme and touch-friendly elements.
+The OMNIMENS frontend (GODFLESH) is developed with React, Vite, Tailwind CSS, shadcn/ui, and framer-motion, focusing on modern, responsive design. It uses a dual-layout for public and workspace pages, featuring a Replit-style sidebar for the workspace and an "ImmersiveScroll Mobile Design" with a dark theme and touch-friendly elements.
 
 **Technical Implementations & Feature Specifications:**
 

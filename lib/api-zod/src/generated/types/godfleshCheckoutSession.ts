@@ -6,9 +6,6 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface OmnimensPricing {
-  priceId: string;
-  amount: number;
-  currency: string;
-  interval: string;
+export interface GodfleshCheckoutSession {
+  url: string;
 }

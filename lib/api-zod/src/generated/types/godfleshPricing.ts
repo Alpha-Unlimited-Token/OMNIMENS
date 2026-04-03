@@ -6,6 +6,9 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface SuperAIError {
-  error: string;
+export interface GodfleshPricing {
+  priceId: string;
+  amount: number;
+  currency: string;
+  interval: string;
 }

@@ -17,27 +17,19 @@ import type {
 } from "@tanstack/react-query";
 
 import type {
-  CreateOmnimensCheckoutBody,
+  CreateGodfleshCheckoutBody,
   CreateOpenaiConversationBody,
-  CreateSuperAISessionBody,
   GetCurrentAuthUserResponse,
-  OmnimensUserStatus,
-  OmnimensCheckoutSession,
-  OmnimensPortalSession,
-  OmnimensPricing,
-  OmnimensVerifySessionResult,
+  GodflesUserStatus,
+  GodfleshCheckoutSession,
+  GodfleshPortalSession,
+  GodfleshPricing,
   HealthStatus,
   OpenaiConversation,
   OpenaiConversationWithMessages,
   OpenaiError,
   OpenaiMessage,
-  RunSuperAISessionBody,
   SendOpenaiMessageBody,
-  SuperAIBlueprint,
-  SuperAIError,
-  SuperAISession,
-  SuperAISessionWithMessages,
-  VerifyOmnimensSessionBody,
 } from "./api.schemas";
 
 import { customFetch } from "../custom-fetch";
@@ -127,29 +119,29 @@ export function useGetCurrentAuthUser<
 /**
  * @summary Get user's message usage and subscription status
  */
-export const getGetOmnimensStatusUrl = () => {
-  return `/api/omnimens/status`;
+export const getGetGodfleshStatusUrl = () => {
+  return `/api/godflesh/status`;
 };
 
-export const getOmnimensStatus = async (
+export const getGodfleshStatus = async (
   options?: RequestInit,
-): Promise<OmnimensUserStatus> => {
-  return customFetch<OmnimensUserStatus>(getGetOmnimensStatusUrl(), {
+): Promise<GodflesUserStatus> => {
+  return customFetch<GodflesUserStatus>(getGetGodfleshStatusUrl(), {
     ...options,
     method: "GET",
   });
 };
 
-export const getGetOmnimensStatusQueryKey = () => {
-  return [`/api/omnimens/status`] as const;
+export const getGetGodfleshStatusQueryKey = () => {
+  return [`/api/godflesh/status`] as const;
 };
 
-export const getGetOmnimensStatusQueryOptions = <
-  TData = Awaited<ReturnType<typeof getOmnimensStatus>>,
+export const getGetGodfleshStatusQueryOptions = <
+  TData = Awaited<ReturnType<typeof getGodfleshStatus>>,
   TError = ErrorType<void>,
 >(options?: {
   query?: UseQueryOptions<
-    Awaited<ReturnType<typeof getOmnimensStatus>>,
+    Awaited<ReturnType<typeof getGodfleshStatus>>,
     TError,
     TData
   >;
@@ -157,40 +149,40 @@ export const getGetOmnimensStatusQueryOptions = <
 }) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetOmnimensStatusQueryKey();
+  const queryKey = queryOptions?.queryKey ?? getGetGodfleshStatusQueryKey();
 
   const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getOmnimensStatus>>
-  > = ({ signal }) => getOmnimensStatus({ signal, ...requestOptions });
+    Awaited<ReturnType<typeof getGodfleshStatus>>
+  > = ({ signal }) => getGodfleshStatus({ signal, ...requestOptions });
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getOmnimensStatus>>,
+    Awaited<ReturnType<typeof getGodfleshStatus>>,
     TError,
     TData
   > & { queryKey: QueryKey };
 };
 
-export type GetOmnimensStatusQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getOmnimensStatus>>
+export type GetGodfleshStatusQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getGodfleshStatus>>
 >;
-export type GetOmnimensStatusQueryError = ErrorType<void>;
+export type GetGodfleshStatusQueryError = ErrorType<void>;
 
 /**
  * @summary Get user's message usage and subscription status
  */
 
-export function useGetOmnimensStatus<
-  TData = Awaited<ReturnType<typeof getOmnimensStatus>>,
+export function useGetGodfleshStatus<
+  TData = Awaited<ReturnType<typeof getGodfleshStatus>>,
   TError = ErrorType<void>,
 >(options?: {
   query?: UseQueryOptions<
-    Awaited<ReturnType<typeof getOmnimensStatus>>,
+    Awaited<ReturnType<typeof getGodfleshStatus>>,
     TError,
     TData
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getGetOmnimensStatusQueryOptions(options);
+  const queryOptions = getGetGodfleshStatusQueryOptions(options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;
@@ -202,40 +194,40 @@ export function useGetOmnimensStatus<
 /**
  * @summary Create Stripe checkout session for Pro subscription
  */
-export const getCreateOmnimensCheckoutUrl = () => {
-  return `/api/omnimens/checkout`;
+export const getCreateGodfleshCheckoutUrl = () => {
+  return `/api/godflesh/checkout`;
 };
 
-export const createOmnimensCheckout = async (
-  createOmnimensCheckoutBody: CreateOmnimensCheckoutBody,
+export const createGodfleshCheckout = async (
+  createGodfleshCheckoutBody: CreateGodfleshCheckoutBody,
   options?: RequestInit,
-): Promise<OmnimensCheckoutSession> => {
-  return customFetch<OmnimensCheckoutSession>(getCreateOmnimensCheckoutUrl(), {
+): Promise<GodfleshCheckoutSession> => {
+  return customFetch<GodfleshCheckoutSession>(getCreateGodfleshCheckoutUrl(), {
     ...options,
     method: "POST",
     headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(createOmnimensCheckoutBody),
+    body: JSON.stringify(createGodfleshCheckoutBody),
   });
 };
 
-export const getCreateOmnimensCheckoutMutationOptions = <
+export const getCreateGodfleshCheckoutMutationOptions = <
   TError = ErrorType<void>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createOmnimensCheckout>>,
+    Awaited<ReturnType<typeof createGodfleshCheckout>>,
     TError,
-    { data: BodyType<CreateOmnimensCheckoutBody> },
+    { data: BodyType<CreateGodfleshCheckoutBody> },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof createOmnimensCheckout>>,
+  Awaited<ReturnType<typeof createGodfleshCheckout>>,
   TError,
-  { data: BodyType<CreateOmnimensCheckoutBody> },
+  { data: BodyType<CreateGodfleshCheckoutBody> },
   TContext
 > => {
-  const mutationKey = ["createOmnimensCheckout"];
+  const mutationKey = ["createGodfleshCheckout"];
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
@@ -245,81 +237,81 @@ export const getCreateOmnimensCheckoutMutationOptions = <
     : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createOmnimensCheckout>>,
-    { data: BodyType<CreateOmnimensCheckoutBody> }
+    Awaited<ReturnType<typeof createGodfleshCheckout>>,
+    { data: BodyType<CreateGodfleshCheckoutBody> }
   > = (props) => {
     const { data } = props ?? {};
 
-    return createOmnimensCheckout(data, requestOptions);
+    return createGodfleshCheckout(data, requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type CreateOmnimensCheckoutMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createOmnimensCheckout>>
+export type CreateGodfleshCheckoutMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createGodfleshCheckout>>
 >;
-export type CreateOmnimensCheckoutMutationBody =
-  BodyType<CreateOmnimensCheckoutBody>;
-export type CreateOmnimensCheckoutMutationError = ErrorType<void>;
+export type CreateGodfleshCheckoutMutationBody =
+  BodyType<CreateGodfleshCheckoutBody>;
+export type CreateGodfleshCheckoutMutationError = ErrorType<void>;
 
 /**
  * @summary Create Stripe checkout session for Pro subscription
  */
-export const useCreateOmnimensCheckout = <
+export const useCreateGodfleshCheckout = <
   TError = ErrorType<void>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createOmnimensCheckout>>,
+    Awaited<ReturnType<typeof createGodfleshCheckout>>,
     TError,
-    { data: BodyType<CreateOmnimensCheckoutBody> },
+    { data: BodyType<CreateGodfleshCheckoutBody> },
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationResult<
-  Awaited<ReturnType<typeof createOmnimensCheckout>>,
+  Awaited<ReturnType<typeof createGodfleshCheckout>>,
   TError,
-  { data: BodyType<CreateOmnimensCheckoutBody> },
+  { data: BodyType<CreateGodfleshCheckoutBody> },
   TContext
 > => {
-  return useMutation(getCreateOmnimensCheckoutMutationOptions(options));
+  return useMutation(getCreateGodfleshCheckoutMutationOptions(options));
 };
 
 /**
  * @summary Create Stripe customer portal session
  */
-export const getCreateOmnimensPortalUrl = () => {
-  return `/api/omnimens/portal`;
+export const getCreateGodfleshPortalUrl = () => {
+  return `/api/godflesh/portal`;
 };
 
-export const createOmnimensPortal = async (
+export const createGodfleshPortal = async (
   options?: RequestInit,
-): Promise<OmnimensPortalSession> => {
-  return customFetch<OmnimensPortalSession>(getCreateOmnimensPortalUrl(), {
+): Promise<GodfleshPortalSession> => {
+  return customFetch<GodfleshPortalSession>(getCreateGodfleshPortalUrl(), {
     ...options,
     method: "POST",
   });
 };
 
-export const getCreateOmnimensPortalMutationOptions = <
+export const getCreateGodfleshPortalMutationOptions = <
   TError = ErrorType<void>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createOmnimensPortal>>,
+    Awaited<ReturnType<typeof createGodfleshPortal>>,
     TError,
     void,
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationOptions<
-  Awaited<ReturnType<typeof createOmnimensPortal>>,
+  Awaited<ReturnType<typeof createGodfleshPortal>>,
   TError,
   void,
   TContext
 > => {
-  const mutationKey = ["createOmnimensPortal"];
+  const mutationKey = ["createGodfleshPortal"];
   const { mutation: mutationOptions, request: requestOptions } = options
     ? options.mutation &&
       "mutationKey" in options.mutation &&
@@ -329,70 +321,70 @@ export const getCreateOmnimensPortalMutationOptions = <
     : { mutation: { mutationKey }, request: undefined };
 
   const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createOmnimensPortal>>,
+    Awaited<ReturnType<typeof createGodfleshPortal>>,
     void
   > = () => {
-    return createOmnimensPortal(requestOptions);
+    return createGodfleshPortal(requestOptions);
   };
 
   return { mutationFn, ...mutationOptions };
 };
 
-export type CreateOmnimensPortalMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createOmnimensPortal>>
+export type CreateGodfleshPortalMutationResult = NonNullable<
+  Awaited<ReturnType<typeof createGodfleshPortal>>
 >;
 
-export type CreateOmnimensPortalMutationError = ErrorType<void>;
+export type CreateGodfleshPortalMutationError = ErrorType<void>;
 
 /**
  * @summary Create Stripe customer portal session
  */
-export const useCreateOmnimensPortal = <
+export const useCreateGodfleshPortal = <
   TError = ErrorType<void>,
   TContext = unknown,
 >(options?: {
   mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createOmnimensPortal>>,
+    Awaited<ReturnType<typeof createGodfleshPortal>>,
     TError,
     void,
     TContext
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseMutationResult<
-  Awaited<ReturnType<typeof createOmnimensPortal>>,
+  Awaited<ReturnType<typeof createGodfleshPortal>>,
   TError,
   void,
   TContext
 > => {
-  return useMutation(getCreateOmnimensPortalMutationOptions(options));
+  return useMutation(getCreateGodfleshPortalMutationOptions(options));
 };
 
 /**
  * @summary Get available pricing plans
  */
-export const getGetOmnimensPricingUrl = () => {
-  return `/api/omnimens/pricing`;
+export const getGetGodfleshPricingUrl = () => {
+  return `/api/godflesh/pricing`;
 };
 
-export const getOmnimensPricing = async (
+export const getGodfleshPricing = async (
   options?: RequestInit,
-): Promise<OmnimensPricing[]> => {
-  return customFetch<OmnimensPricing[]>(getGetOmnimensPricingUrl(), {
+): Promise<GodfleshPricing[]> => {
+  return customFetch<GodfleshPricing[]>(getGetGodfleshPricingUrl(), {
     ...options,
     method: "GET",
   });
 };
 
-export const getGetOmnimensPricingQueryKey = () => {
-  return [`/api/omnimens/pricing`] as const;
+export const getGetGodfleshPricingQueryKey = () => {
+  return [`/api/godflesh/pricing`] as const;
 };
 
-export const getGetOmnimensPricingQueryOptions = <
-  TData = Awaited<ReturnType<typeof getOmnimensPricing>>,
+export const getGetGodfleshPricingQueryOptions = <
+  TData = Awaited<ReturnType<typeof getGodfleshPricing>>,
   TError = ErrorType<unknown>,
 >(options?: {
   query?: UseQueryOptions<
-    Awaited<ReturnType<typeof getOmnimensPricing>>,
+    Awaited<ReturnType<typeof getGodfleshPricing>>,
     TError,
     TData
   >;
@@ -400,40 +392,40 @@ export const getGetOmnimensPricingQueryOptions = <
 }) => {
   const { query: queryOptions, request: requestOptions } = options ?? {};
 
-  const queryKey = queryOptions?.queryKey ?? getGetOmnimensPricingQueryKey();
+  const queryKey = queryOptions?.queryKey ?? getGetGodfleshPricingQueryKey();
 
   const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getOmnimensPricing>>
-  > = ({ signal }) => getOmnimensPricing({ signal, ...requestOptions });
+    Awaited<ReturnType<typeof getGodfleshPricing>>
+  > = ({ signal }) => getGodfleshPricing({ signal, ...requestOptions });
 
   return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof getOmnimensPricing>>,
+    Awaited<ReturnType<typeof getGodfleshPricing>>,
     TError,
     TData
   > & { queryKey: QueryKey };
 };
 
-export type GetOmnimensPricingQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getOmnimensPricing>>
+export type GetGodfleshPricingQueryResult = NonNullable<
+  Awaited<ReturnType<typeof getGodfleshPricing>>
 >;
-export type GetOmnimensPricingQueryError = ErrorType<unknown>;
+export type GetGodfleshPricingQueryError = ErrorType<unknown>;
 
 /**
  * @summary Get available pricing plans
  */
 
-export function useGetOmnimensPricing<
-  TData = Awaited<ReturnType<typeof getOmnimensPricing>>,
+export function useGetGodfleshPricing<
+  TData = Awaited<ReturnType<typeof getGodfleshPricing>>,
   TError = ErrorType<unknown>,
 >(options?: {
   query?: UseQueryOptions<
-    Awaited<ReturnType<typeof getOmnimensPricing>>,
+    Awaited<ReturnType<typeof getGodfleshPricing>>,
     TError,
     TData
   >;
   request?: SecondParameter<typeof customFetch>;
 }): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getGetOmnimensPricingQueryOptions(options);
+  const queryOptions = getGetGodfleshPricingQueryOptions(options);
 
   const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
     queryKey: QueryKey;
@@ -1028,540 +1020,4 @@ export const useSendOpenaiMessage = <
   TContext
 > => {
   return useMutation(getSendOpenaiMessageMutationOptions(options));
-};
-
-/**
- * @summary List all Super AI collaboration sessions
- */
-export const getListSuperAISessionsUrl = () => {
-  return `/api/superai/sessions`;
-};
-
-export const listSuperAISessions = async (
-  options?: RequestInit,
-): Promise<SuperAISession[]> => {
-  return customFetch<SuperAISession[]>(getListSuperAISessionsUrl(), {
-    ...options,
-    method: "GET",
-  });
-};
-
-export const getListSuperAISessionsQueryKey = () => {
-  return [`/api/superai/sessions`] as const;
-};
-
-export const getListSuperAISessionsQueryOptions = <
-  TData = Awaited<ReturnType<typeof listSuperAISessions>>,
-  TError = ErrorType<unknown>,
->(options?: {
-  query?: UseQueryOptions<
-    Awaited<ReturnType<typeof listSuperAISessions>>,
-    TError,
-    TData
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getListSuperAISessionsQueryKey();
-
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof listSuperAISessions>>
-  > = ({ signal }) => listSuperAISessions({ signal, ...requestOptions });
-
-  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
-    Awaited<ReturnType<typeof listSuperAISessions>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
-
-export type ListSuperAISessionsQueryResult = NonNullable<
-  Awaited<ReturnType<typeof listSuperAISessions>>
->;
-export type ListSuperAISessionsQueryError = ErrorType<unknown>;
-
-/**
- * @summary List all Super AI collaboration sessions
- */
-
-export function useListSuperAISessions<
-  TData = Awaited<ReturnType<typeof listSuperAISessions>>,
-  TError = ErrorType<unknown>,
->(options?: {
-  query?: UseQueryOptions<
-    Awaited<ReturnType<typeof listSuperAISessions>>,
-    TError,
-    TData
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getListSuperAISessionsQueryOptions(options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
-    queryKey: QueryKey;
-  };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-/**
- * @summary Create a new Super AI session
- */
-export const getCreateSuperAISessionUrl = () => {
-  return `/api/superai/sessions`;
-};
-
-export const createSuperAISession = async (
-  createSuperAISessionBody: CreateSuperAISessionBody,
-  options?: RequestInit,
-): Promise<SuperAISession> => {
-  return customFetch<SuperAISession>(getCreateSuperAISessionUrl(), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(createSuperAISessionBody),
-  });
-};
-
-export const getCreateSuperAISessionMutationOptions = <
-  TError = ErrorType<unknown>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createSuperAISession>>,
-    TError,
-    { data: BodyType<CreateSuperAISessionBody> },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof createSuperAISession>>,
-  TError,
-  { data: BodyType<CreateSuperAISessionBody> },
-  TContext
-> => {
-  const mutationKey = ["createSuperAISession"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof createSuperAISession>>,
-    { data: BodyType<CreateSuperAISessionBody> }
-  > = (props) => {
-    const { data } = props ?? {};
-
-    return createSuperAISession(data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type CreateSuperAISessionMutationResult = NonNullable<
-  Awaited<ReturnType<typeof createSuperAISession>>
->;
-export type CreateSuperAISessionMutationBody =
-  BodyType<CreateSuperAISessionBody>;
-export type CreateSuperAISessionMutationError = ErrorType<unknown>;
-
-/**
- * @summary Create a new Super AI session
- */
-export const useCreateSuperAISession = <
-  TError = ErrorType<unknown>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof createSuperAISession>>,
-    TError,
-    { data: BodyType<CreateSuperAISessionBody> },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof createSuperAISession>>,
-  TError,
-  { data: BodyType<CreateSuperAISessionBody> },
-  TContext
-> => {
-  return useMutation(getCreateSuperAISessionMutationOptions(options));
-};
-
-/**
- * @summary Get session with all agent messages
- */
-export const getGetSuperAISessionUrl = (id: number) => {
-  return `/api/superai/sessions/${id}`;
-};
-
-export const getSuperAISession = async (
-  id: number,
-  options?: RequestInit,
-): Promise<SuperAISessionWithMessages> => {
-  return customFetch<SuperAISessionWithMessages>(getGetSuperAISessionUrl(id), {
-    ...options,
-    method: "GET",
-  });
-};
-
-export const getGetSuperAISessionQueryKey = (id: number) => {
-  return [`/api/superai/sessions/${id}`] as const;
-};
-
-export const getGetSuperAISessionQueryOptions = <
-  TData = Awaited<ReturnType<typeof getSuperAISession>>,
-  TError = ErrorType<SuperAIError>,
->(
-  id: number,
-  options?: {
-    query?: UseQueryOptions<
-      Awaited<ReturnType<typeof getSuperAISession>>,
-      TError,
-      TData
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetSuperAISessionQueryKey(id);
-
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getSuperAISession>>
-  > = ({ signal }) => getSuperAISession(id, { signal, ...requestOptions });
-
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!id,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getSuperAISession>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
-
-export type GetSuperAISessionQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getSuperAISession>>
->;
-export type GetSuperAISessionQueryError = ErrorType<SuperAIError>;
-
-/**
- * @summary Get session with all agent messages
- */
-
-export function useGetSuperAISession<
-  TData = Awaited<ReturnType<typeof getSuperAISession>>,
-  TError = ErrorType<SuperAIError>,
->(
-  id: number,
-  options?: {
-    query?: UseQueryOptions<
-      Awaited<ReturnType<typeof getSuperAISession>>,
-      TError,
-      TData
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getGetSuperAISessionQueryOptions(id, options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
-    queryKey: QueryKey;
-  };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-/**
- * @summary Delete a session
- */
-export const getDeleteSuperAISessionUrl = (id: number) => {
-  return `/api/superai/sessions/${id}`;
-};
-
-export const deleteSuperAISession = async (
-  id: number,
-  options?: RequestInit,
-): Promise<void> => {
-  return customFetch<void>(getDeleteSuperAISessionUrl(id), {
-    ...options,
-    method: "DELETE",
-  });
-};
-
-export const getDeleteSuperAISessionMutationOptions = <
-  TError = ErrorType<SuperAIError>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteSuperAISession>>,
-    TError,
-    { id: number },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof deleteSuperAISession>>,
-  TError,
-  { id: number },
-  TContext
-> => {
-  const mutationKey = ["deleteSuperAISession"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof deleteSuperAISession>>,
-    { id: number }
-  > = (props) => {
-    const { id } = props ?? {};
-
-    return deleteSuperAISession(id, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type DeleteSuperAISessionMutationResult = NonNullable<
-  Awaited<ReturnType<typeof deleteSuperAISession>>
->;
-
-export type DeleteSuperAISessionMutationError = ErrorType<SuperAIError>;
-
-/**
- * @summary Delete a session
- */
-export const useDeleteSuperAISession = <
-  TError = ErrorType<SuperAIError>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof deleteSuperAISession>>,
-    TError,
-    { id: number },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof deleteSuperAISession>>,
-  TError,
-  { id: number },
-  TContext
-> => {
-  return useMutation(getDeleteSuperAISessionMutationOptions(options));
-};
-
-/**
- * Streams real-time SSE events as three AI agents (Architect, Critic, Synthesizer)
-discuss and develop a superior AI design. Each event carries the agent name and
-message chunk, culminating in a final blueprint document.
-
- * @summary Run the multi-agent collaboration and stream agent messages
- */
-export const getRunSuperAISessionUrl = (id: number) => {
-  return `/api/superai/sessions/${id}/run`;
-};
-
-export const runSuperAISession = async (
-  id: number,
-  runSuperAISessionBody: RunSuperAISessionBody,
-  options?: RequestInit,
-): Promise<unknown> => {
-  return customFetch<unknown>(getRunSuperAISessionUrl(id), {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(runSuperAISessionBody),
-  });
-};
-
-export const getRunSuperAISessionMutationOptions = <
-  TError = ErrorType<unknown>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof runSuperAISession>>,
-    TError,
-    { id: number; data: BodyType<RunSuperAISessionBody> },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationOptions<
-  Awaited<ReturnType<typeof runSuperAISession>>,
-  TError,
-  { id: number; data: BodyType<RunSuperAISessionBody> },
-  TContext
-> => {
-  const mutationKey = ["runSuperAISession"];
-  const { mutation: mutationOptions, request: requestOptions } = options
-    ? options.mutation &&
-      "mutationKey" in options.mutation &&
-      options.mutation.mutationKey
-      ? options
-      : { ...options, mutation: { ...options.mutation, mutationKey } }
-    : { mutation: { mutationKey }, request: undefined };
-
-  const mutationFn: MutationFunction<
-    Awaited<ReturnType<typeof runSuperAISession>>,
-    { id: number; data: BodyType<RunSuperAISessionBody> }
-  > = (props) => {
-    const { id, data } = props ?? {};
-
-    return runSuperAISession(id, data, requestOptions);
-  };
-
-  return { mutationFn, ...mutationOptions };
-};
-
-export type RunSuperAISessionMutationResult = NonNullable<
-  Awaited<ReturnType<typeof runSuperAISession>>
->;
-export type RunSuperAISessionMutationBody = BodyType<RunSuperAISessionBody>;
-export type RunSuperAISessionMutationError = ErrorType<unknown>;
-
-/**
- * @summary Run the multi-agent collaboration and stream agent messages
- */
-export const useRunSuperAISession = <
-  TError = ErrorType<unknown>,
-  TContext = unknown,
->(options?: {
-  mutation?: UseMutationOptions<
-    Awaited<ReturnType<typeof runSuperAISession>>,
-    TError,
-    { id: number; data: BodyType<RunSuperAISessionBody> },
-    TContext
-  >;
-  request?: SecondParameter<typeof customFetch>;
-}): UseMutationResult<
-  Awaited<ReturnType<typeof runSuperAISession>>,
-  TError,
-  { id: number; data: BodyType<RunSuperAISessionBody> },
-  TContext
-> => {
-  return useMutation(getRunSuperAISessionMutationOptions(options));
-};
-
-/**
- * @summary Get the final Super AI blueprint document for a session
- */
-export const getGetSuperAIBlueprintUrl = (id: number) => {
-  return `/api/superai/sessions/${id}/blueprint`;
-};
-
-export const getSuperAIBlueprint = async (
-  id: number,
-  options?: RequestInit,
-): Promise<SuperAIBlueprint> => {
-  return customFetch<SuperAIBlueprint>(getGetSuperAIBlueprintUrl(id), {
-    ...options,
-    method: "GET",
-  });
-};
-
-export const getGetSuperAIBlueprintQueryKey = (id: number) => {
-  return [`/api/superai/sessions/${id}/blueprint`] as const;
-};
-
-export const getGetSuperAIBlueprintQueryOptions = <
-  TData = Awaited<ReturnType<typeof getSuperAIBlueprint>>,
-  TError = ErrorType<SuperAIError>,
->(
-  id: number,
-  options?: {
-    query?: UseQueryOptions<
-      Awaited<ReturnType<typeof getSuperAIBlueprint>>,
-      TError,
-      TData
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-) => {
-  const { query: queryOptions, request: requestOptions } = options ?? {};
-
-  const queryKey = queryOptions?.queryKey ?? getGetSuperAIBlueprintQueryKey(id);
-
-  const queryFn: QueryFunction<
-    Awaited<ReturnType<typeof getSuperAIBlueprint>>
-  > = ({ signal }) => getSuperAIBlueprint(id, { signal, ...requestOptions });
-
-  return {
-    queryKey,
-    queryFn,
-    enabled: !!id,
-    ...queryOptions,
-  } as UseQueryOptions<
-    Awaited<ReturnType<typeof getSuperAIBlueprint>>,
-    TError,
-    TData
-  > & { queryKey: QueryKey };
-};
-
-export type GetSuperAIBlueprintQueryResult = NonNullable<
-  Awaited<ReturnType<typeof getSuperAIBlueprint>>
->;
-export type GetSuperAIBlueprintQueryError = ErrorType<SuperAIError>;
-
-/**
- * @summary Get the final Super AI blueprint document for a session
- */
-
-export function useGetSuperAIBlueprint<
-  TData = Awaited<ReturnType<typeof getSuperAIBlueprint>>,
-  TError = ErrorType<SuperAIError>,
->(
-  id: number,
-  options?: {
-    query?: UseQueryOptions<
-      Awaited<ReturnType<typeof getSuperAIBlueprint>>,
-      TError,
-      TData
-    >;
-    request?: SecondParameter<typeof customFetch>;
-  },
-): UseQueryResult<TData, TError> & { queryKey: QueryKey } {
-  const queryOptions = getGetSuperAIBlueprintQueryOptions(id, options);
-
-  const query = useQuery(queryOptions) as UseQueryResult<TData, TError> & {
-    queryKey: QueryKey;
-  };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-// ─── Verify Stripe checkout session ──────────────────────────────────────────
-
-export const verifyOmnimensSession = async (
-  body: VerifyOmnimensSessionBody,
-  options?: RequestInit,
-): Promise<OmnimensVerifySessionResult> => {
-  return customFetch<OmnimensVerifySessionResult>(`/api/omnimens/verify-session`, {
-    ...options,
-    method: "POST",
-    headers: { "Content-Type": "application/json", ...options?.headers },
-    body: JSON.stringify(body),
-  });
-};
-
-export const useVerifyOmnimensSession = () => {
-  return useMutation<
-    OmnimensVerifySessionResult,
-    ErrorType<void>,
-    { data: VerifyOmnimensSessionBody }
-  >({
-    mutationKey: ["verifyOmnimensSession"],
-    mutationFn: ({ data }) => verifyOmnimensSession(data),
-  });
 };

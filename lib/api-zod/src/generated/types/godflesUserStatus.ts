@@ -6,11 +6,10 @@
  * OpenAPI spec version: 0.1.0
  */
 
-export interface OmnimensUserStatus {
+export interface GodflesUserStatus {
   messagesUsedToday: number;
   dailyLimit: number;
   isPro: boolean;
-  isOwner?: boolean;
   stripeCustomerId?: string;
   stripeSubscriptionId?: string;
 }
