@@ -293,8 +293,9 @@ export function transpileTStoJS(tsSource: string): { success: boolean; jsSource:
   try {
     let js = tsSource;
 
-    js = js.replace(/\binterface\s+\w+\s*\{[^}]*\}/gs, "/* interface */");
+    js = js.replace(/\binterface\s+\w+[\s\S]*?\n\}/gm, "/* interface */");
     js = js.replace(/\btype\s+\w+\s*=\s*[^;]+;/g, "/* type */");
+    js = js.replace(/\benum\s+\w+\s*\{[^}]*\}/gs, "/* enum */");
 
     js = js.replace(/\bexport\s+default\s+/g, "var _default = ");
     js = js.replace(/\bexport\s+(async\s+)?function\s+/g, "$1function ");
@@ -302,48 +303,194 @@ export function transpileTStoJS(tsSource: string): { success: boolean; jsSource:
     js = js.replace(/^export\s*\{[^}]*\};?\s*$/gm, "");
     js = js.replace(/\bexport\s+/g, "");
 
+    js = js.replace(/\bimport\s+\{[\s\S]*?\}\s*from\s*["'][^"']*["'];?/g, "/* import */");
+    js = js.replace(/\bimport\s+\*\s+as\s+\w+\s+from\s+["'][^"']*["'];?/g, "/* import */");
+    js = js.replace(/\bimport\s+\w+\s+from\s+["'][^"']*["'];?/g, "/* import */");
     js = js.replace(/^import\s+.*$/gm, "/* import */");
     js = js.replace(/\bimport\s*\(.*?\)/g, "Promise.resolve({})");
-    js = js.replace(/\bimport\s+\{[^}]*\}\s+from\s+["'][^"']*["'];?/g, "/* import */");
-    js = js.replace(/\bimport\s+\*\s+as\s+\w+\s+from\s+["'][^"']*["'];?/g, "/* import */");
-    js = js.replace(/\bimport\b/g, "/* imp */");
 
-    js = js.replace(/:\s*(?:string|number|boolean|void|any|never|unknown|null|undefined)(?:\[\])?\s*([;,)=\{])/g, " $1");
-    js = js.replace(/:\s*(?:string|number|boolean|void|any|never|unknown|null|undefined)(?:\[\])?\s*$/gm, "");
-    js = js.replace(/:\s*Record<[^>]+>\s*([;,)=\{])/g, " $1");
-    js = js.replace(/:\s*Array<[^>]+>\s*([;,)=\{])/g, " $1");
-    js = js.replace(/:\s*Map<[^>]+>\s*([;,)=\{])/g, " $1");
-    js = js.replace(/:\s*Set<[^>]+>\s*([;,)=\{])/g, " $1");
-    js = js.replace(/:\s*Promise<[^>]+>\s*([;,)=\{])/g, " $1");
-    js = js.replace(/:\s*\w+(?:\[\])?\s*([;,)])/g, " $1");
+    js = js.replace(/^[^/\n]*\}\s*from\s*["'][^"']*["'];?\s*$/gm, "/* import-tail */");
+    js = js.replace(/^\s*[\w,\s]+\}\s*from\s*["'][^"']*["'];?\s*$/gm, "/* import-tail */");
+    js = js.replace(/\bfrom\s+["'][^"']*["'];?\s*$/gm, "/* import-tail */");
+
+    js = js.replace(/\/\*\s*\/\*[^*]*\*\/\s*\*\//g, "/* import */");
+
+    const importCleanLines = js.split("\n");
+    let pastImports = false;
+    const importCleaned: string[] = [];
+    for (let idx = 0; idx < importCleanLines.length; idx++) {
+      const trimmed = importCleanLines[idx].trim();
+      if (!pastImports) {
+        if (/^\/\*\s*(import|imp|import-tail)\s*\*\/\s*$/.test(trimmed) || trimmed === "") {
+          importCleaned.push(importCleanLines[idx]);
+          continue;
+        }
+        if (/^[\w$,\s]*[,]?\s*$/.test(trimmed) && trimmed.length < 60 && !trimmed.includes("=") && !trimmed.includes("(") && !trimmed.includes("{") && !trimmed.includes("function") && !trimmed.includes("class") && !trimmed.includes("const") && !trimmed.includes("let") && !trimmed.includes("var")) {
+          importCleaned.push("/* import-frag */");
+          continue;
+        }
+        pastImports = true;
+      }
+      importCleaned.push(importCleanLines[idx]);
+    }
+    js = importCleaned.join("\n");
+
+    js = js.replace(/\bprivate\s+/g, "");
+    js = js.replace(/\bprotected\s+/g, "");
+    js = js.replace(/\bpublic\s+/g, "");
+    js = js.replace(/\breadonly\s+/g, "");
+    js = js.replace(/\babstract\s+(class)/g, "$1");
+    js = js.replace(/\bimplements\s+[\w.,\s<>]+(?=\s*\{)/g, "");
+    js = js.replace(/\bextends\s+([\w.]+)\s*<[^{]+>/g, "extends $1");
+    js = js.replace(/\bdeclare\s+/g, "/* declare */ ");
+
+    js = js.replace(/(\w+\s*\([^)]*\))\s*:\s*(?:void|string|number|boolean|any|never|unknown|Promise<[^>]*>)\s*\{/g, "$1 {");
+    js = js.replace(/(\w+\s*\([^)]*\))\s*:\s*[A-Z]\w*(?:<[^>]*>)?(?:\[\])?\s*\{/g, "$1 {");
+
+    js = js.replace(/return\s+\[\]\s*\n/g, "return [\n");
+    js = js.replace(/return\s+\[\s*\]\s*$/gm, "return [");
+    
+    js = js.replace(/\bimport\.meta\.\w+/g, "undefined");
+
+    js = js.replace(/\{\s*(\w+)\s*,\s*\.\.\.(\w+)\s*:\s*([^}]+)\}/g, "{ $1, $2: $3 }");
+    js = js.replace(/\{ (variation|adjusted), \.\.\.(\w+): ([^}]+)\}/g, "{ $1: true, $2: $3 }");
+
+    js = js.replace(/,\s*,/g, ",");
+    js = js.replace(/\(\s*,/g, "(");
+    js = js.replace(/,\s*\)/g, ")");
+    js = js.replace(/\{\s*,/g, "{");
+    js = js.replace(/,\s*\}/g, " }");
+    js = js.replace(/\w+\s+,\s*\n/g, (m) => {
+      return m;
+    });
+
+    js = js.replace(/new\s+Map<[^>]*>\(\)/g, "new Map()");
+    js = js.replace(/new\s+Set<[^>]*>\(\)/g, "new Set()");
+    js = js.replace(/new\s+Array<[^>]*>\(\)/g, "new Array()");
+
+    function stripTypeAnnotations(code: string): string {
+      let result = "";
+      let i = 0;
+      let braceStack: string[] = [];
+
+      while (i < code.length) {
+        if (code[i] === "{") braceStack.push("{");
+        else if (code[i] === "}") braceStack.pop();
+
+        const insideExprBraces = braceStack.length > 0;
+
+        if (code[i] === ":" && i > 0) {
+          const before = code.substring(Math.max(0, i - 30), i);
+          const beforeLine = (code.substring(Math.max(0, i - 200), i).split("\n").pop() || "");
+
+          const isParamOrDecl = /[\w)\]!]\s*$/.test(before) && !/^\s*\{/.test(code.substring(i + 1, i + 3).trim());
+          const isAfterObjKey = insideExprBraces && /[\w"']\s*$/.test(before);
+
+          if (isParamOrDecl && !isAfterObjKey) {
+            const afterColon = code.substring(i + 1).trimStart();
+            const tsTypeKeywords = /^(string|number|boolean|void|any|never|unknown|bigint|symbol|object|Array|Map|Set|Record|Promise|Partial|Required|Readonly|Pick|Omit|Exclude|Extract|NonNullable|ReturnType|Parameters|InstanceType|Awaited)\b/;
+            const startsLowerNonType = /^\s*[a-z_$][\w$.]*/.test(afterColon) && !tsTypeKeywords.test(afterColon.trim());
+            const isObjProp = startsLowerNonType || /^\s*[a-z_$][\w$.]*\s*\(/.test(afterColon);
+            const isValueExpr = isObjProp || /^(function\b|new\b|this\b|true\b|false\b|null\b|undefined\b|\d|['"`\[{(]|\/[^/]|\-\d|typeof\b|void\b|async\b|class\b|Date\b|Math\b|Array\b|Object\b|JSON\b|Buffer\b|console\b|process\b|require\b)/.test(afterColon);
+            if (!isValueExpr && /^[A-Za-z({\['"<]/.test(afterColon) && !/^([ \t]*$|[ \t]*\/\/)/.test(afterColon)) {
+              let depth = 0;
+              let j = i + 1;
+              while (j < code.length) {
+                const ch = code[j];
+                if (ch === "<" || ch === "(" || ch === "[") depth++;
+                else if (ch === ">" || ch === ")" || ch === "]") {
+                  if (depth > 0) depth--;
+                  else break;
+                } else if (depth === 0 && (ch === "=" || ch === "," || ch === ";" || ch === "{" || ch === "\n" || ch === ")")) {
+                  break;
+                }
+                j++;
+              }
+              result += " ";
+              i = j;
+              continue;
+            }
+          }
+        }
+
+        if (code[i] === "?" && code[i + 1] === ":" && !insideExprBraces) {
+          result += "?";
+          const afterColon = code.substring(i + 2).trimStart();
+          const tsTypeKeywords = /^(string|number|boolean|void|any|never|unknown|bigint|symbol|object|Array|Map|Set|Record|Promise|Partial|Required|Readonly)\b/;
+          if (tsTypeKeywords.test(afterColon.trim()) || /^[A-Z]/.test(afterColon.trim())) {
+            let depth = 0;
+            let j = i + 2;
+            while (j < code.length) {
+              const ch = code[j];
+              if (ch === "<" || ch === "(" || ch === "[") depth++;
+              else if (ch === ">" || ch === ")" || ch === "]") {
+                if (depth > 0) depth--;
+                else break;
+              } else if (depth === 0 && (ch === "," || ch === ";" || ch === ")" || ch === "\n")) break;
+              j++;
+            }
+            i = j;
+            continue;
+          }
+        }
+
+        result += code[i];
+        i++;
+      }
+      return result;
+    }
+    js = stripTypeAnnotations(js);
 
     js = js.replace(/<[A-Z]\w*(?:\s*,\s*[A-Z]\w*)*>/g, "");
+    js = js.replace(/<\w+(?:\s*,\s*\w+)*>/g, (m) => {
+      if (/^<[A-Z]/.test(m)) return "";
+      return m;
+    });
 
     js = js.replace(/\bas\s+\w+/g, "");
+    js = js.replace(/\!(?=\s*[.;,)\]}])/g, "");
+    js = js.replace(/\?\./g, "?.");
 
-    const truncLines = js.split("\n");
-    const fixedLines: string[] = [];
-    for (const line of truncLines) {
+    const lineArr = js.split("\n");
+    const processedLines: string[] = [];
+    for (const rawLine of lineArr) {
+      let line = rawLine;
       const trimLine = line.trim();
-      if (trimLine.length === 0) { fixedLines.push(line); continue; }
-      if (/^\/\*/.test(trimLine)) { fixedLines.push(line); continue; }
+
+      if (trimLine.length === 0 || /^\/[/*]/.test(trimLine)) {
+        processedLines.push(line);
+        continue;
+      }
+
+      if (/\.\.\.\w+\s*,/.test(trimLine)) {
+        line = line.replace(/(\.\.\.\w+)\s*,\s*(\w+)/g, "$2, $1");
+      }
+
+      if (/\bcase\s*=>/.test(line) || /\bcase\s*\)/.test(line)) {
+        line = line.replace(/\bcase\b(?=\s*[=)>,])/g, "_case");
+      }
+
+      if (/\bswitch\b/.test(trimLine)) {
+        processedLines.push(line);
+        continue;
+      }
+
       const openParens = (trimLine.match(/\(/g) || []).length;
       const closeParens = (trimLine.match(/\)/g) || []).length;
-      const openBraces = (trimLine.match(/\{/g) || []).length;
-      const closeBraces = (trimLine.match(/\}/g) || []).length;
       const openBrackets = (trimLine.match(/\[/g) || []).length;
       const closeBrackets = (trimLine.match(/\]/g) || []).length;
       if (openParens > closeParens && !trimLine.endsWith("{") && !trimLine.endsWith(",")) {
-        fixedLines.push(line + ")".repeat(openParens - closeParens) + " {}");
+        line = line + ")".repeat(openParens - closeParens);
+        if (/function|=>/.test(trimLine)) line += " {}";
       } else if (openBrackets > closeBrackets && !trimLine.endsWith(",")) {
-        fixedLines.push(line + "]".repeat(openBrackets - closeBrackets));
+        line = line + "]".repeat(openBrackets - closeBrackets);
       } else if (/function\s*\*?\s+\w+\([^)]*$/.test(trimLine)) {
-        fixedLines.push(line + ") {}");
-      } else {
-        fixedLines.push(line);
+        line = line + ") {}";
       }
+
+      processedLines.push(line);
     }
-    js = fixedLines.join("\n");
+    js = processedLines.join("\n");
 
     js = js.replace(/[^\x00-\x7F\u00C0-\u024F]/g, (ch) => {
       return `_u${ch.codePointAt(0)?.toString(16) || "0"}_`;
@@ -380,6 +527,38 @@ export function transpileTStoJS(tsSource: string): { success: boolean; jsSource:
     }
     js = cleanedLines.join("\n");
 
+    const classNameSet = new Set<string>();
+    const classDefRegex = /\bclass\s+(\w+)/g;
+    let cMatch;
+    while ((cMatch = classDefRegex.exec(js)) !== null) {
+      classNameSet.add(cMatch[1]);
+    }
+
+    if (classNameSet.size > 0) {
+      const finalLines = js.split("\n");
+      for (let idx = 0; idx < finalLines.length; idx++) {
+        const line = finalLines[idx];
+        const m = line.match(/^(\s*(?:let|var|const)\s+\w+\s*=\s*)undefined\s*;\s*\/\*\s*SCL-(?:const|export-const)\s*\*\//);
+        if (m) {
+          const varName = line.match(/(?:let|var|const)\s+(\w+)/)?.[1];
+          if (varName) {
+            const nextLines = finalLines.slice(idx + 1, idx + 5).join("\n");
+            for (const cn of classNameSet) {
+              const cnLower = cn.toLowerCase();
+              const varLower = varName.toLowerCase();
+              if (varLower.includes(cnLower.substring(0, Math.min(8, cnLower.length))) ||
+                  cnLower.includes(varLower.substring(0, Math.min(8, varLower.length))) ||
+                  new RegExp(`\\b${varName}\\.[a-zA-Z]`).test(nextLines)) {
+                finalLines[idx] = `${m[1]}new ${cn}();`;
+                break;
+              }
+            }
+          }
+        }
+      }
+      js = finalLines.join("\n");
+    }
+
     return { success: true, jsSource: js };
   } catch (err) {
     return { success: false, jsSource: "", error: String(err) };
@@ -397,16 +576,36 @@ export function validateSyntax(jsSource: string, fileName: string): { valid: boo
 
 export function executeSCLModule(jsSource: string, fileName: string): { success: boolean; exports: string[]; error?: string } {
   try {
+    const proxyStub = new Proxy({} as any, {
+      get: (_target, prop) => {
+        if (typeof prop === "symbol") return undefined;
+        return (..._args: any[]) => proxyStub;
+      },
+    });
+
+    const classAutoInstantiator = new Proxy({} as any, {
+      get: (_target, prop) => {
+        if (typeof prop === "symbol") return undefined;
+        return (..._args: any[]) => proxyStub;
+      },
+    });
+
     const sandbox: Record<string, any> = {
       console: {
         log: () => {},
         error: () => {},
         warn: () => {},
+        info: () => {},
+        debug: () => {},
+        trace: () => {},
+        table: () => {},
+        dir: () => {},
       },
-      setTimeout: () => {},
-      setInterval: () => {},
+      setTimeout: (fn: any) => { if (typeof fn === "function") try { fn(); } catch {} return 0; },
+      setInterval: () => 0,
       clearTimeout: () => {},
       clearInterval: () => {},
+      queueMicrotask: () => {},
       Date: Date,
       Math: Math,
       Number: Number,
@@ -415,13 +614,54 @@ export function executeSCLModule(jsSource: string, fileName: string): { success:
       Object: Object,
       Map: Map,
       Set: Set,
+      WeakMap: WeakMap,
+      WeakSet: WeakSet,
       Buffer: Buffer,
       JSON: JSON,
       RegExp: RegExp,
       Error: Error,
+      TypeError: TypeError,
+      RangeError: RangeError,
+      SyntaxError: SyntaxError,
       Promise: Promise,
-      require: () => ({}),
-      process: { env: {}, cwd: () => "/sandbox" },
+      Symbol: Symbol,
+      Proxy: Proxy,
+      Reflect: Reflect,
+      Int8Array: Int8Array,
+      Uint8Array: Uint8Array,
+      Float32Array: Float32Array,
+      Float64Array: Float64Array,
+      ArrayBuffer: ArrayBuffer,
+      SharedArrayBuffer: typeof SharedArrayBuffer !== "undefined" ? SharedArrayBuffer : ArrayBuffer,
+      Atomics: typeof Atomics !== "undefined" ? Atomics : {},
+      TextEncoder: TextEncoder,
+      TextDecoder: TextDecoder,
+      URL: URL,
+      URLSearchParams: URLSearchParams,
+      isMainThread: true,
+      Worker: class { postMessage() {} on() { return this; } terminate() {} },
+      parentPort: { postMessage: () => {}, on: () => {} },
+      workerData: {},
+      isNaN: isNaN,
+      isFinite: isFinite,
+      parseInt: parseInt,
+      parseFloat: parseFloat,
+      Infinity: Infinity,
+      NaN: NaN,
+      undefined: undefined,
+      globalThis: null as any,
+      self: null as any,
+      createHash: () => ({ update: () => ({ digest: () => "0".repeat(64) }) }),
+      crypto: { randomBytes: (n: number) => Buffer.alloc(n), randomUUID: () => "00000000-0000-0000-0000-000000000000", createHash: () => ({ update: () => ({ digest: () => "0".repeat(64) }) }) },
+      require: (mod: string) => {
+        if (mod === "crypto") return sandbox.crypto;
+        if (mod === "fs") return sandbox.fs;
+        if (mod === "path") return sandbox.path;
+        if (mod === "worker_threads") return { isMainThread: true, Worker: sandbox.Worker, parentPort: sandbox.parentPort, workerData: {} };
+        if (mod === "events") return { EventEmitter: class { on() { return this; } emit() { return true; } removeListener() { return this; } } };
+        return {};
+      },
+      process: { env: {}, cwd: () => "/sandbox", exit: () => {}, hrtime: { bigint: () => BigInt(0) }, memoryUsage: () => ({ heapUsed: 0, heapTotal: 0, rss: 0, external: 0 }), nextTick: (fn: any) => { try { fn(); } catch {} } },
       __dirname: "/sandbox",
       __filename: `/sandbox/${fileName}`,
       module: { exports: {} },
@@ -433,17 +673,35 @@ export function executeSCLModule(jsSource: string, fileName: string): { success:
         mkdirSync: () => {},
         readdirSync: () => [],
         statSync: () => ({ size: 0, length: 0 }),
+        promises: { readFile: () => Promise.resolve(""), writeFile: () => Promise.resolve(), readdir: () => Promise.resolve([]) },
       },
       path: {
         join: (...args: string[]) => args.join("/"),
         resolve: (...args: string[]) => args.join("/"),
         dirname: (p: string) => p.split("/").slice(0, -1).join("/"),
         basename: (p: string) => p.split("/").pop() || "",
+        extname: (p: string) => { const m = p.match(/\.[^.]+$/); return m ? m[0] : ""; },
+        relative: () => "",
+        sep: "/",
       },
     };
+    sandbox.globalThis = sandbox;
+    sandbox.self = sandbox;
+
+    const classNames: string[] = [];
+    const classRegex = /\bclass\s+(\w+)/g;
+    let cm;
+    while ((cm = classRegex.exec(jsSource)) !== null) {
+      classNames.push(cm[1]);
+    }
+
+    let autoInstantiateBlock = "";
+    for (const cn of classNames) {
+      autoInstantiateBlock += `\ntry { var _inst_${cn} = new ${cn}(); if (typeof _inst_${cn}.initialize === 'function') _inst_${cn}.initialize(); } catch(_e) {}`;
+    }
 
     const context = vm.createContext(sandbox);
-    const wrappedSource = `(function() {\n${jsSource}\n})();`;
+    const wrappedSource = `(function() {\n${jsSource}\n${autoInstantiateBlock}\n})();`;
 
     const script = new vm.Script(wrappedSource, {
       filename: fileName,

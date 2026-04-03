@@ -61,7 +61,7 @@ import { internalAnalyze, internalSynthesize, getSymbolKnowledgeForSCL, SYMBOL_K
 import { getFileRegistry, getAccessibleFiles, getReadOnlyFiles, canWriteFile, readFileContent, writeFileContent, getFileDigest, getRegistrySummary, type RegisteredFile } from "./omnimens-file-registry.js";
 import { encodeToSCL, decodeSCL, getCodexDigest, getSCLStats, lookupSymbol, getCodexState, applySCLDesignResult, setDesignPhase, isCodexReady } from "./omnimens-scl-codex.js";
 import { runSCLSandboxTest } from "./omnimens-scl-runtime.js";
-import { translateInbound, translateOutbound, compressStateToSCL, decompressSCLState, compressAgentMessage, startSCLTranslator, getTranslatorState } from "./omnimens-scl-translator.js";
+import { translateInbound, translateOutbound, compressStateToSCL, decompressSCLState, compressAgentMessage, startSCLTranslator, getTranslatorState, translateAndExecute, loadSCLDirectory, loadSCLFromFile, registerSCLModule, getTranslatorPipelineState } from "./omnimens-scl-translator.js";
 
 const __filename_local = fileURLToPath(import.meta.url);
 const __dirname_local = dirname(__filename_local);
@@ -2223,6 +2223,13 @@ async function runGen2SCLFullRewrite(): Promise<void> {
         console.log(`[NEXTGEN] 🔤 ${testReport.syntaxValid}/${testReport.totalFiles} files passed syntax check`);
         console.log(`[NEXTGEN] 🔤 ${testReport.failed} files failed`);
         console.log(`[NEXTGEN] 🔤 Compression: ${testReport.overallCompressionPercent}% reduction maintained`);
+
+        console.log(`[NEXTGEN] 🔤 PHASE 3b: Loading SCL modules through Translator→Sandbox pipeline...`);
+        const pipelineResult = loadSCLDirectory(sclTestDir);
+        const pipelineState = getTranslatorPipelineState();
+        console.log(`[NEXTGEN] 🔤 Translator Pipeline: ${pipelineResult.loaded}/${pipelineResult.loaded + pipelineResult.failed} modules loaded`);
+        console.log(`[NEXTGEN] 🔤 Module Registry: ${pipelineState.registeredModules} registered, ${pipelineState.loadedModules} cached`);
+        console.log(`[NEXTGEN] 🔤 Pipeline Success Rate: ${pipelineState.successRate}%`);
         console.log(`[NEXTGEN] 🔤 ═══════════════════════════════════════════════════════════════`);
 
         gen2SendToGen1v2("scl_sandbox_test", {
@@ -2231,6 +2238,12 @@ async function runGen2SCLFullRewrite(): Promise<void> {
           total: testReport.totalFiles,
           failed: testReport.failed,
           compression: testReport.overallCompressionPercent,
+          translatorPipeline: {
+            modulesLoaded: pipelineResult.loaded,
+            modulesFailed: pipelineResult.failed,
+            registeredModules: pipelineState.registeredModules,
+            successRate: pipelineState.successRate,
+          },
         });
 
         _gen2SclSandboxTestComplete = true;

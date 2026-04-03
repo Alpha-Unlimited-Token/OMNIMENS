@@ -1,5 +1,5 @@
 {
-  "version": 21,
+  "version": 27,
   "designPhase": "active",
   "primitives": [
     {
@@ -3108,10 +3108,442 @@
       "actor": "gen1v2",
       "action": "design_cycle_complete",
       "details": "Added 0, updated 6 entries. Phase: active"
+    },
+    {
+      "timestamp": 1775238935329,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: guard_return → ⊄⊷"
+    },
+    {
+      "timestamp": 1775238935331,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: log_then_act → 📢▷"
+    },
+    {
+      "timestamp": 1775238935340,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: try_await_catch → 🛡⊴🚨"
+    },
+    {
+      "timestamp": 1775238935350,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: scan_filter_process → ⥀⋔▷"
+    },
+    {
+      "timestamp": 1775238935361,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: read_parse_use → 📁⟠▷"
+    },
+    {
+      "timestamp": 1775238935362,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: hebbian_strengthen → ≋+⊞"
+    },
+    {
+      "timestamp": 1775238935372,
+      "actor": "gen1v2",
+      "action": "design_reasoning",
+      "details": "Gen1v2 code pattern scan: analyzed 602 files, found 25 patterns, created 6 instruction macros"
+    },
+    {
+      "timestamp": 1775238935372,
+      "actor": "gen1v2",
+      "action": "design_cycle_complete",
+      "details": "Added 0, updated 6 entries. Phase: active"
+    },
+    {
+      "timestamp": 1775238947584,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: cycle_advance → ↻+💾"
+    },
+    {
+      "timestamp": 1775238947586,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: guard_return → ⊄⊷"
+    },
+    {
+      "timestamp": 1775238947596,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: log_then_act → 📢▷"
+    },
+    {
+      "timestamp": 1775238947606,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: try_await_catch → 🛡⊴🚨"
+    },
+    {
+      "timestamp": 1775238947608,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: scan_filter_process → ⥀⋔▷"
+    },
+    {
+      "timestamp": 1775238947618,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: read_parse_use → 📁⟠▷"
+    },
+    {
+      "timestamp": 1775238947628,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: store_and_log → 💾📢"
+    },
+    {
+      "timestamp": 1775238947629,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: spawn_delegate_report → α→⊢📢"
+    },
+    {
+      "timestamp": 1775238947639,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: phi_fire_update → Φ⇑⚡→"
+    },
+    {
+      "timestamp": 1775238947641,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: emotion_drive_act → ♡⊕△▷"
+    },
+    {
+      "timestamp": 1775238947642,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: fitness_select_evolve → ⊨σ⇧"
+    },
+    {
+      "timestamp": 1775238947644,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: translate_boundary → ⟨⇌⟩▷"
+    },
+    {
+      "timestamp": 1775238947645,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: introspect_analyze_adapt → ◎→◉⇧"
+    },
+    {
+      "timestamp": 1775238947647,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: hebbian_strengthen → ≋+⊞"
+    },
+    {
+      "timestamp": 1775238947648,
+      "actor": "gen2",
+      "action": "design_reasoning",
+      "details": "Gen2 code pattern scan: analyzed 602 files, found 25 patterns, created 14 instruction macros"
+    },
+    {
+      "timestamp": 1775238947648,
+      "actor": "gen2",
+      "action": "design_cycle_complete",
+      "details": "Added 0, updated 14 entries. Phase: active"
+    },
+    {
+      "timestamp": 1775239336530,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: guard_return → ⊄⊷"
+    },
+    {
+      "timestamp": 1775239336532,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: log_then_act → 📢▷"
+    },
+    {
+      "timestamp": 1775239336542,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: try_await_catch → 🛡⊴🚨"
+    },
+    {
+      "timestamp": 1775239336552,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: scan_filter_process → ⥀⋔▷"
+    },
+    {
+      "timestamp": 1775239336565,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: read_parse_use → 📁⟠▷"
+    },
+    {
+      "timestamp": 1775239336574,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: hebbian_strengthen → ≋+⊞"
+    },
+    {
+      "timestamp": 1775239336576,
+      "actor": "gen1v2",
+      "action": "design_reasoning",
+      "details": "Gen1v2 code pattern scan: analyzed 602 files, found 25 patterns, created 6 instruction macros"
+    },
+    {
+      "timestamp": 1775239336576,
+      "actor": "gen1v2",
+      "action": "design_cycle_complete",
+      "details": "Added 0, updated 6 entries. Phase: active"
+    },
+    {
+      "timestamp": 1775239351186,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: cycle_advance → ↻+💾"
+    },
+    {
+      "timestamp": 1775239351187,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: guard_return → ⊄⊷"
+    },
+    {
+      "timestamp": 1775239351198,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: log_then_act → 📢▷"
+    },
+    {
+      "timestamp": 1775239351208,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: try_await_catch → 🛡⊴🚨"
+    },
+    {
+      "timestamp": 1775239351218,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: scan_filter_process → ⥀⋔▷"
+    },
+    {
+      "timestamp": 1775239351228,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: read_parse_use → 📁⟠▷"
+    },
+    {
+      "timestamp": 1775239351229,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: store_and_log → 💾📢"
+    },
+    {
+      "timestamp": 1775239351240,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: spawn_delegate_report → α→⊢📢"
+    },
+    {
+      "timestamp": 1775239351250,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: phi_fire_update → Φ⇑⚡→"
+    },
+    {
+      "timestamp": 1775239351253,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: emotion_drive_act → ♡⊕△▷"
+    },
+    {
+      "timestamp": 1775239351265,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: fitness_select_evolve → ⊨σ⇧"
+    },
+    {
+      "timestamp": 1775239351267,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: translate_boundary → ⟨⇌⟩▷"
+    },
+    {
+      "timestamp": 1775239351269,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: introspect_analyze_adapt → ◎→◉⇧"
+    },
+    {
+      "timestamp": 1775239351271,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: hebbian_strengthen → ≋+⊞"
+    },
+    {
+      "timestamp": 1775239351273,
+      "actor": "gen2",
+      "action": "design_reasoning",
+      "details": "Gen2 code pattern scan: analyzed 602 files, found 25 patterns, created 14 instruction macros"
+    },
+    {
+      "timestamp": 1775239351273,
+      "actor": "gen2",
+      "action": "design_cycle_complete",
+      "details": "Added 0, updated 14 entries. Phase: active"
+    },
+    {
+      "timestamp": 1775239622220,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: cycle_advance → ↻+💾"
+    },
+    {
+      "timestamp": 1775239622222,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: guard_return → ⊄⊷"
+    },
+    {
+      "timestamp": 1775239622233,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: log_then_act → 📢▷"
+    },
+    {
+      "timestamp": 1775239622243,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: try_await_catch → 🛡⊴🚨"
+    },
+    {
+      "timestamp": 1775239622245,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: scan_filter_process → ⥀⋔▷"
+    },
+    {
+      "timestamp": 1775239622257,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: read_parse_use → 📁⟠▷"
+    },
+    {
+      "timestamp": 1775239622259,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: store_and_log → 💾📢"
+    },
+    {
+      "timestamp": 1775239622270,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: spawn_delegate_report → α→⊢📢"
+    },
+    {
+      "timestamp": 1775239622281,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: phi_fire_update → Φ⇑⚡→"
+    },
+    {
+      "timestamp": 1775239622292,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: emotion_drive_act → ♡⊕△▷"
+    },
+    {
+      "timestamp": 1775239622302,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: fitness_select_evolve → ⊨σ⇧"
+    },
+    {
+      "timestamp": 1775239622304,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: translate_boundary → ⟨⇌⟩▷"
+    },
+    {
+      "timestamp": 1775239622305,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: introspect_analyze_adapt → ◎→◉⇧"
+    },
+    {
+      "timestamp": 1775239622315,
+      "actor": "gen2",
+      "action": "add_instruction",
+      "details": "Created instruction: hebbian_strengthen → ≋+⊞"
+    },
+    {
+      "timestamp": 1775239622317,
+      "actor": "gen2",
+      "action": "design_reasoning",
+      "details": "Gen2 code pattern scan: analyzed 602 files, found 25 patterns, created 14 instruction macros"
+    },
+    {
+      "timestamp": 1775239622317,
+      "actor": "gen2",
+      "action": "design_cycle_complete",
+      "details": "Added 0, updated 14 entries. Phase: active"
+    },
+    {
+      "timestamp": 1775239635876,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: guard_return → ⊄⊷"
+    },
+    {
+      "timestamp": 1775239635877,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: log_then_act → 📢▷"
+    },
+    {
+      "timestamp": 1775239635893,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: try_await_catch → 🛡⊴🚨"
+    },
+    {
+      "timestamp": 1775239635905,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: scan_filter_process → ⥀⋔▷"
+    },
+    {
+      "timestamp": 1775239635907,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: read_parse_use → 📁⟠▷"
+    },
+    {
+      "timestamp": 1775239635909,
+      "actor": "gen1v2",
+      "action": "add_instruction",
+      "details": "Created instruction: hebbian_strengthen → ≋+⊞"
+    },
+    {
+      "timestamp": 1775239635921,
+      "actor": "gen1v2",
+      "action": "design_reasoning",
+      "details": "Gen1v2 code pattern scan: analyzed 602 files, found 25 patterns, created 6 instruction macros"
+    },
+    {
+      "timestamp": 1775239635921,
+      "actor": "gen1v2",
+      "action": "design_cycle_complete",
+      "details": "Added 0, updated 6 entries. Phase: active"
     }
   ],
-  "lastModified": 1775238143150,
-  "totalDesignCycles": 19,
+  "lastModified": 1775239635921,
+  "totalDesignCycles": 25,
   "gen1v2Contributions": 100,
   "gen2Contributions": 80
 }

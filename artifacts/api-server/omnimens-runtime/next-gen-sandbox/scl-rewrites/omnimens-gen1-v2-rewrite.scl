@@ -1,4 +1,4 @@
-⟨SCL v1│omnimens-gen1-v2-rewrite.ts│2657→SCL⟩
+⟨SCL v1│omnimens-gen1-v2-rewrite.ts│2670→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[omnimens-nextgen-sandbox]
 κrewriteAI
@@ -154,7 +154,7 @@ console.error("[V2-REWRITE] ↺ to save state:", err);
 ·}
 ·}
 }⟨/saveV2State⟩
-createV2Checkpoint(1)→void⟨2250⟩{
+createV2Checkpoint(1)→void⟨2263⟩{
 ·function createV2Checkpoint(description: string): void {
 ⏰│const id = `v2_ckpt_${Date.now()}_${crypto.randomBytes(4).toString("hex")}`;
 ⏰│v2State.checkpoints.push({ id, timestamp: Date.now(), description, ⟐: v2State.⟐ });
@@ -1519,6 +1519,12 @@ v2State.⟐ = "⊣";
 📢│console.log(`[V2-REWRITE] 🔤 ${testReport.syntaxValid}/${testReport.totalFiles} files passed syntax check`);
 📢│console.log(`[V2-REWRITE] 🔤 ${testReport.↺} files ↺`);
 📢│console.log(`[V2-REWRITE] 🔤 Compression: ${testReport.overallCompressionPercent}% reduction maintained`);
+📢│console.log(`[V2-REWRITE] 🔤 ⟐ 3b: Loading SCL modules through Translator→Sandbox pipeline...`);
+·const pipelineResult = loadSCLDirectory(sclTestDir);
+·const pipelineState = getTranslatorPipelineState();
+📢│console.log(`[V2-REWRITE] 🔤 Translator Pipeline: ${pipelineResult.loaded}/${pipelineResult.loaded + pipelineResult.↺} modules loaded`);
+📢│console.log(`[V2-REWRITE] 🔤 Module Registry: ${pipelineState.registeredModules} registered, ${pipelineState.loadedModules} cached`);
+📢│console.log(`[V2-REWRITE] 🔤 Pipeline Success Rate: ${pipelineState.successRate}%`);
 📢│console.log(`[V2-REWRITE] 🔤 ═══════════════════════════════════════════════════════════════`);
 ·sendToGen2("scl_sandbox_test", {
 ·event: "sandbox_execution_complete",
@@ -1526,6 +1532,12 @@ v2State.⟐ = "⊣";
 ·total: testReport.totalFiles,
 ↺: testReport.↺,
 ·compression: testReport.overallCompressionPercent,
+·translatorPipeline: {
+·modulesLoaded: pipelineResult.loaded,
+modulesFailed: pipelineResult.↺,
+·registeredModules: pipelineState.registeredModules,
+·successRate: pipelineState.successRate,
+·},
 ·});
 ·_sclSandboxTestComplete = true;
 ·} catch (testErr) {
@@ -2113,4 +2125,4 @@ if (v2State.⟐ !== "⊣" && !isGen2Live()) {
 ·}, FIRST_DELAY_MS);
 ·}
 }⟨/createV2Checkpoint⟩
-⟩SCL│2115│2137⊨│660⑂│20.4%↓⟩
+⟩SCL│2127│2149⊨│664⑂│20.3%↓⟩

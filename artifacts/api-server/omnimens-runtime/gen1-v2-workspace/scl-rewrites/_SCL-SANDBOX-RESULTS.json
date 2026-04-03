@@ -1,37 +1,22 @@
 {
-  "timestamp": 1775238153330,
+  "timestamp": 1775239646359,
   "generator": "gen1v2",
   "totalFiles": 100,
   "decoded": 100,
-  "syntaxValid": 78,
+  "syntaxValid": 82,
   "transpiled": 100,
-  "executed": 67,
-  "failed": 33,
+  "executed": 79,
+  "failed": 21,
   "errors": [
-    {
-      "file": "adaptiveApiCache_gen1.scl",
-      "stage": "syntax",
-      "error": "Unexpected token ';'"
-    },
-    {
-      "file": "adaptiveApiCachingProxy_gen1.scl",
-      "stage": "syntax",
-      "error": "Unexpected token ';'"
-    },
-    {
-      "file": "adaptiveLearningModule_gen1.scl",
-      "stage": "syntax",
-      "error": "Unexpected token ';'"
-    },
     {
       "file": "adaptiveRateLimitedCaching_gen1.scl",
       "stage": "syntax",
-      "error": "Unexpected token '{'"
+      "error": "Malformed arrow function parameter list"
     },
     {
       "file": "adversarialCounterfactualGenerator_gen1.scl",
       "stage": "syntax",
-      "error": "Rest parameter must be last formal parameter"
+      "error": "Unexpected token '...'"
     },
     {
       "file": "adversarialDefenseMechanism_gen1.scl",
@@ -41,7 +26,7 @@
     {
       "file": "adversarialEdgeCaseTester_gen1.scl",
       "stage": "syntax",
-      "error": "Unexpected token 'case'"
+      "error": "Unexpected token ':'"
     },
     {
       "file": "adversarialSelfTest_gen1.scl",
@@ -49,59 +34,29 @@
       "error": "Unexpected token ':'"
     },
     {
-      "file": "adversarialStressTester_gen1.scl",
-      "stage": "execute",
-      "error": "Cannot read properties of undefined (reading 'addTestCase')"
-    },
-    {
-      "file": "adversarialToolTester_gen1.scl",
-      "stage": "execute",
-      "error": "Cannot read properties of undefined (reading 'addTestCase')"
+      "file": "adversarialSentinel_gen1.scl",
+      "stage": "syntax",
+      "error": "Unexpected token ':'"
     },
     {
       "file": "adversarialToolTesting_gen1.scl",
       "stage": "execute",
-      "error": "Cannot read properties of undefined (reading 'addTestCase')"
+      "error": "report is not defined"
     },
     {
       "file": "alphaEvolve_gen1.scl",
       "stage": "execute",
-      "error": "Cannot read properties of undefined (reading 'initializePopulation')"
-    },
-    {
-      "file": "apiBatchingOptimizer_gen1.scl",
-      "stage": "syntax",
-      "error": "Unexpected token ';'"
+      "error": "array is not defined"
     },
     {
       "file": "attention-system.scl",
       "stage": "syntax",
-      "error": "Unexpected identifier 'targets'"
+      "error": "Unexpected identifier 'focus'"
     },
     {
-      "file": "bayesianConfidenceModule_gen1.scl",
-      "stage": "execute",
-      "error": "Cannot read properties of undefined (reading 'setPrior')"
-    },
-    {
-      "file": "bayesianEvaluator_gen1.scl",
+      "file": "bayesianCalibrationModule_gen1.scl",
       "stage": "syntax",
-      "error": "Unexpected token ')'"
-    },
-    {
-      "file": "bayesianInferenceModule_gen1.scl",
-      "stage": "syntax",
-      "error": "Unexpected token ')'"
-    },
-    {
-      "file": "bayesianUncertaintyEvaluator_gen1.scl",
-      "stage": "syntax",
-      "error": "Unexpected token ')'"
-    },
-    {
-      "file": "bayesianUncertaintyModule_gen1.scl",
-      "stage": "syntax",
-      "error": "Unexpected token ')'"
+      "error": "Unexpected token ':'"
     },
     {
       "file": "bayesianUncertaintyQuantification_gen1.scl",
@@ -109,19 +64,9 @@
       "error": "Unexpected token ','"
     },
     {
-      "file": "bayesianUncertaintyTransfer_gen1.scl",
-      "stage": "execute",
-      "error": "Cannot read properties of undefined (reading 'transferKnowledge')"
-    },
-    {
       "file": "boundedAutonomyModule_gen1.scl",
       "stage": "syntax",
       "error": "Unexpected token ','"
-    },
-    {
-      "file": "branchEvaluator_gen1.scl",
-      "stage": "execute",
-      "error": "Cannot read properties of undefined (reading 'addBranch')"
     },
     {
       "file": "checkpointedComputationManager_gen1.scl",
@@ -129,24 +74,19 @@
       "error": "Unexpected token ')'"
     },
     {
-      "file": "coalaMemoryConsolidation_gen1.scl",
-      "stage": "execute",
-      "error": "Cannot read properties of undefined (reading 'categorizeMemory')"
+      "file": "coalaMemoryModule_gen1.scl",
+      "stage": "syntax",
+      "error": "Unexpected token ':'"
     },
     {
       "file": "communication-hub.scl",
       "stage": "syntax",
-      "error": "Unexpected identifier 'subscriptions'"
+      "error": "Unexpected token ':'"
     },
     {
-      "file": "computationalTradeoffEvaluator_gen1.scl",
-      "stage": "execute",
-      "error": "Cannot read properties of undefined (reading 'registerModule')"
-    },
-    {
-      "file": "confidenceCalibratedCompute_gen1.scl",
-      "stage": "execute",
-      "error": "Cannot read properties of undefined (reading 'subscribe')"
+      "file": "confidenceInformedSelfConsistency_gen1.scl",
+      "stage": "syntax",
+      "error": "Unexpected token ':'"
     },
     {
       "file": "consciousness-engine.scl",
@@ -164,14 +104,14 @@
       "error": "Unexpected token ']'"
     },
     {
-      "file": "continuousWorkerManager_gen1.scl",
-      "stage": "execute",
-      "error": "isMainThread is not defined"
+      "file": "contextSummarizer_gen1.scl",
+      "stage": "syntax",
+      "error": "Invalid regular expression: /(?<!\\w\\.\\w.)(?<![A-Z][a-z]\\.)(?<=\\.|\\?|\\)\\s+/: Unterminated group"
     },
     {
-      "file": "conversationContextCompressor_gen1.scl",
-      "stage": "syntax",
-      "error": "Unexpected token ';'"
+      "file": "conversationMemoryManager_gen1.scl",
+      "stage": "execute",
+      "error": "Cannot access 'ConversationMemoryManager' before initialization"
     }
   ],
   "totalDecodedLines": 3070,

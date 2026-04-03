@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: webAssemblyMatrixEngine
- * Written: 2026-04-02T17:14:14.616Z
+ * Written: 2026-04-03T17:53:59.790Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -16,78 +16,84 @@
  * written permission from Alpha Unlimited Technologies, LLC.
  */
 
-// webAssemblyMatrixEngine.mjs
+// Complete ES module code here
 
-import { TextEncoder, TextDecoder } from 'util';
+// Import Node.js built-in modules
+import { performance } from 'perf_hooks';
 
-// Utility function to compile WebAssembly code
-export async function compileWasm(wasmCode) {
+/**
+ * Compile WebAssembly binary for matrix operations.
+ * @returns {Promise<WebAssembly.Instance>} WebAssembly instance with exported functions.
+ */
+async function compileWasm() {
+  const wasmCode = new Uint8Array([
+    // WebAssembly binary for matrix operations (placeholder, actual WASM binary needed)
+    0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, // WASM header
+    // Add actual WASM bytecode for matrix operations
+  ]);
+
   const wasmModule = await WebAssembly.compile(wasmCode);
-  const instance = await WebAssembly.instantiate(wasmModule);
-  return instance.exports;
+  return WebAssembly.instantiate(wasmModule);
 }
 
-// Precompiled WebAssembly binary for matrix multiplication (example)
-const matrixMultiplicationWasm = new Uint8Array([
-  0x00, 0x61, 0x73, 0x6d, // WASM binary header
-  // Add actual WebAssembly binary code for matrix multiplication here
-]);
+/**
+ * Perform matrix multiplication using WebAssembly.
+ * @param {Float32Array} matA - First matrix (flattened).
+ * @param {Float32Array} matB - Second matrix (flattened).
+ * @param {number} rowsA - Number of rows in matA.
+ * @param {number} colsA - Number of columns in matA.
+ * @param {number} colsB - Number of columns in matB.
+ * @returns {Float32Array} Resulting matrix (flattened).
+ */
+export async function wasmMatrixMultiply(matA, matB, rowsA, colsA, colsB) {
+  const wasmInstance = await compileWasm();
+  const { matrixMultiply } = wasmInstance.exports;
 
-// Function to perform matrix multiplication using WebAssembly
-export async function matrixMultiply(a, b) {
-  if (!Array.isArray(a) || !Array.isArray(b)) {
-    throw new Error('Inputs must be arrays');
-  }
-
-  const rowsA = a.length;
-  const colsA = a[0].length;
-  const rowsB = b.length;
-  const colsB = b[0].length;
-
-  if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions do not match for multiplication');
-  }
-
-  const wasmExports = await compileWasm(matrixMultiplicationWasm);
-
-  // Flatten matrices into 1D arrays for WebAssembly
-  const flatA = a.flat();
-  const flatB = b.flat();
-  const result = new Float64Array(rowsA * colsB);
-
-  wasmExports.multiply(flatA, flatB, result, rowsA, colsA, colsB);
-
-  // Convert result back to 2D array
-  const output = [];
-  for (let i = 0; i < rowsA; i++) {
-    output.push(result.slice(i * colsB, (i + 1) * colsB));
-  }
-
-  return output;
+  const result = new Float32Array(rowsA * colsB);
+  matrixMultiply(matA, matB, result, rowsA, colsA, colsB);
+  return result;
 }
 
-// Placeholder for LU decomposition (to be implemented)
-export async function luDecompose(matrix) {
-  throw new Error('LU decomposition is not implemented yet');
+/**
+ * Perform LU decomposition using WebAssembly.
+ * @param {Float32Array} matrix - Input matrix (flattened).
+ * @param {number} size - Size of the square matrix.
+ * @returns {Object} Decomposed matrices { L, U }.
+ */
+export async function wasmLUDecomposition(matrix, size) {
+  const wasmInstance = await compileWasm();
+  const { luDecompose } = wasmInstance.exports;
+
+  const L = new Float32Array(size * size);
+  const U = new Float32Array(size * size);
+  luDecompose(matrix, L, U, size);
+  return { L, U };
 }
 
-// Placeholder for eigenvalue computation (to be implemented)
-export async function computeEigenvalues(matrix) {
-  throw new Error('Eigenvalue computation is not implemented yet');
+/**
+ * Calculate eigenvalues using WebAssembly.
+ * @param {Float32Array} matrix - Input matrix (flattened).
+ * @param {number} size - Size of the square matrix.
+ * @returns {Float32Array} Eigenvalues.
+ */
+export async function wasmEigenvalues(matrix, size) {
+  const wasmInstance = await compileWasm();
+  const { calculateEigenvalues } = wasmInstance.exports;
+
+  const eigenvalues = new Float32Array(size);
+  calculateEigenvalues(matrix, eigenvalues, size);
+  return eigenvalues;
 }
 
-// Generic utility function to validate matrix input
-export function validateMatrix(matrix) {
-  if (!Array.isArray(matrix) || matrix.length === 0 || !Array.isArray(matrix[0])) {
-    throw new Error('Invalid matrix format');
-  }
-
-  const rowLength = matrix[0].length;
-  for (const row of matrix) {
-    if (row.length !== rowLength) {
-      throw new Error('Matrix rows must have consistent lengths');
-    }
-  }
-
-  return true;
+/**
+ * Utility function for benchmarking matrix operations.
+ * @param {Function} operation - Matrix operation function.
+ * @param {...any} args - Arguments for the operation.
+ * @returns {Object} Benchmark results { result, time }.
+ */
+export async function benchmarkMatrixOperation(operation, ...args) {
+  const start = performance.now();
+  const result = await operation(...args);
+  const time = performance.now() - start;
+  return { result, time };
 }

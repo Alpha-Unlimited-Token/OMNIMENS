@@ -1,4 +1,4 @@
-⟨SCL v1│omnimens-scl-translator.ts│206→SCL⟩
+⟨SCL v1│omnimens-scl-translator.ts│373→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
 ⟨⇌⟩│encodeToSCL,
@@ -9,6 +9,15 @@
 ·lookupSymbol,
 ·type SCLSymbol,
 ·} from "./omnimens-scl-codex.js";
+⊫[]
+⟨⇌⟩│decodeSCLFile,
+·transpileTStoJS,
+·validateSyntax,
+·executeSCLModule,
+·type SCLDecodeResult,
+·type SCLExecResult,
+·} from "./omnimens-scl-runtime.js";
+⊫[]
 ⊬TranslationResult⟨original:string│translated:string│direction:"inbound" | "outbound"│symbolsUsed:string[]│bytesSaved:number│timestamp:number⟩
 ⊬TranslationBoundary⟨name:string│type:η│translationsIn:number│translationsOut:number│totalBytesSaved:number⟩
 κboundaries
@@ -143,7 +152,148 @@ const ⟐ = getOrCreateBoundary(boundaryName, boundaryType);
 ·}
 }⟨/getTranslatorState⟩
 ·let _translatorStarted = false;
-⊩startSCLTranslator(1)→void⟨21⟩{
+⊬SCLModuleExport⟨fileName:string│decoded:boolean│syntaxValid:boolean│executed:boolean│exports:string[]│jsSource:string│decodedSource:string│error:string⟩
+κ_loadedModules
+κ_moduleRegistry
+⊩registerSCLModule(2)→void⟨3⟩{
+⊩│export function registerSCLModule(name: string, sclFilePath: string): void {
+⊡│_moduleRegistry.set(name, sclFilePath);
+·}
+}⟨/registerSCLModule⟩
+⊩translateAndExecute(2)→Ε⟨44⟩{
+⊩│export function translateAndExecute(sclContent: string, fileName: string): SCLModuleExport {
+·const result: SCLModuleExport = {
+·fileName,
+·decoded: false,
+·syntaxValid: false,
+·executed: false,
+·exports: [],
+·jsSource: "",
+·decodedSource: "",
+·};
+⟨⇌⟩│const decoded = decodeSCLFile(sclContent, fileName);
+⊹│if (decoded.errors.length > 0) {
+⊰│result.error = `Decode ↺: ${decoded.errors.join("; ")}`;
+⊷│return result;
+·}
+·result.decoded = true;
+·result.decodedSource = decoded.decodedSource;
+·const transpiled = transpileTStoJS(decoded.decodedSource);
+·if (!transpiled.success) {
+⊰│result.error = `Transpile ↺: ${transpiled.error}`;
+⊷│return result;
+·}
+·result.jsSource = transpiled.jsSource;
+·const syntax = validateSyntax(transpiled.jsSource, fileName);
+·if (!syntax.valid) {
+⊰│result.error = `Syntax invalid: ${syntax.error}`;
+⊷│return result;
+·}
+·result.syntaxValid = true;
+·const exec = executeSCLModule(transpiled.jsSource, fileName);
+·if (!exec.success) {
+⊰│result.error = `Execution ↺: ${exec.error}`;
+⊷│return result;
+·}
+·result.executed = true;
+·result.exports = exec.exports;
+⊡│_loadedModules.set(fileName, result);
+⊷│return result;
+·}
+}⟨/translateAndExecute⟩
+⊩loadSCLFromFile(1)→Ε⟨22⟩{
+⊩│export function loadSCLFromFile(filePath: string): SCLModuleExport {
+·const fileName = path.basename(filePath);
+⊡│const cached = _loadedModules.get(fileName);
+⊷│if (cached) return cached;
+·if (!fs.existsSync(filePath)) {
+⊷│return {
+·fileName,
+·decoded: false,
+·syntaxValid: false,
+·executed: false,
+·exports: [],
+·jsSource: "",
+·decodedSource: "",
+⊰│error: `File not found: ${filePath}`,
+·};
+·}
+📁│const sclContent = fs.readFileSync(filePath, "utf-8");
+⊷│return translateAndExecute(sclContent, fileName);
+·}
+}⟨/loadSCLFromFile⟩
+⊩loadSCLByName(1)→Ε⟨5⟩{
+⊩│export function loadSCLByName(moduleName: string): SCLModuleExport | null {
+⊡│const filePath = _moduleRegistry.get(moduleName);
+⊄│if (!filePath) return null;
+⊷│return loadSCLFromFile(filePath);
+·}
+}⟨/loadSCLByName⟩
+⊩loadSCLDirectory(1)→Ε⟨1⟩{
+⊩│export function loadSCLDirectory(dirPath: string): { loaded: number; ↺: number; ⊢: SCLModuleExport[] } {
+}⟨/loadSCLDirectory⟩
+·if (!fs.existsSync(dirPath)) {
+⊷│return { loaded: 0, failed: 0, results: [] };
+·}
+κsclFiles
+⊻│.filter(f => f.endsWith(".scl") && !f.startsWith("_"))
+·.sort();
+κresults
+·let loaded = 0;
+let ↺ = 0;
+⥀│for (const file of sclFiles) {
+κfilePath
+κresult
+⊺│results.push(result);
+κmoduleName
+⊡│_moduleRegistry.set(moduleName, filePath);
+·if (result.executed) {
+·loaded++;
+·} else {
+↺++;
+·}
+·}
+⊷│return { loaded, failed, results };
+·}
+⊩getSCLModuleExports(1)→string[]⟨4⟩{
+⊩│export function getSCLModuleExports(fileName: string): string[] {
+⊡│const mod = _loadedModules.get(fileName);
+❔│return mod?.exports || [];
+·}
+}⟨/getSCLModuleExports⟩
+⊩getLoadedModuleCount(1)→number⟨3⟩{
+⊩│export function getLoadedModuleCount(): number {
+⊷│return _loadedModules.size;
+·}
+}⟨/getLoadedModuleCount⟩
+⊩getRegisteredModules(1)→string[]⟨3⟩{
+⊩│export function getRegisteredModules(): string[] {
+⊷│return Array.from(_moduleRegistry.keys());
+·}
+}⟨/getRegisteredModules⟩
+⊩clearModuleCache(1)→void⟨3⟩{
+⊩│export function clearModuleCache(): void {
+·_loadedModules.clear();
+·}
+}⟨/clearModuleCache⟩
+⊩getTranslatorPipelineState(1)→ ⟨15⟩{
+⊩│export function getTranslatorPipelineState(): {
+·registeredModules: number;
+·loadedModules: number;
+·moduleNames: string[];
+·successRate: number;
+·} {
+·const loaded = Array.from(_loadedModules.values());
+·const executed = loaded.filter(m => m.executed).length;
+⊷│return {
+·registeredModules: _moduleRegistry.size,
+·loadedModules: _loadedModules.size,
+·moduleNames: Array.from(_loadedModules.keys()),
+⊳│successRate: loaded.length > 0 ? Math.round((executed / loaded.length) * 100) : 0,
+·};
+·}
+}⟨/getTranslatorPipelineState⟩
+⊩startSCLTranslator(1)→void⟨22⟩{
 ⊩│export function startSCLTranslator(): void {
 ·if (_translatorStarted) return;
 ·_translatorStarted = true;
@@ -154,6 +304,7 @@ const ⟐ = getOrCreateBoundary(boundaryName, boundaryType);
 📢│console.log(`[SCL-TRANSLATOR] 📖 Codex loaded: ${stats.totalPrimitives} primitives + ${stats.totalCompounds} compounds`);
 📢│console.log(`[SCL-TRANSLATOR] 🔗 ${stats.totalCompositionRules} composition rules + ${stats.totalInstructions} instructions`);
 📢│console.log(`[SCL-TRANSLATOR] 🌐 ${stats.totalTranslationEntries} text↔symbol translation entries`);
+📢│console.log(`[SCL-TRANSLATOR] ✅ Translator→Sandbox pipeline active — SCL files run natively`);
 📢│console.log(`[SCL-TRANSLATOR] ✅ All η boundaries wired — inbound (text→SCL) and outbound (SCL→text)`);
 ·} else {
 📢│console.log(`[SCL-TRANSLATOR] 📖 Codex ⟐: ${stats.designPhase} — Gen1v2 + Gen2 designing their ⊣`);
@@ -163,4 +314,4 @@ const ⟐ = getOrCreateBoundary(boundaryName, boundaryType);
 ·}
 ·}
 }⟨/startSCLTranslator⟩
-⟩SCL│165│165⊨│55⑂│19.9%↓⟩
+⟩SCL│316│309⊨│102⑂│15.3%↓⟩

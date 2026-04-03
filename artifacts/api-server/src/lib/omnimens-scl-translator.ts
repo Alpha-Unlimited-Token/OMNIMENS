@@ -27,6 +27,16 @@ import {
   lookupSymbol,
   type SCLSymbol,
 } from "./omnimens-scl-codex.js";
+import {
+  decodeSCLFile,
+  transpileTStoJS,
+  validateSyntax,
+  executeSCLModule,
+  type SCLDecodeResult,
+  type SCLExecResult,
+} from "./omnimens-scl-runtime.js";
+import * as fs from "fs";
+import * as path from "path";
 
 export interface TranslationResult {
   original: string;
@@ -182,6 +192,162 @@ export function getTranslatorState(): {
 
 let _translatorStarted = false;
 
+export interface SCLModuleExport {
+  fileName: string;
+  decoded: boolean;
+  syntaxValid: boolean;
+  executed: boolean;
+  exports: string[];
+  jsSource: string;
+  decodedSource: string;
+  error?: string;
+}
+
+const _loadedModules = new Map<string, SCLModuleExport>();
+const _moduleRegistry = new Map<string, string>();
+
+export function registerSCLModule(name: string, sclFilePath: string): void {
+  _moduleRegistry.set(name, sclFilePath);
+}
+
+export function translateAndExecute(sclContent: string, fileName: string): SCLModuleExport {
+  const result: SCLModuleExport = {
+    fileName,
+    decoded: false,
+    syntaxValid: false,
+    executed: false,
+    exports: [],
+    jsSource: "",
+    decodedSource: "",
+  };
+
+  const decoded = decodeSCLFile(sclContent, fileName);
+  if (decoded.errors.length > 0) {
+    result.error = `Decode failed: ${decoded.errors.join("; ")}`;
+    return result;
+  }
+  result.decoded = true;
+  result.decodedSource = decoded.decodedSource;
+
+  const transpiled = transpileTStoJS(decoded.decodedSource);
+  if (!transpiled.success) {
+    result.error = `Transpile failed: ${transpiled.error}`;
+    return result;
+  }
+  result.jsSource = transpiled.jsSource;
+
+  const syntax = validateSyntax(transpiled.jsSource, fileName);
+  if (!syntax.valid) {
+    result.error = `Syntax invalid: ${syntax.error}`;
+    return result;
+  }
+  result.syntaxValid = true;
+
+  const exec = executeSCLModule(transpiled.jsSource, fileName);
+  if (!exec.success) {
+    result.error = `Execution failed: ${exec.error}`;
+    return result;
+  }
+  result.executed = true;
+  result.exports = exec.exports;
+
+  _loadedModules.set(fileName, result);
+  return result;
+}
+
+export function loadSCLFromFile(filePath: string): SCLModuleExport {
+  const fileName = path.basename(filePath);
+
+  const cached = _loadedModules.get(fileName);
+  if (cached) return cached;
+
+  if (!fs.existsSync(filePath)) {
+    return {
+      fileName,
+      decoded: false,
+      syntaxValid: false,
+      executed: false,
+      exports: [],
+      jsSource: "",
+      decodedSource: "",
+      error: `File not found: ${filePath}`,
+    };
+  }
+
+  const sclContent = fs.readFileSync(filePath, "utf-8");
+  return translateAndExecute(sclContent, fileName);
+}
+
+export function loadSCLByName(moduleName: string): SCLModuleExport | null {
+  const filePath = _moduleRegistry.get(moduleName);
+  if (!filePath) return null;
+  return loadSCLFromFile(filePath);
+}
+
+export function loadSCLDirectory(dirPath: string): { loaded: number; failed: number; results: SCLModuleExport[] } {
+  if (!fs.existsSync(dirPath)) {
+    return { loaded: 0, failed: 0, results: [] };
+  }
+
+  const sclFiles = fs.readdirSync(dirPath)
+    .filter(f => f.endsWith(".scl") && !f.startsWith("_"))
+    .sort();
+
+  const results: SCLModuleExport[] = [];
+  let loaded = 0;
+  let failed = 0;
+
+  for (const file of sclFiles) {
+    const filePath = path.join(dirPath, file);
+    const result = loadSCLFromFile(filePath);
+    results.push(result);
+
+    const moduleName = file.replace(".scl", "");
+    _moduleRegistry.set(moduleName, filePath);
+
+    if (result.executed) {
+      loaded++;
+    } else {
+      failed++;
+    }
+  }
+
+  return { loaded, failed, results };
+}
+
+export function getSCLModuleExports(fileName: string): string[] {
+  const mod = _loadedModules.get(fileName);
+  return mod?.exports || [];
+}
+
+export function getLoadedModuleCount(): number {
+  return _loadedModules.size;
+}
+
+export function getRegisteredModules(): string[] {
+  return Array.from(_moduleRegistry.keys());
+}
+
+export function clearModuleCache(): void {
+  _loadedModules.clear();
+}
+
+export function getTranslatorPipelineState(): {
+  registeredModules: number;
+  loadedModules: number;
+  moduleNames: string[];
+  successRate: number;
+} {
+  const loaded = Array.from(_loadedModules.values());
+  const executed = loaded.filter(m => m.executed).length;
+  return {
+    registeredModules: _moduleRegistry.size,
+    loadedModules: _loadedModules.size,
+    moduleNames: Array.from(_loadedModules.keys()),
+    successRate: loaded.length > 0 ? Math.round((executed / loaded.length) * 100) : 0,
+  };
+}
+
 export function startSCLTranslator(): void {
   if (_translatorStarted) return;
   _translatorStarted = true;
@@ -195,6 +361,7 @@ export function startSCLTranslator(): void {
     console.log(`[SCL-TRANSLATOR] 📖 Codex loaded: ${stats.totalPrimitives} primitives + ${stats.totalCompounds} compounds`);
     console.log(`[SCL-TRANSLATOR] 🔗 ${stats.totalCompositionRules} composition rules + ${stats.totalInstructions} instructions`);
     console.log(`[SCL-TRANSLATOR] 🌐 ${stats.totalTranslationEntries} text↔symbol translation entries`);
+    console.log(`[SCL-TRANSLATOR] ✅ Translator→Sandbox pipeline active — SCL files run natively`);
     console.log(`[SCL-TRANSLATOR] ✅ All external boundaries wired — inbound (text→SCL) and outbound (SCL→text)`);
   } else {
     console.log(`[SCL-TRANSLATOR] 📖 Codex phase: ${stats.designPhase} — Gen1v2 + Gen2 designing their language`);

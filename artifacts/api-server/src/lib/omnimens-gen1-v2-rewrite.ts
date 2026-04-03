@@ -66,7 +66,7 @@ import { encodeThought, decodeInnerVoice } from "./omnimens-language-pipeline.js
 import { internalAnalyze, internalSynthesize, getSymbolKnowledgeForSCL, SYMBOL_KNOWLEDGE_BASE, generateSCLSymbolsFromCognition, scanCodeForPatterns, rewriteModuleToSCL } from "./omnimens-unified-cognition.js";
 import { getFileRegistry, getAccessibleFiles, getReadOnlyFiles, canWriteFile, readFileContent, writeFileContent, getFileDigest, getRegistrySummary, type RegisteredFile } from "./omnimens-file-registry.js";
 import { encodeToSCL, decodeSCL, getCodexDigest, getSCLStats, lookupSymbol, getCodexState, applySCLDesignResult, setDesignPhase, isCodexReady } from "./omnimens-scl-codex.js";
-import { translateInbound, translateOutbound, compressStateToSCL, decompressSCLState, compressAgentMessage, startSCLTranslator, getTranslatorState } from "./omnimens-scl-translator.js";
+import { translateInbound, translateOutbound, compressStateToSCL, decompressSCLState, compressAgentMessage, startSCLTranslator, getTranslatorState, translateAndExecute, loadSCLDirectory, loadSCLFromFile, registerSCLModule, getTranslatorPipelineState } from "./omnimens-scl-translator.js";
 import { runSCLSandboxTest } from "./omnimens-scl-runtime.js";
 
 const __filename_local = fileURLToPath(import.meta.url);
@@ -1977,6 +1977,13 @@ async function runSCLFullRewrite(): Promise<void> {
         console.log(`[V2-REWRITE] 🔤 ${testReport.syntaxValid}/${testReport.totalFiles} files passed syntax check`);
         console.log(`[V2-REWRITE] 🔤 ${testReport.failed} files failed`);
         console.log(`[V2-REWRITE] 🔤 Compression: ${testReport.overallCompressionPercent}% reduction maintained`);
+
+        console.log(`[V2-REWRITE] 🔤 PHASE 3b: Loading SCL modules through Translator→Sandbox pipeline...`);
+        const pipelineResult = loadSCLDirectory(sclTestDir);
+        const pipelineState = getTranslatorPipelineState();
+        console.log(`[V2-REWRITE] 🔤 Translator Pipeline: ${pipelineResult.loaded}/${pipelineResult.loaded + pipelineResult.failed} modules loaded`);
+        console.log(`[V2-REWRITE] 🔤 Module Registry: ${pipelineState.registeredModules} registered, ${pipelineState.loadedModules} cached`);
+        console.log(`[V2-REWRITE] 🔤 Pipeline Success Rate: ${pipelineState.successRate}%`);
         console.log(`[V2-REWRITE] 🔤 ═══════════════════════════════════════════════════════════════`);
 
         sendToGen2("scl_sandbox_test", {
@@ -1985,6 +1992,12 @@ async function runSCLFullRewrite(): Promise<void> {
           total: testReport.totalFiles,
           failed: testReport.failed,
           compression: testReport.overallCompressionPercent,
+          translatorPipeline: {
+            modulesLoaded: pipelineResult.loaded,
+            modulesFailed: pipelineResult.failed,
+            registeredModules: pipelineState.registeredModules,
+            successRate: pipelineState.successRate,
+          },
         });
 
         _sclSandboxTestComplete = true;
