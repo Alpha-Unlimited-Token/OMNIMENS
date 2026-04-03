@@ -218774,13 +218774,14 @@
       "filename": "recursiveContextManager_gen1.mjs",
       "stage": "context_compression",
       "exports": [
-        "chunkData",
-        "scoreChunk",
-        "summarizeChunk",
-        "reconstructContext",
-        "processDataset"
+        "generateHash",
+        "summarizeText",
+        "recursiveSummarize",
+        "reinforceContext",
+        "defaultScoringFunction",
+        "manageContext"
       ],
-      "loadedAt": 1775187467195,
+      "loadedAt": 1775188467361,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -232928,12 +232929,15 @@
       "stage": "memory_retrieval",
       "exports": [
         "generateHash",
-        "euclideanDistance",
-        "kMeansClustering",
-        "hierarchicalTokenCompression",
-        "retrieveTokens"
+        "summarizeText",
+        "segmentText",
+        "recursiveSummarization",
+        "hierarchicalMemoryManager",
+        "getTopLevelSummary",
+        "getSegmentHashes",
+        "rebuildTextFromSegments"
       ],
-      "loadedAt": 1775187463032,
+      "loadedAt": 1775188467226,
       "callCount": 0,
       "lastCalledAt": null,
       "totalDurationMs": 0,
@@ -254380,9 +254384,48 @@
       "totalDurationMs": 0,
       "errors": 0,
       "active": true
+    },
+    "omnimens_autocode_consciousness_expansion_mnid5u90.mjs": {
+      "filename": "omnimens_autocode_consciousness_expansion_mnid5u90.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "consciousnessExpansion_mnid5u90"
+      ],
+      "loadedAt": 1775188466968,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_neural_pathway_mnid5udd.mjs": {
+      "filename": "omnimens_autocode_neural_pathway_mnid5udd.mjs",
+      "stage": "knowledge_synthesis",
+      "exports": [
+        "newNeuralPathway_mnid5udd"
+      ],
+      "loadedAt": 1775188467066,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
+    },
+    "omnimens_autocode_emergent_capability_mnid5w6q.mjs": {
+      "filename": "omnimens_autocode_emergent_capability_mnid5w6q.mjs",
+      "stage": "reasoning_enhancement",
+      "exports": [
+        "emergentCapability_mnid5w6q"
+      ],
+      "loadedAt": 1775188467432,
+      "callCount": 0,
+      "lastCalledAt": null,
+      "totalDurationMs": 0,
+      "errors": 0,
+      "active": true
     }
   },
   "lastScan": 1775187467422,
-  "totalModules": 18651,
+  "totalModules": 18658,
   "totalCalls": 0
 }
