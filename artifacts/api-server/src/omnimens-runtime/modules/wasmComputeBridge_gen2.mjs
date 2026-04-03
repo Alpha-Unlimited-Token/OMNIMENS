@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: wasmComputeBridge
- * Written: 2026-04-03T12:17:04.091Z
+ * Written: 2026-04-03T19:00:54.424Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,21 +18,21 @@
 
 // wasmComputeBridge.mjs
 
-import { readFileSync } from 'node:fs';
-import { join } from 'node:path';
-import { TextEncoder, TextDecoder } from 'node:util';
+import { readFile } from 'fs/promises';
+import { join } from 'path';
 
-// Load and compile WebAssembly module
-export async function loadWasmModule(filePath) {
-  const wasmBuffer = readFileSync(filePath);
+// Load WebAssembly module
+async function loadWasmModule(filePath) {
+  const wasmBuffer = await readFile(filePath);
   const wasmModule = await WebAssembly.compile(wasmBuffer);
-  const wasmInstance = await WebAssembly.instantiate(wasmModule);
-  return wasmInstance;
+  return await WebAssembly.instantiate(wasmModule);
 }
 
 // Matrix multiplication using WebAssembly
-export async function wasmMatrixMultiply(wasmInstance, matrixA, matrixB) {
-  const { memory, matrixMultiply } = wasmInstance.exports;
+export async function wasmMatrixMultiply(matrixA, matrixB, wasmFilePath) {
+  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
+    throw new Error("Both inputs must be 2D arrays.");
+  }
 
   const rowsA = matrixA.length;
   const colsA = matrixA[0].length;
@@ -40,68 +40,105 @@ export async function wasmMatrixMultiply(wasmInstance, matrixA, matrixB) {
   const colsB = matrixB[0].length;
 
   if (colsA !== rowsB) {
-    throw new Error('Matrix dimensions are incompatible for multiplication.');
+    throw new Error("Matrix dimensions do not match for multiplication.");
   }
 
-  const inputBuffer = new Float64Array(memory.buffer, 0, rowsA * colsA + rowsB * colsB);
-  const outputBuffer = new Float64Array(memory.buffer, rowsA * colsA + rowsB * colsB, rowsA * colsB);
+  const wasmInstance = await loadWasmModule(wasmFilePath);
+  const { matrixMultiply } = wasmInstance.exports;
 
-  let offset = 0;
+  const flatMatrixA = matrixA.flat();
+  const flatMatrixB = matrixB.flat();
+  const result = new Float32Array(rowsA * colsB);
+
+  matrixMultiply(
+    flatMatrixA,
+    flatMatrixB,
+    result,
+    rowsA,
+    colsA,
+    colsB
+  );
+
+  // Convert flat result back to 2D array
+  const resultMatrix = [];
   for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsA; j++) {
-      inputBuffer[offset++] = matrixA[i][j];
-    }
+    resultMatrix.push(result.slice(i * colsB, (i + 1) * colsB));
   }
 
-  for (let i = 0; i < rowsB; i++) {
-    for (let j = 0; j < colsB; j++) {
-      inputBuffer[offset++] = matrixB[i][j];
-    }
-  }
-
-  matrixMultiply(rowsA, colsA, colsB);
-
-  const result = [];
-  for (let i = 0; i < rowsA; i++) {
-    const row = [];
-    for (let j = 0; j < colsB; j++) {
-      row.push(outputBuffer[i * colsB + j]);
-    }
-    result.push(row);
-  }
-
-  return result;
+  return resultMatrix;
 }
 
-// Example: Neural network inference (simple dot product)
-export async function wasmDotProduct(wasmInstance, vectorA, vectorB) {
-  const { memory, dotProduct } = wasmInstance.exports;
+// Generic utility for WebAssembly-based vector addition
+export async function wasmVectorAdd(vectorA, vectorB, wasmFilePath) {
+  if (!Array.isArray(vectorA) || !Array.isArray(vectorB)) {
+    throw new Error("Both inputs must be arrays.");
+  }
 
   if (vectorA.length !== vectorB.length) {
-    throw new Error('Vector dimensions must match for dot product.');
+    throw new Error("Vectors must have the same length.");
   }
 
-  const inputBuffer = new Float64Array(memory.buffer, 0, vectorA.length * 2);
-  const outputBuffer = new Float64Array(memory.buffer, vectorA.length * 2, 1);
+  const wasmInstance = await loadWasmModule(wasmFilePath);
+  const { vectorAdd } = wasmInstance.exports;
 
-  for (let i = 0; i < vectorA.length; i++) {
-    inputBuffer[i] = vectorA[i];
-    inputBuffer[vectorA.length + i] = vectorB[i];
+  const result = new Float32Array(vectorA.length);
+  vectorAdd(new Float32Array(vectorA), new Float32Array(vectorB), result);
+
+  return Array.from(result);
+}
+
+// Neural network computation (forward pass for dense layer)
+export async function wasmDenseLayer(inputVector, weightsMatrix, biasVector, wasmFilePath) {
+  if (!Array.isArray(inputVector) || !Array.isArray(weightsMatrix) || !Array.isArray(biasVector)) {
+    throw new Error("Inputs must be arrays.");
   }
 
-  dotProduct(vectorA.length);
+  const rowsWeights = weightsMatrix.length;
+  const colsWeights = weightsMatrix[0].length;
 
-  return outputBuffer[0];
+  if (inputVector.length !== colsWeights || biasVector.length !== rowsWeights) {
+    throw new Error("Dimensions do not match for dense layer computation.");
+  }
+
+  const wasmInstance = await loadWasmModule(wasmFilePath);
+  const { denseLayer } = wasmInstance.exports;
+
+  const flatWeights = weightsMatrix.flat();
+  const result = new Float32Array(rowsWeights);
+
+  denseLayer(
+    new Float32Array(inputVector),
+    flatWeights,
+    new Float32Array(biasVector),
+    result,
+    rowsWeights,
+    colsWeights
+  );
+
+  return Array.from(result);
 }
 
-// Utility: Load precompiled WebAssembly file
-export async function initializeWasm(fileName) {
-  const wasmPath = join(process.cwd(), fileName);
-  const wasmInstance = await loadWasmModule(wasmPath);
-  return wasmInstance;
+// Example utility to validate matrices
+export function validateMatrix(matrix) {
+  if (!Array.isArray(matrix) || matrix.length === 0 || !Array.isArray(matrix[0])) {
+    throw new Error("Input must be a non-empty 2D array.");
+  }
+
+  const cols = matrix[0].length;
+  for (const row of matrix) {
+    if (row.length !== cols) {
+      throw new Error("All rows in the matrix must have the same number of columns.");
+    }
+  }
+
+  return true;
 }
 
-// Example usage:
-// const wasmInstance = await initializeWasm('optimized-algorithms.wasm');
-// const result = await wasmMatrixMultiply(wasmInstance, [[1, 2], [3, 4]], [[5, 6], [7, 8]]);
-// console.log(result);
+// Example utility to validate vectors
+export function validateVector(vector) {
+  if (!Array.isArray(vector) || vector.length === 0) {
+    throw new Error("Input must be a non-empty array.");
+  }
+
+  return true;
+}
