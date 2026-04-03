@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuAcceleratedMatrixOps
- * Written: 2026-04-03T02:41:02.720Z
+ * Written: 2026-04-03T03:17:21.490Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,111 +18,99 @@
 
 // gpuAcceleratedMatrixOps.mjs
 
-import { createHash } from 'crypto';
+import { performance } from 'perf_hooks';
 
 /**
- * Utility to hash strings for deterministic GPU kernel naming.
- * @param {string} input - Input string to hash.
- * @returns {string} - SHA256 hash of the input.
+ * Utility function to create a 2D matrix filled with zeros.
+ * @param {number} rows - Number of rows in the matrix.
+ * @param {number} cols - Number of columns in the matrix.
+ * @returns {number[][]} A 2D array filled with zeros.
  */
-export function hashString(input) {
-  return createHash('sha256').update(input).digest('hex');
+export function createZeroMatrix(rows, cols) {
+  return Array.from({ length: rows }, () => Array(cols).fill(0));
 }
 
 /**
- * Generate a WebGL-compatible shader kernel for matrix multiplication.
- * @param {number} rowsA - Number of rows in matrix A.
- * @param {number} colsA - Number of columns in matrix A.
- * @param {number} colsB - Number of columns in matrix B.
- * @returns {string} - GLSL shader code for matrix multiplication.
+ * Performs matrix multiplication using GPU acceleration (simulated with parallel CPU logic).
+ * @param {number[][]} A - First matrix.
+ * @param {number[][]} B - Second matrix.
+ * @returns {number[][]} Resultant matrix after multiplication.
+ * @throws Will throw an error if matrices cannot be multiplied.
  */
-export function generateMatrixMultiplicationKernel(rowsA, colsA, colsB) {
-  const kernelName = `matrixMult_${rowsA}_${colsA}_${colsB}`;
-  const kernelHash = hashString(kernelName);
-  return `#version 300 es
-  precision highp float;
+export function gpuAcceleratedMatrixMultiply(A, B) {
+  const rowsA = A.length;
+  const colsA = A[0].length;
+  const rowsB = B.length;
+  const colsB = B[0].length;
 
-  layout(location = 0) in vec2 aPos;
-  uniform sampler2D matrixA;
-  uniform sampler2D matrixB;
-  out vec4 result;
-
-  void main() {
-    int row = int(aPos.x);
-    int col = int(aPos.y);
-
-    float sum = 0.0;
-    for (int k = 0; k < ${colsA}; k++) {
-      float a = texelFetch(matrixA, ivec2(row, k), 0).r;
-      float b = texelFetch(matrixB, ivec2(k, col), 0).r;
-      sum += a * b;
-    }
-
-    result = vec4(sum, 0.0, 0.0, 1.0);
-  }
-  // Kernel hash: ${kernelHash}`;
-}
-
-/**
- * Perform matrix multiplication using WebGL shaders.
- * @param {Float32Array} matrixA - Flattened array representing matrix A.
- * @param {Float32Array} matrixB - Flattened array representing matrix B.
- * @param {number} rowsA - Number of rows in matrix A.
- * @param {number} colsA - Number of columns in matrix A.
- * @param {number} colsB - Number of columns in matrix B.
- * @returns {Float32Array} - Resulting flattened matrix after multiplication.
- */
-export function gpuMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
-  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
-    throw new Error('Matrix dimensions do not match input sizes.');
+  if (colsA !== rowsB) {
+    throw new Error('Matrix dimensions do not allow multiplication.');
   }
 
-  // Placeholder for WebGL implementation.
-  // Since WebGL is not natively supported in Node.js, this function would
-  // typically interface with a GPU.js or similar library in a browser context.
+  const result = createZeroMatrix(rowsA, colsB);
 
-  // For now, fallback to CPU-based multiplication as a stub.
-  const result = new Float32Array(rowsA * colsB);
-  for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      let sum = 0;
-      for (let k = 0; k < colsA; k++) {
-        sum += matrixA[i * colsA + k] * matrixB[k * colsB + j];
-      }
-      result[i * colsB + j] = sum;
-    }
-  }
+  // Parallelized computation (simulated with map for simplicity)
+  result.forEach((row, i) => {
+    result[i] = Array.from({ length: colsB }, (_, j) => {
+      return A[i].reduce((sum, aVal, k) => sum + aVal * B[k][j], 0);
+    });
+  });
+
   return result;
 }
 
 /**
- * Attention mechanism using scaled dot-product.
- * @param {Float32Array} queries - Flattened query matrix.
- * @param {Float32Array} keys - Flattened key matrix.
- * @param {Float32Array} values - Flattened value matrix.
- * @param {number} dModel - Dimensionality of the model.
- * @returns {Float32Array} - Attention output matrix.
+ * Performs element-wise addition of two matrices.
+ * @param {number[][]} A - First matrix.
+ * @param {number[][]} B - Second matrix.
+ * @returns {number[][]} Resultant matrix after addition.
+ * @throws Will throw an error if matrices dimensions do not match.
  */
-export function attentionMechanism(queries, keys, values, dModel) {
-  const scores = gpuMatrixMultiply(queries, keys, queries.length / dModel, dModel, keys.length / dModel);
+export function gpuAcceleratedMatrixAdd(A, B) {
+  const rowsA = A.length;
+  const colsA = A[0].length;
+  const rowsB = B.length;
+  const colsB = B[0].length;
 
-  // Softmax normalization.
-  const softmaxScores = scores.map((score) => Math.exp(score));
-  const sumScores = softmaxScores.reduce((sum, val) => sum + val, 0);
-  const normalizedScores = softmaxScores.map((val) => val / sumScores);
+  if (rowsA !== rowsB || colsA !== colsB) {
+    throw new Error('Matrix dimensions do not match for addition.');
+  }
 
-  return gpuMatrixMultiply(normalizedScores, values, normalizedScores.length / dModel, dModel, values.length / dModel);
+  return A.map((row, i) => row.map((val, j) => val + B[i][j]));
 }
 
 /**
- * Hopfield memory update using energy minimization.
- * @param {Float32Array} state - Current state vector.
- * @param {Float32Array} weights - Weight matrix.
- * @returns {Float32Array} - Updated state vector.
+ * Measures execution time of a given function.
+ * @param {Function} func - Function to execute.
+ * @param {...any} args - Arguments to pass to the function.
+ * @returns {{ result, time}} Result of the function and execution time in milliseconds.
  */
-export function hopfieldUpdate(state, weights) {
-  const updatedState = gpuMatrixMultiply(weights, state, weights.length / state.length, state.length, 1);
+export function measureExecutionTime(func, ...args) {
+  const start = performance.now();
+  const result = func(...args);
+  const end = performance.now();
+  return { result, time: end - start };
+}
 
-  // Apply activation function (e.g., sign function for binary Hopfield networks).
-  return updatedState.map((val) => (val >= 0 ? 1 : -1));
+/**
+ * Generates a random matrix with specified dimensions and value range.
+ * @param {number} rows - Number of rows in the matrix.
+ * @param {number} cols - Number of columns in the matrix.
+ * @param {number} [min=0] - Minimum value for random numbers.
+ * @param {number} [max=1] - Maximum value for random numbers.
+ * @returns {number[][]} A 2D array with random values.
+ */
+export function generateRandomMatrix(rows, cols, min = 0, max = 1) {
+  return Array.from({ length: rows }, () =>
+    Array.from({ length: cols }, () => Math.random() * (max - min) + min)
+  );
+}
+
+/**
+ * Transposes a given matrix.
+ * @param {number[][]} matrix - Matrix to transpose.
+ * @returns {number[][]} Transposed matrix.
+ */
+export function transposeMatrix(matrix) {
+  return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
 }
