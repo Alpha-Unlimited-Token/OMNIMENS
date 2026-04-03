@@ -1669,7 +1669,7 @@ async function _runV2CycleInner(): Promise<void> {
   }
 
   const poolHealthy = isPoolHealthy();
-  const phasesNeedingDb = ["db_pool_optimization", "identity_verification", "self_test", "hot_swap_prep"];
+  const phasesNeedingDb = ["db_pool_optimization", "identity_verification"];
   const thisPhaseNeedsDb = phasesNeedingDb.includes(v2State.phase);
   if (!poolHealthy && thisPhaseNeedsDb) {
     console.log(`[V2-REWRITE] ⏸️ DB pool under pressure — skipping DB-dependent phase to protect resources`);
