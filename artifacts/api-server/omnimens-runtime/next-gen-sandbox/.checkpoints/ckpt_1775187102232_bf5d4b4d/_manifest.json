@@ -1,0 +1,12 @@
+{
+  "id": "ckpt_1775187102232_bf5d4b4d",
+  "timestamp": 1775187102238,
+  "description": "Cross-gen scan complete — all domains mapped",
+  "phase": "cross_gen_consolidation",
+  "fileCount": 80,
+  "totalLines": 4325,
+  "buildVersion": "2.0.0",
+  "generation": 2,
+  "testsPassed": 26,
+  "testsFailed": 3
+}

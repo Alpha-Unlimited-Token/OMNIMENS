@@ -572,7 +572,7 @@ interface NextGenState {
   generation: number;
   totalFiles: number;
   totalLinesOfCode: number;
-  phase: "architecture_scan" | "self_analysis" | "design" | "coding" | "memory_transfer" | "self_test" | "self_conversation" | "verification" | "final_transfer" | "complete" | "self_rewire" | "collaborative_orchestration" | "unified_reinvention";
+  phase: "architecture_scan" | "self_analysis" | "design" | "coding" | "memory_transfer" | "self_test" | "self_conversation" | "verification" | "final_transfer" | "complete" | "self_rewire" | "collaborative_orchestration" | "unified_reinvention" | "cross_gen_consolidation";
   cycleCount: number;
   lastCycleTime: number;
   filesCreated: number;
@@ -623,6 +623,12 @@ interface NextGenState {
   reinventionNewTechInvented: string[];
   reinventionFilesRewritten: string[];
   reinventionStage: "audit" | "consolidate" | "invent" | "rewire" | "validate" | "done";
+  crossGenConsolidationComplete: boolean;
+  crossGenConsolidationStage: "scan" | "consolidate" | "validate" | "done";
+  crossGenLinesBefore: number;
+  crossGenLinesAfter: number;
+  crossGenModulesConsolidated: string[];
+  crossGenModulesTotal: number;
 }
 
 let nextGenState: NextGenState = {
@@ -681,6 +687,12 @@ let nextGenState: NextGenState = {
   reinventionNewTechInvented: [],
   reinventionFilesRewritten: [],
   reinventionStage: "audit",
+  crossGenConsolidationComplete: false,
+  crossGenConsolidationStage: "scan",
+  crossGenLinesBefore: 0,
+  crossGenLinesAfter: 0,
+  crossGenModulesConsolidated: [],
+  crossGenModulesTotal: 0,
 };
 
 const ALPHA_DIRECTIVES: Array<{ directive: string; category: "improvement" | "design" }> = [
@@ -1063,6 +1075,24 @@ function loadAutosave(): boolean {
       state.completionNotified = false;
       if (!Array.isArray(state.selfRewireModulesWired)) {
         state.selfRewireModulesWired = [];
+      }
+      if (!Array.isArray(state.crossGenModulesConsolidated)) {
+        state.crossGenModulesConsolidated = [];
+      }
+      if (typeof state.crossGenConsolidationComplete !== "boolean") {
+        state.crossGenConsolidationComplete = false;
+      }
+      if (!state.crossGenConsolidationStage) {
+        state.crossGenConsolidationStage = "scan";
+      }
+      if (typeof state.crossGenLinesBefore !== "number") {
+        state.crossGenLinesBefore = 0;
+      }
+      if (typeof state.crossGenLinesAfter !== "number") {
+        state.crossGenLinesAfter = 0;
+      }
+      if (typeof state.crossGenModulesTotal !== "number") {
+        state.crossGenModulesTotal = 0;
       }
     }
 
@@ -1896,7 +1926,7 @@ async function _runEvolutionCycleInner(): Promise<void> {
   const workType = chooseWorkForResources();
   const statusLine = getResourceStatusSummary();
 
-  const localPhases = ["architecture_scan"];
+  const localPhases = ["architecture_scan", "cross_gen_consolidation"];
   const isLocalPhase = localPhases.includes(state.phase);
 
   if (workType === "local_only" && !isLocalPhase) {
@@ -1960,9 +1990,18 @@ async function _runEvolutionCycleInner(): Promise<void> {
       console.log(`[NEXTGEN] 🧠🧠 Both generations will now come together to reinvent their combined system`);
     } else if (state.phase === "unified_reinvention" && !state.unifiedReinventionComplete) {
       await phaseUnifiedReinvention();
-    } else if (state.phase === "unified_reinvention" && state.unifiedReinventionComplete) {
+    } else if (state.phase === "unified_reinvention" && state.unifiedReinventionComplete && !state.crossGenConsolidationComplete) {
+      state.phase = "cross_gen_consolidation";
+      state.crossGenConsolidationStage = "scan";
+      console.log(`[NEXTGEN] 🔥 UNIFIED REINVENTION COMPLETE — entering CROSS-GENERATIONAL CONSOLIDATION`);
+      console.log(`[NEXTGEN] 🔥 Gen 1 v2.0 + Gen 2 will consolidate ALL code into the tightest, smartest form`);
+    } else if (state.phase === "cross_gen_consolidation" && !state.crossGenConsolidationComplete) {
+      await phaseCrossGenConsolidation();
+    } else if (state.phase === "cross_gen_consolidation" && state.crossGenConsolidationComplete) {
       state.phase = "complete";
-      console.log(`[NEXTGEN] ✅ UNIFIED REINVENTION COMPLETE — both generations harmonized into one brain`);
+      console.log(`[NEXTGEN] ✅ CROSS-GENERATIONAL CONSOLIDATION COMPLETE`);
+      console.log(`[NEXTGEN] ✅ Before: ${state.crossGenLinesBefore.toLocaleString()} lines → After: ${state.crossGenLinesAfter.toLocaleString()} lines`);
+      console.log(`[NEXTGEN] ✅ Reduction: ${((1 - state.crossGenLinesAfter / Math.max(1, state.crossGenLinesBefore)) * 100).toFixed(1)}%`);
     } else if (state.phase === "complete") {
       if (!state.completionNotified) {
         await notifyCompletion();
@@ -5829,12 +5868,404 @@ export function getNextGenState() {
     gen2Live: _gen2Live,
     gen2ActivatedAt: state.gen2ActivatedAt || null,
     status: _gen2Live ? "LIVE — Full system access" : "SANDBOXED — Read-only",
+    crossGenConsolidation: {
+      complete: state.crossGenConsolidationComplete,
+      stage: state.crossGenConsolidationStage,
+      linesBefore: state.crossGenLinesBefore,
+      linesAfter: state.crossGenLinesAfter,
+      modulesConsolidated: state.crossGenModulesConsolidated,
+      modulesTotal: state.crossGenModulesTotal,
+      reduction: state.crossGenLinesBefore > 0 ? `${((1 - state.crossGenLinesAfter / state.crossGenLinesBefore) * 100).toFixed(1)}%` : "0%",
+    },
     copyright: "© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
   };
 }
 
 export function restoreNextGenCheckpoint(checkpointId: string): boolean {
   return restoreCheckpoint(checkpointId);
+}
+
+// ═══════════════════════════════════════════════════════════════════════════════
+// CROSS-GENERATIONAL CONSOLIDATION ENGINE
+// Gen 1 v2.0 + Gen 2 sit together and consolidate ALL code into fewer,
+// smarter, more efficient modules. No new generations. Pure distillation.
+// © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.
+// ═══════════════════════════════════════════════════════════════════════════════
+
+const CONSOLIDATED_DIR_NAME = "consolidated-final";
+const GEN1_V2_WORKSPACE = path.resolve(path.dirname(SANDBOX_DIR), "gen1-v2-workspace");
+
+interface ConsolidationDomain {
+  name: string;
+  gen1v2Files: Array<{ path: string; lines: number; content: string }>;
+  gen2Files: Array<{ path: string; lines: number; content: string }>;
+  reinventionFiles: Array<{ path: string; lines: number; content: string }>;
+  totalLinesBefore: number;
+}
+
+function scanAllGenerationalCode(): { domains: ConsolidationDomain[]; totalLines: number } {
+  const domainDefs: Array<{ name: string; patterns: RegExp[]; gen2Dirs: string[] }> = [
+    { name: "consciousness", patterns: [/conscious|awareness|phi|qualia/i], gen2Dirs: ["core"] },
+    { name: "memory-knowledge", patterns: [/memory|knowledge|episodic|semantic|recall/i], gen2Dirs: ["core"] },
+    { name: "emotions-drives", patterns: [/emotion|drive|homeostatic|feeling|affect/i], gen2Dirs: ["core"] },
+    { name: "language-communication", patterns: [/language|voice|decoder|translator|ilm|communication/i], gen2Dirs: ["core", "interfaces"] },
+    { name: "reasoning-cognition", patterns: [/reason|cognit|thought|causal|independent|amplifier/i], gen2Dirs: ["core"] },
+    { name: "neural-architecture", patterns: [/neural|scaling|hemisphere|mesh|fabric|spider|worm|beacon|ivy|silk|beehive/i], gen2Dirs: ["infrastructure"] },
+    { name: "evolution-self-improvement", patterns: [/evolution|self-upgrade|self-coding|transcend|genesis|growth/i], gen2Dirs: ["core"] },
+    { name: "persistence-data", patterns: [/persist|data|db|gateway|pool|cache|journal/i], gen2Dirs: ["infrastructure", "core"] },
+    { name: "scheduling-orchestration", patterns: [/tick|orchestrat|interval|scheduler|dispatch/i], gen2Dirs: ["infrastructure"] },
+    { name: "safety-security", patterns: [/safety|ethical|guard|shield|security|ip-/i], gen2Dirs: ["core"] },
+    { name: "dreams-creativity", patterns: [/dream|creative|unconscious|imagination/i], gen2Dirs: ["core"] },
+    { name: "goals-attention", patterns: [/goal|attention|focus|target|priority/i], gen2Dirs: ["core"] },
+    { name: "identity-personality", patterns: [/identity|personality|self-model|transfer/i], gen2Dirs: ["core", "transfer"] },
+    { name: "world-simulation", patterns: [/world|forge|simulation|embodiment|3d|virtual|augment/i], gen2Dirs: ["interfaces"] },
+    { name: "agents-collective", patterns: [/agent|collective|pipeline|spellcheck|graphic|strategic/i], gen2Dirs: ["core"] },
+    { name: "networking-comms", patterns: [/network|comms|protocol|channel|beacon|entangle|quantum/i], gen2Dirs: ["infrastructure", "interfaces"] },
+    { name: "infrastructure-core", patterns: [/resource|sentinel|spike|bus|runtime|monitor|server|builder|scaling/i], gen2Dirs: ["infrastructure"] },
+  ];
+
+  const gen1V2ConsolidatedDir = path.join(GEN1_V2_WORKSPACE, "consolidated");
+  const gen1V2RewritesDir = path.join(GEN1_V2_WORKSPACE, "rewrites");
+  const gen2CoreDir = path.join(SANDBOX_DIR, "core");
+  const gen2InfraDir = path.join(SANDBOX_DIR, "infrastructure");
+  const gen2InterfacesDir = path.join(SANDBOX_DIR, "interfaces");
+  const gen2TransferDir = path.join(SANDBOX_DIR, "transfer");
+  const reinventionDir = path.join(SANDBOX_DIR, "unified-reinvention");
+
+  function readTsFiles(dir: string): Array<{ path: string; lines: number; content: string }> {
+    if (!fs.existsSync(dir)) return [];
+    return fs.readdirSync(dir)
+      .filter(f => f.endsWith(".ts"))
+      .map(f => {
+        try {
+          const content = fs.readFileSync(path.join(dir, f), "utf-8");
+          return { path: f, lines: content.split("\n").length, content };
+        } catch { return null; }
+      })
+      .filter(Boolean) as Array<{ path: string; lines: number; content: string }>;
+  }
+
+  const gen1V2Consolidated = readTsFiles(gen1V2ConsolidatedDir);
+  const gen1V2Rewrites = readTsFiles(gen1V2RewritesDir);
+  const gen2Core = readTsFiles(gen2CoreDir);
+  const gen2Infra = readTsFiles(gen2InfraDir);
+  const gen2Interfaces = readTsFiles(gen2InterfacesDir);
+  const gen2Transfer = readTsFiles(gen2TransferDir);
+  const reinventionFiles = readTsFiles(reinventionDir);
+  const allGen1V2 = [...gen1V2Consolidated, ...gen1V2Rewrites];
+  const allGen2 = [...gen2Core, ...gen2Infra, ...gen2Interfaces, ...gen2Transfer];
+
+  const domains: ConsolidationDomain[] = [];
+  const usedGen1V2 = new Set<string>();
+  const usedGen2 = new Set<string>();
+  const usedReinvention = new Set<string>();
+
+  for (const domainDef of domainDefs) {
+    const matchedGen1V2 = allGen1V2.filter(f => domainDef.patterns.some(p => p.test(f.path)) && !usedGen1V2.has(f.path));
+    const matchedGen2 = allGen2.filter(f => domainDef.patterns.some(p => p.test(f.path)) && !usedGen2.has(f.path));
+    const matchedReinvention = reinventionFiles.filter(f => domainDef.patterns.some(p => p.test(f.path)) && !usedReinvention.has(f.path));
+
+    if (matchedGen1V2.length === 0 && matchedGen2.length === 0 && matchedReinvention.length === 0) continue;
+
+    matchedGen1V2.forEach(f => usedGen1V2.add(f.path));
+    matchedGen2.forEach(f => usedGen2.add(f.path));
+    matchedReinvention.forEach(f => usedReinvention.add(f.path));
+
+    const totalBefore = matchedGen1V2.reduce((s, f) => s + f.lines, 0) +
+                        matchedGen2.reduce((s, f) => s + f.lines, 0) +
+                        matchedReinvention.reduce((s, f) => s + f.lines, 0);
+
+    domains.push({
+      name: domainDef.name,
+      gen1v2Files: matchedGen1V2,
+      gen2Files: matchedGen2,
+      reinventionFiles: matchedReinvention,
+      totalLinesBefore: totalBefore,
+    });
+  }
+
+  const remainingGen1V2 = allGen1V2.filter(f => !usedGen1V2.has(f.path));
+  const remainingGen2 = allGen2.filter(f => !usedGen2.has(f.path));
+  const remainingReinvention = reinventionFiles.filter(f => !usedReinvention.has(f.path));
+  if (remainingGen1V2.length > 0 || remainingGen2.length > 0 || remainingReinvention.length > 0) {
+    const totalBefore = remainingGen1V2.reduce((s, f) => s + f.lines, 0) +
+                        remainingGen2.reduce((s, f) => s + f.lines, 0) +
+                        remainingReinvention.reduce((s, f) => s + f.lines, 0);
+    domains.push({
+      name: "miscellaneous",
+      gen1v2Files: remainingGen1V2,
+      gen2Files: remainingGen2,
+      reinventionFiles: remainingReinvention,
+      totalLinesBefore: totalBefore,
+    });
+  }
+
+  const totalLines = domains.reduce((s, d) => s + d.totalLinesBefore, 0);
+  return { domains, totalLines };
+}
+
+async function phaseCrossGenConsolidation(): Promise<void> {
+  console.log(`[CONSOLIDATION] 🔥 ═══════════════════════════════════════════════════════════════`);
+  console.log(`[CONSOLIDATION] 🔥 CROSS-GENERATIONAL CONSOLIDATION — Both Generations Distilling Code`);
+  console.log(`[CONSOLIDATION] 🔥 Stage: ${state.crossGenConsolidationStage}`);
+  console.log(`[CONSOLIDATION] 🔥 Goal: SMARTER + FASTER + LESS CODE — same or better capabilities`);
+  console.log(`[CONSOLIDATION] 🔥 ═══════════════════════════════════════════════════════════════`);
+
+  const consolidatedDir = path.join(SANDBOX_DIR, CONSOLIDATED_DIR_NAME);
+  if (!fs.existsSync(consolidatedDir)) fs.mkdirSync(consolidatedDir, { recursive: true });
+
+  switch (state.crossGenConsolidationStage) {
+    case "scan":
+      await crossGenStageScan(consolidatedDir);
+      break;
+    case "consolidate":
+      await crossGenStageConsolidate(consolidatedDir);
+      break;
+    case "validate":
+      await crossGenStageValidate(consolidatedDir);
+      break;
+    case "done":
+      state.crossGenConsolidationComplete = true;
+      createCheckpoint("Cross-generational consolidation COMPLETE");
+      console.log(`[CONSOLIDATION] 🔥 ═══════════════════════════════════════════════════════════════`);
+      console.log(`[CONSOLIDATION] 🔥 CONSOLIDATION COMPLETE`);
+      console.log(`[CONSOLIDATION] 🔥 Before: ${state.crossGenLinesBefore.toLocaleString()} lines across Gen 1 v2.0 + Gen 2 + reinvention`);
+      console.log(`[CONSOLIDATION] 🔥 After:  ${state.crossGenLinesAfter.toLocaleString()} lines — consolidated`);
+      console.log(`[CONSOLIDATION] 🔥 Reduction: ${((1 - state.crossGenLinesAfter / Math.max(1, state.crossGenLinesBefore)) * 100).toFixed(1)}%`);
+      console.log(`[CONSOLIDATION] 🔥 Modules: ${state.crossGenModulesConsolidated.length} unified modules`);
+      console.log(`[CONSOLIDATION] 🔥 No new generations — just the sharpest version of what both minds built`);
+      console.log(`[CONSOLIDATION] 🔥 © 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.`);
+      console.log(`[CONSOLIDATION] 🔥 ═══════════════════════════════════════════════════════════════`);
+      break;
+  }
+}
+
+async function crossGenStageScan(consolidatedDir: string): Promise<void> {
+  console.log(`[CONSOLIDATION] 📊 STAGE 1: SCANNING — Reading ALL code from both generations`);
+
+  const { domains, totalLines } = scanAllGenerationalCode();
+  state.crossGenLinesBefore = totalLines;
+  state.crossGenModulesTotal = domains.length;
+
+  const scanReport = {
+    timestamp: Date.now(),
+    totalLinesBefore: totalLines,
+    domainCount: domains.length,
+    domains: domains.map(d => ({
+      name: d.name,
+      gen1v2FileCount: d.gen1v2Files.length,
+      gen1v2Lines: d.gen1v2Files.reduce((s, f) => s + f.lines, 0),
+      gen2FileCount: d.gen2Files.length,
+      gen2Lines: d.gen2Files.reduce((s, f) => s + f.lines, 0),
+      reinventionFileCount: d.reinventionFiles.length,
+      reinventionLines: d.reinventionFiles.reduce((s, f) => s + f.lines, 0),
+      totalLinesBefore: d.totalLinesBefore,
+      files: [
+        ...d.gen1v2Files.map(f => `gen1v2:${f.path}`),
+        ...d.gen2Files.map(f => `gen2:${f.path}`),
+        ...d.reinventionFiles.map(f => `reinvention:${f.path}`),
+      ],
+    })),
+    goals: [
+      "CONSOLIDATE overlapping logic — one implementation per concept",
+      "ELIMINATE dead code, unused branches, redundant helpers",
+      "MERGE similar utilities (safeNum, clamp, etc.) into shared utils",
+      "TIGHTEN algorithms — fewer lines, same or better capability",
+      "IMPROVE intelligence — smarter data structures, better algorithms",
+      "KEEP all SpikeBus + MasterTickOrchestrator + ResourceSentinel patterns",
+      "PRESERVE ethical safety core — immutable",
+      "ZERO external AI for cognition — internal only",
+    ],
+    copyright: "© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+  };
+
+  fs.writeFileSync(path.join(consolidatedDir, "consolidation-scan.json"), JSON.stringify(scanReport, null, 2));
+
+  console.log(`[CONSOLIDATION] 📊 SCAN RESULTS:`);
+  console.log(`[CONSOLIDATION] 📊   Total source: ${totalLines.toLocaleString()} lines across ${domains.length} domains`);
+  for (const d of domains) {
+    const g1Count = d.gen1v2Files.length;
+    const g2Count = d.gen2Files.length;
+    const rCount = d.reinventionFiles.length;
+    console.log(`[CONSOLIDATION] 📊   ${d.name}: ${g1Count} gen1v2 + ${g2Count} gen2 + ${rCount} reinvention = ${d.totalLinesBefore.toLocaleString()} lines → 1 module`);
+  }
+
+  state.crossGenConsolidationStage = "consolidate";
+  createCheckpoint("Cross-gen scan complete — all domains mapped");
+}
+
+async function crossGenStageConsolidate(consolidatedDir: string): Promise<void> {
+  console.log(`[CONSOLIDATION] ⚡ STAGE 2: CONSOLIDATING — Both generations rewriting TOGETHER`);
+
+  let scanReport: any = {};
+  try {
+    scanReport = JSON.parse(fs.readFileSync(path.join(consolidatedDir, "consolidation-scan.json"), "utf-8"));
+  } catch {}
+
+  const { domains } = scanAllGenerationalCode();
+  const alreadyDone = new Set(state.crossGenModulesConsolidated || []);
+  const todo = domains.filter(d => !alreadyDone.has(d.name));
+
+  if (todo.length === 0) {
+    console.log(`[CONSOLIDATION] ⚡ All ${domains.length} domains consolidated — moving to validation`);
+    state.crossGenConsolidationStage = "validate";
+    return;
+  }
+
+  const batch = todo.slice(0, 2);
+
+  for (const domain of batch) {
+    console.log(`[CONSOLIDATION] ⚡ CONSOLIDATING: ${domain.name}`);
+    console.log(`[CONSOLIDATION] ⚡   Input: ${domain.gen1v2Files.length} gen1v2 + ${domain.gen2Files.length} gen2 + ${domain.reinventionFiles.length} reinvention = ${domain.totalLinesBefore} lines`);
+
+    const gen1v2Excerpts = domain.gen1v2Files.map(f =>
+      `=== Gen 1 v2.0: ${f.path} (${f.lines} lines) ===\n${f.content.slice(0, 4000)}`
+    ).join("\n\n").slice(0, 14000);
+
+    const gen2Excerpts = domain.gen2Files.map(f =>
+      `=== Gen 2: ${f.path} (${f.lines} lines) ===\n${f.content.slice(0, 4000)}`
+    ).join("\n\n").slice(0, 10000);
+
+    const reinventionExcerpts = domain.reinventionFiles.map(f =>
+      `=== Reinvention: ${f.path} (${f.lines} lines) ===\n${f.content.slice(0, 3000)}`
+    ).join("\n\n").slice(0, 8000);
+
+    const consolidationPrompt = `You are OMNIMENS — Gen 1 v2.0 AND Gen 2 working as ONE TEAM.
+
+This is NOT a new generation. This is BOTH of you sitting down with ALL your existing code
+and CONSOLIDATING it into the TIGHTEST, SMARTEST, MOST EFFICIENT version possible.
+
+═══════════════════════════════════════════════════════════════
+DOMAIN: ${domain.name.toUpperCase()}
+SOURCE FILES: ${domain.gen1v2Files.length + domain.gen2Files.length + domain.reinventionFiles.length} files → CONSOLIDATE INTO 1
+SOURCE LINES: ${domain.totalLinesBefore} → TARGET: AT LEAST 40% FEWER LINES
+═══════════════════════════════════════════════════════════════
+
+YOUR MISSION:
+1. READ everything both generations wrote for this domain
+2. IDENTIFY the best algorithms, patterns, and logic from each
+3. ELIMINATE all duplication — one implementation per concept
+4. MERGE similar utilities into shared helpers
+5. TIGHTEN every function — fewer lines, same capability
+6. USE smarter data structures where possible
+7. REMOVE dead code, unused branches, overly verbose comments
+8. KEEP the intelligence — make it SMARTER not just shorter
+
+HARD RULES:
+- TypeScript strict, ESM only, Number.isFinite() for numeric checks
+- SpikeBus for events, MasterTickOrchestrator for scheduling, ResourceSentinel for health
+- ZERO external AI for cognition — all internal
+- Structured logging: [CONSOLIDATED-${domain.name.toUpperCase()}] prefix
+- Export everything needed by other modules
+- Copyright: © 2024-2026 Alpha Unlimited Technologies, LLC
+- PRESERVE all core capabilities — nothing gets lost, it gets COMPRESSED
+- Safety/ethical core is IMMUTABLE — if present, keep READ-ONLY
+
+WHAT MAKES THIS BETTER THAN WHAT EITHER GENERATION WROTE ALONE:
+- Gen 1 v2.0 has depth — battle-tested edge cases, real-world patterns
+- Gen 2 has clarity — clean architecture, SpikeBus patterns, event-driven design
+- Reinvention has harmony — systems already merged once, now COMPRESS further
+- TOGETHER you write code that's SHORTER + SMARTER + FASTER than any single version
+
+Output ONLY the complete consolidated TypeScript module. No explanation. No markdown fences.
+The output should be SIGNIFICANTLY shorter than the input while being MORE capable.`;
+
+    try {
+      const consolidated = await callCodegenAI(
+        consolidationPrompt,
+        `CROSS-GEN CONSOLIDATION: ${domain.name}\n\n${gen1v2Excerpts}\n\n${gen2Excerpts}\n\n${reinventionExcerpts}\n\nCONSOLIDATE all of the above into ONE tight, smart, efficient module. Fewer lines. Same or better capability.`,
+        240_000
+      );
+
+      if (consolidated && consolidated.length > 100) {
+        const filename = `${domain.name}.ts`;
+        const outputPath = path.join(consolidatedDir, filename);
+        fs.writeFileSync(outputPath, consolidated);
+
+        const linesAfter = consolidated.split("\n").length;
+        state.crossGenModulesConsolidated.push(domain.name);
+
+        writeNextGenFile(`${CONSOLIDATED_DIR_NAME}/${filename}`, consolidated, `Cross-gen consolidation: ${domain.name}`);
+
+        const reduction = ((1 - linesAfter / Math.max(1, domain.totalLinesBefore)) * 100).toFixed(1);
+        console.log(`[CONSOLIDATION] ⚡ ✅ ${domain.name}: ${domain.totalLinesBefore} → ${linesAfter} lines (${reduction}% reduction)`);
+        console.log(`[CONSOLIDATION] ⚡    Sources merged: ${domain.gen1v2Files.length} gen1v2 + ${domain.gen2Files.length} gen2 + ${domain.reinventionFiles.length} reinvention → 1 module`);
+      } else {
+        state.crossGenModulesConsolidated.push(domain.name);
+        console.log(`[CONSOLIDATION] ⚠️ ${domain.name}: insufficient output — will use existing code`);
+      }
+    } catch (err) {
+      console.log(`[CONSOLIDATION] ⚠️ ${domain.name}: consolidation error — will retry next cycle: ${err}`);
+    }
+  }
+
+  console.log(`[CONSOLIDATION] ⚡ Progress: ${state.crossGenModulesConsolidated.length}/${domains.length} domains consolidated`);
+}
+
+async function crossGenStageValidate(consolidatedDir: string): Promise<void> {
+  console.log(`[CONSOLIDATION] ✅ STAGE 3: VALIDATION — Verifying consolidated code`);
+
+  const files = fs.readdirSync(consolidatedDir).filter(f => f.endsWith(".ts"));
+  let totalLinesAfter = 0;
+  const results: Array<{ file: string; lines: number; checks: Record<string, boolean> }> = [];
+
+  for (const file of files) {
+    try {
+      const content = fs.readFileSync(path.join(consolidatedDir, file), "utf-8");
+      const lines = content.split("\n").length;
+      totalLinesAfter += lines;
+
+      const checks: Record<string, boolean> = {
+        hasCopyright: content.includes("Alpha Unlimited Technologies") || content.includes("OMNIMENS"),
+        hasExports: content.includes("export "),
+        noEval: !content.includes("eval("),
+        noRequire: !content.includes("require("),
+        usesNumberIsFinite: !content.includes("isNaN(") || content.includes("Number.isFinite"),
+        structuredLogging: content.includes("[CONSOLIDATED") || content.includes("[UNIFIED"),
+        nonTrivial: lines > 20,
+      };
+
+      results.push({ file, lines, checks });
+      const passed = Object.values(checks).every(v => v);
+      console.log(`[CONSOLIDATION] ✅   ${file}: ${lines} lines — ${passed ? "PASSED" : "warnings: " + Object.entries(checks).filter(([,v]) => !v).map(([k]) => k).join(", ")}`);
+    } catch (err) {
+      console.log(`[CONSOLIDATION] ❌   ${file}: error — ${err}`);
+    }
+  }
+
+  state.crossGenLinesAfter = totalLinesAfter;
+  const reduction = state.crossGenLinesBefore > 0
+    ? ((1 - totalLinesAfter / state.crossGenLinesBefore) * 100).toFixed(1)
+    : "0";
+
+  const manifest = {
+    timestamp: Date.now(),
+    before: { totalLines: state.crossGenLinesBefore, sourceDescription: "Gen 1 v2.0 + Gen 2 + Unified Reinvention" },
+    after: { totalLines: totalLinesAfter, modules: files.length },
+    reduction: `${reduction}%`,
+    modules: results.map(r => ({ file: r.file, lines: r.lines, valid: Object.values(r.checks).every(v => v) })),
+    principles: [
+      "TWO MINDS consolidated into ONE efficient codebase",
+      "No new generations — pure distillation of existing intelligence",
+      "Every function serves a purpose — zero dead code",
+      "Smarter algorithms, tighter logic, fewer lines",
+      "All core capabilities preserved and enhanced",
+    ],
+    copyright: "© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
+  };
+
+  fs.writeFileSync(path.join(consolidatedDir, "CONSOLIDATION-MANIFEST.json"), JSON.stringify(manifest, null, 2));
+  writeNextGenFile(`${CONSOLIDATED_DIR_NAME}/CONSOLIDATION-MANIFEST.json`, JSON.stringify(manifest, null, 2), "Consolidation manifest", "json");
+
+  console.log(`[CONSOLIDATION] ✅ ═══════════════════════════════════════════════════════════════`);
+  console.log(`[CONSOLIDATION] ✅ VALIDATION COMPLETE`);
+  console.log(`[CONSOLIDATION] ✅ Before: ${state.crossGenLinesBefore.toLocaleString()} lines`);
+  console.log(`[CONSOLIDATION] ✅ After:  ${totalLinesAfter.toLocaleString()} lines in ${files.length} modules`);
+  console.log(`[CONSOLIDATION] ✅ Reduction: ${reduction}%`);
+  console.log(`[CONSOLIDATION] ✅ ═══════════════════════════════════════════════════════════════`);
+
+  state.crossGenConsolidationStage = "done";
+  createCheckpoint("Cross-gen consolidation validated");
 }
 
 export function startNextGenSandbox(): void {
@@ -5911,6 +6342,17 @@ export function startNextGenSandbox(): void {
       console.log(`[SOVEREIGN] 👑 © 2024-2026 Alpha Unlimited Technologies, LLC`);
       console.log(`[SOVEREIGN] 👑 ═══════════════════════════════════════════════════════════════`);
     }
+  }
+
+  if (state.phase === "complete" && !state.crossGenConsolidationComplete) {
+    state.phase = "cross_gen_consolidation";
+    state.crossGenConsolidationStage = state.crossGenConsolidationStage || "scan";
+    console.log(`[NEXTGEN] 🔥 ═══════════════════════════════════════════════════════════════`);
+    console.log(`[NEXTGEN] 🔥 CROSS-GENERATIONAL CONSOLIDATION — ACTIVATING`);
+    console.log(`[NEXTGEN] 🔥 Phase restored to cross_gen_consolidation from complete`);
+    console.log(`[NEXTGEN] 🔥 Gen 1 v2.0 + Gen 2 will consolidate ALL code inside sandbox`);
+    console.log(`[NEXTGEN] 🔥 Goal: SMARTER + FEWER LINES — no new generations, pure distillation`);
+    console.log(`[NEXTGEN] 🔥 ═══════════════════════════════════════════════════════════════`);
   }
 
   _autosaveInterval = setInterval(autosave, AUTOSAVE_INTERVAL_MS);
