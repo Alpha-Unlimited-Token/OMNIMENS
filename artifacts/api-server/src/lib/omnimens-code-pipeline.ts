@@ -716,18 +716,26 @@ export async function loadRuntimeModules(): Promise<{ name: string; loaded: bool
 
   const results: { name: string; loaded: boolean; error?: string }[] = [];
 
+  const yieldToEventLoop = () => new Promise<void>(resolve => setImmediate(resolve));
+
   try {
     const files = readdirSync(MODULES_DIR).filter(f => f.endsWith(".mjs") || f.endsWith(".js"));
 
-    console.log(`[SOURCE-INTEGRATION] Loading ${files.length} runtime modules from source...`);
+    console.log(`[SOURCE-INTEGRATION] Loading ${files.length} runtime modules from source (batched with event-loop yields)...`);
 
-    for (const file of files) {
+    const BATCH_SIZE = 50;
+    for (let i = 0; i < files.length; i++) {
+      const file = files[i];
       try {
         const filePath = join(MODULES_DIR, file);
         await import(filePath);
         results.push({ name: file, loaded: true });
       } catch (err: any) {
-        results.push({ name: file, loaded: false, error: err.message?.slice(0, 200) });
+        results.push({ name: files[i], loaded: false, error: err.message?.slice(0, 200) });
+      }
+
+      if ((i + 1) % BATCH_SIZE === 0) {
+        await yieldToEventLoop();
       }
     }
 
@@ -1075,7 +1083,15 @@ export async function scanAndRegisterModules(): Promise<{
   let readFailed = 0;
   let repaired = 0;
 
+  const yieldToEventLoop = () => new Promise<void>(resolve => setImmediate(resolve));
+  let processedCount = 0;
+  const SCAN_BATCH_SIZE = 25;
+
   for (const file of files) {
+    processedCount++;
+    if (processedCount % SCAN_BATCH_SIZE === 0) {
+      await yieldToEventLoop();
+    }
     const filePath = join(MODULES_DIR, file);
 
     try {
