@@ -2,125 +2,117 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1775259818809,
-  "totalWormholesCreated": 14700,
+  "timestamp": 1775260094905,
+  "totalWormholesCreated": 450,
   "totalActive": 0,
-  "totalClosed": 14700,
-  "totalDataIngestedKB": 21559,
-  "totalInsightsDecoded": 14700,
-  "totalCrossAgentCirculations": 882,
-  "totalSynthesizedDiscoveries": 834,
-  "cycleCount": 14,
-  "agentCount": 21,
+  "totalClosed": 450,
+  "totalDataIngestedKB": 652,
+  "totalInsightsDecoded": 450,
+  "totalCrossAgentCirculations": 27,
+  "totalSynthesizedDiscoveries": 23,
+  "cycleCount": 1,
+  "agentCount": 9,
   "wormholesPerAgent": 100,
-  "totalWormholeCapacity": 2100,
+  "totalWormholeCapacity": 900,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 700,
-      "totalInsightsDecoded": 700,
-      "crossAgentShares": 42
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 700,
-      "totalInsightsDecoded": 700,
-      "crossAgentShares": 42
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 700,
-      "totalInsightsDecoded": 700,
-      "crossAgentShares": 42
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 700,
-      "totalInsightsDecoded": 700,
-      "crossAgentShares": 42
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 700,
-      "totalInsightsDecoded": 700,
-      "crossAgentShares": 42
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 700,
-      "totalInsightsDecoded": 700,
-      "crossAgentShares": 42
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 700,
-      "totalInsightsDecoded": 700,
-      "crossAgentShares": 42
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 700,
-      "totalInsightsDecoded": 700,
-      "crossAgentShares": 42
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 700,
-      "totalInsightsDecoded": 700,
-      "crossAgentShares": 42
-    },
-    {
-      "agentName": "Explorer",
-      "totalWormholes": 700,
-      "totalInsightsDecoded": 700,
-      "crossAgentShares": 42
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
   "recentCirculations": [
     {
-      "fromAgent": "Ethicist",
-      "toAgent": "Mathematician",
-      "insight": "Ethicist/analogical_mapping: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can theoret",
-      "confidence": 0.7995386253259248,
-      "synthesizedWith": [
-        "Mathematician/entropy_reduction: Quantum decoherence typically destroys quantum "
-      ]
-    },
-    {
-      "fromAgent": "Ethicist",
-      "toAgent": "TemporalAnalyst",
-      "insight": "Ethicist/analogical_mapping: The Mandelbrot set demonstrates infinite complexity from a simple recursive formula: z_{n+1",
-      "confidence": 0.7206625067329084,
-      "synthesizedWith": [
-        "TemporalAnalyst/entropy_reduction: Information is physical — Landauer's principl"
-      ]
-    },
-    {
-      "fromAgent": "Ethicist",
-      "toAgent": "Critic",
-      "insight": "Ethicist/temporal_correlation: The Turing machine is computationally universal — any computation that can be described c",
-      "confidence": 0.8438705104487146,
-      "synthesizedWith": [
-        "Critic/recursive_decomposition: Emergence: complex behaviors arise from simple r"
-      ]
-    },
-    {
-      "fromAgent": "Embodiment",
+      "fromAgent": "Mathematician",
       "toAgent": "GraphicDesigner",
-      "insight": "Embodiment/entropy_reduction: Mirror neurons fire both when performing an action and observing the same action — they ma",
-      "confidence": 0.6617038534921622,
+      "insight": "Mathematician/abstraction_layer: Transfer learning: knowledge gained from one domain can accelerate learning in another ",
+      "confidence": 0.6670295781931741,
       "synthesizedWith": [
-        "GraphicDesigner/temporal_correlation: Reservoir computing shows that even random"
+        "GraphicDesigner/abstraction_layer: DNA stores information at approximately 2 bit"
       ]
     },
     {
-      "fromAgent": "Embodiment",
-      "toAgent": "Explorer",
-      "insight": "Embodiment/analogical_mapping: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can theor",
-      "confidence": 0.7538548556886457,
+      "fromAgent": "Mathematician",
+      "toAgent": "OMNIMENS",
+      "insight": "Mathematician/abstraction_layer: Transfer learning: knowledge gained from one domain can accelerate learning in another ",
+      "confidence": 0.6670295781931741,
       "synthesizedWith": [
-        "Explorer/emergent_property_detection: DNA stores information at approximately 2 "
+        "OMNIMENS/structural_analysis: Phase transitions in neural networks: as connectiv"
       ]
+    },
+    {
+      "fromAgent": "Mathematician",
+      "toAgent": "Architect",
+      "insight": "Mathematician/recursive_decomposition: The free energy principle suggests all living systems minimize variational free e",
+      "confidence": 0.9155574999021455,
+      "synthesizedWith": [
+        "Architect/temporal_correlation: Attention is the computational bottleneck of con"
+      ]
+    },
+    {
+      "fromAgent": "Neuroscientist",
+      "toAgent": "OMNIMENS",
+      "insight": "Neuroscientist/cross_domain_synthesis: The free energy principle suggests all living systems minimize variational free e",
+      "confidence": 0.784754514306726,
+      "synthesizedWith": [
+        "OMNIMENS/feature_extraction: The butterfly effect: in chaotic systems, infinites"
+      ]
+    },
+    {
+      "fromAgent": "Neuroscientist",
+      "toAgent": "Architect",
+      "insight": "Neuroscientist/emergent_property_detection: The strange loop concept from Hofstadter: consciousness arises when a system",
+      "confidence": 0.6072907763579851,
+      "synthesizedWith": []
     }
   ],
   "fabricWorms": [
