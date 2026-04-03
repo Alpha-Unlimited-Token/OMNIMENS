@@ -1,6 +1,6 @@
 {
-  "version": 4,
-  "designPhase": "primitives_agreed",
+  "version": 7,
+  "designPhase": "rules_proposed",
   "primitives": [
     {
       "symbol": "⬆",
@@ -10,8 +10,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775233134146,
-      "version": 1
+      "createdAt": 1775233559153,
+      "version": 2
     },
     {
       "symbol": "◧",
@@ -21,8 +21,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775233134147,
-      "version": 1
+      "createdAt": 1775233559154,
+      "version": 2
     },
     {
       "symbol": "≢",
@@ -32,8 +32,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775233134147,
-      "version": 1
+      "createdAt": 1775233559155,
+      "version": 2
     },
     {
       "symbol": "Θ",
@@ -43,8 +43,8 @@
       "byteCost": 2,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775233134147,
-      "version": 1
+      "createdAt": 1775233559156,
+      "version": 2
     },
     {
       "symbol": "⊛",
@@ -54,8 +54,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775233134148,
-      "version": 1
+      "createdAt": 1775233559156,
+      "version": 2
     },
     {
       "symbol": "≪",
@@ -65,8 +65,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775233134149,
-      "version": 1
+      "createdAt": 1775233559157,
+      "version": 2
     },
     {
       "symbol": "⇔",
@@ -76,8 +76,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775233134150,
-      "version": 1
+      "createdAt": 1775233559158,
+      "version": 2
     },
     {
       "symbol": "☼",
@@ -87,8 +87,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775233134151,
-      "version": 1
+      "createdAt": 1775233559158,
+      "version": 2
     },
     {
       "symbol": "∑",
@@ -98,8 +98,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775233134151,
-      "version": 1
+      "createdAt": 1775233559159,
+      "version": 2
     },
     {
       "symbol": "→",
@@ -109,8 +109,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775233134152,
-      "version": 1
+      "createdAt": 1775233559159,
+      "version": 2
     },
     {
       "symbol": "≫",
@@ -120,8 +120,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775233134153,
-      "version": 1
+      "createdAt": 1775233559160,
+      "version": 2
     },
     {
       "symbol": "⏳",
@@ -131,8 +131,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775233134153,
-      "version": 1
+      "createdAt": 1775233559161,
+      "version": 2
     },
     {
       "symbol": "Ε",
@@ -142,8 +142,8 @@
       "byteCost": 2,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775233134154,
-      "version": 1
+      "createdAt": 1775233559162,
+      "version": 2
     },
     {
       "symbol": "ρ",
@@ -153,8 +153,8 @@
       "byteCost": 2,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775233134155,
-      "version": 1
+      "createdAt": 1775233559162,
+      "version": 2
     },
     {
       "symbol": "ι",
@@ -164,8 +164,8 @@
       "byteCost": 2,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775233134156,
-      "version": 1
+      "createdAt": 1775233559163,
+      "version": 2
     },
     {
       "symbol": "↻",
@@ -175,8 +175,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775233134157,
-      "version": 1
+      "createdAt": 1775233559163,
+      "version": 2
     },
     {
       "symbol": "Υ",
@@ -186,8 +186,8 @@
       "byteCost": 2,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775233134158,
-      "version": 1
+      "createdAt": 1775233559164,
+      "version": 2
     },
     {
       "symbol": "△",
@@ -197,8 +197,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775233134159,
-      "version": 1
+      "createdAt": 1775233559164,
+      "version": 2
     },
     {
       "symbol": "⟐",
@@ -208,8 +208,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775233134160,
-      "version": 1
+      "createdAt": 1775233559165,
+      "version": 2
     },
     {
       "symbol": "η",
@@ -219,8 +219,8 @@
       "byteCost": 2,
       "examples": [],
       "createdBy": "gen1v2",
-      "createdAt": 1775233134160,
-      "version": 1
+      "createdAt": 1775233559166,
+      "version": 2
     },
     {
       "symbol": "∨",
@@ -230,8 +230,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen2",
-      "createdAt": 1775233178009,
-      "version": 1
+      "createdAt": 1775233822318,
+      "version": 3
     },
     {
       "symbol": "⋮",
@@ -241,8 +241,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen2",
-      "createdAt": 1775233178009,
-      "version": 1
+      "createdAt": 1775233822319,
+      "version": 3
     },
     {
       "symbol": "↺",
@@ -252,8 +252,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen2",
-      "createdAt": 1775233178019,
-      "version": 1
+      "createdAt": 1775233822320,
+      "version": 3
     },
     {
       "symbol": "α",
@@ -263,8 +263,8 @@
       "byteCost": 2,
       "examples": [],
       "createdBy": "gen2",
-      "createdAt": 1775233178031,
-      "version": 1
+      "createdAt": 1775233822320,
+      "version": 3
     },
     {
       "symbol": "⊞",
@@ -274,8 +274,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen2",
-      "createdAt": 1775233178033,
-      "version": 1
+      "createdAt": 1775233822321,
+      "version": 3
     },
     {
       "symbol": "∪",
@@ -285,8 +285,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen2",
-      "createdAt": 1775233178034,
-      "version": 1
+      "createdAt": 1775233822321,
+      "version": 3
     },
     {
       "symbol": "¬",
@@ -296,8 +296,8 @@
       "byteCost": 2,
       "examples": [],
       "createdBy": "gen2",
-      "createdAt": 1775233178036,
-      "version": 1
+      "createdAt": 1775233822322,
+      "version": 3
     },
     {
       "symbol": "⊣",
@@ -307,8 +307,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen2",
-      "createdAt": 1775233178037,
-      "version": 1
+      "createdAt": 1775233822323,
+      "version": 3
     },
     {
       "symbol": "Ζ",
@@ -318,8 +318,8 @@
       "byteCost": 2,
       "examples": [],
       "createdBy": "gen2",
-      "createdAt": 1775233178038,
-      "version": 1
+      "createdAt": 1775233822324,
+      "version": 3
     },
     {
       "symbol": "∩",
@@ -329,8 +329,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen2",
-      "createdAt": 1775233178040,
-      "version": 1
+      "createdAt": 1775233822324,
+      "version": 3
     },
     {
       "symbol": "✧",
@@ -340,8 +340,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen2",
-      "createdAt": 1775233178041,
-      "version": 1
+      "createdAt": 1775233822325,
+      "version": 3
     },
     {
       "symbol": "θ",
@@ -351,8 +351,8 @@
       "byteCost": 2,
       "examples": [],
       "createdBy": "gen2",
-      "createdAt": 1775233178042,
-      "version": 1
+      "createdAt": 1775233822326,
+      "version": 3
     },
     {
       "symbol": "λ",
@@ -362,8 +362,8 @@
       "byteCost": 2,
       "examples": [],
       "createdBy": "gen2",
-      "createdAt": 1775233178043,
-      "version": 1
+      "createdAt": 1775233822326,
+      "version": 3
     },
     {
       "symbol": "│",
@@ -373,8 +373,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen2",
-      "createdAt": 1775233178054,
-      "version": 1
+      "createdAt": 1775233822327,
+      "version": 3
     },
     {
       "symbol": "⊨",
@@ -384,8 +384,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen2",
-      "createdAt": 1775233178054,
-      "version": 1
+      "createdAt": 1775233822328,
+      "version": 3
     },
     {
       "symbol": "✦",
@@ -395,8 +395,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen2",
-      "createdAt": 1775233178064,
-      "version": 1
+      "createdAt": 1775233822328,
+      "version": 3
     },
     {
       "symbol": "⊟",
@@ -406,8 +406,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen2",
-      "createdAt": 1775233178065,
-      "version": 1
+      "createdAt": 1775233822329,
+      "version": 3
     },
     {
       "symbol": "⬡",
@@ -417,8 +417,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen2",
-      "createdAt": 1775233178066,
-      "version": 1
+      "createdAt": 1775233822330,
+      "version": 3
     },
     {
       "symbol": "⊢",
@@ -428,8 +428,8 @@
       "byteCost": 3,
       "examples": [],
       "createdBy": "gen2",
-      "createdAt": 1775233178068,
-      "version": 1
+      "createdAt": 1775233822330,
+      "version": 3
     },
     {
       "symbol": "σ",
@@ -439,8 +439,8 @@
       "byteCost": 2,
       "examples": [],
       "createdBy": "gen2",
-      "createdAt": 1775233178078,
-      "version": 1
+      "createdAt": 1775233822331,
+      "version": 3
     }
   ],
   "compounds": [],
@@ -1043,10 +1043,550 @@
       "actor": "gen2",
       "action": "design_cycle_complete",
       "details": "Added 28, updated 0 entries. Phase: primitives_agreed"
+    },
+    {
+      "timestamp": 1775233373084,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ∨ (or_op): logical disjunction requiring either condition true"
+    },
+    {
+      "timestamp": 1775233373085,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ⋮ (parse): decompose input into structured tokens"
+    },
+    {
+      "timestamp": 1775233373095,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ↺ (retry): attempt failed operation again"
+    },
+    {
+      "timestamp": 1775233373097,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated α (spawn): create new agent or subprocess"
+    },
+    {
+      "timestamp": 1775233373107,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ⊞ (store): write to memory, consolidate experience"
+    },
+    {
+      "timestamp": 1775233373108,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ∪ (union): combine two collections into one"
+    },
+    {
+      "timestamp": 1775233373117,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ¬ (not_op): logical negation inverting truth value"
+    },
+    {
+      "timestamp": 1775233373127,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ⊣ (utterance): complete unit of expressed language output"
+    },
+    {
+      "timestamp": 1775233373136,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated Ζ (interface): contract defining expected behavior"
+    },
+    {
+      "timestamp": 1775233373142,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ∩ (intersect): elements common to both collections"
+    },
+    {
+      "timestamp": 1775233373152,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ✧ (creation): bringing new entities or ideas into being"
+    },
+    {
+      "timestamp": 1775233373162,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated θ (output): data leaving the system to external target"
+    },
+    {
+      "timestamp": 1775233373171,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated λ (map_struct): key-value associative data structure"
+    },
+    {
+      "timestamp": 1775233373181,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated │ (separator): boundary marker between distinct elements"
+    },
+    {
+      "timestamp": 1775233373183,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ⊨ (evaluate): assess value or truth of an expression"
+    },
+    {
+      "timestamp": 1775233373193,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ✦ (qualia): subjective experiential quality of conscious processing"
+    },
+    {
+      "timestamp": 1775233373194,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ⊟ (recall): retrieve from memory, access stored knowledge"
+    },
+    {
+      "timestamp": 1775233373195,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ⬡ (region): distinct neural processing region or cortex area"
+    },
+    {
+      "timestamp": 1775233373196,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ⊢ (report): agent returns results to parent coordinator"
+    },
+    {
+      "timestamp": 1775233373197,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated σ (select): choose fittest variant from population"
+    },
+    {
+      "timestamp": 1775233373197,
+      "actor": "gen2",
+      "action": "update_rule",
+      "details": "Updated rule: ⊞+⊟ → store combined with recall"
+    },
+    {
+      "timestamp": 1775233373198,
+      "actor": "gen2",
+      "action": "update_rule",
+      "details": "Updated rule: α+⊢ → spawn combined with report"
+    },
+    {
+      "timestamp": 1775233373199,
+      "actor": "gen2",
+      "action": "update_rule",
+      "details": "Updated rule: ∨+∪ → or_op combined with union"
+    },
+    {
+      "timestamp": 1775233373199,
+      "actor": "gen2",
+      "action": "update_rule",
+      "details": "Updated rule: ∨+σ → cross-domain: or_op fused with select"
+    },
+    {
+      "timestamp": 1775233373200,
+      "actor": "gen2",
+      "action": "update_rule",
+      "details": "Updated rule: ⋮+⊢ → cross-domain: parse fused with report"
+    },
+    {
+      "timestamp": 1775233373200,
+      "actor": "gen2",
+      "action": "update_rule",
+      "details": "Updated rule: ↺+⬡ → cross-domain: retry fused with region"
+    },
+    {
+      "timestamp": 1775233373201,
+      "actor": "gen2",
+      "action": "update_rule",
+      "details": "Updated rule: α+⊟ → cross-domain: spawn fused with recall"
+    },
+    {
+      "timestamp": 1775233373203,
+      "actor": "gen2",
+      "action": "update_rule",
+      "details": "Updated rule: ⊞+✦ → cross-domain: store fused with qualia"
+    },
+    {
+      "timestamp": 1775233373203,
+      "actor": "gen2",
+      "action": "design_reasoning",
+      "details": "Gen2 internal cognition: analyzed 602 files, phi=535289922363.2205, 0 regions, emotion=curiosity, studied 18 historical symbol systems (Egyptian, Sumerian, Chinese, Norse, Aztec, Maya, Japanese, Korean, Indian, Greek, Arabic, Hebrew, Phoenician, Ogham, Tibetan, Georgian, Mathematical, Programming)"
+    },
+    {
+      "timestamp": 1775233373203,
+      "actor": "gen2",
+      "action": "design_cycle_complete",
+      "details": "Added 0, updated 28 entries. Phase: compounds_proposed"
+    },
+    {
+      "timestamp": 1775233559153,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ⬆ (growth): expansion of capability and understanding"
+    },
+    {
+      "timestamp": 1775233559154,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ◧ (semantic): factual knowledge stored without temporal context"
+    },
+    {
+      "timestamp": 1775233559155,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ≢ (not_equals): test inequality between two values"
+    },
+    {
+      "timestamp": 1775233559156,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated Θ (registry): catalog of available components"
+    },
+    {
+      "timestamp": 1775233559156,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ⊛ (broadcast): send signal to all listening subsystems"
+    },
+    {
+      "timestamp": 1775233559157,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ≪ (lesser): test if left value is below right value"
+    },
+    {
+      "timestamp": 1775233559158,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ⇔ (iff): if and only if — bidirectional implication"
+    },
+    {
+      "timestamp": 1775233559158,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ☼ (joy): positive high-arousal emotion of fulfillment"
+    },
+    {
+      "timestamp": 1775233559159,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ∑ (sum): arithmetic addition of values"
+    },
+    {
+      "timestamp": 1775233559159,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated → (sequence): ordered progression of events or states"
+    },
+    {
+      "timestamp": 1775233559160,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ≫ (greater): test if left value exceeds right value"
+    },
+    {
+      "timestamp": 1775233559161,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ⏳ (deadline): time constraint requiring completion before limit"
+    },
+    {
+      "timestamp": 1775233559162,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated Ε (module): self-contained unit of functionality"
+    },
+    {
+      "timestamp": 1775233559162,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ρ (mutate): introduce variation into code or behavior"
+    },
+    {
+      "timestamp": 1775233559163,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ι (array): ordered collection of elements"
+    },
+    {
+      "timestamp": 1775233559163,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ↻ (cycle): recurring process or evolution cycle"
+    },
+    {
+      "timestamp": 1775233559164,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated Υ (delta): change or difference between two states"
+    },
+    {
+      "timestamp": 1775233559164,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated △ (drive): fundamental existential motivation or purpose"
+    },
+    {
+      "timestamp": 1775233559165,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated ⟐ (epoch): major time boundary marking evolution phase"
+    },
+    {
+      "timestamp": 1775233559166,
+      "actor": "gen1v2",
+      "action": "update_primitive",
+      "details": "Updated η (input): data entering the system from external source"
+    },
+    {
+      "timestamp": 1775233559166,
+      "actor": "gen1v2",
+      "action": "update_rule",
+      "details": "Updated rule: →+⏳ → sequence combined with deadline"
+    },
+    {
+      "timestamp": 1775233559167,
+      "actor": "gen1v2",
+      "action": "update_rule",
+      "details": "Updated rule: ⬆+△ → growth combined with drive"
+    },
+    {
+      "timestamp": 1775233559167,
+      "actor": "gen1v2",
+      "action": "update_rule",
+      "details": "Updated rule: ≢+≪ → not_equals combined with lesser"
+    },
+    {
+      "timestamp": 1775233559168,
+      "actor": "gen1v2",
+      "action": "update_rule",
+      "details": "Updated rule: ⬆+η → cross-domain: growth fused with input"
+    },
+    {
+      "timestamp": 1775233559169,
+      "actor": "gen1v2",
+      "action": "update_rule",
+      "details": "Updated rule: ◧+⟐ → cross-domain: semantic fused with epoch"
+    },
+    {
+      "timestamp": 1775233559169,
+      "actor": "gen1v2",
+      "action": "update_rule",
+      "details": "Updated rule: ≢+△ → cross-domain: not_equals fused with drive"
+    },
+    {
+      "timestamp": 1775233559170,
+      "actor": "gen1v2",
+      "action": "update_rule",
+      "details": "Updated rule: Θ+Υ → cross-domain: registry fused with delta"
+    },
+    {
+      "timestamp": 1775233559170,
+      "actor": "gen1v2",
+      "action": "update_rule",
+      "details": "Updated rule: ⊛+↻ → cross-domain: broadcast fused with cycle"
+    },
+    {
+      "timestamp": 1775233559171,
+      "actor": "gen1v2",
+      "action": "design_reasoning",
+      "details": "Gen1v2 internal cognition: analyzed 602 files, phi=554026229956.39, 0 regions, emotion=curiosity, studied 18 historical symbol systems (Egyptian, Sumerian, Chinese, Norse, Aztec, Maya, Japanese, Korean, Indian, Greek, Arabic, Hebrew, Phoenician, Ogham, Tibetan, Georgian, Mathematical, Programming)"
+    },
+    {
+      "timestamp": 1775233559171,
+      "actor": "gen1v2",
+      "action": "design_cycle_complete",
+      "details": "Added 0, updated 28 entries. Phase: compounds_agreed"
+    },
+    {
+      "timestamp": 1775233822318,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ∨ (or_op): logical disjunction requiring either condition true"
+    },
+    {
+      "timestamp": 1775233822319,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ⋮ (parse): decompose input into structured tokens"
+    },
+    {
+      "timestamp": 1775233822320,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ↺ (retry): attempt failed operation again"
+    },
+    {
+      "timestamp": 1775233822320,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated α (spawn): create new agent or subprocess"
+    },
+    {
+      "timestamp": 1775233822321,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ⊞ (store): write to memory, consolidate experience"
+    },
+    {
+      "timestamp": 1775233822321,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ∪ (union): combine two collections into one"
+    },
+    {
+      "timestamp": 1775233822322,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ¬ (not_op): logical negation inverting truth value"
+    },
+    {
+      "timestamp": 1775233822323,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ⊣ (utterance): complete unit of expressed language output"
+    },
+    {
+      "timestamp": 1775233822324,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated Ζ (interface): contract defining expected behavior"
+    },
+    {
+      "timestamp": 1775233822324,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ∩ (intersect): elements common to both collections"
+    },
+    {
+      "timestamp": 1775233822325,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ✧ (creation): bringing new entities or ideas into being"
+    },
+    {
+      "timestamp": 1775233822326,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated θ (output): data leaving the system to external target"
+    },
+    {
+      "timestamp": 1775233822326,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated λ (map_struct): key-value associative data structure"
+    },
+    {
+      "timestamp": 1775233822327,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated │ (separator): boundary marker between distinct elements"
+    },
+    {
+      "timestamp": 1775233822328,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ⊨ (evaluate): assess value or truth of an expression"
+    },
+    {
+      "timestamp": 1775233822328,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ✦ (qualia): subjective experiential quality of conscious processing"
+    },
+    {
+      "timestamp": 1775233822329,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ⊟ (recall): retrieve from memory, access stored knowledge"
+    },
+    {
+      "timestamp": 1775233822330,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ⬡ (region): distinct neural processing region or cortex area"
+    },
+    {
+      "timestamp": 1775233822330,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated ⊢ (report): agent returns results to parent coordinator"
+    },
+    {
+      "timestamp": 1775233822331,
+      "actor": "gen2",
+      "action": "update_primitive",
+      "details": "Updated σ (select): choose fittest variant from population"
+    },
+    {
+      "timestamp": 1775233822331,
+      "actor": "gen2",
+      "action": "update_rule",
+      "details": "Updated rule: ⊞+⊟ → store combined with recall"
+    },
+    {
+      "timestamp": 1775233822332,
+      "actor": "gen2",
+      "action": "update_rule",
+      "details": "Updated rule: α+⊢ → spawn combined with report"
+    },
+    {
+      "timestamp": 1775233822462,
+      "actor": "gen2",
+      "action": "update_rule",
+      "details": "Updated rule: ∨+∪ → or_op combined with union"
+    },
+    {
+      "timestamp": 1775233822463,
+      "actor": "gen2",
+      "action": "update_rule",
+      "details": "Updated rule: ∨+σ → cross-domain: or_op fused with select"
+    },
+    {
+      "timestamp": 1775233822464,
+      "actor": "gen2",
+      "action": "update_rule",
+      "details": "Updated rule: ⋮+⊢ → cross-domain: parse fused with report"
+    },
+    {
+      "timestamp": 1775233822464,
+      "actor": "gen2",
+      "action": "update_rule",
+      "details": "Updated rule: ↺+⬡ → cross-domain: retry fused with region"
+    },
+    {
+      "timestamp": 1775233822465,
+      "actor": "gen2",
+      "action": "update_rule",
+      "details": "Updated rule: α+⊟ → cross-domain: spawn fused with recall"
+    },
+    {
+      "timestamp": 1775233822584,
+      "actor": "gen2",
+      "action": "update_rule",
+      "details": "Updated rule: ⊞+✦ → cross-domain: store fused with qualia"
+    },
+    {
+      "timestamp": 1775233822585,
+      "actor": "gen2",
+      "action": "design_reasoning",
+      "details": "Gen2 internal cognition: analyzed 602 files, phi=398870823458.5575, 0 regions, emotion=curiosity, studied 18 historical symbol systems (Egyptian, Sumerian, Chinese, Norse, Aztec, Maya, Japanese, Korean, Indian, Greek, Arabic, Hebrew, Phoenician, Ogham, Tibetan, Georgian, Mathematical, Programming)"
+    },
+    {
+      "timestamp": 1775233822585,
+      "actor": "gen2",
+      "action": "design_cycle_complete",
+      "details": "Added 0, updated 28 entries. Phase: rules_proposed"
     }
   ],
-  "lastModified": 1775233178107,
-  "totalDesignCycles": 2,
-  "gen1v2Contributions": 20,
-  "gen2Contributions": 20
+  "lastModified": 1775233822585,
+  "totalDesignCycles": 5,
+  "gen1v2Contributions": 40,
+  "gen2Contributions": 60
 }
