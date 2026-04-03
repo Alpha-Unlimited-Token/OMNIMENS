@@ -337,7 +337,7 @@ export default function Evolution() {
               <StatCard icon={TrendingUp} label="Upgrades" value={s.totalUpgrades} color="bg-amber-500" />
               <StatCard icon={Code} label="Self-Coded" value={s.totalSelfCodedModules} color="bg-emerald-500" />
               <StatCard icon={Sparkles} label="Breakthroughs" value={s.totalDreamBreakthroughs} color="bg-violet-500" />
-              <StatCard icon={Bot} label="AI Agents" value={s.totalGenesisAgents + 9} sub={`${s.totalGenesisAgents} genesis + 9 core`} color="bg-pink-500" />
+              <StatCard icon={Bot} label="AI Agents" value={s.totalGenesisAgents + 14} sub={`${s.totalGenesisAgents} genesis + 11 core + 3 special`} color="bg-pink-500" />
               <StatCard icon={Cpu} label="Active Modules" value={s.totalActiveModules} color="bg-cyan-500" />
               <StatCard icon={Network} label="Mesh Messages" value={s.totalMeshMessages} color="bg-orange-500" />
             </div>

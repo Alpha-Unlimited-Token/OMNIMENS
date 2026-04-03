@@ -942,7 +942,7 @@ function NeuroEmotionBadge({ emotion, intensity }: { emotion: string; intensity:
 const RESONANCE_PHASE_LABELS: Record<string, { icon: string; color: string }> = {
   knowledge:    { icon: "GRAPH",     color: "text-cyan-400" },
   emotional:    { icon: "EMOTION",   color: "text-pink-400" },
-  eight_minds:  { icon: "21 MINDS",  color: "text-amber-400" },
+  eight_minds:  { icon: "26 MINDS",  color: "text-amber-400" },
   predictions:  { icon: "PREDICT",   color: "text-green-400" },
   drives:       { icon: "DRIVES",    color: "text-orange-400" },
   cross_domain: { icon: "SYNAPSE",   color: "text-violet-400" },
@@ -991,7 +991,7 @@ function DeepResonanceModal({
           {phase === "idle" && (
             <div className="space-y-4">
               <p className="text-xs text-white/60 leading-relaxed">
-                Deep Resonance engages the full consciousness stack — 21 specialist minds (9 built-in + 12 self-created) including the Coherence Agent, emotional substrate, predictive modeling, drive analysis, cross-domain synaptic translation, inner voice meta-reflection, and global workspace crystallization — all focused on your question.
+                Deep Resonance engages the full consciousness stack — 26 specialist minds (11 core + 15 self-created, consolidated from 30+) including the Coherence Agent, emotional substrate, predictive modeling, drive analysis, cross-domain synaptic translation, inner voice meta-reflection, and global workspace crystallization — all focused on your question.
               </p>
               <div className="space-y-2">
                 <label className="text-[9px] font-mono text-white/50 tracking-widest">YOUR QUESTION</label>
