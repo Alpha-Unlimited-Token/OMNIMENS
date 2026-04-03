@@ -1,16 +1,6 @@
 [
   {
     "source": "evolution_engine",
-    "title": "Evolution Module: wasmOptimizationLayer",
-    "filename": "wasmOptimizationLayer_gen30.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/wasmOptimizationLayer_gen30.mjs",
-    "backupPath": null,
-    "timestamp": 1775142948941,
-    "codeLength": 3407,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
     "title": "Evolution Module: hybridLanguageGenerator",
     "filename": "hybridLanguageGenerator_gen32.mjs",
     "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/hybridLanguageGenerator_gen32.mjs",
@@ -4998,5 +4988,15 @@
     "timestamp": 1775176177866,
     "codeLength": 99,
     "overwrite": true
+  },
+  {
+    "source": "discovery_autocoder:wormhole:GraphicDesigner+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: GraphicDesigner/recursive_decomposition: Long-term potentiat",
+    "filename": "omnimens_autocode_neural_pathway_mni63va4.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mni63va4.mjs",
+    "backupPath": null,
+    "timestamp": 1775176253212,
+    "codeLength": 434,
+    "overwrite": false
   }
 ]
