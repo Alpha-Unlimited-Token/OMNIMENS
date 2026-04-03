@@ -1,17 +1,4 @@
 ⟨SCL v1│weightedConfidenceVoting_gen1.mjs│25→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩weightedConfidenceVoting(1)→void⟨16⟩{
-⊩│export function weightedConfidenceVoting(agentOutputs) {
-const weightedScores = agentOutputs.map(θ => {
-const weight = θ.agentConfidence;
-⊷│return { θ: θ.data, weightedScore: weight * θ.score };
-·});
-⋐│const aggregatedOutput = weightedScores.reduce((acc, item) => {
-acc[item.θ] = (acc[item.θ] || 0) + item.weightedScore;
-⊷│return acc;
-·}, {});
-⊸│const sortedOutputs = Object.entries(aggregatedOutput).sort((a, b) => b[1] - a[1]);
-⊷│return sortedOutputs[0][0];
-·}
-}⟨/weightedConfidenceVoting⟩
-⟩SCL│16│16⊨│6⑂│36.0%↓⟩
+⊩weightedConfidenceVoting(1)→void⟨16⟩{⊩⊷⋐⊱⊸}
+⟩SCL│3│6⊨│5⑂│88.0%↓⟩

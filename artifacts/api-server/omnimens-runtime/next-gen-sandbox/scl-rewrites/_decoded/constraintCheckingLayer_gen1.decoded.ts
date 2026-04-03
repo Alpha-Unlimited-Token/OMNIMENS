@@ -1,3 +1,4 @@
+export function constraintCheckingLayer(arg0, arg1) {
   export function constraintCheckingLayer(upgradeProposal, safetyMetrics) {
 const STOPPrinciples = ['alignment', 'stability', 'predictability'];
 const violations = [];
@@ -16,4 +17,5 @@ violations
 approved: true,
 message: 'Upgrade adheres to STOP principles.'
 };
+}
 }

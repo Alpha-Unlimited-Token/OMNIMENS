@@ -15,7 +15,7 @@
 ·const branch = this.branches.find(b => b.id === branchId);
 ·if (branch) {
 ·branch.state = 'backtracked';
-⊡│this.pubSubSystem.get(branchId).forEach(callback => callback(branch));
+⊡│this.pubSubSystem.get(branchId).forEach(callback => callback
 ·}
 ·}
 ·subscribe(branchId, callback) {

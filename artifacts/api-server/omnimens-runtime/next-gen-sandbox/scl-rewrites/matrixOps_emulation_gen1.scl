@@ -1,74 +1,10 @@
 ⟨SCL v1│matrixOps_emulation_gen1.mjs│142→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩multiplyMatrices(2)→void⟨22⟩{
-⊩│export function multiplyMatrices(matrixA, matrixB) {
-·const rowsA = matrixA.length;
-·const colsA = matrixA[0].length;
-·const rowsB = matrixB.length;
-·const colsB = matrixB[0].length;
-·if (colsA !== rowsB) {
-⊵│throw new Error("Matrix dimensions do not allow multiplication.");
-·}
-·const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
-·for (let i = 0; i < rowsA; i++) {
-·for (let j = 0; j < colsB; j++) {
-·for (let k = 0; k < colsA; k++) {
-·result[i][j] += matrixA[i][k] * matrixB[k][j];
-·}
-·}
-·}
-⊷│return result;
-·}
-}⟨/multiplyMatrices⟩
-⊩addMatrices(2)→void⟨20⟩{
-⊩│export function addMatrices(matrixA, matrixB) {
-·const rowsA = matrixA.length;
-·const colsA = matrixA[0].length;
-·const rowsB = matrixB.length;
-·const colsB = matrixB[0].length;
-·if (rowsA !== rowsB || colsA !== colsB) {
-⊵│throw new Error("Matrix dimensions do not match for ∑.");
-·}
-·const result = Array.from({ length: rowsA }, () => Array(colsA).fill(0));
-·for (let i = 0; i < rowsA; i++) {
-·for (let j = 0; j < colsA; j++) {
-·result[i][j] = matrixA[i][j] + matrixB[i][j];
-·}
-·}
-⊷│return result;
-·}
-}⟨/addMatrices⟩
-⊩transposeMatrix(1)→void⟨14⟩{
-⊩│export function transposeMatrix(matrix) {
-·const rows = matrix.length;
-·const cols = matrix[0].length;
-·const result = Array.from({ length: cols }, () => Array(rows).fill(0));
-·for (let i = 0; i < rows; i++) {
-·for (let j = 0; j < cols; j++) {
-·result[j][i] = matrix[i][j];
-·}
-·}
-⊷│return result;
-·}
-}⟨/transposeMatrix⟩
-⊩generateIdentityMatrix(1)→void⟨9⟩{
-⊩│export function generateIdentityMatrix(size) {
-·const result = Array.from({ length: size }, () => Array(size).fill(0));
-·for (let i = 0; i < size; i++) {
-·result[i][i] = 1;
-·}
-⊷│return result;
-·}
-}⟨/generateIdentityMatrix⟩
-⊩isValidMatrix(1)→void⟨8⟩{
-⊩│export function isValidMatrix(matrix) {
-⊹│if (!Array.isArray(matrix) || matrix.length === 0) {
-⊷│return false;
-·}
-·const cols = matrix[0].length;
-⊷│return matrix.every(row => Array.isArray(row) && row.length === cols);
-·}
-}⟨/isValidMatrix⟩
+⊩multiplyMatrices(2)→void⟨22⟩{⊩⊵⊷}
+⊩addMatrices(2)→void⟨20⟩{⊩⊵⊷}
+⊩transposeMatrix(1)→void⟨14⟩{⊩⊷}
+⊩generateIdentityMatrix(1)→void⟨9⟩{⊩⊷}
+⊩isValidMatrix(1)→void⟨8⟩{⊩⊹⊷}
 κexampleMatrixA
 κexampleMatrixB
 ·try {
@@ -77,4 +13,4 @@
 ·} catch (error) {
 ·console.error(error.message);
 ·}
-⟩SCL│79│75⊨│14⑂│44.4%↓⟩
+⟩SCL│15│21⊨│13⑂│89.4%↓⟩

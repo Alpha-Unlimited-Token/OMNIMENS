@@ -1,34 +1,4 @@
 ⟨SCL v1│sleepPhaseMemoryReconsolidation_gen1.mjs│44→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩sleepPhaseMemoryReconsolidation(1)→void⟨35⟩{
-⊩│export function sleepPhaseMemoryReconsolidation(memoryStore) {
-⊱│const STDPAdjustments = (synapses) => {
-·synapses.forEach(synapse => {
-·if (synapse.activityLevel > 0.8) {
-·synapse.strength += 0.1;
-·} else if (synapse.activityLevel < 0.3) {
-·synapse.strength -= 0.1;
-·}
-·});
-⊷│return synapses;
-·};
-⊱│const consolidateMemory = (memoryStore) => {
-·const keyMemories = memoryStore.filter(memory => memory.relevanceScore > 0.7);
-·const irrelevantMemories = memoryStore.filter(memory => memory.relevanceScore <= 0.7);
-·keyMemories.forEach(memory => {
-·memory.stability += 0.2;
-·});
-·irrelevantMemories.forEach(memory => {
-·memory.stability -= 0.2;
-·});
-⊷│return [...keyMemories, ...irrelevantMemories];
-·};
-·const updatedSynapses = STDPAdjustments(memoryStore.synapses);
-·const updatedMemories = consolidateMemory(memoryStore.memories);
-⊷│return {
-·synapses: updatedSynapses,
-·memories: updatedMemories
-·};
-·}
-}⟨/sleepPhaseMemoryReconsolidation⟩
-⟩SCL│33│32⊨│6⑂│25.0%↓⟩
+⊩sleepPhaseMemoryReconsolidation(1)→void⟨35⟩{⊩⊱⊷}
+⟩SCL│3│4⊨│3⑂│93.2%↓⟩

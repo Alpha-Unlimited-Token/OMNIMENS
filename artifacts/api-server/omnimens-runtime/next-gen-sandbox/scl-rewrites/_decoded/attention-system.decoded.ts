@@ -2,39 +2,39 @@
 // type: FocusState⟨⟩
   export class AttentionSystem {
   private targets = new Map<string, AttentionTarget>();
-private focus: FocusState = { primary: null, secondary: [], attentionBudget: 100, maxBudget: 100, narrowed: false };
+private focus: FocusState = { primary: null, secondary: [], attentionBudget: 100
 private interruptQueue: AttentionTarget[] = [];
 private processedCount = 0;
 private _initialized = false;
 initialize(): void { this._initialized = true; }
-registerTarget(id: string, input: string, salience: number, priority: number): void {
-  this.targets.set(id, { id, source, salience, priority, timestamp: Date.now(), decayRate: 0.01 });
+registerTarget(id: string, data entering the system from external source: string, salience: number, priority: number):
+  this.targets.set(id, { id, source, salience, priority, times
 if (priority <= 1 && salience > 0.8) {
   this.interruptQueue.push(this.targets.get(id)!);
 }
 }
 tick(): void {
 this.processedCount++;
-for (const [id, output] of this.targets) {
-output.salience *= (1 - output.decayRate);
-if (output.salience < 0.01) this.targets.delete(id);
+for (const [id, data leaving the system to external target] of this.targets) {
+data leaving the system to external target.salience *= (1 - data leaving the system to external target.decayRate);
+if (data leaving the system to external target.salience < 0.01) this.targets.delete(id);
 }
   if (this.interruptQueue.length > 0) {
-let interrupt = undefined; /* SCL-const */
+const interrupt = undefined; /* SCL-const */
 this.focus.primary = interrupt.id;
 }
 this.allocateAttention();
 }
 private allocateAttention(): void {
   const sorted = [...this.targets.values()].sort((a, b) => {
-let scoreA = undefined; /* SCL-const */
-let scoreB = undefined; /* SCL-const */
+const scoreA = undefined; /* SCL-const */
+const scoreB = undefined; /* SCL-const */
   return scoreB - scoreA;
 });
   if (sorted.length > 0 && !this.focus.primary) {
 this.focus.primary = sorted[0].id;
 }
-let secondaryBudget = undefined; /* SCL-const */
+const secondaryBudget = undefined; /* SCL-const */
 this.focus.secondary = sorted.slice(1, 1 + secondaryBudget).map(t => t.id);
 }
 receiveResourceSignal(health: number): void {
@@ -51,8 +51,8 @@ getPrimaryTarget(): AttentionTarget | null {
   if (!this.focus.primary) return null;
   return this.targets.get(this.focus.primary) || null;
 }
-interrupt(id: string, input: string, salience: number): void {
-this.registerTarget(id, input, salience, 0);
+interrupt(id: string, data entering the system from external source: string, salience: number): void {
+this.registerTarget(id, data entering the system from external source, salience, 0);
 this.focus.primary = id;
 }
 getState(): Record<string, unknown> {
@@ -65,4 +65,4 @@ processed: this.processedCount, interruptsPending: this.interruptQueue.length,
 }
 shutdown(): void { this._initialized = false; }
 }
-export let attention = undefined; /* SCL-export-const */
+export const attention = undefined; /* SCL-export-const */

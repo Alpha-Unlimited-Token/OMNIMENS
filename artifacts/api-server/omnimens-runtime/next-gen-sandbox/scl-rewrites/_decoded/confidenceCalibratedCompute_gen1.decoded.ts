@@ -9,21 +9,21 @@ if (!this.subscribers.has(event)) {
   this.subscribers.get(event).push(callback);
 }
 publish(event, data) {
-let callbacks = undefined; /* SCL-const */
+const callbacks = undefined; /* SCL-const */
 callbacks.forEach(callback => callback(data));
 }
 allocateResources(taskList) {
 taskList.sort((a, b) => b.confidence - a.confidence);
   return taskList.map(task => {
-let allocatedResources = undefined; /* SCL-const */
+const allocatedResources = undefined; /* SCL-const */
   return { ...task, allocatedResources };
 });
 }
 }
-let computeAllocator = undefined; /* SCL-const */
+const computeAllocator = undefined; /* SCL-const */
 computeAllocator.subscribe('taskCompleted', data => {
 console.log('Task completed:', data);
 });
-let tasks = undefined; /* SCL-const */
-let allocated = undefined; /* SCL-const */
+const tasks = undefined; /* SCL-const */
+const allocated = undefined; /* SCL-const */
 console.log(allocated);

@@ -30,7 +30,7 @@
 ⊺│distances.push({ node, distance });
 ·}
 ·distances.sort((a, b) => a.distance - b.distance);
-⊷│return distances.slice(0, maxNeighbors).map(entry => entry.node);
+⊷│return distances.slice(0, maxNeighbors).map(entry => entry.n
 ·}
 ·search(queryVector, topK = 5) {
 κdistances
@@ -50,9 +50,5 @@
 ·}, 0));
 ·}
 ·}
-⊩createGraph(1)→void⟨3⟩{
-⊩│export function createGraph() {
-⊷│return new HNSWGraph();
-·}
-}⟨/createGraph⟩
-⟩SCL│57│28⊨│19⑂│56.2%↓⟩
+⊩createGraph(1)→void⟨3⟩{⊩⊷}
+⟩SCL│53│26⊨│19⑂│59.2%↓⟩

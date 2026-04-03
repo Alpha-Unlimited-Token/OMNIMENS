@@ -1,64 +1,8 @@
 ⟨SCL v1│wasmMatrixAcceleration_gen1.mjs│86→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩⟿loadWasmModule(1)→void⟨7⟩{
-⊩│export async function loadWasmModule(wasmFilePath) {
-const wasmPath = join(↻.cwd(), wasmFilePath);
-⊴│const wasmBuffer = await readFile(wasmPath);
-·const wasmModule = await WebAssembly.compile(wasmBuffer);
-·const wasmInstance = await WebAssembly.instantiate(wasmModule);
-⊷│return wasmInstance;
-·}
-}⟨/loadWasmModule⟩
-⊩⟿wasmMatrixMultiply(3)→void⟨41⟩{
-⊩│export async function wasmMatrixMultiply(matrixA, matrixB, wasmFilePath) {
-·if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
-⊵│throw new Error('Both matrixA and matrixB must be 2D arrays.');
-·}
-·const rowsA = matrixA.length;
-·const colsA = matrixA[0].length;
-·const rowsB = matrixB.length;
-·const colsB = matrixB[0].length;
-·if (colsA !== rowsB) {
-⊵│throw new Error('Matrix multiplication not possible: columns of A must match rows of B.');
-·}
-⊴│const wasmInstance = await loadWasmModule(wasmFilePath);
-⊲│const { memory, matrix_multiply } = wasmInstance.exports;
-·const flatA = matrixA.flat();
-·const flatB = matrixB.flat();
-·const resultSize = rowsA * colsB;
-·const memoryBuffer = new Float32Array(memory.buffer);
-·const offsetA = 0;
-·const offsetB = flatA.length;
-·const offsetResult = offsetA + flatA.length + flatB.length;
-⊡│memoryBuffer.set(flatA, offsetA);
-⊡│memoryBuffer.set(flatB, offsetB);
-·matrix_multiply(offsetA, offsetB, offsetResult, rowsA, colsA, colsB);
-·const result = [];
-·for (let i = 0; i < rowsA; i++) {
-⊺│result.push(Array.from(memoryBuffer.slice(offsetResult + i * colsB, offsetResult + (i + 1) * colsB)));
-·}
-⊷│return result;
-·}
-}⟨/wasmMatrixMultiply⟩
-⊩validateMatrix(1)→void⟨12⟩{
-⊩│export function validateMatrix(matrix) {
-⊹│if (!Array.isArray(matrix) || matrix.length === 0 || !Array.isArray(matrix[0])) {
-⊵│throw new Error('Input must be a 2D array.');
-·}
-·const rowLength = matrix[0].length;
-⥀│for (const row of matrix) {
-⊹│if (row.length !== rowLength) {
-⊵│throw new Error('All rows in the matrix must have the same length.');
-·}
-·}
-·}
-}⟨/validateMatrix⟩
-⊩⟿matrixOperationWrapper(3)→void⟨5⟩{
-⊩│export async function matrixOperationWrapper(matrixA, matrixB, wasmFilePath) {
-·validateMatrix(matrixA);
-·validateMatrix(matrixB);
-⊴│return await wasmMatrixMultiply(matrixA, matrixB, wasmFilePath);
-·}
-}⟨/matrixOperationWrapper⟩
-⟩SCL│63│69⊨│20⑂│26.7%↓⟩
+⊩⟿loadWasmModule(1)→void⟨7⟩{⊩⊴⊷}
+⊩⟿wasmMatrixMultiply(3)→void⟨41⟩{⊩⊵⊴⊲⊡⊞⊟⊺⊷}
+⊩validateMatrix(1)→void⟨12⟩{⊩⊹⊵⥀}
+⊩⟿matrixOperationWrapper(3)→void⟨5⟩{⊩⊴⊷}
+⟩SCL│7│23⊨│18⑂│91.9%↓⟩

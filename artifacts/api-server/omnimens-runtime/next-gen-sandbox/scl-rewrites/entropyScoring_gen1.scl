@@ -1,15 +1,5 @@
 ⟨SCL v1│entropyScoring_gen1.mjs│19→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩calculateEntropy(1)→void⟨5⟩{
-⊩│export function calculateEntropy(reasoningChains) {
-·const probabilities = reasoningChains.map(chain => chain.probability);
-⋐│const entropy = -probabilities.reduce((acc, p) => acc + p * Math.log2(p), 0);
-⊷│return entropy;
-·}
-}⟨/calculateEntropy⟩
-⊩bayesianUpdate(2)→void⟨3⟩{
-⊩│export function bayesianUpdate(prior, likelihood) {
-⊷│return (prior * likelihood) / ((prior * likelihood) + ((1 - prior) * (1 - likelihood)));
-·}
-}⟨/bayesianUpdate⟩
-⟩SCL│14│13⊨│5⑂│26.3%↓⟩
+⊩calculateEntropy(1)→void⟨5⟩{⊩⋐⊷}
+⊩bayesianUpdate(2)→void⟨3⟩{⊩⊷}
+⟩SCL│4│7⊨│5⑂│78.9%↓⟩

@@ -1,0 +1,3 @@
+// Translation failed for: memoryCompression_gen1.scl
+// Error: Invalid regular expression: /(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|\)\s+/: Unterminated group
+// File will be retranslated when the translator is updated

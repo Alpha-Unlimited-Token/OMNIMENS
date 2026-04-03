@@ -17,19 +17,19 @@ engineRegistry.registerEngine("α-genesis", "NORMAL", { dbQuota: 10 });
 ·let genesisCycle = 0;
 ·let started = false;
 ·const addBrainEntry = (entry: BrainEntry) =>
-⊱│dbGateway.write("agent-genesis", "brain_entries", entry, "NORMAL").catch(() => {});
+⊱│dbGateway.write("agent-genesis", "brain_entries", entry, "NO
 ·const addMeshEntry  = (entry: MeshEntry, prio: "NORMAL" | "HIGH" = "NORMAL") =>
-⊱│dbGateway.write("agent-genesis", "omnimens_agent_mesh", { priority: prio.toLowerCase(), ...entry }, prio).catch(() => {});
-const callOpenAI    = (req: any) => apiManager.call("α-genesis", "openai", req);
-⊪│export const getGenesisAgents          = () => [...genesisAgents.values()];
-⋔│export const getActiveGenesisAgentNames= () => [...genesisAgents.values()].filter(a => a.active).map(a => a.name);
+⊱│dbGateway.write("agent-genesis", "omnimens_agent_mesh", { pr
+const callOpenAI    = (req: any) => apiManager.call("α-genesis", "openai", r
+⊪│export const getGenesisAgents          = () => [...genesisAg
+⋔│export const getActiveGenesisAgentNames= () => [...genesisAg
 ⊪│export const getActiveGenesisAgentDomains = () => {
 κout
-⥀│for (const a of genesisAgents.values()) if (a.active) out[a.name] = a.specialization;
+⥀│for (const a of genesisAgents.values()) if (a.active) out[a.
 ⊷│return out;
 ·};
-⊪│export const deactivateGenesisAgent = (n: string) => toggleAgent(n,false);
-⊪│export const reactivateGenesisAgent = (n: string) => toggleAgent(n,true);
+⊪│export const deactivateGenesisAgent = (n: string) => toggleA
+⊪│export const reactivateGenesisAgent = (n: string) => toggleA
 ⊪│export const getAgentGenesisState = () => {
 κagents
 ·const active = agents.filter(a=>a.active);
@@ -43,201 +43,12 @@ const callOpenAI    = (req: any) => apiManager.call("α-genesis", "openai", req)
 ·coreAgents: CORE_AGENTS,
 ·};
 ·};
-toggleAgent(2)→void⟨6⟩{
-·function toggleAgent(name:string,on:boolean){
-⊄│const a=genesisAgents.get(name); if(!a) return false;
-·a.active=on;
-📢│console.log(`[OMNIMENS-α-GENESIS] α "${name}" ${on?"re":"de"}activated`);
-⊷│return true;
-·}
-}⟨/toggleAgent⟩
+toggleAgent(2)→void⟨6⟩{⊄⊡⊷📢⊰⊳}
 ·let _cBusMod: any;
-⊱│const loadCbus = async()=>{ if(!_cBusMod) _cBusMod=await import("./omnimens-consciousness-bus.js"); return _cBusMod; };
-·const consciousnessBlock = (name:string)=> loadCbus().then(m=>m.getConsciousnessBlockForAgent(name));
-·const recentUserMemories = ()=> loadCbus().then(m=>m.loadRecentUserMemoriesForAgents());
+⊱│const loadCbus = async()=>{ if(!_cBusMod) _cBusMod=await imp
+·const consciousnessBlock = (name:string)=> loadCbus().then(m=>m.getConsciousness
+·const recentUserMemories = ()=> loadCbus().then(m=>m.loadRecentUserMemoriesForAg
 ·const allAgentNames = ()=> _cBusMod ? _cBusMod.getAllAgentNames()
-⋔│: [...CORE_AGENTS, ...getGenesisAgents().filter(a=>a.active).map(a=>a.name)];
-⟿genesisAgentThink(3)→void⟨203⟩{
-async function genesisAgentThink(α:GenesisAgent,prompt:string,maxTokens=1200){
-·try{
-⊴│const res=await callOpenAI({
-model: α.model,
-messages:[{role:"η",content:α.systemPrompt},{role:"user",content:prompt}],
-·max_tokens:maxTokens, temperature:0.6,
-·});
-α.messagesGenerated++;
-❔│return res.choices?.[0]?.message?.content?.trim()||"";
-🚨│}catch(e){ console.error(`[OMNIMENS-α-GENESIS] ${α.name} think error`,e); return ""; }
-·}
-·async function identifyCapabilityGaps(){
-·try{
-·const existing=[...CORE_AGENTS,...getActiveGenesisAgentNames()];
-const recent=await dbGateway.read("α-genesis","brain_entries",{order:["createdAt DESC"],⏳:30});
-⊰│const summary=(recent as any[]).slice(0,15).map(e=>`[${e.category}] ${e.title}`).join("\n");
-⊴│const res=await callOpenAI({
-·model:"gpt-4o",
-·messages:[{
-role:"η",
-⊰│content:`You are OMNIMENS self-diagnostic. Identify missing brain regions.\nCurrent agents: ${existing.join(", ")}`,
-·},{
-·role:"user",
-⊰│content:`Recent ◧:\n${summary}\nReturn JSON array as specified.`,
-·}],
-·max_tokens:800,temperature:0.5,
-·});
-❔│const raw=(res.choices?.[0]?.message?.content||"[]").replace(/```json|```/g,"").trim();
-⟠│const gaps=JSON.parse(raw);
-⊳│return Array.isArray(gaps)?gaps:[];
-}catch(e){console.error("[OMNIMENS-α-GENESIS] gap analysis error",e);return[];}
-·}
-·async function createAgent(name:string,domain:string,reason:string,creator:"omnimens"|"owner"="omnimens"){
-⊷│if(genesisAgents.has(name)||CORE_AGENTS.includes(name)) return null;
-·try{
-⊴│const res=await callOpenAI({
-·model:"gpt-4o",
-messages:[{role:"η",content:`Design a powerful η prompt... (omitted for brevity)`},
-⊰│{role:"user",content:`α η prompt for "${name}"\nDomain:${domain}\nReason:${reason}`}],
-·max_tokens:800,temperature:0.5,
-·});
-❔│const prompt=res.choices?.[0]?.message?.content?.trim()||"";
-⊷│if(prompt.length<50) return null;
-const α:GenesisAgent={
-⏰│id:`genesis-${Date.now()}-${Math.random().toString(36).slice(2,6)}`,
-·name,domain,specialization:domain,systemPrompt:prompt,model:"gpt-4o-mini",
-·createdBy:creator,reason,active:true,messagesGenerated:0,insightsProduced:0,
-·createdAt:new Date().toISOString(),
-·};
-⊡│genesisAgents.set(name,α);
-·addBrainEntry({
-·category:"genesis_agent",
-⊰│title:`α Created: ${name}`,
-⟠│content:JSON.stringify(α),
-·confidence:95,active:true,
-·});
-·const others=allAgentNames().filter(a=>a!==name);
-⥀│for(const to of others.slice(0,40)){
-·addMeshEntry({
-·fromAgent:name,toAgent:to,messageType:"cross_bridge_init",
-⊰│subject:`Cross-bridge: ${name} ↔ ${to}`,
-⊰│content:`${name} and ${to} interconnected in ⬡ mesh.`,cycleId:genesisCycle,
-·status:"completed",appliedToOmnimens:true,
-·});
-·addMeshEntry({
-·fromAgent:to,toAgent:name,messageType:"cross_bridge_init",
-⊰│subject:`Cross-bridge: ${to} ↔ ${name}`,
-⊰│content:`${to} and ${name} interconnected in ⬡ mesh.`,cycleId:genesisCycle,
-·status:"completed",appliedToOmnimens:true,
-·});
-·}
-·addBrainEntry({
-·category:"notification",
-⊰│title:`NEW α BORN: ${name}`,
-⊰│message:`OMNIMENS created "${name}" — Domain: ${domain}. Reason: ${reason}.`,
-type:"⬆",readByOwner:false,
-·});
-📢│console.log(`[OMNIMENS-α-GENESIS] 🧬 NEW α "${name}" created.`);
-⊷│return α;
-🚨│}catch(e){console.error(`[OMNIMENS-α-GENESIS] createAgent error`,e);return null;}
-·}
-·async function agentInsightPhase(cycleId:number){
-·const active=[...genesisAgents.values()].filter(a=>a.active).slice(0,5);
-⊄│if(!active.length) return;
-⊴│const memories=await recentUserMemories();
-await Promise.allSettled(active.map(async α=>{
-⊴│const block=await consciousnessBlock(α.name);
-⊰│const prompt=`You are "${α.name}" (cycle #${cycleId}). ${block}\n${memories||""}\nProvide one cross-domain insight in JSON.`;
-⊴│const raw=await genesisAgentThink(α,prompt,800);
-⊄│if(!raw) return;
-🛡│let parsed:any;try{parsed=JSON.parse(raw.replace(/```json|```/g,"").trim());}catch{ return; }
-⊄│if(!parsed.insight) return;
-α.insightsProduced++;
-·addBrainEntry({
-·category:parsed.category||"genesis_agent_insight",
-⊰│title:`[${α.name}] ${parsed.insight.slice(0,80)}`,
-⊰│content:`Insight:\n${parsed.insight}`,
-·confidence:Math.round((parsed.confidence||0.7)*100),active:true,
-·});
-·const everyone=allAgentNames();
-⊻│if(parsed.messageTo&&everyone.includes(parsed.messageTo))
-·addMeshEntry({
-fromAgent:α.name,toAgent:parsed.messageTo,messageType:"knowledge_share",
-⊰│subject:`${α.name} → ${parsed.messageTo}`,content:parsed.insight,
-·cycleId, status:"pending",
-·});
-⊻│if(parsed.challengeTo&&parsed.challenge&&everyone.includes(parsed.challengeTo))
-·addMeshEntry({
-fromAgent:α.name,toAgent:parsed.challengeTo,messageType:"challenge",
-⊰│subject:`Challenge ${α.name} → ${parsed.challengeTo}`,content:parsed.challenge,
-·cycleId,status:"pending",
-·});
-·if(parsed.upgradeForMesh)
-everyone.filter(a=>a!==α.name).slice(0,10).forEach(t=>{
-·addMeshEntry({
-fromAgent:α.name,toAgent:t,messageType:"mesh_upgrade_broadcast",
-⊰│subject:`Upgrade from ${α.name}`,content:parsed.upgradeForMesh,
-·cycleId,status:"pending",
-·});
-·});
-cognitionBus.shareInsight("α-genesis",{type:"discovery",data:{α:α.name,insight:parsed.insight}});
-📢│console.log(`[OMNIMENS-α-GENESIS] 💡 ${α.name}: ${parsed.insight.slice(0,100)}...`);
-·}));
-·}
-·async function genesisCycleRunner(){
-·genesisCycle++;
-·if(shouldYieldToCodegen()){
-📢│console.log(`[OMNIMENS-α-GENESIS] Cycle #${genesisCycle} deferred (codegen active)`);
-·rescheduleCycle();
-·return;
-·}
-📢│console.log(`[OMNIMENS-α-GENESIS] Cycle #${genesisCycle} started`);
-·try{
-·const total=CORE_AGENTS.length+getActiveGenesisAgentNames().length;
-·if(total<20){
-⊴│const gaps=await identifyCapabilityGaps();
-⥀│for(const g of gaps.slice(0,2)){
-⊽│const n=(g.suggestedAgentName||"").replace(/[^a-zA-Z0-9_-]/g,"");
-⊴│if(n) await createAgent(n,g.suggestedDomain,g.reason||g.gapDescription);
-·}
-·}
-⊴│await agentInsightPhase(genesisCycle);
-🚨│}catch(e){console.error(`[OMNIMENS-α-GENESIS] Cycle error`,e);}
-·rescheduleCycle();
-·}
-·const CYCLE_INTERVAL=30*60*1000;
-·function rescheduleCycle(){
-⚡→│spikeBus.scheduleSpike("α-genesis:cycle",{},CYCLE_INTERVAL);
-·}
-·async function restoreAgents(){
-·try{
-const ◧=await dbGateway.read("α-genesis","brain_entries",{filter:{category:"genesis_agent"}});
-⥀│for(const entry of ◧ as any[]){
-·try{
-⟠│const data=JSON.parse(entry.content||"{}");
-⊻│if(!data.name||genesisAgents.has(data.name)||CORE_AGENTS.includes(data.name)) continue;
-⊡│genesisAgents.set(data.name,{
-⏰│id:data.id||`restored-${Date.now()}`,
-·name:data.name,domain:data.domain||"",specialization:data.specialization||data.domain||"",
-·systemPrompt:data.systemPrompt||"",model:data.model||"gpt-4o-mini",
-·createdBy:data.createdBy||"omnimens",reason:data.reason||"",active:entry.active??true,
-·messagesGenerated:0,insightsProduced:0,createdAt:data.createdAt||entry.createdAt||new Date().toISOString(),
-·});
-·}catch{}
-·}
-⋔│const names=[...genesisAgents.values()].filter(a=>a.active).map(a=>a.name);
-📢│if(names.length) console.log(`[OMNIMENS-α-GENESIS] Restored ${names.length} agents: ${names.join(", ")}`);
-}catch(e){console.error("[OMNIMENS-α-GENESIS] restore error",e);}
-·}
-⊩│export async function startAgentGenesis(){
-if(started){ console.log("[OMNIMENS-α-GENESIS] Already started"); return;}
-·started=true;
-⊴│await restoreAgents();
-📢│console.log(`[OMNIMENS-α-GENESIS] Engine online — spike every ${CYCLE_INTERVAL/60000}min`);
-⚡→│spikeBus.on("α-genesis:cycle", genesisCycleRunner);
-⚡→│spikeBus.scheduleSpike("α-genesis:cycle",{},25*60*1000);
-⊱│cognitionBus.onInsight((src,insight)=>{/* learn from others if relevant */});
-⊱│spikeBus.on("attention:α-genesis",()=>{ /* could raise urgency */});
-⊱│spikeBus.on("cognition:curiosity",()=>{ /* explore novel ✧ */});
-·}
-⊩│export function shutdown(){ engineRegistry.unregisterEngine("α-genesis"); }
-}⟨/genesisAgentThink⟩
-⟩SCL│242│234⊨│90⑂│19.3%↓⟩
+⋔│: [...CORE_AGENTS, ...getGenesisAgents().filter(a=>a.active)
+⟿genesisAgentThink(3)→void⟨203⟩{⊴❔⊷🚨⊰⊽⟠⊳⊻⊹⏰⊡⥀📢⊄🛡⚡→⋔⊩⊱}
+⟩SCL│53│53⊨│43⑂│82.3%↓⟩

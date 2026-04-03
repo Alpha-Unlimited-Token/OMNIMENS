@@ -11,7 +11,7 @@
 ·for (const { scenario, expectedOutcome } of this.counterfactuals) {
 κresult
 ·if (result !== expectedOutcome) {
-⊰│console.log(`Counterfactual failed: Expected ${expectedOutcome}, got ${result}`);
+⊰│console.log(`Counterfactual failed: Expected ${expectedOutco
 ·}
 ·}
 ·}

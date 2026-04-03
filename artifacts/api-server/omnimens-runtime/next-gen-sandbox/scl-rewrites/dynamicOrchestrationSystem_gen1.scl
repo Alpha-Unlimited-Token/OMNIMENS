@@ -11,10 +11,10 @@
 ·this.assignTaskToAgent(selectedAgent, task);
 ·}
 ·getAvailableAgents() {
-⊡│return Array.from(this.agentMetrics.keys()).filter(agent => this.agentMetrics.get(agent).status === 'available');
+⊡│return Array.from(this.agentMetrics.keys()).filter(agent => 
 ·}
 ·selectAgent(agents, task) {
-⊡│return agents.sort((a, b) => this.agentMetrics.get(b).performance - this.agentMetrics.get(a).performance)[0];
+⊡│return agents.sort((a, b) => this.agentMetrics.get(b).perfor
 ·}
 assignTaskToAgent(α, task) {
 ⊡│this.agentMetrics.get(agent).status = 'busy';

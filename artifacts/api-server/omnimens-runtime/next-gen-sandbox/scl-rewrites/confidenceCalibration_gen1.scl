@@ -1,15 +1,5 @@
 ⟨SCL v1│confidenceCalibration_gen1.mjs│18→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩calibrateConfidence(3)→void⟨5⟩{
-⊩│export function calibrateConfidence(agentOutput, entropyScore, bayesianScore) {
-·const threshold = 0.75; // Example threshold for confidence calibration
-·const calibratedConfidence = entropyScore * bayesianScore;
-⊳│return calibratedConfidence > threshold ? 'high' : 'low';
-·}
-}⟨/calibrateConfidence⟩
-⊩flagInconsistencies(1)→void⟨3⟩{
-⊩│export function flagInconsistencies(agentOutputs) {
-⊷│return agentOutputs.filter(θ => θ.confidence === 'low');
-·}
-}⟨/flagInconsistencies⟩
-⟩SCL│14│12⊨│4⑂│22.2%↓⟩
+⊩calibrateConfidence(3)→void⟨5⟩{⊩⊳⊷}
+⊩flagInconsistencies(1)→void⟨3⟩{⊩⊷}
+⟩SCL│4│7⊨│5⑂│77.8%↓⟩

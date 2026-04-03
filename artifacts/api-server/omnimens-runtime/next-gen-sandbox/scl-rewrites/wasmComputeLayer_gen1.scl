@@ -1,58 +1,8 @@
 ⟨SCL v1│wasmComputeLayer_gen1.mjs│102→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩⟿initializeWasmModule(1)→void⟨10⟩{
-⊩│export async function initializeWasmModule(wasmFilePath) {
-·try {
-⊴│const wasmBuffer = await readFile(wasmFilePath);
-·const wasmModule = await WebAssembly.compile(wasmBuffer);
-·const wasmInstance = await WebAssembly.instantiate(wasmModule);
-⊷│return wasmInstance;
-·} catch (error) {
-⊰│throw new Error(`↺ to initialize WebAssembly module: ${error.message}`);
-·}
-·}
-}⟨/initializeWasmModule⟩
-⊩⟿multiplyMatrices(3)→void⟨39⟩{
-⊩│export async function multiplyMatrices(matrixA, matrixB, wasmFilePath) {
-·if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) {
-⊵│throw new Error('Both inputs must be 2D arrays.');
-·}
-·const rowsA = matrixA.length;
-❔│const colsA = matrixA[0]?.length || 0;
-·const rowsB = matrixB.length;
-❔│const colsB = matrixB[0]?.length || 0;
-·if (colsA !== rowsB) {
-⊵│throw new Error('Matrix dimensions are incompatible for multiplication.');
-·}
-⊴│const wasmInstance = await initializeWasmModule(wasmFilePath);
-·if (!wasmInstance.exports || typeof wasmInstance.exports.multiply !== 'function') {
-⊵│throw new Error('The WebAssembly module does not export a valid multiply function.');
-·}
-·const flatA = matrixA.flat();
-·const flatB = matrixB.flat();
-·const resultArray = new Float64Array(rowsA * colsB);
-·wasmInstance.exports.multiply(
-·flatA, flatB, resultArray,
-·rowsA, colsA, colsB
-·);
-·const resultMatrix = [];
-·for (let i = 0; i < rowsA; i++) {
-⊺│resultMatrix.push(resultArray.slice(i * colsB, (i + 1) * colsB));
-·}
-⊷│return resultMatrix;
-·}
-}⟨/multiplyMatrices⟩
-⊩generateRandomMatrix(2)→void⟨5⟩{
-⊩│export function generateRandomMatrix(rows, cols) {
-⊷│return Array.from({ length: rows }, () =>
-·Array.from({ length: cols }, () => Math.random())
-·);
-·}
-}⟨/generateRandomMatrix⟩
-⊩printMatrix(1)→void⟨3⟩{
-⊩│export function printMatrix(matrix) {
-·console.log(matrix.map(row => row.join('\t')).join('\n'));
-·}
-}⟨/printMatrix⟩
-⟩SCL│57│60⊨│16⑂│44.1%↓⟩
+⊩⟿initializeWasmModule(1)→void⟨10⟩{⊩⊴⊷⊰⊵}
+⊩⟿multiplyMatrices(3)→void⟨39⟩{⊩⊵❔⊴⊺⊷}
+⊩generateRandomMatrix(2)→void⟨5⟩{⊩⊷}
+⊩printMatrix(1)→void⟨3⟩{⊩}
+⟩SCL│7│19⊨│14⑂│93.1%↓⟩

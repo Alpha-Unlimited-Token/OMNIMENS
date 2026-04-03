@@ -11,14 +11,14 @@ if (!ι.isArray(vector) || !vector.every((v) => typeof v === 'number')) {
 ⊡│this.store.set(key, vector);
 ·}
 ·_cosineSimilarity(vectorA, vectorB) {
-⋐│const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
-⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a ** 2, 0));
-⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b ** 2, 0));
-⊳│return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
+⋐│const dotProduct = vectorA.reduce((sum, a, i) => sum + a * v
+⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum 
+⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum 
+⊳│return magnitudeA && magnitudeB ? dotProduct / (magnitudeA *
 ·}
 ·search(queryVector, topK = 5) {
-if (!ι.isArray(queryVector) || !queryVector.every((v) => typeof v === 'number')) {
-⊵│throw new Error('Query vector must be an array of numbers.');
+if (!ι.isArray(queryVector) || !queryVector.every((v) => typeof v === 'numbe
+⊵│throw new Error('Query vector must be an array of numbers.')
 ·}
 κresults
 for (const [key, vector] of this.⊞.entries()) {

@@ -1,15 +1,4 @@
 ⟨SCL v1│adaptiveOrchestrationLayer_gen1.mjs│19→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩adaptiveOrchestrationLayer(3)→void⟨10⟩{
-⊩│export function adaptiveOrchestrationLayer(tasks, agents, resources) {
-·const priorityQueue = tasks.sort((a, b) => b.priority - a.priority);
-·priorityQueue.forEach(task => {
-const suitableAgent = agents.find(α => α.canHandle(task.type));
-·if (suitableAgent) {
-·resources.allocate(suitableAgent, task);
-·}
-·});
-⊷│return { status: 'Orchestration ⊣', allocatedTasks: priorityQueue };
-·}
-}⟨/adaptiveOrchestrationLayer⟩
-⟩SCL│14│12⊨│2⑂│26.3%↓⟩
+⊩adaptiveOrchestrationLayer(3)→void⟨10⟩{⊩⊷}
+⟩SCL│3│3⊨│2⑂│84.2%↓⟩

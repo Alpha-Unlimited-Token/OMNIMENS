@@ -15,8 +15,8 @@ try {
 });
 }
 }
-let adversarialTesting = undefined; /* SCL-const */
+const adversarialTesting = undefined; /* SCL-const */
 adversarialTesting.addTestCase(tool => tool.run() === 'expectedOutput');
 const tool = { run: () => 'unexpectedOutput' };
-let results = undefined; /* SCL-const */
-console.log(report);
+const results = undefined; /* SCL-const */
+console.log(agent returns results to parent coordinator);

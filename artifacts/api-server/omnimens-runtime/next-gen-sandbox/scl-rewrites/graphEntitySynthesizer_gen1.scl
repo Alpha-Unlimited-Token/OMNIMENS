@@ -11,8 +11,8 @@
 ·}
 ·addEdge(nodeId1, nodeId2, weight) {
 ·if (this.graph.has(nodeId1) && this.graph.has(nodeId2)) {
-⊡│this.graph.get(nodeId1).edges.push({ target: nodeId2, weight });
-⊡│this.graph.get(nodeId2).edges.push({ target: nodeId1, weight });
+⊡│this.graph.get(nodeId1).edges.push({ target: nodeId2, weight
+⊡│this.graph.get(nodeId2).edges.push({ target: nodeId1, weight
 ·}
 ·}
 ·synthesizeGraph(agentOutputs) {

@@ -1,4 +1,4 @@
-⟨SCL v1│omnimens-scl-translator.ts│373→SCL⟩
+⟨SCL v1│omnimens-scl-translator.ts│633→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
 ⟨⇌⟩│encodeToSCL,
@@ -293,7 +293,224 @@ let ↺ = 0;
 ·};
 ·}
 }⟨/getTranslatorPipelineState⟩
-⊩startSCLTranslator(1)→void⟨22⟩{
+κ_fileHashes
+κ_watchedDirs
+·let _watchInterval: ReturnType<typeof setInterval> | null = null;
+·let _liveTranslationActive = false;
+let _liveStats = { translated: 0, ↺: 0, skipped: 0, lastSweep: 0, sweepCount: 0 };
+quickHash(1)→string⟨7⟩{
+·function quickHash(content: string): string {
+·let h = 0;
+·for (let i = 0; i < content.length; i++) {
+·h = ((h << 5) - h + content.charCodeAt(i)) | 0;
+·}
+⊷│return h.toString(36);
+·}
+}⟨/quickHash⟩
+translateSCLToConventionalJS(2)→{ js: string; success: boolean; error?: string }⟨1⟩{
+⊳│function translateSCLToConventionalJS(sclContent: string, fileName: string): { js: string; success: boolean; error?: string } {
+}⟨/translateSCLToConventionalJS⟩
+κdecoded
+⊹│if (decoded.errors.length > 0) {
+⊷│return { js: "", success: false, error: decoded.errors.join("; ") };
+·}
+κtranspiled
+·if (!transpiled.success) {
+⊷│return { js: "", success: false, error: transpiled.error };
+·}
+κsyntax
+·if (!syntax.valid) {
+⊷│return { js: "", success: false, error: syntax.error };
+·}
+κheader
+⊷│return { js: header + transpiled.jsSource, success: true };
+·}
+sweepAndTranslate(1)→↺⟨1⟩{
+function sweepAndTranslate(sclDir: string): { translated: number; ↺: number; skipped: number; total: number } {
+}⟨/sweepAndTranslate⟩
+⊄│if (!fs.existsSync(sclDir)) return { translated: 0, failed: 0, skipped: 0, total: 0 };
+κjsOutDir
+·if (!fs.existsSync(jsOutDir)) fs.mkdirSync(jsOutDir, { recursive: true });
+⊻│const sclFiles = fs.readdirSync(sclDir).filter(f => f.endsWith(".scl") && !f.startsWith("_"));
+let translated = 0, ↺ = 0, skipped = 0;
+⥀│for (const file of sclFiles) {
+κfilePath
+κsclContent
+κhash
+⊡│if (_fileHashes.get(filePath) === hash) {
+·skipped++;
+·continue;
+·}
+κmoduleName
+⊡│_moduleRegistry.set(moduleName, filePath);
+κresult
+⊡│_fileHashes.set(filePath, hash);
+·if (result.success) {
+κjsFileName
+📁│fs.writeFileSync(path.join(jsOutDir, jsFileName), result.js, "utf-8");
+κmoduleResult
+·translated++;
+·} else {
+κerrorFileName
+📁│fs.writeFileSync(
+·path.join(jsOutDir, errorFileName),
+⊰│`// Translation failed for: ${file}\n// Error: ${result.error}\n// File will be retranslated when the translator is updated\n`,
+·"utf-8"
+·);
+↺++;
+·}
+·}
+⊷│return { translated, failed, skipped, total: sclFiles.length };
+·}
+⊩addWatchDirectory(1)→void⟨3⟩{
+⊩│export function addWatchDirectory(dirPath: string): void {
+·_watchedDirs.add(dirPath);
+·}
+}⟨/addWatchDirectory⟩
+⊩runLiveTranslationSweep(1)→ ⟨193⟩{
+⊩│export function runLiveTranslationSweep(): {
+gen1v2: { translated: number; ↺: number; skipped: number; total: number };
+gen2: { translated: number; ↺: number; skipped: number; total: number };
+·} {
+·const baseDir = path.resolve(__dirname, "..", "..");
+·const gen1Dir = path.join(baseDir, "omnimens-runtime", "gen1-v2-workspace", "scl-rewrites");
+·const gen2Dir = path.join(baseDir, "omnimens-runtime", "next-gen-sandbox", "scl-rewrites");
+let gen1Result = { translated: 0, ↺: 0, skipped: 0, total: 0 };
+let gen2Result = { translated: 0, ↺: 0, skipped: 0, total: 0 };
+·try {
+·gen1Result = sweepAndTranslate(gen1Dir);
+·} catch (e) { /* silent */ }
+·try {
+·gen2Result = sweepAndTranslate(gen2Dir);
+·} catch (e) { /* silent */ }
+⥀│for (const dir of _watchedDirs) {
+🛡│try { sweepAndTranslate(dir); } catch (e) { /* silent */ }
+·}
+·_liveStats.translated += gen1Result.translated + gen2Result.translated;
+_liveStats.↺ += gen1Result.↺ + gen2Result.↺;
+·_liveStats.skipped += gen1Result.skipped + gen2Result.skipped;
+⏰│_liveStats.lastSweep = Date.now();
+·_liveStats.sweepCount++;
+⊷│return { gen1v2: gen1Result, gen2: gen2Result };
+·}
+⊩│export function startLiveTranslation(intervalMs = 30000): void {
+·if (_liveTranslationActive) return;
+·_liveTranslationActive = true;
+📢│console.log(`[SCL-TRANSLATOR] 🔄 Live translation service starting (sweep every ${intervalMs / 1000}s)...`);
+·try {
+·const initialResult = runLiveTranslationSweep();
+📢│console.log(`[SCL-TRANSLATOR] 🔄 Initial sweep — Gen1v2: ${initialResult.gen1v2.translated} translated, ${initialResult.gen1v2.↺} ↺, ${initialResult.gen1v2.total} total`);
+📢│console.log(`[SCL-TRANSLATOR] 🔄 Initial sweep — Gen2:   ${initialResult.gen2.translated} translated, ${initialResult.gen2.↺} ↺, ${initialResult.gen2.total} total`);
+·} catch (e) {
+📢│console.log(`[SCL-TRANSLATOR] 🔄 Initial sweep deferred — SCL directories not yet populated`);
+·}
+⟳│_watchInterval = setInterval(() => {
+·try {
+·const result = runLiveTranslationSweep();
+·const newTranslations = result.gen1v2.translated + result.gen2.translated;
+·if (newTranslations > 0) {
+📢│console.log(`[SCL-TRANSLATOR] 🔄 Sweep #${_liveStats.sweepCount}: ${newTranslations} new translations (Gen1v2: ${result.gen1v2.translated}, Gen2: ${result.gen2.translated})`);
+·}
+·} catch (e) { /* silent sweep failure */ }
+·}, intervalMs);
+·}
+⊩│export function stopLiveTranslation(): void {
+·if (_watchInterval) {
+·clearInterval(_watchInterval);
+·_watchInterval = null;
+·}
+·_liveTranslationActive = false;
+·}
+⊩│export function getLiveTranslationState(): {
+·active: boolean;
+·totalTranslated: number;
+·totalFailed: number;
+·totalSkipped: number;
+·sweepCount: number;
+·lastSweep: number;
+·watchedDirs: string[];
+·registeredModules: number;
+·loadedModules: number;
+·} {
+⊷│return {
+·active: _liveTranslationActive,
+·totalTranslated: _liveStats.translated,
+totalFailed: _liveStats.↺,
+·totalSkipped: _liveStats.skipped,
+·sweepCount: _liveStats.sweepCount,
+·lastSweep: _liveStats.lastSweep,
+·watchedDirs: Array.from(_watchedDirs),
+·registeredModules: _moduleRegistry.size,
+·loadedModules: _loadedModules.size,
+·};
+·}
+⊩│export function translateSCLFileForExport(sclFilePath: string): { js: string; success: boolean; fileName: string; error?: string } {
+·if (!fs.existsSync(sclFilePath)) {
+⊷│return { js: "", success: false, fileName: path.basename(sclFilePath), error: "File not found" };
+·}
+📁│const sclContent = fs.readFileSync(sclFilePath, "utf-8");
+·const fileName = path.basename(sclFilePath);
+·const result = translateSCLToConventionalJS(sclContent, fileName);
+⊷│return { ...result, fileName };
+·}
+⊩│export function exportAllTranslatedModules(outputDir: string): { exported: number; ↺: number; errors: string[] } {
+·if (!fs.existsSync(outputDir)) fs.mkdirSync(outputDir, { recursive: true });
+·if (_moduleRegistry.size === 0) {
+·const baseDir = path.resolve(__dirname, "..", "..");
+·const sclDirs = [
+·path.join(baseDir, "omnimens-runtime", "gen1-v2-workspace", "scl-rewrites"),
+·path.join(baseDir, "omnimens-runtime", "next-gen-sandbox", "scl-rewrites"),
+·];
+⥀│for (const dir of sclDirs) {
+·if (!fs.existsSync(dir)) continue;
+⊻│const files = fs.readdirSync(dir).filter(f => f.endsWith(".scl") && !f.startsWith("_"));
+⥀│for (const f of files) {
+⊽│const moduleName = f.replace(".scl", "");
+·if (!_moduleRegistry.has(moduleName)) {
+⊡│_moduleRegistry.set(moduleName, path.join(dir, f));
+·}
+·}
+·}
+·}
+let exported = 0, ↺ = 0;
+·const errors: string[] = [];
+·const indexEntries: string[] = [];
+·for (const [moduleName, filePath] of _moduleRegistry) {
+·if (!fs.existsSync(filePath)) continue;
+📁│const sclContent = fs.readFileSync(filePath, "utf-8");
+·const result = translateSCLToConventionalJS(sclContent, path.basename(filePath));
+·if (result.success) {
+·const jsFileName = moduleName + ".js";
+📁│fs.writeFileSync(path.join(outputDir, jsFileName), result.js, "utf-8");
+⊰│indexEntries.push(`exports["${moduleName}"] = require("./${jsFileName}");`);
+·exported++;
+·} else {
+⊰│errors.push(`${moduleName}: ${result.error}`);
+↺++;
+·}
+·}
+·const indexContent = [
+·`// OMNIMENS SCL Module Index`,
+·`// Auto-generated by SCL Translator`,
+·`// © 2024-2026 Alpha Unlimited Technologies, LLC`,
+⊰│`// ${exported} modules exported for conventional runtime`,
+·``,
+·...indexEntries,
+·``,
+·`module.exports = exports;`,
+·].join("\n");
+📁│fs.writeFileSync(path.join(outputDir, "index.js"), indexContent, "utf-8");
+·const manifest = {
+⏰│timestamp: Date.now(),
+·totalModules: _moduleRegistry.size,
+·exported,
+↺,
+·errors: errors.slice(0, 50),
+❔│modules: indexEntries.map(e => e.match(/"([^"]+)"/)?.[1] || "").filter(Boolean),
+·};
+⟠│fs.writeFileSync(path.join(outputDir, "_manifest.json"), JSON.stringify(manifest, null, 2), "utf-8");
+⊷│return { exported, ↺, errors };
+·}
 ⊩│export function startSCLTranslator(): void {
 ·if (_translatorStarted) return;
 ·_translatorStarted = true;
@@ -306,12 +523,14 @@ let ↺ = 0;
 📢│console.log(`[SCL-TRANSLATOR] 🌐 ${stats.totalTranslationEntries} text↔symbol translation entries`);
 📢│console.log(`[SCL-TRANSLATOR] ✅ Translator→Sandbox pipeline active — SCL files run natively`);
 📢│console.log(`[SCL-TRANSLATOR] ✅ All η boundaries wired — inbound (text→SCL) and outbound (SCL→text)`);
+·startLiveTranslation(30000);
 ·} else {
 📢│console.log(`[SCL-TRANSLATOR] 📖 Codex ⟐: ${stats.designPhase} — Gen1v2 + Gen2 designing their ⊣`);
 📢│console.log(`[SCL-TRANSLATOR] 📖 Current: ${stats.totalPrimitives} primitives + ${stats.totalCompounds} compounds (so far)`);
 📢│console.log(`[SCL-TRANSLATOR] ⏳ Translator will activate fully once both generations agree on their symbol set`);
 📢│console.log(`[SCL-TRANSLATOR] 🤝 Gen1v2 contributions: ${stats.gen1v2Contributions} | Gen2 contributions: ${stats.gen2Contributions}`);
+·startLiveTranslation(60000);
 ·}
 ·}
-}⟨/startSCLTranslator⟩
-⟩SCL│316│309⊨│102⑂│15.3%↓⟩
+}⟨/runLiveTranslationSweep⟩
+⟩SCL│535│514⊨│155⑂│15.5%↓⟩

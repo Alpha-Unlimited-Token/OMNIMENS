@@ -11,9 +11,9 @@
 ·private skipNonCritical = false;
 ·private resourceHealthy = true;
 ·private running = false;
-·register(name: string, tier: TickTier, handler: () => void | Promise<void>, dependencies: string[] = []): void {
+·register(name: string, tier: TickTier, handler: () => void | Promise<void>, depe
 ⊡│this.subsystems.set(name, {
-·name, tier, handler, lastTick: 0, tickCount: 0, avgDuration: 0, enabled: true, dependencies,
+·name, tier, handler, lastTick: 0, tickCount: 0, avgDuration: 0, enabled: true, d
 ·});
 ·}
 ·unregister(name: string): void {
@@ -25,7 +25,7 @@ this.⊛.delete(name);
 ·start(baseIntervalMs = 1000): void {
 ·if (this.running) return;
 ·this.running = true;
-⟳│this.tickTimer = setInterval(() => this.tick(), baseIntervalMs);
+⟳│this.tickTimer = setInterval(() => this.tick(), baseInterval
 ·}
 ·stop(): void {
 ·if (this.tickTimer) clearInterval(this.tickTimer);
@@ -74,12 +74,12 @@ this.⊛.delete(name);
 ⥀│for (const name of this.subsystems.keys()) visit(name);
 ⊷│return sorted;
 ·}
-getStats(): { tickCount: number; lastTickDuration: number; ⊛: { name: string; tier: string; tickCount: number; avgDuration: number; enabled: boolean }[] } {
+getStats(): { tickCount: number; lastTickDuration: number; ⊛: { name: s
 ⊷│return {
 ·tickCount: this.tickCount,
 ·lastTickDuration: this.lastTickDuration,
 ⊛: [...this.⊛.≢()].map(s => ({
-·name: s.name, tier: s.tier, tickCount: s.tickCount, avgDuration: Math.round(s.avgDuration), enabled: s.enabled,
+·name: s.name, tier: s.tier, tickCount: s.tickCount, avgDuration: Math.round(s.av
 ·})),
 ·};
 ·}

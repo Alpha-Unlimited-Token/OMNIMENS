@@ -1,62 +1,9 @@
 ⟨SCL v1│slidingContextManager_gen1.mjs│111→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-generateEmbedding(1)→void⟨12⟩{
-·function generateEmbedding(text) {
-·const hash = require('crypto').createHash('sha256');
-·hash.update(text);
-·const hex = hash.digest('hex');
-·const embedding = [];
-·for (let i = 0; i < hex.length; i += 8) {
-⊺│embedding.push(parseInt(hex.slice(i, i + 8), 16));
-·}
-⊷│return embedding.slice(0, 16); // Fixed length embedding
-·}
-}⟨/generateEmbedding⟩
-calculateDistance(2)→void⟨6⟩{
-·function calculateDistance(emb1, emb2) {
-⊹│if (emb1.length !== emb2.length) {
-⊵│throw new Error('Embeddings must have the same length');
-·}
-⋐│return Math.sqrt(emb1.reduce((sum, val, i) => sum + Math.pow(val - emb2[i], 2), 0));
-·}
-}⟨/calculateDistance⟩
-clusterContext(2)→void⟨24⟩{
-function clusterContext(◧, threshold) {
-·const clusters = [];
-⥀│for (const item of ◧) {
-·let added = false;
-⥀│for (const cluster of clusters) {
-·const representative = cluster[0];
-·const distance = calculateDistance(item.embedding, representative.embedding);
-·if (distance <= threshold) {
-⊺│cluster.push(item);
-·added = true;
-·break;
-·}
-·}
-·if (!added) {
-⊺│clusters.push([item]);
-·}
-·}
-⊷│return clusters.map(cluster => cluster.map(item => item.text));
-·}
-}⟨/clusterContext⟩
-summarizeCluster(1)→void⟨3⟩{
-·function summarizeCluster(cluster) {
-⊷│return cluster.join(' ').slice(0, 200); // Naive summary by concatenation and truncation
-·}
-}⟨/summarizeCluster⟩
-manageContext(3)→void⟨12⟩{
-·function manageContext(conversation, windowSize, threshold) {
-⟛│const startIndex = Math.max(0, conversation.length - windowSize);
-·const slidingWindow = conversation.slice(startIndex);
-const ◧ = slidingWindow.map(text => ({
-·text,
-·embedding: generateEmbedding(text)
-·}));
-const clusters = clusterContext(◧, threshold);
-⊷│return clusters.map(summarizeCluster);
-·}
-}⟨/manageContext⟩
-·export { generateEmbedding, calculateDistance, clusterContext, summarizeCluster, manageContext };
-⟩SCL│61│59⊨│13⑂│45.0%↓⟩
+generateEmbedding(1)→void⟨12⟩{⊺⊷}
+calculateDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
+clusterContext(2)→void⟨24⟩{⥀⊺⊷}
+summarizeCluster(1)→void⟨3⟩{⊷}
+manageContext(3)→void⟨12⟩{⟛⊷}
+·export { generateEmbedding, calculateDistance, clusterContext, summarizeCluster,
+⟩SCL│8│17⊨│12⑂│92.8%↓⟩

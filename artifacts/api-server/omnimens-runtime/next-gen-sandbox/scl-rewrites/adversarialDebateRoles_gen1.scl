@@ -1,18 +1,5 @@
 ⟨SCL v1│adversarialDebateRoles_gen1.mjs│21→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩adversarialDebateRoles(1)→void⟨4⟩{
-⊩│export function adversarialDebateRoles(agents) {
-·const roles = ['proposer', 'opponent', 'adjudicator'];
-⊱│return agents.map((α, index) => ({ α, role: roles[index % roles.length] }));
-·}
-}⟨/adversarialDebateRoles⟩
-⊩resolveDebate(1)→void⟨7⟩{
-⊩│export function resolveDebate(debateContext) {
-⊲│const { proposer, opponent, adjudicator } = debateContext;
-·const proposal = proposer.propose();
-·const critique = opponent.critique(proposal);
-·const resolution = adjudicator.adjudicate(proposal, critique);
-⊷│return resolution;
-·}
-}⟨/resolveDebate⟩
-⟩SCL│17│16⊨│5⑂│19.0%↓⟩
+⊩adversarialDebateRoles(1)→void⟨4⟩{⊩⊱⊷}
+⊩resolveDebate(1)→void⟨7⟩{⊩⊲⊷}
+⟩SCL│4│8⊨│6⑂│81.0%↓⟩

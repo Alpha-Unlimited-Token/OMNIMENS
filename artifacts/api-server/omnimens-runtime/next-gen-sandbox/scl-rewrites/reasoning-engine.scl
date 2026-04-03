@@ -1,6 +1,6 @@
 ⟨SCL v1│reasoning-engine.ts│164→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊭│type ReasoningMode = "deductive" | "inductive" | "abductive" | "analogical" | "causal" | "creative";
+⊭│type ReasoningMode = "deductive" | "inductive" | "abductive"
 ⊬ReasoningStep⟨⟩
 ⊬CausalLink⟨⟩
 ⊬Analogy⟨⟩
@@ -12,7 +12,7 @@
 ·private selfCorrections = 0;
 ·private _initialized = false;
 ·initialize(): void { this._initialized = true; }
-·reason(question: string, mode: ReasoningMode = "deductive", maxSteps = 20): ReasoningStep[] {
+·reason(question: string, mode: ReasoningMode = "deductive", maxSteps = 20): Reas
 ·this.totalReasoned++;
 κchain
 ⑃│switch (mode) {
@@ -26,17 +26,17 @@
 ·this.selfCorrect(chain);
 ⊷│return chain;
 ·}
-·private deductiveReason(question: string, chain: ReasoningStep[], maxSteps: number): void {
-⊹│const premises = question.split(". ").filter(s => s.length > 0);
-⟛│for (let i = 0; i < Math.min(premises.length, maxSteps); i++) {
+·private deductiveReason(question: string, chain: ReasoningStep[], maxSteps: numb
+⊹│const premises = question.split(". ").filter(s => s.length >
+⟛│for (let i = 0; i < Math.min(premises.length, maxSteps); i++
 ⊺│chain.push({
 ·id: ++this.stepCounter, mode: "deductive",
-⊰│premise: premises[i], conclusion: `From "${premises[i]}", it follows that...`,
+⊰│premise: premises[i], conclusion: `From "${premises[i]}", it
 ·confidence: 0.9 - (i * 0.05), evidence: [premises[i]],
 ·});
 ·}
 ·}
-·private inductiveReason(question: string, chain: ReasoningStep[], maxSteps: number): void {
+·private inductiveReason(question: string, chain: ReasoningStep[], maxSteps: numb
 ⊺│chain.push({
 ·id: ++this.stepCounter, mode: "inductive",
 ⊰│premise: `Observed pattern: ${question}`,
@@ -44,7 +44,7 @@
 ·confidence: 0.7, evidence: [question],
 ·});
 ·}
-·private abductiveReason(question: string, chain: ReasoningStep[], maxSteps: number): void {
+·private abductiveReason(question: string, chain: ReasoningStep[], maxSteps: numb
 ⊺│chain.push({
 ·id: ++this.stepCounter, mode: "abductive",
 ⊰│premise: `Observation: ${question}`,
@@ -52,70 +52,70 @@
 ·confidence: 0.6, evidence: [question],
 ·});
 ·}
-·private analogicalReason(question: string, chain: ReasoningStep[], maxSteps: number): void {
-⊻│const relevant = this.analogies.filter(a => question.includes(a.source) || question.includes(a.target));
+·private analogicalReason(question: string, chain: ReasoningStep[], maxSteps: num
+⊻│const relevant = this.analogies.filter(a => question.include
 ⊹│if (relevant.length > 0) {
 ⥀│for (const analogy of relevant.slice(0, maxSteps)) {
 ⊺│chain.push({
 ·id: ++this.stepCounter, mode: "analogical",
-⊰│premise: `${analogy.source} is analogous to ${analogy.target}`,
-⊰│conclusion: `Transfer reasoning from ${analogy.source} domain to ${analogy.target}`,
-⊰│confidence: analogy.strength, evidence: [...analogy.mappings.entries()].map(([k, v]) => `${k} -> ${v}`),
+⊰│premise: `${analogy.source} is analogous to ${analogy.target
+⊰│conclusion: `Transfer reasoning from ${analogy.source} domai
+⊰│confidence: analogy.strength, evidence: [...analogy.mappings
 ·});
 ·}
 ·} else {
 ⊺│chain.push({
 ·id: ++this.stepCounter, mode: "analogical",
-·premise: question, conclusion: "No known analogies found — creating new analogy space",
+·premise: question, conclusion: "No known analogies found — creating new analogy 
 ·confidence: 0.3, evidence: [],
 ·});
 ·}
 ·}
-·private causalReason(question: string, chain: ReasoningStep[], maxSteps: number): void {
-⊻│const relevant = this.causalGraph.filter(link => question.includes(link.cause) || question.includes(link.effect));
+·private causalReason(question: string, chain: ReasoningStep[], maxSteps: number)
+⊻│const relevant = this.causalGraph.filter(link => question.in
 ⥀│for (const link of relevant.slice(0, maxSteps)) {
 ⊺│chain.push({
 ·id: ++this.stepCounter, mode: "causal",
-⊰│premise: `${link.cause} causes ${link.effect} (observed ${link.observedCount} times)`,
-⊰│conclusion: `Causal chain identified with strength ${link.strength.toFixed(2)}`,
-⊰│confidence: link.strength, evidence: [`Observed ${link.observedCount} times`],
+⊰│premise: `${link.cause} causes ${link.effect} (observed ${li
+⊰│conclusion: `Causal chain identified with strength ${link.st
+⊰│confidence: link.strength, evidence: [`Observed ${link.obser
 ·});
 ·}
 ·}
-·private creativeReason(question: string, chain: ReasoningStep[], maxSteps: number): void {
+·private creativeReason(question: string, chain: ReasoningStep[], maxSteps: numbe
 κwords
-·const randomCombination = words.sort(() => Math.random() - 0.5).slice(0, 3).join(" ");
+·const randomCombination = words.sort(() => Math.random() - 0.5).slice(0, 3).join
 ⊺│chain.push({
 ·id: ++this.stepCounter, mode: "creative",
 ⊰│premise: `Creative recombination of: ${question}`,
-⊰│conclusion: `Novel insight: ${randomCombination} — unexpected connection found`,
+⊰│conclusion: `Novel insight: ${randomCombination} — unexpecte
 ·confidence: 0.4, evidence: ["creative_leap", "divergent_thinking"],
 ·});
 ·}
 ·private selfCorrect(chain: ReasoningStep[]): void {
 ·for (let i = 1; i < chain.length; i++) {
 ·if (chain[i].confidence < 0.3 && chain[i - 1].confidence > 0.7) {
-⊰│chain[i].conclusion = `[SELF-CORRECTED] Revised: ${chain[i].conclusion}`;
-⟛│chain[i].confidence = Math.min(chain[i].confidence + 0.2, chain[i - 1].confidence);
+⊰│chain[i].conclusion = `[SELF-CORRECTED] Revised: ${chain[i].
+⟛│chain[i].confidence = Math.min(chain[i].confidence + 0.2, ch
 ·this.selfCorrections++;
 ·}
 ·}
 ·}
 ·addCausalLink(cause: string, effect: string, strength: number): void {
-·const existing = this.causalGraph.find(l => l.cause === cause && l.effect === effect);
-⟛│if (existing) { existing.observedCount++; existing.strength = Math.min(1, existing.strength + 0.05); }
-⊺│else { this.causalGraph.push({ cause, effect, strength, observedCount: 1 }); }
+·const existing = this.causalGraph.find(l => l.cause === cause && l.effect === ef
+⟛│if (existing) { existing.observedCount++; existing.strength 
+⊺│else { this.causalGraph.push({ cause, effect, strength, obse
 ⊹│if (this.causalGraph.length > 1000) {
-·this.causalGraph.sort((a, b) => b.strength * b.observedCount - a.strength * a.observedCount);
+·this.causalGraph.sort((a, b) => b.strength * b.observedCount - a.strength * a.ob
 ·this.causalGraph = this.causalGraph.slice(0, 500);
 ·}
 ·}
-addAnalogy(η: string, θ: string, mappings: Map<string, string>): void {
-⊺│this.analogies.push({ source, target, mappings, strength: 0.5 });
-⊹│if (this.analogies.length > 200) this.analogies = this.analogies.slice(-100);
+addAnalogy(η: string, θ: string, mappings: Map<string, string>): void 
+⊺│this.analogies.push({ source, target, mappings, strength: 0.
+⊹│if (this.analogies.length > 200) this.analogies = this.analo
 ·}
 ·getState(): Record<string, unknown> {
-⊷│return { initialized: this._initialized, totalReasoned: this.totalReasoned, selfCorrections: this.selfCorrections, causalLinks: this.causalGraph.length, analogies: this.analogies.length, steps: this.stepCounter };
+⊷│return { initialized: this._initialized, totalReasoned: this
 ·}
 ·shutdown(): void { this._initialized = false; }
 ·}

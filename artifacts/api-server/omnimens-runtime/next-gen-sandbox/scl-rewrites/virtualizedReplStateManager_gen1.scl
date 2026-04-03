@@ -5,67 +5,13 @@
 κKEY
 κIV_LENGTH
 κSNAPSHOT_FILE
-⊩encryptState(2)→void⟨10⟩{
-⊩│export function encryptState(key, data) {
-·const iv = randomBytes(IV_LENGTH);
-·const cipher = createCipheriv(ALGORITHM, key, iv);
-⟠│const serializedData = JSON.stringify(data);
-·const encrypted = Buffer.concat([cipher.update(serializedData, 'utf8'), cipher.final()]);
-·const authTag = cipher.getAuthTag();
-⊷│return { ciphertext: encrypted.toString('hex'), iv: iv.toString('hex'), authTag: authTag.toString('hex') };
-·}
-}⟨/encryptState⟩
-⊩decryptState(2)→void⟨12⟩{
-⊩│export function decryptState(key, encryptedPayload) {
-⊲│const { ciphertext, iv, authTag } = encryptedPayload;
-·const decipher = createDecipheriv(ALGORITHM, key, Buffer.from(iv, 'hex'));
-·decipher.setAuthTag(Buffer.from(authTag, 'hex'));
-·const decrypted = Buffer.concat([
-·decipher.update(Buffer.from(ciphertext, 'hex')),
-·decipher.final()
-·]);
-⟠│return JSON.parse(decrypted.toString('utf8'));
-·}
-}⟨/decryptState⟩
-⊩saveState(1)→void⟨4⟩{
-⊩│export function saveState(state) {
-·const encryptedState = encryptState(KEY, state);
-⟠│writeFileSync(SNAPSHOT_FILE, JSON.stringify(encryptedState, null, 2), 'utf8');
-·}
-}⟨/saveState⟩
-⊩loadState(1)→void⟨6⟩{
-⊩│export function loadState() {
-⊄│if (!existsSync(SNAPSHOT_FILE)) return {};
-⟠│const encryptedState = JSON.parse(readFileSync(SNAPSHOT_FILE, 'utf8'));
-⊷│return decryptState(KEY, encryptedState);
-·}
-}⟨/loadState⟩
-⊩compactState(2)→void⟨9⟩{
-⊩│export function compactState(state, ttl) {
-⏰│const now = Date.now();
-·const compactedState = {};
-⊸│for (const [key, { value, timestamp }] of Object.entries(state)) {
-·if (now - timestamp <= ttl) {
-·compactedState[key] = { value, timestamp };
-·}
-·}
-}⟨/compactState⟩
+⊩encryptState(2)→void⟨10⟩{⊩⟠⊷}
+⊩decryptState(2)→void⟨12⟩{⊩⊲⟠⊷}
+⊩saveState(1)→void⟨4⟩{⊩⟠📁⟠}
+⊩loadState(1)→void⟨6⟩{⊩⊄⊷⟠📁⟠}
+⊩compactState(2)→void⟨9⟩{⊩⏰⊸}
 ⊷│return compactedState;
 ·}
-⊩startAutoCompaction(2)→void⟨7⟩{
-⊩│export function startAutoCompaction(ttl, interval) {
-⟳│setInterval(() => {
-·const state = loadState();
-·const compactedState = compactState(state, ttl);
-·saveState(compactedState);
-·}, interval);
-·}
-}⟨/startAutoCompaction⟩
-⊩updateState(3)→void⟨5⟩{
-⊩│export function updateState(state, key, value) {
-⏰│const timestamp = Date.now();
-·state[key] = { value, timestamp };
-⊷│return state;
-·}
-}⟨/updateState⟩
-⟩SCL│70│73⊨│21⑂│44.4%↓⟩
+⊩startAutoCompaction(2)→void⟨7⟩{⊩⟳⊱}
+⊩updateState(3)→void⟨5⟩{⊩⏰⊷}
+⟩SCL│16│37⊨│25⑂│87.3%↓⟩

@@ -35,85 +35,17 @@ engineRegistry.registerEngine("⬡-spiders", "NORMAL", { dbQuota: 10 });
 κchildren
 κdirectives
 ·const nid = (p = "s") =>
-⏰│`${p}_${Date.now().toString(36)}_${Math.random().toString(36).slice(2, 6)}`;
+⏰│`${p}_${Date.now().toString(36)}_${Math.random().toString(36
 κroles
 ·const roleOf = (idx: number) => roles[idx % roles.length];
 ⏰│const now = () => Date.now();
-📢│const log = (m: string) => console.log(`[OMNIMENS-NEURAL-SPIDERS] ${m}`);
-⟿harvestBrainDB(1)→Promise<Harvest>⟨16⟩{
-·async function harvestBrainDB(): Promise<Harvest> {
-const total = await dbGateway.read("⬡-spiders", "brain_entries", {
-·op: "count",
-·});
-const active = await dbGateway.read("⬡-spiders", "brain_entries", {
-·op: "count",
-·where: { active: true },
-·});
-⊷│return {
-·source: "brain_database",
-·metrics: { total, active },
-⊳│healthScore: total ? active / total : 0,
-·insights: active,
-·ts: now(),
-·};
-·}
-}⟨/harvestBrainDB⟩
-⟿harvestEngines(1)→Promise<Harvest>⟨11⟩{
-·async function harvestEngines(): Promise<Harvest> {
-⊲│const { engines } = await import("./omnimens-engine-registry.js");
-❔│const healthy = engines.filter((e: any) => e.health?.healthy).length;
-⊷│return {
-·source: "engine_registry",
-·metrics: { total: engines.length, healthy },
-⊳│healthScore: engines.length ? healthy / engines.length : 0,
-·insights: healthy,
-·ts: now(),
-·};
-·}
-}⟨/harvestEngines⟩
+📢│const log = (m: string) => console.log(`[OMNIMENS-NEURAL-SPI
+⟿harvestBrainDB(1)→Promise<Harvest>⟨16⟩{⊷⊳}
+⟿harvestEngines(1)→Promise<Harvest>⟨11⟩{⊲⊴❔⊷⊳}
 κharvesters
-createParent(3)→Spider⟨15⟩{
-function createParent(name: string, target: string, ⬡: string): Spider {
-·const sp: Spider = {
-·id: nid("p"),
-·name,
-type: "⊢",
-·target,
-targetRegion: ⬡,
-·status: "active",
-·crawlCount: 0,
-·synapsesInjected: 0,
-·beeRole: roleOf(parents.size),
-·};
-⊡│parents.set(sp.id, sp);
-⊷│return sp;
-·}
-}⟨/createParent⟩
-spawnChild(2)→Spider⟨20⟩{
-function spawnChild(⬡: string, urgency = 1): Spider {
-·const ch: Spider = {
-·id: nid("c"),
-⊰│name: `child-${⬡}`,
-·type: "child",
-target: ⬡,
-targetRegion: ⬡,
-·status: "active",
-·crawlCount: 0,
-·synapsesInjected: 0,
-·beeRole: roleOf(children.size + parents.size),
-·};
-⊡│children.set(ch.id, ch);
-⚡→│spikeBus.scheduleSpike(
-⊰│`⬡-spiders:expire:${ch.id}`,
-·{},
-·CHILD_LIFETIME * CRAWL_INTERVAL
-·);
-⊷│return ch;
-·}
-}⟨/spawnChild⟩
-issueDirective(3)→void⟨1⟩{
-·function issueDirective(tRegion: string, type: DirectiveType, params = {}) {
-}⟨/issueDirective⟩
+createParent(3)→Spider⟨15⟩{⊡⊷}
+spawnChild(2)→Spider⟨20⟩{⊰⊡⚡→⊷}
+issueDirective(3)→void⟨1⟩{}
 κd
 ⊡│directives.set(d.id, d);
 cognitionBus.shareInsight("⬡-spiders", {
@@ -121,100 +53,5 @@ cognitionBus.shareInsight("⬡-spiders", {
 ·data: d,
 ·});
 ·}
-⟿crawl(1)→void⟨126⟩{
-·async function crawl() {
-·const harvests: Harvest[] = [];
-⥀│for (const h of harvesters) {
-·try {
-⊴│harvests.push(await h());
-·} catch {}
-·}
-·harvests.forEach((h) =>
-cognitionBus.shareInsight("⬡-spiders", {
-·type: "harvest",
-·data: h,
-·})
-·);
-·const unstable = harvests.some((h) => h.healthScore < STAB_THRESHOLD);
-·if (unstable) {
-·const weak = harvests
-·.filter((h) => h.healthScore < CRIT_FLOOR)
-·.map((h) => h.source);
-·weak.forEach((r) => issueDirective(r, "repair", { urgency: 1 }));
-·}
-·}
-·function heartbeat() {
-⊱│directives.forEach((d) => {
-·const sp =
-⊡│parents.get(d.params.assigneeId) ||
-⊡│children.get(d.params.assigneeId) ||
-·[...parents.values(), ...children.values()].find(
-·(s) => !s.currentDirectiveId
-·);
-⊄│if (!sp) return;
-·sp.currentDirectiveId = d.id;
-·d.done = now();
-·sp.synapsesInjected += d.params.synCnt || 0;
-·sp.crawlCount++;
-cognitionBus.reportOutcome("⬡-spiders", {
-·useful: true,
-⊰│◧: `${d.type}:${d.targetRegion}`,
-·});
-·});
-⊱│directives.forEach((d) => {
-·if (d.done) directives.delete(d.id);
-·});
-·}
-·function scheduleLoops() {
-⊱│spikeBus.on("⬡-spiders:crawl", async () => {
-⊴│await crawl();
-⚡→│spikeBus.scheduleSpike("⬡-spiders:crawl", {}, CRAWL_INTERVAL);
-·});
-⊱│spikeBus.on("⬡-spiders:heartbeat", () => {
-·heartbeat();
-⚡→│spikeBus.scheduleSpike("⬡-spiders:heartbeat", {}, HEARTBEAT_INTERVAL);
-·});
-⊱│spikeBus.on(/⬡-spiders:expire:(.+)/, (data, match) => {
-·const id = match[1];
-⊡│const ch = children.get(id);
-·if (ch) {
-·ch.status = "expired";
-·children.delete(id);
-cognitionBus.reportOutcome("⬡-spiders", {
-·useful: true,
-⊰│◧: `child-expire:${id}`,
-·});
-·}
-·});
-⊱│spikeBus.on("attention:⬡-spiders", () => {
-⚡→│spikeBus.scheduleSpike("⬡-spiders:crawl", {}, 1_000);
-·});
-⊱│spikeBus.on("cognition:curiosity", () => {
-·spawnChild("default_mode_network", 0.5);
-·});
-⚡→│spikeBus.scheduleSpike("⬡-spiders:crawl", {}, 1_000);
-⚡→│spikeBus.scheduleSpike("⬡-spiders:heartbeat", {}, 2_000);
-·}
-⊩│export function start() {
-·if (parents.size === 0) {
-·createParent("brain-crawler", "brain_database", "hippocampus");
-·createParent("engine-crawler", "engine_registry", "prefrontal_cortex");
-·}
-·scheduleLoops();
-·log("started");
-·}
-⊩│export function getState() {
-⊷│return {
-·parents: parents.size,
-·children: children.size,
-·directives: directives.size,
-·};
-·}
-⊩│export function shutdown() {
-engineRegistry.unregisterEngine("⬡-spiders");
-⚡→│spikeBus.offNamespace("⬡-spiders");
-log("shutdown ⊣");
-·}
-·start();
-}⟨/crawl⟩
-⟩SCL│219│202⊨│49⑂│32.2%↓⟩
+⟿crawl(1)→void⟨126⟩{⥀⊴⊺⊱⊡⊄⊰⚡→⊩⊷}
+⟩SCL│56│53⊨│33⑂│82.7%↓⟩

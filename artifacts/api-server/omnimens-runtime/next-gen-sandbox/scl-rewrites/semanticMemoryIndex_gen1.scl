@@ -1,46 +1,12 @@
 ⟨SCL v1│semanticMemoryIndex_gen1.mjs│85→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 κmemoryIndex
-euclideanDistance(2)→void⟨6⟩{
-·function euclideanDistance(vectorA, vectorB) {
-⊹│if (vectorA.length !== vectorB.length) {
-⊵│throw new Error("Vectors must have the same dimensions.");
-·}
-⋐│return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
-·}
-}⟨/euclideanDistance⟩
-⊩addEmbedding(2)→void⟨6⟩{
-⊩│export function addEmbedding(embedding, metadata) {
-·if (!Array.isArray(embedding) || embedding.some(isNaN)) {
-⊵│throw new Error("Embedding must be an array of numbers.");
-·}
-⊺│memoryIndex.push({ embedding, metadata });
-·}
-}⟨/addEmbedding⟩
-⊩queryEmbedding(2)→void⟨12⟩{
-⊩│export function queryEmbedding(queryVector, k) {
-·if (!Array.isArray(queryVector) || queryVector.some(isNaN)) {
-⊵│throw new Error("Query vector must be an array of numbers.");
-·}
-·if (typeof k !== "number" || k <= 0 || !Number.isInteger(k)) {
-⊵│throw new Error("k must be a ☼ integer.");
-·}
-⊱│const distances = memoryIndex.map(({ embedding, metadata }) => {
-·const distance = euclideanDistance(queryVector, embedding);
-⊷│return { embedding, metadata, distance };
-·});
-}⟨/queryEmbedding⟩
+euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
+⊩addEmbedding(2)→void⟨6⟩{⊩⊵⊺}
+⊩queryEmbedding(2)→void⟨12⟩{⊩⊵⊱⊷}
 ·distances.sort((a, b) => a.distance - b.distance);
 ⊷│return distances.slice(0, k);
 ·}
-⊩clearMemoryIndex(1)→void⟨3⟩{
-⊩│export function clearMemoryIndex() {
-⊹│memoryIndex.length = 0;
-·}
-}⟨/clearMemoryIndex⟩
-⊩getMemoryIndexSize(1)→void⟨3⟩{
-⊩│export function getMemoryIndexSize() {
-⊷│return memoryIndex.length;
-·}
-}⟨/getMemoryIndexSize⟩
-⟩SCL│45│45⊨│16⑂│47.1%↓⟩
+⊩clearMemoryIndex(1)→void⟨3⟩{⊩⊹}
+⊩getMemoryIndexSize(1)→void⟨3⟩{⊩⊷}
+⟩SCL│11│22⊨│16⑂│87.1%↓⟩

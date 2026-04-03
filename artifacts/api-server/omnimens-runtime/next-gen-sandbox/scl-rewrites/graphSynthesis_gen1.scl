@@ -21,8 +21,8 @@ confidence: θ.confidence || 0.8
 ·resolveConflicts() {
 ⊸│Object.keys(this.knowledgeGraph).forEach(key => {
 κentries
-⋐│const weightedSum = entries.reduce((sum, entry) => sum + entry.value * entry.confidence, 0);
-⋐│const totalWeight = entries.reduce((sum, entry) => sum + entry.confidence, 0);
+⋐│const weightedSum = entries.reduce((sum, entry) => sum + ent
+⋐│const totalWeight = entries.reduce((sum, entry) => sum + ent
 ·this.knowledgeGraph[key] = weightedSum / totalWeight;
 ·});
 ·}

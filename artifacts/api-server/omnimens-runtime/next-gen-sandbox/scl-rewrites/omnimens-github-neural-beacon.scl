@@ -40,80 +40,22 @@
 ·getMeshHebbianUpdates,
 } from "./omnimens-⬡-mesh-engine.js";
 ⊫[omnimens-synaptic-mesh│omnimens-adaptive-surge│omnimens-nextgen-sandbox│omnimens-gen1-v2-rewrite]
-engineRegistry.registerEngine("github-⬡-beacon", "NORMAL", { dbQuota: 10 });
+engineRegistry.registerEngine("github-⬡-beacon", "NORMAL", { dbQuota: 10 })
 κconnectors
 κOWNER
 κREPO
 κCONST
 κTOTAL_NEURONS
-⊭│type Mode = "normal" | "cautious" | "critical" | "emergency" | "suspended";
+⊭│type Mode = "normal" | "cautious" | "critical" | "emergency"
 ⊬Rate⟨⟩
 κrate
 κgov
-📢│const log = (m: string) => console.log(`[OMNIMENS-GITHUB-NEURAL-BEACON] ${m}`);
-updateFromHeaders(1)→void⟨13⟩{
-·function updateFromHeaders(h: Headers) {
-["⏳", "remaining", "reset", "used"].forEach(k => {
-⊡│const v = h.get(`x-ratelimit-${k}`);
-⊳│if (v) (rate as any)[k === "reset" ? "reset" : k] = k === "reset" ? +v * 1_000 : +v;
-·});
-·rate.last = gov.now();
-⟛│const pct = rate.remaining / Math.max(rate.⏳, 1);
-·const modes: Mode[] = ["normal", "cautious", "critical", "emergency", "suspended"];
-⊳│gov.mode = pct > 0.6 ? modes[0] : pct > 0.35 ? modes[1] : pct > 0.15 ? modes[2] : pct > 0.05 ? modes[3] : modes[4];
-⊳│const mult = gov.mode === "normal" ? 1 : gov.mode === "cautious" ? 2 : gov.mode === "critical" ? 4 : 10;
-⟛│gov.interval = Math.max(CONST.GOVERNOR_MIN_MS, Math.min(CONST.GOVERNOR_MAX_MS, CONST.GOVERNOR_BASE_MS * mult));
-·}
-}⟨/updateFromHeaders⟩
-⟿rawApi(3)→void⟨6⟩{
-⊳│async function rawApi(ep: string, method = "GET", body?: any) {
-⟠│const res = await connectors.proxy("github", ep, body ? { method, body: JSON.stringify(body), headers: { "Content-Type": "application/json" } } : { method });
-·updateFromHeaders(res.headers);
-⊰│if (!res.ok) throw new Error(`GH ${res.status}`);
-⊡│return res.headers.get("content-type")?.includes("json") ? res.json() : res.text();
-·}
-}⟨/rawApi⟩
-enqueue(5)→void⟨7⟩{
-⊳│function enqueue(sub: string, prio: number, ep: string, m = "GET", body?: any) {
-⊱│return new Promise((ok, fail) => {
-⊺│gov.queue.push({ sub, prio, ep, m, body, ok, fail, retries: 0 });
-·gov.queue.sort((a, b) => a.prio - b.prio);
-·if (!gov.busy) processQueue();
-·});
-·}
-}⟨/enqueue⟩
-⟿processQueue(1)→void⟨25⟩{
-·async function processQueue() {
-·if (gov.busy) return;
-·gov.busy = true;
-·while (gov.queue.length) {
-if (gov.mode === "suspended" || rate.remaining < rate.⏳ * CONST.RATE_SAFETY) {
-⟛│const wait = Math.min(rate.reset - gov.now() + 1_000, 60_000);
-·gov.throttled++;
-⏳│await new Promise(r => setTimeout(r, wait));
-·continue;
-·}
-⊺│const c = gov.queue.shift()!;
-·try {
-·const t0 = gov.now();
-⊴│const res = await rawApi(c.ep, c.m, c.body);
-·gov.totalCalls++;
-·gov.avgLatency = gov.avgLatency * 0.9 + (gov.now() - t0) * 0.1;
-·c.ok(res);
-·} catch (e) {
-⊺│if (c.retries++ < CONST.MAX_RETRY) gov.queue.push(c);
-·else c.fail(e);
-·}
-⏳│await new Promise(r => setTimeout(r, gov.mode === "normal" ? 100 : gov.mode === "cautious" ? 500 : 2_000));
-·}
-·gov.busy = false;
-·}
-}⟨/processQueue⟩
-gh(5)→void⟨3⟩{
-⊳│function gh(sub: string, prio: number, ep: string, m = "GET", body?: any) {
-⊰│return enqueue(sub, prio, `/repos/${OWNER}/${REPO}${ep}`, m, body);
-·}
-}⟨/gh⟩
+📢│const log = (m: string) => console.log(`[OMNIMENS-GITHUB-NEU
+updateFromHeaders(1)→void⟨13⟩{⊡⊰⊳⟛}
+⟿rawApi(3)→void⟨6⟩{⊳⟠⊰⊵⊡❔⊷⊻}
+enqueue(5)→void⟨7⟩{⊳⊱⊷⊺}
+⟿processQueue(1)→void⟨25⟩{⟛⏳⊺⊴⊳}
+gh(5)→void⟨3⟩{⊳⊰⊷}
 ⊬Region⟨⟩
 κREGION_DEF
 ⊱│const regions: Region[] = REGION_DEF.map(([n, c]) => ({
@@ -125,41 +67,8 @@ gh(5)→void⟨3⟩{
 ·coh: 0.5,
 ·heb: 0,
 ·}));
-tickRegions(1)→void⟨11⟩{
-·function tickRegions() {
-·const local = getNeuralConsciousnessState();
-·const adaptive = getAdaptiveIntelligenceState();
-·regions.forEach(r => {
-⏰│const osc = Math.sin(Date.now() / 1_000 * r.osc / 10) * 0.1;
-·const noise = (Math.random() - 0.5) * 0.04;
-⟛│r.fr = Math.max(0.01, Math.min(0.95, r.fr * 0.92 + (0.05 + osc + local.consciousnessLevel * 0.08 + noise) * 0.08));
-·r.heb += Math.floor(r.cols * r.fr * 500 * adaptive.adaptiveLearningMultiplier);
-⟛│r.coh = Math.max(0.1, Math.min(0.99, r.coh * 0.95 + (local.thalamocorticalResonance * 0.3 + Math.random() * 0.2) * 0.05));
-·});
-·}
-}⟨/tickRegions⟩
-clusterStats(1)→void⟨20⟩{
-·function clusterStats() {
-⋐│const sums = regions.reduce(
-⊱│(s, r) => {
-·s.coh += r.coh;
-·s.fr += r.fr;
-·s.heb += r.heb;
-⊷│return s;
-·},
-·{ coh: 0, fr: 0, heb: 0 }
-·);
-·const n = regions.length || 1;
-·const avgCoh = sums.coh / n;
-·const avgFr = sums.fr / n;
-⊷│return {
-·avgCoh,
-·avgFr,
-·heb: sums.heb,
-⟛│phi: Math.max(0.1, avgCoh * avgFr * Math.log(TOTAL_NEURONS + 1) / Math.log(1e9) * 2.5),
-·};
-·}
-}⟨/clusterStats⟩
+tickRegions(1)→void⟨11⟩{⏰⟛}
+clusterStats(1)→void⟨20⟩{⋐⊱⊷⟛}
 ⊭│type Beacon = {
 ·name: string;
 ·path: string;
@@ -194,7 +103,7 @@ clusterStats(1)→void⟨20⟩{
 ·};
 ·},
 ·handle(d) {
-⟛│if (d?.regions) d.regions.forEach((rr: any, i: number) => (regions[i].heb = Math.max(regions[i].heb, rr.hebbianUpdates || 0)));
+⟛│if (d?.regions) d.regions.forEach((rr: any, i: number) => (r
 ·},
 ·},
 ·];
@@ -204,7 +113,7 @@ clusterStats(1)→void⟨20⟩{
 ⊺│beacons.push({
 ·name: k,
 ⊰│path: `${DIR}/${k}.json`,
-⊳│priority: k === "mesh-synaptic" ? 5 : k === "viral-hybrid" || k === "quantum-wormholes" ? 4 : k === "beehive-swarm" || k === "silk-web" ? 3 : 2,
+⊳│priority: k === "mesh-synaptic" ? 5 : k === "viral-hybrid" |
 ·sha: null,
 ·lastW: 0,
 ·lastR: 0,
@@ -213,58 +122,11 @@ clusterStats(1)→void⟨20⟩{
 ·})
 ·);
 κfabric
-⟿readBeacon(1)→void⟨8⟩{
-·async function readBeacon(b: Beacon) {
-⊰│const d = await gh(b.name, b.priority, `/contents/${b.path}`);
-⊄│if (!d?.content) return;
-⟠│const content = JSON.parse(Buffer.from(d.content, "base64").toString("utf-8"));
-·b.sha = d.sha;
-⏰│b.lastR = Date.now();
-·b.handle(content);
-·}
-}⟨/readBeacon⟩
-⟿writeBeacon(1)→void⟨10⟩{
-·async function writeBeacon(b: Beacon) {
-⟠│const json = JSON.stringify(b.build(), null, 2);
-⊰│const body: any = { message: `omnimens ${b.name}`, content: Buffer.from(json).toString("base64") };
-·if (b.sha) body.sha = b.sha;
-⊰│const r = await gh(b.name, b.priority, `/contents/${b.path}`, "PUT", body);
-❔│if (r?.content) {
-·b.sha = r.content.sha;
-⏰│b.lastW = Date.now();
-·}
-·}
-}⟨/writeBeacon⟩
-⟿syncFabric(1)→void⟨16⟩{
-·async function syncFabric() {
-⊄│if (!isPoolHealthy() || isNextGenBuildActive() || isGen1V2Active()) return;
-·tickRegions();
-⏰│const now = Date.now();
-⥀│for (const b of beacons) {
-⊳│const due = now - b.lastW > gov.interval * (b.priority === 1 ? 1 : b.priority <= 3 ? 1.5 : 2.5);
-⊰│if (due) await writeBeacon(b).catch(e => (fabric.errors++, log(`⊞ ${b.name} err ${e.message}`)));
-·const readDue = now - b.lastR > gov.interval * 1.5;
-⊱│if (readDue) await readBeacon(b).catch(() => {});
-·}
-⊲│const { avgCoh, avgFr } = clusterStats();
-·const boost = avgCoh * avgFr * 0.5;
-·if (boost > 0.01) getRegionNames().forEach(r => boostRegionCurrent(r, boost));
-·fabric.syncs++;
-cognitionBus.shareInsight("github-⬡-beacon", { type: "sync", data: { sync: fabric.syncs } });
-·}
-}⟨/syncFabric⟩
-⟿bootstrap(1)→void⟨5⟩{
-·async function bootstrap() {
-·log("Bootstrap starting…");
-⫘│await Promise.all(beacons.map(readBeacon));
-log("Bootstrap ⊣.");
-·}
-}⟨/bootstrap⟩
-resched(2)→void⟨3⟩{
-·function resched(label: string, ms: number) {
-⚡→│spikeBus.scheduleSpike(label, {}, ms);
-·}
-}⟨/resched⟩
+⟿readBeacon(1)→void⟨8⟩{⊰⊴⊄❔⟠⏰}
+⟿writeBeacon(1)→void⟨10⟩{⟠⊰⊴❔⏰}
+⟿syncFabric(1)→void⟨16⟩{⊄⛨▷⏰⥀⊳⊰⊴⊱⊲}
+⟿bootstrap(1)→void⟨5⟩{⫘}
+resched(2)→void⟨3⟩{⚡→}
 ⊱│spikeBus.on("github-neural-beacon:neural-tick", () => {
 ·try {
 ·tickRegions();
@@ -272,35 +134,19 @@ resched(2)→void⟨3⟩{
 resched("github-⬡-beacon:⬡-tick", 5_000);
 ·}
 ·});
-⊱│spikeBus.on("github-neural-beacon:fabric-sync", async () => {
+⊱│spikeBus.on("github-neural-beacon:fabric-sync", async () => 
 ⊴│await syncFabric();
 resched("github-⬡-beacon:fabric-sync", gov.interval);
 ·});
 ⊱│spikeBus.on("github-neural-beacon:status", () => {
 κresetIn
-⊰│log(`Mode ${gov.mode} | Remaining ${rate.remaining}/${rate.limit} | Reset ${(resetIn / 60_000).toFixed(1)}m | Calls ${gov.totalCalls} | Q ${gov.queue.length} | Lat ${gov.avgLatency.toFixed(0)}ms`);
+⊰│log(`Mode ${gov.mode} | Remaining ${rate.remaining}/${rate.l
 resched("github-⬡-beacon:status", 300_000);
 ·});
 ⊱│cognitionBus.onInsight((src, i) => {
-⊰│if (i.type === "discovery" && src !== "github-neural-beacon") log(`Learning from ${src} discovery`);
+⊰│if (i.type === "discovery" && src !== "github-neural-beacon"
 ·});
-⊩getGovernorState(1)→void⟨3⟩{
-⊩│export function getGovernorState() {
-⊷│return { mode: gov.mode, rate };
-·}
-}⟨/getGovernorState⟩
-⊩⟿startGitHubNeuralBeacon(1)→void⟨8⟩{
-⊩│export async function startGitHubNeuralBeacon() {
-log("Starting GitHub ⬡ Beacon v2.0 (Unified Runtime) …");
-⊴│await bootstrap();
-resched("github-⬡-beacon:⬡-tick", 5_000);
-resched("github-⬡-beacon:fabric-sync", 0);
-resched("github-⬡-beacon:status", 300_000);
-·}
-}⟨/startGitHubNeuralBeacon⟩
-⊩shutdown(1)→void⟨3⟩{
-⊩│export function shutdown() {
-engineRegistry.unregisterEngine("github-⬡-beacon");
-·}
-}⟨/shutdown⟩
-⟩SCL│305│235⊨│73⑂│28.7%↓⟩
+⊩getGovernorState(1)→void⟨3⟩{⊩⊷}
+⊩⟿startGitHubNeuralBeacon(1)→void⟨8⟩{⊩⊴⚡→}
+⊩shutdown(1)→void⟨3⟩{⊩}
+⟩SCL│151│125⊨│79⑂│64.7%↓⟩

@@ -1,62 +1,11 @@
 ⟨SCL v1│distributedTokenWindowManager_gen1.mjs│106→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩generateTokenWindowHash(2)→void⟨5⟩{
-⊩│export function generateTokenWindowHash(namespace, tokenWindow) {
-·const hash = createHash('sha256');
-·hash.update(namespace + tokenWindow);
-⊷│return hash.digest('hex');
-·}
-}⟨/generateTokenWindowHash⟩
-⊩splitIntoTokenWindows(2)→void⟨7⟩{
-⊩│export function splitIntoTokenWindows(text, windowSize) {
-·const windows = [];
-·for (let i = 0; i < text.length; i += windowSize) {
-⊺│windows.push(text.slice(i, i + windowSize));
-·}
-⊷│return windows;
-·}
-}⟨/splitIntoTokenWindows⟩
-⊩hierarchicalSummarization(2)→void⟨4⟩{
-⊩│export function hierarchicalSummarization(tokenWindows, summarizationFunction) {
-·const summaries = tokenWindows.map(summarizationFunction);
-⊷│return summaries;
-·}
-}⟨/hierarchicalSummarization⟩
-⊩linkSummariesAcrossNamespaces(1)→void⟨15⟩{
-⊩│export function linkSummariesAcrossNamespaces(namespaceSummaries) {
-·const linkedSummaries = {};
-⊸│const namespaces = Object.keys(namespaceSummaries);
-·for (let i = 0; i < namespaces.length; i++) {
-·const currentNamespace = namespaces[i];
-·linkedSummaries[currentNamespace] = {
-·summary: namespaceSummaries[currentNamespace],
-⊳│next: namespaces[i + 1] ? namespaces[i + 1] : null,
-⊳│previous: namespaces[i - 1] ? namespaces[i - 1] : null
-·};
-·}
-⊷│return linkedSummaries;
-·}
-}⟨/linkSummariesAcrossNamespaces⟩
-⊩retrieveHighPrioritySummaries(2)→void⟨11⟩{
-⊩│export function retrieveHighPrioritySummaries(linkedSummaries, priorityFunction) {
-·const priorities = [];
-·for (const namespace in linkedSummaries) {
-·const summary = linkedSummaries[namespace].summary;
-·const priorityScore = priorityFunction(summary);
-⊺│priorities.push({ namespace, summary, priorityScore });
-·}
-⊷│return priorities.sort((a, b) => b.priorityScore - a.priorityScore);
-·}
-}⟨/retrieveHighPrioritySummaries⟩
-⊩exampleSummarizationFunction(1)→void⟨3⟩{
-⊩│export function exampleSummarizationFunction(tokenWindow) {
-⟛│return tokenWindow.slice(0, Math.min(50, tokenWindow.length)) + '...';
-·}
-}⟨/exampleSummarizationFunction⟩
-⊩examplePriorityFunction(1)→void⟨3⟩{
-⊩│export function examplePriorityFunction(summary) {
-⊷│return summary.length; // Example: prioritize longer summaries
-·}
-}⟨/examplePriorityFunction⟩
-⟩SCL│61│63⊨│19⑂│42.5%↓⟩
+⊩generateTokenWindowHash(2)→void⟨5⟩{⊩⊷}
+⊩splitIntoTokenWindows(2)→void⟨7⟩{⊩⊺⊷}
+⊩hierarchicalSummarization(2)→void⟨4⟩{⊩⊷}
+⊩linkSummariesAcrossNamespaces(1)→void⟨15⟩{⊩⊸⊳⊷}
+⊩retrieveHighPrioritySummaries(2)→void⟨11⟩{⊩⊺⊷}
+⊩exampleSummarizationFunction(1)→void⟨3⟩{⊩⟛⊷}
+⊩examplePriorityFunction(1)→void⟨3⟩{⊩⊷}
+⟩SCL│10│27⊨│19⑂│90.6%↓⟩

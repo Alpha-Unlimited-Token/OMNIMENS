@@ -2,66 +2,11 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
 κmetrics
-⊩updateMetrics(2)→void⟨4⟩{
-⊩│export function updateMetrics(accuracy, responseTime) {
-⊺│metrics.accuracy.push(accuracy);
-⊺│metrics.responseTime.push(responseTime);
-·}
-}⟨/updateMetrics⟩
-⊩calculateMovingAverage(2)→void⟨6⟩{
-⊩│export function calculateMovingAverage(data, windowSize) {
-⟛│const start = Math.max(0, data.length - windowSize);
-·const subset = data.slice(start);
-⋐│const sum = subset.reduce((acc, val) => acc + val, 0);
-⊳│return subset.length ? sum / subset.length : 0;
-·}
-}⟨/calculateMovingAverage⟩
-⊩adjustPipelines(2)→void⟨25⟩{
-⊩│export function adjustPipelines(preprocessingFunction, postprocessingFunction) {
-·const avgAccuracy = calculateMovingAverage(metrics.accuracy, 10);
-·const avgResponseTime = calculateMovingAverage(metrics.responseTime, 10);
-·let newPreprocessingFunction = preprocessingFunction;
-·let newPostprocessingFunction = postprocessingFunction;
-·if (avgAccuracy < 0.8) {
-⊱│newPreprocessingFunction = (input) => {
-⊷│return input.map((item) => item.trim().toLowerCase());
-·};
-·} else if (avgResponseTime > 500) {
-⊱│newPostprocessingFunction = (θ) => {
-⊷│return θ.slice(0, 10);
-·};
-·}
-⊷│return {
-·preprocessingFunction: newPreprocessingFunction,
-·postprocessingFunction: newPostprocessingFunction,
-·};
-·}
-}⟨/adjustPipelines⟩
-⊩measureExecutionTime(2)→void⟨9⟩{
-⊩│export function measureExecutionTime(func, ...args) {
-·const start = performance.now();
-·const result = func(...args);
-·const end = performance.now();
-⊷│return {
-·result,
-·executionTime: end - start,
-·};
-·}
-}⟨/measureExecutionTime⟩
-⊩fitnessFunction(2)→void⟨3⟩{
-⊩│export function fitnessFunction(accuracy, responseTime) {
-⊷│return accuracy * 100 - responseTime / 10; // Example scoring formula
-·}
-}⟨/fitnessFunction⟩
-⊩resetMetrics(1)→void⟨4⟩{
-⊩│export function resetMetrics() {
-·metrics.accuracy = [];
-·metrics.responseTime = [];
-·}
-}⟨/resetMetrics⟩
-⊩getMetrics(1)→void⟨3⟩{
-⊩│export function getMetrics() {
-⊷│return { ...metrics };
-·}
-}⟨/getMetrics⟩
-⟩SCL│66│66⊨│20⑂│44.5%↓⟩
+⊩updateMetrics(2)→void⟨4⟩{⊩⊺}
+⊩calculateMovingAverage(2)→void⟨6⟩{⊩⟛⋐⊳⊷}
+⊩adjustPipelines(2)→void⟨25⟩{⊩⊱⊷}
+⊩measureExecutionTime(2)→void⟨9⟩{⊩⊷}
+⊩fitnessFunction(2)→void⟨3⟩{⊩⊨σ⊷}
+⊩resetMetrics(1)→void⟨4⟩{⊩}
+⊩getMetrics(1)→void⟨3⟩{⊩⊷}
+⟩SCL│11│27⊨│18⑂│90.8%↓⟩

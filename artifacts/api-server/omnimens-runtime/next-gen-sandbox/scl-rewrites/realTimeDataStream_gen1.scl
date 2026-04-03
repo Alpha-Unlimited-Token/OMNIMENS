@@ -1,36 +1,8 @@
 ⟨SCL v1│realTimeDataStream_gen1.mjs│90→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩createWebSocketServer(2)→void⟨29⟩{
-⊩│export function createWebSocketServer(port, onClientMessage) {
-·const wss = new WebSocketServer({ port });
-⊱│wss.on('connection', (ws) => {
-·console.log('Client connected');
-⊱│ws.on('message', (message) => {
-·try {
-⟠│const parsedMessage = JSON.parse(message);
-·if (typeof onClientMessage === 'function') {
-·const response = onClientMessage(parsedMessage);
-·if (response) {
-⟠│ws.send(JSON.stringify(response));
-·}
-·}
-·} catch (error) {
-console.error('Error ✦ client message:', error);
-⟠│ws.send(JSON.stringify({ error: 'Invalid message format' }));
-·}
-·});
-⊱│ws.on('close', () => {
-·console.log('Client disconnected');
-·});
-·});
-⊰│console.log(`WebSocket server running on ws://localhost:${port}`);
-⊷│return wss;
-·}
-}⟨/createWebSocketServer⟩
-⊩createStateManager(1)→void⟨1⟩{
-⊩│export function createStateManager(initialState = {}) {
-}⟨/createStateManager⟩
+⊩createWebSocketServer(2)→void⟨29⟩{⊩⊱⟠⊰⊷}
+⊩createStateManager(1)→void⟨1⟩{⊩}
 ·let state = { ...initialState };
 ⊷│return {
 ⊱│getState: () => ({ ...state }),
@@ -46,24 +18,6 @@ console.error('Error ✦ client message:', error);
 ·}
 ·};
 ·}
-⊩startRealTimeDataStream(1)→void⟨19⟩{
-⊩│export function startRealTimeDataStream(port = 8080) {
-·const stateManager = createStateManager({ clients: 0 });
-⊱│const server = createWebSocketServer(port, (message) => {
-·if (message.type === 'increment') {
-·stateManager.updateState({ clients: stateManager.getState().clients + 1 });
-⊷│return { type: 'stateUpdate', state: stateManager.getState() };
-·} else if (message.type === 'decrement') {
-⟛│stateManager.updateState({ clients: Math.max(stateManager.getState().clients - 1, 0) });
-⊷│return { type: 'stateUpdate', state: stateManager.getState() };
-·} else if (message.type === 'getState') {
-⊷│return { type: 'stateUpdate', state: stateManager.getState() };
-·} else {
-⊷│return { error: 'Unknown message type' };
-·}
-·});
-⊷│return { server, stateManager };
-·}
-}⟨/startRealTimeDataStream⟩
+⊩startRealTimeDataStream(1)→void⟨19⟩{⊩⊱⊷⟛}
 ⊪realTimeUtilityFunctions
-⟩SCL│68│60⊨│23⑂│24.4%↓⟩
+⟩SCL│22│20⊨│15⑂│75.6%↓⟩

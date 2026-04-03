@@ -2,58 +2,9 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
 κCHECKPOINT_DIR
-⊩generateCheckpointFilename(1)→void⟨4⟩{
-⊩│export function generateCheckpointFilename(computationId) {
-·const hash = createHash('sha256').update(computationId).digest('hex');
-⊰│return resolve(CHECKPOINT_DIR, `${hash}.json`);
-·}
-}⟨/generateCheckpointFilename⟩
-⊩⟿saveCheckpoint(2)→void⟨5⟩{
-⊩│export async function saveCheckpoint(computationId, state) {
-·const filename = generateCheckpointFilename(computationId);
-⟠│const data = JSON.stringify(state);
-⊴│await writeFile(filename, data, 'utf8');
-·}
-}⟨/saveCheckpoint⟩
-⊩⟿loadCheckpoint(1)→void⟨12⟩{
-⊩│export async function loadCheckpoint(computationId) {
-·const filename = generateCheckpointFilename(computationId);
-·try {
-⊴│const data = await readFile(filename, 'utf8');
-⟠│return JSON.parse(data);
-·} catch (err) {
-·if (err.code === 'ENOENT') {
-⊷│return null; // No checkpoint found
-·}
-·throw err; // Rethrow other errors
-·}
-·}
-}⟨/loadCheckpoint⟩
-⊩⟿manageComputation(4)→void⟨17⟩{
-⊩│export async function manageComputation(computationId, computationStep, initialState, checkpointInterval = 10) {
-⊴│let state = await loadCheckpoint(computationId) || initialState;
-·let stepCount = state.stepCount || 0;
-·while (!state.done) {
-⊴│state = await computationStep(state);
-·stepCount++;
-·state.stepCount = stepCount;
-·if (stepCount % checkpointInterval === 0) {
-⊴│await saveCheckpoint(computationId, state);
-·}
-·}
-⊴│await saveCheckpoint(computationId, state); // Final save
-⊷│return state;
-·}
-}⟨/manageComputation⟩
-⊩⟿exampleComputationStep(1)→void⟨9⟩{
-⊩│export async function exampleComputationStep(state) {
-⊲│const { current, target } = state;
-·const next = current + 1;
-⊷│return {
-·current: next,
-·target,
-·done: next >= target
-·};
-·}
-}⟨/exampleComputationStep⟩
-⟩SCL│58│61⊨│18⑂│39.6%↓⟩
+⊩generateCheckpointFilename(1)→void⟨4⟩{⊩⊰⊷}
+⊩⟿saveCheckpoint(2)→void⟨5⟩{⊩⟠⊴}
+⊩⟿loadCheckpoint(1)→void⟨12⟩{⊩⊴⟠⊷}
+⊩⟿manageComputation(4)→void⟨17⟩{⊩⊴⊷}
+⊩⟿exampleComputationStep(1)→void⟨9⟩{⊩⊲⊷}
+⟩SCL│9│23⊨│16⑂│90.6%↓⟩

@@ -1,71 +1,9 @@
 ⟨SCL v1│sandboxOptimizer_gen1.mjs│117→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩generateCacheKey(1)→void⟨5⟩{
-⊩│export function generateCacheKey(...args) {
-·const hash = createHash('sha256');
-⟠│hash.update(JSON.stringify(args));
-⊷│return hash.digest('hex');
-·}
-}⟨/generateCacheKey⟩
-⊩memoize(1)→void⟨12⟩{
-⊩│export function memoize(fn) {
-⊮│const cache = new Map();
-⊷│return function (...args) {
-·const key = generateCacheKey(...args);
-·if (cache.has(key)) {
-⊡│return cache.get(key);
-·}
-·const result = fn(...args);
-⊡│cache.set(key, result);
-⊷│return result;
-·};
-·}
-}⟨/memoize⟩
-⊩createDependencyGraph(1)→void⟨43⟩{
-⊩│export function createDependencyGraph() {
-⊮│const graph = new Map();
-⊷│return {
-·addDependencies(node, dependencies) {
-⊡│graph.set(node, new Set(dependencies));
-·},
-·resolveDependencies(node) {
-⊯│const resolved = new Set();
-·function resolve(node) {
-⊄│if (!graph.has(node)) return;
-⥀│for (const dep of graph.get(node)) {
-·if (!resolved.has(dep)) {
-·resolved.add(dep);
-·resolve(dep);
-·}
-·}
-·}
-·resolve(node);
-⊷│return resolved;
-·},
-·clearGraph() {
-·graph.clear();
-·}
-·};
-·}
-}⟨/createDependencyGraph⟩
-⊩lazyEvaluate(1)→void⟨12⟩{
-⊩│export function lazyEvaluate(computeFn) {
-·let cached = null;
-·let isComputed = false;
-⊷│return function () {
-·if (!isComputed) {
-·cached = computeFn();
-·isComputed = true;
-·}
-⊷│return cached;
-·};
-·}
-}⟨/lazyEvaluate⟩
-⊩optimizeFunction(1)→void⟨4⟩{
-⊩│export function optimizeFunction(fn) {
-·const memoizedFn = memoize(fn);
-⊷│return lazyEvaluate(() => memoizedFn);
-·}
-}⟨/optimizeFunction⟩
-⟩SCL│70│76⊨│22⑂│40.2%↓⟩
+⊩generateCacheKey(1)→void⟨5⟩{⊩⟠⊷}
+⊩memoize(1)→void⟨12⟩{⊩⊮⊷⊡}
+⊩createDependencyGraph(1)→void⟨43⟩{⊩⊮⊷⊡⊯⊄⥀}
+⊩lazyEvaluate(1)→void⟨12⟩{⊩⊷}
+⊩optimizeFunction(1)→void⟨4⟩{⊩⊷}
+⟩SCL│8│24⊨│18⑂│93.2%↓⟩

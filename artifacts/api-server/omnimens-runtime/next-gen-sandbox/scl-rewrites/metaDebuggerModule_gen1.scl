@@ -11,7 +11,7 @@ collectAgentOutput(agentName, θ, confidence) {
 ·const weightedOutputs = this.agentOutputs.map(entry => {
 ⊷│return {
 θ: entry.θ,
-·weightedScore: entry.confidence * Math.random() // Placeholder for actual scoring algorithm
+·weightedScore: entry.confidence * Math.random() // Placeholder for actual scorin
 ·};
 ·});
 ·weightedOutputs.sort((a, b) => b.weightedScore - a.weightedScore);

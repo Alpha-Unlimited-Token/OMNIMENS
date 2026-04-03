@@ -1,32 +1,7 @@
 ⟨SCL v1│crossAgentConsensusModule_gen1.mjs│35→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[graphUtils]
-⊩crossAgentConsensus(1)→void⟨5⟩{
-⊩│export function crossAgentConsensus(agentOutputs) {
-·const knowledgeGraph = buildKnowledgeGraph(agentOutputs);
-·const consensus = weightedVoting(knowledgeGraph);
-⊷│return consensus;
-·}
-}⟨/crossAgentConsensus⟩
-⊩buildKnowledgeGraph(1)→void⟨7⟩{
-⊩│export function buildKnowledgeGraph(agentOutputs) {
-·const graph = {};
-agentOutputs.forEach(θ => {
-graph[θ.agentId] = θ.data;
-·});
-⊷│return graph;
-·}
-}⟨/buildKnowledgeGraph⟩
-⊩weightedVoting(1)→void⟨10⟩{
-⊩│export function weightedVoting(graph) {
-⊱│const votes = Object.entries(graph).map(([agentId, data]) => {
-·const weight = data.confidence;
-⊷│return { agentId, weight, decision: data.decision };
-·});
-⋐│const consensus = votes.reduce((best, vote) => {
-⊳│return vote.weight > best.weight ? vote : best;
-·}, { weight: 0 });
-⊷│return consensus;
-·}
-}⟨/weightedVoting⟩
-⟩SCL│31│32⊨│10⑂│11.4%↓⟩
+⊩crossAgentConsensus(1)→void⟨5⟩{⊩⊷}
+⊩buildKnowledgeGraph(1)→void⟨7⟩{⊩⊷}
+⊩weightedVoting(1)→void⟨10⟩{⊩⊱⊸⊷⋐⊳}
+⟩SCL│6│14⊨│10⑂│82.9%↓⟩

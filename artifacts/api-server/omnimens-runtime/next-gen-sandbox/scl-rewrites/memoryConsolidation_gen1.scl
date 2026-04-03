@@ -1,15 +1,4 @@
 ⟨SCL v1│memoryConsolidation_gen1.mjs│19→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩memoryConsolidation(1)→void⟨10⟩{
-⊩│export function memoryConsolidation(memoryChunks) {
-⋐│const consolidatedMemory = memoryChunks.reduce((acc, chunk) => {
-·if (!acc[chunk.category]) {
-·acc[chunk.category] = [];
-·}
-⊺│acc[chunk.category].push(chunk.data);
-⊷│return acc;
-·}, {});
-⊷│return consolidatedMemory;
-·}
-}⟨/memoryConsolidation⟩
-⟩SCL│14│14⊨│5⑂│26.3%↓⟩
+⊩memoryConsolidation(1)→void⟨10⟩{⊩⋐⊱⊺⊷}
+⟩SCL│3│6⊨│5⑂│84.2%↓⟩

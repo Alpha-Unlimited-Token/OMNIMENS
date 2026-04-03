@@ -1,22 +1,10 @@
 ⟨SCL v1│confidenceWeightedSynthesis_gen1.mjs│36→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩confidenceWeightedSynthesis(1)→void⟨12⟩{
-⊩│export function confidenceWeightedSynthesis(agentOutputs) {
-·const weightedResults = {};
-⊱│agentOutputs.forEach(({ θ, confidence }) => {
-⊸│for (const [key, value] of Object.entries(θ)) {
-·if (!weightedResults[key]) {
-·weightedResults[key] = { total: 0, weight: 0 };
-·}
-·weightedResults[key].total += value * confidence;
-·weightedResults[key].weight += confidence;
-·}
-·});
-}⟨/confidenceWeightedSynthesis⟩
+⊩confidenceWeightedSynthesis(1)→void⟨12⟩{⊩⊱⊸}
 κsynthesizedOutput
-⊸│for (const [key, { total, weight }] of Object.entries(weightedResults)) {
+⊸│for (const [key, { total, weight }] of Object.entries(weight
 ·synthesizedOutput[key] = total / weight;
 ·}
 ⊷│return synthesizedOutput;
 ·}
-⟩SCL│21│17⊨│5⑂│41.7%↓⟩
+⟩SCL│9│7⊨│5⑂│75.0%↓⟩

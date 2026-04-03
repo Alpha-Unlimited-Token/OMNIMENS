@@ -1,18 +1,5 @@
 ⟨SCL v1│memoryReplayModule_gen1.mjs│21→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩replayMemory(1)→void⟨6⟩{
-⊩│export function replayMemory(memoryStore) {
-·const highPriorityMemories = memoryStore.filter(memory => memory.priority > 0.8);
-·highPriorityMemories.forEach(memory => {
-·memoryStore.update(memory.id, { reinforced: true });
-·});
-·}
-}⟨/replayMemory⟩
-⊩pruneIrrelevantMemories(1)→void⟨5⟩{
-⊩│export function pruneIrrelevantMemories(memoryStore) {
-·memoryStore.filter(memory => memory.priority < 0.2).forEach(memory => {
-·memoryStore.delete(memory.id);
-·});
-·}
-}⟨/pruneIrrelevantMemories⟩
-⟩SCL│17│13⊨│2⑂│19.0%↓⟩
+⊩replayMemory(1)→void⟨6⟩{⊩}
+⊩pruneIrrelevantMemories(1)→void⟨5⟩{⊩}
+⟩SCL│4│4⊨│2⑂│81.0%↓⟩

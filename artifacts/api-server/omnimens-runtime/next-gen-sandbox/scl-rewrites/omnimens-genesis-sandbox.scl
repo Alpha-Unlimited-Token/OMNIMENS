@@ -18,11 +18,7 @@
 ⊬GenesisFile⟨content:string⟩
 ⊬GenesisState⟨buildVersion:number│cycleCount:number│lastCycleTime:number│filesCreated:number│filesUpdated:number│testsPassed:number│testsFailed:number│errorsFixed:number│completionNotified:boolean│autonomyScore:number⟩
 κstate
-scheduleNext(1)→void⟨3⟩{
-·function scheduleNext(ms = CYCLE_DELAY_MS) {
-⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, ms);
-·}
-}⟨/scheduleNext⟩
+scheduleNext(1)→void⟨3⟩{⊰⚡→}
 ⊰│spikeBus.on(`${ENGINE_ID}:cycle`, async () => {
 ·try {
 ⊴│await runCycle();
@@ -32,105 +28,21 @@ console.error(LOG_PREFIX, "↻ error", (err as Error).message);
 ·scheduleNext();
 ·}
 ·});
-⟿runCycle(1)→void⟨42⟩{
-·async function runCycle() {
-↻+│state.cycleCount++;
-⏰│state.lastCycleTime = Date.now();
-·console.log(LOG_PREFIX, "Starting cycle", state.cycleCount);
-⊴│const files = await loadFiles();
-⊴│const ◧ = await buildPromptContext();
-⊴│const llmResp = await queryLLM(◧);
-·if (!llmResp.ok) {
-console.error(LOG_PREFIX, "LLM call ↺:", llmResp.error);
-·return;
+⟿runCycle(1)→void⟨42⟩{↻+⏰⊴⊲⊰}
+⟿loadFiles(1)→Promise<Map<string, GenesisFile>>⟨23⟩{⊮⥀⟠⊡⏰⊷}
+⟿saveFile(1)→void⟨16⟩{⟠}
+⟿buildPromptContext(1)→Promise<string>⟨8⟩{⟠⊰⊷}
 ·}
-⊲│const { created, updated, tested, passed, ↺, fixed } =
-⊴│await applyLLMActions(llmResp.data, files);
-·Object.assign(state, {
-·filesCreated: state.filesCreated + created,
-·filesUpdated: state.filesUpdated + updated,
-·testsPassed: state.testsPassed + passed,
-testsFailed: state.testsFailed + ↺,
-·errorsFixed: state.errorsFixed + fixed,
-·});
-·cognitionBus.shareInsight(ENGINE_ID, {
-·type: "cycle_summary",
-⏰│data: { ...state, ts: Date.now() },
-·});
-·console.log(
-·LOG_PREFIX,
-⊰│`Cycle ${state.cycleCount} done (created:${created}, updated:${updated}, pass:${passed}, fail:${↺})`
-·);
-·}
-}⟨/runCycle⟩
-⟿loadFiles(1)→Promise<Map<string, GenesisFile>>⟨23⟩{
-·async function loadFiles(): Promise<Map<string, GenesisFile>> {
-·const rows = await dbGateway.read(ENGINE_ID, "omnimensBrain", {
-·category: "genesis_sandbox_file",
-·active: true,
-·});
-⊮│const files = new Map<string, GenesisFile>();
-⥀│for (const r of rows ?? []) {
-⟠│const meta = JSON.parse(r.sourceConversation ?? "{}");
-⊡│files.set(meta.path || r.title, {
-·path: meta.path || r.title,
-⊣: meta.⊣ || "typescript",
-△: meta.△ || "",
-·version: meta.version ?? 1,
-⏰│createdAt: meta.createdAt ?? Date.now(),
-⏰│updatedAt: meta.updatedAt ?? Date.now(),
-·testedAt: meta.testedAt ?? null,
-·testResult: meta.testResult ?? "untested",
-·errors: meta.errors ?? [],
-·content: r.content ?? "",
-·});
-·}
-⊷│return files;
-·}
-}⟨/loadFiles⟩
-⟿saveFile(1)→void⟨16⟩{
-·async function saveFile(file: GenesisFile) {
-·const meta: GenesisFileMeta = { ...file };
-·delete (meta as Partial<GenesisFile>).content;
-await dbGateway.⊞(
-·ENGINE_ID,
-·"omnimensBrain",
-·{
-·category: "genesis_sandbox_file",
-·title: file.path,
-·content: file.content,
-⟠│sourceConversation: JSON.stringify(meta),
-·active: true,
-·},
-·"NORMAL"
-·);
-·}
-}⟨/saveFile⟩
-⟿buildPromptContext(1)→Promise<string>⟨8⟩{
-·async function buildPromptContext(): Promise<string> {
-const selfKnowledge = await cognitionBus.request("self:◧", {});
-·const goalCtx = await cognitionBus.request("self:goals", {});
-⟠│return `${selfKnowledge}\n\n${goalCtx}\n\n[GENESIS STATE]\n${JSON.stringify(
-·state,
-·null,
-·2
-·).slice(0, 1500)}`;
-}⟨/buildPromptContext⟩
-·}
-⟿queryLLM(1)→Promise<⟨1⟩{
-⊳│async function queryLLM(prompt: string): Promise<{ ok: boolean; data?: any; error?: string }> {
-}⟨/queryLLM⟩
+⟿queryLLM(1)→Promise<⟨1⟩{⊳}
 ·try {
 κres
 ⊄│if (!res.ok) return { ok: false, error: res.error };
-⟠│return { ok: true, data: JSON.parse(res.data.choices[0].message.content) };
+⟠│return { ok: true, data: JSON.parse(res.data.choices[0].mess
 ·} catch (err: any) {
 ⊷│return { ok: false, error: err.message };
 ·}
 ·}
-⟿applyLLMActions(1)→void⟨1⟩{
-·async function applyLLMActions(
-}⟨/applyLLMActions⟩
+⟿applyLLMActions(1)→void⟨1⟩{}
 ·actions: any,
 ·files: Map<string, GenesisFile>
 ·) {
@@ -140,7 +52,7 @@ const selfKnowledge = await cognitionBus.request("self:◧", {});
 ·passed = 0,
 ↺ = 0,
 ·fixed = 0;
-⊄│if (!Array.isArray(actions)) return { created, updated, tested, passed, failed, fixed };
+⊄│if (!Array.isArray(actions)) return { created, updated, test
 κnow
 ⥀│for (const act of actions) {
 κpath
@@ -149,7 +61,7 @@ const selfKnowledge = await cognitionBus.request("self:◧", {});
 κsafe
 ·if (!safe) continue;
 κfile
-⊳│? { ...existing, content: act.content, updatedAt: now, version: existing.version + 1 }
+⊳│? { ...existing, content: act.content, updatedAt: now, versi
 ·: {
 ·path,
 ⊣: act.⊣ || "typescript",
@@ -165,7 +77,7 @@ const selfKnowledge = await cognitionBus.request("self:◧", {});
 κtest
 ·file.testedAt = now;
 ⊳│file.testResult = test.success ? "passed" : "failed";
-⊳│file.errors = test.success ? [] : [test.error ?? "Unknown error"];
+⊳│file.errors = test.success ? [] : [test.error ?? "Unknown er
 ·if (test.success) passed++;
 else ↺++;
 ⊴│await saveFile(file);
@@ -174,81 +86,31 @@ else ↺++;
 ·}
 ⊷│return { created, updated, tested, passed, failed, fixed };
 ·}
-sanitizePath(1)→string | null⟨6⟩{
-·function sanitizePath(raw: unknown): string | null {
-⊷│if (typeof raw !== "string") return null;
-⊽│const cleaned = raw.replace(/\\/g, "/").replace(/\.\.(\/|\\)/g, "").replace(/^\//, "");
-⊄│if (!/^[a-zA-Z0-9_\-./]+$/.test(cleaned) || cleaned.length > 180) return null;
-⊷│return cleaned;
-·}
-}⟨/sanitizePath⟩
-validateSafety(1)→boolean⟨9⟩{
-·function validateSafety(code: string): boolean {
-const forbidden = /child_process|α\s*\(|exec\s*\(|kill\(|SIGKILL|weapon/i;
-⊽│if (forbidden.test(code)) {
-·console.warn(LOG_PREFIX, "Safety violation detected, skipping file");
-·state.errorsFixed++;
-⊷│return false;
-·}
-⊷│return true;
-·}
-}⟨/validateSafety⟩
+sanitizePath(1)→string | null⟨6⟩{⊷⊽⊄⊹}
+validateSafety(1)→boolean⟨9⟩{⊽⊷}
 ⊫[]
-runSandboxTest(1)→void⟨18⟩{
-·function runSandboxTest(code: string) {
-·try {
-·const script = new vm.Script(code, { timeout: SANDBOX_TIMEOUT_MS });
-·script.runInNewContext(
-·{
-⊱│console: { log: () => {}, error: () => {} },
-·require: undefined,
-↻: undefined,
-·setTimeout: undefined,
-·setInterval: undefined,
-·},
-·{ timeout: SANDBOX_TIMEOUT_MS }
-·);
-⊷│return { success: true };
-·} catch (err: any) {
-❔│return { success: false, error: err.message?.slice(0, 300) };
-·}
-·}
-}⟨/runSandboxTest⟩
+runSandboxTest(1)→void⟨18⟩{⊱⊷❔}
 ⊱│cognitionBus.onInsight((src, insight) => {
 ·if (insight.type === "discovery") {
-❔│console.log(LOG_PREFIX, "Learning from", src, "→", insight.data?.summary || "");
-⟛│state.autonomyScore = Math.min(1, state.autonomyScore + 0.01);
+❔│console.log(LOG_PREFIX, "Learning from", src, "→", insight.d
+⟛│state.autonomyScore = Math.min(1, state.autonomyScore + 0.01
 ·}
 ·});
 ⊰│spikeBus.on(`attention:${ENGINE_ID}`, () => {
-⚡→│console.log(LOG_PREFIX, "Attention spike received → prioritizing next cycle");
+⚡→│console.log(LOG_PREFIX, "Attention spike received → prioriti
 ·scheduleNext(1_000);
 ·});
 ⊱│spikeBus.on("cognition:curiosity", () => {
-⚡→│console.log(LOG_PREFIX, "Curiosity spike → exploring novel generation paths");
+⚡→│console.log(LOG_PREFIX, "Curiosity spike → exploring novel g
 ·scheduleNext(5_000);
 ·});
-⊩start(1)→void⟨4⟩{
-⊩│export function start() {
-·console.log(LOG_PREFIX, "Starting engine");
-·scheduleNext(FIRST_DELAY_MS);
-·}
-}⟨/start⟩
-⊩getGenesisState(1)→void⟨3⟩{
-⊩│export function getGenesisState() {
-⊷│return { ...state };
-·}
-}⟨/getGenesisState⟩
-⊩shutdown(1)→void⟨4⟩{
-⊩│export function shutdown() {
-·engineRegistry.unregisterEngine(ENGINE_ID);
-console.log(LOG_PREFIX, "Shutdown ⊣");
-·}
-}⟨/shutdown⟩
+⊩start(1)→void⟨4⟩{⊩}
+⊩getGenesisState(1)→void⟨3⟩{⊩⊷}
+⊩shutdown(1)→void⟨4⟩{⊩}
 ·start();
 ·export default {
 ·start,
 ·shutdown,
 ·getGenesisState,
 ·};
-⟩SCL│253│196⊨│58⑂│28.3%↓⟩
+⟩SCL│115│88⊨│55⑂│67.4%↓⟩

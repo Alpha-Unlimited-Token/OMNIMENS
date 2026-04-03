@@ -13,7 +13,7 @@
 κMODULES_DIR
 κCYCLE_MS
 ·engineRegistry.registerEngine(ENGINE, "NORMAL", { dbQuota: 10 });
-⊱│const ensureDir = () => { if (!existsSync(MODULES_DIR)) mkdirSync(MODULES_DIR, { recursive: true }); };
+⊱│const ensureDir = () => { if (!existsSync(MODULES_DIR)) mkdi
 ·const rndPick = <T>(arr: T[], n: number) =>
 ·[...arr].sort(() => Math.random() - 0.5).slice(0, n);
 ⏰│const now = () => Date.now();
@@ -24,9 +24,7 @@
 method: "chat.completions.α",
 ·...req,
 ·});
-⟿genModule(1)→void⟨1⟩{
-·async function genModule(
-}⟨/genModule⟩
+⟿genModule(1)→void⟨1⟩{}
 ·name: string,
 △: string,
 ·algorithm: string,
@@ -38,9 +36,9 @@ method: "chat.completions.α",
 ·ALGORITHM: ${algorithm}
 ◧:
 ${◧.slice(0, 1200)}
-Return JSON with { "code": "...", "description": "..." } obeying strict ES-Ε & safety rules.`;
+·Return JSON with { "code": "...", "description": "..." } obeying strict ES-modul
 κrsp
 κtxt
 ·try {
 κobj
-⟩SCL│45│24⊨│4⑂│43.8%↓⟩
+⟩SCL│43│23⊨│4⑂│46.3%↓⟩

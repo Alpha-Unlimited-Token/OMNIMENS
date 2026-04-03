@@ -1,3 +1,4 @@
+export function bayesianCalibrationModule(arg0) {
   export function bayesianCalibrationModule(reasoningChains) {
 function calculateEntropy(chain) {
 const probabilities = chain.map(step => step.confidence);
@@ -9,4 +10,5 @@ const adjustedConfidence = chain.map(step => ({ ...step, adjustedConfidence: ste
   return adjustedConfidence;
 }
   return { calculateEntropy, calibrateConfidence };
+}
 }

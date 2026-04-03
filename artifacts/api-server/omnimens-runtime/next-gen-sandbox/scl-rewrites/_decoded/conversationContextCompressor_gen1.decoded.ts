@@ -1,12 +1,15 @@
+function cosineSimilarity(arg0, arg1) {
 function cosineSimilarity(vectorA, vectorB) {
   const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
   const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
   const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
   return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
 }
+}
+function generateEmbedding(arg0) {
 function generateEmbedding(sentence) {
 const vectorSize = 128;
-const vector = new Array(vectorSize).fill(0);
+const vector = new ordered collection of elements(vectorSize).fill(0);
 const words = sentence.split(/\s+/);
   const hash = (str) => {
 let hashValue = 0;
@@ -21,6 +24,8 @@ vector[index] += 1;
 });
   return vector;
 }
+}
+function clusterSentences(arg0, arg1) {
 function clusterSentences(sentences, similarityThreshold = 0.8) {
 const embeddings = sentences.map(generateEmbedding);
 const clusters = [];
@@ -40,8 +45,11 @@ if (!addedToCluster) {
 });
   return clusters.map((cluster) => cluster.join(" "));
 }
+}
+function compressConversation(arg0, arg1) {
 function compressConversation(conversation, maxLength = 10) {
 const clustered = clusterSentences(conversation);
   return clustered.slice(0, maxLength);
 }
-export { cosineSimilarity, generateEmbedding, clusterSentences, compressConversation };
+}
+export { cosineSimilarity, generateEmbedding, clusterSentences, compressConversa

@@ -1,58 +1,7 @@
 ⟨SCL v1│contextSummarizer_gen1.mjs│101→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩summarizeConversation(2)→void⟨36⟩{
-⊩│export function summarizeConversation(conversation, maxSummaryLength) {
-·if (!Array.isArray(conversation) || typeof maxSummaryLength !== 'number' || maxSummaryLength <= 0) {
-⊵│throw new Error("Invalid input: conversation must be an array of strings and maxSummaryLength must be a ☼ number.");
-·}
-·const sentences = conversation.flatMap(text => text.split(/(?<!\w\.\w.)(?<![A-Z][a-z]\.)(?<=\.|\?|\!)\s+/));
-·const wordFrequency = {};
-·sentences.forEach(sentence => {
-·sentence.split(/\W+/).forEach(word => {
-·const normalizedWord = word.toLowerCase();
-·if (normalizedWord) {
-·wordFrequency[normalizedWord] = (wordFrequency[normalizedWord] || 0) + 1;
-·}
-·});
-·});
-·const sentenceScores = sentences.map(sentence => {
-·const words = sentence.split(/\W+/);
-⋐│const score = words.reduce((sum, word) => sum + (wordFrequency[word.toLowerCase()] || 0), 0);
-⊷│return { sentence, score };
-·});
-·sentenceScores.sort((a, b) => b.score - a.score);
-·const extractiveSummary = sentenceScores.slice(0, maxSummaryLength).map(item => item.sentence);
-·const abstractedSummary = extractiveSummary.map(sentence => compressSentence(sentence));
-⊷│return abstractedSummary;
-·}
-}⟨/summarizeConversation⟩
-compressSentence(1)→void⟨7⟩{
-·function compressSentence(sentence) {
-⊷│return sentence
-⊽│.replace(/\s+/g, ' ')
-⊽│.replace(/\b(very|really|actually|basically|just)\b/gi, '')
-·.trim();
-·}
-}⟨/compressSentence⟩
-⊩encodeSummary(1)→void⟨14⟩{
-⊩│export function encodeSummary(summary) {
-·if (!Array.isArray(summary)) {
-⊵│throw new Error("Invalid input: summary must be an array of strings.");
-·}
-⊷│return summary.map(point => {
-·const embedding = new Array(128).fill(0);
-·for (let i = 0; i < point.length; i++) {
-·const charCode = point.charCodeAt(i);
-·embedding[charCode % 128] += 1; // Simple hash into 128 dimensions.
-·}
-⊷│return embedding;
-·});
-·}
-}⟨/encodeSummary⟩
-⊩summarizeAndEncode(2)→void⟨4⟩{
-⊩│export function summarizeAndEncode(conversation, maxSummaryLength) {
-·const summary = summarizeConversation(conversation, maxSummaryLength);
-⊷│return encodeSummary(summary);
-·}
-}⟨/summarizeAndEncode⟩
-⟩SCL│57│58⊨│14⑂│43.6%↓⟩
+⊩summarizeConversation(2)→void⟨36⟩{⊩⊵⋐⊷}
+compressSentence(1)→void⟨7⟩{⊷⊽}
+⊩encodeSummary(1)→void⟨14⟩{⊩⊵⊷}
+⊩summarizeAndEncode(2)→void⟨4⟩{⊩⊷}
+⟩SCL│6│15⊨│11⑂│94.1%↓⟩

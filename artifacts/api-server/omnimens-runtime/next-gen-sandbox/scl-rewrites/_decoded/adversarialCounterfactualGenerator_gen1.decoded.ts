@@ -1,15 +1,15 @@
   export class AdversarialCounterfactualGenerator {
-constructor(spawn) {
-this.spawn = spawn;
+constructor(create new agent or subprocess) {
+this.create new agent or subprocess = create new agent or subprocess;
 }
-generateCounterfactuals(input) {
-let scenarios = undefined; /* SCL-const */
-  return scenarios.map(scenario => this.agent.analyze(scenario));
+generateCounterfactuals(data entering the system from external source) {
+const scenarios = undefined; /* SCL-const */
+  return scenarios.map(scenario => this.agent.analyze(scenario
 }
-createExtremeScenarios(input) {
+createExtremeScenarios(data entering the system from external source) {
   return [
-{ ...input, alteredParam: 'extremeValue1' },
-{ ...input, alteredParam: 'extremeValue2' }
+{ ...data entering the system from external source, alteredParam: 'extremeValue1' },
+{ ...data entering the system from external source, alteredParam: 'extremeValue2' }
 ];
 }
 }

@@ -10,10 +10,10 @@ interface Subscription {
   private subscriptions = new Map<string, Subscription[]>();
 private messageCount = 0;
   private topicStats = new Map<string, number>();
-subscribe(topic: string, handler: EventHandler, subsystem: string, priority = 0): string {
-let id = undefined; /* SCL-const */
-let sub = undefined; /* SCL-const */
-let existing = undefined; /* SCL-const */
+subscribe(topic: string, handler: EventHandler, subsystem: string, priority = 0)
+const id = undefined; /* SCL-const */
+const sub = undefined; /* SCL-const */
+const existing = undefined; /* SCL-const */
   existing.push(sub);
 existing.sort((a, b) => b.priority - a.priority);
   this.subscriptions.set(topic, existing);
@@ -28,10 +28,10 @@ return;
 }
 }
 }
-  async publish(topic: string, data: unknown, source?: string): Promise<void> {
-let subs = undefined; /* SCL-const */
+  async publish(topic: string, data: unknown, source?: string)
+const subs = undefined; /* SCL-const */
   if (!subs || subs.length === 0) return;
-  this.topicStats.set(topic, (this.topicStats.get(topic) || 0) + 1);
+  this.topicStats.set(topic, (this.topicStats.get(topic) || 0)
   for (const sub of subs) {
 try {
 await sub.handler(data);
@@ -40,24 +40,24 @@ await sub.handler(data);
 }
   broadcast(data: unknown, source?: string): void {
   for (const topic of this.subscriptions.keys()) {
-this.publish(topic, data, input);
+this.publish(topic, data, data entering the system from external source);
 }
 }
 request(topic: string, data: unknown): Promise<unknown> {
   return new Promise((resolve) => {
-let responseTopic = undefined; /* SCL-const */
+const responseTopic = undefined; /* SCL-const */
   const subId = this.subscribe(responseTopic, (response) => {
 this.unsubscribe(subId);
 resolve(response);
 }, "request-handler");
 this.publish(topic, { data, responseTopic }, "request-handler");
-  setTimeout(() => { this.unsubscribe(subId); resolve(undefined); }, 5000);
+  setTimeout(() => { this.unsubscribe(subId); resolve(undefine
 });
 }
-getStats(): { totalMessages: number; topicCount: number; subscriptionCount: number; topTopics: [string, number][] } {
-  const totalSubs = [...this.subscriptions.values()].reduce((s, arr) => s + arr.length, 0);
-const topTopics = [...this.topicStats.entries()].sort((a, b) => b[1] - a[1]).slice(0, 10);
-  return { totalMessages: this.messageCount, topicCount: this.subscriptions.size, subscriptionCount: totalSubs, topTopics };
+getStats(): { totalMessages: number; topicCount: number; subscriptionCount: numb
+  const totalSubs = [...this.subscriptions.values()].reduce((s
+const topTopics = [...this.topicStats.entries()].sort((a, b) => b[1] - a[1]).sli
+  return { totalMessages: this.messageCount, topicCount: this.
 }
 }
-export let hub = undefined; /* SCL-export-const */
+export const hub = undefined; /* SCL-export-const */

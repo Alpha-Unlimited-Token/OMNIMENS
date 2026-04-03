@@ -29,9 +29,9 @@
 ·[...src.matchAll(re)].map((m) => m[1]).filter(Boolean);
 ·const scanPatterns = (code: string): string[] => {
 κchecks
-⋔│return checks.filter(([re]) => re.test(code)).map(([, tag]) => tag);
+⋔│return checks.filter(([re]) => re.test(code)).map(([, tag]) 
 ·};
-⊪│export const loadGen1Module = (filePath: string): Gen1Module | null => {
+⊪│export const loadGen1Module = (filePath: string): Gen1Module
 ·try {
 κfull
 κcode
@@ -40,9 +40,9 @@
 ·name: path.basename(full),
 ·category: path.basename(path.dirname(full)),
 △:
-❔│(code.match(/\*\s*(?:Purpose|Description):\s*([^\n]+)/)?.[1] || "").trim(),
+❔│(code.match(/\*\s*(?:Purpose|Description):\s*([^\n]+)/)?.[1]
 ·code,
-⊳│exports: regexMatch(/export\s+(?:async\s+)?(?:function|class|const)\s+(\w+)/g, code),
+⊳│exports: regexMatch(/export\s+(?:async\s+)?(?:function|class
 ·imports: regexMatch(/import\s+.*?from\s+["']([^"']+)["']/g, code),
 ·patterns: scanPatterns(code),
 ·lineCount: code.split("\n").length,
@@ -51,7 +51,7 @@
 ⊷│return null;
 ·}
 ·};
-⊪│export const loadGen1Library = (): Map<string, Gen1Module[]> => {
+⊪│export const loadGen1Library = (): Map<string, Gen1Module[]>
 κlib
 ⊄│if (!fs.existsSync(GEN1_LIBRARY_DIR)) return lib;
 ⥀│for (const cat of fs.readdirSync(GEN1_LIBRARY_DIR)) {
@@ -96,7 +96,7 @@
 ·discardedPatterns: discarded,
 ·};
 ·};
-⊪│export const assembleModuleCode = (tp: ThoughtProcess): string => {
+⊪│export const assembleModuleCode = (tp: ThoughtProcess): stri
 ⊲│const { moduleSpec, gen1Analysis, reasoningChain } = tp;
 κheader
 κimpl
@@ -122,7 +122,7 @@
 await dbGateway.⊞(
 ·"codegen-engine",
 ·"generated_modules",
-⏰│{ name: next.name, code: thought.finishedCode, created: Date.now() },
+⏰│{ name: next.name, code: thought.finishedCode, created: Date
 ·"NORMAL",
 ·);
 ·cognitionBus.shareInsight("codegen-engine", {
@@ -137,7 +137,7 @@ await dbGateway.⊞(
 ·);
 ·} catch (err) {
 ❔│apiManager.logError?.("codegen-engine", err);
-cognitionBus.reportOutcome("codegen-engine", { useful: false, ◧: String(err) });
+cognitionBus.reportOutcome("codegen-engine", { useful: false, ◧: String(er
 ·} finally {
 ·busy = false;
 ·}
@@ -152,13 +152,9 @@ cognitionBus.reportOutcome("codegen-engine", { useful: false, ◧: String(err) }
 ·if (src !== "codegen-engine" && ins.type === "discovery") {
 ·}
 ·});
-⚡→│spikeBus.on("attention:codegen-engine", () => spikeBus.scheduleSpike(CYCLE_EVENT, {}, 0));
-⚡→│spikeBus.on("cognition:curiosity", () => spikeBus.scheduleSpike(CYCLE_EVENT, {}, 2_000));
+⚡→│spikeBus.on("attention:codegen-engine", () => spikeBus.sched
+⚡→│spikeBus.on("cognition:curiosity", () => spikeBus.scheduleSp
 ⊪│export const requestGeneration = (spec: ModuleSpec) =>
-dbGateway.⊞("codegen-engine", "module_specs", { ...spec, status: "pending" }, "NORMAL");
-⊩shutdown(1)→void⟨3⟩{
-⊩│export function shutdown() {
-·engineRegistry.unregisterEngine("codegen-engine");
-·}
-}⟨/shutdown⟩
-⟩SCL│163│81⊨│42⑂│40.1%↓⟩
+dbGateway.⊞("codegen-engine", "module_specs", { ...spec, status: "pending" }
+⊩shutdown(1)→void⟨3⟩{⊩}
+⟩SCL│159│79⊨│42⑂│41.5%↓⟩

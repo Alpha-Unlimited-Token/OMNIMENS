@@ -11,13 +11,8 @@
 ·});
 ·}
 ·simulateCounterfactual(memory) {
-⊰│console.log(`Simulating counterfactual for memory: ${memory}`);
+⊰│console.log(`Simulating counterfactual for memory: ${memory}
 ·}
 ·}
-⊩initializeMemoryReplay(1)→void⟨4⟩{
-⊩│export function initializeMemoryReplay(memoryStore) {
-·const memoryReplay = new EpisodicMemoryReplay(memoryStore);
-·memoryReplay.replayMemory();
-·}
-}⟨/initializeMemoryReplay⟩
-⟩SCL│22│8⊨│3⑂│31.3%↓⟩
+⊩initializeMemoryReplay(1)→void⟨4⟩{⊩}
+⟩SCL│17│5⊨│3⑂│46.9%↓⟩

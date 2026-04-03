@@ -16,11 +16,11 @@ if (!ι.isArray(vector) || !vector.every((val) => typeof val === 'number')) {
 ⊹│if (vectorA.length !== vectorB.length) {
 ⊵│throw new Error('Vectors must have the same dimensions.');
 ·}
-⋐│return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
+⋐│return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.
 ·}
 ·findNearestNeighbors(queryVector, k) {
-if (!ι.isArray(queryVector) || !queryVector.every((val) => typeof val === 'number')) {
-⊵│throw new Error('Query vector must be an array of numbers.');
+if (!ι.isArray(queryVector) || !queryVector.every((val) => typeof val === 'n
+⊵│throw new Error('Query vector must be an array of numbers.')
 ·}
 ⊱│const distances = this.keys.map((key) => {
 κvector
@@ -43,9 +43,5 @@ if (!ι.isArray(queryVector) || !queryVector.every((val) => typeof val === 'numb
 ·this.keys = [];
 ·}
 ·}
-⊩createVectorStoreManager(1)→void⟨3⟩{
-⊩│export function createVectorStoreManager() {
-⊷│return new VectorStoreManager();
-·}
-}⟨/createVectorStoreManager⟩
-⟩SCL│50│23⊨│16⑂│58.0%↓⟩
+⊩createVectorStoreManager(1)→void⟨3⟩{⊩⊷}
+⟩SCL│46│21⊨│16⑂│61.3%↓⟩

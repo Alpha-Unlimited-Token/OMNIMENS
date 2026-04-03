@@ -6,7 +6,7 @@
 ·}
 ·evaluateReasoningChain(chain) {
 ·const confidenceScores = chain.map(step => step.confidence);
-⋐│const averageConfidence = confidenceScores.reduce((a, b) => a + b, 0) / confidenceScores.length;
+⋐│const averageConfidence = confidenceScores.reduce((a, b) => 
 ·if (averageConfidence < 0.7) {
 ·this.suggestRefinement(chain);
 ·}

@@ -1,51 +1,13 @@
 ⟨SCL v1│vectorMemoryStore_gen1.mjs│94→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 κvectorStore
-⊩addVector(3)→void⟨6⟩{
-⊩│export function addVector(id, vector, metadata = null) {
-·if (!Array.isArray(vector) || !vector.every((v) => typeof v === 'number')) {
-⊵│throw new Error('Vector must be an array of numbers.');
-·}
-⊡│vectorStore.set(id, { vector, metadata });
-·}
-}⟨/addVector⟩
-cosineSimilarity(2)→void⟨9⟩{
-·function cosineSimilarity(vectorA, vectorB) {
-⊹│if (vectorA.length !== vectorB.length) {
-⊵│throw new Error('Vectors must have the same length.');
-·}
-⋐│const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
-⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a ** 2, 0));
-⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b ** 2, 0));
-⊷│return dotProduct / (magnitudeA * magnitudeB);
-·}
-}⟨/cosineSimilarity⟩
-⊩findNearestNeighbors(2)→void⟨14⟩{
-⊩│export function findNearestNeighbors(queryVector, k) {
-·if (!Array.isArray(queryVector) || !queryVector.every((v) => typeof v === 'number')) {
-⊵│throw new Error('Query vector must be an array of numbers.');
-·}
-·if (!Number.isInteger(k) || k <= 0) {
-⊵│throw new Error('k must be a ☼ integer.');
-·}
-·const similarities = [];
-·for (const [id, { vector, metadata }] of vectorStore.entries()) {
-·const similarity = cosineSimilarity(queryVector, vector);
-⊺│similarities.push({ id, similarity, metadata });
-·}
-}⟨/findNearestNeighbors⟩
+⊩addVector(3)→void⟨6⟩{⊩⊵⊡}
+cosineSimilarity(2)→void⟨9⟩{⊹⊵⋐⊷}
+⊩findNearestNeighbors(2)→void⟨14⟩{⊩⊵⊺}
 ⊷│return similarities
 ·.sort((a, b) => b.similarity - a.similarity) // Sort by descending similarity
 .slice(0, k); // Return the top k ⊢
 ·}
-⊩clearStore(1)→void⟨3⟩{
-⊩│export function clearStore() {
-·vectorStore.clear();
-·}
-}⟨/clearStore⟩
-⊩getStoreSize(1)→void⟨3⟩{
-⊩│export function getStoreSize() {
-⊷│return vectorStore.size;
-·}
-}⟨/getStoreSize⟩
-⟩SCL│50│49⊨│17⑂│46.8%↓⟩
+⊩clearStore(1)→void⟨3⟩{⊩}
+⊩getStoreSize(1)→void⟨3⟩{⊩⊷}
+⟩SCL│12│21⊨│14⑂│87.2%↓⟩

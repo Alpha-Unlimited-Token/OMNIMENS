@@ -12,7 +12,7 @@
 ·}
 ·publish(eventType, data) {
 ·if (this.subscribers.has(eventType)) {
-⊡│this.subscribers.get(eventType).forEach(callback => callback(data));
+⊡│this.subscribers.get(eventType).forEach(callback => callback
 ·}
 ·}
 ·updateEmbedding(agentId, embedding) {
@@ -21,7 +21,7 @@
 ·}
 κembeddingCache
 ⊱│embeddingCache.subscribe('embeddingUpdate', (data) => {
-⊰│console.log(`Embedding updated for agent ${data.agentId}`, data.embedding);
+⊰│console.log(`Embedding updated for agent ${data.agentId}`, d
 ·});
 ·embeddingCache.updateEmbedding('agent_1', [0.1, 0.2, 0.3]);
 ⟩SCL│26│8⊨│7⑂│31.6%↓⟩

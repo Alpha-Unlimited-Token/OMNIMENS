@@ -12,84 +12,9 @@
 κENGINE_ID
 κstate
 ·engineRegistry.registerEngine(ENGINE_ID, "NORMAL", { dbQuota: 10 });
-execInVM(2)→SandboxResult⟨46⟩{
-·function execInVM(code: string, timeout: Ms = TIMEOUT_MS): SandboxResult {
-const start = performance.now(), mem0 = ↻.memoryUsage().heapUsed;
-·const out: string[] = [];
-⟠│const fmt = (...a: any[]) => a.map(v => typeof v === "object" ? JSON.stringify(v) : String(v)).join(" ");
-⊮│const timers = new Map<string, number>();
-·const sandbox: Record<string, any> = {
-·console: {
-⊺│log: (...a: any[]) => out.push(fmt(...a)),
-⊰│error: (...a: any[]) => out.push(`[ERROR] ${fmt(...a)}`),
-⊰│warn:  (...a: any[]) => out.push(`[WARN] ${fmt(...a)}`),
-⊺│info:  (...a: any[]) => out.push(fmt(...a)),
-⊰│debug: (...a: any[]) => out.push(`[DEBUG] ${fmt(...a)}`),
-⊰│assert:(c: any, ...a: any[])=> { if (!c) out.push(`[ASSERT] ${fmt(...a)}`); },
-⟠│table:(d: any)=> out.push(JSON.stringify(d,null,2)),
-⊡│time:(l="t")=>{timers.set(l,performance.now());},
-⊡│timeEnd:(l="t")=>{out.push(`${l}: ${performance.now()- (timers.get(l)||performance.now())}ms`);},
-⊡│timeLog:(l="t")=>{out.push(`${l}: ${performance.now()- (timers.get(l)||performance.now())}ms`);},
-⟠│dir:(o:any)=>out.push(JSON.stringify(o,null,2)),
-⊰│count:(()=>{const c:Record<string,Num>={};return(l="n")=>{c[l]=(c[l]||0)+1;out.push(`${l}: ${c[l]}`);};})(),
-⊱│clear:()=>{}
-·},
-·Math, JSON, Date, parseInt, parseFloat, isNaN, isFinite,
-·Array, Object, String, Number, Boolean, Map, Set, WeakMap, WeakSet,
-·Promise, RegExp, Symbol, Error, TypeError, RangeError, SyntaxError,
-·URIError, Infinity, NaN, undefined,
-·encodeURIComponent, decodeURIComponent, encodeURI, decodeURI,
-·atob:(s:string)=>Buffer.from(s,"base64").toString("binary"),
-·btoa:(s:string)=>Buffer.from(s,"binary").toString("base64"),
-⟠│structuredClone:(o:any)=>JSON.parse(JSON.stringify(o)),
-setTimeout:undefined, setInterval:undefined, ↻:undefined,
-·require:undefined,__dirname:undefined,__filename:undefined,global:undefined,globalThis:undefined,
-·};
-·try {
-·const result = new vm.Script(code,{timeout}).runInContext(vm.createContext(sandbox),{timeout});
-⟠│if (result!==undefined) out.push(`=> ${typeof result==="object"?JSON.stringify(result):String(result)}`);
-·const execMs = performance.now()-start;
-const mem = (↻.memoryUsage().heapUsed - mem0)/1048576;
-·updateStats(true);
-⟛│return {code,success:true,θ:out.join("\n").slice(0,3000),error:null,executionTimeMs:execMs,memoryUsedMB:Math.max(0,mem)};
-·} catch(e:any){
-·const execMs = performance.now()-start;
-·updateStats(false);
-⊷│return {code,success:false,θ:out.join("\n").slice(0,1000),error:String(e).slice(0,500),executionTimeMs:execMs,memoryUsedMB:0};
-·}
-·}
-}⟨/execInVM⟩
-updateStats(1)→void⟨4⟩{
-·function updateStats(success:boolean){
-·state.totalExecutions++;
-⊳│success?state.successfulExecutions++:state.failedExecutions++;
-·}
-}⟨/updateStats⟩
+execInVM(2)→SandboxResult⟨46⟩{⟠⊳⊮⊺⊰⊱⊡⟛⊷}
+updateStats(1)→void⟨4⟩{⊳}
 ⊪│export const runInSandbox = (code:string)=>execInVM(code);
 κcodeThemes
-⟿nextCycle(1)→Promise<void>⟨27⟩{
-⟿│async function nextCycle():Promise<void>{
-·state.sandboxCycles++;
-⏰│state.lastCycleTime=Date.now();
-·try{
-const brainEntries = await dbGateway.read(ENGINE_ID,"omnimensBrain",{ where:{active:true}, orderBy:"-createdAt", ⏳:8, fields:["title","content","category"]});
-⊰│const ◧ = (brainEntries||[]).map((b:any)=>`[${b.category}] ${b.title}: ${(b.content||"").slice(0,100)}`).join("\n");
-·const idx = (state.sandboxCycles-1)%codeThemes.length;
-·const theme = codeThemes[idx];
-·const gptReq = {
-·model:"gpt-4o",
-·messages:[
-{role:"η",content:
-·`You are the AUTONOMOUS CODE GENERATOR of OMNIMENS. Produce pure JavaScript runnable in an isolated VM.
-·Rules:
-1. No η dependencies, no async, no timers, no I/O.
-·2. Include inline tests with console.assert / console.log.
-3. θ ONLY raw code (no markdown).`},
-⊰│{role:"user",content:`◧:\n${◧}\n\nWrite ${theme}.`}
-·],
-·max_tokens:1500, temperature:0.4
-·};
-const gptRes:any = await apiManager.call(ENGINE_ID,"openai.chat.completions.α",gptReq);
-❔│let code:string = (gptRes?.choices?.[0]?.message?.content||"").replace(/^[\s\S]*?
-}⟨/nextCycle⟩
-⟩SCL│94│97⊨│30⑂│42.3%↓⟩
+⟿nextCycle(1)→Promise<void>⟨27⟩{⟿⏰⊰❔⊽}
+⟩SCL│19│30⊨│20⑂│88.3%↓⟩

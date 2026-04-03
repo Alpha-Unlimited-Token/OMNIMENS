@@ -1,14 +1,4 @@
 ⟨SCL v1│adversarialEvaluation_gen1.mjs│18→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩adversarialEvaluation(2)→void⟨9⟩{
-⊩│export function adversarialEvaluation(modifications, scenarios) {
-const ⊢ = scenarios.map(scenario => {
-⊷│return modifications.map(mod => {
-⊽│const simulatedOutcome = scenario.test(mod);
-⊷│return { modification: mod.id, success: simulatedOutcome.isSafe };
-·});
-·});
-⊷│return ⊢.every(result => result.every(outcome => outcome.success));
-·}
-}⟨/adversarialEvaluation⟩
-⟩SCL│13│12⊨│5⑂│27.8%↓⟩
+⊩adversarialEvaluation(2)→void⟨9⟩{⊩⊷⊽}
+⟩SCL│3│4⊨│3⑂│83.3%↓⟩

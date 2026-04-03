@@ -1,59 +1,10 @@
 ⟨SCL v1│realTimeStateSync_gen1.mjs│92→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩createWebSocketServer(1)→void⟨24⟩{
-⊩│export function createWebSocketServer(port) {
-·const wss = new WebSocketServer({ port });
-⊮│const clients = new Map();
-⊱│wss.on('connection', (ws) => {
-·const clientId = randomUUID();
-⊡│clients.set(clientId, ws);
-⊱│ws.on('message', (message) => {
-·try {
-⟠│const parsedMessage = JSON.parse(message);
-·broadcastStateUpdate(clientId, parsedMessage, clients);
-·} catch (error) {
-·console.error('Invalid message format:', error);
-·}
-·});
-⊱│ws.on('close', () => {
-·clients.delete(clientId);
-·});
-·});
-⊷│return wss;
-·}
-}⟨/createWebSocketServer⟩
-⊩broadcastStateUpdate(3)→void⟨7⟩{
-⊩│export function broadcastStateUpdate(senderId, stateUpdate, clients) {
-·for (const [clientId, ws] of clients.entries()) {
-·if (clientId !== senderId && ws.readyState === ws.OPEN) {
-⟠│ws.send(JSON.stringify(stateUpdate));
-·}
-·}
-·}
-}⟨/broadcastStateUpdate⟩
-⊩validateStateUpdate(2)→void⟨13⟩{
-⊩│export function validateStateUpdate(stateUpdate, schema) {
-·if (typeof stateUpdate !== 'object' || stateUpdate === null) {
-⊷│return false;
-·}
-⥀│for (const key of Object.keys(schema)) {
-·if (!schema[key](stateUpdate[key])) {
-⊷│return false;
-·}
-·}
-⊷│return true;
-·}
-}⟨/validateStateUpdate⟩
+⊩createWebSocketServer(1)→void⟨24⟩{⊩⊮⊱⊡⟠⊷}
+⊩broadcastStateUpdate(3)→void⟨7⟩{⊩⟠}
+⊩validateStateUpdate(2)→void⟨13⟩{⊩⊷⥀⊸}
 ⊪schemaValidators
-⊩mergeState(2)→void⟨3⟩{
-⊩│export function mergeState(currentState, stateUpdate) {
-⊷│return { ...currentState, ...stateUpdate };
-·}
-}⟨/mergeState⟩
-⊩generateUniqueKey(1)→void⟨3⟩{
-⊩│export function generateUniqueKey(prefix = 'key') {
-⊰│return `${prefix}-${randomUUID()}`;
-·}
-}⟨/generateUniqueKey⟩
-⟩SCL│58│61⊨│19⑂│37.0%↓⟩
+⊩mergeState(2)→void⟨3⟩{⊩⊷}
+⊩generateUniqueKey(1)→void⟨3⟩{⊩⊰⊷}
+⟩SCL│9│24⊨│17⑂│90.2%↓⟩

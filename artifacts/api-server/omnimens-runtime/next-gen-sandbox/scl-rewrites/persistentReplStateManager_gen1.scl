@@ -4,62 +4,10 @@
 κalgorithm
 κkey
 κivLength
-⊩encryptState(1)→void⟨14⟩{
-⊩│export function encryptState(data) {
-·const iv = randomBytes(ivLength);
-·const cipher = createCipheriv(algorithm, key, iv);
-⟠│const jsonData = JSON.stringify(data);
-·const encrypted = Buffer.concat([cipher.update(jsonData, 'utf8'), cipher.final()]);
-·const authTag = cipher.getAuthTag();
-⟠│return JSON.stringify({
-·iv: iv.toString('base64'),
-·encryptedData: encrypted.toString('base64'),
-·authTag: authTag.toString('base64')
-·});
+⊩encryptState(1)→void⟨14⟩{⊩⟠⊷}
+⊩decryptState(1)→void⟨13⟩{⊩⟠⊲⊷}
+⊩storeState(4)→void⟨13⟩{⊩⏰⊡⏳⊱}
+⊩retrieveState(2)→void⟨10⟩{⊩⊡⏰⊷}
+⊩clearExpiredStates(1)→void⟨8⟩{⊩⏰}
 ·}
-}⟨/encryptState⟩
-⊩decryptState(1)→void⟨13⟩{
-⊩│export function decryptState(encryptedState) {
-⟠│const { iv, encryptedData, authTag } = JSON.parse(encryptedState);
-·const decipher = createDecipheriv(algorithm, key, Buffer.from(iv, 'base64'));
-·decipher.setAuthTag(Buffer.from(authTag, 'base64'));
-·const decrypted = Buffer.concat([
-·decipher.update(Buffer.from(encryptedData, 'base64')),
-·decipher.final()
-·]);
-⟠│return JSON.parse(decrypted.toString('utf8'));
-·}
-}⟨/decryptState⟩
-⊩storeState(4)→void⟨13⟩{
-⊩│export function storeState(⊞, key, state, ttl) {
-·const encryptedState = encryptState(state);
-⏰│const expirationTime = Date.now() + ttl;
-⊡│⊞.set(key, { encryptedState, expirationTime });
-⏳│setTimeout(() => {
-⊡│if (⊞.has(key) && ⊞.get(key).expirationTime <= Date.now()) {
-⊞.delete(key);
-·}
-·}, ttl);
-·}
-}⟨/storeState⟩
-⊩retrieveState(2)→void⟨10⟩{
-⊩│export function retrieveState(⊞, key) {
-⊡│const entry = ⊞.get(key);
-⏰│if (!entry || entry.expirationTime <= Date.now()) {
-⊞.delete(key);
-⊷│return null;
-·}
-⊷│return decryptState(entry.encryptedState);
-·}
-}⟨/retrieveState⟩
-⊩clearExpiredStates(1)→void⟨8⟩{
-⊩│export function clearExpiredStates(⊞) {
-⏰│const now = Date.now();
-for (const [key, { expirationTime }] of ⊞.entries()) {
-·if (expirationTime <= now) {
-⊞.delete(key);
-·}
-·}
-}⟨/clearExpiredStates⟩
-·}
-⟩SCL│64│65⊨│18⑂│43.4%↓⟩
+⟩SCL│12│27⊨│18⑂│89.4%↓⟩

@@ -1,36 +1,7 @@
 ⟨SCL v1│recursiveRetrievalPlanner_gen1.mjs│40→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩recursiveRetrievalPlanner(3)→void⟨16⟩{
-⊩│export function recursiveRetrievalPlanner(query, memorySystem, evaluationMetrics) {
-let ⊢ = [];
-·let iterations = 0;
-·while (iterations < evaluationMetrics.maxIterations) {
-const retrievedData = memorySystem.⊟(query);
-const evaluationScore = ⊨(retrievedData, evaluationMetrics);
-·if (evaluationScore >= evaluationMetrics.threshold) {
-⊺│⊢.push(retrievedData);
-·break;
-·} else {
-·query = refineQuery(query, retrievedData);
-·}
-·iterations++;
-·}
-⊷│return synthesizeResults(⊢);
-·}
-}⟨/recursiveRetrievalPlanner⟩
-evaluate(2)→void⟨4⟩{
-function ⊨(data, metrics) {
-⊷│return metrics.baseScore + data.relevanceScore;
-·}
-}⟨/evaluate⟩
-refineQuery(2)→void⟨4⟩{
-·function refineQuery(query, data) {
-⊰│return `${query} ${data.suggestedKeywords}`;
-·}
-}⟨/refineQuery⟩
-synthesizeResults(1)→void⟨4⟩{
-function synthesizeResults(⊢) {
-⋐│return ⊢.reduce((acc, result) => `${acc} ${result.content}`, '');
-·}
-}⟨/synthesizeResults⟩
-⟩SCL│35│31⊨│6⑂│12.5%↓⟩
+⊩recursiveRetrievalPlanner(3)→void⟨16⟩{⊩⊺⊷}
+evaluate(2)→void⟨4⟩{⊷}
+refineQuery(2)→void⟨4⟩{⊰⊷}
+synthesizeResults(1)→void⟨4⟩{⋐⊰⊷}
+⟩SCL│6│13⊨│9⑂│85.0%↓⟩

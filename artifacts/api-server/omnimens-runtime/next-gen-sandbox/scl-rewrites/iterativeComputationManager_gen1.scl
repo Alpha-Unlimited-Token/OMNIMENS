@@ -1,53 +1,11 @@
 ⟨SCL v1│iterativeComputationManager_gen1.mjs│95→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩generateCheckpointId(1)→void⟨3⟩{
-⊩│export function generateCheckpointId(input) {
-⊷│return crypto.createHash('sha256').update(input).digest('hex');
-·}
-}⟨/generateCheckpointId⟩
-⊩divideIntoChunks(2)→void⟨7⟩{
-⊩│export function divideIntoChunks(data, chunkSize) {
-·const chunks = [];
-·for (let i = 0; i < data.length; i += chunkSize) {
-⊺│chunks.push(data.slice(i, i + chunkSize));
-·}
-⊷│return chunks;
-·}
-}⟨/divideIntoChunks⟩
-⊩serializeState(1)→void⟨3⟩{
-⊩│export function serializeState(state) {
-⟠│return JSON.stringify(state);
-·}
-}⟨/serializeState⟩
-⊩deserializeState(1)→void⟨3⟩{
-⊩│export function deserializeState(serializedState) {
-⟠│return JSON.parse(serializedState);
-·}
-}⟨/deserializeState⟩
-⊩processChunksWithState(3)→void⟨8⟩{
-⊩│export function processChunksWithState(computationFunction, chunks, preservedState) {
-const ⊢ = [];
-⥀│for (const chunk of chunks) {
-·const result = computationFunction(chunk, preservedState);
-⊺│⊢.push(result);
-·}
-⊷│return ⊢;
-·}
-}⟨/processChunksWithState⟩
-⊩exampleComputationFunction(2)→void⟨6⟩{
-⊩│export function exampleComputationFunction(chunk, state) {
-⊷│return {
-·processedChunk: chunk.map(item => item * state.multiplier),
-⟠│checkpointId: generateCheckpointId(JSON.stringify(chunk))
-·};
-·}
-}⟨/exampleComputationFunction⟩
-⊩iterativeComputationManager(3)→void⟨5⟩{
-⊩│export function iterativeComputationManager(data, chunkSize, initialState) {
-·const chunks = divideIntoChunks(data, chunkSize);
-const ⊢ = processChunksWithState(exampleComputationFunction, chunks, initialState);
-⊷│return ⊢;
-·}
-}⟨/iterativeComputationManager⟩
-⟩SCL│52│54⊨│18⑂│45.3%↓⟩
+⊩generateCheckpointId(1)→void⟨3⟩{⊩⊷}
+⊩divideIntoChunks(2)→void⟨7⟩{⊩⊺⊷}
+⊩serializeState(1)→void⟨3⟩{⊩⟠⊷}
+⊩deserializeState(1)→void⟨3⟩{⊩⟠⊷}
+⊩processChunksWithState(3)→void⟨8⟩{⊩⥀⊺⊷}
+⊩exampleComputationFunction(2)→void⟨6⟩{⊩⊷⟠}
+⊩iterativeComputationManager(3)→void⟨5⟩{⊩⊷}
+⟩SCL│10│28⊨│20⑂│89.5%↓⟩

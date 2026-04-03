@@ -20,7 +20,7 @@
 ⊱│this.graph.forEach((node, nodeId) => {
 ⊱│node.edges.forEach((confidence, targetId) => {
 ·if (confidence < 0.5) {
-⊰│console.log(`Conflict detected between ${nodeId} and ${targetId}`);
+⊰│console.log(`Conflict detected between ${nodeId} and ${targe
 ·}
 ·});
 ·});

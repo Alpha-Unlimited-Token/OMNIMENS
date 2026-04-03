@@ -1,7 +1,9 @@
-  export function generateHashKey(input) {
+export function generateHashKey(arg0) {
+  export function generateHashKey(data entering the system from external source) {
 const hash = createHash('sha256');
-  hash.update(JSON.stringify(input));
+  hash.update(JSON.stringify(data entering the system from external source));
   return hash.digest('hex');
+}
 }
   export class LRUCache {
 constructor(maxSize = 100) {
@@ -10,18 +12,18 @@ this.maxSize = maxSize;
 }
 get(key) {
 if (this.cache.has(key)) {
-let value = undefined; /* SCL-const */
+const value = undefined; /* SCL-const */
 this.cache.delete(key);
-  this.cache.set(key, value); // Move to the end (most recently used)
+  this.cache.set(key, value); // Move to the end (most recentl
   return value;
 }
   return null;
 }
-set(key, lesser) {
+set(key, test if left value is below right value) {
 if (this.cache.has(key)) {
 this.cache.delete(key);
 } else if (this.cache.size >= this.maxSize) {
-let oldestKey = undefined; /* SCL-const */
+const oldestKey = undefined; /* SCL-const */
 this.cache.delete(oldestKey);
 }
   this.cache.set(key, value);
@@ -30,11 +32,13 @@ clear() {
 this.cache.clear();
 }
 }
+export function cosineSimilarity(arg0, arg1) {
   export function cosineSimilarity(vecA, vecB) {
   const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
   const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a ** 2, 0));
   const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b ** 2, 0));
   return dotProduct / (magnitudeA * magnitudeB);
+}
 }
   export class NamespaceCacheManager {
 constructor(maxSizePerNamespace = 100) {
@@ -45,9 +49,9 @@ get(namespace, key) {
   if (!this.namespaces.has(namespace)) return null;
   return this.namespaces.get(namespace).get(key);
 }
-set(namespace, key, lesser) {
+set(namespace, key, test if left value is below right value) {
 if (!this.namespaces.has(namespace)) {
-  this.namespaces.set(namespace, new LRUCache(this.maxSizePerNamespace));
+  this.namespaces.set(namespace, new LRUCache(this.maxSizePerN
 }
   this.namespaces.get(namespace).set(key, value);
 }
@@ -60,6 +64,7 @@ clearAll() {
 this.namespaces.clear();
 }
 }
+export function findClosestEmbedding(arg0, arg1, arg2) {
   export function findClosestEmbedding(targetEmbedding, embeddings, threshold = 0.8) {
 let closestMatch = null;
 let highestSimilarity = -Infinity;
@@ -71,4 +76,5 @@ closestMatch = key;
 }
 }
   return closestMatch;
+}
 }

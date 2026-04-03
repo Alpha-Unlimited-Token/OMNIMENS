@@ -1,25 +1,8 @@
 ⟨SCL v1│memoryAugmentationStore_gen1.mjs│114→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩⟿initializeDatabase(1)→void⟨16⟩{
-⊩│export async function initializeDatabase() {
-⊴│const db = await open({
-·filename: ':memory:',
-·driver: sqlite3.Database
-·});
-·await db.exec(`
-α TABLE embeddings (
-·id INTEGER PRIMARY KEY AUTOINCREMENT,
-·vector TEXT NOT NULL,
-·metadata TEXT
-·);
-·`);
-⊷│return db;
-·}
-}⟨/initializeDatabase⟩
-⊩⟿insertEmbedding(3)→void⟨1⟩{
-⊩│export async function insertEmbedding(db, vector, metadata = {}) {
-}⟨/insertEmbedding⟩
+⊩⟿initializeDatabase(1)→void⟨16⟩{⊩⊴⊷}
+⊩⟿insertEmbedding(3)→void⟨1⟩{⊩}
 κvectorString
 κmetadataString
 κresult
@@ -29,30 +12,11 @@
 ·);
 ⊷│return result.lastID;
 ·}
-⊩⟿findNearestNeighbors(3)→void⟨14⟩{
-⊩│export async function findNearestNeighbors(db, queryVector, k) {
-const embeddings = await db.all('σ id, vector, metadata FROM embeddings');
-⋐│const queryMagnitude = Math.sqrt(queryVector.reduce((sum, val) => sum + val ** 2, 0));
-⊱│const ⊢ = embeddings.map(({ id, vector, metadata }) => {
-⟠│const storedVector = JSON.parse(vector);
-⋐│const dotProduct = storedVector.reduce((sum, val, i) => sum + val * queryVector[i], 0);
-⋐│const storedMagnitude = Math.sqrt(storedVector.reduce((sum, val) => sum + val ** 2, 0));
-·const similarity = dotProduct / (queryMagnitude * storedMagnitude);
-⟠│return { id, metadata: JSON.parse(metadata), similarity };
-·});
-}⟨/findNearestNeighbors⟩
+⊩⟿findNearestNeighbors(3)→void⟨14⟩{⊩⋐⊱⟠⊷}
 ⊷│return results
 ·.sort((a, b) => b.similarity - a.similarity)
 ·.slice(0, k);
 ·}
-⊩⟿clearEmbeddings(1)→void⟨3⟩{
-⊩│export async function clearEmbeddings(db) {
-·await db.exec('DELETE FROM embeddings');
-·}
-}⟨/clearEmbeddings⟩
-⊩⟿closeDatabase(1)→void⟨3⟩{
-⊩│export async function closeDatabase(db) {
-·await db.close();
-·}
-}⟨/closeDatabase⟩
-⟩SCL│57│48⊨│15⑂│50.0%↓⟩
+⊩⟿clearEmbeddings(1)→void⟨3⟩{⊩}
+⊩⟿closeDatabase(1)→void⟨3⟩{⊩}
+⟩SCL│21│23⊨│13⑂│81.6%↓⟩

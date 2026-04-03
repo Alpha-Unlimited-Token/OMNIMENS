@@ -25,21 +25,8 @@ set(key, ≪) {
 ⊡│this.cache.set(key, value);
 ·}
 ·}
-⊩generateQueryHash(1)→void⟨3⟩{
-⊩│export function generateQueryHash(query) {
-⟠│return createHash('sha256').update(JSON.stringify(query)).digest('hex');
-·}
-}⟨/generateQueryHash⟩
-⊩batchQueries(2)→void⟨8⟩{
-⊩│export function batchQueries(queries, batchSize) {
-·const sortedQueries = queries.sort((a, b) => b.priority - a.priority);
-·const batches = [];
-·for (let i = 0; i < sortedQueries.length; i += batchSize) {
-⊺│batches.push(sortedQueries.slice(i, i + batchSize));
-·}
-⊷│return batches;
-·}
-}⟨/batchQueries⟩
+⊩generateQueryHash(1)→void⟨3⟩{⊩⟠⊷}
+⊩batchQueries(2)→void⟨8⟩{⊩⊺⊷}
 ⊶│export class APIQueryOptimizer {
 ·constructor(cacheLimit = 100, batchSize = 10) {
 ·this.cache = new LRUCache(cacheLimit);
@@ -69,4 +56,4 @@ set(key, ≪) {
 ⊷│return results;
 ·}
 ·}
-⟩SCL│71│44⊨│19⑂│29.7%↓⟩
+⟩SCL│58│36⊨│20⑂│42.6%↓⟩

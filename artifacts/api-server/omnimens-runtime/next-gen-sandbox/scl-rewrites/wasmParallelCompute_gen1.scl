@@ -2,52 +2,12 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 κfs
 κpath
-⟿loadWasmModule(1)→void⟨6⟩{
-·async function loadWasmModule(wasmFilePath) {
-📁│const wasmBuffer = fs.readFileSync(wasmFilePath);
-·const wasmModule = await WebAssembly.compile(wasmBuffer);
-·const wasmInstance = await WebAssembly.instantiate(wasmModule);
-⊷│return wasmInstance;
-·}
-}⟨/loadWasmModule⟩
-wasmMatrixMultiply(3)→void⟨40⟩{
-·function wasmMatrixMultiply(matrixA, matrixB, wasmInstance) {
-·const rowsA = matrixA.length;
-·const colsA = matrixA[0].length;
-·const rowsB = matrixB.length;
-·const colsB = matrixB[0].length;
-·if (colsA !== rowsB) {
-⊵│throw new Error('Matrix dimensions are incompatible for multiplication.');
-·}
-·const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
-·const flatA = matrixA.flat();
-·const flatB = matrixB.flat();
-·const flatResult = new Float32Array(rowsA * colsB);
-·const memory = wasmInstance.exports.memory;
-·const wasmMemory = new Float32Array(memory.buffer);
-·const offsetA = 0;
-·const offsetB = flatA.length;
-·const offsetResult = offsetB + flatB.length;
-⊡│wasmMemory.set(flatA, offsetA);
-⊡│wasmMemory.set(flatB, offsetB);
-·wasmInstance.exports.matrixMultiply(offsetA, rowsA, colsA, offsetB, colsB, offsetResult);
-·for (let i = 0; i < rowsA; i++) {
-·for (let j = 0; j < colsB; j++) {
-·result[i][j] = wasmMemory[offsetResult + i * colsB + j];
-·}
-·}
-⊷│return result;
-·}
-}⟨/wasmMatrixMultiply⟩
-⟿initializeWasmParallelCompute(1)→void⟨5⟩{
-·async function initializeWasmParallelCompute(wasmFilePath) {
-⊴│const wasmInstance = await loadWasmModule(wasmFilePath);
-⊷│return (matrixA, matrixB) => wasmMatrixMultiply(matrixA, matrixB, wasmInstance);
-·}
-}⟨/initializeWasmParallelCompute⟩
+⟿loadWasmModule(1)→void⟨6⟩{📁⊷}
+wasmMatrixMultiply(3)→void⟨40⟩{⊵⊡⊷}
+⟿initializeWasmParallelCompute(1)→void⟨5⟩{⊴⊷}
 Ε.exports = {
 ·loadWasmModule,
 ·wasmMatrixMultiply,
 ·initializeWasmParallelCompute
 ·};
-⟩SCL│52│47⊨│8⑂│44.7%↓⟩
+⟩SCL│12│13⊨│7⑂│87.2%↓⟩

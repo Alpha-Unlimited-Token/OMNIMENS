@@ -6,7 +6,7 @@ this.α = α;
 ·}
 generateCounterfactuals(η) {
 κscenarios
-⊷│return scenarios.map(scenario => this.agent.analyze(scenario));
+⊷│return scenarios.map(scenario => this.agent.analyze(scenario
 ·}
 createExtremeScenarios(η) {
 ⊷│return [

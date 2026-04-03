@@ -1,18 +1,5 @@
 ⟨SCL v1│weightedConfidenceTree_gen1.mjs│22→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩weightedConfidenceTree(2)→void⟨8⟩{
-⊩│export function weightedConfidenceTree(agents, ✧) {
-const weightedVotes = ✧.map(idea => {
-const votes = agents.map(α => α.voteOnIdea(idea));
-⋐│const weightedScore = votes.reduce((acc, vote) => acc + vote.confidence * vote.weight, 0);
-⊷│return { idea, weightedScore };
-·});
-⊷│return weightedVotes.sort((a, b) => b.weightedScore - a.weightedScore);
-·}
-}⟨/weightedConfidenceTree⟩
-calculateConfidence(2)→void⟨4⟩{
-function calculateConfidence(α, idea) {
-⊷│return Math.random(); // Placeholder logic
-·}
-}⟨/calculateConfidence⟩
-⟩SCL│17│15⊨│5⑂│22.7%↓⟩
+⊩weightedConfidenceTree(2)→void⟨8⟩{⊩⋐⊷}
+calculateConfidence(2)→void⟨4⟩{⊷}
+⟩SCL│4│6⊨│4⑂│81.8%↓⟩

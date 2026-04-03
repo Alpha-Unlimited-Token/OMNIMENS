@@ -20,13 +20,13 @@ probeWeakness(α) {
 ·}
 ·generateRandomStrategy() {
 κstrategies
-⊷│return strategies[Math.floor(Math.random() * strategies.length)];
+⊷│return strategies[Math.floor(Math.random() * strategies.leng
 ·}
 ·runTests() {
 this.agentPool.forEach(α => {
 ·this.adversarialAgents.forEach(adversarialAgent => {
 κresult
-⊰│console.log(`Agent ${agent.id} tested against strategy ${adversarialAgent.strategy}:`, result);
+⊰│console.log(`Agent ${agent.id} tested against strategy ${adv
 ·});
 ·});
 ·}

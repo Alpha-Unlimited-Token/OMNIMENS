@@ -18,7 +18,7 @@
 ·if (this.testTool(tool)) {
 ⊰│console.log(`Tool ${tool.id} deployed successfully.`);
 ·} else {
-⊰│console.log(`Tool ${tool.id} failed testing and was not deployed.`);
+⊰│console.log(`Tool ${tool.id} failed testing and was not depl
 ·}
 ·}
 ·manageTools() {

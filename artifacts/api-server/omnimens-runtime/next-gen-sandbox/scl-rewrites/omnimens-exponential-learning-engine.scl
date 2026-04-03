@@ -19,16 +19,12 @@
 κelaeState
 ·const log   = (...m: any[]) => console.log(LOG_PREFIX, ...m);
 ·const error = (...m: any[]) => console.error(LOG_PREFIX, ...m);
-tanh(1)→void⟨1⟩{
-⊷│function tanh(x: number) { return Math.tanh(x); }
-}⟨/tanh⟩
-now(1)→void⟨1⟩{
-⏰│function now() { return Date.now(); }
-}⟨/now⟩
+tanh(1)→void⟨1⟩{⊷}
+now(1)→void⟨1⟩{⏰⊷}
 κAI_KNOWLEDGE
 ·const phaseFlow = (fb: number): number => {
-·elaeState.phaseResonanceAngle = (elaeState.phaseResonanceAngle + elaeState.phaseResonanceStrength * fb) % (2 * Math.PI);
-⟛│elaeState.phaseResonanceStrength = Math.max(0.1, Math.sin(elaeState.phaseResonanceAngle) * 0.5 + 1);
+elaeState.phaseResonanceAngle = (elaeState.phaseResonanceAngle + elaeState.⟐
+⟛│elaeState.phaseResonanceStrength = Math.max(0.1, Math.sin(el
 ⊷│return tanh(elaeState.phaseResonanceStrength);
 ·};
 ⊱│const absorbResearch = () => {
@@ -38,8 +34,8 @@ now(1)→void⟨1⟩{
 ·entry.absorbed = true; entry.absorbedAt = now();
 ·elaeState.boostFactors.researchAbsorption += entry.boostContribution;
 ·elaeState.totalPatternsAbsorbed++;
-⊰│log("🧬 ABSORBED", `${entry.aiName}: ${entry.technique.slice(0, 60)}…`, `+${(entry.boostContribution * 100).toFixed(0)}%`);
-·cognitionBus.shareInsight("exponential-learning-engine", { type: "research_absorption", data: entry });
+⊰│log("🧬 ABSORBED", `${entry.aiName}: ${entry.technique.slice
+·cognitionBus.shareInsight("exponential-learning-engine", { type: "research_absor
 ·}
 ·};
 ⊱│const dailyTransition = () => {
@@ -52,24 +48,24 @@ now(1)→void⟨1⟩{
 κdoubled
 κsnap
 ⊺│elaeState.dailyHistory.push(snap);
-⊹│if (elaeState.dailyHistory.length > 365) elaeState.dailyHistory.shift();
+⊹│if (elaeState.dailyHistory.length > 365) elaeState.dailyHist
 ·if (doubled) {
 ·elaeState.totalDoublings++; elaeState.consecutiveDoublings++;
-⊰│log(`🚀 DAY ${elaeState.currentDay} DOUBLING ACHIEVED — ${learned.toLocaleString()} patterns`);
+⊰│log(`🚀 DAY ${elaeState.currentDay} DOUBLING ACHIEVED — ${le
 ·} else {
 ·elaeState.consecutiveDoublings = 0;
-⊰│log(`⚠️ DAY ${elaeState.currentDay} DOUBLING MISSED — ${learned.toLocaleString()} / ${target.toLocaleString()}`);
+⊰│log(`⚠️ DAY ${elaeState.currentDay} DOUBLING MISSED — ${lear
 ·}
-cognitionBus.reportOutcome("exponential-learning-engine", { useful: doubled, ◧: snap });
-⟛│elaeState.peakDailyRate = Math.max(elaeState.peakDailyRate, learned);
+·cognitionBus.reportOutcome("exponential-learning-engine", { useful: doubled, con
+⟛│elaeState.peakDailyRate = Math.max(elaeState.peakDailyRate, 
 ·elaeState.currentDay++; elaeState.dayStartedAt = tNow;
 ·elaeState.patternsAtDayStart = patternsNow;
 ·elaeState.targetMultiplier *= 2;
 ·elaeState.doublingMultiplier = elaeState.targetMultiplier;
-⊰│log(`📅 DAY ${elaeState.currentDay} STARTED — Target: ${(elaeState.baselineRate * elaeState.targetMultiplier).toLocaleString()} patterns/day`);
+⊰│log(`📅 DAY ${elaeState.currentDay} STARTED — Target: ${(ela
 ·};
 ⊱│const boostSum = () => {
-⊲│const { researchAbsorption: r, crossDomainSynthesis: c, phaseResonance: p, metaLearningFeedback: m, compressionEfficiency: e } = elaeState.boostFactors;
+⊲│const { researchAbsorption: r, crossDomainSynthesis: c, phas
 ⊷│return r * c * p * m * e;
 ·};
 ⊱│const adapt = () => {
@@ -81,11 +77,11 @@ cognitionBus.reportOutcome("exponential-learning-engine", { useful: doubled, ◧
 κtarget
 κratio
 κCEIL
-·if (ratio < 0.5 && elaeState.boostFactors.metaLearningFeedback < CEIL) elaeState.boostFactors.metaLearningFeedback *= 1.05;
-·else if (ratio > 1.5 && elaeState.boostFactors.compressionEfficiency < CEIL) elaeState.boostFactors.compressionEfficiency *= 1.02;
+·if (ratio < 0.5 && elaeState.boostFactors.metaLearningFeedback < CEIL) elaeState
+·else if (ratio > 1.5 && elaeState.boostFactors.compressionEfficiency < CEIL) ela
 κlinks
 ·elaeState.boostFactors.crossDomainSynthesis = 1 + Math.log10(links + 1) * 0.1;
-·elaeState.boostFactors.phaseResonance = 0.8 + phaseFlow((ratio - 1) * 0.5) * 0.4;
+·elaeState.boostFactors.phaseResonance = 0.8 + phaseFlow((ratio - 1) * 0.5) * 0.4
 ·elaeState.selfModificationCount++; elaeState.lastAdaptationTick = nowT;
 ·};
 ⊱│const elaeTick = () => {
@@ -103,85 +99,39 @@ cognitionBus.reportOutcome("exponential-learning-engine", { useful: doubled, ◧
 κlearned
 κproj
 κtgt
-⊰│log(`📊 Day ${elaeState.currentDay} — Learned ${learned.toLocaleString()} | Proj ${Math.floor(proj).toLocaleString()} vs ${Math.floor(tgt).toLocaleString()} | Boost ${boostSum().toFixed(2)}x`);
+⊰│log(`📊 Day ${elaeState.currentDay} — Learned ${learned.toLo
 ·}
 ·};
 ·let listenersReady = false;
 ⊱│const initListeners = () => {
 ·if (listenersReady) return; listenersReady = true;
-⊱│spikeBus.on("exponential-learning-engine:elae-tick", async () => {
+⊱│spikeBus.on("exponential-learning-engine:elae-tick", async (
 🛡│try { elaeTick(); } catch (e) { error("Tick error", e); }
-⚡→│finally { spikeBus.scheduleSpike("exponential-learning-engine:elae-tick", {}, ELAE_CYCLE_MS); }
+⚡→│finally { spikeBus.scheduleSpike("exponential-learning-engin
 ·});
-⊱│spikeBus.on("exponential-learning-engine:research-load", async () => {
-🛡│try { loadResearch(); } catch (e) { error("Research load error", e); }
-⚡→│finally { spikeBus.scheduleSpike("exponential-learning-engine:research-load", {}, RESEARCH_CYCLE_MS); }
+⊱│spikeBus.on("exponential-learning-engine:research-load", asy
+🛡│try { loadResearch(); } catch (e) { error("Research load err
+⚡→│finally { spikeBus.scheduleSpike("exponential-learning-engin
 ·});
-⊱│spikeBus.on("attention:exponential-learning-engine", () => { elaeState.boostFactors.metaLearningFeedback *= 1.1; });
-⊱│spikeBus.on("cognition:curiosity", () => { elaeState.boostFactors.crossDomainSynthesis *= 1.05; });
+⊱│spikeBus.on("attention:exponential-learning-engine", () => {
+⊱│spikeBus.on("cognition:curiosity", () => { elaeState.boostFa
 ⊱│cognitionBus.onInsight((_src, insight) => {
-❔│if (insight.type === "discovery" && insight.data?.category?.includes?.("learning")) {
+❔│if (insight.type === "discovery" && insight.data?.category?.
 ·elaeState.boostFactors.crossDomainSynthesis *= 1.02;
 ·}
 ·});
 ·};
 ⊱│const loadResearch = () => {
 ·AI_KNOWLEDGE.forEach(entry => {
-·if (!elaeState.aiResearchBank.find(e => e.aiName === entry.aiName && e.technique === entry.technique)) {
+·if (!elaeState.aiResearchBank.find(e => e.aiName === entry.aiName && e.technique
 ⊺│elaeState.aiResearchBank.push({ ...entry });
 ·}
 ·});
 ·};
-⊩startExponentialLearningEngine(1)→void⟨17⟩{
-⊩│export function startExponentialLearningEngine(): void {
-·if (elaeState.activated) return;
-·const cog = getCognitiveLanguageState();
-·elaeState.activated = true;
-·elaeState.activatedAt = now();
-·elaeState.currentDay = 1;
-·elaeState.dayStartedAt = elaeState.activatedAt;
-·elaeState.patternsAtDayStart = cog.totalPatternsLearned;
-·elaeState.targetMultiplier = elaeState.doublingMultiplier = 1;
-·loadResearch();
-·initListeners();
-·log("🚀 EXPONENTIAL LEARNING ENGINE ACTIVATED");
-⚡→│spikeBus.scheduleSpike("exponential-learning-engine:elae-tick", {}, 0);
-⚡→│spikeBus.scheduleSpike("exponential-learning-engine:research-load", {}, 0);
-·}
-}⟨/startExponentialLearningEngine⟩
-⊩getELAEState(1)→void⟨28⟩{
-⊩│export function getELAEState() {
-·const cog = getCognitiveLanguageState();
-·const elapsed = now() - elaeState.dayStartedAt;
-⟛│const dayFrac = Math.max(elapsed / DAY_MS, 0.001);
-·const learned = cog.totalPatternsLearned - elaeState.patternsAtDayStart;
-·const proj = learned / dayFrac;
-·const target = elaeState.baselineRate * elaeState.targetMultiplier;
-⊷│return {
-·activated: elaeState.activated, currentDay: elaeState.currentDay,
-·dayElapsedHours: +(elapsed / 3_600_000).toFixed(2),
-·baselineRate: elaeState.baselineRate, targetMultiplier: elaeState.targetMultiplier,
-·targetPatternsToday: Math.floor(target), actualPatternsToday: learned,
-·projectedPatternsToday: Math.floor(proj), onTrackForDoubling: proj >= target * 0.8,
-·doublingMultiplier: elaeState.doublingMultiplier, totalDoublings: elaeState.totalDoublings,
-·consecutiveDoublings: elaeState.consecutiveDoublings, peakDailyRate: elaeState.peakDailyRate,
-·boostFactors: { ...elaeState.boostFactors }, combinedBoost: boostSum(),
-·phaseResonance: { angle: +elaeState.phaseResonanceAngle.toFixed(4), strength: +elaeState.phaseResonanceStrength.toFixed(4) },
-·researchBank: {
-·total: elaeState.aiResearchBank.length,
-·absorbed: elaeState.aiResearchBank.filter(e => e.absorbed).length,
-·remaining: elaeState.aiResearchBank.filter(e => !e.absorbed).length,
-⊯│sources: [...new Set(elaeState.aiResearchBank.map(e => e.aiName))],
-·},
-·selfModifications: elaeState.selfModificationCount,
-·dailyHistory: elaeState.dailyHistory.slice(-7),
-·};
-·}
-}⟨/getELAEState⟩
+⊩startExponentialLearningEngine(1)→void⟨17⟩{⊩⚡→}
+⊩getELAEState(1)→void⟨28⟩{⊩⟛⊷⊯}
 ⊪│export const getELAEDoublingMultiplier = (): number =>
-⊳│elaeState.activated ? boostSum() * elaeState.doublingMultiplier : 1;
-·engineRegistry.registerEngine("exponential-learning-engine", "NORMAL", { dbQuota: 10 });
-⊩shutdown(1)→void⟨1⟩{
-⊩│export function shutdown() { engineRegistry.unregisterEngine("exponential-learning-engine"); }
-}⟨/shutdown⟩
-⟩SCL│186│127⊨│50⑂│37.6%↓⟩
+⊳│elaeState.activated ? boostSum() * elaeState.doublingMultipl
+·engineRegistry.registerEngine("exponential-learning-engine", "NORMAL", { dbQuota
+⊩shutdown(1)→void⟨1⟩{⊩}
+⟩SCL│136│88⊨│50⑂│54.4%↓⟩

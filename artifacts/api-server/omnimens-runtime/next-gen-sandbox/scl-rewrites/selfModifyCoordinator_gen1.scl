@@ -1,9 +1,9 @@
 ⟨SCL v1│selfModifyCoordinator_gen1.mjs│26→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 κselfModifyCoordinator
-⊻│const isSafe = safetyRules.every(rule => modificationProposal.rules.includes(rule));
+⊻│const isSafe = safetyRules.every(rule => modificationProposa
 ·if (!isSafe) {
-⊵│throw new Error("Modification proposal violates safety rules.");
+⊵│throw new Error("Modification proposal violates safety rules
 ·}
 ⊷│return modificationProposal;
 ·},

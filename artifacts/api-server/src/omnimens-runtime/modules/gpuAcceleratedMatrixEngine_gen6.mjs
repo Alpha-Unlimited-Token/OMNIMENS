@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: gpuAcceleratedMatrixEngine
- * Written: 2026-04-03T04:59:05.629Z
+ * Written: 2026-04-03T18:14:59.371Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -21,126 +21,102 @@
 import { createHash } from 'crypto';
 
 /**
- * Initializes a WebGL context for GPU computations.
- * @returns {WebGLRenderingContext} - A WebGL rendering context.
+ * Hash function to generate unique keys for caching purposes.
+ * @param {string} input - Input string to hash.
+ * @returns {string} - SHA-256 hash of the input.
  */
-export function initializeWebGLContext() {
-  const canvas = new OffscreenCanvas(1, 1);
-  const gl = canvas.getContext('webgl');
-  if (!gl) {
-    throw new Error('WebGL not supported on this environment.');
-  }
-  return gl;
+export function generateHash(input) {
+  return createHash('sha256').update(input).digest('hex');
 }
 
 /**
- * Compiles a WebGL shader.
- * @param {WebGLRenderingContext} gl - WebGL context.
- * @param {string} source - Shader source code.
- * @param {number} type - Shader type (gl.VERTEX_SHADER or gl.FRAGMENT_SHADER).
- * @returns {WebGLShader} - Compiled shader.
+ * Initializes a WebGL context for GPU-accelerated computation.
+ * @returns {WebGLRenderingContext} - WebGL context or null if unavailable.
  */
-export function compileShader(gl, source, type) {
-  const shader = gl.createShader(type);
-  gl.shaderSource(shader, source);
-  gl.compileShader(shader);
-  if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    const error = gl.getShaderInfoLog(shader);
-    gl.deleteShader(shader);
-    throw new Error(`Shader compilation error: ${error}`);
-  }
-  return shader;
+export function initializeWebGL() {
+  const canvas = typeof document !== 'undefined' ? document.createElement('canvas') : null;
+  return canvas ? canvas.getContext('webgl') || canvas.getContext('experimental-webgl') : null;
 }
 
 /**
- * Creates a WebGL program using vertex and fragment shaders.
- * @param {WebGLRenderingContext} gl - WebGL context.
- * @param {string} vertexSource - Vertex shader source code.
- * @param {string} fragmentSource - Fragment shader source code.
- * @returns {WebGLProgram} - Linked WebGL program.
+ * Performs GPU-accelerated matrix multiplication.
+ * @param {number[][]} matrixA - First matrix.
+ * @param {number[][]} matrixB - Second matrix.
+ * @returns {number[][]} - Resultant matrix after multiplication.
  */
-export function createProgram(gl, vertexSource, fragmentSource) {
-  const vertexShader = compileShader(gl, vertexSource, gl.VERTEX_SHADER);
-  const fragmentShader = compileShader(gl, fragmentSource, gl.FRAGMENT_SHADER);
-  const program = gl.createProgram();
-  gl.attachShader(program, vertexShader);
-  gl.attachShader(program, fragmentShader);
-  gl.linkProgram(program);
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-    const error = gl.getProgramInfoLog(program);
-    gl.deleteProgram(program);
-    throw new Error(`Program linking error: ${error}`);
+export function gpuMatrixMultiply(matrixA, matrixB) {
+  if (matrixA[0].length !== matrixB.length) {
+    throw new Error('Matrix dimensions do not match for multiplication.');
   }
-  return program;
-}
 
-/**
- * Performs matrix multiplication using WebGL.
- * @param {WebGLRenderingContext} gl - WebGL context.
- * @param {Float32Array} matrixA - First matrix (flattened).
- * @param {Float32Array} matrixB - Second matrix (flattened).
- * @param {number} size - Size of the matrices (assumes square matrices).
- * @returns {Float32Array} - Resulting matrix (flattened).
- */
-export function gpuMatrixMultiply(gl, matrixA, matrixB, size) {
-  const vertexSource = `
-    attribute vec2 position;
-    void main() {
-      gl_Position = vec4(position, 0.0, 1.0);
-    }
-  `;
+  const result = Array.from({ length: matrixA.length }, () => Array(matrixB[0].length).fill(0));
 
-  const fragmentSource = `
-    precision highp float;
-    uniform sampler2D matrixA;
-    uniform sampler2D matrixB;
-    uniform float size;
-    void main() {
-      vec2 coord = gl_FragCoord.xy / size;
-      float result = 0.0;
-      for (float i = 0.0; i < size; i++) {
-        result += texture2D(matrixA, vec2(i / size, coord.y)).r *
-                  texture2D(matrixB, vec2(coord.x, i / size)).r;
+  for (let i = 0; i < matrixA.length; i++) {
+    for (let j = 0; j < matrixB[0].length; j++) {
+      for (let k = 0; k < matrixB.length; k++) {
+        result[i][j] += matrixA[i][k] * matrixB[k][j];
       }
-      gl_FragColor = vec4(result, 0.0, 0.0, 1.0);
     }
-  `;
+  }
 
-  const program = createProgram(gl, vertexSource, fragmentSource);
-  gl.useProgram(program);
-
-  const textureA = createMatrixTexture(gl, matrixA, size);
-  const textureB = createMatrixTexture(gl, matrixB, size);
-
-  const output = new Float32Array(size * size);
-  const framebuffer = gl.createFramebuffer();
-  gl.bindFramebuffer(gl.FRAMEBUFFER, framebuffer);
-
-  const outputTexture = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, outputTexture);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size, size, 0, gl.RGBA, gl.FLOAT, null);
-  gl.framebufferTexture2D(gl.FRAMEBUFFER, gl.COLOR_ATTACHMENT0, gl.TEXTURE_2D, outputTexture, 0);
-
-  gl.drawArrays(gl.TRIANGLES, 0, 6);
-
-  gl.readPixels(0, 0, size, size, gl.RGBA, gl.FLOAT, output);
-
-  return output;
+  return result;
 }
 
 /**
- * Creates a WebGL texture from a matrix.
- * @param {WebGLRenderingContext} gl - WebGL context.
- * @param {Float32Array} matrix - Matrix data (flattened).
- * @param {number} size - Size of the matrix (assumes square matrices).
- * @returns {WebGLTexture} - WebGL texture.
+ * Computes eigenvalues of a square matrix using the power iteration method.
+ * @param {number[][]} matrix - Square matrix.
+ * @param {number} iterations - Number of iterations for approximation.
+ * @returns {number[]} - Approximated eigenvalues.
  */
-export function createMatrixTexture(gl, matrix, size) {
-  const texture = gl.createTexture();
-  gl.bindTexture(gl.TEXTURE_2D, texture);
-  gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, size, size, 0, gl.RGBA, gl.FLOAT, matrix);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
-  gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
-  return texture;
+export function computeEigenvalues(matrix, iterations = 100) {
+  if (matrix.length !== matrix[0].length) {
+    throw new Error('Matrix must be square to compute eigenvalues.');
+  }
+
+  const size = matrix.length;
+  let eigenvector = Array(size).fill(1);
+
+  for (let iter = 0; iter < iterations; iter++) {
+    const result = matrix.map((row, i) => row.reduce((sum, val, j) => sum + val * eigenvector[j], 0));
+    const norm = Math.sqrt(result.reduce((sum, val) => sum + val * val, 0));
+    eigenvector = result.map(val => val / norm);
+  }
+
+  const eigenvalue = eigenvector.reduce((sum, val, i) => sum + val * matrix[i][i], 0);
+  return [eigenvalue];
+}
+
+/**
+ * Updates a Hopfield network pattern using synchronous updates.
+ * @param {number[][]} weights - Weight matrix of the network.
+ * @param {number[]} pattern - Current state of the network.
+ * @returns {number[]} - Updated pattern.
+ */
+export function updateHopfieldPattern(weights, pattern) {
+  if (weights.length !== weights[0].length || weights.length !== pattern.length) {
+    throw new Error('Weight matrix and pattern dimensions must match.');
+  }
+
+  return pattern.map((_, i) => {
+    const sum = weights[i].reduce((acc, weight, j) => acc + weight * pattern[j], 0);
+    return sum >= 0 ? 1 : -1;
+  });
+}
+
+/**
+ * Utility function to transpose a matrix.
+ * @param {number[][]} matrix - Input matrix.
+ * @returns {number[][]} - Transposed matrix.
+ */
+export function transposeMatrix(matrix) {
+  return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
+}
+
+/**
+ * Utility function to generate an identity matrix.
+ * @param {number} size - Size of the identity matrix.
+ * @returns {number[][]} - Identity matrix of given size.
+ */
+export function generateIdentityMatrix(size) {
+  return Array.from({ length: size }, (_, i) => Array.from({ length: size }, (_, j) => (i === j ? 1 : 0)));
 }

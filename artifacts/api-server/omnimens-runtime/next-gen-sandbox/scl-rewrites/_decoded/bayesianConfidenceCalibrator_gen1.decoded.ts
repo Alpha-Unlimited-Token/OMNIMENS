@@ -4,9 +4,9 @@ this.priorProbabilities = {};
 this.evidence = {};
 }
 updateConfidence(agentId, newEvidence) {
-let prior = undefined; /* SCL-const */
-let likelihood = undefined; /* SCL-const */
-let posterior = undefined; /* SCL-const */
+const prior = undefined; /* SCL-const */
+const likelihood = undefined; /* SCL-const */
+const posterior = undefined; /* SCL-const */
 this.priorProbabilities[agentId] = posterior;
   return posterior;
 }

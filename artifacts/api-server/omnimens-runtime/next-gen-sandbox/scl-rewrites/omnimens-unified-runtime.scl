@@ -2,26 +2,10 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
 κLOG_PREFIX
-log(2)→void⟨4⟩{
-·function log(message: string, ...args: unknown[]) {
-⊰│console.log(`${LOG_PREFIX} ${message}`, ...args);
-·}
-}⟨/log⟩
-clamp(3)→void⟨3⟩{
-·function clamp(min: number, n: number, max: number) {
-⟛│return Math.max(min, Math.min(max, n));
-·}
-}⟨/clamp⟩
-now(1)→number⟨3⟩{
-·function now(): number {
-⏰│return Date.now();
-·}
-}⟨/now⟩
-jitter(1)→void⟨3⟩{
-·function jitter(ms: number) {
-⊷│return ms + Math.floor(Math.random() * 1000);
-·}
-}⟨/jitter⟩
+log(2)→void⟨4⟩{⊰}
+clamp(3)→void⟨3⟩{⟛⊷}
+now(1)→number⟨3⟩{⏰⊷}
+jitter(1)→void⟨3⟩{⊷}
 ·export enum Priority {
 ·CRITICAL = 1,
 ·HIGH = 2,
@@ -88,7 +72,7 @@ smallest = ≪;
 ·private emitter = new EventEmitter();
 ·private queue = new MinHeap<Spike>();
 ·private currentTimer: NodeJS.Timeout | null = null;
-⊳│emit<T>(channel: string, data?: T, priority: Priority = Priority.NORMAL) {
+⊳│emit<T>(channel: string, data?: T, priority: Priority = Prio
 📡│this.emitter.emit(channel, data);
 ·CognitionBus.handleSpike(channel);
 ·}
@@ -119,7 +103,7 @@ smallest = ≪;
 ·}
 ·}
 ·if (removed.length) {
-⊰│log(`Backpressure: dropped ${removed.length} low-priority spikes`);
+⊰│log(`Backpressure: dropped ${removed.length} low-priority sp
 ·}
 ·}
 ⊺│this.queue.push(spike);
@@ -184,7 +168,7 @@ set(key: K, ≪: V) {
 ·private writeQueue: DBOperation[] = [];
 ·private lastFlush = now();
 ·private readCache = new LRUCache<string, any>(500, 30_000);
-⊮│private perEngineCounts = new Map<string, { count: number; ts: number; limit: number }>();
+⊮│private perEngineCounts = new Map<string, { count: number; t
 ·constructor() {
 ·GlobalSpikeBus.on('db:flush', () => this.flushWrites());
 ·}
@@ -202,15 +186,15 @@ entry = { count: 0, ts: nowTs, ⏳: EngineRegistry.getQuota(engine) };
 ⊡│this.perEngineCounts.set(engine, entry);
 ·}
 if (entry.count >= entry.⏳) {
-📡│GlobalSpikeBus.emit(`db:quota-exceeded:${engine}`, { ts: now(), count: entry.count });
+📡│GlobalSpikeBus.emit(`db:quota-exceeded:${engine}`, { ts: now
 ⊷│return false;
 ·}
 ·entry.count++;
 ⊷│return true;
 ·}
-·async read<T>(engine: string, key: string, sqlFn: () => Promise<T>, priority: DBOpPriority = Priority.NORMAL): Promise<T> {
+·async read<T>(engine: string, key: string, sqlFn: () => Promise<T>, priority: DB
 ·if (!this.canProceed(priority)) {
-⊷│return Promise.reject(new Error('DB pool pressure too high'));
+⊷│return Promise.reject(new Error('DB pool pressure too high')
 ·}
 ·if (!this.countOp(engine)) {
 ⊷│return Promise.reject(new Error('DB quota exceeded'));
@@ -222,11 +206,11 @@ if (entry.count >= entry.⏳) {
 ⊷│return data;
 ·}
 async ⊞(engine: string, ↺: DBOperation): Promise<any> {
-if (↺.priority === Priority.CRITICAL || ↺.priority === Priority.HIGH) {
+if (↺.priority === Priority.CRITICAL || ↺.priority === Priority.
 ⊷│return this.executeWrite(operation);
 ·}
 ⊱│return new Promise((resolve, reject) => {
-⊄│if (!this.countOp(engine)) return reject(new Error('DB quota exceeded'));
+⊄│if (!this.countOp(engine)) return reject(new Error('DB quota
 ⊺│this.writeQueue.push({ ...operation, resolve, reject });
 ⊹│if (this.writeQueue.length >= 50) this.scheduleFlush(0);
 ·else this.scheduleFlush(5_000); // ensure flush within 5s
@@ -251,7 +235,7 @@ if (↺.priority === Priority.CRITICAL || ↺.priority === Priority.HIGH) {
 ⥀│for (const op of batch) {
 ·try {
 ❔│op.resolve?.(true);
-📡│GlobalSpikeBus.emit(`db:invalidate:${op.sql.split(' ')[2]}`);
+📡│GlobalSpikeBus.emit(`db:invalidate:${op.sql.split(' ')[2]}`)
 ·} catch (err) {
 ❔│op.reject?.(err);
 ·}
@@ -310,7 +294,7 @@ if (↺.priority === Priority.CRITICAL || ↺.priority === Priority.HIGH) {
 ·isChat = false
 ·): Promise<T> {
 κp
-⊰│if (!p) throw new Error(`Provider ${provider} not configured`);
+⊰│if (!p) throw new Error(`Provider ${provider} not configured
 κcached
 ⊷│if (cached !== undefined) return cached as T;
 ·await this.acquireToken(p, provider);
@@ -318,7 +302,7 @@ if (↺.priority === Priority.CRITICAL || ↺.priority === Priority.HIGH) {
 ⊰│throw new Error(`Circuit open for provider ${provider}`);
 ·}
 κcontroller
-⏳│const timeout = setTimeout(() => controller.abort(), isChat ? 120_000 : 30_000).unref();
+⏳│const timeout = setTimeout(() => controller.abort(), isChat 
 const ↺ = async (↺: number): Promise<T> => {
 ·try {
 κresult
@@ -377,7 +361,7 @@ p.⋮--;
 ·registerEngine(name: string, priority: Priority, config: any = {}) {
 κinfo
 ⊡│this.engines.set(name, info);
-⊰│log(`Engine registered: ${name}, priority=${Priority[priority]}`);
+⊰│log(`Engine registered: ${name}, priority=${Priority[priorit
 κquota
 ·this.setQuota(name, quota);
 ·}
@@ -435,12 +419,12 @@ p.⋮--;
 ·}
 ·emitInsight(engine: string, data: any) {
 📡│this.insights.emit('insight', { engine, data });
-📡│GlobalSpikeBus.emit(`cognition:insight:${engine}`, data, Priority.HIGH);
+📡│GlobalSpikeBus.emit(`cognition:insight:${engine}`, data, Pri
 ·}
 ·handleSpike(channel: string) {
 κts
 ⊺│this.recentSpikes.push({ channel, ts });
-⊹│if (this.recentSpikes.length > 1000) this.recentSpikes.shift();
+⊹│if (this.recentSpikes.length > 1000) this.recentSpikes.shift
 ·for (let i = this.recentSpikes.length - 2; i >= 0; i--) {
 κprev
 ·if (ts - prev.ts > 50) break;
@@ -451,41 +435,23 @@ p.⋮--;
 ⊱│GlobalSpikeBus.on(prev.channel, (data) => {
 📡│GlobalSpikeBus.emit(channel, data, Priority.HIGH);
 ·});
-⊰│log(`Hebbian fast-path created between ${prev.channel} and ${channel}`);
+⊰│log(`Hebbian fast-path created between ${prev.channel} and $
 ·}
 ·}
 ⊻│if (channel.startsWith('user:')) {
-📡│GlobalSpikeBus.emit('attention', { channel, ts }, Priority.CRITICAL);
+📡│GlobalSpikeBus.emit('attention', { channel, ts }, Priority.C
 ·}
 ⊹│if (this.recentSpikes.length >= 500) {
-⊯│const uniq = new Set(this.recentSpikes.map((s) => s.channel));
+⊯│const uniq = new Set(this.recentSpikes.map((s) => s.channel)
 ⊹│if (uniq.size / this.recentSpikes.length < 0.2) {
-📡│GlobalSpikeBus.emit('cognition:curiosity', {}, Priority.HIGH);
+📡│GlobalSpikeBus.emit('cognition:curiosity', {}, Priority.HIGH
 ·}
 ·}
 ·}
 ·}
 ⊪CognitionBus
 ·let shuttingDown = false;
-⟿shutdown(1)→void⟨23⟩{
-·async function shutdown() {
-·if (shuttingDown) return;
-·shuttingDown = true;
-·log('Initiating unified shutdown…');
-❔│await UnifiedDb['flushWrites']?.();
-⊱│await new Promise<void>((resolve) => {
-·function check() {
-⊷│if (GlobalSpikeBus['queue'].size === 0) return resolve();
-⏳│setTimeout(check, 50).unref();
-·}
-·check();
-·});
-⊱│EngineRegistry.getAllEngines().forEach((e) => {
-·EngineRegistry.unregisterEngine(e.name);
-·});
-log('Shutdown ⊣');
-·}
-}⟨/shutdown⟩
+⟿shutdown(1)→void⟨23⟩{❔⚡→⊱⊷⏳}
 ↻.once('SIGTERM', shutdown);
 ↻.once('SIGINT', shutdown);
 ·export {
@@ -494,4 +460,4 @@ log('Shutdown ⊣');
 ·UnifiedApiManager as ApiManager,
 ·shutdown,
 ·};
-⟩SCL│496│224⊨│127⑂│28.0%↓⟩
+⟩SCL│462│203⊨│129⑂│32.9%↓⟩

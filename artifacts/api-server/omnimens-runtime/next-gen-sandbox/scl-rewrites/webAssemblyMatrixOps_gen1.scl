@@ -1,55 +1,6 @@
 ⟨SCL v1│webAssemblyMatrixOps_gen1.mjs│92→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩⟿initializeWasmModule(1)→void⟨13⟩{
-⊩│export async function initializeWasmModule() {
-·const wasmCode = new Uint8Array([
-·0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, 0x01, 0x0b, 0x02, 0x60, 0x02, 0x7f, 0x7f, 0x01,
-·0x7f, 0x60, 0x03, 0x7f, 0x7f, 0x7f, 0x01, 0x7f, 0x03, 0x03, 0x02, 0x00, 0x01, 0x07, 0x13, 0x02,
-·0x03, 0x61, 0x64, 0x64, 0x00, 0x00, 0x05, 0x6d, 0x75, 0x6c, 0x74, 0x00, 0x01, 0x0a, 0x1a, 0x02,
-·0x0a, 0x00, 0x20, 0x00, 0x20, 0x01, 0x6a, 0x0b, 0x0f, 0x00, 0x20, 0x00, 0x20, 0x01, 0x20, 0x02,
-·0x6c, 0x0b
-·]);
-·const wasmModule = await WebAssembly.compile(wasmCode);
-·const instance = await WebAssembly.instantiate(wasmModule);
-⊷│return instance;
-·}
-}⟨/initializeWasmModule⟩
-⊩⟿addMatrices(2)→void⟨18⟩{
-⊩│export async function addMatrices(matrixA, matrixB) {
-⊹│if (matrixA.length !== matrixB.length || matrixA[0].length !== matrixB[0].length) {
-⊵│throw new Error("Matrices must have the same dimensions for ∑.");
-·}
-⊴│const wasmInstance = await initializeWasmModule();
-·const rows = matrixA.length;
-·const cols = matrixA[0].length;
-·const result = Array.from({ length: rows }, () => Array(cols).fill(0));
-·for (let i = 0; i < rows; i++) {
-·for (let j = 0; j < cols; j++) {
-·result[i][j] = wasmInstance.exports.add(matrixA[i][j], matrixB[i][j]);
-·}
-·}
-⊷│return result;
-·}
-}⟨/addMatrices⟩
-⊩⟿multiplyMatrices(2)→void⟨23⟩{
-⊩│export async function multiplyMatrices(matrixA, matrixB) {
-·const rowsA = matrixA.length;
-·const colsA = matrixA[0].length;
-·const rowsB = matrixB.length;
-·const colsB = matrixB[0].length;
-·if (colsA !== rowsB) {
-⊵│throw new Error("Number of columns in matrixA must equal number of rows in matrixB.");
-·}
-⊴│const wasmInstance = await initializeWasmModule();
-·const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
-·for (let i = 0; i < rowsA; i++) {
-·for (let j = 0; j < colsB; j++) {
-·for (let k = 0; k < colsA; k++) {
-·result[i][j] += wasmInstance.exports.multiply(matrixA[i][k], matrixB[k][j]);
-·}
-·}
-·}
-⊷│return result;
-·}
-}⟨/multiplyMatrices⟩
-⟩SCL│54│57⊨│11⑂│41.3%↓⟩
+⊩⟿initializeWasmModule(1)→void⟨13⟩{⊩⊷}
+⊩⟿addMatrices(2)→void⟨18⟩{⊩⊹⊵⊴⊷}
+⊩⟿multiplyMatrices(2)→void⟨23⟩{⊩⊵⊴⊷}
+⟩SCL│5│14⊨│11⑂│94.6%↓⟩

@@ -19,7 +19,7 @@
 ·let cycleCount = 0;
 ·const log = (msg: string) =>
 📢│console.log(`[OMNIMENS-HOMEOSTATIC-DRIVES] ${msg}`);
-⊱│const safeNum = (v: number, fb = 0) => (Number.isFinite(v) ? v : fb);
+⊱│const safeNum = (v: number, fb = 0) => (Number.isFinite(v) ?
 ⏰│const now = () => Date.now();
 ·const hoursAgo = (h: number) => new Date(now() - h * 3_600_000);
 κDRIVES
@@ -129,7 +129,7 @@ satisfiedBy: "☼ learning ↻ feedback",
 κpatterns
 κcount
 ⊷│return count > 5
-⊰│? { satisfied: true, delta: -0.1, details: `${count} patterns` }
+⊰│? { satisfied: true, delta: -0.1, details: `${count} pattern
 : { satisfied: false, Υ: 0, details: "insufficient patterns" };
 ·},
 ·},
@@ -143,7 +143,7 @@ satisfiedBy: "☼ learning ↻ feedback",
 ⥀│for (const def of DRIVES) {
 ·const row = rows.find((r) => r.driveType === def.name);
 ·if (row) {
-⊡│map.set(def.name, { id: row.id, level: safeNum(row.currentLevel, 0.5) });
+⊡│map.set(def.name, { id: row.id, level: safeNum(row.currentLe
 ·} else {
 const [inserted] = await dbGateway.⊞<DriveRow>(
 ·ENGINE_ID,
@@ -160,80 +160,5 @@ const [inserted] = await dbGateway.⊞<DriveRow>(
 ·}
 ⊷│return map;
 ·};
-⊩⟿runDriveCycle(1)→Promise<void>⟨91⟩{
-⟿│export async function runDriveCycle(): Promise<void> {
-·cycleCount += 1;
-·const t0 = now();
-⊰│log(`⚡ Cycle #${cycleCount} START`);
-⊴│const state = await fetchDriveState();
-·const urgent: string[] = [];
-·const satisfiedLog: string[] = [];
-⫘│await Promise.all(
-⊱│DRIVES.map(async (d) => {
-⊡│const s = state.get(d.name)!;
-·let level = s.level + d.decayRate;
-⊱│const evalRes = await d.⊨().catch(() => ({
-·satisfied: false,
-·delta: 0,
-·details: "eval error",
-·})) as DriveEval;
-·if (evalRes.satisfied) {
-⟛│level = Math.max(0, level + evalRes.delta);
-⊰│satisfiedLog.push(`${d.name}: ${evalRes.details}`);
-·}
-⊺│if (level >= d.urgencyThreshold) urgent.push(d.name);
-await dbGateway.⊞(
-·ENGINE_ID,
-·"omnimensDrives",
-·{
-·id: s.id,
-·currentLevel: level,
-·updatedAt: new Date(),
-·...(evalRes.satisfied
-⊳│? { last_satisfied: new Date(), satisfaction_count: { $inc: 1 } }
-·: {}),
-·},
-·"NORMAL",
-·);
-·const indicator =
-·level >= d.urgencyThreshold
-·? "🔴 URGENT"
-·: level >= 0.5
-·? "🟡 Building"
-·: "🟢 Satisfied";
-·log(
-⊰│`[${indicator}] ${d.name} ${(level * 100).toFixed(
-·0,
-·)}% (th:${(d.urgencyThreshold * 100).toFixed(0)}%)`,
-·);
-·}),
-·);
-·if (urgent.length) {
-⊰│log(`⚡ URGENT drives: ${urgent.join(", ")}`);
-·if (!shouldYieldToCodegen()) {
-·try {
-⊲│const { data: resp } = await apiManager.call(ENGINE_ID, "openai", {
-·model: "gpt-4o-mini",
-·messages: [
-·{
-·role: "user",
-content: `You are the HOMEOSTATIC DRIVE η of an AI mind. These drives are at URGENT levels and need to be addressed:
-·URGENT DRIVES: ${urgent.join(", ")}
-·Drive descriptions:
-·${urgent
-⊱│.map((n) => {
-·const d = DRIVES.find((x) => x.name === n)!;
-⊰│return `- ${n}: ${d.description}. Satisfied by: ${d.satisfiedBy}`;
-·})
-·.join("\n")}
-·Generate 1-2 concrete actions OMNIMENS should take to satisfy these urgent drives. Respond JSON only with:
-·{"driveActions":[{"action":"","targetDrive":"","priority":""}]}`,
-·},
-·],
-·max_tokens: 300,
-·temperature: 0.5,
-·});
-❔│const txt = (resp?.choices?.[0]?.message?.content ?? "").trim();
-⟠│const parsed = JSON.parse(txt.replace(/
-}⟨/runDriveCycle⟩
-⟩SCL│238│146⊨│45⑂│29.0%↓⟩
+⊩⟿runDriveCycle(1)→Promise<void>⟨91⟩{⟿⊩⊰⊴⫘⊱⊡⟛⊺⊳⊲⊷❔⟠⊽}
+⟩SCL│163│76⊨│42⑂│51.3%↓⟩

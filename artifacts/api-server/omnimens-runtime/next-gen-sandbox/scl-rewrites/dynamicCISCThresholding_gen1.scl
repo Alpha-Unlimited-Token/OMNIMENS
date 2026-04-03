@@ -14,7 +14,7 @@
 ·calculateThreshold() {
 κrecentInteractions
 ·const adversarialCount = recentInteractions.filter(i => i.isAdversarial).length;
-⟛│return Math.min(1, this.baseThreshold + adversarialCount * 0.01);
+⟛│return Math.min(1, this.baseThreshold + adversarialCount * 0
 ·}
 ·}
 ⟩SCL│19│6⊨│5⑂│32.1%↓⟩

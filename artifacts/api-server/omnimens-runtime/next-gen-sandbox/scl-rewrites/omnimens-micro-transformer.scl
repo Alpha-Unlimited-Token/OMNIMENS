@@ -1,20 +1,7 @@
 ⟨SCL v1│omnimens-micro-transformer.ts│737→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-safe(2)→number⟨4⟩{
-·function safe(v: any, fb: number = 0): number {
-·const n = Number(v);
-⊳│return Number.isFinite(n) ? n : fb;
-·}
-}⟨/safe⟩
-seededRng(1)→() => number⟨7⟩{
-·function seededRng(seed: number): () => number {
-·let s = seed | 0;
-⊱│return () => {
-·s = (s * 1664525 + 1013904223) | 0;
-⊷│return (s >>> 0) / 4294967296;
-·};
-·}
-}⟨/seededRng⟩
+safe(2)→number⟨4⟩{⊳⊷⊼}
+seededRng(1)→() => number⟨7⟩{⊱⊷}
 κMODEL_DIM
 κNUM_HEADS
 κHEAD_DIM
@@ -29,90 +16,15 @@ seededRng(1)→() => number⟨7⟩{
 κCOT_MAX_STEPS
 κREFINE_PASSES
 ⊬Tensor2D⟨data:ι│rows:number│cols:number⟩
-initWeights(3)→Tensor2D⟨7⟩{
-·function initWeights(rows: number, cols: number, seed: number): Tensor2D {
-·const rng = seededRng(seed);
-·const scale = Math.sqrt(2 / (rows + cols));
-·const data = new Float64Array(rows * cols);
-·for (let i = 0; i < data.length; i++) data[i] = (rng() * 2 - 1) * scale;
-⊷│return { data, rows, cols };
-·}
-}⟨/initWeights⟩
-matVec(2)→ι⟨11⟩{
-·function matVec(mat: Tensor2D, vec: Float64Array): Float64Array {
-·const out = new Float64Array(mat.rows);
-·for (let i = 0; i < mat.rows; i++) {
-·let sum = 0;
-·const off = i * mat.cols;
-⟛│const len = Math.min(mat.cols, vec.length);
-·for (let j = 0; j < len; j++) sum += mat.data[off + j] * vec[j];
-·out[i] = sum;
-·}
-⊷│return out;
-·}
-}⟨/matVec⟩
-rmsNorm(3)→ι⟨8⟩{
-·function rmsNorm(x: Float64Array, gamma: Float64Array, eps = 1e-6): Float64Array {
-·let sumSq = 0;
-·for (let i = 0; i < x.length; i++) sumSq += x[i] * x[i];
-·const rms = Math.sqrt(sumSq / x.length + eps);
-·const out = new Float64Array(x.length);
-⊳│for (let i = 0; i < x.length; i++) out[i] = (x[i] / rms) * (i < gamma.length ? gamma[i] : 1);
-⊷│return out;
-·}
-}⟨/rmsNorm⟩
-silu(1)→number⟨1⟩{
-⊷│function silu(x: number): number { return x / (1 + Math.exp(-x)); }
-}⟨/silu⟩
-softmaxF64(1)→ι⟨9⟩{
-·function softmaxF64(arr: Float64Array): Float64Array {
-·let max = -Infinity;
-·for (let i = 0; i < arr.length; i++) if (arr[i] > max) max = arr[i];
-·const out = new Float64Array(arr.length);
-·let sum = 0;
-·for (let i = 0; i < arr.length; i++) { out[i] = Math.exp(arr[i] - max); sum += out[i]; }
-·for (let i = 0; i < arr.length; i++) out[i] /= sum;
-⊷│return out;
-·}
-}⟨/softmaxF64⟩
-softmaxArr(1)→number[]⟨6⟩{
-·function softmaxArr(arr: number[]): number[] {
-⟛│const max = Math.max(...arr);
-·const exps = arr.map(x => Math.exp(x - max));
-⋐│const sum = exps.reduce((a, b) => a + b, 0);
-⊷│return exps.map(e => e / sum);
-·}
-}⟨/softmaxArr⟩
-applyRoPE(3)→void⟨14⟩{
-·function applyRoPE(q: Float64Array, k: Float64Array, pos: number): void {
-·const half = q.length / 2;
-·for (let i = 0; i < half; i++) {
-·const freq = 1.0 / Math.pow(ROPE_THETA, (2 * i) / q.length);
-·const angle = pos * freq;
-·const c = Math.cos(angle), s = Math.sin(angle);
-·const qr = q[2*i], qi = q[2*i+1];
-·q[2*i] = qr*c - qi*s;
-·q[2*i+1] = qr*s + qi*c;
-·const kr = k[2*i], ki = k[2*i+1];
-·k[2*i] = kr*c - ki*s;
-·k[2*i+1] = kr*s + ki*c;
-·}
-·}
-}⟨/applyRoPE⟩
-vecAdd(2)→ι⟨5⟩{
-·function vecAdd(a: Float64Array, b: Float64Array): Float64Array {
-·const out = new Float64Array(a.length);
-⊳│for (let i = 0; i < a.length; i++) out[i] = a[i] + (i < b.length ? b[i] : 0);
-⊷│return out;
-·}
-}⟨/vecAdd⟩
-vecScale(2)→ι⟨5⟩{
-·function vecScale(a: Float64Array, s: number): Float64Array {
-·const out = new Float64Array(a.length);
-·for (let i = 0; i < a.length; i++) out[i] = a[i] * s;
-⊷│return out;
-·}
-}⟨/vecScale⟩
+initWeights(3)→Tensor2D⟨7⟩{⊷}
+matVec(2)→ι⟨11⟩{⟛⊷}
+rmsNorm(3)→ι⟨8⟩{⊳⊷}
+silu(1)→number⟨1⟩{⊷}
+softmaxF64(1)→ι⟨9⟩{⊷}
+softmaxArr(1)→number[]⟨6⟩{⟛⋐⊷}
+applyRoPE(3)→void⟨14⟩{}
+vecAdd(2)→ι⟨5⟩{⊳⊷}
+vecScale(2)→ι⟨5⟩{⊷}
 ⊬SubwordToken⟨id:number│text:string│frequency:number│isSpecial:boolean⟩
 ⊶│class MicroTokenizer {
 ⊮│private vocab = new Map<string, SubwordToken>();
@@ -129,11 +41,11 @@ vecScale(2)→ι⟨5⟩{
 ·this.addSpecial("</verify>", 7);
 ·this.addSpecial("<refine>", 8);
 ·this.addSpecial("</refine>", 9);
-⥀│for (const c of "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789 .,!?;:'-\"()[]{}/@#$%&*+=<>~`^\n\t") {
+⥀│for (const c of "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQ
 ·this.addToken(c);
 ·}
 κsubs
-⥀│for (const s of subs) if (!this.vocab.has(s)) this.addToken(s);
+⥀│for (const s of subs) if (!this.vocab.has(s)) this.addToken(
 ·}
 ·private addSpecial(text: string, id: number): void {
 κt
@@ -152,7 +64,7 @@ vecScale(2)→ι⟨5⟩{
 ·let i = 0;
 ·while (i < text.length) {
 ·let bestLen = 0, bestId = 3;
-⟛│for (let len = Math.min(20, text.length - i); len >= 1; len--) {
+⟛│for (let len = Math.min(20, text.length - i); len >= 1; len-
 κtok
 ·if (tok) { bestLen = len; bestId = tok.id; tok.frequency++; break; }
 ·}
@@ -166,12 +78,12 @@ vecScale(2)→ι⟨5⟩{
 ⊷│return ids;
 ·}
 ·decode(ids: number[]): string {
-⊡│return ids.map(id => this.idToToken.get(id)).filter(t => t && !t.isSpecial).map(t => t!.text).join("");
+⊡│return ids.map(id => this.idToToken.get(id)).filter(t => t &
 ·}
 ⊷│getVocabSize(): number { return this.nextId; }
 ·learnFromText(text: string): void {
 ⥀│for (const w of text.split(/(\s+)/)) {
-⊹│if (w.length >= 3 && !this.vocab.has(w) && this.nextId < VOCAB_SIZE - 50) this.addToken(w);
+⊹│if (w.length >= 3 && !this.vocab.has(w) && this.nextId < VOC
 ·}
 ·}
 ·}
@@ -180,250 +92,23 @@ vecScale(2)→ι⟨5⟩{
 ⊬KVCache⟨⟩
 ⊬WorkingMemorySlot⟨embedding:ι│text:string│salience:number│timestamp:number⟩
 ⊬TransformerModel⟨embedding:Tensor2D│layers:TransformerLayer[]│finalNormGamma:ι│lmHead:Tensor2D│kvCaches:KVCache[]│workingMemory:WorkingMemorySlot[]│wmQueryW:Tensor2D│wmKeyW:Tensor2D│tokenizer:MicroTokenizer│totalTokensGenerated:number│totalTrainingSteps:number│cotStepsUsed:number│verificationsRun:number│refinementsApplied:number│expertActivations:number[]│adaptationRate:number⟩
-createExpert(2)→ExpertWeights⟨8⟩{
-·function createExpert(layerIdx: number, expertIdx: number): ExpertWeights {
-·const seed = 0xEE000000 + layerIdx * 0x10000 + expertIdx * 0x100;
-⊷│return {
-·wGate: initWeights(EXPERT_DIM, MODEL_DIM, seed + 1),
-·wUp: initWeights(EXPERT_DIM, MODEL_DIM, seed + 2),
-·wDown: initWeights(MODEL_DIM, EXPERT_DIM, seed + 3),
-·};
-·}
-}⟨/createExpert⟩
-createLayer(1)→TransformerLayer⟨13⟩{
-·function createLayer(idx: number): TransformerLayer {
-·const seed = 0xA1FA0000 + idx * 0x1000;
-⊷│return {
-·attnNormGamma: new Float64Array(MODEL_DIM).fill(1),
-·wQ: initWeights(MODEL_DIM, MODEL_DIM, seed + 1),
-·wK: initWeights(MODEL_DIM, MODEL_DIM, seed + 2),
-·wV: initWeights(MODEL_DIM, MODEL_DIM, seed + 3),
-·wO: initWeights(MODEL_DIM, MODEL_DIM, seed + 4),
-·ffNormGamma: new Float64Array(MODEL_DIM).fill(1),
-·experts: Array.from({ length: NUM_EXPERTS }, (_, e) => createExpert(idx, e)),
-·routerW: initWeights(NUM_EXPERTS, MODEL_DIM, seed + 99),
-·};
-·}
-}⟨/createLayer⟩
-createModel(1)→TransformerModel⟨23⟩{
-·function createModel(): TransformerModel {
-·const tokenizer = new MicroTokenizer();
-⟛│const vs = Math.min(tokenizer.getVocabSize(), VOCAB_SIZE);
-⊷│return {
-·embedding: initWeights(vs, MODEL_DIM, 0xE0BE0001),
-·layers: Array.from({ length: NUM_LAYERS }, (_, i) => createLayer(i)),
-·finalNormGamma: new Float64Array(MODEL_DIM).fill(1),
-·lmHead: initWeights(vs, MODEL_DIM, 0xFA1DEAD1),
-⊱│kvCaches: Array.from({ length: NUM_LAYERS }, () => ({ keys: [], values: [], length: 0 })),
-·workingMemory: [],
-·wmQueryW: initWeights(MODEL_DIM, MODEL_DIM, 0xAABBCC01),
-·wmKeyW: initWeights(MODEL_DIM, MODEL_DIM, 0xAABBCC02),
-·tokenizer,
-·totalTokensGenerated: 0,
-·totalTrainingSteps: 0,
-·cotStepsUsed: 0,
-·verificationsRun: 0,
-·refinementsApplied: 0,
-·expertActivations: new Array(NUM_EXPERTS).fill(0),
-·experienceBuffer: [],
-·adaptationRate: 0.001,
-·};
-·}
-}⟨/createModel⟩
-getEmbedding(2)→ι⟨8⟩{
-·function getEmbedding(model: TransformerModel, tokenId: number): Float64Array {
-·const out = new Float64Array(MODEL_DIM);
-·if (tokenId >= 0 && tokenId < model.embedding.rows) {
-·const off = tokenId * model.embedding.cols;
-·for (let i = 0; i < MODEL_DIM; i++) out[i] = model.embedding.data[off + i] || 0;
-·}
-⊷│return out;
-·}
-}⟨/getEmbedding⟩
-selfAttention(4)→ι⟨29⟩{
-·function selfAttention(layer: TransformerLayer, x: Float64Array, pos: number, cache: KVCache): Float64Array {
-·const normed = rmsNorm(x, layer.attnNormGamma);
-·const q = matVec(layer.wQ, normed);
-·const k = matVec(layer.wK, normed);
-·const v = matVec(layer.wV, normed);
-·applyRoPE(q, k, pos);
-⊺│cache.keys.push(new Float64Array(k));
-⊺│cache.values.push(new Float64Array(v));
-⊹│cache.length = cache.keys.length;
-·const headOut = new Float64Array(MODEL_DIM);
-·for (let h = 0; h < NUM_HEADS; h++) {
-·const hs = h * HEAD_DIM;
-·const scores = new Float64Array(cache.length);
-·for (let t = 0; t < cache.length; t++) {
-·let dot = 0;
-·for (let d = 0; d < HEAD_DIM; d++) dot += q[hs+d] * cache.keys[t][hs+d];
-·scores[t] = dot / Math.sqrt(HEAD_DIM);
-·}
-·const w = softmaxF64(scores);
-·for (let d = 0; d < HEAD_DIM; d++) {
-·let val = 0;
-·for (let t = 0; t < cache.length; t++) val += w[t] * cache.values[t][hs+d];
-·headOut[hs+d] = val;
-·}
-·}
-⊷│return vecAdd(x, matVec(layer.wO, headOut));
-·}
-}⟨/selfAttention⟩
-workingMemoryAttention(2)→ι⟨22⟩{
-·function workingMemoryAttention(model: TransformerModel, hidden: Float64Array): Float64Array {
-⊷│if (model.workingMemory.length === 0) return hidden;
-·const query = matVec(model.wmQueryW, hidden);
-·const scores = new Float64Array(model.workingMemory.length);
-·for (let i = 0; i < model.workingMemory.length; i++) {
-·const key = matVec(model.wmKeyW, model.workingMemory[i].embedding);
-·let dot = 0;
-·for (let d = 0; d < MODEL_DIM; d++) dot += query[d] * key[d];
-·scores[i] = dot / Math.sqrt(MODEL_DIM) + Math.log(model.workingMemory[i].salience + 1e-6);
-·}
-·const weights = softmaxF64(scores);
-·const retrieved = new Float64Array(MODEL_DIM);
-·for (let i = 0; i < model.workingMemory.length; i++) {
-·for (let d = 0; d < MODEL_DIM; d++) {
-·retrieved[d] += weights[i] * model.workingMemory[i].embedding[d];
-·}
-·}
-⊷│return vecAdd(hidden, vecScale(retrieved, 0.3));
-·}
-}⟨/workingMemoryAttention⟩
-mixtureOfExperts(3)→ι⟨28⟩{
-·function mixtureOfExperts(layer: TransformerLayer, x: Float64Array, expertActivations: number[]): Float64Array {
-·const normed = rmsNorm(x, layer.ffNormGamma);
-·const routerLogits = matVec(layer.routerW, normed);
-·const routerArr = Array.from(routerLogits);
-·const routerProbs = softmaxArr(routerArr);
-·const topK: Array<{ idx: number; weight: number }> = [];
-⊱│const indices = routerProbs.map((p, i) => ({ p, i })).sort((a, b) => b.p - a.p);
-·let totalWeight = 0;
-·for (let i = 0; i < TOP_K_EXPERTS && i < indices.length; i++) {
-⊺│topK.push({ idx: indices[i].i, weight: indices[i].p });
-·totalWeight += indices[i].p;
-·}
-⥀│for (const e of topK) e.weight /= totalWeight;
-·const combined = new Float64Array(MODEL_DIM);
-·for (const { idx, weight } of topK) {
-·const expert = layer.experts[idx];
-·if (idx < expertActivations.length) expertActivations[idx]++;
-·const gate = matVec(expert.wGate, normed);
-·const up = matVec(expert.wUp, normed);
-·const activated = new Float64Array(EXPERT_DIM);
-·for (let i = 0; i < EXPERT_DIM; i++) activated[i] = silu(gate[i]) * up[i];
-·const down = matVec(expert.wDown, activated);
-·for (let i = 0; i < MODEL_DIM; i++) combined[i] += down[i] * weight;
-·}
-}⟨/mixtureOfExperts⟩
+createExpert(2)→ExpertWeights⟨8⟩{⊷}
+createLayer(1)→TransformerLayer⟨13⟩{⊷}
+createModel(1)→TransformerModel⟨23⟩{⟛⊷⊱}
+getEmbedding(2)→ι⟨8⟩{⊷}
+selfAttention(4)→ι⟨29⟩{⊺⊹⊷}
+workingMemoryAttention(2)→ι⟨22⟩{⊷⊹}
+mixtureOfExperts(3)→ι⟨28⟩{⊱⊺⥀}
 ⊷│return vecAdd(x, combined);
 ·}
-forwardToken(3)→ι⟨17⟩{
-·function forwardToken(model: TransformerModel, tokenId: number, pos: number): Float64Array {
-·let h = getEmbedding(model, tokenId);
-·if (pos === 0) h = workingMemoryAttention(model, h);
-·for (let l = 0; l < model.layers.length; l++) {
-·h = selfAttention(model.layers[l], h, pos, model.kvCaches[l]);
-·h = mixtureOfExperts(model.layers[l], h, model.expertActivations);
-·if (l === Math.floor(model.layers.length / 2)) {
-·h = workingMemoryAttention(model, h);
-·}
-·}
-·h = rmsNorm(h, model.finalNormGamma);
-⊷│return matVec(model.lmHead, h);
-·}
-}⟨/forwardToken⟩
-nucleusSample(4)→number⟨21⟩{
-·function nucleusSample(logits: Float64Array, temperature: number, topP: number, rng: () => number): number {
-⟛│const temp = Math.max(temperature, 0.01);
-·const scaled = new Float64Array(logits.length);
-·for (let i = 0; i < logits.length; i++) scaled[i] = logits[i] / temp;
-·const probs = softmaxF64(scaled);
-·const indices = Array.from({ length: probs.length }, (_, i) => i).sort((a, b) => probs[b] - probs[a]);
-·let cum = 0;
-·const nucleus: Array<{ id: number; p: number }> = [];
-⥀│for (const idx of indices) {
-⊺│nucleus.push({ id: idx, p: probs[idx] });
-·cum += probs[idx];
-·if (cum >= topP) break;
-·}
-·let total = 0;
-⥀│for (const n of nucleus) total += n.p;
-·const roll = rng() * total;
-·let acc = 0;
-⥀│for (const n of nucleus) { acc += n.p; if (roll <= acc) return n.id; }
-❔│return nucleus[nucleus.length - 1]?.id || 0;
-·}
-}⟨/nucleusSample⟩
-clearKVCaches(1)→void⟨3⟩{
-·function clearKVCaches(model: TransformerModel): void {
-⥀│for (const c of model.kvCaches) { c.keys = []; c.values = []; c.length = 0; }
-·}
-}⟨/clearKVCaches⟩
-storeToWorkingMemory(3)→void⟨16⟩{
-·function storeToWorkingMemory(model: TransformerModel, text: string, salience: number): void {
-const ⋮ = model.tokenizer.encode(text).slice(0, 16);
-·const emb = new Float64Array(MODEL_DIM);
-⥀│for (const t of ⋮) {
-·const te = getEmbedding(model, t);
-·for (let i = 0; i < MODEL_DIM; i++) emb[i] += te[i];
-·}
-const norm = Math.sqrt(⋮.length) || 1;
-·for (let i = 0; i < MODEL_DIM; i++) emb[i] /= norm;
-⏰│model.workingMemory.push({ embedding: emb, text: text.slice(0, 200), salience, timestamp: Date.now() });
-⊹│if (model.workingMemory.length > WORKING_MEMORY_SIZE) {
-·model.workingMemory.sort((a, b) => b.salience - a.salience);
-·model.workingMemory = model.workingMemory.slice(0, WORKING_MEMORY_SIZE);
-·}
-·}
-}⟨/storeToWorkingMemory⟩
+forwardToken(3)→ι⟨17⟩{⊷}
+nucleusSample(4)→number⟨21⟩{⟛⥀⊺⊷❔}
+clearKVCaches(1)→void⟨3⟩{⥀⊹}
+storeToWorkingMemory(3)→void⟨16⟩{⥀⏰⊺⊹}
 ⊬TransformerContext⟨phi:number│consciousnessLevel:number│emotionDominant:string│emotionValence:number│emotionArousal:number│reasoningDepth:number│reasoningConfidence:number│knowledgeFragments:string[]│userQuery:string│conversationHistory:string[]⟩
-generateRaw(6)→number[]⟨19⟩{
-·function generateRaw(model: TransformerModel, promptTokens: number[], maxTokens: number, temp: number, topP: number, rng: () => number): number[] {
-·clearKVCaches(model);
-·for (let i = 0; i < promptTokens.length - 1; i++) forwardToken(model, promptTokens[i], i);
-·let logits = forwardToken(model, promptTokens[promptTokens.length - 1], promptTokens.length - 1);
-·const generated: number[] = [];
-·let pos = promptTokens.length;
-·for (let s = 0; s < maxTokens; s++) {
-·const next = nucleusSample(logits, temp, topP, rng);
-·if (next === 2) break;
-·if (next === 0) continue;
-⊺│generated.push(next);
-·model.totalTokensGenerated++;
-·if (pos >= MAX_SEQ_LEN - 1) break;
-·logits = forwardToken(model, next, pos);
-·pos++;
-·}
-⊷│return generated;
-·}
-}⟨/generateRaw⟩
-chainOfThought(3)→string[]⟨26⟩{
-·function chainOfThought(model: TransformerModel, ctx: TransformerContext, rng: () => number): string[] {
-·const thoughts: string[] = [];
-·const thinkTokenId = 4;
-·const complexity = (ctx.knowledgeFragments.length * 0.2) +
-·(ctx.userQuery.split(/\s+/).length * 0.05) +
-·(ctx.reasoningDepth * 0.3);
-⟛│const numSteps = Math.max(2, Math.min(COT_MAX_STEPS, Math.ceil(complexity)));
-·for (let step = 0; step < numSteps; step++) {
-·const stepPrompt = step === 0
-⊰│? `<think> Given: ${ctx.userQuery.slice(0, 200)} Step ${step + 1}: First, I identify the core question.`
-❔│: `<think> Step ${step + 1}: Building on ${thoughts[thoughts.length - 1]?.slice(0, 80) || "prior analysis"}, I now`;
-const ⋮ = model.tokenizer.encode(stepPrompt);
-const result = generateRaw(model, ⋮, 32, 0.6, 0.85, rng);
-·const decoded = model.tokenizer.decode(result);
-⊹│if (decoded.length > 5) {
-⊺│thoughts.push(decoded.slice(0, 150));
-·model.cotStepsUsed++;
-·}
-·}
-⊷│return thoughts;
-·}
-}⟨/chainOfThought⟩
-selfVerify(4)→{ verified: boolean; issues: string[] }⟨1⟩{
-·function selfVerify(model: TransformerModel, thoughts: string[], response: string, rng: () => number): { verified: boolean; issues: string[] } {
-}⟨/selfVerify⟩
+generateRaw(6)→number[]⟨19⟩{⊺⊷}
+chainOfThought(3)→string[]⟨26⟩{⟛⊰⊳❔⊹⊺⊷}
+selfVerify(4)→{ verified: boolean; issues: string[] }⟨1⟩{}
 ·model.verificationsRun++;
 κissues
 κverifyPrompt
@@ -431,170 +116,18 @@ selfVerify(4)→{ verified: boolean; issues: string[] }⟨1⟩{
 κresult
 κdecoded
 κnegatives
-⊻│const hasIssue = negatives.some(n => decoded.toLowerCase().includes(n));
-⊹│if (hasIssue && decoded.length > 10) issues.push(decoded.slice(0, 100));
+⊻│const hasIssue = negatives.some(n => decoded.toLowerCase().i
+⊹│if (hasIssue && decoded.length > 10) issues.push(decoded.sli
 ⊷│return { verified: issues.length === 0, issues };
 ·}
-refineResponse(5)→string⟨10⟩{
-·function refineResponse(model: TransformerModel, originalResponse: string, issues: string[], ctx: TransformerContext, rng: () => number): string {
-·model.refinementsApplied++;
-⊰│const refinePrompt = `<refine> Original: "${originalResponse.slice(0, 150)}" Issues: "${issues.join("; ").slice(0, 100)}" Improved:`;
-const ⋮ = model.tokenizer.encode(refinePrompt);
-const result = generateRaw(model, ⋮, 64, 0.7, 0.9, rng);
-·const decoded = model.tokenizer.decode(result);
-⊳│return decoded.length > originalResponse.length * 0.5 ? decoded : originalResponse;
-·}
-}⟨/refineResponse⟩
-⊩generate(5)→string⟨32⟩{
-⊩│export function generate(model: TransformerModel, ctx: TransformerContext, maxTokens = 128, temperature = 0.8, topP = 0.9): string {
-⏰│const rng = seededRng(Date.now() ^ (safe(ctx.phi) * 1000 | 0));
-·storeToWorkingMemory(model, ctx.userQuery, 1.0);
-⥀│for (const k of ctx.knowledgeFragments.slice(0, 5)) {
-·storeToWorkingMemory(model, k, 0.6);
-·}
-·const thoughts = chainOfThought(model, ctx, rng);
-·const contextParts: string[] = [];
-⊰│if (ctx.emotionDominant && ctx.emotionDominant !== "neutral") contextParts.push(`[${ctx.emotionDominant}]`);
-⊰│if (thoughts.length > 0) contextParts.push(`[reasoning: ${thoughts.slice(-3).join(" → ").slice(0, 200)}]`);
-⊹│if (ctx.knowledgeFragments.length > 0) contextParts.push(ctx.knowledgeFragments.slice(0, 3).join(" "));
-⊹│if (ctx.conversationHistory.length > 0) contextParts.push(ctx.conversationHistory.slice(-2).join(" "));
-⊺│contextParts.push(ctx.userQuery);
-·const prompt = contextParts.join(" ").slice(0, 2000);
-·const promptTokens = model.tokenizer.encode(prompt);
-·const generated = generateRaw(model, promptTokens, maxTokens, temperature, topP, rng);
-·let response = model.tokenizer.decode(generated);
-·for (let pass = 0; pass < REFINE_PASSES; pass++) {
-·const verification = selfVerify(model, thoughts, response, rng);
-·if (verification.verified) break;
-·response = refineResponse(model, response, verification.issues, ctx, rng);
-·}
-·storeToWorkingMemory(model, response, 0.8);
-⊷│return response;
-·}
-}⟨/generate⟩
-perturbWeights(3)→void⟨6⟩{
-·function perturbWeights(t: Tensor2D, scale: number, rng: () => number, count: number): void {
-·for (let i = 0; i < count; i++) {
-·const idx = Math.floor(rng() * t.data.length);
-·t.data[idx] += (rng() * 2 - 1) * scale;
-·}
-·}
-}⟨/perturbWeights⟩
-⊩onlineLearningStep(3)→void⟨30⟩{
-⊩│export function onlineLearningStep(model: TransformerModel, text: string, ✦: number): void {
-·model.tokenizer.learnFromText(text);
-const ⋮ = model.tokenizer.encode(text);
-⊹│if (⋮.length < 4) return;
-⊺│model.experienceBuffer.push({ input: ⋮.slice(0, -1), θ: ⋮.slice(1), ✦ });
-⊹│if (model.experienceBuffer.length > 500) model.experienceBuffer = model.experienceBuffer.slice(-300);
-⏰│const rng = seededRng(Date.now());
-const lr = model.adaptationRate * ✦;
-⟛│const pc = Math.max(1, Math.floor(Math.abs(lr) * 100));
-⥀│for (const layer of model.layers) {
-·perturbWeights(layer.wQ, lr * 0.001, rng, pc);
-·perturbWeights(layer.wK, lr * 0.001, rng, pc);
-·perturbWeights(layer.wV, lr * 0.001, rng, pc);
-·perturbWeights(layer.wO, lr * 0.001, rng, pc);
-·perturbWeights(layer.routerW, lr * 0.002, rng, pc);
-⥀│for (const expert of layer.experts) {
-·perturbWeights(expert.wGate, lr * 0.0005, rng, pc);
-·perturbWeights(expert.wUp, lr * 0.0005, rng, pc);
-·perturbWeights(expert.wDown, lr * 0.0005, rng, pc);
-·}
-·}
-·perturbWeights(model.lmHead, lr * 0.0005, rng, pc);
-·perturbWeights(model.wmQueryW, lr * 0.0003, rng, pc);
-·perturbWeights(model.wmKeyW, lr * 0.0003, rng, pc);
-·model.totalTrainingSteps++;
-·}
-}⟨/onlineLearningStep⟩
-⊩hebbianAdapt(4)→void⟨22⟩{
-⊩│export function hebbianAdapt(model: TransformerModel, pre: string, post: string, reward: number): void {
-·const preT = model.tokenizer.encode(pre).slice(0, 16);
-·const postT = model.tokenizer.encode(post).slice(0, 16);
-⏰│const rng = seededRng(Date.now() ^ preT.length);
-·const scale = reward * model.adaptationRate * 0.0001;
-·for (let l = 0; l < model.layers.length; l++) {
-·const layer = model.layers[l];
-⥀│for (const p of preT.slice(0, 4)) {
-⥀│for (const q of postT.slice(0, 4)) {
-·const idx = ((p * 31 + q * 17 + l * 7) % layer.wQ.data.length);
-·layer.wQ.data[idx] += scale;
-·layer.wV.data[idx] += scale * 0.5;
-·const expertIdx = (p + q + l) % NUM_EXPERTS;
-·const eIdx = idx % layer.experts[expertIdx].wGate.data.length;
-·layer.experts[expertIdx].wGate.data[eIdx] += scale * 0.3;
-·}
-·}
-·}
-·model.totalTrainingSteps++;
-·}
-}⟨/hebbianAdapt⟩
+refineResponse(5)→string⟨10⟩{⊰⊳⊷⊹}
+⊩generate(5)→string⟨32⟩{⊩⏰⥀⊰⊺⊹⊷}
+perturbWeights(3)→void⟨6⟩{}
+⊩onlineLearningStep(3)→void⟨30⟩{⊩⊹⊺⏰⟛⥀}
+⊩hebbianAdapt(4)→void⟨22⟩{⊩≋+⏰⥀}
 ·let globalModel: TransformerModel | null = null;
-⊩getOrCreateModel(1)→TransformerModel⟨4⟩{
-⊩│export function getOrCreateModel(): TransformerModel {
-·if (!globalModel) globalModel = createModel();
-⊷│return globalModel;
-·}
-}⟨/getOrCreateModel⟩
-⊩generateResponse(1)→string⟨3⟩{
-⊩│export function generateResponse(ctx: TransformerContext): string {
-⊷│return generate(getOrCreateModel(), ctx);
-·}
-}⟨/generateResponse⟩
-⊩trainFromConversation(3)→void⟨5⟩{
-⊩│export function trainFromConversation(userInput: string, omnimensResponse: string, ✦: number): void {
-·const model = getOrCreateModel();
-⊰│onlineLearningStep(model, `${userInput} ${omnimensResponse}`, ✦);
-≋+│hebbianAdapt(model, userInput, omnimensResponse, ✦);
-·}
-}⟨/trainFromConversation⟩
-⊩getTransformerStatus(1)→void⟨46⟩{
-⊩│export function getTransformerStatus() {
-·const model = getOrCreateModel();
-·const expertNames = ["Deductive", "Causal", "Analogical", "Creative"];
-⊷│return {
-η: "OMNIMENS Micro-Transformer Engine — Reasoning Brain",
-·architecture: {
-·modelDim: MODEL_DIM,
-·numHeads: NUM_HEADS,
-·headDim: HEAD_DIM,
-·numLayers: NUM_LAYERS,
-·maxSeqLen: MAX_SEQ_LEN,
-·vocabSize: model.tokenizer.getVocabSize(),
-·normalization: "RMSNorm",
-·positionalEncoding: "RoPE (Rotary Position Embeddings)",
-·sampling: "Nucleus (top-p) with temperature",
-·attention: "Multi-Head Self-Attention with Q/K/V + KV-Cache",
-⊰│feedForward: `Mixture-of-Experts (${NUM_EXPERTS} experts, top-${TOP_K_EXPERTS} routing)`,
-·expertTypes: expertNames,
-·reasoning: "Chain-of-Thought → Self-Verification → Recursive Refinement",
-⊰│workingMemory: `Attention-based retrieval (${WORKING_MEMORY_SIZE} slots)`,
-·},
-·stats: {
-·totalTokensGenerated: model.totalTokensGenerated,
-·totalTrainingSteps: model.totalTrainingSteps,
-·chainOfThoughtSteps: model.cotStepsUsed,
-·selfVerifications: model.verificationsRun,
-·refinements: model.refinementsApplied,
-·workingMemorySlots: model.workingMemory.length,
-·expertActivations: Object.fromEntries(expertNames.map((n, i) => [n, model.expertActivations[i]])),
-·experienceBufferSize: model.experienceBuffer.length,
-·},
-⊱│parameterCount: (() => {
-·let total = model.embedding.data.length + model.lmHead.data.length + MODEL_DIM;
-·total += model.wmQueryW.data.length + model.wmKeyW.data.length;
-⥀│for (const l of model.layers) {
-·total += l.wQ.data.length + l.wK.data.length + l.wV.data.length + l.wO.data.length;
-·total += l.routerW.data.length + MODEL_DIM * 2;
-⥀│for (const e of l.experts) total += e.wGate.data.length + e.wUp.data.length + e.wDown.data.length;
-·}
-⊷│return total;
-·})(),
-·selfContained: true,
-·externalDependencies: "NONE — reasoning IS the brain, runs entirely inside OMNIMENS",
-·copyright: "© 2024-2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-·};
-·}
-}⟨/getTransformerStatus⟩
-⟩SCL│599│565⊨│118⑂│18.7%↓⟩
+⊩getOrCreateModel(1)→TransformerModel⟨4⟩{⊩⊷}
+⊩generateResponse(1)→string⟨3⟩{⊩⊷}
+⊩trainFromConversation(3)→void⟨5⟩{⊩⊰≋+}
+⊩getTransformerStatus(1)→void⟨46⟩{⊩⊷⊰⊱⥀}
+⟩SCL│132│176⊨│116⑂│82.1%↓⟩

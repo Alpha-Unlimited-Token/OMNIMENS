@@ -5,7 +5,7 @@
 ·this.debates = [];
 ·}
 ·initiateDebate(agentArguments) {
-·const debate = agentArguments.map(arg => ({ argument: arg, score: this.evaluateArgument(arg) }));
+·const debate = agentArguments.map(arg => ({ argument: arg, score: this.evaluateA
 ⊺│this.debates.push(debate);
 ⊷│return debate;
 ·}

@@ -2,71 +2,13 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 ·'use strict';
 ⊫[]
-⊩generateRandomSeed(1)→void⟨4⟩{
-⊩│export function generateRandomSeed() {
-·const seed = randomBytes(16);
-⊷│return Array.from(seed).map(byte => byte / 255.0); // Normalize to [0, 1]
-·}
-}⟨/generateRandomSeed⟩
-⊩initializeWeights(2)→void⟨11⟩{
-⊩│export function initializeWeights(inputSize, outputSize) {
-·const weights = [];
-·for (let i = 0; i < outputSize; i++) {
-·const row = [];
-·for (let j = 0; j < inputSize; j++) {
-⊺│row.push((Math.random() - 0.5) * 2); // Random values in [-1, 1]
-·}
-⊺│weights.push(row);
-·}
-⊷│return weights;
-·}
-}⟨/initializeWeights⟩
-⊩sigmoid(1)→void⟨3⟩{
-⊩│export function sigmoid(inputs) {
-⊷│return inputs.map(x => 1 / (1 + Math.exp(-x)));
-·}
-}⟨/sigmoid⟩
-⊩dotProduct(2)→void⟨3⟩{
-⊩│export function dotProduct(matrix, vector) {
-⋐│return matrix.map(row => row.reduce((sum, weight, index) => sum + weight * vector[index], 0));
-·}
-}⟨/dotProduct⟩
-⊩forwardPass(2)→void⟨4⟩{
-⊩│export function forwardPass(weights, inputs) {
-·const weightedSum = dotProduct(weights, inputs);
-⊷│return sigmoid(weightedSum);
-·}
-}⟨/forwardPass⟩
-⊩trainLayer(4)→void⟨10⟩{
-⊩│export function trainLayer(weights, inputs, targets, learningRate) {
-·const outputs = forwardPass(weights, inputs);
-·const errors = targets.map((target, index) => target - outputs[index]);
-⊷│return weights.map((row, i) =>
-·row.map((weight, j) =>
-·weight + learningRate * errors[i] * inputs[j] * outputs[i] * (1 - outputs[i])
-·)
-·);
-·}
-}⟨/trainLayer⟩
-⊩meanSquaredError(2)→void⟨4⟩{
-⊩│export function meanSquaredError(targets, outputs) {
-·const errors = targets.map((target, index) => Math.pow(target - outputs[index], 2));
-⋐│return errors.reduce((sum, error) => sum + error, 0) / errors.length;
-·}
-}⟨/meanSquaredError⟩
-⊩trainNetwork(5)→void⟨8⟩{
-⊩│export function trainNetwork(weights, trainingData, targetData, learningRate, epochs) {
-·for (let epoch = 0; epoch < epochs; epoch++) {
-·for (let i = 0; i < trainingData.length; i++) {
-·weights = trainLayer(weights, trainingData[i], targetData[i], learningRate);
-·}
-·}
-⊷│return weights;
-·}
-}⟨/trainNetwork⟩
-⊩predict(2)→void⟨3⟩{
-⊩│export function predict(weights, inputs) {
-⊷│return forwardPass(weights, inputs);
-·}
-}⟨/predict⟩
-⟩SCL│71│69⊨│20⑂│45.0%↓⟩
+⊩generateRandomSeed(1)→void⟨4⟩{⊩⊷}
+⊩initializeWeights(2)→void⟨11⟩{⊩⊺⊷}
+⊩sigmoid(1)→void⟨3⟩{⊩⊷}
+⊩dotProduct(2)→void⟨3⟩{⊩⋐⊷}
+⊩forwardPass(2)→void⟨4⟩{⊩⊷}
+⊩trainLayer(4)→void⟨10⟩{⊩⊷}
+⊩meanSquaredError(2)→void⟨4⟩{⊩⋐⊷}
+⊩trainNetwork(5)→void⟨8⟩{⊩⊷}
+⊩predict(2)→void⟨3⟩{⊩⊷}
+⟩SCL│13│31⊨│21⑂│89.9%↓⟩

@@ -1,17 +1,4 @@
 ⟨SCL v1│bayesianCalibrationModule_gen1.mjs│23→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩bayesianCalibrationModule(1)→void⟨14⟩{
-⊩│export function bayesianCalibrationModule(reasoningChains) {
-·function calculateEntropy(chain) {
-·const probabilities = chain.map(step => step.confidence);
-⋐│return -probabilities.reduce((acc, p) => acc + p * Math.log(p), 0);
-·}
-·function calibrateConfidence(chain) {
-·const entropy = calculateEntropy(chain);
-·const adjustedConfidence = chain.map(step => ({ ...step, adjustedConfidence: step.confidence * (1 - entropy) }));
-⊷│return adjustedConfidence;
-·}
-⊷│return { calculateEntropy, calibrateConfidence };
-·}
-}⟨/bayesianCalibrationModule⟩
-⟩SCL│16│15⊨│4⑂│30.4%↓⟩
+⊩bayesianCalibrationModule(1)→void⟨14⟩{⊩⋐⊷}
+⟩SCL│3│4⊨│3⑂│87.0%↓⟩

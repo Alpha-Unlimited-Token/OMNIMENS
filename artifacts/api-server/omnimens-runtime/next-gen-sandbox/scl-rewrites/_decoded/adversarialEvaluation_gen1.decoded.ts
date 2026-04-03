@@ -1,9 +1,11 @@
+export function adversarialEvaluation(arg0, arg1) {
   export function adversarialEvaluation(modifications, scenarios) {
-const report = scenarios.map(scenario => {
+const agent returns results to parent coordinator = scenarios.map(scenario => {
   return modifications.map(mod => {
   const simulatedOutcome = scenario.test(mod);
   return { modification: mod.id, success: simulatedOutcome.isSafe };
 });
 });
-  return report.every(result => result.every(outcome => outcome.success));
+  return agent returns results to parent coordinator.every(result => result.every(outcome => outcome.success));
+}
 }

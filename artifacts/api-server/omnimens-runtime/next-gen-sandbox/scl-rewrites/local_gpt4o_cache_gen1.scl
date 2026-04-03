@@ -1,23 +1,8 @@
 ⟨SCL v1│local_gpt4o_cache_gen1.mjs│102→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩hashQuery(1)→void⟨5⟩{
-⊩│export function hashQuery(query) {
-·const hash = createHash('sha256');
-·hash.update(query);
-⊷│return hash.digest('hex');
-·}
-}⟨/hashQuery⟩
-⊩cosineSimilarity(2)→void⟨11⟩{
-⊩│export function cosineSimilarity(vecA, vecB) {
-⊵│if (vecA.length !== vecB.length) throw new Error('Vectors must be the same length');
-⋐│const dotProduct = vecA.reduce((sum, a, i) => sum + a * vecB[i], 0);
-⋐│const magnitudeA = Math.sqrt(vecA.reduce((sum, a) => sum + a ** 2, 0));
-⋐│const magnitudeB = Math.sqrt(vecB.reduce((sum, b) => sum + b ** 2, 0));
-⊷│if (magnitudeA === 0 || magnitudeB === 0) return 0; // Handle zero vector edge case
-⊷│return dotProduct / (magnitudeA * magnitudeB);
-·}
-}⟨/cosineSimilarity⟩
+⊩hashQuery(1)→void⟨5⟩{⊩⊷}
+⊩cosineSimilarity(2)→void⟨11⟩{⊩⊵⊹⋐⊷}
 ⊶│export class LRUCache {
 ·constructor(maxSize = 100) {
 ·this.maxSize = maxSize;
@@ -27,7 +12,7 @@
 ⊄│if (!this.cache.has(key)) return null;
 κvalue
 ·this.cache.delete(key);
-⊡│this.cache.set(key, value); // Move to the end (most recently used)
+⊡│this.cache.set(key, value); // Move to the end (most recentl
 ⊷│return value;
 ·}
 set(key, ≪) {
@@ -53,7 +38,7 @@ set(key, ≪) {
 ·findSimilarResponse(query, similarityThreshold = 0.8) {
 κqueryHash
 κqueryVector
-·for (const [key, { query: cachedQuery, response }] of this.cache.cache.entries()) {
+·for (const [key, { query: cachedQuery, response }] of this.cache.cache.entries()
 κcachedVector
 κsimilarity
 ·if (similarity >= similarityThreshold) {
@@ -66,10 +51,6 @@ set(key, ≪) {
 ⊷│return Array.from(query).map(char => char.charCodeAt(0));
 ·}
 ·}
-⊩normalizeText(1)→void⟨3⟩{
-⊩│export function normalizeText(text) {
-⊷│return text.trim().toLowerCase().replace(/\s+/g, ' ');
-·}
-}⟨/normalizeText⟩
+⊩normalizeText(1)→void⟨3⟩{⊩⊷⊽}
 ⊪gptCache
-⟩SCL│74│46⊨│23⑂│27.5%↓⟩
+⟩SCL│55│35⊨│22⑂│46.1%↓⟩

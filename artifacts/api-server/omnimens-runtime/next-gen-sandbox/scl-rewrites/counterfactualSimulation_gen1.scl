@@ -11,7 +11,7 @@ runSimulation(α, scenario) {
 ·}
 ·evaluateRobustness() {
 ⊷│return this.simulations.map(sim => {
-⊷│return { scenario: sim.scenario, successRate: sim.result.successRate };
+⊷│return { scenario: sim.scenario, successRate: sim.result.suc
 ·});
 ·}
 ·}

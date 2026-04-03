@@ -18,7 +18,7 @@ let ↻ = 0;
 ⊭│type SaliencePriority = "critical" | "high" | "normal";
 ⊬WorkspaceSubmission⟨moduleName:string│content:string│salience:number│metadata:Record<string, unknown>⟩
 ⊬BroadcastResult⟨winner:WorkspaceSubmission│integrationInsight:string│receivingModules:string[]│cycleId:number⟩
-⊱│const safe = (n: number, f = 0) => (Number.isFinite(n) ? n : f);
+⊱│const safe = (n: number, f = 0) => (Number.isFinite(n) ? n :
 ·const read = (table: string, query: Record<string, unknown>) =>
 ·dbGateway.read("global-workspace", table, query);
 κwrite
@@ -68,32 +68,20 @@ let ↻ = 0;
 ❔│.filter((d: any) => d.content?.includes("NEW IDEA"))
 ⊱│.map((d: any) => ({
 ·moduleName: "InterAgentDialogue",
-❔│content: `[${d.fromAgent}] ${d.subject}: ${d.content?.slice(0, 300)}`,
+❔│content: `[${d.fromAgent}] ${d.subject}: ${d.content?.slice(
 ·salience: 0.8,
 ·type: "synthesis" as const,
 ·})),
 ·},
 ·] as const;
-⟿competitionPhase(1)→Promise<WorkspaceSubmission[]>⟨9⟩{
-·async function competitionPhase(): Promise<WorkspaceSubmission[]> {
-·const subs = (
-⊡│await Promise.allSettled(MODULES.map((m) => m.get()))
-⊱│).flatMap((r) => (r.status === "fulfilled" ? r.value : []));
-⊷│return subs
-·.filter((s) => s.salience >= IGNITION_THRESHOLD)
-·.sort((a, b) => b.salience - a.salience)
-·.slice(0, WORKSPACE_CAPACITY);
-·}
-}⟨/competitionPhase⟩
-⟿ignitionAndBroadcast(1)→void⟨1⟩{
-·async function ignitionAndBroadcast(
-}⟨/ignitionAndBroadcast⟩
+⟿competitionPhase(1)→Promise<WorkspaceSubmission[]>⟨9⟩{⊡⊱⊳⊷}
+⟿ignitionAndBroadcast(1)→void⟨1⟩{}
 ·winners: WorkspaceSubmission[]
 ·): Promise<BroadcastResult[]> {
 ⊄│if (!winners.length) return [];
 κresults
 ⥀│for (const winner of winners.slice(0, 3)) {
-⋔│const receiving = MODULES.filter((m) => m.name !== winner.moduleName).map(
+⋔│const receiving = MODULES.filter((m) => m.name !== winner.mo
 ·(m) => m.name
 ·);
 ·try {
@@ -104,4 +92,4 @@ let ↻ = 0;
 κparsed
 ⊪_v2RewriteModule
 ·export {};
-⟩SCL│106│52⊨│21⑂│62.0%↓⟩
+⟩SCL│94│45⊨│22⑂│66.3%↓⟩

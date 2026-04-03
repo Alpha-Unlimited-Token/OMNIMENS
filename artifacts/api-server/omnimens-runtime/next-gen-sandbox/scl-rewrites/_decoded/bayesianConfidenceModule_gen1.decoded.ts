@@ -13,16 +13,16 @@ calculatePosterior(variable) {
 if (!this.prior[variable] || !this.evidence[variable]) {
   throw new Error('Prior or evidence missing for variable');
 }
-let likelihood = undefined; /* SCL-const */
-let prior = undefined; /* SCL-const */
-let posterior = undefined; /* SCL-const */
+const likelihood = undefined; /* SCL-const */
+const prior = undefined; /* SCL-const */
+const posterior = undefined; /* SCL-const */
   return posterior;
 }
 getConfidenceScore(variable) {
   return this.calculatePosterior(variable);
 }
 }
-let confidenceModule = undefined; /* SCL-const */
+const confidenceModule = undefined; /* SCL-const */
 confidenceModule.setPrior('taskSuccess', 0.7);
 confidenceModule.updateEvidence('taskSuccess', 0.9);
 console.log(confidenceModule.getConfidenceScore('taskSuccess'));

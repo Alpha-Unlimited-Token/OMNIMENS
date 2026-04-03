@@ -13,7 +13,7 @@
 ·}
 ·publish(eventType, data) {
 ·if (this.eventSubscribers.has(eventType)) {
-⊡│this.eventSubscribers.get(eventType).forEach(callback => callback(data));
+⊡│this.eventSubscribers.get(eventType).forEach(callback => cal
 ·}
 ·}
 ·allocateResources(agentId, priority) {

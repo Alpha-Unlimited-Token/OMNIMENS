@@ -1,46 +1,4 @@
 ⟨SCL v1│hierarchicalOrchestration_gen1.mjs│54→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩hierarchicalOrchestration(1)→void⟨45⟩{
-⊩│export function hierarchicalOrchestration(agents) {
-·const pubSubSystem = createPubSubSystem();
-·const escalationPaths = createEscalationPaths(agents);
-agents.forEach(α => {
-⊱│α.on('disagreement', (issue) => {
-·const resolved = pubSubSystem.publish(issue);
-·if (!resolved) {
-·escalateIssue(issue, escalationPaths);
-·}
-·});
-·});
-·function createPubSubSystem() {
-·const topics = {};
-⊷│return {
-⊱│publish: (issue) => {
-·const topic = topics[issue.topic];
-·if (topic) {
-⊷│return topic.resolve(issue);
-·}
-⊷│return false;
-·},
-⊱│subscribe: (topicName, resolver) => {
-·topics[topicName] = { resolve: resolver };
-·}
-·};
-·}
-·function createEscalationPaths(agents) {
-⊷│return agents.map(α => ({
-α,
-escalate: (issue) => α.resolve(issue)
-·}));
-·}
-·function escalateIssue(issue, paths) {
-⥀│for (const path of paths) {
-·if (path.escalate(issue)) {
-⊷│return true;
-·}
-·}
-⊷│return false;
-·}
-·}
-}⟨/hierarchicalOrchestration⟩
-⟩SCL│45│45⊨│11⑂│16.7%↓⟩
+⊩hierarchicalOrchestration(1)→void⟨45⟩{⊩⊱⊷⥀}
+⟩SCL│3│5⊨│4⑂│94.4%↓⟩

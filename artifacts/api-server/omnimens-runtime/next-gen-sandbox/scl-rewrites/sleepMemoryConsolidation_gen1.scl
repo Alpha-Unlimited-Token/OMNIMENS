@@ -1,16 +1,4 @@
 ⟨SCL v1│sleepMemoryConsolidation_gen1.mjs│20→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩sleepMemoryConsolidation(1)→void⟨11⟩{
-⊩│export function sleepMemoryConsolidation(memory) {
-·const replayedMemory = memory.filter(item => item.relevanceScore > 0.5);
-·replayedMemory.forEach(item => {
-·item.strengthenConnections();
-·});
-·const prunedMemory = memory.filter(item => item.relevanceScore <= 0.5);
-·prunedMemory.forEach(item => {
-·item.prune();
-·});
-⊷│return [...replayedMemory, ...prunedMemory];
-·}
-}⟨/sleepMemoryConsolidation⟩
-⟩SCL│15│13⊨│2⑂│25.0%↓⟩
+⊩sleepMemoryConsolidation(1)→void⟨11⟩{⊩⊷}
+⟩SCL│3│3⊨│2⑂│85.0%↓⟩

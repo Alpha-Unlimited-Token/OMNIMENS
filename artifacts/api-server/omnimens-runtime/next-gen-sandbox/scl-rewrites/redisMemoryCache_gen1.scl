@@ -3,7 +3,7 @@
 ⊶│class RedisMemoryCache {
 ·constructor() {
 ⊮│this.cache = new Map();
-⟳│this.cleanupInterval = setInterval(() => this.cleanupExpiredEntries(), 1000);
+⟳│this.cleanupInterval = setInterval(() => this.cleanupExpired
 ·}
 set(key, ≪, ttl) {
 κexpiry
@@ -35,10 +35,6 @@ set(key, ≪, ttl) {
 ·clearInterval(this.cleanupInterval);
 ·}
 ·}
-createRedisMemoryCache(1)→void⟨3⟩{
-·function createRedisMemoryCache() {
-⊷│return new RedisMemoryCache();
-·}
-}⟨/createRedisMemoryCache⟩
+createRedisMemoryCache(1)→void⟨3⟩{⊷}
 ·export { createRedisMemoryCache };
-⟩SCL│43│15⊨│8⑂│61.3%↓⟩
+⟩SCL│39│13⊨│8⑂│64.9%↓⟩

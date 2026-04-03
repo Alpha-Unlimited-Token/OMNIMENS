@@ -1,15 +1,5 @@
 ⟨SCL v1│entropyConsistencyScorer_gen1.mjs│18→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩calculateEntropy(1)→void⟨3⟩{
-⊩│export function calculateEntropy(probabilities) {
-⋐│return -probabilities.reduce((sum, p) => sum + (p > 0 ? p * Math.log2(p) : 0), 0);
-·}
-}⟨/calculateEntropy⟩
-⊩scoreReasoningChain(1)→void⟨5⟩{
-⊩│export function scoreReasoningChain(chain) {
-·const probabilities = chain.map(step => step.probability);
-·const entropy = calculateEntropy(probabilities);
-⊷│return 1 / (1 + entropy); // Higher score for lower entropy
-·}
-}⟨/scoreReasoningChain⟩
-⟩SCL│14│12⊨│4⑂│22.2%↓⟩
+⊩calculateEntropy(1)→void⟨3⟩{⊩⋐⊳⊷}
+⊩scoreReasoningChain(1)→void⟨5⟩{⊩⊷}
+⟩SCL│4│8⊨│6⑂│77.8%↓⟩

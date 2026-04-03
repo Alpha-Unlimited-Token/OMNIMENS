@@ -1,13 +1,4 @@
 ⟨SCL v1│intrinsicMetacognition_gen1.mjs│17→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩intrinsicMetacognition(1)→void⟨8⟩{
-⊩│export function intrinsicMetacognition(reasoningPaths) {
-·const scores = reasoningPaths.map(path => {
-⋐│const consistency = path.reduce((acc, step) => acc + step.confidence, 0) / path.length;
-⊷│return { path, consistency };
-·});
-⋐│const bestPath = scores.reduce((best, current) => current.consistency > best.consistency ? current : best, scores[0]);
-⊷│return bestPath;
-·}
-}⟨/intrinsicMetacognition⟩
-⟩SCL│12│11⊨│5⑂│29.4%↓⟩
+⊩intrinsicMetacognition(1)→void⟨8⟩{⊩⋐⊷⊳}
+⟩SCL│3│5⊨│4⑂│82.4%↓⟩

@@ -21,7 +21,7 @@
 ·}
 ·}
 ·escalateToHigherAgent(agentId) {
-⊰│console.log(`Escalating tasks for agent ${agentId} to higher-order agent.`);
+⊰│console.log(`Escalating tasks for agent ${agentId} to higher
 ·}
 ·}
 ⟩SCL│26│6⊨│5⑂│35.0%↓⟩

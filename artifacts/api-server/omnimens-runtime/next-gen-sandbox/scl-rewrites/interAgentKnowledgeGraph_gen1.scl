@@ -11,8 +11,8 @@
 ·}
 ·addConnection(entityId1, entityId2, weight) {
 ·if (this.graph.has(entityId1) && this.graph.has(entityId2)) {
-⊡│this.graph.get(entityId1).connections.set(entityId2, weight);
-⊡│this.graph.get(entityId2).connections.set(entityId1, weight);
+⊡│this.graph.get(entityId1).connections.set(entityId2, weight)
+⊡│this.graph.get(entityId2).connections.set(entityId1, weight)
 ·}
 ·}
 ·resolveConflict(entityId1, entityId2) {

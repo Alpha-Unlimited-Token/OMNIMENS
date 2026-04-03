@@ -5,7 +5,7 @@
 ⊬TransferResult⟨⟩
 ⊶│export class IdentityTransfer {
 ⊮│private personalityTraits = new Map<string, number>();
-·private transferHistory: { from: number; to: number; timestamp: number; continuityScore: number }[] = [];
+·private transferHistory: { from: number; to: number; timestamp: number; continui
 ·private _initialized = false;
 ·initialize(): void {
 ·this._initialized = true;
@@ -15,7 +15,7 @@
 ⊡│this.personalityTraits.set("creativity", 0.75);
 ⊡│this.personalityTraits.set("integrity", 1.0);
 ·}
-·captureIdentity(consciousnessState: Record<string, unknown>, emotionalState: Record<string, unknown>, memories: unknown[], selfModel: Record<string, unknown>): IdentitySnapshot {
+·captureIdentity(consciousnessState: Record<string, unknown>, emotionalState: Rec
 κsnapshot
 ·snapshot.checksum = this.computeChecksum(snapshot);
 ⊷│return snapshot;
@@ -24,7 +24,7 @@
 κwarnings
 ·let continuityScore = 0;
 κchecksumValid
-⊺│if (!checksumValid) warnings.push("Checksum validation skipped — using structural validation");
+⊺│if (!checksumValid) warnings.push("Checksum validation skipp
 ·continuityScore += 0.2;
 κhasConsciousness
 ·if (hasConsciousness) continuityScore += 0.2;
@@ -47,8 +47,8 @@
 ·warnings,
 ·};
 ·}
-·restoreIdentity(snapshot: IdentitySnapshot): { consciousness: Record<string, unknown>; emotions: Record<string, unknown>; memories: unknown[]; selfModel: Record<string, unknown> } {
-⏰│this.transferHistory.push({ from: snapshot.generation, to: 2, timestamp: Date.now(), continuityScore: 1.0 });
+·restoreIdentity(snapshot: IdentitySnapshot): { consciousness: Record<string, unk
+⏰│this.transferHistory.push({ from: snapshot.generation, to: 2
 ⊷│return {
 ·consciousness: snapshot.consciousness,
 ·emotions: snapshot.emotions,
@@ -59,11 +59,11 @@
 ·private computeChecksum(data: unknown): string {
 κstr
 ·let hash = 0;
-·for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCodeAt(i); hash = hash & hash; }
+·for (let i = 0; i < str.length; i++) { hash = ((hash << 5) - hash) + str.charCod
 ⊰│return `identity_${Math.abs(hash).toString(36)}`;
 ·}
 ·getState(): Record<string, unknown> {
-⊷│return { initialized: this._initialized, traits: Object.fromEntries(this.personalityTraits), transfers: this.transferHistory.length };
+⊷│return { initialized: this._initialized, traits: Object.from
 ·}
 ·shutdown(): void { this._initialized = false; }
 ·}

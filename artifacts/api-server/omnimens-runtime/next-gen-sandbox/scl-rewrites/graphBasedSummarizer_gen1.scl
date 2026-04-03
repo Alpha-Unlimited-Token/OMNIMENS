@@ -1,63 +1,9 @@
 ⟨SCL v1│graphBasedSummarizer_gen1.mjs│99→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩extractEntities(1)→void⟨5⟩{
-⊩│export function extractEntities(text) {
-⊳│const entityPattern = /\b[A-Z][a-z]+(?:\s[A-Z][a-z]+)*\b/g;
-⊽│const matches = text.match(entityPattern) || [];
-⊯│return new Set(matches);
-·}
-}⟨/extractEntities⟩
-⊩mapRelationships(2)→void⟨24⟩{
-⊩│export function mapRelationships(text, ✧) {
-⊮│const graph = new Map();
-⥀│for (const entity of ✧) {
-⊡│graph.set(entity, new Set());
-·}
-·const words = text.split(/\s+/);
-·for (let i = 0; i < words.length; i++) {
-⥀│for (const entity of ✧) {
-⊻│if (words[i].includes(entity)) {
-⟛│for (let j = Math.max(0, i - 5); j < Math.min(words.length, i + 5); j++) {
-⥀│for (const neighbor of ✧) {
-⊻│if (words[j].includes(neighbor) && neighbor !== entity) {
-⊡│graph.get(entity).add(neighbor);
-·}
-·}
-·}
-·}
-·}
-·}
-⊷│return graph;
-·}
-}⟨/mapRelationships⟩
-⊩rankNodes(1)→void⟨9⟩{
-⊩│export function rankNodes(graph) {
-·const ranks = [];
-·for (const [entity, neighbors] of graph.entries()) {
-⊺│ranks.push({ entity, rank: neighbors.size });
-·}
-⊷│return ranks.sort((a, b) => b.rank - a.rank);
-·}
-}⟨/rankNodes⟩
-⊩summarizeText(1)→void⟨12⟩{
-⊩│export function summarizeText(text) {
-const ✧ = extractEntities(text);
-const graph = mapRelationships(text, ✧);
-·const rankedNodes = rankNodes(graph);
-·const summary = rankedNodes.slice(0, 5).map(node => {
-⊡│const neighbors = Array.from(graph.get(node.entity));
-⊰│return `${node.entity} is connected to: ${neighbors.join(", ")}`;
-·});
-⊷│return summary.join("\n");
-·}
-}⟨/summarizeText⟩
-⊩generateGraphHash(1)→void⟨6⟩{
-⊩│export function generateGraphHash(graph) {
-⟠│const serializedGraph = JSON.stringify(
-·Array.from(graph.entries()).map(([key, value]) => [key, Array.from(value)])
-·);
-⊷│return crypto.createHash('sha256').update(serializedGraph).digest('hex');
-·}
-}⟨/generateGraphHash⟩
-⟩SCL│62│71⊨│25⑂│37.4%↓⟩
+⊩extractEntities(1)→void⟨5⟩{⊩⊳⊽⊯⊷}
+⊩mapRelationships(2)→void⟨24⟩{⊩⊮⥀⊡⊯⊻⟛⊷}
+⊩rankNodes(1)→void⟨9⟩{⊩⊺⊷}
+⊩summarizeText(1)→void⟨12⟩{⊩⊡⊰⊷}
+⊩generateGraphHash(1)→void⟨6⟩{⊩⟠⊷}
+⟩SCL│8│29⊨│23⑂│91.9%↓⟩

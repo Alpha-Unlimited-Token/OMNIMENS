@@ -1,28 +1,7 @@
 ⟨SCL v1│sandboxedSelfModificationFramework_gen1.mjs│32→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩sandboxSelfModification(1)→void⟨8⟩{
-⊩│export function sandboxSelfModification(modificationCode) {
-const ⊢ = executeInSandbox(modificationCode);
-if (⊢.success) {
-·escalateToIntegration(modificationCode);
-·} else {
-logFailure(⊢);
-·}
-·}
-}⟨/sandboxSelfModification⟩
-executeInSandbox(1)→void⟨4⟩{
-·function executeInSandbox(code) {
-⊷│return { success: Math.random() > 0.5 };
-·}
-}⟨/executeInSandbox⟩
-escalateToIntegration(1)→void⟨4⟩{
-·function escalateToIntegration(code) {
-·console.log('Modification integrated:', code);
-·}
-}⟨/escalateToIntegration⟩
-logFailure(1)→void⟨4⟩{
-function logFailure(⊢) {
-console.error('Modification ↺:', ⊢);
-·}
-}⟨/logFailure⟩
-⟩SCL│27│19⊨│2⑂│15.6%↓⟩
+⊩sandboxSelfModification(1)→void⟨8⟩{⊩}
+executeInSandbox(1)→void⟨4⟩{⊷}
+escalateToIntegration(1)→void⟨4⟩{}
+logFailure(1)→void⟨4⟩{}
+⟩SCL│6│6⊨│2⑂│81.3%↓⟩

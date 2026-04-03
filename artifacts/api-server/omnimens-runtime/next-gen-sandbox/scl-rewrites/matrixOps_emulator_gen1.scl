@@ -1,78 +1,10 @@
 ⟨SCL v1│matrixOps_emulator_gen1.mjs│140→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩multiplyMatrices(2)→void⟨22⟩{
-⊩│export function multiplyMatrices(matrixA, matrixB) {
-·const rowsA = matrixA.length;
-·const colsA = matrixA[0].length;
-·const rowsB = matrixB.length;
-·const colsB = matrixB[0].length;
-·if (colsA !== rowsB) {
-⊵│throw new Error('Matrix multiplication dimension mismatch: columns of A must match rows of B.');
-·}
-·const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
-·for (let i = 0; i < rowsA; i++) {
-·for (let j = 0; j < colsB; j++) {
-·for (let k = 0; k < colsA; k++) {
-·result[i][j] += matrixA[i][k] * matrixB[k][j];
-·}
-·}
-·}
-⊷│return result;
-·}
-}⟨/multiplyMatrices⟩
-⊩addVectors(2)→void⟨7⟩{
-⊩│export function addVectors(vectorA, vectorB) {
-⊹│if (vectorA.length !== vectorB.length) {
-⊵│throw new Error('Vector ∑ dimension mismatch: both vectors must have the same length.');
-·}
-⊷│return vectorA.map((val, index) => val + vectorB[index]);
-·}
-}⟨/addVectors⟩
-⊩dotProduct(2)→void⟨7⟩{
-⊩│export function dotProduct(vectorA, vectorB) {
-⊹│if (vectorA.length !== vectorB.length) {
-⊵│throw new Error('Dot product dimension mismatch: both vectors must have the same length.');
-·}
-⋐│return vectorA.reduce((sum, val, index) => sum + val * vectorB[index], 0);
-·}
-}⟨/dotProduct⟩
-⊩transposeMatrix(1)→void⟨14⟩{
-⊩│export function transposeMatrix(matrix) {
-·const rows = matrix.length;
-·const cols = matrix[0].length;
-·const result = Array.from({ length: cols }, () => Array(rows).fill(0));
-·for (let i = 0; i < rows; i++) {
-·for (let j = 0; j < cols; j++) {
-·result[j][i] = matrix[i][j];
-·}
-·}
-⊷│return result;
-·}
-}⟨/transposeMatrix⟩
-⊩applyFunction(2)→void⟨3⟩{
-⊩│export function applyFunction(matrix, fn) {
-⊷│return matrix.map(row => row.map(fn));
-·}
-}⟨/applyFunction⟩
-⊩normalizeVector(1)→void⟨9⟩{
-⊩│export function normalizeVector(vector) {
-⋐│const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
-·if (magnitude === 0) {
-⊵│throw new Error('Cannot normalize a zero-magnitude vector.');
-·}
-⊷│return vector.map(val => val / magnitude);
-·}
-}⟨/normalizeVector⟩
-⊩addMatrices(2)→void⟨12⟩{
-⊩│export function addMatrices(matrixA, matrixB) {
-·const rowsA = matrixA.length;
-·const colsA = matrixA[0].length;
-·const rowsB = matrixB.length;
-·const colsB = matrixB[0].length;
-·if (rowsA !== rowsB || colsA !== colsB) {
-⊵│throw new Error('Matrix ∑ dimension mismatch: both matrices must have the same dimensions.');
-·}
-⊷│return matrixA.map((row, i) => row.map((val, j) => val + matrixB[i][j]));
-·}
-}⟨/addMatrices⟩
-⟩SCL│77│83⊨│22⑂│45.0%↓⟩
+⊩multiplyMatrices(2)→void⟨22⟩{⊩⊵⊷}
+⊩addVectors(2)→void⟨7⟩{⊩⊹⊵⊷}
+⊩dotProduct(2)→void⟨7⟩{⊩⊹⊵⋐⊷}
+⊩transposeMatrix(1)→void⟨14⟩{⊩⊷}
+⊩applyFunction(2)→void⟨3⟩{⊩⊷}
+⊩normalizeVector(1)→void⟨9⟩{⊩⋐⊵⊷}
+⊩addMatrices(2)→void⟨12⟩{⊩⊵⊷}
+⟩SCL│9│30⊨│23⑂│93.6%↓⟩

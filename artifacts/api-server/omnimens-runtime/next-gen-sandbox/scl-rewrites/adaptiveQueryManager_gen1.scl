@@ -2,78 +2,13 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
 κqueryCache
-⊩calculatePriority(2)→void⟨6⟩{
-⊩│export function calculatePriority(taskWeight, expectedGain) {
-·if (taskWeight < 1 || taskWeight > 10 || expectedGain < 0 || expectedGain > 1) {
-⊵│throw new Error('Invalid inputs: taskWeight must be 1-10 and expectedGain must be 0-1.');
-·}
-⊷│return taskWeight * expectedGain * 10;
-·}
-}⟨/calculatePriority⟩
-⊩allocateQueryBudget(2)→void⟨17⟩{
-⊩│export function allocateQueryBudget(tasks, totalBudget) {
-·if (totalBudget <= 0) {
-⊵│throw new Error('Total budget must be greater than 0.');
-·}
-·const priorities = tasks.map(task => ({
-·id: task.id,
-·priority: calculatePriority(task.taskWeight, task.expectedGain)
-·}));
-⋐│const totalPriority = priorities.reduce((sum, task) => sum + task.priority, 0);
-⊷│return priorities.map(task => ({
-·id: task.id,
-·allocatedBudget: (task.priority / totalPriority) * totalBudget
-·}));
-·}
-}⟨/allocateQueryBudget⟩
-⊩cacheQueryResult(3)→void⟨4⟩{
-⊩│export function cacheQueryResult(query, result, ttl) {
-⏰│const expirationTime = Date.now() + ttl;
-⊡│queryCache.set(query, { result, expirationTime });
-·}
-}⟨/cacheQueryResult⟩
-⊩getCachedResult(1)→void⟨8⟩{
-⊩│export function getCachedResult(query) {
-⊡│const cacheEntry = queryCache.get(query);
-⏰│if (!cacheEntry || cacheEntry.expirationTime < Date.now()) {
-·queryCache.delete(query);
-⊷│return null;
-·}
-⊷│return cacheEntry.result;
-·}
-}⟨/getCachedResult⟩
-⊩batchQueries(2)→void⟨18⟩{
-⊩│export function batchQueries(queries, batchSize) {
-·if (batchSize <= 0) {
-⊵│throw new Error('Batch size must be greater than 0.');
-·}
-⊱│const sortedQueries = [...queries].sort((a, b) => {
-·const priorityA = calculatePriority(a.taskWeight, a.expectedGain);
-·const priorityB = calculatePriority(b.taskWeight, b.expectedGain);
-⊷│return priorityB - priorityA;
-·});
-·const batches = [];
-·for (let i = 0; i < sortedQueries.length; i += batchSize) {
-⊺│batches.push(sortedQueries.slice(i, i + batchSize));
-·}
-⊷│return batches;
-·}
-}⟨/batchQueries⟩
-⊩generateTaskId(1)→void⟨3⟩{
-⊩│export function generateTaskId() {
-⊷│return randomUUID();
-·}
-}⟨/generateTaskId⟩
-⊩cleanupCache(1)→void⟨8⟩{
-⊩│export function cleanupCache() {
-⏰│const now = Date.now();
-·for (const [key, value] of queryCache.entries()) {
-·if (value.expirationTime < now) {
-·queryCache.delete(key);
-·}
-·}
-·}
-}⟨/cleanupCache⟩
+⊩calculatePriority(2)→void⟨6⟩{⊩⊵⊷}
+⊩allocateQueryBudget(2)→void⟨17⟩{⊩⊵⋐⊷}
+⊩cacheQueryResult(3)→void⟨4⟩{⊩⏰⊡}
+⊩getCachedResult(1)→void⟨8⟩{⊩⊡⏰⊷}
+⊩batchQueries(2)→void⟨18⟩{⊩⊵⊱⊷⊺}
+⊩generateTaskId(1)→void⟨3⟩{⊩⊷}
+⊩cleanupCache(1)→void⟨8⟩{⊩⏰}
 ⊪│export const exampleUsage = () => {
 κtasks
 κtotalBudget
@@ -85,4 +20,4 @@
 ·console.log('Cached result:', getCachedResult(query));
 ·cleanupCache();
 ·};
-⟩SCL│87│89⊨│26⑂│40.4%↓⟩
+⟩SCL│22│38⊨│24⑂│84.9%↓⟩

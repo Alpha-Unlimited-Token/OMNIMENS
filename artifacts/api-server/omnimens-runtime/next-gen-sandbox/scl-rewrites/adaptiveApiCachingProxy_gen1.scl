@@ -1,19 +1,8 @@
 ⟨SCL v1│adaptiveApiCachingProxy_gen1.mjs│91→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩generateCacheKey(1)→void⟨3⟩{
-⊩│export function generateCacheKey(query) {
-⊷│return createHash('sha256').update(query).digest('hex');
-·}
-}⟨/generateCacheKey⟩
-⊩cosineSimilarity(2)→void⟨6⟩{
-⊩│export function cosineSimilarity(vecA, vecB) {
-⋐│const dotProduct = vecA.reduce((sum, val, idx) => sum + val * vecB[idx], 0);
-⋐│const magnitudeA = Math.sqrt(vecA.reduce((sum, val) => sum + val ** 2, 0));
-⋐│const magnitudeB = Math.sqrt(vecB.reduce((sum, val) => sum + val ** 2, 0));
-⊳│return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
-·}
-}⟨/cosineSimilarity⟩
+⊩generateCacheKey(1)→void⟨3⟩{⊩⊷}
+⊩cosineSimilarity(2)→void⟨6⟩{⊩⋐⊳⊷}
 ⊶│export class AdaptiveLRUCache {
 ·constructor(maxSize = 100) {
 ·this.maxSize = maxSize;
@@ -23,7 +12,7 @@
 ·if (this.cache.has(key)) {
 κvalue
 ·this.cache.delete(key);
-⊡│this.cache.set(key, value); // Move to the end (most recently used)
+⊡│this.cache.set(key, value); // Move to the end (most recentl
 ⊷│return value;
 ·}
 ⊷│return null;
@@ -38,34 +27,6 @@ set(key, ≪) {
 ⊡│this.cache.set(key, value);
 ·}
 ·}
-⊩prefetchQueries(4)→void⟨10⟩{
-⊩│export function prefetchQueries(baseQuery, probableQueries, cache, fetchFunction) {
-⊱│probableQueries.forEach((query) => {
-·const cacheKey = generateCacheKey(query);
-⊡│if (!cache.get(cacheKey)) {
-⊱│fetchFunction(query).then((response) => {
-⊡│cache.set(cacheKey, response);
-·});
-·}
-·});
-·}
-}⟨/prefetchQueries⟩
-⊩⟿adaptiveApiProxy(4)→void⟨20⟩{
-⊩│export async function adaptiveApiProxy(query, fetchFunction, cache, similarityThreshold = 0.8) {
-·const cacheKey = generateCacheKey(query);
-⊡│const cachedResponse = cache.get(cacheKey);
-·if (cachedResponse) {
-⊷│return cachedResponse;
-·}
-·for (const [key, value] of cache.cache.entries()) {
-·const similarity = cosineSimilarity(query.split('').map((char) => char.charCodeAt(0)), key.split('').map((char) => char.charCodeAt(0)));
-·if (similarity >= similarityThreshold) {
-⊷│return value; // Reuse similar response
-·}
-·}
-⊴│const newResponse = await fetchFunction(query);
-⊡│cache.set(cacheKey, newResponse);
-⊷│return newResponse;
-·}
-}⟨/adaptiveApiProxy⟩
-⟩SCL│70│57⊨│25⑂│23.1%↓⟩
+⊩prefetchQueries(4)→void⟨10⟩{⊩⊱⊡}
+⊩⟿adaptiveApiProxy(4)→void⟨20⟩{⊩⊡⊷⊴}
+⟩SCL│31│27⊨│19⑂│65.9%↓⟩

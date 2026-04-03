@@ -1,54 +1,9 @@
 ⟨SCL v1│slidingWindowMemory_gen1.mjs│89→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-generateEmbedding(1)→void⟨7⟩{
-·function generateEmbedding(text) {
-·const hash = crypto.createHash('sha256');
-·hash.update(text);
-·const digest = hash.digest();
-·const embedding = Array.from(digest).slice(0, 16).map(byte => byte / 255); // Normalize to [0, 1]
-⊷│return embedding;
-·}
-}⟨/generateEmbedding⟩
-calculateDistance(2)→void⟨6⟩{
-·function calculateDistance(vec1, vec2) {
-⊹│if (vec1.length !== vec2.length) {
-⊵│throw new Error('Vectors must be of the same length');
-·}
-⋐│return Math.sqrt(vec1.reduce((sum, val, i) => sum + Math.pow(val - vec2[i], 2), 0));
-·}
-}⟨/calculateDistance⟩
-clusterEmbeddings(2)→void⟨19⟩{
-·function clusterEmbeddings(data, threshold) {
-·const clusters = [];
-·data.forEach(item => {
-·let addedToCluster = false;
-⥀│for (const cluster of clusters) {
-·const distances = cluster.embeddings.map(embedding => calculateDistance(item.embedding, embedding));
-⟛│if (Math.min(...distances) <= threshold) {
-⊺│cluster.embeddings.push(item.embedding);
-⊺│cluster.texts.push(item.text);
-·addedToCluster = true;
-·break;
-·}
-·}
-·if (!addedToCluster) {
-⊺│clusters.push({ embeddings: [item.embedding], texts: [item.text] });
-·}
-·});
-⊱│return clusters.map((cluster, index) => ({ cluster: index, texts: cluster.texts }));
-·}
-}⟨/clusterEmbeddings⟩
-summarizeCluster(1)→void⟨3⟩{
-·function summarizeCluster(texts) {
-⊷│return texts.join(' ').slice(0, 200); // ⏳ summary to 200 characters.
-·}
-}⟨/summarizeCluster⟩
-slidingWindowMemory(2)→void⟨5⟩{
-·function slidingWindowMemory(conversationHistory, embeddingThreshold = 0.5) {
-·const data = conversationHistory.map(text => ({ text, embedding: generateEmbedding(text) }));
-·const clusters = clusterEmbeddings(data, embeddingThreshold);
-⊷│return clusters.map(cluster => ({ summary: summarizeCluster(cluster.texts) }));
-·}
-}⟨/slidingWindowMemory⟩
-·export { generateEmbedding, calculateDistance, clusterEmbeddings, summarizeCluster, slidingWindowMemory };
-⟩SCL│53│50⊨│12⑂│40.4%↓⟩
+generateEmbedding(1)→void⟨7⟩{⊷}
+calculateDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
+clusterEmbeddings(2)→void⟨19⟩{⥀⟛⊺⊱⊷}
+summarizeCluster(1)→void⟨3⟩{⊷}
+slidingWindowMemory(2)→void⟨5⟩{⊷}
+·export { generateEmbedding, calculateDistance, clusterEmbeddings, summarizeClust
+⟩SCL│8│17⊨│12⑂│91.0%↓⟩

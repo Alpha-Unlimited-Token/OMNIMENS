@@ -7,7 +7,7 @@
 ·updatePrior(newEvidence) {
 κlikelihood
 κevidence
-·this.prior = (likelihood * this.prior) / ((likelihood * this.prior) + ((1 - likelihood) * (1 - this.prior)));
+·this.prior = (likelihood * this.prior) / ((likelihood * this.prior) + ((1 - like
 ⊷│return this.prior;
 ·}
 ·evaluateConfidence(chain) {

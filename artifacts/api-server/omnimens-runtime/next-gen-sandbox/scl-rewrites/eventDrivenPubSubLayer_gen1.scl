@@ -12,7 +12,7 @@
 ·}
 ·publish(eventType, data) {
 ·if (this.subscribers.has(eventType)) {
-⊡│this.subscribers.get(eventType).forEach(callback => callback(data));
+⊡│this.subscribers.get(eventType).forEach(callback => callback
 ·}
 ·}
 ·delegateTask(eventType, task) {

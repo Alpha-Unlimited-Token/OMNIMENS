@@ -15,7 +15,7 @@ this.learningRates[Ε] = this.calculateRate(performance, resourceUsage);
 ·calculateRate(performance, resourceUsage) {
 κbaseRate
 κadjustmentFactor
-⊷│return baseRate * adjustmentFactor * (1 + performance / 100);
+⊷│return baseRate * adjustmentFactor * (1 + performance / 100)
 ·}
 getLearningRate(Ε) {
 ⊷│return this.learningRates[module] || 0.01;

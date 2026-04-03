@@ -3,62 +3,11 @@
 ⊫[]
 κcache
 κMAX_CACHE_SIZE
-⊩generateQueryFingerprint(1)→void⟨3⟩{
-⊩│export function generateQueryFingerprint(query) {
-⊷│return createHash('sha256').update(query).digest('hex');
-·}
-}⟨/generateQueryFingerprint⟩
-⊩computeResponseSimilarity(2)→void⟨7⟩{
-⊩│export function computeResponseSimilarity(response1, response2) {
-⊯│const set1 = new Set(response1.split(/\s+/));
-⊯│const set2 = new Set(response2.split(/\s+/));
-⊯│const intersectionSize = new Set([...set1].filter(x => set2.has(x))).size;
-⊯│const unionSize = new Set([...set1, ...set2]).size;
-⊳│return unionSize === 0 ? 0 : intersectionSize / unionSize;
-·}
-}⟨/computeResponseSimilarity⟩
-⊩getCachedResponse(2)→void⟨18⟩{
-⊩│export function getCachedResponse(query, response) {
-·const fingerprint = generateQueryFingerprint(query);
-·if (cache.has(fingerprint)) {
-⊡│return cache.get(fingerprint);
-·}
-·if (cache.size >= MAX_CACHE_SIZE) {
-·const oldestKey = cache.keys().next().value;
-·cache.delete(oldestKey);
-·}
-⊡│cache.set(fingerprint, response);
-⊷│return response;
-·}
-}⟨/getCachedResponse⟩
-⊩findSimilarCachedResponse(1)→void⟨15⟩{
-⊩│export function findSimilarCachedResponse(query) {
-·const fingerprint = generateQueryFingerprint(query);
-·let bestMatch = null;
-·let highestSimilarity = 0;
-·for (const [key, cachedResponse] of cache.entries()) {
-·const similarity = computeResponseSimilarity(query, cachedResponse);
-·if (similarity > highestSimilarity) {
-·highestSimilarity = similarity;
-·bestMatch = cachedResponse;
-·}
-·}
-⊳│return highestSimilarity > 0.8 ? bestMatch : null; // Threshold for similarity
-·}
-}⟨/findSimilarCachedResponse⟩
-⊩clearCache(1)→void⟨3⟩{
-⊩│export function clearCache() {
-·cache.clear();
-·}
-}⟨/clearCache⟩
-⊩getCacheSize(1)→void⟨3⟩{
-⊩│export function getCacheSize() {
-⊷│return cache.size;
-·}
-}⟨/getCacheSize⟩
-⊩getCacheEntries(1)→void⟨3⟩{
-⊩│export function getCacheEntries() {
-⊷│return Array.from(cache.entries());
-·}
-}⟨/getCacheEntries⟩
-⟩SCL│63│62⊨│19⑂│41.1%↓⟩
+⊩generateQueryFingerprint(1)→void⟨3⟩{⊩⊷}
+⊩computeResponseSimilarity(2)→void⟨7⟩{⊩⊯⊳⊷}
+⊩getCachedResponse(2)→void⟨18⟩{⊩⊡⊷}
+⊩findSimilarCachedResponse(1)→void⟨15⟩{⊩⊳⊷}
+⊩clearCache(1)→void⟨3⟩{⊩}
+⊩getCacheSize(1)→void⟨3⟩{⊩⊷}
+⊩getCacheEntries(1)→void⟨3⟩{⊩⊷}
+⟩SCL│12│27⊨│17⑂│88.8%↓⟩

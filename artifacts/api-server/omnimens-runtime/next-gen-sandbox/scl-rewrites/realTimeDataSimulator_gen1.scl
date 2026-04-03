@@ -1,77 +1,9 @@
 ⟨SCL v1│realTimeDataSimulator_gen1.mjs│116→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩generateSyntheticData(1)→void⟨7⟩{
-⊩│export function generateSyntheticData(seed) {
-⊷│return {
-⏰│timestamp: Date.now(),
-·value: Math.sin(seed) + Math.random() * 0.5,
-·seed: seed
-·};
-·}
-}⟨/generateSyntheticData⟩
-⊩startWebSocketServer(2)→void⟨18⟩{
-⊩│export function startWebSocketServer(port, interval) {
-·const wss = new WebSocketServer({ port });
-⊱│wss.on('connection', (ws) => {
-·let seed = 0;
-⟳│const intervalId = setInterval(() => {
-·seed++;
-·const data = generateSyntheticData(seed);
-⟠│ws.send(JSON.stringify(data));
-·}, interval);
-⊱│ws.on('close', () => {
-·clearInterval(intervalId);
-·});
-·});
-⊰│console.log(`WebSocket server running on ws://localhost:${port}`);
-·}
-}⟨/startWebSocketServer⟩
-⊩startApiPolling(3)→void⟨35⟩{
-⊩│export function startApiPolling(apiUrl, interval, callback) {
-·const url = new URL(apiUrl);
-⟳│setInterval(() => {
-·const options = {
-·hostname: url.hostname,
-·path: url.pathname,
-·port: url.port || 80,
-·method: 'GET'
-·};
-⊱│const req = request(options, (res) => {
-·let data = '';
-⊱│res.on('data', (chunk) => {
-·data += chunk;
-·});
-⊱│res.on('end', () => {
-·try {
-⟠│const parsedData = JSON.parse(data);
-·callback(parsedData);
-·} catch (error) {
-·console.error('Error parsing API response:', error);
-·}
-·});
-·});
-⊱│req.on('error', (error) => {
-·console.error('Error with API request:', error);
-·});
-·req.end();
-·}, interval);
-·}
-}⟨/startApiPolling⟩
-⊩adaptDataForAgent(2)→void⟨14⟩{
-⊩│export function adaptDataForAgent(seed, agentType) {
-·const baseData = generateSyntheticData(seed);
-⑃│switch (agentType) {
-·case 'Mathematician':
-⊷│return { ...baseData, transformedValue: Math.sqrt(baseData.value) };
-·case 'Neuroscientist':
-⊷│return { ...baseData, neuralSignal: baseData.value * 100 };
-·case 'Architect':
-⊷│return { ...baseData, structuralLoad: baseData.value * 10 };
-·default:
-⊷│return baseData;
-·}
-·}
-}⟨/adaptDataForAgent⟩
+⊩generateSyntheticData(1)→void⟨7⟩{⊩⊷⏰}
+⊩startWebSocketServer(2)→void⟨18⟩{⊩⊱⟳⟠⊰}
+⊩startApiPolling(3)→void⟨35⟩{⊩⟳⊱⟠}
+⊩adaptDataForAgent(2)→void⟨14⟩{⊩⑃⊷}
 ⊪MODULE_DESCRIPTION
-⟩SCL│76│81⊨│22⑂│34.5%↓⟩
+⟩SCL│8│21⊨│15⑂│93.1%↓⟩

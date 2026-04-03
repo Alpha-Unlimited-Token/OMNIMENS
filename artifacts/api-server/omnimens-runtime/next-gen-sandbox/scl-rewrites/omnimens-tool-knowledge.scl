@@ -20,33 +20,9 @@ const log = (...m: any[]) => console.log("[OMNIMENS-TOOL-◧]", ...m);
 ·new Promise<void>((r) =>
 ⚡→│spikeBus.scheduleSpike("tool-knowledge:sleep", r, ms)
 ·);
-⟿fetchDocContent(1)→Promise<string>⟨12⟩{
-·async function fetchDocContent(url: string): Promise<string> {
-·try {
-⊴│const content = await fetchPageContent(url);
-⊷│return content
-⊽│.replace(/<[^>]+>/g, " ")
-⊽│.replace(/\s+/g, " ")
-·.slice(0, 3000)
-·.trim();
-·} catch {
-⊷│return "";
-·}
-·}
-}⟨/fetchDocContent⟩
-⟿openAiChat(1)→void⟨8⟩{
-·async function openAiChat(prompt: string) {
-⊷│return apiManager.call("tool-◧", "openai", {
-·model: "gpt-4o-mini",
-·messages: [{ role: "user", content: prompt }],
-·max_tokens: 1200,
-·temperature: 0.3,
-·});
-·}
-}⟨/openAiChat⟩
-⟿distillToolKnowledge(1)→void⟨1⟩{
-·async function distillToolKnowledge(
-}⟨/distillToolKnowledge⟩
+⟿fetchDocContent(1)→Promise<string>⟨12⟩{⊴⊷⊽}
+⟿openAiChat(1)→void⟨8⟩{⊷}
+⟿distillToolKnowledge(1)→void⟨1⟩{}
 ·tool: ToolDefinition,
 ·searchContent: string,
 ·docContent: string
@@ -56,4 +32,4 @@ const log = (...m: any[]) => console.log("[OMNIMENS-TOOL-◧]", ...m);
 κresponse
 κraw
 ⟠│return JSON.parse(raw.replace(/
-⟩SCL│58│37⊨│10⑂│37.6%↓⟩
+⟩SCL│34│19⊨│8⑂│63.4%↓⟩

@@ -1,22 +1,6 @@
 ⟨SCL v1│counterGroupthinkMechanism_gen1.mjs│29→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩counterGroupthinkMechanism(1)→void⟨11⟩{
-⊩│export function counterGroupthinkMechanism(proposals) {
-·const diversityScores = proposals.map(proposal => {
-⊷│return calculateDiversityScore(proposal);
-·});
-⊱│const filteredProposals = proposals.filter((proposal, index) => {
-⊷│return diversityScores[index] > THRESHOLD;
-·});
-⊷│return filteredProposals;
-·}
-}⟨/counterGroupthinkMechanism⟩
-calculateDiversityScore(1)→void⟨6⟩{
-·function calculateDiversityScore(proposal) {
-·const noveltyScore = proposal.novelty;
-·const differentiationScore = proposal.differentiation;
-⊷│return (noveltyScore + differentiationScore) / 2;
-·}
-}⟨/calculateDiversityScore⟩
+⊩counterGroupthinkMechanism(1)→void⟨11⟩{⊩⊷⊱}
+calculateDiversityScore(1)→void⟨6⟩{⊷}
 κTHRESHOLD
-⟩SCL│21│19⊨│6⑂│27.6%↓⟩
+⟩SCL│5│7⊨│4⑂│82.8%↓⟩

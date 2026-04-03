@@ -1,45 +1,6 @@
 ⟨SCL v1│semanticMemoryStore_gen1.mjs│92→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-cosineSimilarity(2)→void⟨15⟩{
-·function cosineSimilarity(vectorA, vectorB) {
-⊹│if (vectorA.length !== vectorB.length) {
-⊵│throw new Error("Vectors must have the same length.");
-·}
-⋐│const dotProduct = vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
-⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
-⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
-·if (magnitudeA === 0 || magnitudeB === 0) {
-⊷│return 0; // Avoid division by zero; treat as no similarity.
-·}
-⊷│return dotProduct / (magnitudeA * magnitudeB);
-·}
-}⟨/cosineSimilarity⟩
-createSemanticMemoryStore(1)→void⟨48⟩{
-·function createSemanticMemoryStore() {
-⊮│const ⊞ = new Map();
-·function addVector(key, vector) {
-·if (!Array.isArray(vector) || vector.some(isNaN)) {
-⊵│throw new Error("Vector must be an array of numbers.");
-·}
-⊡│⊞.set(key, vector);
-·}
-·function search(queryVector, topK = 5) {
-·if (!Array.isArray(queryVector) || queryVector.some(isNaN)) {
-⊵│throw new Error("Query vector must be an array of numbers.");
-·}
-const ⊢ = [];
-for (const [key, vector] of ⊞.entries()) {
-·const similarity = cosineSimilarity(queryVector, vector);
-⊺│⊢.push({ key, similarity });
-·}
-⊢.sort((a, b) => b.similarity - a.similarity);
-⊷│return ⊢.slice(0, topK);
-·}
-·function getVector(key) {
-⊡│return ⊞.get(key);
-·}
-⊷│return { addVector, search, getVector };
-·}
-}⟨/createSemanticMemoryStore⟩
+cosineSimilarity(2)→void⟨15⟩{⊹⊵⋐⊷}
+createSemanticMemoryStore(1)→void⟨48⟩{⊮⊵⊡⊺⊷}
 ·export { cosineSimilarity, createSemanticMemoryStore };
-⟩SCL│44│46⊨│15⑂│52.2%↓⟩
+⟩SCL│5│11⊨│9⑂│94.6%↓⟩

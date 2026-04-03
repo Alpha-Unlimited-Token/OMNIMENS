@@ -1,24 +1,4 @@
 ⟨SCL v1│constraintCheckingLayer_gen1.mjs│31→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩constraintCheckingLayer(2)→void⟨22⟩{
-⊩│export function constraintCheckingLayer(upgradeProposal, safetyMetrics) {
-·const STOPPrinciples = ['alignment', 'stability', 'predictability'];
-·const violations = [];
-·STOPPrinciples.forEach(principle => {
-·if (!safetyMetrics[principle]) {
-⊰│violations.push(`Violation of ${principle}`);
-·}
-·});
-⊹│if (violations.length > 0) {
-⊷│return {
-·approved: false,
-·violations
-·};
-·}
-⊷│return {
-·approved: true,
-·message: 'Upgrade adheres to STOP principles.'
-·};
-·}
-}⟨/constraintCheckingLayer⟩
-⟩SCL│23│23⊨│5⑂│25.8%↓⟩
+⊩constraintCheckingLayer(2)→void⟨22⟩{⊩⊰⊺⊹⊷}
+⟩SCL│3│6⊨│5⑂│90.3%↓⟩

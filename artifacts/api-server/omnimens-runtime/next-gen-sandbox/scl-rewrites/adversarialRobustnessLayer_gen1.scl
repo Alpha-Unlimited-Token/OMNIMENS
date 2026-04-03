@@ -1,14 +1,4 @@
 ⟨SCL v1│adversarialRobustnessLayer_gen1.mjs│18→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩adversarialRobustnessLayer(1)→void⟨9⟩{
-⊩│export function adversarialRobustnessLayer(agentOutputs) {
-⋐│const consensus = agentOutputs.reduce((acc, θ) => {
-acc[θ] = (acc[θ] || 0) + 1;
-⊷│return acc;
-·}, {});
-⟛│const maxConsensus = Math.max(...Object.values(consensus));
-·const robustnessScore = maxConsensus / agentOutputs.length;
-⊷│return { robustnessScore, consensus };
-·}
-}⟨/adversarialRobustnessLayer⟩
-⟩SCL│13│13⊨│5⑂│27.8%↓⟩
+⊩adversarialRobustnessLayer(1)→void⟨9⟩{⊩⋐⊱⊷⟛⊸}
+⟩SCL│3│7⊨│6⑂│83.3%↓⟩

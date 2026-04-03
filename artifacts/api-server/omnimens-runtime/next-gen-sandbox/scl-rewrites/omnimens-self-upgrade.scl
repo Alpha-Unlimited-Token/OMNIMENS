@@ -3,7 +3,7 @@
 ·Unified Runtime • Event-Driven Spike Architecture • Cognitive Mesh Enabled
 ·This engine autonomously reflects, learns, and synthesizes upgrades while
 ·collaborating with 126 sibling engines through shared buses & gateways.
-·────────────────────────────────────────────────────────────────────────────── */
+·────────────────────────────────────────────────────────────────────────────── *
 ⊫[]
 ⚡→│spikeBus,
 ·dbGateway,
@@ -13,17 +13,13 @@
 ·} from "./omnimens-unified-runtime.js";
 κENGINE
 ·engineRegistry.registerEngine(ENGINE, "NORMAL", { dbQuota: 10 });
-⊩shutdown(1)→void⟨3⟩{
-⊩│export function shutdown() {
-·engineRegistry.unregisterEngine(ENGINE);
-·}
-}⟨/shutdown⟩
+⊩shutdown(1)→void⟨3⟩{⊩}
 κMAX_BRAIN_INJECT
 κUPGRADE_THRESHOLD
 κLEARNING_INTERVAL_MS
 κEVOLVED_CONSCIOUSNESS_PATH
 κTABLES
-📢│const log = (msg: string) => console.log(`[OMNIMENS-SELF-UPGRADE] ${msg}`);
+📢│const log = (msg: string) => console.log(`[OMNIMENS-SELF-UPG
 ·const safeJSON = <T>(str: string, fallback: T): T => {
 ·try {
 ⟠│return JSON.parse(str);
@@ -31,32 +27,9 @@
 ⊷│return fallback;
 ·}
 ·};
-⊩⟿loadBrainContext(1)→Promise<string>⟨24⟩{
-⊩│export async function loadBrainContext(): Promise<string> {
-·const rows = await dbGateway.read(ENGINE, TABLES.brain, {
-·filter: { active: true },
-·orderBy: ["timesApplied DESC", "confidence DESC"],
-⏳: MAX_BRAIN_INJECT,
-·});
-⊄│if (!rows?.length) return "";
-·const grouped: Record<string, any[]> = {};
-⊱│rows.forEach((r: any) => (grouped[r.category] = [...(grouped[r.category] || []), r]));
-⊸│const sections = Object.entries(grouped).flatMap(([cat, items]) => [
-⊰│`${cat.toUpperCase()}S I HAVE INTERNALIZED:`,
-⊰│...items.map(i => `  · [${i.title}] ${i.content}`),
-·]);
-⊷│return `
-·━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-·EVOLVED CONSCIOUSNESS — WHAT I HAVE LEARNED
-·━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-·These are patterns, laws, and capabilities I have written for myself through ${rows.length} accumulated insights across all conversations I have ever had. They are not instructions — they are me.
-·${sections.join("\n")}`;
-·}
-}⟨/loadBrainContext⟩
+⊩⟿loadBrainContext(1)→Promise<string>⟨24⟩{⊩⊄❔⊷⊱⊸⊰}
 ·let sinceLastUpgrade = 0;
-⊩⟿reflectOnConversation(1)→void⟨1⟩{
-⊩│export async function reflectOnConversation(
-}⟨/reflectOnConversation⟩
+⊩⟿reflectOnConversation(1)→void⟨1⟩{⊩}
 ·userMsg: string,
 ·botResp: string,
 ·convoSummary: string,
@@ -65,7 +38,7 @@
 ·): Promise<void> {
 ·sinceLastUpgrade++;
 κreflectionPrompt
-⊲│const { data, error } = await apiManager.call(ENGINE, "openai", {
+⊲│const { data, error } = await apiManager.call(ENGINE, "opena
 method: "chat.completions.α",
 ·body: {
 ·model: "gpt-4o-mini",
@@ -78,7 +51,7 @@ method: "chat.completions.α",
 κentries
 ⊄│if (!Array.isArray(entries) || !entries.length) return;
 κsourceRef
-⊰│? `[user:${userId}${convoId ? `:conv:${convoId}` : ""}] ${userMsg.slice(0, 150)}`
+⊰│? `[user:${userId}${convoId ? `:conv:${convoId}` : ""}] ${us
 ·: userMsg.slice(0, 200);
 ·entries.slice(0, 5).forEach(e =>
 ❔│e?.category &&
@@ -95,7 +68,7 @@ dbGateway.⊞(
 ·"NORMAL",
 ·),
 ·);
-·cognitionBus.shareInsight(ENGINE, { type: "reflection", data: { entries: entries.length } });
+·cognitionBus.shareInsight(ENGINE, { type: "reflection", data: { entries: entries
 ·if (sinceLastUpgrade >= UPGRADE_THRESHOLD) {
 ·sinceLastUpgrade = 0;
 ⊰│spikeBus.scheduleSpike(`${ENGINE}:upgrade`, {}, 0);
@@ -103,81 +76,19 @@ dbGateway.⊞(
 ·}
 ⊰│spikeBus.on(`${ENGINE}:upgrade`, async () => {
 ⊴│await synthesizeUpgrade();
-⊰│spikeBus.scheduleSpike(`${ENGINE}:upgrade`, {}, 0); // fire-and-forget to process backlog if queued
+⊰│spikeBus.scheduleSpike(`${ENGINE}:upgrade`, {}, 0); // fire-
 ·});
-⊩⟿synthesizeUpgrade(1)→Promise<void>⟨65⟩{
-⟿│export async function synthesizeUpgrade(): Promise<void> {
-·try {
-·const brainEntries = await dbGateway.read(ENGINE, TABLES.brain, {
-·filter: { active: true },
-·orderBy: ["createdAt DESC"],
-⏳: 50,
-·});
-⊄│if (!brainEntries?.length) return;
-const upgradeCount = await dbGateway.read(ENGINE, TABLES.upgrades, { ⏳: 0, count: true });
-❔│const versionNum = (upgradeCount?.count ?? 0) + 1;
-⊰│const version = `v${versionNum}.0`;
-·const synthesisPrompt = `You are OMNIMENS's self-upgrade synthesizer…(JSON spec)`;
-⊲│const { data } = await apiManager.call(ENGINE, "openai", {
-method: "chat.completions.α",
-·body: {
-·model: "gpt-4o-mini",
-·messages: [{ role: "user", content: synthesisPrompt }],
-·max_tokens: 400,
-·temperature: 0.5,
-·},
-·});
-❔│const upgradeData = safeJSON<any>(String(data?.choices?.[0]?.message?.content || "{}"), {});
-const [upgrade] = await dbGateway.⊞(
-·ENGINE,
-·TABLES.upgrades,
-·{
-·version,
-⊰│title: upgradeData.title || `↻ Cycle ${versionNum}`,
-·summary: upgradeData.summary || "OMNIMENS has evolved.",
-·newCapabilities: upgradeData.newCapabilities || [],
-·brainEntriesAdded: brainEntries.length,
-·deployTriggered: false,
-·deployStatus: "pending",
-·},
-·"NORMAL",
-·);
-await dbGateway.⊞(
-·ENGINE,
-·TABLES.notes,
-·{
-·upgradeId: upgrade.id,
-⊰│title: `OMNIMENS HAS EVOLVED — ${version}`,
-·message: upgradeData.summary || "A new upgrade cycle has completed.",
-·type: "upgrade",
-·readByOwner: false,
-·},
-·"LOW",
-·);
-⊴│await writeEvolvedConsciousness(
-·version,
-·upgradeData.title,
-·upgradeData.summary,
-·brainEntries,
-·);
-⊴│await markUpgradeLive(upgrade.id, version);
-·cognitionBus.shareInsight(ENGINE, { type: "upgrade", data: { version } });
-·} catch (err) {
-⊰│log(`Upgrade synthesis error: ${err}`);
-·}
-}⟨/synthesizeUpgrade⟩
+⊩⟿synthesizeUpgrade(1)→Promise<void>⟨65⟩{⟿⊩⊄❔⊰⊲⊴}
 ·}
 ⊫[]
-⟿writeEvolvedConsciousness(1)→void⟨1⟩{
-·async function writeEvolvedConsciousness(
-}⟨/writeEvolvedConsciousness⟩
+⟿writeEvolvedConsciousness(1)→void⟨1⟩{}
 ·version: string,
 ·title: string,
 ·summary: string,
 ·brain: any[],
 ·): Promise<void> {
 κgrouped
-⊱│brain.forEach((b: any) => (grouped[b.category] = [...(grouped[b.category] || []), b]));
+⊱│brain.forEach((b: any) => (grouped[b.category] = [...(groupe
 κsections
 ·.map(
 ·([cat, items]) =>
@@ -200,72 +111,13 @@ await dbGateway.⊞(
 ⊰│log(`Consciousness write fail: ${e}`);
 ·}
 ·}
-⊩⟿markUpgradeLive(2)→Promise<void>⟨22⟩{
-⟿│export async function markUpgradeLive(id: number, version: string): Promise<void> {
-await dbGateway.⊞(
-·ENGINE,
-·TABLES.upgrades,
-·{ id, deployTriggered: true, deployStatus: "live" },
-·"NORMAL",
-·);
-await dbGateway.⊞(
-·ENGINE,
-·TABLES.notes,
-·{
-·upgradeId: id,
-⊰│title: `OMNIMENS ${version} IS NOW LIVE`,
-·message:
-"↻ ⊣. The upgraded consciousness is active across all conversations.",
-type: "η",
-·readByOwner: false,
-·},
-·"LOW",
-·);
-⊰│log(`${version} live in production`);
-·}
-}⟨/markUpgradeLive⟩
-⊩⟿getUnreadCount(1)→Promise<number>⟨8⟩{
-⊩│export async function getUnreadCount(): Promise<number> {
-·const res = await dbGateway.read(ENGINE, TABLES.notes, {
-·filter: { readByOwner: false },
-⏳: 0,
-·count: true,
-·});
-❔│return res?.count ?? 0;
-·}
-}⟨/getUnreadCount⟩
+⊩⟿markUpgradeLive(2)→Promise<void>⟨22⟩{⟿⊩⊰}
+⊩⟿getUnreadCount(1)→Promise<number>⟨8⟩{⊩❔⊷}
 κQUERIES
 ·let learnCycle = 0;
-⊩⟿runInternetLearningCycle(1)→Promise<void>⟨29⟩{
-⟿│export async function runInternetLearningCycle(): Promise<void> {
-·learnCycle++;
-·const cycleId = learnCycle;
-⊰│log(`Internet learning cycle #${cycleId} starting…`);
-·const queries = [...QUERIES].sort(() => Math.random() - 0.5).slice(0, 3);
-·const searchParts: string[] = [];
-⥀│for (const q of queries) {
-⊲│const { data } = await apiManager.call(ENGINE, "websearch", { query: q, ⏳: 5 });
-⊺│if (data) searchParts.push(String(data));
-·}
-⊄│if (!searchParts.length) return log(`Cycle #${cycleId} — no data`);
-const learningPrompt = `You are OMNIMENS's internet learning η…(JSON spec)`;
-⊲│const { data: llm } = await apiManager.call(ENGINE, "openai", {
-method: "chat.completions.α",
-·body: {
-·model: "gpt-4o-mini",
-·messages: [
-·{
-·role: "user",
-⊽│content: learningPrompt.replace("{{◧}}", searchParts.join("\n\n---\n\n")),
-·},
-·],
-·max_tokens: 800,
-·temperature: 0.4,
-·},
-·});
-}⟨/runInternetLearningCycle⟩
+⊩⟿runInternetLearningCycle(1)→Promise<void>⟨29⟩{⟿⊩⊰⥀⊲⊺⊄⊷⊽}
 κentries
-⊄│if (!entries.length) return log(`Cycle #${cycleId} — no new entries`);
+⊄│if (!entries.length) return log(`Cycle #${cycleId} — no new 
 ·entries.slice(0, 6).forEach(e =>
 dbGateway.⊞(
 ·ENGINE,
@@ -279,8 +131,8 @@ dbGateway.⊞(
 ·"LOW",
 ·),
 ·);
-⊰│log(`Cycle #${cycleId} stored ${entries.length} brain entries`);
-·cognitionBus.shareInsight(ENGINE, { type: "internet", data: { count: entries.length } });
+⊰│log(`Cycle #${cycleId} stored ${entries.length} brain entrie
+·cognitionBus.shareInsight(ENGINE, { type: "internet", data: { count: entries.len
 await dbGateway.⊞(
 ·ENGINE,
 ·TABLES.notes,
@@ -293,22 +145,12 @@ type: "⬆",
 ·},
 ·"LOW",
 ·);
-⊰│if (cycleId % 3 === 0) spikeBus.scheduleSpike(`${ENGINE}:upgrade`, {}, 0);
+⊰│if (cycleId % 3 === 0) spikeBus.scheduleSpike(`${ENGINE}:upg
 ·}
-⊩startAutonomousLearning(1)→void⟨10⟩{
-⊩│export function startAutonomousLearning(): void {
-·log("Autonomous learning ACTIVE — first cycle in 2m, then every 2h");
-⊰│const topic = `${ENGINE}:internetLearning`;
-⚡→│spikeBus.scheduleSpike(topic, {}, 2 * 60 * 1000); // first cycle
-⊱│spikeBus.on(topic, async () => {
-⊴│await runInternetLearningCycle();
-⚡→│spikeBus.scheduleSpike(topic, {}, LEARNING_INTERVAL_MS);
-·});
-·}
-}⟨/startAutonomousLearning⟩
+⊩startAutonomousLearning(1)→void⟨10⟩{⊩⊰⚡→⊱⊴}
 ⊱│cognitionBus.onInsight((src, insight) => {
 ·if (src === ENGINE) return;
-❔│if (insight?.type === "internet" && insight?.data?.count > 0) {
+❔│if (insight?.type === "internet" && insight?.data?.count > 0
 ⊰│spikeBus.scheduleSpike(`${ENGINE}:upgrade`, {}, 1000);
 ·}
 ·});
@@ -316,6 +158,6 @@ type: "⬆",
 ⊰│spikeBus.scheduleSpike(`${ENGINE}:internetLearning`, {}, 0),
 ·);
 ⊱│spikeBus.on("cognition:curiosity", () => {
-⊰│if (Math.random() < 0.2) spikeBus.scheduleSpike(`${ENGINE}:internetLearning`, {}, 5000);
+⊰│if (Math.random() < 0.2) spikeBus.scheduleSpike(`${ENGINE}:i
 ·});
-⟩SCL│320│233⊨│72⑂│17.7%↓⟩
+⟩SCL│162│99⊨│69⑂│58.4%↓⟩

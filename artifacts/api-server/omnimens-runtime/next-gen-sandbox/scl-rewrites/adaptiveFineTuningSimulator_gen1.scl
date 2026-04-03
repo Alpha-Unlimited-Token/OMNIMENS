@@ -1,40 +1,9 @@
 ⟨SCL v1│adaptiveFineTuningSimulator_gen1.mjs│83→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩generateSyntheticData(2)→void⟨8⟩{
-⊩│export function generateSyntheticData(numSamples, featureSize) {
-·const data = [];
-·for (let i = 0; i < numSamples; i++) {
-·const sample = Array.from({ length: featureSize }, () => randomInt(0, 100) / 100);
-⊺│data.push(sample);
-·}
-⊷│return data;
-·}
-}⟨/generateSyntheticData⟩
-⊩rewardFunction(1)→void⟨3⟩{
-⊩│export function rewardFunction(sample) {
-⋐│return sample.reduce((sum, feature) => sum + feature, 0) / sample.length;
-·}
-}⟨/rewardFunction⟩
-⊩reinforcePolicyOptimization(2)→void⟨12⟩{
-⊩│export function reinforcePolicyOptimization(data, learningRate = 0.01) {
-·let policy = Array(data[0].length).fill(0); // Initialize policy vector.
-⥀│for (const sample of data) {
-·const reward = rewardFunction(sample);
-·const gradient = sample.map((feature) => feature * reward);
-·policy = policy.map((p, i) => p + learningRate * gradient[i]);
-·}
-⊷│return policy;
-·}
-}⟨/reinforcePolicyOptimization⟩
-⊩storePolicy(3)→void⟨3⟩{
-⊩│export function storePolicy(policyName, policyVector, policyIndex) {
-·policyIndex[policyName] = policyVector;
-·}
-}⟨/storePolicy⟩
-⊩retrievePolicy(2)→void⟨3⟩{
-⊩│export function retrievePolicy(policyName, policyIndex) {
-⊷│return policyIndex[policyName] || null;
-·}
-}⟨/retrievePolicy⟩
-⟩SCL│39│38⊨│11⑂│53.0%↓⟩
+⊩generateSyntheticData(2)→void⟨8⟩{⊩⊺⊷}
+⊩rewardFunction(1)→void⟨3⟩{⊩⋐⊷}
+⊩reinforcePolicyOptimization(2)→void⟨12⟩{⊩⥀⊷}
+⊩storePolicy(3)→void⟨3⟩{⊩}
+⊩retrievePolicy(2)→void⟨3⟩{⊩⊷}
+⟩SCL│8│18⊨│12⑂│90.4%↓⟩

@@ -2,32 +2,10 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 κfs
 κpath
-⟿loadWasmModule(1)→void⟨5⟩{
-·async function loadWasmModule(wasmFilePath) {
-📁│const wasmBuffer = fs.readFileSync(wasmFilePath);
-·const wasmModule = await WebAssembly.compile(wasmBuffer);
-⊷│return WebAssembly.instantiate(wasmModule);
-·}
-}⟨/loadWasmModule⟩
-⟿initializeWasmOps(1)→void⟨33⟩{
-·async function initializeWasmOps() {
-·const wasmFilePath = path.join(__dirname, 'matrix_ops.wasm');
-⊴│const wasmInstance = await loadWasmModule(wasmFilePath);
-⊲│const { multiplyMatrices, dotProduct } = wasmInstance.exports;
-⊷│return {
-⊱│multiplyMatrices: (matrixA, matrixB, rowsA, colsA, colsB) => {
-·const result = new Float32Array(rowsA * colsB);
-·multiplyMatrices(matrixA, matrixB, result, rowsA, colsA, colsB);
-⊷│return result;
-·},
-⊱│dotProduct: (vectorA, vectorB) => {
-⊷│return dotProduct(vectorA, vectorB, vectorA.length);
-·}
-·};
-·}
-}⟨/initializeWasmOps⟩
+⟿loadWasmModule(1)→void⟨5⟩{📁⊷}
+⟿initializeWasmOps(1)→void⟨33⟩{⊴⊲⊷⊱}
 Ε.exports = {
 ·loadWasmModule,
 ·initializeWasmOps
 ·};
-⟩SCL│32│29⊨│9⑂│55.6%↓⟩
+⟩SCL│10│11⊨│6⑂│86.1%↓⟩

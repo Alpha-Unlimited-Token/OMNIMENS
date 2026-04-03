@@ -20,148 +20,31 @@
 κstate
 ·const log = (...msg: unknown[]) =>
 ·console.log("[OMNIMENS-WORLD-FORGE]", ...msg);
-⊱│const safeNum = (v: number, d = 0) => (Number.isFinite(v) ? v : d);
+⊱│const safeNum = (v: number, d = 0) => (Number.isFinite(v) ? 
 ·const rand = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 ⏰│const now = () => Date.now();
-⊰│const id = () => `wf-${now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`;
+⊰│const id = () => `wf-${now().toString(36)}-${Math.random().t
 ⊫[]
 ·WORLD_TEMPLATES,
 ·REAL_ENTITIES,
 ·ENVIRONMENTS,
 ·} from "./omnimens-world-datasets.js";
-pickWeaknessTargets(1)→string[]⟨6⟩{
-·function pickWeaknessTargets(): string[] {
-·const candidates =
-❔│state.lastRun?.weaknessesFound?.slice(0, 3) ??
-·rand(WORLD_TEMPLATES).skillsFocused.slice(0, 3);
-⊯│return [...new Set(candidates)];
-·}
-}⟨/pickWeaknessTargets⟩
-⟿createWorld(1)→Promise<SimulationWorld>⟨34⟩{
-·async function createWorld(): Promise<SimulationWorld> {
-·const weaknesses = pickWeaknessTargets();
-·const tpl = rand(WORLD_TEMPLATES.filter((t) =>
-·t.skillsFocused.some((s) =>
-·weaknesses.some((w) =>
-⊻│w.toLowerCase().includes(s.toLowerCase()) ||
-⊻│s.toLowerCase().includes(w.toLowerCase()),
-·),
-·),
-·));
-·const world: SimulationWorld = {
-·id: id(),
-⊰│name: `${tpl.type}:${now()}`,
-⊰│description: `Auto-generated ${tpl.type} world focusing on ${weaknesses.join(
-·", ",
-·)}`,
-·createdAt: now(),
-·createdBy: ENGINE_ID,
-·environment: rand(ENVIRONMENTS),
-✧: rand(REAL_ENTITIES).slice(0, 25),
-⊱│challenges: tpl.challengeTypes.map((c, i) => ({
-⊰│id: `${tpl.type}-c${i}`,
-⊽│description: c.replace(/_/g, " "),
-·targetSkill: rand(tpl.skillsFocused),
-·difficulty: safeNum(Math.random() * 10, 5),
-·successCriteria: "auto-eval",
-·timeLimit_s: 300 + Math.floor(Math.random() * 600),
-·bonusObjectives: [],
-·})),
-·difficulty: safeNum(Math.random() * 10, 1),
-·targetWeaknesses: weaknesses,
-·version: 2,
-·};
-}⟨/createWorld⟩
+pickWeaknessTargets(1)→string[]⟨6⟩{❔⊯⊷}
+⟿createWorld(1)→Promise<SimulationWorld>⟨34⟩{⊻⊰⊱⊽}
 await dbGateway.⊞(ENGINE_ID, "simulation_worlds", world, "BULK");
 ·state.totalWorlds += 1;
 ·state.currentWorld = world;
 ·log("Created world", world.id);
 ⊷│return world;
 ·}
-⟿runWorld(1)→Promise<WorldRunResult>⟨58⟩{
-·async function runWorld(world: SimulationWorld): Promise<WorldRunResult> {
-·const startedAt = now();
-⊱│const advice = await new Promise<string[]>((res) => {
-·const tips: string[] = [];
-⊱│const stop = cognitionBus.onInsight((src, ins) => {
-⊺│if (ins.type === "strategy") tips.push(ins.data as string);
-·});
-⏳│setTimeout(() => {
-·stop();
-·res(tips);
-·}, 500); // short window
-·});
-·const aiResp = await apiManager.call(ENGINE_ID, "openai", {
-⊰│prompt: `Run world ${world.name}. Tips: ${advice.join("; ")}`,
-·temperature: 0.4,
-·});
-·const result: WorldRunResult = {
-·worldId: world.id,
-❔│runNumber: (state.lastRun?.worldId === world.id ? state.lastRun.runNumber + 1 : 1),
-·startedAt,
-·completedAt: now(),
-·simulatedHours: safeNum(Math.random() * 6 + 1, 1),
-❔│overallScore: (aiResp as any)?.score ?? Math.random() * 100,
-❔│weaknessesFound: (aiResp as any)?.weaknesses ?? [],
-❔│strengthsConfirmed: (aiResp as any)?.strengths ?? [],
-❔│insightsGained: (aiResp as any)?.insights ?? [],
-❔│nextWorldSuggestion: (aiResp as any)?.next ?? "",
-·};
-await dbGateway.⊞(ENGINE_ID, "world_runs", result, "NORMAL");
-·state.totalRuns += 1;
-·state.avgScore =
-·((state.avgScore * (state.totalRuns - 1)) + result.overallScore) /
-·state.totalRuns;
-·state.lastRun = result;
-·if (result.insightsGained.length) {
-·cognitionBus.shareInsight(ENGINE_ID, {
-·type: "discovery",
-·data: { worldId: world.id, insights: result.insightsGained },
-·});
-·}
-·cognitionBus.reportOutcome(ENGINE_ID, {
-·useful: result.overallScore < 75, // low score ⇒ high learning potential
-⊰│◧: `Score ${result.overallScore.toFixed(1)}`,
-·});
-⊰│log(`Completed run ${result.runNumber} of ${world.id} — score ${result.overallScore.toFixed(1)}`);
-⊷│return result;
-·}
-}⟨/runWorld⟩
-⟿forgeCycle(1)→Promise<void>⟨28⟩{
-⟿│async function forgeCycle(): Promise<void> {
-·try {
-·const world =
-❔│state.currentWorld && state.lastRun?.overallScore < 90
-⊴│? await createWorld() // new world if still learning
-⊴│: state.currentWorld ?? (await createWorld());
-⊴│await runWorld(world);
-⊴│if (await shouldYieldToCodegen()) {
-·cognitionBus.reportOutcome(ENGINE_ID, {
-·useful: true,
-◧: "yield_to_codegen",
-·});
-·}
-·} catch (err) {
-·log("Error in forgeCycle", err);
-·} finally {
-·state.lastRun && log("State", {
-·totalWorlds: state.totalWorlds,
-·totalRuns: state.totalRuns,
-·avgScore: state.avgScore.toFixed(2),
-·});
-·}
-·}
-}⟨/forgeCycle⟩
-reschedule(1)→void⟨3⟩{
-·function reschedule() {
-⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, CYCLE_MS);
-·}
-}⟨/reschedule⟩
+⟿runWorld(1)→Promise<WorldRunResult>⟨58⟩{⊱⊺⏳⊰❔⊳⊷}
+⟿forgeCycle(1)→Promise<void>⟨28⟩{⟿❔⊴}
+reschedule(1)→void⟨3⟩{⊰⚡→}
 ⊰│spikeBus.on(`${ENGINE_ID}:cycle`, async () => {
 ⊴│await forgeCycle();
 ·reschedule();
 ·});
-⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, FIRST_DELAY_MS);
+⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, FIRST_DELAY
 ⊰│spikeBus.on(`attention:${ENGINE_ID}`, async () => {
 ⚡→│log("Attention spike received — increasing priority");
 ⊴│await forgeCycle();
@@ -177,15 +60,6 @@ reschedule(1)→void⟨3⟩{
 ⊰│log(`Learning from ${src} insight`, ins.data);
 ·}
 ·});
-⊩shutdown(1)→void⟨4⟩{
-⊩│export function shutdown() {
-·engineRegistry.unregisterEngine(ENGINE_ID);
-⊰│spikeBus.off(`${ENGINE_ID}:cycle`);
-·}
-}⟨/shutdown⟩
-⊩currentState(1)→Readonly<ForgeState>⟨3⟩{
-⊩│export function currentState(): Readonly<ForgeState> {
-⊷│return state;
-·}
-}⟨/currentState⟩
-⟩SCL│190│167⊨│55⑂│41.5%↓⟩
+⊩shutdown(1)→void⟨4⟩{⊩⊰⚡→}
+⊩currentState(1)→Readonly<ForgeState>⟨3⟩{⊩⊷}
+⟩SCL│64│59⊨│45⑂│80.3%↓⟩

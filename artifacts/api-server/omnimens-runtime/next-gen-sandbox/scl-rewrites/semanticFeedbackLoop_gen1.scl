@@ -1,14 +1,4 @@
 ⟨SCL v1│semanticFeedbackLoop_gen1.mjs│20→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩semanticFeedbackLoop(2)→void⟨11⟩{
-⊩│export function semanticFeedbackLoop(decisionOutcome, historicalData) {
-·const adjustedThresholds = { ...historicalData.thresholds };
-·if (decisionOutcome.success) {
-·adjustedThresholds[decisionOutcome.type] += 0.05;
-·} else {
-·adjustedThresholds[decisionOutcome.type] -= 0.05;
-·}
-⊷│return adjustedThresholds;
-·}
-}⟨/semanticFeedbackLoop⟩
-⟩SCL│13│11⊨│2⑂│35.0%↓⟩
+⊩semanticFeedbackLoop(2)→void⟨11⟩{⊩⊷}
+⟩SCL│3│3⊨│2⑂│85.0%↓⟩

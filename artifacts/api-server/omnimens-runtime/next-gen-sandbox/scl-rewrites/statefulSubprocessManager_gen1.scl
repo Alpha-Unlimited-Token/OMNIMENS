@@ -1,59 +1,9 @@
 ⟨SCL v1│statefulSubprocessManager_gen1.mjs│103→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩saveStateToCheckpoint(2)→void⟨16⟩{
-⊩│export function saveStateToCheckpoint(state, checkpointId) {
-·if (typeof state !== 'object' || state === null) {
-⊵│throw new Error('State must be a non-null object.');
-·}
-·if (typeof checkpointId !== 'string' || checkpointId.trim() === '') {
-⊵│throw new Error('Checkpoint ID must be a non-empty string.');
-·}
-⟠│const serializedState = JSON.stringify(state);
-·const buffer = Buffer.from(serializedState, 'utf-8');
-⊰│const filePath = join(tmpdir(), `${checkpointId}.json`);
-·writeFileSync(filePath, buffer);
-⊷│return filePath;
-·}
-}⟨/saveStateToCheckpoint⟩
-⊩restoreStateFromCheckpoint(1)→void⟨11⟩{
-⊩│export function restoreStateFromCheckpoint(checkpointId) {
-·if (typeof checkpointId !== 'string' || checkpointId.trim() === '') {
-⊵│throw new Error('Checkpoint ID must be a non-empty string.');
-·}
-⊰│const filePath = join(tmpdir(), `${checkpointId}.json`);
-·const buffer = readFileSync(filePath);
-·const serializedState = buffer.toString('utf-8');
-⟠│return JSON.parse(serializedState);
-·}
-}⟨/restoreStateFromCheckpoint⟩
-⊩generateStateHash(1)→void⟨11⟩{
-⊩│export function generateStateHash(state) {
-·if (typeof state !== 'object' || state === null) {
-⊵│throw new Error('State must be a non-null object.');
-·}
-⟠│const serializedState = JSON.stringify(state);
-·const hash = createHash('sha256');
-·hash.update(serializedState);
-⊷│return hash.digest('hex');
-·}
-}⟨/generateStateHash⟩
-⊩compareStates(2)→void⟨6⟩{
-⊩│export function compareStates(stateA, stateB) {
-·const hashA = generateStateHash(stateA);
-·const hashB = generateStateHash(stateB);
-⊷│return hashA === hashB;
-·}
-}⟨/compareStates⟩
-⊩mergeStates(2)→void⟨11⟩{
-⊩│export function mergeStates(baseState, newState) {
-·if (typeof baseState !== 'object' || baseState === null) {
-⊵│throw new Error('Base state must be a non-null object.');
-·}
-·if (typeof newState !== 'object' || newState === null) {
-⊵│throw new Error('New state must be a non-null object.');
-·}
-⊷│return { ...baseState, ...newState };
-·}
-}⟨/mergeStates⟩
-⟩SCL│58│64⊨│20⑂│43.7%↓⟩
+⊩saveStateToCheckpoint(2)→void⟨16⟩{⊩⊵⟠⊰⊷}
+⊩restoreStateFromCheckpoint(1)→void⟨11⟩{⊩⊵⊰⟠⊷}
+⊩generateStateHash(1)→void⟨11⟩{⊩⊵⟠⊷}
+⊩compareStates(2)→void⟨6⟩{⊩⊷}
+⊩mergeStates(2)→void⟨11⟩{⊩⊵⊷}
+⟩SCL│8│25⊨│19⑂│92.2%↓⟩

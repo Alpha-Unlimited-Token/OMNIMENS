@@ -1,16 +1,4 @@
 ⟨SCL v1│applyGestaltVisualization_gen1.mjs│21→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩applyGestaltVisualization(1)→void⟨12⟩{
-⊩│export function applyGestaltVisualization(data) {
-·const formattedData = data.map(item => ({
-·...item,
-·visualHierarchy: {
-·proximity: item.proximityGroup,
-·similarity: item.similarityGroup,
-·closure: item.isClosed
-·}
-·}));
-⊷│return formattedData;
-·}
-}⟨/applyGestaltVisualization⟩
-⟩SCL│15│13⊨│2⑂│28.6%↓⟩
+⊩applyGestaltVisualization(1)→void⟨12⟩{⊩⊷}
+⟩SCL│3│3⊨│2⑂│85.7%↓⟩

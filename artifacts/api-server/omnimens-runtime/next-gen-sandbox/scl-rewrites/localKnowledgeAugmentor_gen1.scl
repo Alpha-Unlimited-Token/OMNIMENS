@@ -1,36 +1,9 @@
 ⟨SCL v1│localKnowledgeAugmentor_gen1.mjs│112→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩cosineSimilarity(2)→void⟨7⟩{
-⊩│export function cosineSimilarity(vecA, vecB) {
-⊵│if (vecA.length !== vecB.length) throw new Error('Vectors must have the same dimensions');
-⋐│const dotProduct = vecA.reduce((sum, val, i) => sum + val * vecB[i], 0);
-⋐│const magnitudeA = Math.sqrt(vecA.reduce((sum, val) => sum + val ** 2, 0));
-⋐│const magnitudeB = Math.sqrt(vecB.reduce((sum, val) => sum + val ** 2, 0));
-⊳│return magnitudeA && magnitudeB ? dotProduct / (magnitudeA * magnitudeB) : 0;
-·}
-}⟨/cosineSimilarity⟩
-⊩lshHash(2)→void⟨6⟩{
-⊩│export function lshHash(vector, numBuckets = 10) {
-·const hash = createHash('sha256');
-·vector.forEach((val) => hash.update(val.toString()));
-·const fullHash = hash.digest('hex');
-⊷│return Array.from({ length: numBuckets }, (_, i) => fullHash.slice(i * 6, (i + 1) * 6));
-·}
-}⟨/lshHash⟩
-⊩pruneVectors(3)→void⟨12⟩{
-⊩│export function pruneVectors(vectors, maxVectors, similarityThreshold = 0.9) {
-⊷│if (vectors.length <= maxVectors) return vectors;
-·const pruned = [];
-⥀│for (const vec of vectors) {
-·if (!pruned.some((pVec) => cosineSimilarity(vec, pVec) > similarityThreshold)) {
-⊺│pruned.push(vec);
-·}
-⊹│if (pruned.length >= maxVectors) break;
-·}
-⊷│return pruned;
-·}
-}⟨/pruneVectors⟩
+⊩cosineSimilarity(2)→void⟨7⟩{⊩⊵⊹⋐⊳⊷}
+⊩lshHash(2)→void⟨6⟩{⊩⊷}
+⊩pruneVectors(3)→void⟨12⟩{⊩⊷⊹⥀⊺}
 ⊶│export class VectorIndex {
 ·constructor(numBuckets = 10, maxVectors = 1000) {
 ·this.numBuckets = numBuckets;
@@ -50,7 +23,7 @@
 κcandidates
 ⊱│hashes.forEach((hash) => {
 ·if (this.buckets.has(hash)) {
-⊡│this.buckets.get(hash).forEach(({ id, vector: candidateVector }) => {
+⊡│this.buckets.get(hash).forEach(({ id, vector: candidateVecto
 ·if (!candidates.has(id)) {
 ⊡│candidates.set(id, { id, vector: candidateVector });
 ·}
@@ -75,20 +48,11 @@
 ·);
 ⊡│this.buckets.set(
 ·hash,
-⊱│prunedVectors.map((vector, i) => ({ id: vectors[i].id, vector }))
+⊱│prunedVectors.map((vector, i) => ({ id: vectors[i].id, vecto
 ·);
 ·}
 ·});
 ·}
 ·}
-⊩exampleUsage(1)→void⟨9⟩{
-⊩│export function exampleUsage() {
-·const index = new VectorIndex(10, 100);
-·index.addVector('vec1', [1, 0, 0]);
-·index.addVector('vec2', [0, 1, 0]);
-·index.addVector('vec3', [1, 1, 0]);
-const ⊢ = index.query([1, 0.5, 0]);
-⊷│return ⊢;
-·}
-}⟨/exampleUsage⟩
-⟩SCL│93│65⊨│30⑂│17.0%↓⟩
+⊩exampleUsage(1)→void⟨9⟩{⊩⊷}
+⟩SCL│57│39⊨│29⑂│49.1%↓⟩

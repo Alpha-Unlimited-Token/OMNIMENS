@@ -2,59 +2,10 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
 κACTIVATION_FUNCTIONS
-⊩applyTransformerLayer(3)→void⟨14⟩{
-⊩│export function applyTransformerLayer(input, weights, activation = 'relu') {
-·if (!ACTIVATION_FUNCTIONS[activation]) {
-⊰│throw new Error(`Unsupported activation function: ${activation}`);
-·}
-·const activationFn = ACTIVATION_FUNCTIONS[activation];
-⊱│return input.map((row) => {
-⊱│return weights[0].map((_, colIndex) => {
-⋐│const dotProduct = row.reduce((sum, value, rowIndex) => sum + value * weights[rowIndex][colIndex], 0);
-⊷│return activationFn(dotProduct);
-·});
-·});
-·}
-}⟨/applyTransformerLayer⟩
-⊩generateEmbedding(2)→void⟨9⟩{
-⊩│export function generateEmbedding(input, dimensions = 128) {
-·const hash = createHash('sha256').update(input).digest('hex');
-⊱│const embedding = new Array(dimensions).fill(0).map((_, i) => {
-·const segment = hash.slice(i * 2, i * 2 + 2);
-⊷│return parseInt(segment, 16) / 255; // Normalize to [0, 1]
-·});
-⊷│return embedding;
-·}
-}⟨/generateEmbedding⟩
-⊩cosineSimilarity(2)→void⟨11⟩{
-⊩│export function cosineSimilarity(vectorA, vectorB) {
-⊹│if (vectorA.length !== vectorB.length) {
-⊵│throw new Error('Vectors must have the same length');
-·}
-⋐│const dotProduct = vectorA.reduce((sum, a, i) => sum + a * vectorB[i], 0);
-⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, a) => sum + a ** 2, 0));
-⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, b) => sum + b ** 2, 0));
-⊷│return dotProduct / (magnitudeA * magnitudeB);
-·}
-}⟨/cosineSimilarity⟩
-⊩similaritySearch(2)→void⟨10⟩{
-⊩│export function similaritySearch(queryVector, vectorList) {
-⊱│const similarities = vectorList.map((vector, index) => ({
-·index,
-·similarity: cosineSimilarity(queryVector, vector),
-·}));
-⊷│return similarities
-·.sort((a, b) => b.similarity - a.similarity)
-·.map((entry) => entry.index);
-·}
-}⟨/similaritySearch⟩
-⊩quantizeWeights(2)→void⟨7⟩{
-⊩│export function quantizeWeights(weights, levels = 256) {
-⟛│const min = Math.min(...weights.flat());
-⟛│const max = Math.max(...weights.flat());
-·const scale = (levels - 1) / (max - min);
-⊷│return weights.map((row) => row.map((value) => Math.round((value - min) * scale)));
-·}
-}⟨/quantizeWeights⟩
+⊩applyTransformerLayer(3)→void⟨14⟩{⊩⊰⊵⊱⊷⋐}
+⊩generateEmbedding(2)→void⟨9⟩{⊩⊱⊷}
+⊩cosineSimilarity(2)→void⟨11⟩{⊩⊹⊵⋐⊷}
+⊩similaritySearch(2)→void⟨10⟩{⊩⊱⊷}
+⊩quantizeWeights(2)→void⟨7⟩{⊩⟛⊷}
 ⊪MODULE_DESCRIPTION
-⟩SCL│59│66⊨│24⑂│47.3%↓⟩
+⟩SCL│10│28⊨│20⑂│91.1%↓⟩

@@ -6,7 +6,7 @@
 ·this.entropyThreshold = entropyThreshold;
 ·}
 ·calculateEntropy(probabilities) {
-⋐│return -probabilities.reduce((acc, p) => acc + (p > 0 ? p * Math.log(p) : 0), 0);
+⋐│return -probabilities.reduce((acc, p) => acc + (p > 0 ? p * 
 ·}
 ·evaluateChange(probabilities) {
 κentropy

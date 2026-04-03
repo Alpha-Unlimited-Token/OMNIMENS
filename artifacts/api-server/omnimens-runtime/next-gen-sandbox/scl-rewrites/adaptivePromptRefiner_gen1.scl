@@ -1,66 +1,10 @@
 ⟨SCL v1│adaptivePromptRefiner_gen1.mjs│111→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩generateHash(1)→void⟨5⟩{
-⊩│export function generateHash(input) {
-·const hash = createHash('sha256');
-·hash.update(input);
-⊷│return hash.digest('hex');
-·}
-}⟨/generateHash⟩
-⊩analyzeResponses(1)→void⟨16⟩{
-⊩│export function analyzeResponses(responses) {
-·const patternMap = {};
-⥀│for (const response of responses) {
-·const hash = generateHash(response);
-·patternMap[hash] = (patternMap[hash] || 0) + 1;
-·}
-·const totalResponses = responses.length;
-⊱│const patterns = Object.entries(patternMap).map(([hash, count]) => ({
-·hash,
-·frequency: count / totalResponses,
-·}));
-⊷│return { patterns, totalResponses };
-·}
-}⟨/analyzeResponses⟩
-⊩refinePrompts(2)→void⟨9⟩{
-⊩│export function refinePrompts(prompts, feedback) {
-⊱│const refinedPrompts = prompts.map((prompt) => {
-·const score = feedback[prompt] || 0;
-⟛│const adjustmentFactor = Math.max(0.1, Math.min(1, score));
-⊰│return `${prompt} [adjustment:${adjustmentFactor}]`;
-·});
-⊷│return refinedPrompts;
-·}
-}⟨/refinePrompts⟩
-⊩optimizePrompts(3)→void⟨15⟩{
-⊩│export function optimizePrompts(prompts, fitnessFunction, iterations = 10) {
-·let currentPrompts = [...prompts];
-·for (let i = 0; i < iterations; i++) {
-·const feedback = {};
-⥀│for (const prompt of currentPrompts) {
-⊨σ│feedback[prompt] = fitnessFunction(prompt);
-·}
-·currentPrompts = refinePrompts(currentPrompts, feedback);
-·}
-⊷│return currentPrompts;
-·}
-}⟨/optimizePrompts⟩
-⊩normalizeFeedback(1)→void⟨12⟩{
-⊩│export function normalizeFeedback(feedback) {
-⊸│const scores = Object.values(feedback);
-⟛│const maxScore = Math.max(...scores);
-⟛│const minScore = Math.min(...scores);
-·const normalizedFeedback = {};
-⊸│for (const [key, score] of Object.entries(feedback)) {
-·normalizedFeedback[key] = (score - minScore) / (maxScore - minScore || 1);
-·}
-⊷│return normalizedFeedback;
-·}
-}⟨/normalizeFeedback⟩
-⊩exampleFitnessFunction(1)→void⟨3⟩{
-⊩│export function exampleFitnessFunction(prompt) {
-⊷│return prompt.length % 10; // Example scoring based on prompt length.
-·}
-}⟨/exampleFitnessFunction⟩
-⟩SCL│65│72⊨│23⑂│41.4%↓⟩
+⊩generateHash(1)→void⟨5⟩{⊩⊷}
+⊩analyzeResponses(1)→void⟨16⟩{⊩⥀⊱⊸⊷}
+⊩refinePrompts(2)→void⟨9⟩{⊩⊱⟛⊰⊷}
+⊩optimizePrompts(3)→void⟨15⟩{⊩⊨σ⥀⊷}
+⊩normalizeFeedback(1)→void⟨12⟩{⊩⊸⟛⊷}
+⊩exampleFitnessFunction(1)→void⟨3⟩{⊩⊷}
+⟩SCL│9│29⊨│22⑂│91.9%↓⟩

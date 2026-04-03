@@ -1,19 +1,5 @@
 ⟨SCL v1│adversarialDebateSystem_gen1.mjs│23→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩runAdversarialDebate(2)→void⟨7⟩{
-⊩│export function runAdversarialDebate(agents, topic) {
-const arguments = agents.map(α => α.generateArgument(topic));
-const counterArguments = agents.map((α, i) => α.generateCounterArgument(arguments[i], arguments));
-·const scores = arguments.map((arg, i) => evaluateArgument(arg, counterArguments[i]));
-⋐│const consensus = scores.reduce((sum, score) => sum + score, 0) / scores.length;
-⊷│return { arguments, counterArguments, scores, consensus };
-·}
-}⟨/runAdversarialDebate⟩
-evaluateArgument(2)→void⟨6⟩{
-·function evaluateArgument(argument, counterArguments) {
-⟛│const relevance = argument.relevance - Math.max(...counterArguments.map(ca => ca.relevance));
-⟛│const coherence = argument.coherence - Math.max(...counterArguments.map(ca => ca.coherence));
-⟛│return Math.max(0, relevance + coherence);
-·}
-}⟨/evaluateArgument⟩
-⟩SCL│18│16⊨│6⑂│21.7%↓⟩
+⊩runAdversarialDebate(2)→void⟨7⟩{⊩⋐⊷}
+evaluateArgument(2)→void⟨6⟩{⟛⊷}
+⟩SCL│4│7⊨│5⑂│82.6%↓⟩

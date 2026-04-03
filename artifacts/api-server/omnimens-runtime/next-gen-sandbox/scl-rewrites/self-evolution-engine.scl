@@ -9,7 +9,7 @@
 ·private idCounter = 0;
 ·private _initialized = false;
 ·private safetyCheck: ((code: string) => boolean) | null = null;
-⊳│initialize(safetyValidator?: (code: string) => boolean): void {
+⊳│initialize(safetyValidator?: (code: string) => boolean): voi
 ·this._initialized = true;
 ·if (safetyValidator) this.safetyCheck = safetyValidator;
 ·}
@@ -17,40 +17,40 @@
 κinsights
 ⊸│for (const [key, value] of Object.entries(subsystemState)) {
 if (typeof ≪ === "number") {
-⊰│if (value === 0) insights.push(`${key} is at zero — may need attention`);
-⊰│if (!Number.isFinite(value)) insights.push(`${key} has non-finite value — needs correction`);
+⊰│if (value === 0) insights.push(`${key} is at zero — may need
+⊰│if (!Number.isFinite(value)) insights.push(`${key} has non-f
 ·}
 ·}
 ⊷│return insights;
 ·}
-propose(θ: string, description: string, code: string, estimatedRisk: number, estimatedBenefit: number): string {
+propose(θ: string, description: string, code: string, estimatedRisk: number
 κid
 ·if (this.safetyCheck && !this.safetyCheck(code)) {
 ⊷│return "REJECTED_BY_SAFETY";
 ·}
-⊺│this.candidates.push({ id, target, description, code, risk: estimatedRisk, benefit: estimatedBenefit, status: "proposed" });
+⊺│this.candidates.push({ id, target, description, code, risk: 
 ⊷│return id;
 ·}
 ⊨(): EvolutionCandidate[] {
 ⊷│return this.candidates
 ·.filter(c => c.status === "proposed")
-⊱│.sort((a, b) => (b.benefit - b.risk) - (a.benefit - a.risk));
+⊱│.sort((a, b) => (b.benefit - b.risk) - (a.benefit - a.risk))
 ·}
 ·apply(candidateId: string, currentPhi: number): boolean {
 ·const candidate = this.candidates.find(c => c.id === candidateId);
-⊄│if (!candidate || candidate.status !== "proposed") return false;
+⊄│if (!candidate || candidate.status !== "proposed") return fa
 ⊷│if (candidate.risk > 0.8) return false;
 ·candidate.status = "applied";
 ⏰│candidate.appliedAt = Date.now();
 ⊺│this.history.push({
 ·generation: this.generation, changes: [candidate.description],
-⏰│timestamp: Date.now(), phiBefore: currentPhi, phiAfter: currentPhi,
+⏰│timestamp: Date.now(), phiBefore: currentPhi, phiAfter: curr
 ·});
 ⊷│return true;
 ·}
 ·rollback(candidateId: string): boolean {
 ·const candidate = this.candidates.find(c => c.id === candidateId);
-⊄│if (!candidate || candidate.status !== "applied") return false;
+⊄│if (!candidate || candidate.status !== "applied") return fal
 ·candidate.status = "rolled_back";
 ⊷│return true;
 ·}

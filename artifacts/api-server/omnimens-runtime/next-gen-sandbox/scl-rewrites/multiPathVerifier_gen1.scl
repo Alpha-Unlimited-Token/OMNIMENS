@@ -1,17 +1,4 @@
 ⟨SCL v1│multiPathVerifier_gen1.mjs│23→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩multiPathVerifier(1)→void⟨14⟩{
-⊩│export function multiPathVerifier(paths) {
-const ⊢ = paths.map(path => path.run());
-·const inconsistencies = [];
-for (let i = 0; i < ⊢.length - 1; i++) {
-for (let j = i + 1; j < ⊢.length; j++) {
-⟠│if (JSON.stringify(⊢[i]) !== JSON.stringify(⊢[j])) {
-⊺│inconsistencies.push({ pathA: paths[i].name, pathB: paths[j].name });
-·}
-·}
-·}
-⊷│return { ⊢, inconsistencies };
-·}
-}⟨/multiPathVerifier⟩
-⟩SCL│16│16⊨│4⑂│30.4%↓⟩
+⊩multiPathVerifier(1)→void⟨14⟩{⊩⟠⊺⊷}
+⟩SCL│3│5⊨│4⑂│87.0%↓⟩

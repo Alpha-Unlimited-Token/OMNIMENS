@@ -2,52 +2,11 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 κfs
 κpath
-⟿loadWasmModule(1)→void⟨6⟩{
-·async function loadWasmModule() {
-·const wasmPath = path.join(__dirname, 'matrixOps.wasm');
-📁│const wasmBuffer = fs.readFileSync(wasmPath);
-·const wasmModule = await WebAssembly.instantiate(wasmBuffer);
-⊷│return wasmModule.instance;
-·}
-}⟨/loadWasmModule⟩
-⟿wasmMatrixMultiply(5)→void⟨20⟩{
-·async function wasmMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
-⊹│if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
-⊵│throw new Error('Matrix dimensions are incompatible for multiplication.');
-·}
-⊴│const wasmInstance = await loadWasmModule();
-⊲│const { memory, multiplyMatrices } = wasmInstance.exports;
-·const matrixAOffset = 0;
-·const matrixBOffset = matrixA.length * Float32Array.BYTES_PER_ELEMENT;
-·const resultOffset = matrixBOffset + matrixB.length * Float32Array.BYTES_PER_ELEMENT;
-·const wasmMemory = new Float32Array(memory.buffer);
-⊡│wasmMemory.set(matrixA, matrixAOffset / Float32Array.BYTES_PER_ELEMENT);
-⊡│wasmMemory.set(matrixB, matrixBOffset / Float32Array.BYTES_PER_ELEMENT);
-·multiplyMatrices(matrixAOffset, matrixBOffset, resultOffset, rowsA, colsA, colsB);
-⊷│return wasmMemory.slice(resultOffset / Float32Array.BYTES_PER_ELEMENT, resultOffset / Float32Array.BYTES_PER_ELEMENT + rowsA * colsB);
-·}
-}⟨/wasmMatrixMultiply⟩
-⟿wasmNeuralPrimitive(5)→void⟨22⟩{
-·async function wasmNeuralPrimitive(inputs, weights, biases, inputSize, outputSize) {
-⊹│if (inputs.length !== inputSize || weights.length !== inputSize * outputSize || biases.length !== outputSize) {
-⊵│throw new Error('Dimensions are incompatible for ⬡ network ↺.');
-·}
-⊴│const wasmInstance = await loadWasmModule();
-⊲│const { memory, neuralPrimitive } = wasmInstance.exports;
-·const inputsOffset = 0;
-·const weightsOffset = inputs.length * Float32Array.BYTES_PER_ELEMENT;
-·const biasesOffset = weightsOffset + weights.length * Float32Array.BYTES_PER_ELEMENT;
-·const resultOffset = biasesOffset + biases.length * Float32Array.BYTES_PER_ELEMENT;
-·const wasmMemory = new Float32Array(memory.buffer);
-⊡│wasmMemory.set(inputs, inputsOffset / Float32Array.BYTES_PER_ELEMENT);
-⊡│wasmMemory.set(weights, weightsOffset / Float32Array.BYTES_PER_ELEMENT);
-⊡│wasmMemory.set(biases, biasesOffset / Float32Array.BYTES_PER_ELEMENT);
-·neuralPrimitive(inputsOffset, weightsOffset, biasesOffset, resultOffset, inputSize, outputSize);
-⊷│return wasmMemory.slice(resultOffset / Float32Array.BYTES_PER_ELEMENT, resultOffset / Float32Array.BYTES_PER_ELEMENT + outputSize);
-·}
-}⟨/wasmNeuralPrimitive⟩
+⟿loadWasmModule(1)→void⟨6⟩{📁⊷}
+⟿wasmMatrixMultiply(5)→void⟨20⟩{⊹⊵⊴⊲⊡⊷}
+⟿wasmNeuralPrimitive(5)→void⟨22⟩{⊹⊵⊴⊲⊡⊷}
 Ε.exports = {
 ·wasmMatrixMultiply,
 ·wasmNeuralPrimitive
 ·};
-⟩SCL│52│55⊨│17⑂│45.8%↓⟩
+⟩SCL│11│20⊨│14⑂│88.5%↓⟩

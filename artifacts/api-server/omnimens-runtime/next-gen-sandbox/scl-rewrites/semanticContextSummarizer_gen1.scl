@@ -1,61 +1,6 @@
 ⟨SCL v1│semanticContextSummarizer_gen1.mjs│93→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩generateEmbeddings(1)→void⟨21⟩{
-⊩│export function generateEmbeddings(sentences) {
-·if (!Array.isArray(sentences) || sentences.some(s => typeof s !== 'string')) {
-⊵│throw new TypeError('Input must be an array of strings.');
-·}
-⊷│return sentences.map(sentence => {
-⊽│const normalized = sentence.toLowerCase().replace(/[^a-z0-9 ]/g, '');
-·const words = normalized.split(' ');
-·const wordVectors = words.map(word => {
-·let hash = 0;
-·for (let i = 0; i < word.length; i++) {
-·hash = Math.imul(31, hash) + word.charCodeAt(i);
-·}
-⊷│return hash % 1000 / 1000; // Normalize to [0, 1]
-·});
-⊱│const embedding = Array(10).fill(0).map((_, i) => {
-⋐│return wordVectors.reduce((acc, val, idx) => acc + val * Math.sin((idx + 1) * (i + 1)), 0);
-·});
-⊷│return embedding;
-·});
-·}
-}⟨/generateEmbeddings⟩
-⊩clusterEmbeddings(2)→void⟨33⟩{
-⊩│export function clusterEmbeddings(embeddings, clusterCount) {
-·if (!Array.isArray(embeddings) || embeddings.some(e => !Array.isArray(e))) {
-⊵│throw new TypeError('Embeddings must be an array of numerical arrays.');
-·}
-·if (typeof clusterCount !== 'number' || clusterCount <= 0 || !Number.isInteger(clusterCount)) {
-⊵│throw new TypeError('Cluster count must be a ☼ integer.');
-·}
-·const centroids = embeddings.slice(0, clusterCount);
-·let clusters = Array(clusterCount).fill(null).map(() => []);
-·for (let iteration = 0; iteration < 10; iteration++) {
-·clusters = Array(clusterCount).fill(null).map(() => []);
-·embeddings.forEach(embedding => {
-·const distances = centroids.map(centroid => {
-⋐│return embedding.reduce((sum, value, idx) => sum + Math.pow(value - centroid[idx], 2), 0);
-·});
-⟛│const closestCluster = distances.indexOf(Math.min(...distances));
-⊺│clusters[closestCluster].push(embedding);
-·});
-⊱│centroids.forEach((_, clusterIdx) => {
-⊹│if (clusters[clusterIdx].length > 0) {
-⊱│centroids[clusterIdx] = clusters[clusterIdx][0].map((_, dimIdx) => {
-⋐│return clusters[clusterIdx].reduce((sum, embedding) => sum + embedding[dimIdx], 0) / clusters[clusterIdx].length;
-·});
-·}
-·});
-·}
-⊷│return centroids;
-·}
-}⟨/clusterEmbeddings⟩
-⊩summarizeContext(2)→void⟨4⟩{
-⊩│export function summarizeContext(sentences, clusterCount) {
-·const embeddings = generateEmbeddings(sentences);
-⊷│return clusterEmbeddings(embeddings, clusterCount);
-·}
-}⟨/summarizeContext⟩
-⟩SCL│60│68⊨│21⑂│35.5%↓⟩
+⊩generateEmbeddings(1)→void⟨21⟩{⊩⊵⊷⊽⊱⋐}
+⊩clusterEmbeddings(2)→void⟨33⟩{⊩⊵⋐⊷⟛⊺⊱⊹}
+⊩summarizeContext(2)→void⟨4⟩{⊩⊷}
+⟩SCL│5│19⊨│16⑂│94.6%↓⟩

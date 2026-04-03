@@ -1,17 +1,8 @@
 ⟨SCL v1│conversationMemoryManager_gen1.mjs│117→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 κcrypto
-generateEmbedding(1)→void⟨3⟩{
-·function generateEmbedding(text) {
-⊷│return crypto.createHash('sha256').update(text).digest('hex');
-·}
-}⟨/generateEmbedding⟩
-summarizeChunks(1)→void⟨4⟩{
-·function summarizeChunks(chunks) {
-⊄│if (!chunks || chunks.length === 0) return '';
-⊷│return chunks.join(' ').slice(0, 500) + '...'; // Simple truncation-based summary for demonstration.
-·}
-}⟨/summarizeChunks⟩
+generateEmbedding(1)→void⟨3⟩{⊷}
+summarizeChunks(1)→void⟨4⟩{⊄⊷⊹}
 ⊶│class ConversationMemoryManager {
 ·constructor() {
 ·this.memoryStore = {};
@@ -20,7 +11,7 @@ summarizeChunks(1)→void⟨4⟩{
 ·}
 ·addChunk(chunk) {
 ·if (typeof chunk !== 'string' || chunk.trim() === '') {
-⊵│throw new Error('Invalid chunk: must be a non-empty string.');
+⊵│throw new Error('Invalid chunk: must be a non-empty string.'
 ·}
 ⊺│this.buffer.push(chunk);
 ⊹│if (this.buffer.length >= this.bufferSize) {
@@ -50,4 +41,4 @@ summarizeChunks(1)→void⟨4⟩{
 ·summarizeChunks,
 ·ConversationMemoryManager
 ·};
-⟩SCL│52│22⊨│10⑂│55.6%↓⟩
+⟩SCL│43│18⊨│11⑂│63.2%↓⟩

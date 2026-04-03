@@ -1,22 +1,6 @@
 ⟨SCL v1│counterfactualReasoning_gen1.mjs│26→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩generateCounterfactuals(2)→void⟨7⟩{
-⊩│export function generateCounterfactuals(input, scenarios) {
-⊷│return scenarios.map(scenario => {
-·const alteredInput = applyScenario(input, scenario);
-·const result = runSimulation(alteredInput);
-⊷│return { scenario, result };
-·});
-·}
-}⟨/generateCounterfactuals⟩
-applyScenario(2)→void⟨4⟩{
-·function applyScenario(input, scenario) {
-⊷│return { ...input, ...scenario };
-·}
-}⟨/applyScenario⟩
-runSimulation(1)→void⟨4⟩{
-·function runSimulation(alteredInput) {
-⊷│return simulate(alteredInput);
-·}
-}⟨/runSimulation⟩
-⟩SCL│21│17⊨│5⑂│19.2%↓⟩
+⊩generateCounterfactuals(2)→void⟨7⟩{⊩⊷}
+applyScenario(2)→void⟨4⟩{⊷}
+runSimulation(1)→void⟨4⟩{⊷}
+⟩SCL│5│7⊨│4⑂│80.8%↓⟩

@@ -10,7 +10,7 @@
 ⊮│this.cache = new Map(); // Key-value store for embeddings.
 ·}
 ·_hashKey(key) {
-⊷│return crypto.createHash('sha256').update(key).digest('hex');
+⊷│return crypto.createHash('sha256').update(key).digest('hex')
 ·}
 ·set(key, embedding) {
 ·if (!(embedding instanceof Float32Array)) {

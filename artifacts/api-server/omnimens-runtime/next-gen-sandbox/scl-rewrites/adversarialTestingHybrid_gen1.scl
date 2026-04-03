@@ -1,18 +1,5 @@
 ⟨SCL v1│adversarialTestingHybrid_gen1.mjs│23→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩adversarialTestingHybrid(2)→void⟨8⟩{
-⊩│export function adversarialTestingHybrid(testCases, reasoningPaths) {
-·testCases.forEach(testCase => {
-·reasoningPaths.forEach(path => {
-·const result = simulateEdgeCase(testCase, path);
-⊳│path.updateConfidence(result.success ? 0.95 : 0.5); // Penalize inconsistencies
-·});
-·});
-·}
-}⟨/adversarialTestingHybrid⟩
-simulateEdgeCase(2)→void⟨4⟩{
-·function simulateEdgeCase(testCase, path) {
-⊷│return { success: Math.random() > 0.2 }; // Example logic
-·}
-}⟨/simulateEdgeCase⟩
-⟩SCL│17│14⊨│3⑂│26.1%↓⟩
+⊩adversarialTestingHybrid(2)→void⟨8⟩{⊩⊳}
+simulateEdgeCase(2)→void⟨4⟩{⊷}
+⟩SCL│4│5⊨│3⑂│82.6%↓⟩

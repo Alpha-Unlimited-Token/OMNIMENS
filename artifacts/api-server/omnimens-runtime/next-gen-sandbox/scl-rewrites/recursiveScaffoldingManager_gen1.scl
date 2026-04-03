@@ -17,7 +17,7 @@
 ·subsystem.update(refinedOutput);
 ·break;
 ·} else {
-⊺│this.iterationLog.push({ iteration, error: 'Failed robustness test' });
+⊺│this.iterationLog.push({ iteration, error: 'Failed robustnes
 ·}
 ·iteration++;
 ·}

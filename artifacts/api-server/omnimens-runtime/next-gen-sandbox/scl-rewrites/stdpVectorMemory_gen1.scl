@@ -1,6 +1,4 @@
 ⟨SCL v1│stdpVectorMemory_gen1.mjs│10→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩stdpVectorMemory(2)→void⟨1⟩{
-⊩│export function stdpVectorMemory(input, weights) { /* STDP-inspired weight adjustment for vector memory */ }
-}⟨/stdpVectorMemory⟩
-⟩SCL│5│2⊨│1⑂│50.0%↓⟩
+⊩stdpVectorMemory(2)→void⟨1⟩{⊩}
+⟩SCL│3│2⊨│1⑂│70.0%↓⟩

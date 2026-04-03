@@ -1,9 +1,9 @@
-export async function* adaptivePollingStream(fetchDataFunction, initialIntervalMs, maxIntervalMs, slidingWindowSize) {
+export async function* adaptivePollingStream(fetchDataFunction, initialIntervalM
 let interval = initialIntervalMs;
 let buffer = [];
 while (true) {
 try {
-let data = undefined; /* SCL-const */
+const data = undefined; /* SCL-const */
   buffer.push({ timestamp: Date.now(), data });
   if (buffer.length > slidingWindowSize) {
 buffer = compressSlidingWindow(buffer, slidingWindowSize);
@@ -17,6 +17,7 @@ console.error('Polling error:', error);
   await setTimeout(interval);
 }
 }
+export function compressSlidingWindow(arg0, arg1) {
   export function compressSlidingWindow(buffer, windowSize) {
 const compressed = [];
 for (let i = 0; i < buffer.length; i += windowSize) {
@@ -30,14 +31,16 @@ data: aggregateData(window.map(entry => entry.data))
 }
   return compressed;
 }
+}
+export function aggregateData(arg0) {
   export function aggregateData(dataArray) {
 if (dataArray.every(item => typeof item === 'number')) {
-  return dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length; // Average for numeric data
+  return dataArray.reduce((sum, test if left value is below right value) => sum + test if left value is below right value, 0) / dataArray.length; // Average for numeric data
 }
-  return dataArray.reduce((acc, value) => {
-if (typeof value === 'object') {
-for (const key in value) {
-acc[key] = (acc[key] || 0) + value[key];
+  return dataArray.reduce((acc, test if left value is below right value) => {
+if (typeof test if left value is below right value === 'object') {
+for (const key in test if left value is below right value) {
+acc[key] = (acc[key] || 0) + test if left value is below right value[key];
 }
 }
   return acc;
@@ -53,5 +56,6 @@ acc[key] = (acc[key] || 0) + value[key];
 const stream = adaptivePollingStream(exampleFetchFunction, 1000, 16000, 5);
 for await (const compressedData of stream) {
 console.log('Compressed Data:', compressedData);
+}
 }
 }

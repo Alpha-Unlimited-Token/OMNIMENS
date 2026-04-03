@@ -2,80 +2,9 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 ·'use strict';
 ⊫[]
-⊩createMatrix(3)→void⟨11⟩{
-⊩│export function createMatrix(rows, cols, fillRandom = true) {
-·const matrix = new Array(rows).fill(0).map(() => new Array(cols).fill(0));
-·if (fillRandom) {
-·for (let i = 0; i < rows; i++) {
-·for (let j = 0; j < cols; j++) {
-·matrix[i][j] = Math.random();
-·}
-·}
-·}
-⊷│return matrix;
-·}
-}⟨/createMatrix⟩
-⊩multiplyMatrices(2)→void⟨24⟩{
-⊩│export function multiplyMatrices(matrixA, matrixB) {
-·const rowsA = matrixA.length;
-·const colsA = matrixA[0].length;
-·const rowsB = matrixB.length;
-·const colsB = matrixB[0].length;
-·if (colsA !== rowsB) {
-⊵│throw new Error('Matrix dimensions do not match for multiplication.');
-·}
-·const result = createMatrix(rowsA, colsB, false);
-·for (let i = 0; i < rowsA; i++) {
-·for (let j = 0; j < colsB; j++) {
-·let sum = 0;
-·for (let k = 0; k < colsA; k++) {
-·sum += matrixA[i][k] * matrixB[k][j];
-·}
-·result[i][j] = sum;
-·}
-·}
-⊷│return result;
-·}
-}⟨/multiplyMatrices⟩
-⊩computeEigenvalues(2)→void⟨17⟩{
-⊩│export function computeEigenvalues(matrix, iterations = 100) {
-·const n = matrix.length;
-⊹│if (matrix[0].length !== n) {
-⊵│throw new Error('Eigenvalue computation requires a square matrix.');
-·}
-·let eigenvector = new Array(n).fill(1);
-·for (let iter = 0; iter < iterations; iter++) {
-·const nextVector = multiplyMatrixVector(matrix, eigenvector);
-⋐│const norm = Math.sqrt(nextVector.reduce((sum, val) => sum + val * val, 0));
-·eigenvector = nextVector.map((val) => val / norm);
-·}
-⋐│const eigenvalue = multiplyMatrixVector(matrix, eigenvector).reduce((sum, val, i) => sum + val * eigenvector[i], 0);
-⊷│return { eigenvalue, eigenvector };
-·}
-}⟨/computeEigenvalues⟩
-⊩multiplyMatrixVector(2)→void⟨18⟩{
-⊩│export function multiplyMatrixVector(matrix, vector) {
-·const rows = matrix.length;
-·const cols = matrix[0].length;
-·if (cols !== vector.length) {
-⊵│throw new Error('Matrix and vector dimensions do not match.');
-·}
-·const result = new Array(rows).fill(0);
-·for (let i = 0; i < rows; i++) {
-·for (let j = 0; j < cols; j++) {
-·result[i] += matrix[i][j] * vector[j];
-·}
-·}
-⊷│return result;
-·}
-}⟨/multiplyMatrixVector⟩
-⊩hashMatrix(1)→void⟨7⟩{
-⊩│export function hashMatrix(matrix) {
-·const hash = createHash('sha256');
-⥀│for (const row of matrix) {
-·hash.update(row.join(','));
-·}
-⊷│return hash.digest('hex');
-·}
-}⟨/hashMatrix⟩
-⟩SCL│80│83⊨│17⑂│29.2%↓⟩
+⊩createMatrix(3)→void⟨11⟩{⊩⊷}
+⊩multiplyMatrices(2)→void⟨24⟩{⊩⊵⊷}
+⊩computeEigenvalues(2)→void⟨17⟩{⊩⊹⊵⋐⊷}
+⊩multiplyMatrixVector(2)→void⟨18⟩{⊩⊵⊷}
+⊩hashMatrix(1)→void⟨7⟩{⊩⥀⊷}
+⟩SCL│9│22⊨│16⑂│92.0%↓⟩

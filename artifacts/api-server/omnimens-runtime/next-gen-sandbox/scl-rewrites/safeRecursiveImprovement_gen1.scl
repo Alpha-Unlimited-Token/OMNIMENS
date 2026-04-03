@@ -1,20 +1,5 @@
 ⟨SCL v1│safeRecursiveImprovement_gen1.mjs│23→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩safeRecursiveImprovement(2)→void⟨5⟩{
-⊩│export function safeRecursiveImprovement(candidateModules, invariants) {
-⊷│return candidateModules.filter(module => {
-⊷│return invariants.every(invariant => invariant.validate(module));
-·});
-·}
-}⟨/safeRecursiveImprovement⟩
-⊩validateInvariant(2)→void⟨8⟩{
-⊩│export function validateInvariant(module, invariant) {
-·try {
-⊷│return invariant.check(module);
-·} catch (error) {
-console.error('Invariant validation ↺:', error);
-⊷│return false;
-·}
-·}
-}⟨/validateInvariant⟩
-⟩SCL│19│17⊨│6⑂│17.4%↓⟩
+⊩safeRecursiveImprovement(2)→void⟨5⟩{⊩⊷}
+⊩validateInvariant(2)→void⟨8⟩{⊩⊷}
+⟩SCL│4│6⊨│4⑂│82.6%↓⟩

@@ -12,7 +12,7 @@
 ·private defaultTTL = 30_000;
 ·private maxQueueSize = 50;
 ·private flushIntervalMs = 5_000;
-·private stats = { cacheHits: 0, cacheMisses: 0, writesFlushed: 0, batchesExecuted: 0 };
+·private stats = { cacheHits: 0, cacheMisses: 0, writesFlushed: 0, batchesExecute
 ·private dbAvailable = true;
 ⊳│constructor(connectionString?: string) {
 ·this.pool = new Pool({
@@ -22,7 +22,7 @@ connectionString: connectionString || ↻.env.DATABASE_URL,
 ·connectionTimeoutMillis: 5_000,
 ·});
 ⊱│this.pool.on("error", () => { this.dbAvailable = false; });
-⟳│this.flushTimer = setInterval(() => this.flush(), this.flushIntervalMs);
+⟳│this.flushTimer = setInterval(() => this.flush(), this.flush
 ·}
 ·read(table: string, key: string): unknown | undefined {
 κcacheKey
@@ -56,19 +56,19 @@ this.cacheSet(table, key, ≪);
 ·}
 ⊷│return undefined;
 ·}
-⊞(table: string, key: string, ≪: unknown, priority: Priority = "normal"): void {
+⊞(table: string, key: string, ≪: unknown, priority: Priority = "normal")
 this.cacheSet(table, key, ≪);
 ·if (priority === "critical") {
-⏰│this.writeQueue.unshift({ table, key, value, priority, timestamp: Date.now() });
+⏰│this.writeQueue.unshift({ table, key, value, priority, times
 ·this.flush();
 ·return;
 ·}
-⏰│this.writeQueue.push({ table, key, value, priority, timestamp: Date.now() });
+⏰│this.writeQueue.push({ table, key, value, priority, timestam
 ⊹│if (this.writeQueue.length >= this.maxQueueSize) {
 ·this.flush();
 ·}
 ·}
-⊳│batch(ops: { table: string; key: string; value: unknown; priority?: Priority }[]): void {
+⊳│batch(ops: { table: string; key: string; value: unknown; pri
 ⥀│for (const op of ops) {
 this.⊞(op.table, op.key, op.≪, op.priority || "normal");
 ·}
@@ -89,7 +89,7 @@ this.⊞(op.table, op.key, op.≪, op.priority || "normal");
 ·await client.query("BEGIN");
 ⥀│for (const op of toFlush) {
 ·await client.query(
-⊰│`INSERT INTO ${op.table} (key, value, updated_at) VALUES ($1, $2, NOW())
+⊰│`INSERT INTO ${op.table} (key, value, updated_at) VALUES ($1
 ON CONFLICT (key) DO UPDATE SET ≪ = $2, updated_at = NOW()`,
 ⟠│[op.key, JSON.stringify(op.value)]
 ·);
@@ -109,7 +109,7 @@ ON CONFLICT (key) DO UPDATE SET ≪ = $2, updated_at = NOW()`,
 ⏳│setTimeout(() => { this.dbAvailable = true; }, 30_000);
 ·}
 ·}
-·getStats(): { cacheHitRate: number; queueDepth: number; cacheSize: number; dbAvailable: boolean; writesFlushed: number; batchesExecuted: number } {
+·getStats(): { cacheHitRate: number; queueDepth: number; cacheSize: number; dbAva
 κtotal
 ⊷│return {
 ⊳│cacheHitRate: total > 0 ? this.stats.cacheHits / total : 0,
@@ -122,9 +122,9 @@ ON CONFLICT (key) DO UPDATE SET ≪ = $2, updated_at = NOW()`,
 ·}
 private cacheSet(table: string, key: string, ≪: unknown): void {
 κcacheKey
-⊡│this.cache.set(cacheKey, { value, expiresAt: Date.now() + this.defaultTTL, accessCount: 0 });
+⊡│this.cache.set(cacheKey, { value, expiresAt: Date.now() + th
 ·if (this.cache.size > 5000) {
-·const entries = [...this.cache.entries()].sort((a, b) => a[1].accessCount - b[1].accessCount);
+·const entries = [...this.cache.entries()].sort((a, b) => a[1].accessCount - b[1]
 ·for (let i = 0; i < 1000; i++) this.cache.delete(entries[i][0]);
 ·}
 ·}

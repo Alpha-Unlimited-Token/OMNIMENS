@@ -1,64 +1,10 @@
 ⟨SCL v1│semanticContextPreserver_gen1.mjs│103→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩generateTextEmbedding(1)→void⟨8⟩{
-⊩│export function generateTextEmbedding(text) {
-·const hash = createHash('sha256').update(text).digest();
-·const embedding = new Float64Array(hash.length);
-·for (let i = 0; i < hash.length; i++) {
-·embedding[i] = hash[i] / 255; // Normalize to [0, 1]
+⊩generateTextEmbedding(1)→void⟨8⟩{⊩⊷}
+⊩cosineSimilarity(2)→void⟨24⟩{⊩⊹⊵⊷}
+⊩rankSummariesBySemanticSimilarity(2)→void⟨11⟩{⊩⊷⊱}
+⊩normalizeScores(1)→void⟨9⟩{⊩⟛⊱⊷⊳}
 ·}
-⊷│return embedding;
-·}
-}⟨/generateTextEmbedding⟩
-⊩cosineSimilarity(2)→void⟨24⟩{
-⊩│export function cosineSimilarity(embeddingA, embeddingB) {
-⊹│if (embeddingA.length !== embeddingB.length) {
-⊵│throw new Error('Embeddings must have the same length');
-·}
-·let dotProduct = 0;
-·let magnitudeA = 0;
-·let magnitudeB = 0;
-·for (let i = 0; i < embeddingA.length; i++) {
-·dotProduct += embeddingA[i] * embeddingB[i];
-·magnitudeA += embeddingA[i] ** 2;
-·magnitudeB += embeddingB[i] ** 2;
-·}
-·magnitudeA = Math.sqrt(magnitudeA);
-·magnitudeB = Math.sqrt(magnitudeB);
-·if (magnitudeA === 0 || magnitudeB === 0) {
-⊷│return 0; // Avoid division by zero
-·}
-⊷│return dotProduct / (magnitudeA * magnitudeB);
-·}
-}⟨/cosineSimilarity⟩
-⊩rankSummariesBySemanticSimilarity(2)→void⟨11⟩{
-⊩│export function rankSummariesBySemanticSimilarity(originalText, summaries) {
-·const originalEmbedding = generateTextEmbedding(originalText);
-⊷│return summaries
-⊱│.map((summary) => {
-·const summaryEmbedding = generateTextEmbedding(summary);
-·const score = cosineSimilarity(originalEmbedding, summaryEmbedding);
-⊷│return { summary, score };
-·})
-·.sort((a, b) => b.score - a.score); // Sort by descending similarity score
-·}
-}⟨/rankSummariesBySemanticSimilarity⟩
-⊩normalizeScores(1)→void⟨9⟩{
-⊩│export function normalizeScores(rankedSummaries) {
-·const scores = rankedSummaries.map((item) => item.score);
-⟛│const minScore = Math.min(...scores);
-⟛│const maxScore = Math.max(...scores);
-⊱│return rankedSummaries.map(({ summary, score }) => {
-⊳│const normalizedScore = maxScore === minScore ? 1 : (score - minScore) / (maxScore - minScore);
-⊷│return { summary, normalizedScore };
-·});
-}⟨/normalizeScores⟩
-·}
-⊩processSummaries(2)→void⟨4⟩{
-⊩│export function processSummaries(originalText, summaries) {
-·const rankedSummaries = rankSummariesBySemanticSimilarity(originalText, summaries);
-⊷│return normalizeScores(rankedSummaries);
-·}
-}⟨/processSummaries⟩
-⟩SCL│63│66⊨│19⑂│38.8%↓⟩
+⊩processSummaries(2)→void⟨4⟩{⊩⊷}
+⟩SCL│9│22⊨│16⑂│91.3%↓⟩

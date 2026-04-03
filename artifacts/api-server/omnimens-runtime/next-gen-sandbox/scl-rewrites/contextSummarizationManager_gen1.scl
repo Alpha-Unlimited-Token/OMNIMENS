@@ -24,20 +24,16 @@
 ·simulateSemanticCompression(messages) {
 κcombinedText
 κcompressedLength
-⊳│return combinedText.substring(0, compressedLength) + (compressedLength < combinedText.length ? '...' : '');
+⊳│return combinedText.substring(0, compressedLength) + (compre
 ·}
 ·getFullContext() {
-⊷│return [...this.summarizedContext, ...this.recentMessages].join(' ');
+⊷│return [...this.summarizedContext, ...this.recentMessages].j
 ·}
 ·clearContext() {
 ·this.recentMessages = [];
 ·this.summarizedContext = [];
 ·}
 ·}
-createContextSummarizationManager(2)→void⟨3⟩{
-·function createContextSummarizationManager(windowSize = 5, embeddingCompressionFactor = 0.5) {
-⊷│return new ContextSummarizationManager(windowSize, embeddingCompressionFactor);
-·}
-}⟨/createContextSummarizationManager⟩
+createContextSummarizationManager(2)→void⟨3⟩{⊷}
 ·export { createContextSummarizationManager };
-⟩SCL│42│15⊨│8⑂│61.8%↓⟩
+⟩SCL│38│13⊨│8⑂│65.5%↓⟩

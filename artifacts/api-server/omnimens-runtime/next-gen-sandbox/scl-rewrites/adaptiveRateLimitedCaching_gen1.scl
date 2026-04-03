@@ -1,13 +1,7 @@
 ⟨SCL v1│adaptiveRateLimitedCaching_gen1.mjs│146→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩hashQuery(1)→void⟨5⟩{
-⊩│export function hashQuery(query) {
-·const hash = createHash('sha256');
-·hash.update(query);
-⊷│return hash.digest('hex');
-·}
-}⟨/hashQuery⟩
+⊩hashQuery(1)→void⟨5⟩{⊩⊷}
 ⊶│export class LRUCache {
 constructor(⏳) {
 this.⏳ = ⏳;
@@ -47,7 +41,7 @@ set(key, ≪) {
 ⊡│this.transitionMatrix.set(currentQuery, new Map());
 ·}
 κtransitions
-⊡│transitions.set(nextQuery, (transitions.get(nextQuery) || 0) + 1);
+⊡│transitions.set(nextQuery, (transitions.get(nextQuery) || 0)
 ·}
 ·}
 ·predict(nextQueryCandidates, currentQuery) {
@@ -96,7 +90,7 @@ set(key, ≪) {
 ·this.predictor.train(querySequence);
 ·}
 ·predictNextQuery(currentQuery, nextQueryCandidates) {
-⊷│return this.predictor.predict(nextQueryCandidates, currentQuery);
+⊷│return this.predictor.predict(nextQueryCandidates, currentQu
 ·}
 ·}
-⟩SCL│101│44⊨│24⑂│30.8%↓⟩
+⟩SCL│95│40⊨│24⑂│34.9%↓⟩

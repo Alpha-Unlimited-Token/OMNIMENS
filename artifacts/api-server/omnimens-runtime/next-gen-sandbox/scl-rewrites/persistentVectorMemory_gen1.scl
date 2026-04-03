@@ -1,18 +1,6 @@
 ⟨SCL v1│persistentVectorMemory_gen1.mjs│117→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-euclideanDistance(2)→void⟨11⟩{
-·function euclideanDistance(vectorA, vectorB) {
-⊹│if (vectorA.length !== vectorB.length) {
-⊵│throw new Error("Vectors must have the same dimensions.");
-·}
-·let sum = 0;
-·for (let i = 0; i < vectorA.length; i++) {
-·const diff = vectorA[i] - vectorB[i];
-·sum += diff * diff;
-·}
-⊷│return Math.sqrt(sum);
-·}
-}⟨/euclideanDistance⟩
+euclideanDistance(2)→void⟨11⟩{⊹⊵⊷}
 ⊶│class PersistentVectorMemory {
 ·constructor() {
 ⊮│this.vectorStore = new Map();
@@ -25,7 +13,7 @@ euclideanDistance(2)→void⟨11⟩{
 ·}
 ·search(queryVector, k) {
 ·if (k <= 0) {
-⊵│throw new Error("The number of neighbors 'k' must be greater than 0.");
+⊵│throw new Error("The number of neighbors 'k' must be greater
 ·}
 κresults
 ·for (const [id, vector] of this.vectorStore.entries()) {
@@ -46,4 +34,4 @@ euclideanDistance(2)→void⟨11⟩{
 ·}
 ·}
 ·export { PersistentVectorMemory, euclideanDistance };
-⟩SCL│48│25⊨│11⑂│59.0%↓⟩
+⟩SCL│36│15⊨│11⑂│69.2%↓⟩

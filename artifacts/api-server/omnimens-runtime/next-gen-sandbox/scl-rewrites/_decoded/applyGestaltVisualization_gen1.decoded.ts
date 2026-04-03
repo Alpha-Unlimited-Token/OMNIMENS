@@ -1,3 +1,4 @@
+export function applyGestaltVisualization(arg0) {
   export function applyGestaltVisualization(data) {
 const formattedData = data.map(item => ({
 ...item,
@@ -8,4 +9,5 @@ closure: item.isClosed
 }
 }));
   return formattedData;
+}
 }

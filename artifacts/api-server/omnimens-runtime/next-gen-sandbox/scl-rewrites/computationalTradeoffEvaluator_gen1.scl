@@ -5,7 +5,7 @@
 ·this.modules = [];
 ·}
 ·registerModule(moduleName, computeCost, robustnessScore) {
-⊺│this.modules.push({ moduleName, computeCost, robustnessScore });
+⊺│this.modules.push({ moduleName, computeCost, robustnessScore
 ·}
 ·evaluateTradeoffs() {
 ⊷│return this.modules.map(module => {

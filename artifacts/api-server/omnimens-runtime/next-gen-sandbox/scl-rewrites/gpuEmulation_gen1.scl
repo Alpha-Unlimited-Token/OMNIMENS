@@ -1,78 +1,8 @@
 ⟨SCL v1│gpuEmulation_gen1.mjs│139→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩initializeWebGLContext(1)→void⟨10⟩{
-⊩│export function initializeWebGLContext() {
-·const canvas = new OffscreenCanvas(1, 1);
-·const gl = canvas.getContext('webgl');
-·if (!gl) {
-⊵│throw new Error('WebGL is not supported in this environment.');
-·}
-⊷│return gl;
-·}
-}⟨/initializeWebGLContext⟩
-⊩compileShader(3)→void⟨13⟩{
-⊩│export function compileShader(gl, source, type) {
-·const shader = gl.createShader(type);
-·gl.shaderSource(shader, source);
-·gl.compileShader(shader);
-·if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-·const error = gl.getShaderInfoLog(shader);
-·gl.deleteShader(shader);
-⊰│throw new Error(`Shader compilation ↺: ${error}`);
-·}
-⊷│return shader;
-·}
-}⟨/compileShader⟩
-⊩createProgram(2)→void⟨14⟩{
-⊩│export function createProgram(gl, shaders) {
-·const program = gl.createProgram();
-·shaders.forEach(shader => gl.attachShader(program, shader));
-·gl.linkProgram(program);
-·if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-·const error = gl.getProgramInfoLog(program);
-·gl.deleteProgram(program);
-⊰│throw new Error(`Program linking ↺: ${error}`);
-·}
-⊷│return program;
-·}
-}⟨/createProgram⟩
-⊩gpuMatrixMultiply(6)→void⟨40⟩{
-⊩│export function gpuMatrixMultiply(gl, matrixA, matrixB, rowsA, colsA, colsB) {
-·const vertexShaderSource = `
-·attribute vec2 position;
-·void main() {
-·gl_Position = vec4(position, 0.0, 1.0);
-·}
-·`;
-·const fragmentShaderSource = `
-·precision highp float;
-·uniform sampler2D matrixA;
-·uniform sampler2D matrixB;
-·uniform vec2 dimensionsA;
-·uniform vec2 dimensionsB;
-·void main() {
-·vec2 coord = gl_FragCoord.xy;
-·float result = 0.0;
-·for (int i = 0; i < int(dimensionsA.y); i++) {
-·float a = texture2D(matrixA, vec2(coord.x, float(i) / dimensionsA.y)).r;
-·float b = texture2D(matrixB, vec2(float(i) / dimensionsB.x, coord.y)).r;
-·result += a * b;
-·}
-·gl_FragColor = vec4(result, 0.0, 0.0, 1.0);
-·}
-·`;
-·const vertexShader = compileShader(gl, vertexShaderSource, gl.VERTEX_SHADER);
-·const fragmentShader = compileShader(gl, fragmentShaderSource, gl.FRAGMENT_SHADER);
-·const program = createProgram(gl, [vertexShader, fragmentShader]);
-·gl.useProgram(program);
-⊷│return new Float32Array(rowsA * colsB);
-·}
-}⟨/gpuMatrixMultiply⟩
-⊩validateMatrixDimensions(4)→void⟨5⟩{
-⊩│export function validateMatrixDimensions(rowsA, colsA, rowsB, colsB) {
-·if (colsA !== rowsB) {
-⊰│throw new Error(`Matrix dimensions are incompatible for multiplication: (${rowsA}x${colsA}) and (${rowsB}x${colsB}).`);
-·}
-·}
-}⟨/validateMatrixDimensions⟩
-⟩SCL│77│78⊨│13⑂│44.6%↓⟩
+⊩initializeWebGLContext(1)→void⟨10⟩{⊩⊵⊷}
+⊩compileShader(3)→void⟨13⟩{⊩⊰⊵⊷}
+⊩createProgram(2)→void⟨14⟩{⊩⊰⊵⊷}
+⊩gpuMatrixMultiply(6)→void⟨40⟩{⊩⊷}
+⊩validateMatrixDimensions(4)→void⟨5⟩{⊩⊰⊵}
+⟩SCL│7│21⊨│16⑂│95.0%↓⟩

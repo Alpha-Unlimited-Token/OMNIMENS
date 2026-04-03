@@ -16,7 +16,7 @@
 ·getRelevantNodes(nodeId, threshold = 0.5) {
 κrelevantNodes
 ·if (this.graph.has(nodeId)) {
-⊡│for (const [neighbor, weight] of this.graph.get(nodeId).edges.entries()) {
+⊡│for (const [neighbor, weight] of this.graph.get(nodeId).edge
 ·if (weight >= threshold) {
 ⊺│relevantNodes.push({ nodeId: neighbor, weight });
 ·}
@@ -26,8 +26,8 @@
 ·}
 ·}
 κmemoryIntegrator
-·memoryIntegrator.addNode('episodicEvent1', { type: 'event', content: 'User logged in' });
-memoryIntegrator.addNode('semanticKnowledge1', { type: '◧', content: 'Login ↻ involves authentication' });
+·memoryIntegrator.addNode('episodicEvent1', { type: 'event', content: 'User logge
+memoryIntegrator.addNode('semanticKnowledge1', { type: '◧', content: 'Lo
 ·memoryIntegrator.addEdge('episodicEvent1', 'semanticKnowledge1', 0.8);
-⊞⊟│console.log(memoryIntegrator.getRelevantNodes('episodicEvent1'));
+⊞⊟│console.log(memoryIntegrator.getRelevantNodes('episodicEvent
 ⟩SCL│32│12⊨│9⑂│28.9%↓⟩

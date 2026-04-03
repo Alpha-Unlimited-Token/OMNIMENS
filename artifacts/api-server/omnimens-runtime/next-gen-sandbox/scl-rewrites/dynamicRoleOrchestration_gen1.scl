@@ -1,28 +1,4 @@
 ⟨SCL v1│dynamicRoleOrchestration_gen1.mjs│36→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩orchestrateRoles(2)→void⟨26⟩{
-⊩│export function orchestrateRoles(agents, metrics) {
-const roles = agents.map(α => {
-⊷│return {
-α: α,
-role: determineOptimalRole(α, metrics)
-·};
-·});
-function determineOptimalRole(α, metrics) {
-const performance = metrics.performance[α.id];
-const learningRate = metrics.learningRate[α.id];
-const capabilityGaps = metrics.capabilityGaps[α.id];
-·if (performance < 0.5) {
-⊷│return 'support';
-·} else if (learningRate > 0.8) {
-⊷│return 'leader';
-⊹│} else if (capabilityGaps.length > 0) {
-⊷│return 'specialist';
-·} else {
-⊷│return 'generalist';
-·}
-·}
-⊷│return roles;
-·}
-}⟨/orchestrateRoles⟩
-⟩SCL│27│26⊨│8⑂│25.0%↓⟩
+⊩orchestrateRoles(2)→void⟨26⟩{⊩⊷⊹}
+⟩SCL│3│4⊨│3⑂│91.7%↓⟩

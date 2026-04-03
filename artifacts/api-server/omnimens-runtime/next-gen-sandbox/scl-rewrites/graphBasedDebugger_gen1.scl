@@ -13,7 +13,7 @@ prioritizeCorrections(Ε) {
 ⊷│return nodes.sort((a, b) => b.confidence - a.confidence);
 ·}
 ·refineStrategies(feedback) {
-⊱│feedback.forEach(({ module, error, correction, confidence }) => {
+⊱│feedback.forEach(({ module, error, correction, confidence })
 this.addNode(Ε, error, correction);
 ⊡│this.graph.get(module).forEach(node => {
 ·if (node.error === error && node.correction === correction) {

@@ -1,48 +1,8 @@
 ⟨SCL v1│webAssemblyCompute_gen1.mjs│97→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩⟿loadWasmModule(1)→void⟨10⟩{
-⊩│export async function loadWasmModule(wasmFilePath) {
-·try {
-⊴│const wasmBuffer = await readFile(wasmFilePath);
-·const wasmModule = await WebAssembly.compile(wasmBuffer);
-·const wasmInstance = await WebAssembly.instantiate(wasmModule);
-⊷│return wasmInstance;
-·} catch (error) {
-⊰│throw new Error(`↺ to load WebAssembly module: ${error.message}`);
-·}
-·}
-}⟨/loadWasmModule⟩
-⊩wasmMatrixMultiply(6)→void⟨23⟩{
-⊩│export function wasmMatrixMultiply(wasmInstance, matrixA, matrixB, rowsA, colsA, colsB) {
-⊹│if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
-⊵│throw new Error('Matrix dimensions do not match for multiplication.');
-·}
-·const resultMatrix = new Float64Array(rowsA * colsB);
-⊲│const { multiplyMatrices } = wasmInstance.exports;
-·if (!multiplyMatrices) {
-⊵│throw new Error('WebAssembly instance does not contain a multiplyMatrices export.');
-·}
-·multiplyMatrices(
-·matrixA.byteOffset,
-·matrixB.byteOffset,
-·resultMatrix.byteOffset,
-·rowsA,
-·colsA,
-·colsB
-·);
-⊷│return resultMatrix;
-·}
-}⟨/wasmMatrixMultiply⟩
-⊩⟿demoMatrixMultiplication(6)→void⟨4⟩{
-⊩│export async function demoMatrixMultiplication(wasmFilePath, matrixA, matrixB, rowsA, colsA, colsB) {
-⊴│const wasmInstance = await loadWasmModule(wasmFilePath);
-⊷│return wasmMatrixMultiply(wasmInstance, matrixA, matrixB, rowsA, colsA, colsB);
-·}
-}⟨/demoMatrixMultiplication⟩
-⊩validateMatrixDimensions(3)→void⟨3⟩{
-⊩│export function validateMatrixDimensions(rowsA, colsA, colsB) {
-⊷│return colsA === colsB;
-·}
-}⟨/validateMatrixDimensions⟩
-⟩SCL│47│51⊨│15⑂│51.5%↓⟩
+⊩⟿loadWasmModule(1)→void⟨10⟩{⊩⊴⊷⊰⊵}
+⊩wasmMatrixMultiply(6)→void⟨23⟩{⊩⊹⊵⊲⊷}
+⊩⟿demoMatrixMultiplication(6)→void⟨4⟩{⊩⊴⊷}
+⊩validateMatrixDimensions(3)→void⟨3⟩{⊩⊷}
+⟩SCL│7│20⊨│15⑂│92.8%↓⟩

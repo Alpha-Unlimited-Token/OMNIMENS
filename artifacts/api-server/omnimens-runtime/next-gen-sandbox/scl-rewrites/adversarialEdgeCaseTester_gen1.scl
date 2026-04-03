@@ -1,41 +1,7 @@
 ⟨SCL v1│adversarialEdgeCaseTester_gen1.mjs│42→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩simulateAdversarialCases(1)→void⟨5⟩{
-⊩│export function simulateAdversarialCases(agentOutputs) {
-·const edgeCases = generateEdgeCases();
-const ⊢ = edgeCases.map(case => testAgentOutput(agentOutputs, case));
-⊷│return analyzeResults(⊢);
-·}
-}⟨/simulateAdversarialCases⟩
-generateEdgeCases(1)→void⟨6⟩{
-·function generateEdgeCases() {
-⊷│return [
-·{ input: 'unexpected_input_1', expectedOutput: 'error_handled' },
-·{ input: 'boundary_case_2', expectedOutput: 'boundary_handled' }
-·];
-·}
-}⟨/generateEdgeCases⟩
-testAgentOutput(2)→void⟨10⟩{
-·function testAgentOutput(agentOutputs, edgeCase) {
-⊲│const { input, expectedOutput } = edgeCase;
-·const actualOutput = agentOutputs(input);
-⊷│return {
-·input,
-·expectedOutput,
-·actualOutput,
-·passed: actualOutput === expectedOutput
-·};
-·}
-}⟨/testAgentOutput⟩
-analyzeResults(1)→void⟨9⟩{
-function analyzeResults(⊢) {
-const passed = ⊢.filter(r => r.passed).length;
-const total = ⊢.length;
-⊷│return {
-·passed,
-·total,
-·successRate: passed / total
-·};
-·}
-}⟨/analyzeResults⟩
-⟩SCL│40│36⊨│6⑂│4.8%↓⟩
+⊩simulateAdversarialCases(1)→void⟨5⟩{⊩⊷}
+generateEdgeCases(1)→void⟨6⟩{⊷}
+testAgentOutput(2)→void⟨10⟩{⊲⊷}
+analyzeResults(1)→void⟨9⟩{⊷}
+⟩SCL│6│10⊨│6⑂│85.7%↓⟩

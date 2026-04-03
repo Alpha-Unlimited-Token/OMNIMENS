@@ -36,52 +36,8 @@
 ·)
 ·)
 ·`;
-⟿compileWasm(1)→void⟨5⟩{
-·async function compileWasm() {
-·const wasmBuffer = new TextEncoder().encode(wasmSource);
-⊲│const { instance } = await WebAssembly.instantiate(wasmBuffer);
-⊷│return instance;
-·}
-}⟨/compileWasm⟩
-⟿matrixMultiply(2)→void⟨43⟩{
-·async function matrixMultiply(matrixA, matrixB) {
-·const rowsA = matrixA.length;
-·const colsA = matrixA[0].length;
-·const rowsB = matrixB.length;
-·const colsB = matrixB[0].length;
-·if (colsA !== rowsB) {
-⊵│throw new Error("Invalid matrix dimensions for multiplication.");
-·}
-⊴│const wasmInstance = await compileWasm();
-·const flatA = matrixA.flat();
-·const flatB = matrixB.flat();
-·const flatC = new Array(rowsA * colsB).fill(0);
-·const memory = new Uint32Array(wasmInstance.exports.memory.buffer);
-·const ptrA = 0;
-·const ptrB = flatA.length * 4;
-·const ptrC = ptrB + flatB.length * 4;
-⊡│memory.set(flatA, ptrA / 4);
-⊡│memory.set(flatB, ptrB / 4);
-·const resultCode = wasmInstance.exports.matrixMultiply(
-·ptrA, rowsA, colsA, ptrB, rowsB, colsB, ptrC
-·);
-·if (resultCode !== 0) {
-⊵│throw new Error("Matrix multiplication ↺ in WebAssembly.");
-·}
-·const resultMatrix = [];
-·for (let i = 0; i < rowsA; i++) {
-⊺│resultMatrix.push(flatC.slice(i * colsB, (i + 1) * colsB));
-·}
-⊷│return resultMatrix;
-·}
-}⟨/matrixMultiply⟩
-vectorDotProduct(2)→void⟨7⟩{
-·function vectorDotProduct(vectorA, vectorB) {
-⊹│if (vectorA.length !== vectorB.length) {
-⊵│throw new Error("Vectors must have the same length.");
-·}
-⋐│return vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
-·}
-}⟨/vectorDotProduct⟩
+⟿compileWasm(1)→void⟨5⟩{⊲⊷}
+⟿matrixMultiply(2)→void⟨43⟩{⊵⊴⊡⊞⊟⊺⊷}
+vectorDotProduct(2)→void⟨7⟩{⊹⊵⋐⊷}
 ·export { matrixMultiply, vectorDotProduct };
-⟩SCL│86│53⊨│12⑂│39.0%↓⟩
+⟩SCL│42│17⊨│12⑂│70.2%↓⟩

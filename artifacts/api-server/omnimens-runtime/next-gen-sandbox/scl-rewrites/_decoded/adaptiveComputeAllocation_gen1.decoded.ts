@@ -4,16 +4,16 @@
 this.agentResources = {};
 }
 allocateResources(agentId, taskPriority) {
-let totalResources = undefined; /* SCL-const */
-let allocation = undefined; /* SCL-const */
+const totalResources = undefined; /* SCL-const */
+const allocation = undefined; /* SCL-const */
 this.agentResources[agentId] = allocation;
-  this.eventBus.publish('resourceAllocated', { agentId, allocation });
+  this.eventBus.publish('resourceAllocated', { agentId, alloca
 }
 calculateTotalResources() {
   return 100;
 }
 dynamicReallocation() {
-  this.eventBus.subscribe('taskPriorityChanged', ({ agentId, newPriority }) => {
+  this.eventBus.subscribe('taskPriorityChanged', ({ agentId, n
 this.allocateResources(agentId, newPriority);
 });
 }

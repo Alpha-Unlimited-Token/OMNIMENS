@@ -10,14 +10,14 @@
 ·this.reallocateResources();
 ·}
 ·reallocateResources() {
-·const sortedAgents = [...this.agentLoadMap.entries()].sort((a, b) => b[1] - a[1]);
+·const sortedAgents = [...this.agentLoadMap.entries()].sort((a, b) => b[1] - a[1]
 ⊱│sortedAgents.forEach(([agentId, load], index) => {
 κpriority
 ·this.allocateToAgent(agentId, priority);
 ·});
 ·}
 ·allocateToAgent(agentId, priority) {
-⊰│console.log(`Allocating ${priority} priority resources to ${agentId}`);
+⊰│console.log(`Allocating ${priority} priority resources to ${
 ·}
 ·handleEvent(event) {
 ⊺│this.eventQueue.push(event);

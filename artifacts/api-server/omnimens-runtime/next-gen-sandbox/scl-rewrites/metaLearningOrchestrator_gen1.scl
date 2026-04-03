@@ -23,7 +23,7 @@ this.performanceMetrics[agentId][metric] = ≪;
 ⟛│return Math.max(0.01, 1 / (1 + errorRate * throughput));
 ·}
 ·allocateResources(agentId, learningRate) {
-⊰│console.log(`Allocating resources for ${agentId} with learning rate: ${learningRate}`);
+⊰│console.log(`Allocating resources for ${agentId} with learni
 ·}
 ·}
 ⟩SCL│28│10⊨│4⑂│31.7%↓⟩

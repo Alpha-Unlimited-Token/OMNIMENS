@@ -1,34 +1,7 @@
 ⟨SCL v1│conflictResolutionIntegrator_gen1.mjs│39→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩⟿resolveConflicts(1)→void⟨12⟩{
-⊩│export async function resolveConflicts(agentOutputs) {
-const weightedOutputs = agentOutputs.map(θ => {
-⊷│return {
-...θ,
-confidenceWeight: calculateConfidenceWeight(θ)
-·};
-·});
-·const analogicalClusters = clusterByAnalogy(weightedOutputs);
-·const unifiedOutput = synthesizeClusters(analogicalClusters);
-⊷│return unifiedOutput;
-·}
-}⟨/resolveConflicts⟩
-calculateConfidenceWeight(1)→void⟨4⟩{
-function calculateConfidenceWeight(θ) {
-⊷│return Math.random();
-·}
-}⟨/calculateConfidenceWeight⟩
-clusterByAnalogy(1)→void⟨7⟩{
-·function clusterByAnalogy(outputs) {
-⋐│return outputs.reduce((clusters, θ) => {
-⊺│clusters.push([θ]);
-⊷│return clusters;
-·}, []);
-·}
-}⟨/clusterByAnalogy⟩
-synthesizeClusters(1)→void⟨4⟩{
-·function synthesizeClusters(clusters) {
-⊷│return clusters.flat();
-·}
-}⟨/synthesizeClusters⟩
-⟩SCL│33│30⊨│8⑂│15.4%↓⟩
+⊩⟿resolveConflicts(1)→void⟨12⟩{⊩⊷}
+calculateConfidenceWeight(1)→void⟨4⟩{⊷}
+clusterByAnalogy(1)→void⟨7⟩{⋐⊱⊷⊺}
+synthesizeClusters(1)→void⟨4⟩{⊷}
+⟩SCL│6│12⊨│8⑂│84.6%↓⟩

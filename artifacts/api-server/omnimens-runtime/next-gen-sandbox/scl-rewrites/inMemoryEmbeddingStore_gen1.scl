@@ -1,35 +1,22 @@
 ⟨SCL v1│inMemoryEmbeddingStore_gen1.mjs│114→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-cosineSimilarity(2)→void⟨15⟩{
-·function cosineSimilarity(vectorA, vectorB) {
-⊹│if (vectorA.length !== vectorB.length || vectorA.length === 0) {
-⊵│throw new Error("Vectors must have the same non-zero length.");
-·}
-⋐│const dotProduct = vectorA.reduce((sum, val, index) => sum + val * vectorB[index], 0);
-⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val * val, 0));
-⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val * val, 0));
-·if (magnitudeA === 0 || magnitudeB === 0) {
-⊵│throw new Error("Vectors must not be zero vectors.");
-·}
-⊷│return dotProduct / (magnitudeA * magnitudeB);
-·}
-}⟨/cosineSimilarity⟩
+cosineSimilarity(2)→void⟨15⟩{⊹⊵⋐⊷}
 ⊶│class InMemoryEmbeddingStore {
 ·constructor() {
 ⊮│this.store = new Map();
 ·}
 ·addEmbedding(key, embedding) {
 if (this.⊞.has(key)) {
-⊰│throw new Error(`Key '${key}' already exists in the store.`);
+⊰│throw new Error(`Key '${key}' already exists in the store.`)
 ·}
-⊹│if (!Array.isArray(embedding) || embedding.length === 0 || !embedding.every(val => typeof val === 'number')) {
-⊵│throw new Error("Embedding must be a non-empty array of numbers.");
+⊹│if (!Array.isArray(embedding) || embedding.length === 0 || !
+⊵│throw new Error("Embedding must be a non-empty array of numb
 ·}
 ⊡│this.store.set(key, embedding);
 ·}
 ·search(queryEmbedding, topN = 1) {
-⊹│if (!Array.isArray(queryEmbedding) || queryEmbedding.length === 0 || !queryEmbedding.every(val => typeof val === 'number')) {
-⊵│throw new Error("Query embedding must be a non-empty array of numbers.");
+⊹│if (!Array.isArray(queryEmbedding) || queryEmbedding.length 
+⊵│throw new Error("Query embedding must be a non-empty array o
 ·}
 ·if (!Number.isInteger(topN) || topN <= 0) {
 ⊵│throw new Error("topN must be a positive integer.");
@@ -52,4 +39,4 @@ this.⊞.clear();
 ·}
 ·}
 ·export { cosineSimilarity, InMemoryEmbeddingStore };
-⟩SCL│54│32⊨│18⑂│52.6%↓⟩
+⟩SCL│41│21⊨│15⑂│64.0%↓⟩

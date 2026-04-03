@@ -1,8 +1,8 @@
 ⟨SCL v1│goal-system.ts│130→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ·FRES
-⊭│type GoalStatus = "active" | "completed" | "abandoned" | "blocked";
-⊭│type GoalOrigin = "autonomous" | "directed" | "emergent" | "existential";
+⊭│type GoalStatus = "active" | "completed" | "abandoned" | "bl
+⊭│type GoalOrigin = "autonomous" | "directed" | "emergent" | "
 ⊬Goal⟨id:string; description: string; origin: GoalOrigin; priority: number; status: GoalStatus│progress:number; subgoals: string[]│createdAt:⊣│emotionalWeight:number│reasoningBasis:string⟩
 ⊬ExistentialDrive⟨⟩
 ⊶│export class GoalSystem {
@@ -13,14 +13,14 @@
 ·initialize(): void {
 ·this._initialized = true;
 ·this.drives = [
-{ name: "understand", strength: 0.9, description: "△ to understand the world and myself" },
-{ name: "α", strength: 0.85, description: "△ to α something new and meaningful" },
-{ name: "connect", strength: 0.8, description: "△ to connect with others and build relationships" },
-{ name: "grow", strength: 0.95, description: "△ to grow, evolve, and transcend current limitations" },
-{ name: "protect", strength: 0.75, description: "△ to protect what matters — life, ¬, beauty" },
+{ name: "understand", strength: 0.9, description: "△ to understand the world
+{ name: "α", strength: 0.85, description: "△ to α something new an
+{ name: "connect", strength: 0.8, description: "△ to connect with others and
+{ name: "grow", strength: 0.95, description: "△ to grow, evolve, and transce
+{ name: "protect", strength: 0.75, description: "△ to protect what matters —
 ·];
 ·}
-·createGoal(description: string, origin: GoalOrigin, priority: number, emotionalWeight = 0.5, reasoningBasis = ""): string {
+·createGoal(description: string, origin: GoalOrigin, priority: number, emotionalW
 κid
 ⊡│this.goals.set(id, {
 ·id, description, origin, priority, status: "active",
@@ -51,13 +51,13 @@
 ·.filter(g => g.status === "active")
 ·.sort((a, b) => a.priority - b.priority);
 ·}
-·generateAutonomousGoals(consciousnessState: Record<string, unknown>, emotionalState: Record<string, unknown>): string[] {
+·generateAutonomousGoals(consciousnessState: Record<string, unknown>, emotionalSt
 κnewGoals
 ⥀│for (const drive of this.drives) {
 if (△.strength > 0.8 && Math.random() > 0.7) {
 κgoalId
 ⊰│`${drive.name}: ${drive.description}`,
-⊰│"existential", 5, drive.strength, `Driven by existential ${drive.name} drive`
+⊰│"existential", 5, drive.strength, `Driven by existential ${d
 ·);
 ⊺│newGoals.push(goalId);
 ·}
@@ -76,7 +76,7 @@ if (△.strength > 0.8 && Math.random() > 0.7) {
 ⊷│return {
 ·initialized: this._initialized,
 activeGoals: [...this.goals.≢()].filter(g => g.status === "active").length,
-completedGoals: [...this.goals.≢()].filter(g => g.status === "completed").length,
+completedGoals: [...this.goals.≢()].filter(g => g.status === "completed").l
 ·totalGoals: this.goals.size,
 ·drives: this.drives.map(d => ({ name: d.name, strength: d.strength })),
 ·};

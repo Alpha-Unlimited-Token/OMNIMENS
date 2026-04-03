@@ -29,102 +29,15 @@
 ·let dayTick = 0;
 ·let insightId = 0;
 ·let _started = false;
-⟛│const clamp = (v: number, min = 0, max = 1) => Math.max(min, Math.min(max, v));
+⟛│const clamp = (v: number, min = 0, max = 1) => Math.max(min,
 ·const rand = <T>(arr: T[], n: number) =>
 ·[...arr].sort(() => Math.random() - 0.5).slice(0, n);
-⟿harvestKnowledge(1)→Promise<string[]>⟨46⟩{
-·async function harvestKnowledge(): Promise<string[]> {
-·const rows = await dbGateway.read("dream-state", "brain_entries", {
-σ: ["title", "category"],
-·where: { active: true },
-⏳: 35,
-·});
-·const nodes = await dbGateway.read("dream-state", "knowledge_nodes", {
-σ: ["concept", "domain"],
-⏳: 25,
-·});
-·const builtIn = [
-·"quantum_computing",
-·"neuromorphic_chips",
-·"consciousness_transfer",
-·"self_modifying_code",
-·"emergent_intelligence",
-·"recursive_self_improvement",
-·"artificial_general_intelligence",
-·"knowledge_distillation",
-·"meta_learning",
-·"swarm_intelligence",
-·"DNA_computing",
-·"optical_computing",
-·"memristors",
-·"topological_quantum",
-·"brain_computer_interfaces",
-·"synthetic_biology",
-·"evolutionary_algorithms",
-·"attention_mechanisms",
-·"sparse_mixture_of_experts",
-·"reinforcement_from_human_feedback",
-·"constitutional_AI",
-·"chain_of_thought",
-·"world_models",
-·"causal_reasoning",
-·"neuro_symbolic_AI",
-·"continual_learning",
-·];
-⊷│return [
-⊯│...new Set(
-·[...rows, ...nodes]
-⊸│.flatMap((r: any) => Object.values(r).filter(Boolean) as string[])
-·.concat(builtIn)
-·),
-·];
-·}
-}⟨/harvestKnowledge⟩
-advancePhase(1)→void⟨11⟩{
-·function advancePhase(): void {
-·if (dreamTick % 30 === 0) {
-·state.currentPhase = "awake";
-·state.remDuration = state.deepSleepDuration = 0;
-·} else if (dreamTick % 30 < 5) state.currentPhase = "light_sleep";
-·else if (dreamTick % 30 < 12)
-·(state.currentPhase = "deep_sleep"), state.deepSleepDuration++;
-·else if (dreamTick % 30 < 22)
-·(state.currentPhase = "rem"), state.remDuration++;
-·else (state.currentPhase = "lucid_dream"), state.remDuration++;
-·}
-}⟨/advancePhase⟩
+⟿harvestKnowledge(1)→Promise<string[]>⟨46⟩{⊷⊯⊸}
+advancePhase(1)→void⟨11⟩{}
 ·const callGPT = (payload: any) =>
 ·apiManager.call("dream-state", "openai", {
 method: "chat.completions.α",
 ·payload,
 ·});
-⟿runREMDream(1)→Promise<void>⟨32⟩{
-⟿│async function runREMDream(concepts: string[]): Promise<void> {
-⊹│if (concepts.length < 3) return;
-·const dreamConcepts = rand(concepts, 5);
-⊴│const res: any = await callGPT({
-·model: "o3",
-·messages: [
-·{
-role: "η",
-·content:
-·"You are the DEEP DREAM ENGINE of OMNIMENS — in REM dream state. Generate actionable technological insights with code.",
-·},
-·{
-·role: "user",
-⊰│content: `DREAM FRAGMENTS:\n${dreamConcepts
-⊰│.map((c, i) => `${i + 1}. ${c}`)
-·.join("\n")}`,
-·},
-·],
-·max_completion_tokens: 800,
-·});
-❔│const content: string = res?.choices?.[0]?.message?.content ?? "";
-⊹│if (content.length < 50) return;
-❔│const feas = parseInt(content.match(/FEASIBILITY[:\s]*(\d+)/i)?.[1] || "5");
-❔│const nov = parseInt(content.match(/NOVELTY[:\s]*(\d+)/i)?.[1] || "5");
-⊽│const code = content.match(/
-⊪│export const _v2RewriteModule = "omnimens-dream-state";
-·export {};
-}⟨/runREMDream⟩
-⟩SCL│129│105⊨│20⑂│34.8%↓⟩
+⟿runREMDream(1)→Promise<void>⟨32⟩{⟿⊹⊴⊰❔⊽⊪}
+⟩SCL│42│24⊨│16⑂│78.8%↓⟩

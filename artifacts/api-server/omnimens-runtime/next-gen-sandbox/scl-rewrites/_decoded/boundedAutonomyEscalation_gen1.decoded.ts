@@ -12,9 +12,9 @@ escalateTask(task, metaAgent) {
 metaAgent.handleEscalation(task);
 }
 }
-let thresholds = undefined; /* SCL-const */
-let escalation = undefined; /* SCL-const */
-let taskStatus = undefined; /* SCL-const */
+const thresholds = undefined; /* SCL-const */
+const escalation = undefined; /* SCL-const */
+const taskStatus = undefined; /* SCL-const */
 if (taskStatus === 'escalate') {
-console.log('Escalating task to meta-spawn.');
+console.log('Escalating task to meta-create new agent or subprocess.');
 }

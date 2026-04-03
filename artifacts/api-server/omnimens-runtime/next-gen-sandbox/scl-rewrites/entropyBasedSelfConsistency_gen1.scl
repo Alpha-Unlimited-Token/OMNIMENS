@@ -6,16 +6,16 @@
 ·}
 ·calculateEntropy(chain) {
 ·const probabilities = chain.map(step => step.probability);
-⋐│const entropy = -probabilities.reduce((sum, p) => sum + (p * Math.log2(p)), 0);
+⋐│const entropy = -probabilities.reduce((sum, p) => sum + (p *
 ⊷│return entropy;
 ·}
 ·bayesianCalibration(chain) {
-⊷│return chain.map(step => ({ ...step, calibratedConfidence: step.probability * 0.9 }));
+⊷│return chain.map(step => ({ ...step, calibratedConfidence: s
 ·}
 ·scoreChain(chain) {
 κentropy
 κcalibratedChain
-⋐│const averageConfidence = calibratedChain.reduce((sum, step) => sum + step.calibratedConfidence, 0) / calibratedChain.length;
+⋐│const averageConfidence = calibratedChain.reduce((sum, step)
 ⊷│return { entropy, averageConfidence };
 ·}
 ·}

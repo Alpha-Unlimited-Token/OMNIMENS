@@ -1,61 +1,20 @@
 ⟨SCL v1│dynamicMemoryOverlay_gen1.mjs│112→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩generateSemanticHash(1)→void⟨5⟩{
-⊩│export function generateSemanticHash(input) {
-·const hash = crypto.createHash('sha256');
-·hash.update(input);
-⊷│return hash.digest('hex');
-·}
-}⟨/generateSemanticHash⟩
-⊩storeInteraction(2)→void⟨4⟩{
-⊩│export function storeInteraction(memoryStore, ◧) {
-const hash = generateSemanticHash(◧);
-⊡│memoryStore.set(hash, ◧);
-·}
-}⟨/storeInteraction⟩
-⊩retrieveSimilarContext(2)→void⟨14⟩{
-⊩│export function retrieveSimilarContext(memoryStore, query) {
-·let bestMatch = null;
-·let highestSimilarity = 0;
-·for (const [hash, storedContext] of memoryStore.entries()) {
-·const similarity = calculateStringSimilarity(query, storedContext);
-·if (similarity > highestSimilarity) {
-·highestSimilarity = similarity;
-·bestMatch = storedContext;
-·}
-·}
-⊷│return bestMatch;
-·}
-}⟨/retrieveSimilarContext⟩
-⊩calculateStringSimilarity(2)→void⟨5⟩{
-⊩│export function calculateStringSimilarity(str1, str2) {
-⊻│const commonChars = str1.split('').filter(char => str2.includes(char)).length;
-⟛│const maxLength = Math.max(str1.length, str2.length);
-⊷│return commonChars / maxLength;
-·}
-}⟨/calculateStringSimilarity⟩
-⊩injectContextIntoPrompt(2)→void⟨6⟩{
-⊩│export function injectContextIntoPrompt(prompt, ◧) {
-if (◧) {
-⊰│return `${◧}\n\n${prompt}`;
-·}
-⊷│return prompt;
-·}
-}⟨/injectContextIntoPrompt⟩
-⊩initializeMemoryStore(1)→void⟨3⟩{
-⊩│export function initializeMemoryStore() {
-⊮│return new Map();
-·}
-}⟨/initializeMemoryStore⟩
+⊩generateSemanticHash(1)→void⟨5⟩{⊩⊷}
+⊩storeInteraction(2)→void⟨4⟩{⊩⊡⊞⊟}
+⊩retrieveSimilarContext(2)→void⟨14⟩{⊩⊷}
+⊩calculateStringSimilarity(2)→void⟨5⟩{⊩⊻⟛⊷}
+⊩injectContextIntoPrompt(2)→void⟨6⟩{⊩⊰⊷}
+⊩initializeMemoryStore(1)→void⟨3⟩{⊩⊮⊷}
 ⊪│export const exampleUsage = () => {
 κmemoryStore
-·storeInteraction(memoryStore, "AI persistent memory architecture user preferences 2025");
-·storeInteraction(memoryStore, "multimodal reasoning image text integration techniques 2025");
+·storeInteraction(memoryStore, "AI persistent memory architecture user preference
+·storeInteraction(memoryStore, "multimodal reasoning image text integration techn
 κquery
 κcontext
 κprompt
 κmodifiedPrompt
 ⊷│return modifiedPrompt;
 ·};
-⟩SCL│60│58⊨│17⑂│46.4%↓⟩
+⟩SCL│19│31⊨│19⑂│83.0%↓⟩

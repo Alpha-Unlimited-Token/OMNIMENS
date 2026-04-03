@@ -2,60 +2,12 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊲│const { Client } = require('pg');
 κcrypto
-generateHash(1)→void⟨3⟩{
-·function generateHash(input) {
-⊷│return crypto.createHash('sha256').update(input).digest('hex');
-·}
-}⟨/generateHash⟩
-initializeDatabase(1)→void⟨5⟩{
-·function initializeDatabase(connectionString) {
-·const client = new Client({ connectionString });
-·client.connect();
-⊷│return client;
-·}
-}⟨/initializeDatabase⟩
-⟿ensureTable(1)→void⟨11⟩{
-·async function ensureTable(client) {
-·const query = `
-α TABLE IF NOT EXISTS ◧ (
-·id SERIAL PRIMARY KEY,
-·context_hash TEXT UNIQUE NOT NULL,
-·context_data TEXT NOT NULL,
-·created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-·);
-·`;
-·await client.query(query);
-·}
-}⟨/ensureTable⟩
-⟿saveContext(2)→void⟨9⟩{
-async function saveContext(client, ◧) {
-const contextHash = generateHash(◧);
-·const query = `
-INSERT INTO ◧ (context_hash, context_data)
-·VALUES ($1, $2)
-·ON CONFLICT (context_hash) DO NOTHING;
-·`;
-await client.query(query, [contextHash, ◧]);
-·}
-}⟨/saveContext⟩
-⟿retrieveContext(3)→void⟨11⟩{
-async function retrieveContext(client, searchTerm, ⏳ = 5) {
-·const query = `
-σ context_data, created_at
-FROM ◧
-·WHERE context_data ILIKE $1
-·ORDER BY created_at DESC
-⏳ $2;
-·`;
-⊰│const result = await client.query(query, [`%${searchTerm}%`, ⏳]);
-⊷│return result.rows;
-·}
-}⟨/retrieveContext⟩
-⟿closeDatabase(1)→void⟨3⟩{
-·async function closeDatabase(client) {
-·await client.end();
-·}
-}⟨/closeDatabase⟩
+generateHash(1)→void⟨3⟩{⊷}
+initializeDatabase(1)→void⟨5⟩{⊷}
+⟿ensureTable(1)→void⟨11⟩{}
+⟿saveContext(2)→void⟨9⟩{}
+⟿retrieveContext(3)→void⟨11⟩{⊰⊷}
+⟿closeDatabase(1)→void⟨3⟩{}
 Ε.exports = {
 ·generateHash,
 ·initializeDatabase,
@@ -64,4 +16,4 @@ FROM ◧
 ·retrieveContext,
 ·closeDatabase
 ·};
-⟩SCL│66│49⊨│5⑂│38.3%↓⟩
+⟩SCL│18│13⊨│5⑂│83.2%↓⟩

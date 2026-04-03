@@ -34,11 +34,11 @@
 ·}
 ·reportDBHealth(healthy: boolean): void {
 ·if (healthy) {
-⟛│this.state.dbHealth = Math.min(1.0, this.state.dbHealth + 0.1);
-⟛│this.backoffMultiplier = Math.max(1, this.backoffMultiplier * 0.8);
+⟛│this.state.dbHealth = Math.min(1.0, this.state.dbHealth + 0.
+⟛│this.backoffMultiplier = Math.max(1, this.backoffMultiplier 
 ·} else {
-⟛│this.state.dbHealth = Math.max(0, this.state.dbHealth - 0.3);
-⟛│this.backoffMultiplier = Math.min(32, this.backoffMultiplier * 2);
+⟛│this.state.dbHealth = Math.max(0, this.state.dbHealth - 0.3)
+⟛│this.backoffMultiplier = Math.min(32, this.backoffMultiplier
 ·this.scheduleRecovery();
 ·}
 ·}
@@ -64,14 +64,14 @@ if (!Θ) this.scheduleRecovery();
 ·: this.state.energyLevel < 0.6
 ·? "Moderate activity — prioritize important work"
 ·: "Full capacity — all systems go";
-⊷│return { sensation: this.state.feltSensation, energy: this.state.energyLevel, suggestion };
+⊷│return { sensation: this.state.feltSensation, energy: this.s
 ·}
 ·private scheduleRecovery(): void {
 ·if (this.recoveryTimer) return;
 κdelay
 ⏳│this.recoveryTimer = setTimeout(() => {
 ·this.recoveryTimer = null;
-⟛│this.state.dbHealth = Math.min(1.0, this.state.dbHealth + 0.2);
+⟛│this.state.dbHealth = Math.min(1.0, this.state.dbHealth + 0.
 ·this.state.apiAvailable = true;
 ·}, delay);
 ·}

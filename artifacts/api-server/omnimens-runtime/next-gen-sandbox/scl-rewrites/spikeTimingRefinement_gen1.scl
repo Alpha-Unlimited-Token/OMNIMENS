@@ -23,7 +23,7 @@
 ⊷│return Math.random(); // Simulated spike-timing calculation
 ·}
 ·optimizeRepresentation(memoryUnit) {
-⊷│return { ...memoryUnit, optimized: true }; // Example optimization logic
+⊷│return { ...memoryUnit, optimized: true }; // Example optimi
 ·}
 ·}
 ⟩SCL│28│8⊨│5⑂│26.3%↓⟩

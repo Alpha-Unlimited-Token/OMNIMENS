@@ -1,40 +1,8 @@
 ⟨SCL v1│redisVectorStore_gen1.mjs│127→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩calculateDistance(2)→void⟨6⟩{
-⊩│export function calculateDistance(vectorA, vectorB) {
-⊹│if (vectorA.length !== vectorB.length) {
-⊵│throw new Error("Vectors must be of the same length.");
-·}
-⋐│return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
-·}
-}⟨/calculateDistance⟩
-⊩findKNearestNeighbors(3)→void⟨14⟩{
-⊩│export function findKNearestNeighbors(data, query, k) {
-·if (!Array.isArray(data) || !Array.isArray(query) || typeof k !== "number" || k <= 0) {
-⊵│throw new Error("Invalid input parameters.");
-·}
-⊱│const distances = data.map((vector, index) => ({
-·index,
-·distance: calculateDistance(vector, query)
-·}));
-·distances.sort((a, b) => a.distance - b.distance);
-⊷│return distances.slice(0, k);
-·}
-}⟨/findKNearestNeighbors⟩
-⊩startPeriodicSync(3)→void⟨13⟩{
-⊩│export function startPeriodicSync(memoryStore, syncFunction, intervalMs) {
-·if (typeof memoryStore !== "object" || typeof syncFunction !== "function" || typeof intervalMs !== "number" || intervalMs <= 0) {
-⊵│throw new Error("Invalid input parameters.");
-·}
-⟳│return setInterval(() => {
-·try {
-·syncFunction(memoryStore);
-·} catch (error) {
-·console.error("Error during sync:", error);
-·}
-·}, intervalMs);
-·}
-}⟨/startPeriodicSync⟩
+⊩calculateDistance(2)→void⟨6⟩{⊩⊹⊵⋐⊷}
+⊩findKNearestNeighbors(3)→void⟨14⟩{⊩⊵⊱⊷}
+⊩startPeriodicSync(3)→void⟨13⟩{⊩⊵⟳⊱⊷}
 ⊶│export class RedisVectorStore {
 ·constructor() {
 ⊮│this.store = new Map();
@@ -49,7 +17,7 @@ if (typeof key !== "string" || !ι.isArray(vector)) {
 ⊡│return this.store.get(key);
 ·}
 ·search(query, k) {
-⊱│const data = Array.from(this.store.entries()).map(([key, vector]) => ({ key, vector }));
+⊱│const data = Array.from(this.store.entries()).map(([key, vec
 ⊱│const distances = data.map(({ key, vector }) => ({
 ·key,
 ·distance: calculateDistance(vector, query)
@@ -58,9 +26,5 @@ if (typeof key !== "string" || !ι.isArray(vector)) {
 ⊷│return distances.slice(0, k);
 ·}
 ·}
-⊩syncToPostgreSQL(1)→void⟨3⟩{
-⊩│export function syncToPostgreSQL(memoryStore) {
-·console.log("Syncing to PostgreSQL:", Array.from(memoryStore.entries()));
-·}
-}⟨/syncToPostgreSQL⟩
-⟩SCL│65│53⊨│20⑂│48.8%↓⟩
+⊩syncToPostgreSQL(1)→void⟨3⟩{⊩}
+⟩SCL│29│28⊨│23⑂│77.2%↓⟩

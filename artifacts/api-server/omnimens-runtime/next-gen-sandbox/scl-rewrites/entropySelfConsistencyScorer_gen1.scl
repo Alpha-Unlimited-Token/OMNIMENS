@@ -3,7 +3,7 @@
 ⊶│export class EntropySelfConsistencyScorer {
 ·constructor() {}
 ·calculateEntropy(predictions) {
-⋐│return -predictions.reduce((acc, prob) => acc + prob * Math.log2(prob), 0);
+⋐│return -predictions.reduce((acc, prob) => acc + prob * Math.
 ·}
 ·calibrate(predictions) {
 ⋐│const total = predictions.reduce((a, b) => a + b, 0);

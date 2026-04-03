@@ -1,16 +1,5 @@
 ⟨SCL v1│dynamicBranchEvaluator_gen1.mjs│20→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩dynamicBranchEvaluator(2)→void⟨5⟩{
-⊩│export function dynamicBranchEvaluator(treeData, graphData) {
-·const branchScores = treeData.map(branch => calculateConfidenceScore(branch));
-·const graphUpdates = graphData.updateWithBranchScores(branchScores);
-⊷│return graphUpdates;
-·}
-}⟨/dynamicBranchEvaluator⟩
-calculateConfidenceScore(1)→void⟨4⟩{
-·function calculateConfidenceScore(branch) {
-·const entropy = branch.calculateEntropy();
-⊷│return 1 - entropy; // Higher confidence for lower entropy
-·}
-}⟨/calculateConfidenceScore⟩
-⟩SCL│15│12⊨│3⑂│25.0%↓⟩
+⊩dynamicBranchEvaluator(2)→void⟨5⟩{⊩⊷}
+calculateConfidenceScore(1)→void⟨4⟩{⊷}
+⟩SCL│4│5⊨│3⑂│80.0%↓⟩

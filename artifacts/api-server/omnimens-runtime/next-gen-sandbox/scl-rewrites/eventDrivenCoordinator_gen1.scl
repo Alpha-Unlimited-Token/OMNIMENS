@@ -21,8 +21,8 @@
 ·}
 ·}
 κcoordinator
-⊱│coordinator.subscribe('resourceAllocation:task1', (data) => {
-⊰│console.log(`Allocating resources for task: ${data.task.id}`);
+⊱│coordinator.subscribe('resourceAllocation:task1', (data) => 
+⊰│console.log(`Allocating resources for task: ${data.task.id}`
 ·});
 ⊢.allocateResources({ id: 'task1' });
 ⟩SCL│27│7⊨│4⑂│30.8%↓⟩

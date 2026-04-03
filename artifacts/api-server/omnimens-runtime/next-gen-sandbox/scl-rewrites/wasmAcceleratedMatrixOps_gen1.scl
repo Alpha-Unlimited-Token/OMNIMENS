@@ -1,65 +1,7 @@
 ⟨SCL v1│wasmAcceleratedMatrixOps_gen1.mjs│110→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩⟿initializeWasm(1)→void⟨14⟩{
-⊩│export async function initializeWasm() {
-·const wasmCode = new Uint8Array([
-·0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, 0x01, 0x07, 0x01, 0x60, 0x03, 0x7f, 0x7f, 0x7f, 0x01,
-·0x7f, 0x03, 0x02, 0x01, 0x00, 0x07, 0x07, 0x01, 0x03, 0x6d, 0x75, 0x6c, 0x00, 0x00, 0x0a, 0x0b, 0x01,
-·0x09, 0x00, 0x20, 0x00, 0x20, 0x01, 0x20, 0x02, 0x6c, 0x0b
-·]);
-·const wasmModule = await WebAssembly.compile(wasmCode);
-·const wasmInstance = await WebAssembly.instantiate(wasmModule);
-⊷│return wasmInstance;
-·}
-}⟨/initializeWasm⟩
-⊩multiplyMatrices(3)→void⟨22⟩{
-⊩│export function multiplyMatrices(matrixA, matrixB, wasmInstance) {
-·const rowsA = matrixA.length;
-·const colsA = matrixA[0].length;
-·const rowsB = matrixB.length;
-·const colsB = matrixB[0].length;
-·if (colsA !== rowsB) {
-⊵│throw new Error("Matrix dimensions are incompatible for multiplication.");
-·}
-·const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
-·for (let i = 0; i < rowsA; i++) {
-·for (let j = 0; j < colsB; j++) {
-·for (let k = 0; k < colsA; k++) {
-·result[i][j] += matrixA[i][k] * matrixB[k][j];
-·}
-·}
-·}
-⊷│return result;
-·}
-}⟨/multiplyMatrices⟩
-⊩validateMatrix(1)→void⟨8⟩{
-⊩│export function validateMatrix(matrix) {
-⊹│if (!Array.isArray(matrix) || matrix.length === 0) {
-⊷│return false;
-·}
-·const rowLength = matrix[0].length;
-⊷│return matrix.every(row => Array.isArray(row) && row.length === rowLength);
-·}
-}⟨/validateMatrix⟩
-⊩⟿exampleUsage(1)→void⟨22⟩{
-⊩│export async function exampleUsage() {
-⊴│const wasmInstance = await initializeWasm();
-·const matrixA = [
-·[1, 2, 3],
-·[4, 5, 6],
-·[7, 8, 9]
-·];
-·const matrixB = [
-·[9, 8, 7],
-·[6, 5, 4],
-·[3, 2, 1]
-·];
-·if (validateMatrix(matrixA) && validateMatrix(matrixB)) {
-·const result = multiplyMatrices(matrixA, matrixB, wasmInstance);
-·console.log("Resulting Matrix:", result);
-·} else {
-·console.error("Invalid matrix input.");
-·}
-·}
-}⟨/exampleUsage⟩
-⟩SCL│64│64⊨│11⑂│41.8%↓⟩
+⊩⟿initializeWasm(1)→void⟨14⟩{⊩⊷}
+⊩multiplyMatrices(3)→void⟨22⟩{⊩⊵⊷}
+⊩validateMatrix(1)→void⟨8⟩{⊩⊹⊷}
+⊩⟿exampleUsage(1)→void⟨22⟩{⊩⊴}
+⟩SCL│6│14⊨│10⑂│94.5%↓⟩

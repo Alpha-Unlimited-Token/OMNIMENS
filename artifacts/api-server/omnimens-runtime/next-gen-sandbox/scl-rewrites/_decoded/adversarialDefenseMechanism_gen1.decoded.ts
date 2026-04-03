@@ -1,4 +1,4 @@
-export let adversarialDefenseMechanism = undefined; /* SCL-export-const */
+export const adversarialDefenseMechanism = undefined; /* SCL-export-const */
   if (typeof input !== 'string' || input.length > 1000) {
   flags.push('malformedInput');
 }

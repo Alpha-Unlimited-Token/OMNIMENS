@@ -12,11 +12,11 @@
 ·}
 ·publish(eventType, data) {
 ·if (this.subscribers.has(eventType)) {
-⊡│this.subscribers.get(eventType).forEach(callback => callback(data));
+⊡│this.subscribers.get(eventType).forEach(callback => callback
 ·}
 ·}
 ·escalate(eventType, data) {
-⊰│console.log(`Escalating event ${eventType} with data:`, data);
+⊰│console.log(`Escalating event ${eventType} with data:`, data
 ·}
 ·}
 ⟩SCL│21│6⊨│6⑂│36.4%↓⟩

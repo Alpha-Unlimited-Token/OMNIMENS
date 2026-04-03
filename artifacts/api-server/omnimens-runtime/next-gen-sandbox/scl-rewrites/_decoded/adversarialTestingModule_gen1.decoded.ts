@@ -11,20 +11,20 @@ for (let i = 0; i < count; i++) {
 createAdversarialAgent() {
   return {
 strategy: this.generateRandomStrategy(),
-probeWeakness(spawn) {
+probeWeakness(create new agent or subprocess) {
   return agent.evaluate(this.strategy);
 }
 };
 }
 generateRandomStrategy() {
-let strategies = undefined; /* SCL-const */
-  return strategies[Math.floor(Math.random() * strategies.length)];
+const strategies = undefined; /* SCL-const */
+  return strategies[Math.floor(Math.random() * strategies.leng
 }
 runTests() {
-this.agentPool.forEach(spawn => {
+this.agentPool.forEach(create new agent or subprocess => {
 this.adversarialAgents.forEach(adversarialAgent => {
-let result = undefined; /* SCL-const */
-  console.log(`Agent ${agent.id} tested against strategy ${adversarialAgent.strategy}:`, result);
+const result = undefined; /* SCL-const */
+  console.log(`Agent ${agent.id} tested against strategy ${adv
 });
 });
 }

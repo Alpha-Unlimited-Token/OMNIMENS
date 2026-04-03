@@ -1,7 +1,7 @@
 ⟨SCL v1│dynamicEmbeddingStore_gen1.mjs│140→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊶│class HNSWGraph {
-·constructor(maxNodes = 1000, maxEdges = 16, distanceFunction = HNSWGraph.euclideanDistance) {
+·constructor(maxNodes = 1000, maxEdges = 16, distanceFunction = HNSWGraph.euclide
 ·this.maxNodes = maxNodes; // Maximum number of nodes in the graph
 ·this.maxEdges = maxEdges; // Maximum number of edges per node
 ·this.distanceFunction = distanceFunction; // Distance function for similarity
@@ -22,7 +22,7 @@ this.nodes = []; // ι to ⊞ nodes (embeddings)
 ·_connectNode(nodeIndex) {
 ⊱│const distances = this.nodes.map((node, index) => {
 ⊷│if (index === nodeIndex) return Infinity;
-⊷│return { index, distance: this.distanceFunction(this.nodes[nodeIndex], node) };
+⊷│return { index, distance: this.distanceFunction(this.nodes[n
 ·});
 ·distances.sort((a, b) => a.distance - b.distance);
 κneighbors
@@ -36,7 +36,7 @@ this.nodes = []; // ι to ⊞ nodes (embeddings)
 ·}
 ·search(query, k = 1) {
 ⊱│const distances = this.nodes.map((node, index) => {
-⊷│return { index, distance: this.distanceFunction(query, node) };
+⊷│return { index, distance: this.distanceFunction(query, node)
 ·});
 ·distances.sort((a, b) => a.distance - b.distance);
 ⊷│return distances.slice(0, k);
@@ -45,22 +45,9 @@ this.nodes = []; // ι to ⊞ nodes (embeddings)
 ⊹│if (a.length !== b.length) {
 ⊵│throw new Error('Vectors must have the same dimensions');
 ·}
-⋐│return Math.sqrt(a.reduce((sum, val, i) => sum + Math.pow(val - b[i], 2), 0));
+⋐│return Math.sqrt(a.reduce((sum, val, i) => sum + Math.pow(va
 ·}
 ·}
-⊩createHNSWGraph(3)→void⟨3⟩{
-⊩│export function createHNSWGraph(maxNodes = 1000, maxEdges = 16, distanceFunction = HNSWGraph.euclideanDistance) {
-⊷│return new HNSWGraph(maxNodes, maxEdges, distanceFunction);
-·}
-}⟨/createHNSWGraph⟩
-⊩testModule(1)→void⟨10⟩{
-⊩│export function testModule() {
-·const graph = createHNSWGraph(100, 5);
-·graph.addNode([1, 2, 3]);
-·graph.addNode([4, 5, 6]);
-·graph.addNode([7, 8, 9]);
-·const neighbors = graph.search([2, 3, 4], 2);
-·console.log('Nearest neighbors:', neighbors);
-·}
-}⟨/testModule⟩
-⟩SCL│65│38⊨│23⑂│53.6%↓⟩
+⊩createHNSWGraph(3)→void⟨3⟩{⊩⊷}
+⊩testModule(1)→void⟨10⟩{⊩}
+⟩SCL│52│29⊨│23⑂│62.9%↓⟩

@@ -1,63 +1,8 @@
 ⟨SCL v1│webAssemblyMathEngine_gen1.mjs│106→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 κwasmCode
-⟿initializeWasm(1)→void⟨5⟩{
-·async function initializeWasm() {
-·const wasmModule = await WebAssembly.compile(wasmCode);
-·const wasmInstance = await WebAssembly.instantiate(wasmModule, {});
-⊷│return wasmInstance.exports;
-·}
-}⟨/initializeWasm⟩
-⊩⟿dotProduct(2)→void⟨14⟩{
-⊩│export async function dotProduct(vectorA, vectorB) {
-⊹│if (vectorA.length !== vectorB.length) {
-⊵│throw new Error('Vectors must be of the same length.');
-·}
-⊴│const wasm = await initializeWasm();
-·let result = 0;
-·for (let i = 0; i < vectorA.length; i++) {
-·result += wasm.dot(vectorA[i], vectorB[i]);
-·}
-⊷│return result;
-·}
-}⟨/dotProduct⟩
-⊩⟿matrixMultiply(2)→void⟨23⟩{
-⊩│export async function matrixMultiply(matrixA, matrixB) {
-·const rowsA = matrixA.length;
-·const colsA = matrixA[0].length;
-·const rowsB = matrixB.length;
-·const colsB = matrixB[0].length;
-·if (colsA !== rowsB) {
-⊵│throw new Error('Number of columns in Matrix A must equal number of rows in Matrix B.');
-·}
-⊴│const wasm = await initializeWasm();
-·const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
-·for (let i = 0; i < rowsA; i++) {
-·for (let j = 0; j < colsB; j++) {
-·for (let k = 0; k < colsA; k++) {
-·result[i][j] += wasm.matrix_mul(matrixA[i][k], matrixB[k][j]);
-·}
-·}
-·}
-⊷│return result;
-·}
-}⟨/matrixMultiply⟩
-⊩⟿example(1)→void⟨17⟩{
-⊩│export async function example() {
-·const vectorA = [1, 2, 3];
-·const vectorB = [4, 5, 6];
-⊴│const dot = await dotProduct(vectorA, vectorB);
-·console.log('Dot Product:', dot);
-·const matrixA = [
-·[1, 2],
-·[3, 4]
-·];
-·const matrixB = [
-·[5, 6],
-·[7, 8]
-·];
-⊴│const product = await matrixMultiply(matrixA, matrixB);
-·console.log('Matrix Product:', product);
-·}
-}⟨/example⟩
-⟩SCL│62│64⊨│13⑂│41.5%↓⟩
+⟿initializeWasm(1)→void⟨5⟩{⊷}
+⊩⟿dotProduct(2)→void⟨14⟩{⊩⊹⊵⊴⊷}
+⊩⟿matrixMultiply(2)→void⟨23⟩{⊩⊵⊴⊷}
+⊩⟿example(1)→void⟨17⟩{⊩⊴}
+⟩SCL│7│17⊨│12⑂│93.4%↓⟩

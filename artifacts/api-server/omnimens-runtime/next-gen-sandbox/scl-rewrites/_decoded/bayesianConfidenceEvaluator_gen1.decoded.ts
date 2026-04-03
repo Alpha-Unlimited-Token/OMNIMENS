@@ -3,9 +3,9 @@ constructor() {
 this.prior = 0.5; // Default prior probability
 }
 updatePrior(newEvidence) {
-let likelihood = undefined; /* SCL-const */
-let evidence = undefined; /* SCL-const */
-this.prior = (likelihood * this.prior) / ((likelihood * this.prior) + ((1 - likelihood) * (1 - this.prior)));
+const likelihood = undefined; /* SCL-const */
+const evidence = undefined; /* SCL-const */
+this.prior = (likelihood * this.prior) / ((likelihood * this.prior) + ((1 - like
   return this.prior;
 }
 evaluateConfidence(chain) {

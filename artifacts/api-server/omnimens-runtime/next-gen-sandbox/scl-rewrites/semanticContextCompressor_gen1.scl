@@ -1,72 +1,11 @@
 ⟨SCL v1│semanticContextCompressor_gen1.mjs│112→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩semanticHash(1)→void⟨3⟩{
-⊩│export function semanticHash(token) {
-⊷│return createHash('sha256').update(token).digest('hex').slice(0, 8);
-·}
-}⟨/semanticHash⟩
-⊩clusterTokens(1)→void⟨11⟩{
-⊩│export function clusterTokens(⋮) {
-·const clusters = {};
-⥀│for (const token of ⋮) {
-·const hash = semanticHash(token);
-·if (!clusters[hash]) {
-·clusters[hash] = [];
-·}
-⊺│clusters[hash].push(token);
-·}
-⊷│return clusters;
-·}
-}⟨/clusterTokens⟩
-⊩extractDependencies(1)→void⟨21⟩{
-⊩│export function extractDependencies(sentence) {
-·const words = sentence.split(/\s+/);
-·const dependencies = {
-·subject: null,
-·verb: null,
-·object: null
-·};
-·for (let i = 0; i < words.length; i++) {
-·const word = words[i].toLowerCase();
-·if (!dependencies.subject && isNoun(word)) {
-·dependencies.subject = word;
-·} else if (!dependencies.verb && isVerb(word)) {
-·dependencies.verb = word;
-·} else if (!dependencies.object && isNoun(word)) {
-·dependencies.object = word;
-·}
-·}
-⊷│return dependencies;
-·}
-}⟨/extractDependencies⟩
-isNoun(1)→void⟨4⟩{
-·function isNoun(word) {
-·const nounEndings = ['tion', 'ment', 'ness', 'ity', 'ship', 'er', 'or'];
-⊷│return nounEndings.some(ending => word.endsWith(ending));
-·}
-}⟨/isNoun⟩
-isVerb(1)→void⟨4⟩{
-·function isVerb(word) {
-·const verbEndings = ['ing', 'ed', 'ify', 'ize'];
-⊷│return verbEndings.some(ending => word.endsWith(ending));
-·}
-}⟨/isVerb⟩
-⊩compressContext(1)→void⟨10⟩{
-⊩│export function compressContext(sentences) {
-·const allTokens = sentences.flatMap(sentence => sentence.split(/\s+/));
-·const clusters = clusterTokens(allTokens);
-·const dependencies = sentences.map(sentence => extractDependencies(sentence));
-⊷│return {
-·clusters,
-·dependencies
-·};
-·}
-}⟨/compressContext⟩
-⊩exampleUsage(1)→void⟨4⟩{
-⊩│export function exampleUsage(sentences) {
-·const compressed = compressContext(sentences);
-console.log('Compressed ◧:', compressed);
-·}
-}⟨/exampleUsage⟩
-⟩SCL│71│68⊨│13⑂│36.6%↓⟩
+⊩semanticHash(1)→void⟨3⟩{⊩⊷}
+⊩clusterTokens(1)→void⟨11⟩{⊩⥀⊺⊷}
+⊩extractDependencies(1)→void⟨21⟩{⊩⊷}
+isNoun(1)→void⟨4⟩{⊷⊻}
+isVerb(1)→void⟨4⟩{⊷⊻}
+⊩compressContext(1)→void⟨10⟩{⊩⊷}
+⊩exampleUsage(1)→void⟨4⟩{⊩}
+⟩SCL│10│23⊨│15⑂│91.1%↓⟩

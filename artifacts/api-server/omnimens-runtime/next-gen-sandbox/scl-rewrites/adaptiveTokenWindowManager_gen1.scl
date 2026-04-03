@@ -1,55 +1,10 @@
 ⟨SCL v1│adaptiveTokenWindowManager_gen1.mjs│92→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩computeSegmentScore(1)→void⟨8⟩{
-⊩│export function computeSegmentScore(segment) {
-·const hash = createHash('sha256').update(segment).digest('hex');
-·let score = 0;
-·for (let i = 0; i < hash.length; i++) {
-·score += parseInt(hash[i], 16);
-·}
-⊷│return score / hash.length;
-·}
-}⟨/computeSegmentScore⟩
-⊩rankSegmentsByScore(1)→void⟨6⟩{
-⊩│export function rankSegmentsByScore(segments) {
-⊷│return segments
-·.map(segment => ({ segment, score: computeSegmentScore(segment) }))
-·.sort((a, b) => b.score - a.score)
-·.map(entry => entry.segment);
-·}
-}⟨/rankSegmentsByScore⟩
-⊩compressSegments(2)→void⟨12⟩{
-⊩│export function compressSegments(segments, tokenLimit) {
-·const rankedSegments = rankSegmentsByScore(segments);
-·let compressed = '';
-⥀│for (const segment of rankedSegments) {
-·if ((compressed.length + segment.length) <= tokenLimit) {
-·compressed += segment + ' ';
-·} else {
-·break;
-·}
-·}
-⊷│return compressed.trim();
-·}
-}⟨/compressSegments⟩
-⊩adaptiveTokenWindowManager(2)→void⟨3⟩{
-⊩│export function adaptiveTokenWindowManager(contextSegments, tokenLimit) {
-⊷│return compressSegments(contextSegments, tokenLimit);
-·}
-}⟨/adaptiveTokenWindowManager⟩
-⊩splitTextIntoSegments(2)→void⟨7⟩{
-⊩│export function splitTextIntoSegments(text, segmentSize) {
-·const segments = [];
-·for (let i = 0; i < text.length; i += segmentSize) {
-⊺│segments.push(text.slice(i, i + segmentSize));
-·}
-⊷│return segments;
-·}
-}⟨/splitTextIntoSegments⟩
-⊩countTokens(1)→void⟨3⟩{
-⊩│export function countTokens(text) {
-⊷│return text.split(/\s+/).length;
-·}
-}⟨/countTokens⟩
-⟩SCL│54│54⊨│14⑂│41.3%↓⟩
+⊩computeSegmentScore(1)→void⟨8⟩{⊩⊷}
+⊩rankSegmentsByScore(1)→void⟨6⟩{⊩⊷}
+⊩compressSegments(2)→void⟨12⟩{⊩⥀⊷}
+⊩adaptiveTokenWindowManager(2)→void⟨3⟩{⊩⊷}
+⊩splitTextIntoSegments(2)→void⟨7⟩{⊩⊺⊷}
+⊩countTokens(1)→void⟨3⟩{⊩⊷}
+⟩SCL│9│21⊨│14⑂│90.2%↓⟩

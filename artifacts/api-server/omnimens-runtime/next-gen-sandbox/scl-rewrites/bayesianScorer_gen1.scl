@@ -1,10 +1,4 @@
 ⟨SCL v1│bayesianScorer_gen1.mjs│14→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩bayesianScorer(1)→void⟨5⟩{
-⊩│export function bayesianScorer(reasoningChain) {
-·const entropy = calculateEntropy(reasoningChain);
-·const calibration = calibrateConfidence(reasoningChain);
-⊷│return { score: entropy + calibration };
-·}
-}⟨/bayesianScorer⟩
-⟩SCL│9│7⊨│2⑂│35.7%↓⟩
+⊩bayesianScorer(1)→void⟨5⟩{⊩⊷}
+⟩SCL│3│3⊨│2⑂│78.6%↓⟩

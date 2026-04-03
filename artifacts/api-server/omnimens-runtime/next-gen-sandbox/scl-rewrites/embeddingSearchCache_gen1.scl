@@ -7,21 +7,21 @@
 ·}
 ·this.numHashes = numHashes;
 ·this.numBands = numBands;
-⊮│this.hashTables = Array.from({ length: numBands }, () => new Map());
+⊮│this.hashTables = Array.from({ length: numBands }, () => new
 ⊮│this.embeddings = new Map();
 ·}
 ·_hashVector(vector) {
 κhashes
 ·for (let i = 0; i < this.numHashes; i++) {
-·const randomProjection = vector.map((val, idx) => val * Math.sin((i + 1) * idx));
-⋐│const sum = randomProjection.reduce((acc, val) => acc + val, 0);
+·const randomProjection = vector.map((val, idx) => val * Math.sin((i + 1) * idx))
+⋐│const sum = randomProjection.reduce((acc, val) => acc + val,
 ⊳│hashes.push(sum >= 0 ? 1 : 0);
 ·}
 ⊷│return hashes;
 ·}
 ·addEmbedding(id, vector) {
 ·if (this.embeddings.has(id)) {
-⊰│throw new Error(`Embedding with id '${id}' already exists.`);
+⊰│throw new Error(`Embedding with id '${id}' already exists.`)
 ·}
 κhashValues
 κbandSize
@@ -60,9 +60,9 @@
 ⊷│return results.slice(0, maxResults);
 ·}
 ·_cosineSimilarity(vec1, vec2) {
-⋐│const dotProduct = vec1.reduce((sum, val, idx) => sum + val * vec2[idx], 0);
-⋐│const magnitude1 = Math.sqrt(vec1.reduce((sum, val) => sum + val * val, 0));
-⋐│const magnitude2 = Math.sqrt(vec2.reduce((sum, val) => sum + val * val, 0));
+⋐│const dotProduct = vec1.reduce((sum, val, idx) => sum + val 
+⋐│const magnitude1 = Math.sqrt(vec1.reduce((sum, val) => sum +
+⋐│const magnitude2 = Math.sqrt(vec2.reduce((sum, val) => sum +
 ⊷│return dotProduct / (magnitude1 * magnitude2);
 ·}
 ·clear() {

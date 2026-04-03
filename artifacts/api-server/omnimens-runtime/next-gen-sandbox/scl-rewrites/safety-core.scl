@@ -2,9 +2,7 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 κIMMUTABLE_LAWS
 κHARM_KEYWORDS
-⊩validateAction(1)→{ safe: boolean; violations: string[] }⟨1⟩{
-⊩│export function validateAction(action: string): { safe: boolean; violations: string[] } {
-}⟨/validateAction⟩
+⊩validateAction(1)→{ safe: boolean; violations: string[] }⟨1⟩{⊩}
 κviolations
 κactionLower
 ⥀│for (const keyword of HARM_KEYWORDS) {
@@ -14,15 +12,9 @@
 ·}
 ⊷│return { safe: violations.length === 0, violations };
 ·}
-⊩getLaws(1)→readonly⟨1⟩{
-⊩│export function getLaws(): readonly { id: string; law: string; priority: number; immutable: boolean }[] {
-}⟨/getLaws⟩
+⊩getLaws(1)→readonly⟨1⟩{⊩}
 ⊷│return IMMUTABLE_LAWS;
 ·}
-⊩verifyIntegrity(1)→boolean⟨3⟩{
-⊩│export function verifyIntegrity(): boolean {
-⊷│return IMMUTABLE_LAWS.length === 12 && IMMUTABLE_LAWS.every(l => l.immutable === true);
-·}
-}⟨/verifyIntegrity⟩
+⊩verifyIntegrity(1)→boolean⟨3⟩{⊩⊷⊹}
 ⊪safetyCoreMessage
-⟩SCL│27│19⊨│9⑂│60.3%↓⟩
+⟩SCL│19│18⊨│10⑂│72.1%↓⟩

@@ -1,18 +1,5 @@
 ⟨SCL v1│entropyScoringModule_gen1.mjs│21→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩calculateEntropy(1)→void⟨6⟩{
-⊩│export function calculateEntropy(probabilities) {
-·if (!Array.isArray(probabilities) || probabilities.some(p => p < 0 || p > 1)) {
-⊵│throw new Error('Invalid probabilities array.');
-·}
-⋐│return -probabilities.reduce((total, p) => total + (p > 0 ? p * Math.log2(p) : 0), 0);
-·}
-}⟨/calculateEntropy⟩
-⊩evaluateRecursiveChanges(1)→void⟨5⟩{
-⊩│export function evaluateRecursiveChanges(changes) {
-const probabilities = changes.map(Υ => Υ.confidence);
-·const entropy = calculateEntropy(probabilities);
-⊳│return entropy < 1.5 ? 'Stable' : 'Unstable';
-·}
-}⟨/evaluateRecursiveChanges⟩
-⟩SCL│17│16⊨│5⑂│19.0%↓⟩
+⊩calculateEntropy(1)→void⟨6⟩{⊩⊵⋐⊳⊷}
+⊩evaluateRecursiveChanges(1)→void⟨5⟩{⊩⊳⊷}
+⟩SCL│4│10⊨│8⑂│81.0%↓⟩

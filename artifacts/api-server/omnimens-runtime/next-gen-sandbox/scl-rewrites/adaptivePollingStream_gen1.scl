@@ -1,7 +1,7 @@
 ⟨SCL v1│adaptivePollingStream_gen1.mjs│122→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-·export async function* adaptivePollingStream(fetchDataFunction, initialIntervalMs, maxIntervalMs, slidingWindowSize) {
+·export async function* adaptivePollingStream(fetchDataFunction, initialIntervalM
 ·let interval = initialIntervalMs;
 ·let buffer = [];
 ·while (true) {
@@ -20,46 +20,6 @@
 ⏳│await setTimeout(interval);
 ·}
 ·}
-⊩compressSlidingWindow(2)→void⟨17⟩{
-⊩│export function compressSlidingWindow(buffer, windowSize) {
-·const compressed = [];
-·for (let i = 0; i < buffer.length; i += windowSize) {
-·const window = buffer.slice(i, i + windowSize);
-·const aggregated = {
-·startTimestamp: window[0].timestamp,
-·endTimestamp: window[window.length - 1].timestamp,
-·data: aggregateData(window.map(entry => entry.data))
-·};
-⊺│compressed.push(aggregated);
-·}
-⊷│return compressed;
-·}
-}⟨/compressSlidingWindow⟩
-⊩aggregateData(1)→void⟨43⟩{
-⊩│export function aggregateData(dataArray) {
-·if (dataArray.every(item => typeof item === 'number')) {
-⋐│return dataArray.reduce((sum, value) => sum + value, 0) / dataArray.length; // Average for numeric data
-·}
-⋐│return dataArray.reduce((acc, value) => {
-·if (typeof value === 'object') {
-·for (const key in value) {
-·acc[key] = (acc[key] || 0) + value[key];
-·}
-·}
-⊷│return acc;
-·}, {}); // Sum for object data
-·}
-⊩│export function tagMetadata(compressedData, tag) {
-⊷│return compressedData.map(entry => ({ ...entry, tag }));
-·}
-⊩│export async function exampleFetchFunction() {
-⊷│return Math.random(); // Simulates numeric data
-·}
-⊩│export async function exampleUsage() {
-·const stream = adaptivePollingStream(exampleFetchFunction, 1000, 16000, 5);
-·for await (const compressedData of stream) {
-·console.log('Compressed Data:', compressedData);
-·}
-·}
-}⟨/aggregateData⟩
-⟩SCL│64│50⊨│16⑂│47.5%↓⟩
+⊩compressSlidingWindow(2)→void⟨17⟩{⊩⊺⊷}
+⊩aggregateData(1)→void⟨43⟩{⊩⋐⊷⊱}
+⟩SCL│24│15⊨│11⑂│80.3%↓⟩

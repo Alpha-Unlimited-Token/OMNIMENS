@@ -1,20 +1,4 @@
 ⟨SCL v1│unifiedKnowledgeGraphSynthesis_gen1.mjs│26→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩unifiedKnowledgeGraphSynthesis(1)→void⟨17⟩{
-⊩│export function unifiedKnowledgeGraphSynthesis(agentOutputs) {
-const weightedVotes = agentOutputs.map(θ => ({
-entity: θ.entity,
-confidence: θ.confidence
-·}));
-⋐│const synthesizedGraph = weightedVotes.reduce((graph, vote) => {
-·if (!graph[vote.entity]) {
-·graph[vote.entity] = vote.confidence;
-·} else {
-·graph[vote.entity] = (graph[vote.entity] + vote.confidence) / 2;
-·}
-⊷│return graph;
-·}, {});
-⊷│return synthesizedGraph;
-·}
-}⟨/unifiedKnowledgeGraphSynthesis⟩
-⟩SCL│19│18⊨│4⑂│26.9%↓⟩
+⊩unifiedKnowledgeGraphSynthesis(1)→void⟨17⟩{⊩⋐⊱⊷}
+⟩SCL│3│5⊨│4⑂│88.5%↓⟩

@@ -20,7 +20,7 @@ agents.forEach(α => {
 if (α.getLoad() < threshold) {
 α.handleTask(task);
 ·} else {
-⊰│console.warn(`Agent ${agent.name} unable to handle task due to load.`);
+⊰│console.warn(`Agent ${agent.name} unable to handle task due 
 ·}
 ·});
 ·}

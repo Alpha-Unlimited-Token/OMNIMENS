@@ -1,62 +1,9 @@
 ⟨SCL v1│recursiveContextManager_gen1.mjs│98→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩chunkData(2)→void⟨10⟩{
-⊩│export function chunkData(data, chunkSize) {
-·if (typeof data !== 'string' || chunkSize <= 0) {
-⊵│throw new Error('Invalid input: data must be a string and chunkSize must be a ☼ number.');
-·}
-·const chunks = [];
-·for (let i = 0; i < data.length; i += chunkSize) {
-⊺│chunks.push(data.slice(i, i + chunkSize));
-·}
-⊷│return chunks;
-·}
-}⟨/chunkData⟩
-⊩scoreChunk(1)→void⟨8⟩{
-⊩│export function scoreChunk(chunk) {
-·if (typeof chunk !== 'string') {
-⊵│throw new Error('Invalid input: chunk must be a string.');
-·}
-·const hash = createHash('sha256').update(chunk).digest('hex');
-·const score = parseInt(hash.slice(0, 8), 16) / 0xffffffff;
-⊷│return score;
-·}
-}⟨/scoreChunk⟩
-⊩summarizeChunk(1)→void⟨8⟩{
-⊩│export function summarizeChunk(chunk) {
-·if (typeof chunk !== 'string') {
-⊵│throw new Error('Invalid input: chunk must be a string.');
-·}
-·const words = chunk.split(' ');
-⟛│const summary = words.slice(0, Math.min(10, words.length)).join(' ') + (words.length > 10 ? '...' : '');
-⊷│return summary;
-·}
-}⟨/summarizeChunk⟩
-⊩reconstructContext(2)→void⟨22⟩{
-⊩│export function reconstructContext(chunks, depth = 0) {
-·if (!Array.isArray(chunks)) {
-⊵│throw new Error('Invalid input: chunks must be an array.');
-·}
-·if (depth > 10) {
-⊵│throw new Error('Maximum recursion depth exceeded.');
-·}
-·const scoredChunks = chunks.map(chunk => ({
-·chunk,
-·score: scoreChunk(chunk)
-·}));
-·scoredChunks.sort((a, b) => b.score - a.score);
-·const topChunks = scoredChunks.slice(0, Math.ceil(scoredChunks.length / 2)).map(item => summarizeChunk(item.chunk));
-⊹│if (topChunks.length === 1) {
-⊷│return topChunks[0];
-·}
-⊷│return reconstructContext(topChunks, depth + 1);
-·}
-}⟨/reconstructContext⟩
-⊩processDataset(2)→void⟨4⟩{
-⊩│export function processDataset(data, chunkSize) {
-·const chunks = chunkData(data, chunkSize);
-⊷│return reconstructContext(chunks);
-·}
-}⟨/processDataset⟩
-⟩SCL│61│66⊨│19⑂│37.8%↓⟩
+⊩chunkData(2)→void⟨10⟩{⊩⊵⊺⊷}
+⊩scoreChunk(1)→void⟨8⟩{⊩⊵⊷}
+⊩summarizeChunk(1)→void⟨8⟩{⊩⊵⟛⊳⊹⊷}
+⊩reconstructContext(2)→void⟨22⟩{⊩⊵⊹⊷}
+⊩processDataset(2)→void⟨4⟩{⊩⊷}
+⟩SCL│8│25⊨│19⑂│91.8%↓⟩

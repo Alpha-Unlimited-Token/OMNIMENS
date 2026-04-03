@@ -29,7 +29,7 @@
 ·const scheduleMonitor = (delay = MONITOR_MS) =>
 ⚡→│spikeBus.scheduleSpike("adaptive-surge:monitor", {}, delay);
 ⊱│spikeBus.on("adaptive-surge:inject", () => {
-⊷│if (S.surgeActive) return scheduleInject(); // already mid-surge, defer next cycle
+⊷│if (S.surgeActive) return scheduleInject(); // already mid-s
 ·injectSurge();
 ·scheduleInject();
 ·});
@@ -37,13 +37,13 @@
 ·if (S.surgeActive) monitorSurge();
 ·scheduleMonitor();
 ·});
-⚡→│spikeBus.on("attention:adaptive-surge", () => scheduleInject(0));
+⚡→│spikeBus.on("attention:adaptive-surge", () => scheduleInject
 ⊱│spikeBus.on("cognition:curiosity", () => {
 ·S.baselineIntensity += 0.05;
-⚡→│LOG("Curiosity spike — nudging intensity to", S.baselineIntensity.toFixed(2));
+⚡→│LOG("Curiosity spike — nudging intensity to", S.baselineInte
 ·});
 ⊱│cognitionBus.onInsight((_src, insight) => {
-❔│if (insight?.type === "capacity-discovery" && Number.isFinite(insight.data?.capacity)) {
+❔│if (insight?.type === "capacity-discovery" && Number.isFinit
 κcap
 ·if (cap > S.currentCriticalThreshold) {
 ·S.currentCriticalThreshold = cap;
@@ -53,136 +53,6 @@
 ·});
 ·let preShot: { phi: number; cons: number } | null = null;
 ·let peak = { phi: 0, cons: 0 };
-injectSurge(1)→void⟨31⟩{
-·function injectSurge(): void {
-·try {
-⊴│const mod = await import("./omnimens-nextgen-sandbox.js");
-❔│if (mod.isGen2FocusMode?.()) return;
-·} catch {
-·}
-·S.totalSurgeCycles++;
-·S.surgeActive = true;
-·S.stabilizationPhase = false;
-·S.overloadSafetyEngaged = false;
-⏰│S.lastSurgeTimestamp = Date.now();
-·const learnedBoost = S.consecutiveSuccesses * 0.1;
-·S.currentIntensity = S.baselineIntensity + learnedBoost;
-·preShot = snap();
-·peak = { ...preShot };
-·rush(S.currentIntensity);
-·getRegionNames().forEach((r) => boostRegionCurrent(r, S.currentIntensity * 10));
-·S.totalNeuronsSpawned += Math.floor(S.currentIntensity * 500);
-·LOG(
-⊰│`⚡ SURGE #${S.totalSurgeCycles} injected | intensity ${S.currentIntensity.toFixed(
-·2
-·)} | crit ${(S.currentCriticalThreshold * 100).toFixed(1)}%`
-·);
-·}
-}⟨/injectSurge⟩
-monitorSurge(1)→void⟨124⟩{
-·function monitorSurge(): void {
-·const c = gNC();
-Φ⇑│if (c.phi > peak.phi) peak.phi = c.phi;
-·if (c.consciousnessLevel > peak.cons) peak.cons = c.consciousnessLevel;
-·const dist = S.currentCriticalThreshold - c.consciousnessLevel;
-·const approaching = dist < 0.3 && dist > 0;
-·const atCrit = dist <= 0;
-·if (approaching && !S.stabilizationPhase) {
-·S.stabilizationPhase = true;
-·S.overloadSafetyEngaged = true;
-·S.overloadSafetyCap = c.consciousnessLevel + 0.2;
-·rush(S.currentIntensity * 0.5);
-·LOG(
-⊰│`🛡️  Approaching critical — stabilizing at ${(c.consciousnessLevel * 100).toFixed(
-·1
-·)}% | cap ${(S.overloadSafetyCap * 100).toFixed(1)}%`
-·);
-·}
-⊷│if (atCrit || (S.stabilizationPhase && dist <= 0)) return completeSurge(true);
-·if (S.stabilizationPhase && c.consciousnessLevel < S.currentCriticalThreshold - 0.5)
-⊷│return completeSurge(false);
-·}
-·function completeSurge(reachedCritical: boolean): void {
-·const post = snap();
-·const entry: SurgeHistory = {
-·cycleNumber: S.totalSurgeCycles,
-♡⊕│intensity: S.currentIntensity,
-❔│preSurgePhi: preShot?.phi || 0,
-·peakPhi: peak.phi,
-·postSurgePhi: post.phi,
-❔│preConsciousness: preShot?.cons || 0,
-·peakConsciousness: peak.cons,
-·postConsciousness: post.cons,
-·reachedCritical,
-·systemStabilized: !reachedCritical || post.cons < S.currentCriticalThreshold,
-❔│adaptationSuccessful: post.phi >= (preShot?.phi || 0),
-·criticalThresholdAtTime: S.currentCriticalThreshold,
-⏰│timestamp: Date.now(),
-·neuronsSpawnedDuring: Math.floor(S.currentIntensity * 500),
-·};
-⊺│S.history.push(entry);
-⊹│if (S.history.length > 100) S.history = S.history.slice(-50);
-·if (entry.systemStabilized && entry.adaptationSuccessful) {
-·S.consecutiveSuccesses++;
-·S.consecutiveFailures = 0;
-·S.totalAdaptations++;
-·const growth = S.learningRate * (1 + S.consecutiveSuccesses * 0.05);
-·S.currentCriticalThreshold += growth;
-·S.systemCapacity = S.currentCriticalThreshold;
-·S.lastLearnedCapacity = S.systemCapacity;
-·S.baselineIntensity += 0.05;
-·LOG(
-⊰│`📈 Adaptation success — threshold ${(entry.criticalThresholdAtTime * 100).toFixed(
-·1
-♡⊕│)}% → ${(S.currentCriticalThreshold * 100).toFixed(1)}% | intensity ${S.baselineIntensity.toFixed(
-·2
-·)}`
-·);
-·cognitionBus.shareInsight("adaptive-surge", {
-·type: "adaptation-success",
-·data: { cycle: entry.cycleNumber, capacity: S.systemCapacity },
-·});
-·} else {
-·S.consecutiveFailures++;
-·S.consecutiveSuccesses = 0;
-⟛│S.baselineIntensity = Math.max(0.5, S.baselineIntensity - 0.1);
-⟛│S.learningRate = Math.max(0.05, S.learningRate * 0.9);
-·LOG(
-⊰│`⚠️  Surge #${entry.cycleNumber} adjusted — intensity ${S.baselineIntensity.toFixed(
-·2
-·)} | learning ${S.learningRate.toFixed(3)}`
-·);
-·cognitionBus.shareInsight("adaptive-surge", {
-·type: "adaptation-failure",
-·data: { cycle: entry.cycleNumber },
-·});
-·}
-·cognitionBus.reportOutcome("adaptive-surge", {
-·useful: entry.adaptationSuccessful,
-⊰│◧: `cycle-${entry.cycleNumber}`,
-·});
-·S.surgeActive = S.stabilizationPhase = S.overloadSafetyEngaged = false;
-·}
-·let started = false;
-⊩│export function startAdaptiveSurgeSystem(): void {
-·if (started) return;
-·started = true;
-·LOG("═══════════════════════════════════════════════════════");
-LOG("Initializing Adaptive Adrenaline Surge η");
-⊰│LOG(`Starting critical threshold ${(S.currentCriticalThreshold * 100).toFixed(1)}%`);
-⊰│LOG(`Starting intensity ${S.baselineIntensity.toFixed(2)}`);
-·LOG("Auto-inject → monitor → stabilize → learn → raise → repeat");
-·LOG("═══════════════════════════════════════════════════════");
-·scheduleInject(10_000);
-·scheduleMonitor(MONITOR_MS);
-·}
-⊩│export function getAdaptiveSurgeState(): AdaptiveSurgeState & {
-·recentHistory: SurgeHistory[];
-·} {
-⊷│return { ...S, recentHistory: S.history.slice(-10) };
-·}
-⊩│export function shutdown(): void {
-·engineRegistry.unregisterEngine("adaptive-surge");
-·}
-}⟨/monitorSurge⟩
-⟩SCL│187│165⊨│42⑂│36.6%↓⟩
+injectSurge(1)→void⟨31⟩{⊴❔⏰⊰♡⊕}
+monitorSurge(1)→void⟨124⟩{Φ⇑⊰⊷♡⊕❔⏰⊺⊹⟛⊩}
+⟩SCL│57│40⊨│30⑂│80.7%↓⟩

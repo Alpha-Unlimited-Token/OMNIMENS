@@ -16,7 +16,7 @@ aggregatedResults[θ] = 0;
 ·}
 aggregatedResults[θ] += confidence;
 ·});
-⊷│return Object.entries(aggregatedResults).sort((a, b) => b[1] - a[1])[0][0];
+⊷│return Object.entries(aggregatedResults).sort((a, b) => b[1]
 ·}
 ·}
 ⟩SCL│21│11⊨│6⑂│40.0%↓⟩

@@ -1,51 +1,10 @@
 ⟨SCL v1│dynamicMemoryCache_gen1.mjs│106→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-cosineSimilarity(2)→void⟨15⟩{
-·function cosineSimilarity(vectorA, vectorB) {
-⊹│if (vectorA.length !== vectorB.length) {
-⊵│throw new Error("Vectors must have the same length.");
-·}
-⋐│const dotProduct = vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
-⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
-⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
-·if (magnitudeA === 0 || magnitudeB === 0) {
-⊷│return 0; // Avoid division by zero
-·}
-⊷│return dotProduct / (magnitudeA * magnitudeB);
-·}
-}⟨/cosineSimilarity⟩
+cosineSimilarity(2)→void⟨15⟩{⊹⊵⋐⊷}
 κembeddingStore
-addEmbedding(2)→void⟨6⟩{
-·function addEmbedding(id, vector) {
-·if (embeddingStore.has(id)) {
-⊰│throw new Error(`Embedding with id '${id}' already exists.`);
-·}
-⊡│embeddingStore.set(id, vector);
-·}
-}⟨/addEmbedding⟩
-searchEmbeddings(2)→void⟨16⟩{
-·function searchEmbeddings(queryVector, topK = 1) {
-·if (topK <= 0) {
-⊵│throw new Error("topK must be greater than 0.");
-·}
-const ⊢ = [];
-·for (const [id, vector] of embeddingStore.entries()) {
-·const similarity = cosineSimilarity(queryVector, vector);
-⊺│⊢.push({ id, similarity });
-·}
-⊢.sort((a, b) => b.similarity - a.similarity);
-⊷│return ⊢.slice(0, topK);
-·}
-}⟨/searchEmbeddings⟩
-clearEmbeddings(1)→void⟨3⟩{
-·function clearEmbeddings() {
-·embeddingStore.clear();
-·}
-}⟨/clearEmbeddings⟩
-getEmbeddingCount(1)→void⟨3⟩{
-·function getEmbeddingCount() {
-⊷│return embeddingStore.size;
-·}
-}⟨/getEmbeddingCount⟩
+addEmbedding(2)→void⟨6⟩{⊰⊵⊡}
+searchEmbeddings(2)→void⟨16⟩{⊵⊺⊷}
+clearEmbeddings(1)→void⟨3⟩{}
+getEmbeddingCount(1)→void⟨3⟩{⊷}
 ·export { addEmbedding, searchEmbeddings, clearEmbeddings, getEmbeddingCount };
-⟩SCL│50│47⊨│13⑂│52.8%↓⟩
+⟩SCL│9│17⊨│11⑂│91.5%↓⟩

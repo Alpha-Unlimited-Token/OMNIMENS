@@ -2,68 +2,10 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
 κtaskQueue
-⊩addTask(3)→void⟨6⟩{
-⊩│export function addTask(taskId, taskFunction, initialState) {
-·if (taskQueue.has(taskId)) {
-⊰│throw new Error(`Task with ID '${taskId}' already exists.`);
-·}
-⊡│taskQueue.set(taskId, { taskFunction, state: initialState, completed: false });
-·}
-}⟨/addTask⟩
-⊩executeTask(1)→void⟨22⟩{
-⊩│export function executeTask(taskId) {
-⊡│const task = taskQueue.get(taskId);
-·if (!task) {
-⊰│throw new Error(`Task with ID '${taskId}' not found.`);
-·}
-·if (task.completed) {
-⊷│return 'completed';
-·}
-·try {
-·const nextState = task.taskFunction(task.state);
-·if (nextState === null || nextState === undefined) {
-·task.completed = true;
-·task.state = null;
-⊷│return 'completed';
-·}
-·task.state = nextState;
-⊷│return 'in-progress';
-·} catch (error) {
-⊰│throw new Error(`Error executing task '${taskId}': ${error.message}`);
-·}
-·}
-}⟨/executeTask⟩
-⊩removeTask(1)→void⟨10⟩{
-⊩│export function removeTask(taskId) {
-⊡│const task = taskQueue.get(taskId);
-·if (!task) {
-⊰│throw new Error(`Task with ID '${taskId}' not found.`);
-·}
-·if (!task.completed) {
-⊰│throw new Error(`Cannot remove task '${taskId}' because it is not completed.`);
-·}
-·taskQueue.delete(taskId);
-·}
-}⟨/removeTask⟩
-⊩listTasks(1)→void⟨6⟩{
-⊩│export function listTasks() {
-⊱│return Array.from(taskQueue.entries()).map(([taskId, task]) => ({
-·taskId,
-·completed: task.completed
-·}));
-·}
-}⟨/listTasks⟩
-⊩generateTaskId(2)→void⟨6⟩{
-⊩│export function generateTaskId(taskFunction, initialState) {
-·const hash = createHash('sha256');
-·hash.update(taskFunction.toString());
-⟠│hash.update(JSON.stringify(initialState));
-⊷│return hash.digest('hex');
-·}
-}⟨/generateTaskId⟩
-⊩resetQueue(1)→void⟨3⟩{
-⊩│export function resetQueue() {
-·taskQueue.clear();
-·}
-}⟨/resetQueue⟩
-⟩SCL│68│70⊨│20⑂│33.3%↓⟩
+⊩addTask(3)→void⟨6⟩{⊩⊰⊵⊡}
+⊩executeTask(1)→void⟨22⟩{⊩⊡⊰⊵⊷}
+⊩removeTask(1)→void⟨10⟩{⊩⊡⊰⊵}
+⊩listTasks(1)→void⟨6⟩{⊩⊱⊷}
+⊩generateTaskId(2)→void⟨6⟩{⊩⟠⊷}
+⊩resetQueue(1)→void⟨3⟩{⊩}
+⟩SCL│10│28⊨│20⑂│90.2%↓⟩

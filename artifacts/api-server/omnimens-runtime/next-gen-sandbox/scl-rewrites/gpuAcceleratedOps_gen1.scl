@@ -1,48 +1,6 @@
 ⟨SCL v1│gpuAcceleratedOps_gen1.mjs│88→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩⟿gpuMatrixMultiply(5)→void⟨33⟩{
-⊩│export async function gpuMatrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
-⊹│if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
-⊵│throw new Error("Matrix dimensions do not match for multiplication.");
-·}
-·const wasmCode = new Uint8Array([
-·0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, 0x01, 0x0b, 0x02, 0x60,
-·0x03, 0x7f, 0x7f, 0x7f, 0x01, 0x7f, 0x60, 0x00, 0x00, 0x03, 0x03, 0x02,
-·0x00, 0x01, 0x07, 0x07, 0x01, 0x03, 0x6d, 0x75, 0x6c, 0x00, 0x00, 0x0a,
-·0x1e, 0x01, 0x1c, 0x00, 0x20, 0x00, 0x20, 0x01, 0x20, 0x02, 0x10, 0x00,
-·0x0b
-·]);
-·const wasmModule = await WebAssembly.compile(wasmCode);
-·const wasmInstance = await WebAssembly.instantiate(wasmModule, {});
-⊲│const { mul } = wasmInstance.exports;
-·const result = new Float32Array(rowsA * colsB);
-·for (let i = 0; i < rowsA; i++) {
-·for (let j = 0; j < colsB; j++) {
-·let sum = 0;
-·for (let k = 0; k < colsA; k++) {
-·sum += matrixA[i * colsA + k] * matrixB[k * colsB + j];
-·}
-·result[i * colsB + j] = sum;
-·}
-·}
-⊷│return result;
-·}
-}⟨/gpuMatrixMultiply⟩
-⊩⟿gpuNeuralInference(4)→void⟨7⟩{
-⊩│export async function gpuNeuralInference(input, weights, inputSize, outputSize) {
-⊹│if (input.length !== inputSize || weights.length !== inputSize * outputSize) {
-⊵│throw new Error("Input or weight dimensions do not match.");
-·}
-⊴│return await gpuMatrixMultiply(input, weights, 1, inputSize, outputSize);
-·}
-}⟨/gpuNeuralInference⟩
-⊩isGpuAcceleratedEnvAvailable(1)→void⟨7⟩{
-⊩│export function isGpuAcceleratedEnvAvailable() {
-·try {
-⊷│return typeof WebAssembly !== "undefined";
-·} catch (e) {
-⊷│return false;
-·}
-·}
-}⟨/isGpuAcceleratedEnvAvailable⟩
-⟩SCL│47│50⊨│12⑂│46.6%↓⟩
+⊩⟿gpuMatrixMultiply(5)→void⟨33⟩{⊩⊹⊵⊲⊷}
+⊩⟿gpuNeuralInference(4)→void⟨7⟩{⊩⊹⊵⊴⊷}
+⊩isGpuAcceleratedEnvAvailable(1)→void⟨7⟩{⊩⊷}
+⟩SCL│5│15⊨│12⑂│94.3%↓⟩

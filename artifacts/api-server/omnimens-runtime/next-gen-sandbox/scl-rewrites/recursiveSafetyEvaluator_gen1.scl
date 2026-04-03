@@ -1,7 +1,7 @@
 ⟨SCL v1│recursiveSafetyEvaluator_gen1.mjs│30→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊪recursiveSafetyEvaluator
-⊷│return simulatedFailures.filter(failure => failure.likelihood > 0.3);
+⊷│return simulatedFailures.filter(failure => failure.likelihoo
 ·},
 ⊱│counterfactualAnalysis: (modification) => {
 κcounterfactualScenarios

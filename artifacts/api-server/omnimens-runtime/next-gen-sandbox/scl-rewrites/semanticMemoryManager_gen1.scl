@@ -2,63 +2,15 @@
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊲│const { createHash } = require('crypto');
 κvectorStore
-cosineSimilarity(2)→void⟨15⟩{
-·function cosineSimilarity(vectorA, vectorB) {
-⊹│if (vectorA.length !== vectorB.length) {
-⊵│throw new Error('Vectors must be of the same length.');
-·}
-⋐│const dotProduct = vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
-⋐│const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
-⋐│const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
-·if (magnitudeA === 0 || magnitudeB === 0) {
-⊷│return 0; // Avoid division by zero
-·}
-⊷│return dotProduct / (magnitudeA * magnitudeB);
-·}
-}⟨/cosineSimilarity⟩
-generateKey(2)→void⟨5⟩{
-·function generateKey(sessionId, input) {
-·const hash = createHash('sha256');
-⊰│hash.update(`${sessionId}:${input}`);
-⊷│return hash.digest('hex');
-·}
-}⟨/generateKey⟩
-storeEmbedding(3)→void⟨4⟩{
-·function storeEmbedding(sessionId, input, embedding) {
-·const key = generateKey(sessionId, input);
-·vectorStore[key] = { sessionId, input, embedding };
-·}
-}⟨/storeEmbedding⟩
-searchEmbedding(2)→void⟨17⟩{
-·function searchEmbedding(sessionId, queryEmbedding) {
-·let bestMatch = null;
-·let highestSimilarity = -Infinity;
-·for (const key in vectorStore) {
-⊲│const { sessionId: storedSessionId, embedding } = vectorStore[key];
-·if (storedSessionId === sessionId) {
-·const similarity = cosineSimilarity(queryEmbedding, embedding);
-·if (similarity > highestSimilarity) {
-·highestSimilarity = similarity;
-·bestMatch = vectorStore[key];
-·}
-·}
-·}
-⊷│return bestMatch;
-·}
-}⟨/searchEmbedding⟩
-clearSessionEmbeddings(1)→void⟨7⟩{
-·function clearSessionEmbeddings(sessionId) {
-·for (const key in vectorStore) {
-·if (vectorStore[key].sessionId === sessionId) {
-·delete vectorStore[key];
-·}
-·}
-·}
-}⟨/clearSessionEmbeddings⟩
+cosineSimilarity(2)→void⟨15⟩{⊹⊵⋐⊷}
+generateKey(2)→void⟨5⟩{⊰⊷}
+storeEmbedding(3)→void⟨4⟩{}
+searchEmbedding(2)→void⟨17⟩{⊲⊷}
+clearSessionEmbeddings(1)→void⟨7⟩{}
 Ε.exports = {
 ·cosineSimilarity,
 ·storeEmbedding,
 ·searchEmbedding,
 ·clearSessionEmbeddings
 ·};
-⟩SCL│63│54⊨│12⑂│43.8%↓⟩
+⟩SCL│15│16⊨│9⑂│86.6%↓⟩

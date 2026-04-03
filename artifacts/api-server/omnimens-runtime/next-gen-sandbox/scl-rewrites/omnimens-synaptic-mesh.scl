@@ -20,25 +20,8 @@
 let ↻ = 0;
 κconnections
 κAGENT_DOMAINS
-key(2)→void⟨3⟩{
-·function key(f: AgentName, t: AgentName) {
-⊰│return `${f}→${t}`;
-·}
-}⟨/key⟩
-conn(2)→SynapticConnection⟨12⟩{
-·function conn(f: AgentName, t: AgentName): SynapticConnection {
-·const k = key(f, t);
-·if (!connections.has(k))
-⊡│connections.set(k, {
-·fromAgent: f,
-·toAgent: t,
-·strength: 0.5,
-·successfulTransfers: 0,
-·totalAttempts: 0,
-·});
-⊡│return connections.get(k)!;
-·}
-}⟨/conn⟩
+key(2)→void⟨3⟩{⊰⊷}
+conn(2)→SynapticConnection⟨12⟩{⊡⊷}
 ⊱│const strengthen = (f: AgentName, t: AgentName) => {
 κc
 ·c.successfulTransfers++;
@@ -58,54 +41,5 @@ dbGateway.⊞("synaptic-mesh", "omnimensAgentMesh", row, "NORMAL");
 dbGateway.⊞("synaptic-mesh", "omnimensBrain", row, "NORMAL");
 ·const writeNotif = (row: Record<string, unknown>) =>
 dbGateway.⊞("synaptic-mesh", "omnimensNotifications", row, "NORMAL");
-⟿motherBrainScan(1)→Promise<⟨56⟩{
-·async function motherBrainScan(): Promise<{
-·crossOpportunities: { from: AgentName; to: AgentName; discovery: string; reason: string }[];
-·}> {
-⏰│const after = new Date(Date.now() - 2 * 60 * 60 * 1_000).toISOString();
-⊴│const recent = await readMesh({
-·messageType: [
-·"spider_beacon",
-·"discovery",
-·"upgrade_proposal",
-·"knowledge_share",
-·"spider_swarm_detail",
-·],
-·createdAfter: after,
-⏳: 40,
-·});
-⊮│const byAgent = new Map<AgentName, string[]>();
-·const agents = getAllAgentNames();
-⊡│agents.forEach((a) => byAgent.set(a, []));
-⊱│recent.forEach((r: any) => {
-⊽│const a = (r.fromAgent || "").replace("Spider:", "") as AgentName;
-⊡│if (agents.includes(a)) byAgent.get(a)!.push(`[${r.messageType}] ${r.content?.slice(0, 180)}`);
-·});
-⊡│const active = agents.filter((a) => (byAgent.get(a) || []).length);
-⊷│if (active.length < 2) return { crossOpportunities: [] };
-·const summaries = active
-·.map(
-·(a) =>
-⊡│`${a} (domain: ${AGENT_DOMAINS[a]})\n${(byAgent.get(a) || []).slice(0, 3).join("\n")}`
-·)
-·.join("\n\n---\n\n");
-·const aiResponse = await apiManager.call("synaptic-mesh", "openai", {
-·path: "/chat/completions",
-·model: "gpt-4o",
-·messages: [
-·{
-·role: "user",
-⊰│content: `You are the MOTHER BRAIN... (truncated prompt)\n${summaries}`,
-·},
-·],
-·max_tokens: 800,
-·temperature: 0.5,
-·});
-·let parsed: any = {};
-·try {
-⟠│parsed = JSON.parse(
-❔│(aiResponse.choices?.[0]?.message?.content || "").replace(/
-⊪│export const _v2RewriteModule = "omnimens-synaptic-mesh";
-·export {};
-}⟨/motherBrainScan⟩
-⟩SCL│110│94⊨│24⑂│25.2%↓⟩
+⟿motherBrainScan(1)→Promise<⟨56⟩{⏰⊴⊮α→⊢⊡⊱⊽❔⊰⊺⊻⊷⊹⟠⊪}
+⟩SCL│44│40⊨│26⑂│70.1%↓⟩

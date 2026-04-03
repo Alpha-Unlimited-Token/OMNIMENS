@@ -1,14 +1,4 @@
 ⟨SCL v1│stopSelfRewardingMechanism_gen1.mjs│18→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩selfRewardingMechanism(2)→void⟨9⟩{
-⊩│export function selfRewardingMechanism(systemMetrics, feedbackSignal) {
-·const highPriorityThreshold = 0.8;
-·const rewardSignal = systemMetrics.performance * feedbackSignal;
-·if (rewardSignal > highPriorityThreshold) {
-⊷│return { priority: 'high', adjustment: rewardSignal * 0.1 };
-·} else {
-⊷│return { priority: 'normal', adjustment: rewardSignal * 0.05 };
-·}
-·}
-}⟨/selfRewardingMechanism⟩
-⟩SCL│13│11⊨│3⑂│27.8%↓⟩
+⊩selfRewardingMechanism(2)→void⟨9⟩{⊩⊷}
+⟩SCL│3│3⊨│2⑂│83.3%↓⟩

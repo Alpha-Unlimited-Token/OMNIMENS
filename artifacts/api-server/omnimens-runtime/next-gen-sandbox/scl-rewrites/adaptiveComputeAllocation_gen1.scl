@@ -9,13 +9,13 @@
 κtotalResources
 κallocation
 ·this.agentResources[agentId] = allocation;
-📡⊛│this.eventBus.publish('resourceAllocated', { agentId, allocation });
+📡⊛│this.eventBus.publish('resourceAllocated', { agentId, alloca
 ·}
 ·calculateTotalResources() {
 ⊷│return 100;
 ·}
 ·dynamicReallocation() {
-⊱│this.eventBus.subscribe('taskPriorityChanged', ({ agentId, newPriority }) => {
+⊱│this.eventBus.subscribe('taskPriorityChanged', ({ agentId, n
 ·this.allocateResources(agentId, newPriority);
 ·});
 ·}

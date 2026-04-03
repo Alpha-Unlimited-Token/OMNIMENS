@@ -1,18 +1,5 @@
 ⟨SCL v1│entityRelationshipSynthesis_gen1.mjs│23→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩entityRelationshipSynthesis(1)→void⟨12⟩{
-⊩│export function entityRelationshipSynthesis(agentOutputs) {
-·const graph = createGraph();
-agentOutputs.forEach(θ => {
-θ.✧.forEach(entity => {
-·graph.addNode(entity.name, entity.attributes);
-·entity.relationships.forEach(rel => {
-·graph.addEdge(entity.name, rel.target, rel.type);
-·});
-·});
-·});
-⊷│return rankNodes(graph);
-·}
-}⟨/entityRelationshipSynthesis⟩
-⟩SCL│17│15⊨│2⑂│26.1%↓⟩
+⊩entityRelationshipSynthesis(1)→void⟨12⟩{⊩⊷}
+⟩SCL│4│4⊨│2⑂│82.6%↓⟩

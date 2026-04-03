@@ -1,20 +1,4 @@
 ⟨SCL v1│faultInjectionTesting_gen1.mjs│26→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩simulateFaultInjection(1)→void⟨17⟩{
-⊩│export function simulateFaultInjection(agentMesh) {
-·const faults = [
-⊱│{ type: 'communicationDropout', simulate: () => { /* simulate dropout */ } },
-⊱│{ type: 'dataCorruption', simulate: () => { /* simulate corrupted data */ } },
-⊱│{ type: 'timingMismatch', simulate: () => { /* simulate timing issues */ } }
-·];
-·faults.forEach(fault => {
-·try {
-·fault.simulate(agentMesh);
-·} catch (error) {
-⊰│console.error(`Fault injection ↺ for ${fault.type}:`, error);
-·}
-·});
-⊷│return agentMesh;
-·}
-}⟨/simulateFaultInjection⟩
-⟩SCL│19│19⊨│6⑂│26.9%↓⟩
+⊩simulateFaultInjection(1)→void⟨17⟩{⊩⊱⊰⊷}
+⟩SCL│3│5⊨│4⑂│88.5%↓⟩

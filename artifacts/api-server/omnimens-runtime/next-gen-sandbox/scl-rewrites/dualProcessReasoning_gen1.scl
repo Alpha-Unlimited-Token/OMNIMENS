@@ -1,6 +1,4 @@
 ⟨SCL v1│dualProcessReasoning_gen1.mjs│10→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩dualProcessReasoning(1)→void⟨1⟩{
-⊩│export function dualProcessReasoning(task) { const system1 = (input) => { /* fast heuristic-driven reasoning */ return input.someQuickDecision; }; const system2 = (input) => { /* slower deliberative reasoning */ return input.detailedAnalysis(); }; return task.isHighPriority ? system2(task.input) : system1(task.input); }
-}⟨/dualProcessReasoning⟩
-⟩SCL│5│2⊨│1⑂│50.0%↓⟩
+⊩dualProcessReasoning(1)→void⟨1⟩{⊩⊱⊳⊷}
+⟩SCL│3│5⊨│4⑂│70.0%↓⟩

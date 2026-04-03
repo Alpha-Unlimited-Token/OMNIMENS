@@ -1,30 +1,7 @@
 ⟨SCL v1│longContextManager_gen1.mjs│75→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-generateSummary(1)→void⟨5⟩{
-function generateSummary(⋮) {
-⊹│const keyTokens = ⋮.filter(token => token.length > 3); // Example: filter ⋮ longer than 3 characters.
-⊷│return keyTokens.slice(0, 10).join(" "); // Return first 10 key ⋮ as summary.
-·}
-}⟨/generateSummary⟩
-manageContext(3)→void⟨18⟩{
-function manageContext(⋮, windowSize, overlapSize) {
-·if (windowSize <= 0 || overlapSize < 0 || overlapSize >= windowSize) {
-⊵│throw new Error("Invalid windowSize or overlapSize parameters.");
-·}
-·const contextWindows = [];
-for (let i = 0; i < ⋮.length; i += windowSize - overlapSize) {
-const windowTokens = ⋮.slice(i, i + windowSize);
-·const summary = generateSummary(windowTokens);
-⊺│contextWindows.push({ ⋮: windowTokens, summary });
-if (i + windowSize >= ⋮.length) break;
-·}
-⊷│return contextWindows;
-·}
-}⟨/manageContext⟩
-combineSummaries(1)→void⟨3⟩{
-·function combineSummaries(contextWindows) {
-⊷│return contextWindows.map(window => window.summary).join(" | ");
-·}
-}⟨/combineSummaries⟩
+generateSummary(1)→void⟨5⟩{⊹⊷}
+manageContext(3)→void⟨18⟩{⊵⊺⊷}
+combineSummaries(1)→void⟨3⟩{⊷}
 ·export { generateSummary, manageContext, combineSummaries };
-⟩SCL│29│26⊨│6⑂│61.3%↓⟩
+⟩SCL│6│9⊨│6⑂│92.0%↓⟩

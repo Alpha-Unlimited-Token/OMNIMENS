@@ -1,22 +1,4 @@
 ⟨SCL v1│dynamicGraphSynthesizer_gen1.mjs│28→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩dynamicGraphSynthesizer(2)→void⟨19⟩{
-⊩│export function dynamicGraphSynthesizer(graphData, agentOutputs) {
-const weightedVotes = agentOutputs.map(θ => {
-⊷│return {
-node: θ.node,
-weight: θ.confidence
-·};
-·});
-·const synthesizedGraph = graphData.map(node => {
-·const votes = weightedVotes.filter(vote => vote.node === node.id);
-⋐│const totalWeight = votes.reduce((acc, v) => acc + v.weight, 0);
-⊷│return {
-·...node,
-·confidence: totalWeight / votes.length
-·};
-·});
-⊷│return synthesizedGraph;
-·}
-}⟨/dynamicGraphSynthesizer⟩
-⟩SCL│21│20⊨│5⑂│25.0%↓⟩
+⊩dynamicGraphSynthesizer(2)→void⟨19⟩{⊩⊷⋐}
+⟩SCL│3│4⊨│3⑂│89.3%↓⟩

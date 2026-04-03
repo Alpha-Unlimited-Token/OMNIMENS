@@ -3,7 +3,7 @@ constructor() {
 this.scenarios = [];
 }
 simulateScenario(inputs, model) {
-let results = undefined; /* SCL-const */
+const results = undefined; /* SCL-const */
   this.scenarios.push({ inputs, results });
   return results;
 }
@@ -11,7 +11,7 @@ evaluateScenarios() {
   return this.scenarios.map(scenario => {
   return {
 inputs: scenario.inputs,
-report: scenario.report,
+agent returns results to parent coordinator: scenario.agent returns results to parent coordinator,
 robustnessScore: Math.random() // Placeholder for robustness evaluation
 };
 });

@@ -19,10 +19,5 @@ if (α.taskComplexity > 5) {
 ·}
 ·}
 ·}
-⊩initializeRoleManager(1)→void⟨4⟩{
-⊩│export function initializeRoleManager(agentMesh) {
-·const roleManager = new DynamicRoleManager(agentMesh);
-·roleManager.negotiateRoles();
-·}
-}⟨/initializeRoleManager⟩
-⟩SCL│27│14⊨│5⑂│25.0%↓⟩
+⊩initializeRoleManager(1)→void⟨4⟩{⊩}
+⟩SCL│22│11⊨│5⑂│38.9%↓⟩

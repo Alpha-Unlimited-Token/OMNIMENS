@@ -1,62 +1,12 @@
 ⟨SCL v1│subprocessCheckpointManager_gen1.mjs│108→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
 ⊫[]
-⊩generateTaskId(1)→void⟨4⟩{
-⊩│export function generateTaskId(input) {
-⟠│const data = typeof input === 'object' ? JSON.stringify(input) : String(input);
-⊷│return createHash('sha256').update(data).digest('hex');
-·}
-}⟨/generateTaskId⟩
-⊩serializeState(1)→void⟨3⟩{
-⊩│export function serializeState(state) {
-⟠│return JSON.stringify(state);
-·}
-}⟨/serializeState⟩
-⊩deserializeState(1)→void⟨3⟩{
-⊩│export function deserializeState(serializedState) {
-⟠│return JSON.parse(serializedState);
-·}
-}⟨/deserializeState⟩
-⊩partitionTasks(2)→void⟨7⟩{
-⊩│export function partitionTasks(tasks, partitions) {
-·const result = Array.from({ length: partitions }, () => []);
-⊱│tasks.forEach((task, index) => {
-⊺│result[index % partitions].push(task);
-·});
-⊷│return result;
-·}
-}⟨/partitionTasks⟩
-⊩resumeFromCheckpoint(2)→void⟨5⟩{
-⊩│export function resumeFromCheckpoint(checkpoint, computationFunction) {
-⊲│const { state, metadata } = checkpoint;
-·const deserializedState = deserializeState(state);
-⊷│return computationFunction(deserializedState, metadata);
-·}
-}⟨/resumeFromCheckpoint⟩
-⊩createCheckpoint(2)→void⟨6⟩{
-⊩│export function createCheckpoint(state, metadata) {
-⊷│return {
-·state: serializeState(state),
-·metadata
-·};
-·}
-}⟨/createCheckpoint⟩
-⊩exampleComputationFunction(2)→void⟨8⟩{
-⊩│export function exampleComputationFunction(state, metadata) {
-⊷│return {
-·...state,
-·counter: (state.counter || 0) + 1,
-·metadata
-·};
-·}
-}⟨/exampleComputationFunction⟩
-⊩exampleUsage(1)→void⟨9⟩{
-⊩│export function exampleUsage() {
-·const initialState = { counter: 0 };
-·const metadata = { taskId: generateTaskId(initialState) };
-·const checkpoint = createCheckpoint(initialState, metadata);
-·const resumedState = resumeFromCheckpoint(checkpoint, exampleComputationFunction);
-⊷│return resumedState;
-·}
-}⟨/exampleUsage⟩
-⟩SCL│61│63⊨│20⑂│43.5%↓⟩
+⊩generateTaskId(1)→void⟨4⟩{⊩⟠⊳⊷}
+⊩serializeState(1)→void⟨3⟩{⊩⟠⊷}
+⊩deserializeState(1)→void⟨3⟩{⊩⟠⊷}
+⊩partitionTasks(2)→void⟨7⟩{⊩⊱⊺⊷}
+⊩resumeFromCheckpoint(2)→void⟨5⟩{⊩⊲⊷}
+⊩createCheckpoint(2)→void⟨6⟩{⊩⊷}
+⊩exampleComputationFunction(2)→void⟨8⟩{⊩⊷}
+⊩exampleUsage(1)→void⟨9⟩{⊩⊷}
+⟩SCL│11│32⊨│23⑂│89.8%↓⟩

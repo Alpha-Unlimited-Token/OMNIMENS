@@ -8,7 +8,7 @@
 ⊬IntelSweepResult⟨⟩
 ⊶│export class UnifiedNeuralFabric {
 ⊮│private subscriptions = new Map<Topic, Subscription[]>();
-⊮│private sharedMemory = new Map<string, { value: unknown; owner: string; updatedAt: number }>();
+⊮│private sharedMemory = new Map<string, { value: unknown; own
 ·private taskQueue: TaskItem[] = [];
 ⊮│private knowledgeGraph = new Map<string, KnowledgeNode>();
 ·private sweepResults: IntelSweepResult[] = [];
@@ -16,11 +16,11 @@
 ·private taskIdCounter = 0;
 ·private _initialized = false;
 ·initialize(): void { this._initialized = true; }
-·subscribe(topic: Topic, subscriberId: string, handler: Handler, priority = 5): () => void {
-⊡│if (!this.subscriptions.has(topic)) this.subscriptions.set(topic, []);
+·subscribe(topic: Topic, subscriberId: string, handler: Handler, priority = 5): (
+⊡│if (!this.subscriptions.has(topic)) this.subscriptions.set(t
 κsub
 ⊡│this.subscriptions.get(topic)!.push(sub);
-⊡│this.subscriptions.get(topic)!.sort((a, b) => a.priority - b.priority);
+⊡│this.subscriptions.get(topic)!.sort((a, b) => a.priority - b
 ⊱│return () => {
 κsubs
 ·if (subs) {
@@ -38,7 +38,7 @@
 ·}
 κwildcardSubs
 ⥀│for (const sub of wildcardSubs) {
-🛡│try { sub.handler({ topic, payload }, from); delivered++; } catch {}
+🛡│try { sub.handler({ topic, payload }, from); delivered++; } 
 ·}
 ⊷│return delivered;
 ·}
@@ -50,7 +50,7 @@
 ⊷│return delivered;
 ·}
 setShared(key: string, ≪: unknown, owner: string): void {
-⊡│this.sharedMemory.set(key, { value, owner, updatedAt: Date.now() });
+⊡│this.sharedMemory.set(key, { value, owner, updatedAt: Date.n
 ·}
 ·getShared(key: string): unknown | undefined {
 ⊡│return this.sharedMemory.get(key)?.value;
@@ -62,24 +62,24 @@ setShared(key: string, ≪: unknown, owner: string): void {
 ·}
 ⊷│return result;
 ·}
-⊳│enqueueTask(task: string, priority: number, assignee?: string): string {
+⊳│enqueueTask(task: string, priority: number, assignee?: strin
 κid
-⏰│this.taskQueue.push({ id, task, priority, assignee: assignee || null, status: "pending", createdAt: Date.now() });
+⏰│this.taskQueue.push({ id, task, priority, assignee: assignee
 ·this.taskQueue.sort((a, b) => a.priority - b.priority);
 ⊷│return id;
 ·}
 ·claimTask(workerId: string): TaskItem | null {
-·const task = this.taskQueue.find(t => t.status === "pending" && (!t.assignee || t.assignee === workerId));
+·const task = this.taskQueue.find(t => t.status === "pending" && (!t.assignee || 
 ·if (task) { task.status = "running"; task.assignee = workerId; }
 ⊷│return task || null;
 ·}
 ·completeTask(taskId: string): void {
 ·const task = this.taskQueue.find(t => t.id === taskId);
 ·if (task) task.status = "done";
-⏰│this.taskQueue = this.taskQueue.filter(t => t.status !== "done" || Date.now() - t.createdAt < 60_000);
+⏰│this.taskQueue = this.taskQueue.filter(t => t.status !== "do
 ·}
 ·addKnowledge(id: string, label: string, data: unknown): void {
-⊡│this.knowledgeGraph.set(id, { id, label, connections: new Set(), data, strength: 1.0, lastAccessed: Date.now() });
+⊡│this.knowledgeGraph.set(id, { id, label, connections: new Se
 ·}
 ·connectKnowledge(idA: string, idB: string): void {
 κa
@@ -100,25 +100,25 @@ setShared(key: string, ≪: unknown, owner: string): void {
 ⟛│node.strength = Math.min(node.strength + 0.1, 10);
 ⊺│results.push(node);
 ⥀│for (const conn of node.connections) {
-⊺│if (!visited.has(conn)) queue.push({ nodeId: conn, d: d + 1 });
+⊺│if (!visited.has(conn)) queue.push({ nodeId: conn, d: d + 1 
 ·}
 ·}
 ·}
 ⊷│return results;
 ·}
 recordSweep(η: string, insights: string[]): void {
-⏰│this.sweepResults.push({ source, insights, timestamp: Date.now() });
-⊹│if (this.sweepResults.length > 200) this.sweepResults = this.sweepResults.slice(-100);
+⏰│this.sweepResults.push({ source, insights, timestamp: Date.n
+⊹│if (this.sweepResults.length > 200) this.sweepResults = this
 ·}
 ·runIntelSweep(): IntelSweepResult[] {
-⏰│const recent = this.sweepResults.filter(s => Date.now() - s.timestamp < 60_000);
+⏰│const recent = this.sweepResults.filter(s => Date.now() - s.
 ⊷│return recent;
 ·}
-·getStats(): { topics: number; subscriptions: number; messages: number; sharedKeys: number; pendingTasks: number; knowledgeNodes: number; knowledgeEdges: number; sweepResults: number } {
+·getStats(): { topics: number; subscriptions: number; messages: number; sharedKey
 ·let totalSubs = 0;
-⥀│for (const subs of this.subscriptions.values()) totalSubs += subs.length;
+⥀│for (const subs of this.subscriptions.values()) totalSubs +=
 ·let totalEdges = 0;
-⥀│for (const node of this.knowledgeGraph.values()) totalEdges += node.connections.size;
+⥀│for (const node of this.knowledgeGraph.values()) totalEdges 
 ⊷│return {
 ·topics: this.subscriptions.size,
 ·subscriptions: totalSubs,
@@ -131,7 +131,7 @@ recordSweep(η: string, insights: string[]): void {
 ·};
 ·}
 ·getState(): Record<string, unknown> {
-⊷│return { initialized: this._initialized, ...this.getStats() };
+⊷│return { initialized: this._initialized, ...this.getStats() 
 ·}
 ·shutdown(): void {
 ·this.subscriptions.clear();

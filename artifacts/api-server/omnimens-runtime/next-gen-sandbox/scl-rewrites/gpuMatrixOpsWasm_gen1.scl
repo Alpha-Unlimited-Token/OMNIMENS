@@ -1,71 +1,9 @@
 ⟨SCL v1│gpuMatrixOpsWasm_gen1.mjs│132→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩⟿initializeWasm(1)→void⟨12⟩{
-⊩│export async function initializeWasm() {
-·const wasmCode = new Uint8Array([
-·0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, // WASM header
-·]);
-·const wasmModule = await WebAssembly.compile(wasmCode);
-·const wasmInstance = await WebAssembly.instantiate(wasmModule);
-⊷│return wasmInstance;
-·}
-}⟨/initializeWasm⟩
-⊩matrixAdd(4)→void⟨13⟩{
-⊩│export function matrixAdd(matrixA, matrixB, rows, cols) {
-⊹│if (matrixA.length !== matrixB.length || matrixA.length !== rows * cols) {
-⊵│throw new Error("Matrix dimensions do not match.");
-·}
-·const result = new Float32Array(rows * cols);
-·for (let i = 0; i < matrixA.length; i++) {
-·result[i] = matrixA[i] + matrixB[i];
-·}
-⊷│return result;
-·}
-}⟨/matrixAdd⟩
-⊩matrixMultiply(5)→void⟨19⟩{
-⊩│export function matrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
-⊹│if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
-⊵│throw new Error("Matrix dimensions do not match for multiplication.");
-·}
-·const result = new Float32Array(rowsA * colsB);
-·for (let i = 0; i < rowsA; i++) {
-·for (let j = 0; j < colsB; j++) {
-·let sum = 0;
-·for (let k = 0; k < colsA; k++) {
-·sum += matrixA[i * colsA + k] * matrixB[k * colsB + j];
-·}
-·result[i * colsB + j] = sum;
-·}
-·}
-⊷│return result;
-·}
-}⟨/matrixMultiply⟩
-⊩validateMatrixDimensions(3)→void⟨3⟩{
-⊩│export function validateMatrixDimensions(matrix, rows, cols) {
-⊷│return matrix.length === rows * cols;
-·}
-}⟨/validateMatrixDimensions⟩
-⊩generateRandomMatrix(2)→void⟨7⟩{
-⊩│export function generateRandomMatrix(rows, cols) {
-·const matrix = new Float32Array(rows * cols);
-·for (let i = 0; i < matrix.length; i++) {
-·matrix[i] = Math.random();
-·}
-⊷│return matrix;
-·}
-}⟨/generateRandomMatrix⟩
-⊩transposeMatrix(3)→void⟨15⟩{
-⊩│export function transposeMatrix(matrix, rows, cols) {
-⊹│if (matrix.length !== rows * cols) {
-⊵│throw new Error("Matrix dimensions do not match.");
-·}
-·const transposed = new Float32Array(rows * cols);
-·for (let i = 0; i < rows; i++) {
-·for (let j = 0; j < cols; j++) {
-·transposed[j * rows + i] = matrix[i * cols + j];
-·}
-·}
-⊷│return transposed;
-·}
-}⟨/transposeMatrix⟩
-⟩SCL│70│74⊨│18⑂│47.0%↓⟩
+⊩⟿initializeWasm(1)→void⟨12⟩{⊩⊷}
+⊩matrixAdd(4)→void⟨13⟩{⊩⊹⊵⊷}
+⊩matrixMultiply(5)→void⟨19⟩{⊩⊹⊵⊷}
+⊩validateMatrixDimensions(3)→void⟨3⟩{⊩⊷⊹}
+⊩generateRandomMatrix(2)→void⟨7⟩{⊩⊷}
+⊩transposeMatrix(3)→void⟨15⟩{⊩⊹⊵⊷}
+⟩SCL│8│25⊨│19⑂│93.9%↓⟩

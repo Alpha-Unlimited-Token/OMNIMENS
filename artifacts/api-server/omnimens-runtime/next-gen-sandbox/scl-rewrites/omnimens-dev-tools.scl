@@ -12,10 +12,8 @@
 κ__dirname
 κPY_DIR
 κPYTHON
-📢│const LOG = (msg: string) => console.log(`[OMNIMENS-DEV-TOOLS] ${msg}`);
-⊩⟿runPythonTool(1)→void⟨1⟩{
-⊩│export async function runPythonTool(
-}⟨/runPythonTool⟩
+📢│const LOG = (msg: string) => console.log(`[OMNIMENS-DEV-TOOL
+⊩⟿runPythonTool(1)→void⟨1⟩{⊩}
 ·script: string,
 ·payload: unknown,
 ·timeoutMs = 60_000,
@@ -27,7 +25,7 @@
 ⊱│return new Promise((resolve) => {
 ⏳│const timer = setTimeout(() => {
 ·proc.kill("SIGKILL");
-⊰│resolve({ success: false, error: `Tool timeout after ${timeoutMs}ms` });
+⊰│resolve({ success: false, error: `Tool timeout after ${timeo
 ·}, timeoutMs);
 ⊱│proc.stdout.on("data", (d: Buffer) => (stdout += d));
 ⊱│proc.stderr.on("data", (d: Buffer) => (stderr += d));
@@ -78,7 +76,7 @@ proc.stdin.⊞(η);
 ·nlp: {
 ·script: "nlp_analyzer.py",
 ·timeout: 60_000,
-❔│log: (s) => `NLP ${s.action} on ${s.text?.length || 0} chars`,
+❔│log: (s) => `NLP ${s.action} on ${s.text?.length || 0} chars
 ·},
 ·media: {
 ·script: "ffmpeg_tools.py",
@@ -131,81 +129,37 @@ proc.stdin.⊞(η);
 ⊰│log: (s) => `File tool: ${s.op}`,
 ·},
 ·};
-⟿callTool(2)→Promise<any>⟨7⟩{
-·async function callTool(kind: keyof typeof TOOL_DEF, spec: Spec): Promise<any> {
-·const def = TOOL_DEF[kind];
-·const timeout =
-⊳│typeof def.timeout === "function" ? def.timeout(spec) : def.timeout;
-·LOG(def.log(spec));
-⊷│return runPythonTool(def.script, spec, timeout);
-·}
-}⟨/callTool⟩
-⊪│export const generateChart = (s: Spec) => callTool("chart", s);
+⟿callTool(2)→Promise<any>⟨7⟩{⊳⊷}
+⊪│export const generateChart = (s: Spec) => callTool("chart", 
 ⊪│export const processPDF = (s: Spec) => callTool("pdf", s);
-⊪│export const processDocument = (s: Spec) => callTool("doc", s);
+⊪│export const processDocument = (s: Spec) => callTool("doc", 
 ⊪│export const runOCR = (img: string) => callTool("ocr", img);
 ⊪│export const analyzeText = (s: Spec) => callTool("nlp", s);
-⊪│export const processMedia = (s: Spec) => callTool("media", s);
-⊪│export const generateDiagram = (s: Spec) => callTool("diagram", s);
-⊪│export const runDataScience = (s: Spec) => callTool("ds", s);
+⊪│export const processMedia = (s: Spec) => callTool("media", s
+⊪│export const generateDiagram = (s: Spec) => callTool("diagra
+⊪│export const runDataScience = (s: Spec) => callTool("ds", s)
 ⊪│export const solveMath = (s: Spec) => callTool("math", s);
-⊪│export const analyzeAudio = (s: Spec) => callTool("audio", s);
+⊪│export const analyzeAudio = (s: Spec) => callTool("audio", s
 ⊪│export const runCode = (s: Spec) => callTool("code", s);
 ⊪│export const fetchWebUrl = (s: Spec) => callTool("web", s);
 ⊪│export const runGitOp = (s: Spec) => callTool("git", s);
-⊪│export const getSystemInfo = (s: Spec) => callTool("system", s);
+⊪│export const getSystemInfo = (s: Spec) => callTool("system",
 ⊪│export const runFileTool = (s: Spec) => callTool("file", s);
-⟿healthCheck(1)→void⟨5⟩{
-·async function healthCheck() {
-⊴│const tools = await checkAllTools();
-·cognitionBus.shareInsight("dev-tools", { type: "health", data: tools });
-⚡→│spikeBus.scheduleSpike("dev-tools:health", {}, 600_000); // 10-minute interval
-·}
-}⟨/healthCheck⟩
+⟿healthCheck(1)→void⟨5⟩{⊴⚡→}
 ⚡→│spikeBus.on("dev-tools:health", healthCheck);
 ⚡→│spikeBus.scheduleSpike("dev-tools:health", {}, 100);
-⊩⟿checkAllTools(1)→Promise<Record<string, boolean>>⟨17⟩{
-⊩│export async function checkAllTools(): Promise<Record<string, boolean>> {
-·const tests: Record<string, () => Promise<any>> = {
-·chart: () => generateChart({ type: "bar", title: "Test", data: { labels: ["A", "B"], datasets: [{ values: [1, 2] }] } }),
-math: () => solveMath({ action: "simplify", ⊨: "x**2 + 2*x + 1" }),
-·};
-·const out: Record<string, boolean> = {};
-⫘│await Promise.all(
-⊱│Object.entries(tests).map(async ([k, fn]) => {
-·try {
-❔│out[k] = (await fn())?.success === true;
-·} catch {
-·out[k] = false;
-·}
-·}),
-·);
-⊷│return out;
-·}
-}⟨/checkAllTools⟩
+⊩⟿checkAllTools(1)→Promise<Record<string, boolean>>⟨17⟩{⊩⫘⊱⊸❔⊴⊷}
 κREGEX_MAP
-⊩detectDevToolIntent(1)→void⟨6⟩{
-⊩│export function detectDevToolIntent(msg: string) {
-·const m = msg.toLowerCase();
-⊷│return Object.fromEntries(
-⊸│Object.entries(REGEX_MAP).map(([k, r]) => [k, r.test(m)]),
-·) as ReturnType<typeof detectDevToolIntent>;
-·}
-}⟨/detectDevToolIntent⟩
+⊩detectDevToolIntent(1)→void⟨6⟩{⊩⊷⊸⊽}
 ⊱│cognitionBus.onInsight((src, insight) => {
 ❔│if (src !== "dev-tools" && insight?.type === "discovery") {
 ⊰│LOG(`Learning from ${src} insight`);
 ·}
 ·});
-⚡→│spikeBus.on("attention:dev-tools", () => spikeBus.scheduleSpike("dev-tools:health", {}, 1_000));
+⚡→│spikeBus.on("attention:dev-tools", () => spikeBus.scheduleSp
 ⊱│spikeBus.on("cognition:curiosity", () => {
 ⚡→│LOG("Curiosity spike — re-checking tools");
 ⚡→│spikeBus.scheduleSpike("dev-tools:health", {}, 0);
 ·});
-⊩shutdown(1)→void⟨4⟩{
-⊩│export function shutdown() {
-·engineRegistry.unregisterEngine("dev-tools");
-·LOG("Engine shutdown");
-·}
-}⟨/shutdown⟩
-⟩SCL│210│116⊨│64⑂│15.3%↓⟩
+⊩shutdown(1)→void⟨4⟩{⊩}
+⟩SCL│164│85⊨│67⑂│33.9%↓⟩

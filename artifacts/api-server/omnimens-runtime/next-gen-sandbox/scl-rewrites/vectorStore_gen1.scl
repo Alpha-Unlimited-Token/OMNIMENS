@@ -4,20 +4,13 @@
 ·constructor(id, vector) {
 ·this.id = id; // Unique identifier for the node
 ·this.vector = vector; // The vector associated with the node
-⊮│this.neighbors = new Map(); // Map of neighbors (key: neighbor ID, value: distance)
+⊮│this.neighbors = new Map(); // Map of neighbors (key: neighb
 ·}
 ·}
-euclideanDistance(2)→void⟨6⟩{
-·function euclideanDistance(vectorA, vectorB) {
-⊹│if (vectorA.length !== vectorB.length) {
-⊵│throw new Error("Vectors must have the same dimension.");
-·}
-⋐│return Math.sqrt(vectorA.reduce((sum, val, i) => sum + Math.pow(val - vectorB[i], 2), 0));
-·}
-}⟨/euclideanDistance⟩
+euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
 ⊶│class HNSWGraph {
 ·constructor(maxNeighbors = 10) {
-⊮│this.nodes = new Map(); // Map of all nodes (key: node ID, value: HNSWNode)
+⊮│this.nodes = new Map(); // Map of all nodes (key: node ID, v
 ·this.maxNeighbors = maxNeighbors; // Maximum number of neighbors per node
 ·}
 ·addNode(id, vector) {
@@ -35,7 +28,7 @@ euclideanDistance(2)→void⟨6⟩{
 ·}
 ·search(queryVector, k = 5) {
 ·if (k <= 0) {
-⊵│throw new Error("Number of neighbors to return must be greater than 0.");
+⊵│throw new Error("Number of neighbors to return must be great
 ·}
 κdistances
 ·for (const [id, node] of this.nodes) {
@@ -48,10 +41,10 @@ euclideanDistance(2)→void⟨6⟩{
 ·_addNeighbor(node, neighbor, distance) {
 ⊡│node.neighbors.set(neighbor.id, distance);
 ·if (node.neighbors.size > this.maxNeighbors) {
-const sortedNeighbors = ι.from(node.neighbors.entries()).sort((a, b) => a[1] - b[1]);
-⊮│node.neighbors = new Map(sortedNeighbors.slice(0, this.maxNeighbors));
+const sortedNeighbors = ι.from(node.neighbors.entries()).sort((a, b) => a[1]
+⊮│node.neighbors = new Map(sortedNeighbors.slice(0, this.maxNe
 ·}
 ·}
 ·}
 ·export { HNSWGraph, euclideanDistance };
-⟩SCL│56│25⊨│14⑂│50.0%↓⟩
+⟩SCL│49│21⊨│15⑂│56.3%↓⟩

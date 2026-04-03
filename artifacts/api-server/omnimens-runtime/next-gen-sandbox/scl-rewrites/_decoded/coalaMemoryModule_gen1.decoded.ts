@@ -16,20 +16,20 @@ addProceduralTask(task) {
 retrieveMemory(type, query) {
   switch (type) {
 case 'episodic':
-  return this.episodicMemory.filter(event => event.includes(query));
-case 'semantic':
+  return this.episodicMemory.filter(event => event.includes(qu
+case 'factual knowledge stored without temporal context':
   return this.semanticMemory[query] || null;
 case 'procedural':
-  return this.proceduralMemory.filter(task => task.includes(query));
+  return this.proceduralMemory.filter(task => task.includes(qu
 default:
   return null;
 }
 }
 consolidateMemory() {
-  this.semanticMemory = Object.keys(this.semanticMemory).reduce((acc, concept) => {
-acc[concept] = this.semanticMemory[concept].map(rel => ({ ...rel, strength: rel.strength * 1.1 }));
+  this.semanticMemory = Object.keys(this.semanticMemory).reduc
+acc[concept] = this.semanticMemory[concept].map(rel => ({ ...rel, strength: rel.
   return acc;
 }, {});
 }
 }
-export let coalaMemory = undefined; /* SCL-export-const */
+export const coalaMemory = undefined; /* SCL-export-const */

@@ -11,12 +11,12 @@ if (!this.subscribers.has(eventType)) {
 }
 publish(eventType, eventData) {
 if (this.subscribers.has(eventType)) {
-  this.subscribers.get(eventType).forEach(callback => callback(eventData));
+  this.subscribers.get(eventType).forEach(callback => callback
 }
 }
 allocateResources(task) {
   const { urgency, dependencies, complexity } = task;
-let priority = undefined; /* SCL-const */
+const priority = undefined; /* SCL-const */
 this.resourcePool[task.id] = { allocated: true, priority };
   return this.resourcePool[task.id];
 }

@@ -1,21 +1,6 @@
 ⟨SCL v1│adversarialSelfCheckModule_gen1.mjs│26→SCL⟩
 ⟨CODEX│P:40│R:16│I:14⟩
-⊩runAdversarialTests(1)→void⟨6⟩{
-⊩│export function runAdversarialTests(plan) {
-·const adversarialScenarios = generateScenarios(plan);
-const ⊢ = adversarialScenarios.map(scenario => executeTest(scenario));
-const vulnerabilities = ⊢.filter(result => result.isVulnerable);
-⊷│return { vulnerabilities, passRate: (⊢.length - vulnerabilities.length) / ⊢.length };
-·}
-}⟨/runAdversarialTests⟩
-generateScenarios(1)→void⟨4⟩{
-·function generateScenarios(plan) {
-⊷│return [/* simulated scenarios */];
-·}
-}⟨/generateScenarios⟩
-executeTest(1)→void⟨4⟩{
-·function executeTest(scenario) {
-⊷│return { isVulnerable: Math.random() > 0.8 };
-·}
-}⟨/executeTest⟩
-⟩SCL│20│16⊨│4⑂│23.1%↓⟩
+⊩runAdversarialTests(1)→void⟨6⟩{⊩⊷}
+generateScenarios(1)→void⟨4⟩{⊷}
+executeTest(1)→void⟨4⟩{⊷}
+⟩SCL│5│7⊨│4⑂│80.8%↓⟩

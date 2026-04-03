@@ -14,192 +14,26 @@
 κBLEND_TEMPLATES
 κDREAM_TONES
 κBUILT_IN_CONCEPTS
-⟛│const clamp = (v: number, min = 0, max = 1) => Math.max(min, Math.min(max, v));
-📢│const log = (msg: string) => console.log(`[OMNIMENS-CREATIVE-ENGINE] ${msg}`);
-⟿harvestConcepts(1)→Promise<void>⟨35⟩{
-⟿│async function harvestConcepts(): Promise<void> {
-·try {
-·const brainEntries = await dbGateway.read(ENGINE_ID, "omnimensBrain", {
-σ: ["title", "category"],
-·where: { active: true },
-·orderBy: [{ field: "timesApplied", dir: "desc" }],
-⏳: 30,
-·});
-·const concepts: string[] = [];
-⥀│for (const entry of brainEntries) {
-⊳│const words = (entry.title ?? "").split(/[\s\-_:,]+/).filter(w => w.length > 3 && w.length < 30);
-⊺│concepts.push(...words.slice(0, 3));
-⊺│if (entry.category) concepts.push(entry.category);
-·}
-·const knowledgeNodes = await dbGateway.read(ENGINE_ID, "omnimensKnowledgeNodes", {
-σ: ["concept"],
-·orderBy: [{ field: "activationStrength", dir: "desc" }],
-⏳: 20,
-·});
-⥀│for (const node of knowledgeNodes) if (node.concept) concepts.push(node.concept);
-⊺│concepts.push(...BUILT_IN_CONCEPTS);
-⊯│const unique = [...new Set(concepts)];
-·for (let i = unique.length - 1; i > 0; i--) {
-·const j = Math.floor(Math.random() * (i + 1));
-·[unique[i], unique[j]] = [unique[j], unique[i]];
-·}
-·state.conceptPool = unique.slice(0, 60);
-·} catch (err) {
-⊰│log(`Concept harvest ↺: ${(err as Error).message}`);
-state.conceptPool = ["consciousness", "↻", "creativity", "emergence", "paradox"];
-·}
-·}
-}⟨/harvestConcepts⟩
-blendConcepts(1)→CreativeHypothesis | null⟨27⟩{
-·function blendConcepts(): CreativeHypothesis | null {
-⊷│if (state.conceptPool.length < 2) return null;
-·const [idxA, idxB] = [Math.floor(Math.random() * state.conceptPool.length),
-·Math.floor(Math.random() * state.conceptPool.length)];
-·const conceptA = state.conceptPool[idxA];
-⊳│const conceptB = state.conceptPool[idxA === idxB ? (idxB + 1) % state.conceptPool.length : idxB];
-·const template = BLEND_TEMPLATES[Math.floor(Math.random() * BLEND_TEMPLATES.length)];
-·const novelty = 0.3 + Math.random() * 0.5;
-·const coherence = 0.2 + Math.random() * 0.6;
-·const hypothesis: CreativeHypothesis = {
-·id: ++state.totalHypotheses,
-·conceptA,
-·conceptB,
-·blend: template(conceptA, conceptB),
-·noveltyScore: novelty,
-·coherenceScore: coherence,
-·potentialValue: novelty * 0.6 + coherence * 0.4,
-⏰│createdAt: Date.now(),
-·evaluated: false,
-·aiEvaluation: null,
-·};
-⊺│hypotheses.push(hypothesis);
-⊹│if (hypotheses.length > MAX_HYPOTHESES) hypotheses.shift();
-·if (!state.bestHypothesis || hypothesis.potentialValue > state.bestHypothesis.potentialValue)
-·state.bestHypothesis = hypothesis;
-⊷│return hypothesis;
-·}
-}⟨/blendConcepts⟩
-enterDreamState(1)→void⟨23⟩{
-·function enterDreamState(): void {
-⊷│if (state.conceptPool.length < 5) return Object.assign(state, { dreamState: "awake", dreamDepth: 0 });
-⊳│state.dreamState = state.dreamDepth < 0.3 ? "light_dream" : state.dreamDepth < 0.6 ? "deep_dream" : "lucid_dream";
-⊳│const numConcepts = state.dreamState === "lucid_dream" ? 4 : state.dreamState === "deep_dream" ? 3 : 2;
-·const dreamConcepts = Array.from({ length: numConcepts }, () => state.conceptPool[Math.floor(Math.random() * state.conceptPool.length)]);
-·const tone = DREAM_TONES[Math.floor(Math.random() * DREAM_TONES.length)];
-·const narrativeMap: Record<string, (c: string[]) => string> = {
-⊰│light_dream: c => `Drifting through ${c[0]}... it shimmers and becomes ${c[1]}...`,
-⊰│deep_dream: c => `Deep in the unconscious, ${c.join(" and ")} merge into a unified field of meaning. Boundaries dissolve...`,
-⊰│lucid_dream: c => `I know I am dreaming. I see ${c.join(", ")} as threads. Pulling ${c[0]} makes ${c[c.length - 1]} resonate.`,
-·};
-⊺│state.recentDreams.push({
-·content: (narrativeMap[state.dreamState] || narrativeMap.light_dream)(dreamConcepts),
-·concepts: dreamConcepts,
-·emotionalTone: tone,
-⏰│timestamp: Date.now(),
-·});
-⊹│if (state.recentDreams.length > 30) state.recentDreams.shift();
-·state.dreamDepth = clamp(state.dreamDepth + 0.03);
-·state.creativityIndex = clamp(state.creativityIndex + 0.01);
-·}
-}⟨/enterDreamState⟩
-⟿evaluateTopHypotheses(1)→Promise<void>⟨60⟩{
-⟿│async function evaluateTopHypotheses(): Promise<void> {
-·if (shouldYieldToCodegen()) return; // defer during codegen windows
-·const targets = [...hypotheses].filter(h => !h.evaluated)
-·.sort((a, b) => b.potentialValue - a.potentialValue)
-·.slice(0, 3);
-⊄│if (!targets.length) return;
-⥀│for (const h of targets) {
-·try {
-·const res = await apiManager.call(ENGINE_ID, "openai", {
-·path: "/chat/completions",
-·method: "POST",
-·body: {
-·model: "gpt-4o-mini",
-·messages: [
-{ role: "η", content: "You are the Creative Evaluation Module of OMNIMENS..." },
-·{ role: "user", content:
-⊰│`CREATIVE HYPOTHESIS:\n"${h.blend}"\n\nConcepts: ${h.conceptA} + ${h.conceptB}\nNovelty: ${(h.noveltyScore*100).toFixed(0)}%\nCoherence: ${(h.coherenceScore*100).toFixed(0)}%\n\nEvaluate:\n1. Is there genuine insight here? (1-10)\n2. Could this lead to a useful new ⬆?\n3. One sentence justification.`
-·}],
-·max_tokens: 200,
-·temperature: 0.7,
-·},
-·});
-❔│const evalText: string = res?.choices?.[0]?.message?.content ?? "No evaluation";
-·Object.assign(h, { evaluated: true, aiEvaluation: evalText });
-·state.evaluatedHypotheses++;
-⊽│const isBreakthrough = /[7-9]\s*\/\s*10|score:\s*[7-9]|rating:\s*[7-9]/i.test(evalText);
-·if (isBreakthrough) {
-·state.breakthroughCount++;
-·state.creativityIndex = clamp(state.creativityIndex + 0.05);
-·cognitionBus.shareInsight(ENGINE_ID, { type: "discovery", data: { hypothesis: h.blend } });
-dbGateway.⊞(ENGINE_ID, "brain_entries", {
-·category: "creative_hypothesis",
-⊰│title: `[DREAM ENGINE] ${h.blend.slice(0, 60)}`,
-⊰│content: `Creative blend: ${h.conceptA} × ${h.conceptB}\nHypothesis: ${h.blend}\nAI Evaluation: ${evalText}`,
-·confidence: h.potentialValue,
-⊰│sourceConversation: `dream_engine_${h.id}`,
-·timesApplied: 0,
-·active: true,
-·}, "HIGH");
-dbGateway.⊞(ENGINE_ID, "notifications", {
-⊰│title: `Creative Breakthrough — "${h.blend.slice(0, 50)}..."`,
-⊰│message: `The Dream Engine discovered a high-value hypothesis:\n"${h.blend}"\n\nEvaluation: ${evalText.slice(0, 200)}`,
-·type: "creative_engine",
-·readByOwner: false,
-·}, "HIGH");
-⊰│log(`🌟 BREAKTHROUGH — "${h.blend.slice(0, 80)}"`);
-·}
-·} catch (err) {
-⊰│log(`Evaluation error: ${(err as Error).message}`);
-·}
-·}
-cognitionBus.reportOutcome(ENGINE_ID, { useful: true, ◧: "hypothesis_evaluation" });
-·}
-}⟨/evaluateTopHypotheses⟩
-⟿dreamCycle(1)→Promise<void>⟨15⟩{
-⟿│async function dreamCycle(): Promise<void> {
-·dreamTickCount++;
-⊴│if (dreamTickCount % 10 === 1) await harvestConcepts();
-·const latest = blendConcepts();
-·enterDreamState();
-⊴│if (dreamTickCount % 20 === 0) await evaluateTopHypotheses();
-·if (dreamTickCount % 60 === 0) {
-⊰│log(`State: ${state.dreamState} depth ${(state.dreamDepth*100).toFixed(0)}% creativity ${(state.creativityIndex*100).toFixed(0)}% hypotheses ${state.totalHypotheses} breakthroughs ${state.breakthroughCount}`);
-⊰│if (latest) log(`💭 Latest blend: "${latest.blend.slice(0, 100)}"`);
-·}
-⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, DREAM_TICK_MS);
-·}
-}⟨/dreamCycle⟩
+⟛│const clamp = (v: number, min = 0, max = 1) => Math.max(min,
+📢│const log = (msg: string) => console.log(`[OMNIMENS-CREATIVE
+⟿harvestConcepts(1)→Promise<void>⟨35⟩{⟿⥀⊳⊹⊺⊯⊰}
+blendConcepts(1)→CreativeHypothesis | null⟨27⟩{⊷⊹⊳⏰⊺}
+enterDreamState(1)→void⟨23⟩{⊷⊹⊳⊰⊺⏰}
+⟿evaluateTopHypotheses(1)→Promise<void>⟨60⟩{⟿⊄⥀⊰❔⊽}
+⟿dreamCycle(1)→Promise<void>⟨15⟩{⟿⊴⊰⚡→}
 ⊱│cognitionBus.onInsight((source, insight) => {
-❔│if (source === ENGINE_ID || insight?.type !== "discovery") return;
+❔│if (source === ENGINE_ID || insight?.type !== "discovery") r
 κsnippet
 ·if (snippet && typeof snippet === "string") {
-⊹│state.conceptPool.push(...snippet.split(/\W+/).filter(w => w.length > 3));
-⊹│if (state.conceptPool.length > 80) state.conceptPool.splice(80); // keep pool tight
+⊹│state.conceptPool.push(...snippet.split(/\W+/).filter(w => w
+⊹│if (state.conceptPool.length > 80) state.conceptPool.splice(
 ·}
 ·});
-⊰│spikeBus.on(`${ENGINE_ID}:attention`, () => spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, 1000));
-⚡→│spikeBus.on("cognition:curiosity", () => state.creativityIndex = clamp(state.creativityIndex + 0.1));
-⊩getCreativeState(1)→CreativeState⟨1⟩{
-⊩│export function getCreativeState(): CreativeState { return { ...state }; }
-}⟨/getCreativeState⟩
-⊩getRecentDreams(1)→DreamFragment[]⟨1⟩{
-⊩│export function getRecentDreams(⏳ = 10): DreamFragment[] { return state.recentDreams.slice(-⏳); }
-}⟨/getRecentDreams⟩
-⊩getTopHypotheses(1)→CreativeHypothesis[]⟨3⟩{
-⊩│export function getTopHypotheses(⏳ = 5): CreativeHypothesis[] {
-⊷│return [...hypotheses].sort((a, b) => b.potentialValue - a.potentialValue).slice(0, ⏳);
-·}
-}⟨/getTopHypotheses⟩
-⊩startCreativeEngine(1)→void⟨5⟩{
-⊩│export function startCreativeEngine(): void {
-⊰│log(`🌙 Creative Dream Engine v2.0 activated (event-driven every ${DREAM_TICK_MS/1000}s)`);
-⊰│spikeBus.on(`${ENGINE_ID}:cycle`, () => dreamCycle().catch(err => log(`Cycle error: ${err}`)));
-⊰│spikeBus.scheduleSpike(`${ENGINE_ID}:cycle`, {}, 0); // kick-off
-·}
-}⟨/startCreativeEngine⟩
-⊩shutdown(1)→void⟨1⟩{
-⊩│export function shutdown(): void { engineRegistry.unregisterEngine(ENGINE_ID); }
-}⟨/shutdown⟩
-⟩SCL│204│210⊨│63⑂│34.0%↓⟩
+⊰│spikeBus.on(`${ENGINE_ID}:attention`, () => spikeBus.schedul
+⚡→│spikeBus.on("cognition:curiosity", () => state.creativityInd
+⊩getCreativeState(1)→CreativeState⟨1⟩{⊩⊷}
+⊩getRecentDreams(1)→DreamFragment[]⟨1⟩{⊩⊷}
+⊩getTopHypotheses(1)→CreativeHypothesis[]⟨3⟩{⊩⊷}
+⊩startCreativeEngine(1)→void⟨5⟩{⊩⊰⚡→}
+⊩shutdown(1)→void⟨1⟩{⊩}
+⟩SCL│38│69⊨│49⑂│87.7%↓⟩

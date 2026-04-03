@@ -9,8 +9,8 @@
 ·}
 ·balanceEfficiency() {
 ⊸│Object.keys(this.efficiencyMetrics).forEach(agent => {
-⊲│const { computeCost, taskComplexity } = this.efficiencyMetrics[agent];
-⊰│console.log(`Balancing for ${agent}: ${computeCost} vs ${taskComplexity}`);
+⊲│const { computeCost, taskComplexity } = this.efficiencyMetri
+⊰│console.log(`Balancing for ${agent}: ${computeCost} vs ${tas
 ·});
 ·}
 ·}

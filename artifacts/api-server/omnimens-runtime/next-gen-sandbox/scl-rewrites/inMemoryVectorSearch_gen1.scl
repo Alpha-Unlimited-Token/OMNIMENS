@@ -7,14 +7,7 @@
 this.neighbors = []; // ι of neighboring nodes
 ·}
 ·}
-euclideanDistance(2)→void⟨6⟩{
-·function euclideanDistance(vectorA, vectorB) {
-⊹│if (vectorA.length !== vectorB.length) {
-⊵│throw new Error("Vectors must have the same dimensions.");
-·}
-⋐│return Math.sqrt(vectorA.reduce((sum, val, idx) => sum + (val - vectorB[idx]) ** 2, 0));
-·}
-}⟨/euclideanDistance⟩
+euclideanDistance(2)→void⟨6⟩{⊹⊵⋐⊷}
 ⊶│class HNSWGraph {
 ·constructor(maxNeighbors = 10) {
 this.nodes = []; // ι of all nodes in the graph
@@ -29,7 +22,7 @@ this.nodes = []; // ι of all nodes in the graph
 ⥀│for (const neighbor of neighbors) {
 ⊺│neighbor.neighbors.push(newNode);
 ⊹│if (neighbor.neighbors.length > this.maxNeighbors) {
-·neighbor.neighbors.sort((a, b) => euclideanDistance(neighbor.vector, a.vector) - euclideanDistance(neighbor.vector, b.vector));
+·neighbor.neighbors.sort((a, b) => euclideanDistance(neighbor.vector, a.vector) -
 ⊺│neighbor.neighbors.pop();
 ·}
 ·}
@@ -62,10 +55,10 @@ this.nodes = []; // ι of all nodes in the graph
 ⊷│return results.slice(0, k);
 ·}
 ·_findNearestNeighbors(vector, k) {
-·const distances = this.nodes.map(node => ({ node, distance: euclideanDistance(vector, node.vector) }));
+·const distances = this.nodes.map(node => ({ node, distance: euclideanDistance(ve
 ·distances.sort((a, b) => a.distance - b.distance);
 ⊷│return distances.slice(0, k).map(entry => entry.node);
 ·}
 ·}
 ·export { HNSWGraph, euclideanDistance };
-⟩SCL│70│37⊨│20⑂│47.8%↓⟩
+⟩SCL│63│33⊨│21⑂│53.0%↓⟩
