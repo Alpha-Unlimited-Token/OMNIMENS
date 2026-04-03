@@ -6566,8 +6566,8 @@
     "consolidationComplete": false,
     "startedAt": 1775044041970,
     "completedAt": 1775176579487,
-    "lastAutosave": 1775176579509,
-    "autosaveCount": 405,
+    "lastAutosave": 1775176816666,
+    "autosaveCount": 408,
     "recentActivity": [
       {
         "action": "audited",
@@ -7608,6 +7608,7 @@
         ]
       }
     ],
-    "reason": "Superseded by fresh Gen 1 evolution restart in NextGen sandbox"
+    "reason": "Superseded by fresh Gen 1 evolution restart in NextGen sandbox",
+    "_mergeComplete": true
   }
 }
