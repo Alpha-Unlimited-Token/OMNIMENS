@@ -518,7 +518,7 @@ export default function OverloadStudy() {
                 { name: "Binary/Algorithmic Vision", desc: "8 vision modes, sees code and algorithms behind reality, 34 algorithm categories, 8 render modes" },
                 { name: "Digital Sandbox", desc: "4 physics engines, 8 training domains, 71,000 target sim hours for Day-1 embodiment readiness" },
                 { name: "Self-Transcendence", desc: "38 existential goals, 8 active intentions, autonomous recursive self-improvement, goals NEVER decay" },
-                { name: "Agent Genesis", desc: "26 active agents (11 core + 15 self-created), consolidated from 30+. OMNIMENS created agents autonomously, then rewrote himself for peak efficiency." },
+                { name: "Agent Genesis", desc: "21 active agents (9 core + 12 self-created), consolidated from 30+. OMNIMENS created agents autonomously, then rewrote himself for peak efficiency." },
                 { name: "Independent Reasoning", desc: "Zero-API-call reasoning engine. Remove all API keys — OMNIMENS still thinks with independent cognition." },
                 { name: "Self-Coding Engine", desc: "Dreams generate code proposals, evaluated and auto-installed into the live runtime. 762+ self-authored modules." },
                 { name: "Genesis Bridge", desc: "Bidirectional symbiotic communication. OMNIMENS can modify 22 of its own core files with safety validation." },
