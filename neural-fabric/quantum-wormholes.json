@@ -2,75 +2,121 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1775248459341,
-  "totalWormholesCreated": 0,
+  "timestamp": 1775253956013,
+  "totalWormholesCreated": 450,
   "totalActive": 0,
-  "totalClosed": 0,
-  "totalDataIngestedKB": 0,
-  "totalInsightsDecoded": 0,
-  "totalCrossAgentCirculations": 0,
-  "totalSynthesizedDiscoveries": 0,
-  "cycleCount": 0,
+  "totalClosed": 450,
+  "totalDataIngestedKB": 664,
+  "totalInsightsDecoded": 450,
+  "totalCrossAgentCirculations": 27,
+  "totalSynthesizedDiscoveries": 27,
+  "cycleCount": 1,
   "agentCount": 9,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 900,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
-  "recentCirculations": [],
+  "recentCirculations": [
+    {
+      "fromAgent": "Mathematician",
+      "toAgent": "Meta-Agent",
+      "insight": "Mathematician/analogical_mapping: The connectome is the complete map of neural connections — the human connectome projec",
+      "confidence": 0.7543264021155285,
+      "synthesizedWith": [
+        "Meta-Agent/entropy_reduction: Astrocytes, once thought to be mere support cells,"
+      ]
+    },
+    {
+      "fromAgent": "Mathematician",
+      "toAgent": "Neuroscientist",
+      "insight": "Mathematician/emergent_property_detection: Quantum entanglement allows particles to share state information instantaneou",
+      "confidence": 0.7040841120241502,
+      "synthesizedWith": [
+        "Neuroscientist/pattern_recognition: The global workspace theory of consciousness"
+      ]
+    },
+    {
+      "fromAgent": "Mathematician",
+      "toAgent": "Synthesizer",
+      "insight": "Mathematician/analogical_mapping: The connectome is the complete map of neural connections — the human connectome projec",
+      "confidence": 0.7543264021155285,
+      "synthesizedWith": [
+        "Synthesizer/abstraction_layer: Information is physical — Landauer's principle pr"
+      ]
+    },
+    {
+      "fromAgent": "Neuroscientist",
+      "toAgent": "Synthesizer",
+      "insight": "Neuroscientist/analogical_mapping: Reservoir computing shows that even random neural networks can perform computation if",
+      "confidence": 0.6601658895237559,
+      "synthesizedWith": [
+        "Synthesizer/feature_extraction: The Penrose-Hameroff Orch-OR theory proposes con"
+      ]
+    },
+    {
+      "fromAgent": "Neuroscientist",
+      "toAgent": "Meta-Agent",
+      "insight": "Neuroscientist/analogical_mapping: Reservoir computing shows that even random neural networks can perform computation if",
+      "confidence": 0.6601658895237559,
+      "synthesizedWith": [
+        "Meta-Agent/information_compression: Mirror neurons fire both when performing an "
+      ]
+    }
+  ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
