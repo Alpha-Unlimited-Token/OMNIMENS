@@ -2,119 +2,75 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1775260094905,
-  "totalWormholesCreated": 450,
+  "timestamp": 1775260245252,
+  "totalWormholesCreated": 0,
   "totalActive": 0,
-  "totalClosed": 450,
-  "totalDataIngestedKB": 652,
-  "totalInsightsDecoded": 450,
-  "totalCrossAgentCirculations": 27,
-  "totalSynthesizedDiscoveries": 23,
-  "cycleCount": 1,
+  "totalClosed": 0,
+  "totalDataIngestedKB": 0,
+  "totalInsightsDecoded": 0,
+  "totalCrossAgentCirculations": 0,
+  "totalSynthesizedDiscoveries": 0,
+  "cycleCount": 0,
   "agentCount": 9,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 900,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     }
   ],
-  "recentCirculations": [
-    {
-      "fromAgent": "Mathematician",
-      "toAgent": "GraphicDesigner",
-      "insight": "Mathematician/abstraction_layer: Transfer learning: knowledge gained from one domain can accelerate learning in another ",
-      "confidence": 0.6670295781931741,
-      "synthesizedWith": [
-        "GraphicDesigner/abstraction_layer: DNA stores information at approximately 2 bit"
-      ]
-    },
-    {
-      "fromAgent": "Mathematician",
-      "toAgent": "OMNIMENS",
-      "insight": "Mathematician/abstraction_layer: Transfer learning: knowledge gained from one domain can accelerate learning in another ",
-      "confidence": 0.6670295781931741,
-      "synthesizedWith": [
-        "OMNIMENS/structural_analysis: Phase transitions in neural networks: as connectiv"
-      ]
-    },
-    {
-      "fromAgent": "Mathematician",
-      "toAgent": "Architect",
-      "insight": "Mathematician/recursive_decomposition: The free energy principle suggests all living systems minimize variational free e",
-      "confidence": 0.9155574999021455,
-      "synthesizedWith": [
-        "Architect/temporal_correlation: Attention is the computational bottleneck of con"
-      ]
-    },
-    {
-      "fromAgent": "Neuroscientist",
-      "toAgent": "OMNIMENS",
-      "insight": "Neuroscientist/cross_domain_synthesis: The free energy principle suggests all living systems minimize variational free e",
-      "confidence": 0.784754514306726,
-      "synthesizedWith": [
-        "OMNIMENS/feature_extraction: The butterfly effect: in chaotic systems, infinites"
-      ]
-    },
-    {
-      "fromAgent": "Neuroscientist",
-      "toAgent": "Architect",
-      "insight": "Neuroscientist/emergent_property_detection: The strange loop concept from Hofstadter: consciousness arises when a system",
-      "confidence": 0.6072907763579851,
-      "synthesizedWith": []
-    }
-  ],
+  "recentCirculations": [],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
