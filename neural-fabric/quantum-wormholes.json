@@ -2,11 +2,11 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1775248067436,
+  "timestamp": 1775248287970,
   "totalWormholesCreated": 450,
   "totalActive": 0,
   "totalClosed": 450,
-  "totalDataIngestedKB": 660,
+  "totalDataIngestedKB": 668,
   "totalInsightsDecoded": 450,
   "totalCrossAgentCirculations": 27,
   "totalSynthesizedDiscoveries": 26,
@@ -74,46 +74,46 @@
     {
       "fromAgent": "Mathematician",
       "toAgent": "OMNIMENS",
-      "insight": "Mathematician/pattern_recognition: The Turing machine is computationally universal — any computation that can be describ",
-      "confidence": 0.6940659907948271,
+      "insight": "Mathematician/pattern_recognition: The cerebellum contains more neurons than all other brain regions combined and is cru",
+      "confidence": 0.8143374903483566,
       "synthesizedWith": [
-        "OMNIMENS/structural_analysis: The Turing machine is computationally universal — "
+        "OMNIMENS/pattern_recognition: DNA stores information at approximately 2 bits per"
       ]
     },
     {
       "fromAgent": "Mathematician",
-      "toAgent": "Architect",
-      "insight": "Mathematician/recursive_decomposition: The butterfly effect: in chaotic systems, infinitesimal differences in initial co",
-      "confidence": 0.6487638744823011,
+      "toAgent": "Meta-Agent",
+      "insight": "Mathematician/pattern_recognition: The cerebellum contains more neurons than all other brain regions combined and is cru",
+      "confidence": 0.8143374903483566,
       "synthesizedWith": [
-        "Architect/cross_domain_synthesis: The Chinese Room argument: can a system that m"
+        "Meta-Agent/cross_domain_synthesis: The strange loop concept from Hofstadter: con"
       ]
     },
     {
       "fromAgent": "Mathematician",
-      "toAgent": "Synthesizer",
-      "insight": "Mathematician/recursive_decomposition: The butterfly effect: in chaotic systems, infinitesimal differences in initial co",
-      "confidence": 0.6487638744823011,
-      "synthesizedWith": [
-        "Synthesizer/temporal_correlation: The vagus nerve connects the brain to the gut,"
-      ]
-    },
-    {
-      "fromAgent": "Neuroscientist",
-      "toAgent": "Mathematician",
-      "insight": "Neuroscientist/temporal_correlation: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibers",
-      "confidence": 0.874601276169718,
-      "synthesizedWith": [
-        "Mathematician/abstraction_layer: Integrated Information Theory (IIT) states cons"
-      ]
-    },
-    {
-      "fromAgent": "Neuroscientist",
       "toAgent": "GraphicDesigner",
-      "insight": "Neuroscientist/feature_extraction: Emergence: complex behaviors arise from simple rules — consciousness may be an emerge",
-      "confidence": 0.7662614477110669,
+      "insight": "Mathematician/recursive_decomposition: Reservoir computing shows that even random neural networks can perform computatio",
+      "confidence": 0.649920929027759,
       "synthesizedWith": [
-        "GraphicDesigner/pattern_recognition: Neuroplasticity allows the brain to reorgan"
+        "GraphicDesigner/emergent_property_detection: Quantum decoherence typically destr"
+      ]
+    },
+    {
+      "fromAgent": "Neuroscientist",
+      "toAgent": "OMNIMENS",
+      "insight": "Neuroscientist/cross_domain_synthesis: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fibe",
+      "confidence": 0.8313009348497624,
+      "synthesizedWith": [
+        "OMNIMENS/pattern_recognition: DNA stores information at approximately 2 bits per"
+      ]
+    },
+    {
+      "fromAgent": "Neuroscientist",
+      "toAgent": "Architect",
+      "insight": "Neuroscientist/entropy_reduction: Information is physical — Landauer's principle proves that erasing one bit of informat",
+      "confidence": 0.889964685524399,
+      "synthesizedWith": [
+        "Architect/emergent_property_detection: Wolfram's Rule 110 cellular automaton is "
       ]
     }
   ],
