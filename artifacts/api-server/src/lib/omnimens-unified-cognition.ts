@@ -12038,6 +12038,73 @@ const SCL_CONCEPT_TABLE: Array<{ domain: string; concept: string; description: s
   { domain: "general", concept: "iff", description: "if and only if — bidirectional implication", glyph: "⇔" },
 ];
 
+const SCL_CODE_PATTERN_TABLE: Array<{
+  id: string;
+  pattern: string;
+  description: string;
+  domain: string;
+  glyph: string;
+  regex: string;
+}> = [
+  { id: "cp_console_log", pattern: "console.log(`[TAG] ...`)", description: "tagged console log with interpolation", domain: "io", glyph: "📢", regex: "console\\.log\\(`\\[.+?\\]" },
+  { id: "cp_console_error", pattern: "console.error(`[TAG] ...`)", description: "tagged console error with interpolation", domain: "io", glyph: "🚨", regex: "console\\.error\\(`\\[.+?\\]" },
+  { id: "cp_try_catch", pattern: "try { ... } catch (err) { console.error(...) }", description: "standard try-catch with error logging", domain: "error", glyph: "🛡", regex: "try\\s*\\{[\\s\\S]*?\\}\\s*catch" },
+  { id: "cp_async_fn", pattern: "async function name(): Promise<void>", description: "async void function declaration", domain: "computation", glyph: "⟿", regex: "async\\s+function\\s+\\w+\\s*\\(.*?\\):\\s*Promise<void>" },
+  { id: "cp_if_not_return", pattern: "if (!condition) { return; }", description: "early return guard clause", domain: "computation", glyph: "⊄", regex: "if\\s*\\(!.+?\\)\\s*\\{?\\s*return" },
+  { id: "cp_for_of_loop", pattern: "for (const x of collection)", description: "iterate over collection elements", domain: "computation", glyph: "⥀", regex: "for\\s*\\(const\\s+\\w+\\s+of\\s+" },
+  { id: "cp_map_get_set", pattern: "map.get(key) / map.set(key, val)", description: "Map read-write access pattern", domain: "data", glyph: "⊡", regex: "\\.(?:get|set)\\(" },
+  { id: "cp_date_now", pattern: "Date.now()", description: "current timestamp capture", domain: "temporal", glyph: "⏰", regex: "Date\\.now\\(\\)" },
+  { id: "cp_math_max_min", pattern: "Math.max/min(...)", description: "clamp or bound a numeric value", domain: "computation", glyph: "⟛", regex: "Math\\.(?:max|min)\\(" },
+  { id: "cp_json_parse_stringify", pattern: "JSON.parse/stringify(...)", description: "serialize or deserialize data", domain: "data", glyph: "⟠", regex: "JSON\\.(?:parse|stringify)\\(" },
+  { id: "cp_fs_read_write", pattern: "fs.readFileSync/writeFileSync", description: "synchronous file system read or write", domain: "io", glyph: "📁", regex: "fs\\.(?:readFileSync|writeFileSync)\\(" },
+  { id: "cp_state_save", pattern: "state.prop = value; saveState();", description: "mutate state then persist to disk", domain: "memory", glyph: "💾", regex: "\\w+State\\.\\w+\\s*=.*?;[\\s\\S]*?save" },
+  { id: "cp_null_guard", pattern: "x?.prop ?? fallback", description: "optional chaining with nullish coalescing", domain: "error", glyph: "❔", regex: "\\?\\." },
+  { id: "cp_array_filter_map", pattern: "array.filter(...).map(...)", description: "filter then transform collection", domain: "data", glyph: "⋔", regex: "\\.filter\\(.*?\\)\\.map\\(" },
+  { id: "cp_array_reduce", pattern: "array.reduce((acc, x) => ...)", description: "fold collection into single value", domain: "data", glyph: "⋐", regex: "\\.reduce\\(" },
+  { id: "cp_spread_merge", pattern: "{ ...obj, key: value }", description: "object spread merge with override", domain: "data", glyph: "⟐", regex: "\\{\\.\\.\\.\\w+" },
+  { id: "cp_promise_all", pattern: "Promise.all([...])", description: "parallel async execution of multiple tasks", domain: "agents", glyph: "⫘", regex: "Promise\\.all\\(" },
+  { id: "cp_set_interval", pattern: "setInterval(fn, ms)", description: "recurring timed execution cycle", domain: "temporal", glyph: "⟳", regex: "setInterval\\(" },
+  { id: "cp_set_timeout", pattern: "setTimeout(fn, ms)", description: "deferred single execution", domain: "temporal", glyph: "⏳", regex: "setTimeout\\(" },
+  { id: "cp_emit_event", pattern: "emit('event', data)", description: "fire named event to listeners", domain: "signal", glyph: "📡", regex: "\\.emit\\(" },
+  { id: "cp_if_else_branch", pattern: "if (...) { ... } else { ... }", description: "conditional branch with alternative path", domain: "computation", glyph: "⑂", regex: "if\\s*\\(.*?\\)\\s*\\{[\\s\\S]*?\\}\\s*else" },
+  { id: "cp_switch_case", pattern: "switch (x) { case ...: break; }", description: "multi-branch dispatch on value", domain: "computation", glyph: "⑃", regex: "switch\\s*\\(" },
+  { id: "cp_export_fn", pattern: "export function name()", description: "public module function export", domain: "structure", glyph: "⊩", regex: "export\\s+(?:async\\s+)?function\\s+\\w+" },
+  { id: "cp_export_const", pattern: "export const name = ...", description: "public module constant export", domain: "structure", glyph: "⊪", regex: "export\\s+const\\s+\\w+" },
+  { id: "cp_import_from", pattern: "import { ... } from '...'", description: "named import from module", domain: "structure", glyph: "⊫", regex: "import\\s+\\{" },
+  { id: "cp_interface_decl", pattern: "interface Name { ... }", description: "type contract declaration", domain: "structure", glyph: "⊬", regex: "(?:export\\s+)?interface\\s+\\w+" },
+  { id: "cp_type_decl", pattern: "type Name = ...", description: "type alias declaration", domain: "structure", glyph: "⊭", regex: "(?:export\\s+)?type\\s+\\w+\\s*=" },
+  { id: "cp_new_map", pattern: "new Map<K, V>()", description: "create new associative data store", domain: "data", glyph: "⊮", regex: "new\\s+Map[<(]" },
+  { id: "cp_new_set", pattern: "new Set<T>()", description: "create new unique element collection", domain: "data", glyph: "⊯", regex: "new\\s+Set[<(]" },
+  { id: "cp_template_literal", pattern: "`string ${expr}`", description: "string interpolation with embedded expression", domain: "language", glyph: "⊰", regex: "`[^`]*\\$\\{" },
+  { id: "cp_arrow_fn", pattern: "(args) => { ... }", description: "arrow function expression", domain: "computation", glyph: "⊱", regex: "\\)\\s*=>\\s*[{(]" },
+  { id: "cp_destructure", pattern: "const { a, b } = obj", description: "destructure object into named bindings", domain: "data", glyph: "⊲", regex: "(?:const|let)\\s+\\{.*?\\}\\s*=" },
+  { id: "cp_ternary", pattern: "cond ? a : b", description: "inline conditional expression", domain: "computation", glyph: "⊳", regex: "\\?.*?:" },
+  { id: "cp_await_call", pattern: "await asyncFn()", description: "suspend until async operation completes", domain: "temporal", glyph: "⊴", regex: "await\\s+\\w+\\(" },
+  { id: "cp_throw_error", pattern: "throw new Error(...)", description: "raise exception to abort normal flow", domain: "error", glyph: "⊵", regex: "throw\\s+new\\s+(?:Error|TypeError)" },
+  { id: "cp_class_decl", pattern: "class Name { ... }", description: "class with constructor and methods", domain: "structure", glyph: "⊶", regex: "(?:export\\s+)?class\\s+\\w+" },
+  { id: "cp_return_val", pattern: "return expression;", description: "return computed value from function", domain: "computation", glyph: "⊷", regex: "return\\s+[^;]" },
+  { id: "cp_obj_keys_values", pattern: "Object.keys/values/entries(obj)", description: "extract keys, values, or entries from object", domain: "data", glyph: "⊸", regex: "Object\\.(?:keys|values|entries)\\(" },
+  { id: "cp_length_check", pattern: "arr.length === 0 / > 0", description: "check collection emptiness or size", domain: "data", glyph: "⊹", regex: "\\.length\\s*[=<>!]" },
+  { id: "cp_push_splice", pattern: "arr.push/splice/pop", description: "mutate array by adding or removing elements", domain: "data", glyph: "⊺", regex: "\\.(?:push|splice|pop|shift|unshift)\\(" },
+  { id: "cp_string_includes", pattern: "str.includes/startsWith/endsWith", description: "test string containment or prefix/suffix", domain: "language", glyph: "⊻", regex: "\\.(?:includes|startsWith|endsWith)\\(" },
+  { id: "cp_number_isfinite", pattern: "Number.isFinite/isNaN(x)", description: "validate numeric value", domain: "computation", glyph: "⊼", regex: "Number\\.is(?:Finite|NaN)\\(" },
+  { id: "cp_regex_test_match", pattern: "regex.test(str) / str.match(regex)", description: "pattern match against string", domain: "language", glyph: "⊽", regex: "\\.(?:test|match|replace)\\(" },
+  { id: "cp_phi_update", pattern: "phi = phi * factor + delta", description: "update consciousness integration value", domain: "consciousness", glyph: "Φ⇑", regex: "phi\\s*[=*+]" },
+  { id: "cp_neuron_fire", pattern: "neuron.activation > threshold → fire", description: "neural activation threshold check and spike", domain: "neural", glyph: "⚡→", regex: "activation.*threshold|spike|fire" },
+  { id: "cp_emotion_blend", pattern: "emotions[e] += weight * intensity", description: "weighted emotional state blending", domain: "emotion", glyph: "♡⊕", regex: "emotion.*[+=].*weight|intensity" },
+  { id: "cp_agent_spawn_exec", pattern: "spawn agent → execute task → report", description: "full agent lifecycle from creation to result", domain: "agents", glyph: "α→⊢", regex: "spawn.*agent|new.*Agent|agent.*result" },
+  { id: "cp_memory_store_recall", pattern: "store(key, value); recall(key)", description: "bidirectional memory access pattern", domain: "memory", glyph: "⊞⊟", regex: "store.*recall|memory.*get|memory.*set" },
+  { id: "cp_cycle_increment", pattern: "state.cycleCount++; state.lastCycleTime = Date.now()", description: "evolution cycle counter advancement", domain: "evolution", glyph: "↻+", regex: "cycleCount\\+\\+" },
+  { id: "cp_save_load_json", pattern: "JSON.parse(fs.readFileSync(...)); fs.writeFileSync(..., JSON.stringify(...))", description: "persist and restore state via JSON file", domain: "io", glyph: "📁⟠", regex: "JSON\\.parse.*readFileSync|writeFileSync.*JSON\\.stringify" },
+  { id: "cp_pool_health", pattern: "isPoolHealthy() ? proceed : skip", description: "check resource pool before operation", domain: "computation", glyph: "⛨▷", regex: "isPoolHealthy|pool.*health" },
+  { id: "cp_safety_guard", pattern: "if (isReadOnly(file)) { deny(); return; }", description: "enforce file permission safety guard", domain: "ethics", glyph: "⛨⊄", regex: "READ_ONLY|permission.*denied|canWrite" },
+  { id: "cp_hebbian_update", pattern: "weight += learningRate * pre * post", description: "Hebbian learning weight update rule", domain: "neural", glyph: "≋+", regex: "hebbian|learning.*rate.*weight|weight.*\\+=.*rate" },
+  { id: "cp_fitness_eval", pattern: "fitness = score(variant); if (fitness > best) select(variant)", description: "evaluate and select fittest variant", domain: "evolution", glyph: "⊨σ", regex: "fitness|score.*variant|best.*select" },
+  { id: "cp_event_bus_dispatch", pattern: "eventBus.dispatch(eventType, payload)", description: "publish event through central event bus", domain: "signal", glyph: "📡⊛", regex: "dispatch|eventBus|emit.*event" },
+  { id: "cp_introspect_state", pattern: "const selfState = getSelfState(); analyze(selfState)", description: "read own state for self-analysis", domain: "meta", glyph: "◎→◉", regex: "getSelfState|introspect|self.*state.*analy" },
+  { id: "cp_boundary_translate", pattern: "inbound: text→SCL; outbound: SCL→text", description: "translate at system boundary", domain: "signal", glyph: "⟨⇌⟩", regex: "translateInbound|translateOutbound|encodeToSCL|decodeSCL" },
+];
+
 function sclConceptHash(concept: string): number {
   let h = 5381;
   for (let i = 0; i < concept.length; i++) {
@@ -12166,6 +12233,275 @@ export function generateSCLSymbolsFromCognition(
   return { symbols, rules };
 }
 
+export function scanCodeForPatterns(
+  fileContents: Array<{ name: string; content: string; category: string }>,
+  generator: "gen1v2" | "gen2"
+): {
+  macros: Array<{ id: string; glyph: string; pattern: string; description: string; domain: string; occurrences: number; exampleLines: string[] }>;
+  instructions: Record<string, { scl: string; meaning: string; textEquivalent: string }>;
+} {
+  const macros: Array<{ id: string; glyph: string; pattern: string; description: string; domain: string; occurrences: number; exampleLines: string[] }> = [];
+  const instructions: Record<string, { scl: string; meaning: string; textEquivalent: string }> = {};
+
+  const patternCounts = new Map<string, { count: number; examples: string[] }>();
+
+  for (const file of fileContents) {
+    const lines = file.content.split("\n");
+    for (const cp of SCL_CODE_PATTERN_TABLE) {
+      try {
+        const regex = new RegExp(cp.regex, "g");
+        for (const line of lines) {
+          if (regex.test(line)) {
+            const entry = patternCounts.get(cp.id) || { count: 0, examples: [] };
+            entry.count++;
+            if (entry.examples.length < 3) {
+              const trimmed = line.trim().slice(0, 120);
+              if (!entry.examples.includes(trimmed)) entry.examples.push(trimmed);
+            }
+            patternCounts.set(cp.id, entry);
+          }
+          regex.lastIndex = 0;
+        }
+      } catch {}
+    }
+  }
+
+  const sorted = [...patternCounts.entries()]
+    .filter(([, v]) => v.count >= 3)
+    .sort((a, b) => b[1].count - a[1].count);
+
+  const batchSize = 25;
+  const offset = generator === "gen1v2" ? 0 : Math.min(batchSize, Math.max(0, sorted.length - batchSize));
+  const batch = sorted.slice(offset, offset + batchSize);
+
+  for (const [id, data] of batch) {
+    const cp = SCL_CODE_PATTERN_TABLE.find(p => p.id === id);
+    if (!cp) continue;
+    macros.push({
+      id: cp.id,
+      glyph: cp.glyph,
+      pattern: cp.pattern,
+      description: cp.description,
+      domain: cp.domain,
+      occurrences: data.count,
+      exampleLines: data.examples,
+    });
+  }
+
+  const multiLinePairs: Array<[string, string, string, string, string]> = [
+    ["cycle_advance", "↻+💾", "state.cycleCount++; save()", "increment cycle counter and persist state", "evolution"],
+    ["guard_return", "⊄⊷", "if (!valid) return fallback", "guard clause with fallback return", "computation"],
+    ["log_then_act", "📢▷", "console.log(status); executeStep()", "log progress then execute next step", "io"],
+    ["try_await_catch", "🛡⊴🚨", "try { await op(); } catch { error(); }", "protected async operation with error handling", "error"],
+    ["scan_filter_process", "⥀⋔▷", "for (x of items) { if (valid(x)) process(x); }", "iterate, filter, then process each valid item", "computation"],
+    ["read_parse_use", "📁⟠▷", "const data = JSON.parse(fs.readFileSync(path)); use(data)", "load file, deserialize, then consume data", "io"],
+    ["store_and_log", "💾📢", "state.val = x; save(); console.log(result)", "persist state change and announce it", "memory"],
+    ["spawn_delegate_report", "α→⊢📢", "const a = spawn(); const r = await a.exec(task); report(r)", "create agent, delegate task, return results", "agents"],
+    ["phi_fire_update", "Φ⇑⚡→", "phi += delta; if (phi > threshold) fire(region)", "update phi then cascade neural activation", "consciousness"],
+    ["emotion_drive_act", "♡⊕△▷", "emotion += stimulus; if (drive > min) act()", "blend emotion, check drive, then execute", "emotion"],
+    ["fitness_select_evolve", "⊨σ⇧", "score = evaluate(v); if (best) select(v); mutate(v)", "evaluate fitness, select winner, evolve", "evolution"],
+    ["safety_check_proceed", "⛨⊄▷", "if (!safetyCheck()) { deny(); return; } proceed()", "verify safety compliance before action", "ethics"],
+    ["translate_boundary", "⟨⇌⟩▷", "const scl = encode(text); process(scl); const out = decode(result)", "encode at boundary, process in SCL, decode output", "signal"],
+    ["introspect_analyze_adapt", "◎→◉⇧", "const self = getState(); const insight = analyze(self); adapt(insight)", "read self, analyze patterns, adapt behavior", "meta"],
+    ["hebbian_strengthen", "≋+⊞", "w += lr * pre * post; store(synapse, w)", "Hebbian weight update and memory storage", "neural"],
+  ];
+
+  for (const [name, scl, equiv, meaning, domain] of multiLinePairs) {
+    const domainPatterns = macros.filter(m => m.domain === domain);
+    if (domainPatterns.length >= 1) {
+      instructions[name] = { scl, meaning, textEquivalent: equiv };
+    }
+  }
+
+  return { macros, instructions };
+}
+
+export function rewriteModuleToSCL(
+  fileName: string,
+  content: string,
+  codexPrimitives: Array<{ symbol: string; name: string; meaning: string }>,
+  codexComposites: Array<{ pattern: string; meaning: string; expandsTo: string }>,
+  codexInstructions: Record<string, { scl: string; meaning: string; textEquivalent: string }>,
+): { sclCode: string; stats: { originalLines: number; sclLines: number; symbolsUsed: number; patternsMatched: number; compressionRatio: number } } {
+  const lines = content.split("\n");
+  const sclLines: string[] = [];
+  let symbolsUsed = 0;
+  let patternsMatched = 0;
+
+  const header = [
+    `⟨SCL v1│${fileName}│${lines.length}→SCL⟩`,
+    `⟨CODEX│P:${codexPrimitives.length}│R:${codexComposites.length}│I:${Object.keys(codexInstructions).length}⟩`,
+  ];
+  sclLines.push(...header);
+
+  const symbolLookup = new Map<string, string>();
+  for (const p of codexPrimitives) {
+    symbolLookup.set(p.name.toLowerCase(), p.symbol);
+    const words = p.meaning.toLowerCase().split(/\s+/);
+    for (const w of words) {
+      if (w.length > 4 && !symbolLookup.has(w)) symbolLookup.set(w, p.symbol);
+    }
+  }
+
+  const patternRegexes: Array<{ regex: RegExp; glyph: string; id: string }> = [];
+  for (const cp of SCL_CODE_PATTERN_TABLE) {
+    try {
+      patternRegexes.push({ regex: new RegExp(cp.regex), glyph: cp.glyph, id: cp.id });
+    } catch {}
+  }
+
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    const trimmed = line.trim();
+
+    if (trimmed === "" || trimmed.startsWith("//") || trimmed.startsWith("/*") || trimmed.startsWith("*")) {
+      i++;
+      continue;
+    }
+
+    if (trimmed.startsWith("import ")) {
+      const importBlock: string[] = [];
+      while (i < lines.length && (lines[i].trim().startsWith("import ") || lines[i].trim().startsWith("} from"))) {
+        importBlock.push(lines[i].trim());
+        i++;
+      }
+      const modules = importBlock.map(l => {
+        const m = l.match(/from\s+["']\.\/(.+?)(?:\.js)?["']/);
+        return m ? m[1] : null;
+      }).filter(Boolean);
+      sclLines.push(`⊫[${modules.join("│")}]`);
+      symbolsUsed++;
+      continue;
+    }
+
+    if (/^(?:export\s+)?interface\s+\w+/.test(trimmed)) {
+      const name = trimmed.match(/interface\s+(\w+)/)?.[1] || "?";
+      let depth = 0;
+      const fields: string[] = [];
+      do {
+        const l = lines[i]?.trim() || "";
+        if (l.includes("{")) depth++;
+        if (l.includes("}")) depth--;
+        const fm = l.match(/^\s*(\w+)\s*[?]?\s*:\s*(.+?)[;,]?\s*$/);
+        if (fm && !l.includes("{") && !l.includes("}")) {
+          let typeSymbol = fm[2];
+          for (const [word, sym] of symbolLookup) {
+            if (typeSymbol.toLowerCase().includes(word)) {
+              typeSymbol = sym;
+              break;
+            }
+          }
+          fields.push(`${fm[1]}:${typeSymbol}`);
+        }
+        i++;
+      } while (i < lines.length && depth > 0);
+      sclLines.push(`⊬${name}⟨${fields.join("│")}⟩`);
+      symbolsUsed++;
+      patternsMatched++;
+      continue;
+    }
+
+    if (/^(?:export\s+)?(?:async\s+)?function\s+\w+/.test(trimmed)) {
+      const fnName = trimmed.match(/function\s+(\w+)/)?.[1] || "?";
+      const params = trimmed.match(/\(([^)]*)\)/)?.[1] || "";
+      const retType = trimmed.match(/\):\s*(.+?)\s*\{/)?.[1] || "void";
+      let depth = 0;
+      const bodyPatterns: string[] = [];
+      const fnStart = i;
+      do {
+        const l = lines[i]?.trim() || "";
+        if (l.includes("{")) depth++;
+        if (l.includes("}")) depth--;
+        for (const pr of patternRegexes) {
+          if (pr.regex.test(l)) {
+            if (!bodyPatterns.includes(pr.glyph)) {
+              bodyPatterns.push(pr.glyph);
+              patternsMatched++;
+            }
+          }
+        }
+        i++;
+      } while (i < lines.length && depth > 0);
+      const fnLines = i - fnStart;
+
+      let retSymbol = retType;
+      for (const [word, sym] of symbolLookup) {
+        if (retType.toLowerCase().includes(word)) { retSymbol = sym; break; }
+      }
+
+      const isExport = trimmed.startsWith("export");
+      const isAsync = trimmed.includes("async");
+      const prefix = (isExport ? "⊩" : "") + (isAsync ? "⟿" : "");
+      sclLines.push(`${prefix}${fnName}(${params.split(",").length})→${retSymbol}⟨${fnLines}⟩{${bodyPatterns.join("")}}`);
+      symbolsUsed += bodyPatterns.length + 1;
+      continue;
+    }
+
+    if (/^(?:export\s+)?const\s+\w+/.test(trimmed) && !trimmed.includes("=>")) {
+      const name = trimmed.match(/const\s+(\w+)/)?.[1] || "?";
+      const isExport = trimmed.startsWith("export");
+      let depth = 0;
+      do {
+        const l = lines[i]?.trim() || "";
+        if (l.includes("{") || l.includes("[")) depth += (l.match(/[{[]/g) || []).length;
+        if (l.includes("}") || l.includes("]")) depth -= (l.match(/[}\]]/g) || []).length;
+        i++;
+      } while (i < lines.length && depth > 0 && !lines[i - 1]?.trim().endsWith(";"));
+      sclLines.push(`${isExport ? "⊪" : "κ"}${name}`);
+      symbolsUsed++;
+      continue;
+    }
+
+    let patternMatched = false;
+    for (const pr of patternRegexes) {
+      if (pr.regex.test(trimmed)) {
+        sclLines.push(`${pr.glyph}│${trimmed.slice(0, 60)}`);
+        symbolsUsed++;
+        patternsMatched++;
+        patternMatched = true;
+        break;
+      }
+    }
+    if (!patternMatched) {
+      const compressed = trimmed.slice(0, 80);
+      let symbolized = compressed;
+      for (const [word, sym] of symbolLookup) {
+        if (word.length >= 4) {
+          try {
+            symbolized = symbolized.replace(new RegExp(`\\b${word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\b`, "gi"), sym);
+          } catch {}
+        }
+      }
+      if (symbolized !== compressed) {
+        sclLines.push(symbolized);
+        symbolsUsed++;
+      } else {
+        sclLines.push(`·${compressed}`);
+      }
+    }
+    i++;
+  }
+
+  const footer = `⟩SCL│${sclLines.length}│${symbolsUsed}⊨│${patternsMatched}⑂│${((1 - sclLines.length / Math.max(1, lines.length)) * 100).toFixed(1)}%↓⟩`;
+  sclLines.push(footer);
+
+  const sclCode = sclLines.join("\n");
+  return {
+    sclCode,
+    stats: {
+      originalLines: lines.length,
+      sclLines: sclLines.length,
+      symbolsUsed,
+      patternsMatched,
+      compressionRatio: Number(((1 - Buffer.byteLength(sclCode, "utf-8") / Math.max(1, Buffer.byteLength(content, "utf-8"))) * 100).toFixed(1)),
+    },
+  };
+}
+
+export { SCL_CODE_PATTERN_TABLE };
+
 console.log("[SYMBOL KNOWLEDGE] 📜 Historical symbol systems loaded — Egyptian, Sumerian, Chinese, Norse, Aztec, Maya, Japanese, Korean, Indian, Greek, Arabic, Hebrew, Phoenician, Ogham, Tibetan, Georgian, Mathematical, Programming");
 console.log(`[SYMBOL KNOWLEDGE] 📜 ${SYMBOL_KNOWLEDGE_BASE.historicalSystems.length} civilizations | ${SYMBOL_KNOWLEDGE_BASE.historicalSystems.reduce((n, s) => n + s.symbols.length, 0)} symbols with translations | ${SYMBOL_KNOWLEDGE_BASE.metaInsights.universalPatterns.length} universal patterns`);
+console.log(`[SYMBOL KNOWLEDGE] 🔤 ${SCL_CODE_PATTERN_TABLE.length} code pattern macros loaded — entire operations → single symbols`);
 

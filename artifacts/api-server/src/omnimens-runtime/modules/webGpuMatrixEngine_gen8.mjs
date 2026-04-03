@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: webGpuMatrixEngine
- * Written: 2026-04-03T09:44:47.226Z
+ * Written: 2026-04-03T16:37:30.014Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -18,91 +18,118 @@
 
 // webGpuMatrixEngine.mjs
 
-import { GPU } from 'gpu.js';
-
-const gpu = new GPU();
+import { createHash } from 'crypto';
 
 /**
- * Multiplies two matrices using GPU acceleration.
- * @param {number[][]} matrixA - The first matrix.
- * @param {number[][]} matrixB - The second matrix.
- * @returns {number[][]} The resulting matrix after multiplication.
+ * Generates a unique identifier for GPU tasks to ensure reproducibility.
+ * @param {string} input - Input string to hash.
+ * @returns {string} - A unique hash identifier.
  */
-export function gpuMatrixMultiply(matrixA, matrixB) {
-  if (matrixA[0].length !== matrixB.length) {
-    throw new Error('Matrix dimensions do not match for multiplication.');
+export function generateTaskId(input) {
+  const hash = createHash('sha256');
+  hash.update(input);
+  return hash.digest('hex');
+}
+
+/**
+ * Validates matrix dimensions for operations like multiplication and convolution.
+ * @param {Array<Array<number>>} matrixA - First matrix.
+ * @param {Array<Array<number>>} matrixB - Second matrix.
+ * @returns {boolean} - True if dimensions are valid, otherwise false.
+ */
+export function validateMatrixDimensions(matrixA, matrixB) {
+  if (!Array.isArray(matrixA) || !Array.isArray(matrixB)) return false;
+  if (matrixA.length === 0 || matrixB.length === 0) return false;
+  const colsA = matrixA[0].length;
+  const rowsB = matrixB.length;
+  return colsA === rowsB;
+}
+
+/**
+ * Performs matrix multiplication using pure JavaScript (CPU fallback).
+ * @param {Array<Array<number>>} matrixA - First matrix.
+ * @param {Array<Array<number>>} matrixB - Second matrix.
+ * @returns {Array<Array<number>>} - Resultant matrix after multiplication.
+ */
+export function multiplyMatrices(matrixA, matrixB) {
+  if (!validateMatrixDimensions(matrixA, matrixB)) {
+    throw new Error('Invalid matrix dimensions for multiplication.');
   }
 
-  const multiplyKernel = gpu.createKernel(function (a, b) {
-    let sum = 0;
-    for (let i = 0; i < this.constants.sharedDim; i++) {
-      sum += a[this.thread.y][i] * b[i][this.thread.x];
+  const result = Array(matrixA.length).fill(null).map(() => Array(matrixB[0].length).fill(0));
+
+  for (let i = 0; i < matrixA.length; i++) {
+    for (let j = 0; j < matrixB[0].length; j++) {
+      for (let k = 0; k < matrixB.length; k++) {
+        result[i][j] += matrixA[i][k] * matrixB[k][j];
+      }
     }
-    return sum;
-  })
-    .setOutput([matrixB[0].length, matrixA.length])
-    .setConstants({ sharedDim: matrixA[0].length });
+  }
 
-  return multiplyKernel(matrixA, matrixB);
+  return result;
 }
 
 /**
- * Calculates the eigenvalues of a square matrix using the power iteration method.
- * @param {number[][]} matrix - The input square matrix.
- * @param {number} iterations - Number of iterations for convergence.
- * @returns {number[]} The dominant eigenvalue and corresponding eigenvector.
+ * Applies an activation function element-wise to a matrix.
+ * @param {Array<Array<number>>} matrix - Input matrix.
+ * @param {Function} activationFunction - Activation function to apply.
+ * @returns {Array<Array<number>>} - Matrix after applying the activation function.
  */
-export function gpuEigenvalueDecomposition(matrix, iterations = 100) {
-  if (matrix.length !== matrix[0].length) {
-    throw new Error('Matrix must be square for eigenvalue decomposition.');
+export function applyActivationFunction(matrix, activationFunction) {
+  if (typeof activationFunction !== 'function') {
+    throw new Error('Activation function must be a valid function.');
   }
 
-  const size = matrix.length;
-  let vector = Array(size).fill(1);
-
-  for (let iter = 0; iter < iterations; iter++) {
-    const result = gpuMatrixMultiply([vector], matrix)[0];
-    const norm = Math.sqrt(result.reduce((sum, val) => sum + val * val, 0));
-    vector = result.map((val) => val / norm);
-  }
-
-  const eigenvalue = gpuMatrixMultiply([vector], matrix)[0].reduce((sum, val, i) => sum + val * vector[i], 0);
-  return { eigenvalue, eigenvector: vector };
+  return matrix.map(row => row.map(value => activationFunction(value)));
 }
 
 /**
- * Updates a Hopfield network pattern using GPU acceleration.
- * @param {number[][]} weights - The weight matrix of the Hopfield network.
- * @param {number[]} state - The current state vector.
- * @returns {number[]} The updated state vector.
+ * ReLU activation function.
+ * @param {number} x - Input value.
+ * @returns {number} - Output value after applying ReLU.
  */
-export function gpuHopfieldUpdate(weights, state) {
-  if (weights.length !== weights[0].length || weights.length !== state.length) {
-    throw new Error('Weight matrix must be square and match the state vector size.');
-  }
-
-  const updateKernel = gpu.createKernel(function (weights, state) {
-    let sum = 0;
-    for (let i = 0; i < this.constants.size; i++) {
-      sum += weights[this.thread.x][i] * state[i];
-    }
-    return sum > 0 ? 1 : -1;
-  })
-    .setOutput([state.length])
-    .setConstants({ size: state.length });
-
-  return updateKernel(weights, state);
+export function relu(x) {
+  return Math.max(0, x);
 }
 
 /**
- * Validates if a matrix is valid for GPU operations.
- * @param {number[][]} matrix - The matrix to validate.
- * @returns {boolean} True if valid, otherwise false.
+ * Sigmoid activation function.
+ * @param {number} x - Input value.
+ * @returns {number} - Output value after applying Sigmoid.
  */
-export function isValidMatrix(matrix) {
-  return (
-    Array.isArray(matrix) &&
-    matrix.length > 0 &&
-    matrix.every((row) => Array.isArray(row) && row.length === matrix[0].length)
-  );
+export function sigmoid(x) {
+  return 1 / (1 + Math.exp(-x));
+}
+
+/**
+ * Softmax activation function for a vector.
+ * @param {Array<number>} vector - Input vector.
+ * @returns {Array<number>} - Output vector after applying Softmax.
+ */
+export function softmax(vector) {
+  const expValues = vector.map(value => Math.exp(value));
+  const sumExp = expValues.reduce((acc, val) => acc + val, 0);
+  return expValues.map(value => value / sumExp);
+}
+
+/**
+ * Transposes a matrix.
+ * @param {Array<Array<number>>} matrix - Input matrix.
+ * @returns {Array<Array<number>>} - Transposed matrix.
+ */
+export function transposeMatrix(matrix) {
+  return matrix[0].map((_, colIndex) => matrix.map(row => row[colIndex]));
+}
+
+/**
+ * Normalizes a matrix to have values between 0 and 1.
+ * @param {Array<Array<number>>} matrix - Input matrix.
+ * @returns {Array<Array<number>>} - Normalized matrix.
+ */
+export function normalizeMatrix(matrix) {
+  const flat = matrix.flat();
+  const min = Math.min(...flat);
+  const max = Math.max(...flat);
+
+  return matrix.map(row => row.map(value => (value - min) / (max - min)));
 }

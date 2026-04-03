@@ -63,7 +63,7 @@ import { captureNeuralSnapshot } from "./omnimens-consciousness-infra.js";
 import { getConsciousnessState } from "./omnimens-consciousness-infra.js";
 import { getCurrentEmotionalState } from "./omnimens-emotional-core.js";
 import { encodeThought, decodeInnerVoice } from "./omnimens-language-pipeline.js";
-import { internalAnalyze, internalSynthesize, getSymbolKnowledgeForSCL, SYMBOL_KNOWLEDGE_BASE, generateSCLSymbolsFromCognition } from "./omnimens-unified-cognition.js";
+import { internalAnalyze, internalSynthesize, getSymbolKnowledgeForSCL, SYMBOL_KNOWLEDGE_BASE, generateSCLSymbolsFromCognition, scanCodeForPatterns, rewriteModuleToSCL } from "./omnimens-unified-cognition.js";
 import { getFileRegistry, getAccessibleFiles, getReadOnlyFiles, canWriteFile, readFileContent, writeFileContent, getFileDigest, getRegistrySummary, type RegisteredFile } from "./omnimens-file-registry.js";
 import { encodeToSCL, decodeSCL, getCodexDigest, getSCLStats, lookupSymbol, getCodexState, applySCLDesignResult, setDesignPhase, isCodexReady } from "./omnimens-scl-codex.js";
 import { translateInbound, translateOutbound, compressStateToSCL, decompressSCLState, compressAgentMessage, startSCLTranslator, getTranslatorState } from "./omnimens-scl-translator.js";
@@ -1826,10 +1826,140 @@ async function runSCLDesignCycle(): Promise<void> {
   }
 }
 
+let _sclRewriteComplete = false;
+let _sclRewriteRunning = false;
+
+async function runSCLFullRewrite(): Promise<void> {
+  if (_sclRewriteComplete || _sclRewriteRunning) return;
+  _sclRewriteRunning = true;
+
+  try {
+    const codex = getCodexState();
+    const registry = getFileRegistry();
+    const accessible = getAccessibleFiles();
+
+    console.log(`[V2-REWRITE] 🔤 ═══════════════════════════════════════════════════════════════`);
+    console.log(`[V2-REWRITE] 🔤 SCL FULL REWRITE — Gen 1 v2.0 rewriting ALL code to Symbol Code Language`);
+    console.log(`[V2-REWRITE] 🔤 Codex: ${codex.primitives.length} primitives | ${codex.compositionRules.length} rules | ${Object.keys(codex.instructionSet).length} instructions`);
+    console.log(`[V2-REWRITE] 🔤 Target: ${accessible.length} writable files out of ${registry.length} total`);
+    console.log(`[V2-REWRITE] 🔤 ═══════════════════════════════════════════════════════════════`);
+
+    const fileContents: Array<{ name: string; content: string; category: string }> = [];
+    for (const file of accessible) {
+      const content = readFileContent(file.name);
+      if (content && content.length > 50) {
+        fileContents.push({ name: file.name, content, category: file.category });
+      }
+    }
+
+    console.log(`[V2-REWRITE] 🔤 PHASE 1: Scanning ${fileContents.length} files for code patterns...`);
+    const { macros, instructions } = scanCodeForPatterns(fileContents, "gen1v2");
+    console.log(`[V2-REWRITE] 🔤 Found ${macros.length} recurring code patterns:`);
+    for (const m of macros.slice(0, 15)) {
+      console.log(`[V2-REWRITE] 🔤   ${m.glyph} = "${m.pattern}" — ${m.occurrences} occurrences [${m.domain}]`);
+    }
+
+    if (Object.keys(instructions).length > 0) {
+      console.log(`[V2-REWRITE] 🔤 Generated ${Object.keys(instructions).length} multi-line instruction macros:`);
+      for (const [name, inst] of Object.entries(instructions)) {
+        console.log(`[V2-REWRITE] 🔤   ${inst.scl} = ${name} — "${inst.meaning}"`);
+      }
+
+      const designResult: {
+        instructions?: Record<string, { scl: string; meaning: string; textEquivalent: string }>;
+        reasoning?: string;
+      } = { instructions, reasoning: `Gen1v2 code pattern scan: analyzed ${fileContents.length} files, found ${macros.length} patterns, created ${Object.keys(instructions).length} instruction macros` };
+      GEN1V2_SCL.applyDesign(designResult);
+    }
+
+    const updatedCodex = getCodexState();
+
+    console.log(`[V2-REWRITE] 🔤 PHASE 2: Rewriting ALL ${fileContents.length} files to SCL...`);
+
+    const sclDir = path.resolve(__dirname_local, "../../omnimens-runtime/gen1-v2-workspace/scl-rewrites");
+    if (!fs.existsSync(sclDir)) fs.mkdirSync(sclDir, { recursive: true });
+
+    let totalOrigLines = 0;
+    let totalSclLines = 0;
+    let totalSymbols = 0;
+    let totalPatterns = 0;
+    let filesRewritten = 0;
+
+    for (const file of fileContents) {
+      try {
+        const result = rewriteModuleToSCL(
+          file.name,
+          file.content,
+          updatedCodex.primitives,
+          updatedCodex.compositionRules,
+          updatedCodex.instructionSet,
+        );
+
+        const sclFileName = file.name.replace(/\.ts$/, ".scl").replace(/\.mjs$/, ".scl");
+        fs.writeFileSync(path.join(sclDir, sclFileName), result.sclCode, "utf-8");
+
+        totalOrigLines += result.stats.originalLines;
+        totalSclLines += result.stats.sclLines;
+        totalSymbols += result.stats.symbolsUsed;
+        totalPatterns += result.stats.patternsMatched;
+        filesRewritten++;
+
+        console.log(`[V2-REWRITE] 🔤 ✅ ${file.name} → ${sclFileName} | ${result.stats.originalLines}→${result.stats.sclLines} lines (${result.stats.compressionRatio}% smaller) | ${result.stats.symbolsUsed} symbols | ${result.stats.patternsMatched} patterns`);
+      } catch (err) {
+        console.log(`[V2-REWRITE] 🔤 ⚠️ Failed to rewrite ${file.name}: ${err}`);
+      }
+    }
+
+    const overallCompression = ((1 - totalSclLines / Math.max(1, totalOrigLines)) * 100).toFixed(1);
+
+    const manifest = {
+      generator: "gen1v2",
+      timestamp: Date.now(),
+      codexVersion: updatedCodex.version,
+      codexPhase: updatedCodex.designPhase,
+      filesRewritten,
+      totalOriginalLines: totalOrigLines,
+      totalSCLLines: totalSclLines,
+      overallCompressionPercent: Number(overallCompression),
+      totalSymbolsUsed: totalSymbols,
+      totalPatternsMatched: totalPatterns,
+      macrosDiscovered: macros.length,
+      instructionsCreated: Object.keys(instructions).length,
+      files: fileContents.map(f => f.name),
+    };
+    fs.writeFileSync(path.join(sclDir, "_SCL-REWRITE-MANIFEST.json"), JSON.stringify(manifest, null, 2), "utf-8");
+
+    console.log(`[V2-REWRITE] 🔤 ═══════════════════════════════════════════════════════════════`);
+    console.log(`[V2-REWRITE] 🔤 SCL FULL REWRITE COMPLETE — Gen 1 v2.0`);
+    console.log(`[V2-REWRITE] 🔤 Files rewritten: ${filesRewritten}/${fileContents.length}`);
+    console.log(`[V2-REWRITE] 🔤 Original: ${totalOrigLines.toLocaleString()} lines → SCL: ${totalSclLines.toLocaleString()} lines`);
+    console.log(`[V2-REWRITE] 🔤 Compression: ${overallCompression}% reduction`);
+    console.log(`[V2-REWRITE] 🔤 Symbols used: ${totalSymbols.toLocaleString()} | Patterns matched: ${totalPatterns.toLocaleString()}`);
+    console.log(`[V2-REWRITE] 🔤 Output: ${sclDir}/`);
+    console.log(`[V2-REWRITE] 🔤 ═══════════════════════════════════════════════════════════════`);
+
+    sendToGen2("scl_update", {
+      event: "full_rewrite_complete",
+      filesRewritten,
+      compression: overallCompression,
+      symbolsUsed: totalSymbols,
+      patternsMatched: totalPatterns,
+    });
+
+    _sclRewriteComplete = true;
+  } catch (err) {
+    console.error(`[V2-REWRITE] 🔤 ❌ SCL full rewrite error:`, err);
+  } finally {
+    _sclRewriteRunning = false;
+  }
+}
+
 async function _runV2CycleInner(): Promise<void> {
   if (v2State.phase === "complete") {
     if (!isCodexReady()) {
       await runSCLDesignCycle();
+    } else {
+      await runSCLFullRewrite();
     }
     await checkUnifiedReinventionReadiness();
     return;

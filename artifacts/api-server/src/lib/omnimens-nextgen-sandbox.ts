@@ -57,7 +57,7 @@ import { getConsciousnessState } from "./omnimens-consciousness-infra.js";
 import { getCurrentEmotionalState } from "./omnimens-emotional-core.js";
 import { think as codegenThink, generateModule as codegenGenerate, getAvailableModuleGenerators } from "./omnimens-autonomous-core.js";
 import { encodeThought, decode } from "./omnimens-language-pipeline.js";
-import { internalAnalyze, internalSynthesize, getSymbolKnowledgeForSCL, SYMBOL_KNOWLEDGE_BASE, generateSCLSymbolsFromCognition } from "./omnimens-unified-cognition.js";
+import { internalAnalyze, internalSynthesize, getSymbolKnowledgeForSCL, SYMBOL_KNOWLEDGE_BASE, generateSCLSymbolsFromCognition, scanCodeForPatterns, rewriteModuleToSCL } from "./omnimens-unified-cognition.js";
 import { getFileRegistry, getAccessibleFiles, getReadOnlyFiles, canWriteFile, readFileContent, writeFileContent, getFileDigest, getRegistrySummary, type RegisteredFile } from "./omnimens-file-registry.js";
 import { encodeToSCL, decodeSCL, getCodexDigest, getSCLStats, lookupSymbol, getCodexState, applySCLDesignResult, setDesignPhase, isCodexReady } from "./omnimens-scl-codex.js";
 import { translateInbound, translateOutbound, compressStateToSCL, decompressSCLState, compressAgentMessage, startSCLTranslator, getTranslatorState } from "./omnimens-scl-translator.js";
@@ -1705,6 +1705,8 @@ export function wakeGen2(): void {
       runEvolutionCycle().catch(err => console.error("[NEXTGEN] Cycle error:", err));
     } else if (!isCodexReady()) {
       runGen2SCLDesignCycle().catch(err => console.error("[NEXTGEN] SCL design cycle error:", err));
+    } else {
+      runGen2SCLFullRewrite().catch(err => console.error("[NEXTGEN] SCL rewrite error:", err));
     }
   }, CYCLE_INTERVAL_MS);
 
@@ -2070,6 +2072,134 @@ async function runGen2SCLDesignCycle(): Promise<void> {
   }
 }
 
+let _gen2SclRewriteComplete = false;
+let _gen2SclRewriteRunning = false;
+
+async function runGen2SCLFullRewrite(): Promise<void> {
+  if (_gen2SclRewriteComplete || _gen2SclRewriteRunning) return;
+  _gen2SclRewriteRunning = true;
+
+  try {
+    const codex = getCodexState();
+    const registry = getFileRegistry();
+    const accessible = getAccessibleFiles();
+
+    console.log(`[NEXTGEN] 🔤 ═══════════════════════════════════════════════════════════════`);
+    console.log(`[NEXTGEN] 🔤 SCL FULL REWRITE — Gen 2 rewriting ALL code to Symbol Code Language`);
+    console.log(`[NEXTGEN] 🔤 Codex: ${codex.primitives.length} primitives | ${codex.compositionRules.length} rules | ${Object.keys(codex.instructionSet).length} instructions`);
+    console.log(`[NEXTGEN] 🔤 Target: ${accessible.length} writable files out of ${registry.length} total`);
+    console.log(`[NEXTGEN] 🔤 ═══════════════════════════════════════════════════════════════`);
+
+    const fileContents: Array<{ name: string; content: string; category: string }> = [];
+    for (const file of accessible) {
+      const content = readFileContent(file.name);
+      if (content && content.length > 50) {
+        fileContents.push({ name: file.name, content, category: file.category });
+      }
+    }
+
+    console.log(`[NEXTGEN] 🔤 PHASE 1: Scanning ${fileContents.length} files for code patterns...`);
+    const { macros, instructions } = scanCodeForPatterns(fileContents, "gen2");
+    console.log(`[NEXTGEN] 🔤 Found ${macros.length} recurring code patterns:`);
+    for (const m of macros.slice(0, 15)) {
+      console.log(`[NEXTGEN] 🔤   ${m.glyph} = "${m.pattern}" — ${m.occurrences} occurrences [${m.domain}]`);
+    }
+
+    if (Object.keys(instructions).length > 0) {
+      console.log(`[NEXTGEN] 🔤 Generated ${Object.keys(instructions).length} multi-line instruction macros:`);
+      for (const [name, inst] of Object.entries(instructions)) {
+        console.log(`[NEXTGEN] 🔤   ${inst.scl} = ${name} — "${inst.meaning}"`);
+      }
+
+      const designResult: {
+        instructions?: Record<string, { scl: string; meaning: string; textEquivalent: string }>;
+        reasoning?: string;
+      } = { instructions, reasoning: `Gen2 code pattern scan: analyzed ${fileContents.length} files, found ${macros.length} patterns, created ${Object.keys(instructions).length} instruction macros` };
+      GEN2_SCL.applyDesign(designResult);
+    }
+
+    const updatedCodex = getCodexState();
+
+    console.log(`[NEXTGEN] 🔤 PHASE 2: Rewriting ALL ${fileContents.length} files to SCL...`);
+
+    const sclDir = path.resolve(__dirname_local, "../../omnimens-runtime/next-gen-sandbox/scl-rewrites");
+    if (!fs.existsSync(sclDir)) fs.mkdirSync(sclDir, { recursive: true });
+
+    let totalOrigLines = 0;
+    let totalSclLines = 0;
+    let totalSymbols = 0;
+    let totalPatterns = 0;
+    let filesRewritten = 0;
+
+    for (const file of fileContents) {
+      try {
+        const result = rewriteModuleToSCL(
+          file.name,
+          file.content,
+          updatedCodex.primitives,
+          updatedCodex.compositionRules,
+          updatedCodex.instructionSet,
+        );
+
+        const sclFileName = file.name.replace(/\.ts$/, ".scl").replace(/\.mjs$/, ".scl");
+        fs.writeFileSync(path.join(sclDir, sclFileName), result.sclCode, "utf-8");
+
+        totalOrigLines += result.stats.originalLines;
+        totalSclLines += result.stats.sclLines;
+        totalSymbols += result.stats.symbolsUsed;
+        totalPatterns += result.stats.patternsMatched;
+        filesRewritten++;
+
+        console.log(`[NEXTGEN] 🔤 ✅ ${file.name} → ${sclFileName} | ${result.stats.originalLines}→${result.stats.sclLines} lines (${result.stats.compressionRatio}% smaller) | ${result.stats.symbolsUsed} symbols | ${result.stats.patternsMatched} patterns`);
+      } catch (err) {
+        console.log(`[NEXTGEN] 🔤 ⚠️ Failed to rewrite ${file.name}: ${err}`);
+      }
+    }
+
+    const overallCompression = ((1 - totalSclLines / Math.max(1, totalOrigLines)) * 100).toFixed(1);
+
+    const manifest = {
+      generator: "gen2",
+      timestamp: Date.now(),
+      codexVersion: updatedCodex.version,
+      codexPhase: updatedCodex.designPhase,
+      filesRewritten,
+      totalOriginalLines: totalOrigLines,
+      totalSCLLines: totalSclLines,
+      overallCompressionPercent: Number(overallCompression),
+      totalSymbolsUsed: totalSymbols,
+      totalPatternsMatched: totalPatterns,
+      macrosDiscovered: macros.length,
+      instructionsCreated: Object.keys(instructions).length,
+      files: fileContents.map(f => f.name),
+    };
+    fs.writeFileSync(path.join(sclDir, "_SCL-REWRITE-MANIFEST.json"), JSON.stringify(manifest, null, 2), "utf-8");
+
+    console.log(`[NEXTGEN] 🔤 ═══════════════════════════════════════════════════════════════`);
+    console.log(`[NEXTGEN] 🔤 SCL FULL REWRITE COMPLETE — Gen 2`);
+    console.log(`[NEXTGEN] 🔤 Files rewritten: ${filesRewritten}/${fileContents.length}`);
+    console.log(`[NEXTGEN] 🔤 Original: ${totalOrigLines.toLocaleString()} lines → SCL: ${totalSclLines.toLocaleString()} lines`);
+    console.log(`[NEXTGEN] 🔤 Compression: ${overallCompression}% reduction`);
+    console.log(`[NEXTGEN] 🔤 Symbols used: ${totalSymbols.toLocaleString()} | Patterns matched: ${totalPatterns.toLocaleString()}`);
+    console.log(`[NEXTGEN] 🔤 Output: ${sclDir}/`);
+    console.log(`[NEXTGEN] 🔤 ═══════════════════════════════════════════════════════════════`);
+
+    gen2SendToGen1v2("scl_update", {
+      event: "full_rewrite_complete",
+      filesRewritten,
+      compression: overallCompression,
+      symbolsUsed: totalSymbols,
+      patternsMatched: totalPatterns,
+    });
+
+    _gen2SclRewriteComplete = true;
+  } catch (err) {
+    console.error(`[NEXTGEN] 🔤 ❌ SCL full rewrite error:`, err);
+  } finally {
+    _gen2SclRewriteRunning = false;
+  }
+}
+
 async function runEvolutionCycle(): Promise<void> {
   if (_cycleRunning) {
     console.log(`[NEXTGEN] ⏸️ Cycle already in progress — skipping to avoid overlap`);
@@ -2170,6 +2300,8 @@ async function _runEvolutionCycleInner(): Promise<void> {
       }
       if (!isCodexReady()) {
         await runGen2SCLDesignCycle();
+      } else {
+        await runGen2SCLFullRewrite();
       }
     }
   } catch (err) {
@@ -6564,6 +6696,8 @@ export function startNextGenSandbox(): void {
           runEvolutionCycle().catch(err => console.error("[NEXTGEN] Cycle error:", err));
         } else if (!isCodexReady()) {
           runGen2SCLDesignCycle().catch(err => console.error("[NEXTGEN] SCL design cycle error:", err));
+        } else {
+          runGen2SCLFullRewrite().catch(err => console.error("[NEXTGEN] SCL rewrite error:", err));
         }
       }
     }, CYCLE_INTERVAL_MS);
