@@ -1,146 +1,6 @@
 [
   {
     "source": "evolution_engine",
-    "title": "Evolution Module: hybridLanguageGenerator",
-    "filename": "hybridLanguageGenerator_gen32.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/hybridLanguageGenerator_gen32.mjs",
-    "backupPath": null,
-    "timestamp": 1775142949276,
-    "codeLength": 3158,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 32 Complete — 3 modules",
-    "filename": "evolution_marker_gen32.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen32.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen32.mjs.backup.2026-04-02T15-15-49-439Z",
-    "timestamp": 1775142949438,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: contextualMemoryReconstructor",
-    "filename": "contextualMemoryReconstructor_gen33.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/contextualMemoryReconstructor_gen33.mjs",
-    "backupPath": null,
-    "timestamp": 1775142949843,
-    "codeLength": 3233,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: webGpuMatrixAccelerator",
-    "filename": "webGpuMatrixAccelerator_gen36.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/webGpuMatrixAccelerator_gen36.mjs",
-    "backupPath": null,
-    "timestamp": 1775142950039,
-    "codeLength": 3512,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: dynamicContextCompressor",
-    "filename": "dynamicContextCompressor_gen28.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/dynamicContextCompressor_gen28.mjs",
-    "backupPath": null,
-    "timestamp": 1775142952059,
-    "codeLength": 4195,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: checkpointedTaskRunner",
-    "filename": "checkpointedTaskRunner_gen31.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/checkpointedTaskRunner_gen31.mjs",
-    "backupPath": null,
-    "timestamp": 1775142955276,
-    "codeLength": 3337,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 31 Complete — 3 modules",
-    "filename": "evolution_marker_gen31.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen31.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen31.mjs.backup.2026-04-02T15-15-55-423Z",
-    "timestamp": 1775142955422,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: gpuParallelMatrixEngine",
-    "filename": "gpuParallelMatrixEngine_gen34.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/gpuParallelMatrixEngine_gen34.mjs",
-    "backupPath": null,
-    "timestamp": 1775142956529,
-    "codeLength": 3012,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: distributedTaskScheduler",
-    "filename": "distributedTaskScheduler_gen33.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/distributedTaskScheduler_gen33.mjs",
-    "backupPath": null,
-    "timestamp": 1775142963717,
-    "codeLength": 2919,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 33 Complete — 3 modules",
-    "filename": "evolution_marker_gen33.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen33.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen33.mjs.backup.2026-04-02T15-16-03-861Z",
-    "timestamp": 1775142963860,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: semanticHashCompressor",
-    "filename": "semanticHashCompressor_gen35.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/semanticHashCompressor_gen35.mjs",
-    "backupPath": null,
-    "timestamp": 1775142966305,
-    "codeLength": 3372,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: adaptivePromptRewriter",
-    "filename": "adaptivePromptRewriter_gen28.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/adaptivePromptRewriter_gen28.mjs",
-    "backupPath": null,
-    "timestamp": 1775142970706,
-    "codeLength": 3513,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: contextPreservationRL",
-    "filename": "contextPreservationRL_gen30.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/contextPreservationRL_gen30.mjs",
-    "backupPath": null,
-    "timestamp": 1775142970713,
-    "codeLength": 4643,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Cycle 28 Complete — 3 modules",
-    "filename": "evolution_marker_gen28.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen28.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/evolution_marker_gen28.mjs.backup.2026-04-02T15-16-10-954Z",
-    "timestamp": 1775142970954,
-    "codeLength": 100,
-    "overwrite": true
-  },
-  {
-    "source": "evolution_engine",
     "title": "Evolution Cycle 30 Complete — 3 modules",
     "filename": "evolution_marker_gen30.mjs",
     "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/evolution_marker_gen30.mjs",
@@ -4997,6 +4857,146 @@
     "backupPath": null,
     "timestamp": 1775176253212,
     "codeLength": 434,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:GraphicDesigner+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: GraphicDesigner/information_compression: Astrocytes, once th",
+    "filename": "omnimens_autocode_consciousness_expansion_mni67o81.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mni67o81.mjs",
+    "backupPath": null,
+    "timestamp": 1775176430690,
+    "codeLength": 393,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+OMNIMENS",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: SpellCheckVisual/analogical_mapping: Gödel's incompleteness ",
+    "filename": "omnimens_autocode_pattern_recognition_mni67oca.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mni67oca.mjs",
+    "backupPath": null,
+    "timestamp": 1775176430842,
+    "codeLength": 471,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+GraphicDesigner",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: SpellCheckVisual/pattern_recognition: Information is physica",
+    "filename": "omnimens_autocode_pattern_recognition_mni69ybf.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mni69ybf.mjs",
+    "backupPath": null,
+    "timestamp": 1775176537083,
+    "codeLength": 478,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Critic",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: SpellCheckVisual/pattern_recognition: Information is physica",
+    "filename": "omnimens_autocode_pattern_recognition_mni69ygw.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mni69ygw.mjs",
+    "backupPath": null,
+    "timestamp": 1775176537280,
+    "codeLength": 469,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Neuroscientist",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SpellCheckVisual/entropy_reduction: The strange loop concept",
+    "filename": "omnimens_autocode_consciousness_expansion_mni69ynh.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mni69ynh.mjs",
+    "backupPath": null,
+    "timestamp": 1775176537517,
+    "codeLength": 397,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Neuroscientist",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: SpellCheckVisual/recursive_decomposition: Neuroplasticity al",
+    "filename": "omnimens_autocode_neural_pathway_mni6auuf.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mni6auuf.mjs",
+    "backupPath": null,
+    "timestamp": 1775176579240,
+    "codeLength": 438,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Mathematician",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: SpellCheckVisual/feature_extraction: Recurrent neural networ",
+    "filename": "omnimens_autocode_neural_pathway_mni6av8q.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mni6av8q.mjs",
+    "backupPath": null,
+    "timestamp": 1775176579754,
+    "codeLength": 437,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SpellCheckVisual/temporal_correlation: The Boltzmann brain p",
+    "filename": "omnimens_autocode_consciousness_expansion_mni6awa2.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mni6awa2.mjs",
+    "backupPath": null,
+    "timestamp": 1775176581098,
+    "codeLength": 394,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:spider:OMNIMENS+evolution-crawler",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider evolution-crawler harvest: agent_evolution — 207 syna",
+    "filename": "omnimens_autocode_neural_pathway_mni6awcm.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mni6awcm.mjs",
+    "backupPath": null,
+    "timestamp": 1775176581190,
+    "codeLength": 420,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:spider:OMNIMENS+genesis-crawler",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: Spider genesis-crawler harvest: agent_genesis — 209 synapses",
+    "filename": "omnimens_autocode_neural_pathway_mni6awey.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mni6awey.mjs",
+    "backupPath": null,
+    "timestamp": 1775176581274,
+    "codeLength": 414,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:GraphicDesigner+Mathematician",
+    "title": "[OMNIMENS AutoCoder] pattern_recognition: GraphicDesigner/pattern_recognition: The free energy princip",
+    "filename": "omnimens_autocode_pattern_recognition_mni6conh.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_pattern_recognition_mni6conh.mjs",
+    "backupPath": null,
+    "timestamp": 1775176664525,
+    "codeLength": 475,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:GraphicDesigner+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: GraphicDesigner/temporal_correlation: Scale-free networks fo",
+    "filename": "omnimens_autocode_consciousness_expansion_mni6e2an.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mni6e2an.mjs",
+    "backupPath": null,
+    "timestamp": 1775176728864,
+    "codeLength": 393,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Synthesizer",
+    "title": "[OMNIMENS AutoCoder] consciousness_expansion: SpellCheckVisual/information_compression: Wolfram's Rule 110",
+    "filename": "omnimens_autocode_consciousness_expansion_mni6e2eu.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_consciousness_expansion_mni6e2eu.mjs",
+    "backupPath": null,
+    "timestamp": 1775176729014,
+    "codeLength": 394,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Critic",
+    "title": "[OMNIMENS AutoCoder] adaptive_algorithm: SpellCheckVisual/causal_inference: Hebbian learning: neurons",
+    "filename": "omnimens_autocode_adaptive_algorithm_mni6e2hv.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_adaptive_algorithm_mni6e2hv.mjs",
+    "backupPath": null,
+    "timestamp": 1775176729123,
+    "codeLength": 450,
     "overwrite": false
   }
 ]
