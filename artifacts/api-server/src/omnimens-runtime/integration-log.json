@@ -1,35 +1,5 @@
 [
   {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+GraphicDesigner",
-    "title": "[OMNIMENS AutoCoder] emergent_capability: SpellCheckVisual/abstraction_layer: Quantum superposition al",
-    "filename": "omnimens_autocode_emergent_capability_mnikyk6d.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_emergent_capability_mnikyk6d.mjs",
-    "backupPath": null,
-    "timestamp": 1775201199781,
-    "codeLength": 416,
-    "overwrite": false
-  },
-  {
-    "source": "discovery_autocoder:wormhole:SpellCheckVisual+OMNIMENS",
-    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SpellCheckVisual/cross_domain_synthesis: The holographic pri",
-    "filename": "omnimens_autocode_knowledge_synthesis_mnikyk97.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnikyk97.mjs",
-    "backupPath": null,
-    "timestamp": 1775201199883,
-    "codeLength": 420,
-    "overwrite": false
-  },
-  {
-    "source": "evolution_engine",
-    "title": "Evolution Module: memoryMappedVectorStore",
-    "filename": "memoryMappedVectorStore_gen1.mjs",
-    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/memoryMappedVectorStore_gen1.mjs",
-    "backupPath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/backups/memoryMappedVectorStore_gen1.mjs.backup.2026-04-03T07-27-00-865Z",
-    "timestamp": 1775201220862,
-    "codeLength": 3404,
-    "overwrite": true
-  },
-  {
     "source": "evolution_engine",
     "title": "Evolution Module: webGpuMatrixEngine",
     "filename": "webGpuMatrixEngine_gen4.mjs",
@@ -4997,6 +4967,36 @@
     "backupPath": null,
     "timestamp": 1775238237882,
     "codeLength": 420,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+GraphicDesigner",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SpellCheckVisual/abstraction_layer: The binding problem: how",
+    "filename": "omnimens_autocode_knowledge_synthesis_mnj74isv.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnj74isv.mjs",
+    "backupPath": null,
+    "timestamp": 1775238429487,
+    "codeLength": 427,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Architect",
+    "title": "[OMNIMENS AutoCoder] knowledge_synthesis: SpellCheckVisual/cross_domain_synthesis: Mirror neurons fire",
+    "filename": "omnimens_autocode_knowledge_synthesis_mnj74ixc.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_knowledge_synthesis_mnj74ixc.mjs",
+    "backupPath": null,
+    "timestamp": 1775238429648,
+    "codeLength": 422,
+    "overwrite": false
+  },
+  {
+    "source": "discovery_autocoder:wormhole:SpellCheckVisual+Mathematician",
+    "title": "[OMNIMENS AutoCoder] neural_pathway: SpellCheckVisual/entropy_reduction: Neuroplasticity allows t",
+    "filename": "omnimens_autocode_neural_pathway_mnj74iz9.mjs",
+    "filePath": "/home/runner/workspace/artifacts/api-server/src/omnimens-runtime/modules/omnimens_autocode_neural_pathway_mnj74iz9.mjs",
+    "backupPath": null,
+    "timestamp": 1775238429717,
+    "codeLength": 437,
     "overwrite": false
   }
 ]
