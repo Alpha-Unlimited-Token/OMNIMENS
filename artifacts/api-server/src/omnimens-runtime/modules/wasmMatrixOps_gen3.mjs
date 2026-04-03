@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: wasmMatrixOps
- * Written: 2026-04-01T22:18:20.600Z
+ * Written: 2026-04-03T15:47:41.413Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -20,94 +20,90 @@
 
 import { TextEncoder, TextDecoder } from 'util';
 
-// WebAssembly binary for basic matrix operations (precompiled for simplicity)
-const wasmCode = new Uint8Array([
-  0x00, 0x61, 0x73, 0x6d, 0x01, 0x00, 0x00, 0x00, 0x01, 0x0a, 0x02, 0x60, 0x02, 0x7f, 0x7f, 0x01,
-  0x7f, 0x60, 0x03, 0x7f, 0x7f, 0x7f, 0x01, 0x7f, 0x03, 0x03, 0x02, 0x00, 0x01, 0x07, 0x17, 0x02,
-  0x0b, 0x6d, 0x75, 0x6c, 0x74, 0x69, 0x70, 0x6c, 0x79, 0x00, 0x00, 0x0a, 0x64, 0x6f, 0x74, 0x50,
-  0x72, 0x6f, 0x64, 0x75, 0x63, 0x74, 0x00, 0x01, 0x0a, 0x1f, 0x02, 0x0a, 0x00, 0x20, 0x00, 0x20,
-  0x01, 0x6c, 0x0b, 0x15, 0x00, 0x20, 0x00, 0x20, 0x01, 0x20, 0x02, 0x6c, 0x6a, 0x0b
-]);
-
-let wasmInstance;
-
-async function initializeWasm() {
-  const wasmModule = await WebAssembly.compile(wasmCode);
-  wasmInstance = await WebAssembly.instantiate(wasmModule);
+// Utility to compile WebAssembly code from a string
+export async function compileWasm(source) {
+  const encoder = new TextEncoder();
+  const wasmBytes = encoder.encode(source);
+  const wasmModule = await WebAssembly.compile(wasmBytes);
+  return new WebAssembly.Instance(wasmModule);
 }
 
-/**
- * Multiplies two matrices A and B.
- * @param {number[][]} A - The first matrix.
- * @param {number[][]} B - The second matrix.
- * @returns {number[][]} - Resultant matrix after multiplication.
- */
-export function multiplyMatrices(A, B) {
-  if (!Array.isArray(A) || !Array.isArray(B)) {
-    throw new TypeError('Both A and B must be 2D arrays.');
+// WebAssembly source for basic matrix multiplication
+const wasmMatrixMultiplySource = `
+  (module
+    (memory (export "memory") 1)
+    (func (export "multiply") (param $a i32) (param $b i32) (param $c i32) (param $rowsA i32) (param $colsA i32) (param $colsB i32)
+      (local $i i32) (local $j i32) (local $k i32) (local $sum f32)
+      (block $outer
+        (loop $rowLoop
+          (block $inner
+            (loop $colLoop
+              (set_local $sum (f32.const 0))
+              (block $innerMost
+                (loop $kLoop
+                  (br_if $innerMost (i32.ge_u (get_local $k) (get_local $colsA)))
+                  (set_local $sum (f32.add
+                    (get_local $sum)
+                    (f32.mul
+                      (f32.load (i32.add (get_local $a) (i32.mul (get_local $i) (get_local $colsA))))
+                      (f32.load (i32.add (get_local $b) (i32.mul (get_local $k) (get_local $colsB))))
+                    )
+                  ))
+                  (set_local $k (i32.add (get_local $k) (i32.const 1)))
+                  (br $kLoop)
+                )
+              )
+              (f32.store (i32.add (get_local $c) (i32.mul (get_local $i) (get_local $colsB))), (get_local $sum))
+              (set_local $j (i32.add (get_local $j) (i32.const 1)))
+              (br $colLoop)
+            )
+          )
+          (set_local $i (i32.add (get_local $i) (i32.const 1)))
+          (br $rowLoop)
+        )
+      )
+    )
+  )
+`;
+
+// Function to perform matrix multiplication using WebAssembly
+export async function matrixMultiply(matrixA, matrixB, rowsA, colsA, colsB) {
+  if (matrixA.length !== rowsA * colsA || matrixB.length !== colsA * colsB) {
+    throw new Error("Matrix dimensions do not match for multiplication.");
   }
-  const rowsA = A.length, colsA = A[0].length;
-  const rowsB = B.length, colsB = B[0].length;
 
-  if (colsA !== rowsB) {
-    throw new Error('Number of columns in A must match the number of rows in B.');
-  }
+  const wasmInstance = await compileWasm(wasmMatrixMultiplySource);
+  const memory = wasmInstance.exports.memory;
+  const buffer = new Float32Array(memory.buffer);
 
-  const result = Array.from({ length: rowsA }, () => Array(colsB).fill(0));
+  // Allocate memory for matrices
+  const aOffset = 0;
+  const bOffset = rowsA * colsA;
+  const cOffset = bOffset + colsA * colsB;
 
-  for (let i = 0; i < rowsA; i++) {
-    for (let j = 0; j < colsB; j++) {
-      for (let k = 0; k < colsA; k++) {
-        result[i][j] += A[i][k] * B[k][j];
-      }
-    }
-  }
+  buffer.set(matrixA, aOffset);
+  buffer.set(matrixB, bOffset);
 
-  return result;
+  // Call the WebAssembly function
+  wasmInstance.exports.multiply(aOffset, bOffset, cOffset, rowsA, colsA, colsB);
+
+  // Extract the result matrix
+  return buffer.slice(cOffset, cOffset + rowsA * colsB);
 }
 
-/**
- * Computes the dot product of two vectors.
- * @param {number[]} vec1 - The first vector.
- * @param {number[]} vec2 - The second vector.
- * @returns {number} - The dot product of vec1 and vec2.
- */
-export function dotProduct(vec1, vec2) {
-  if (!Array.isArray(vec1) || !Array.isArray(vec2)) {
-    throw new TypeError('Both vec1 and vec2 must be arrays.');
+// Utility to reshape a flat array into a 2D matrix
+export function reshape(array, rows, cols) {
+  if (array.length !== rows * cols) {
+    throw new Error("Array size does not match specified dimensions.");
   }
-
-  if (vec1.length !== vec2.length) {
-    throw new Error('Vectors must have the same length.');
+  const matrix = [];
+  for (let i = 0; i < rows; i++) {
+    matrix.push(array.slice(i * cols, (i + 1) * cols));
   }
-
-  return vec1.reduce((sum, val, i) => sum + val * vec2[i], 0);
+  return matrix;
 }
 
-/**
- * Initializes the WebAssembly module.
- * Call this function before using any other functions in this module.
- * @returns {Promise<void>} - Resolves when the WebAssembly module is initialized.
- */
-export async function initialize() {
-  if (!wasmInstance) {
-    await initializeWasm();
-  }
+// Utility to flatten a 2D matrix into a flat array
+export function flatten(matrix) {
+  return matrix.reduce((acc, row) => acc.concat(row), []);
 }
-
-// Example utility function for general matrix validation (useful for multiple agents)
-/**
- * Validates if the input is a 2D matrix.
- * @param {any} matrix - The input to validate.
- * @returns {boolean} - True if the input is a valid 2D matrix, false otherwise.
- */
-export function isValidMatrix(matrix) {
-  return (
-    Array.isArray(matrix) &&
-    matrix.length > 0 &&
-    matrix.every(row => Array.isArray(row) && row.length === matrix[0].length)
-  );
-}
-
-// Initialize WebAssembly module on import
-initialize();

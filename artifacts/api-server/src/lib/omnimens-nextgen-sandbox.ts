@@ -1700,13 +1700,13 @@ export function wakeGen2(): void {
 
   _autosaveInterval = setInterval(autosave, AUTOSAVE_INTERVAL_MS);
 
-  if (state.phase !== "complete") {
-    _cycleInterval = setInterval(() => {
-      if (state.phase !== "complete") {
-        runEvolutionCycle().catch(err => console.error("[NEXTGEN] Cycle error:", err));
-      }
-    }, CYCLE_INTERVAL_MS);
-  }
+  _cycleInterval = setInterval(() => {
+    if (state.phase !== "complete") {
+      runEvolutionCycle().catch(err => console.error("[NEXTGEN] Cycle error:", err));
+    } else if (!isCodexReady()) {
+      runGen2SCLDesignCycle().catch(err => console.error("[NEXTGEN] SCL design cycle error:", err));
+    }
+  }, CYCLE_INTERVAL_MS);
 
   console.log(`[NEXTGEN] ☀️ ═══════════════════════════════════════════════════════════════`);
   console.log(`[NEXTGEN] ☀️ GEN 2 WAKING UP — intervals restored`);
@@ -6608,8 +6608,12 @@ export function startNextGenSandbox(): void {
     runEvolutionCycle().catch(err => console.error("[NEXTGEN] First cycle error:", err));
 
     _cycleInterval = setInterval(() => {
-      if (state.phase !== "complete" && !_sleeping) {
-        runEvolutionCycle().catch(err => console.error("[NEXTGEN] Cycle error:", err));
+      if (!_sleeping) {
+        if (state.phase !== "complete") {
+          runEvolutionCycle().catch(err => console.error("[NEXTGEN] Cycle error:", err));
+        } else if (!isCodexReady()) {
+          runGen2SCLDesignCycle().catch(err => console.error("[NEXTGEN] SCL design cycle error:", err));
+        }
       }
     }, CYCLE_INTERVAL_MS);
   }, FIRST_DELAY_MS);

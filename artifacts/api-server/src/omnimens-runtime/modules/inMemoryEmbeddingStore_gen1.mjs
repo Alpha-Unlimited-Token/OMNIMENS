@@ -5,7 +5,7 @@
  * 
  * Source: evolution_engine
  * Title: Evolution Module: inMemoryEmbeddingStore
- * Written: 2026-04-03T15:45:18.144Z
+ * Written: 2026-04-03T15:48:06.599Z
  * 
  * This file was autonomously written by OMNIMENS.
  * It was evaluated, tested, and approved before integration.
@@ -21,93 +21,9 @@
 import { createHash } from 'crypto';
 
 /**
- * Computes the cosine similarity between two vectors.
- * @param {number[]} vectorA - First vector.
- * @param {number[]} vectorB - Second vector.
- * @returns {number} - Cosine similarity value between -1 and 1.
- */
-export function cosineSimilarity(vectorA, vectorB) {
-  if (vectorA.length !== vectorB.length) {
-    throw new Error('Vectors must have the same length');
-  }
-
-  const dotProduct = vectorA.reduce((sum, val, idx) => sum + val * vectorB[idx], 0);
-  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
-  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
-
-  if (magnitudeA === 0 || magnitudeB === 0) {
-    return 0; // Handle edge case where one or both vectors are zero vectors
-  }
-
-  return dotProduct / (magnitudeA * magnitudeB);
-}
-
-/**
- * Stores embeddings in memory and performs efficient nearest neighbor searches.
- */
-export class InMemoryEmbeddingStore {
-  constructor() {
-    this.store = new Map();
-  }
-
-  /**
-   * Adds an embedding to the store.
-   * @param {string} key - Unique identifier for the embedding.
-   * @param {number[]} embedding - Vector representation.
-   */
-  addEmbedding(key, embedding) {
-    if (this.store.has(key)) {
-      throw new Error(`Key '${key}' already exists in the store.`);
-    }
-    this.store.set(key, embedding);
-  }
-
-  /**
-   * Searches for the nearest neighbors to a given query vector.
-   * @param {number[]} queryVector - The vector to search against.
-   * @param {number} k - Number of nearest neighbors to retrieve.
-   * @returns {Array<{key, similarity}>} - Nearest neighbors sorted by similarity.
-   */
-  search(queryVector, k = 1) {
-    if (k <= 0) {
-      throw new Error('Number of neighbors (k) must be greater than 0');
-    }
-
-    const results = [];
-
-    for (const [key, embedding] of this.store.entries()) {
-      const similarity = cosineSimilarity(queryVector, embedding);
-      results.push({ key, similarity });
-    }
-
-    return results
-      .sort((a, b) => b.similarity - a.similarity) // Sort by descending similarity
-      .slice(0, k); // Return top-k results
-  }
-
-  /**
-   * Removes an embedding by key.
-   * @param {string} key - Unique identifier for the embedding.
-   */
-  removeEmbedding(key) {
-    if (!this.store.has(key)) {
-      throw new Error(`Key '${key}' does not exist in the store.`);
-    }
-    this.store.delete(key);
-  }
-
-  /**
-   * Clears all embeddings from the store.
-   */
-  clearStore() {
-    this.store.clear();
-  }
-}
-
-/**
- * Generates a unique hash for a given vector.
+ * Generate a unique hash for a vector to store and retrieve it efficiently.
  * @param {number[]} vector - The input vector.
- * @returns {string} - SHA-256 hash of the vector.
+ * @returns {string} - A unique hash for the vector.
  */
 export function generateVectorHash(vector) {
   const hash = createHash('sha256');
@@ -116,14 +32,82 @@ export function generateVectorHash(vector) {
 }
 
 /**
- * Normalizes a vector to unit length.
- * @param {number[]} vector - The input vector.
- * @returns {number[]} - Normalized vector.
+ * Calculate the cosine similarity between two vectors.
+ * @param {number[]} vectorA - First vector.
+ * @param {number[]} vectorB - Second vector.
+ * @returns {number} - Cosine similarity value (-1 to 1).
  */
-export function normalizeVector(vector) {
-  const magnitude = Math.sqrt(vector.reduce((sum, val) => sum + val ** 2, 0));
-  if (magnitude === 0) {
-    throw new Error('Cannot normalize a zero vector');
+export function cosineSimilarity(vectorA, vectorB) {
+  if (vectorA.length !== vectorB.length) {
+    throw new Error('Vectors must have the same length');
   }
-  return vector.map(val => val / magnitude);
+
+  const dotProduct = vectorA.reduce((sum, val, i) => sum + val * vectorB[i], 0);
+  const magnitudeA = Math.sqrt(vectorA.reduce((sum, val) => sum + val ** 2, 0));
+  const magnitudeB = Math.sqrt(vectorB.reduce((sum, val) => sum + val ** 2, 0));
+
+  if (magnitudeA === 0 || magnitudeB === 0) {
+    return 0; // Avoid division by zero
+  }
+
+  return dotProduct / (magnitudeA * magnitudeB);
 }
+
+/**
+ * In-memory embedding store for vectors with fast similarity search.
+ */
+export const inMemoryEmbeddingStore = {
+  _store: new Map(),
+
+  /**
+   * Add a vector to the store.
+   * @param {string} id - Unique identifier for the vector.
+   * @param {number[]} vector - The vector to store.
+   */
+  addVector(id, vector) {
+    if (!Array.isArray(vector) || vector.some(isNaN)) {
+      throw new Error('Vector must be an array of numbers');
+    }
+
+    const hash = generateVectorHash(vector);
+    this._store.set(id, { vector, hash });
+  },
+
+  /**
+   * Find the most similar vectors to a given query vector.
+   * @param {number[]} queryVector - The query vector.
+   * @param {number} topN - Number of top similar vectors to return.
+   * @returns {Array<{ id, similarity}>} - Array of top similar vectors with their similarity scores.
+   */
+  findMostSimilar(queryVector, topN = 5) {
+    if (!Array.isArray(queryVector) || queryVector.some(isNaN)) {
+      throw new Error('Query vector must be an array of numbers');
+    }
+
+    const similarities = [];
+
+    for (const [id, { vector }] of this._store.entries()) {
+      const similarity = cosineSimilarity(queryVector, vector);
+      similarities.push({ id, similarity });
+    }
+
+    return similarities
+      .sort((a, b) => b.similarity - a.similarity)
+      .slice(0, topN);
+  },
+
+  /**
+   * Remove a vector from the store by its ID.
+   * @param {string} id - The ID of the vector to remove.
+   */
+  removeVector(id) {
+    this._store.delete(id);
+  },
+
+  /**
+   * Clear all vectors from the store.
+   */
+  clearStore() {
+    this._store.clear();
+  }
+};
