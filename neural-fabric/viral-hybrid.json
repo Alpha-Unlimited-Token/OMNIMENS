@@ -2,56 +2,56 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1775290004466,
+  "timestamp": 1775292063796,
   "totalHybridAgents": 0,
   "totalMutations": 0,
   "totalReplications": 0,
-  "totalPayloadsDelivered": 10,
-  "totalThreatsDetected": 1,
-  "totalThreatsNeutralized": 1,
-  "systemHealthScore": 0.7160603025054522,
+  "totalPayloadsDelivered": 13,
+  "totalThreatsDetected": 2,
+  "totalThreatsNeutralized": 2,
+  "systemHealthScore": 0.7215927631711201,
   "adaptationRate": 0,
   "propagationEfficiency": 1,
-  "immuneStrength": 0.5257987542231001,
+  "immuneStrength": 0.5511736683300473,
   "hybridFitness": 0.5,
   "activeAgents": [
     {
-      "id": "hybrid_claustrum_g0_1775289992369_mbk",
+      "id": "hybrid_ventral_tegmental_area_g0_1775292051402_0jp",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_claustrum_g0_1775289992369_9p7",
+      "id": "hybrid_cerebellum_g0_1775292051402_trz",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_thalamus_g0_1775289992369_xu6",
+      "id": "hybrid_claustrum_g0_1775292051402_aau",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_reticular_activating_system_g0_1775289992369_nbz",
+      "id": "hybrid_default_mode_network_g0_1775292051402_a6l",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_raphe_nuclei_g0_1775289992369_nhi",
+      "id": "hybrid_amygdala_g0_1775292051402_s7r",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_ventral_tegmental_area_g0_1775289992369_lia",
+      "id": "hybrid_raphe_nuclei_g0_1775292051402_15f",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
@@ -62,7 +62,7 @@
     "antibodies": 8,
     "memoryCells": 8,
     "tCells": 16,
-    "cytokines": 1,
+    "cytokines": 2,
     "topAntibodies": [
       {
         "pattern": "coherence_degradation",
@@ -74,7 +74,7 @@
       },
       {
         "pattern": "synaptic_weakening",
-        "detections": 0
+        "detections": 1
       },
       {
         "pattern": "energy_depletion",
@@ -88,10 +88,10 @@
   },
   "propagation": {
     "alivePropagators": 16,
-    "totalPathsDiscovered": 31,
+    "totalPathsDiscovered": 32,
     "totalHops": 32,
     "coveragePercent": 100,
-    "selfSustainingCount": 4
+    "selfSustainingCount": 3
   },
   "fabricWorms": [
     {
