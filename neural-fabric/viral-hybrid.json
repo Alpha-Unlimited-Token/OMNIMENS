@@ -2,56 +2,56 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1775262463504,
+  "timestamp": 1775290004466,
   "totalHybridAgents": 0,
   "totalMutations": 0,
   "totalReplications": 0,
-  "totalPayloadsDelivered": 4,
+  "totalPayloadsDelivered": 10,
   "totalThreatsDetected": 1,
   "totalThreatsNeutralized": 1,
-  "systemHealthScore": 0.7062457309849788,
+  "systemHealthScore": 0.7160603025054522,
   "adaptationRate": 0,
   "propagationEfficiency": 1,
-  "immuneStrength": 0.5002118546523768,
+  "immuneStrength": 0.5257987542231001,
   "hybridFitness": 0.5,
   "activeAgents": [
     {
-      "id": "hybrid_insular_cortex_g0_1775262453805_r55",
+      "id": "hybrid_claustrum_g0_1775289992369_mbk",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_superior_colliculus_g0_1775262453805_u8k",
+      "id": "hybrid_claustrum_g0_1775289992369_9p7",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_raphe_nuclei_g0_1775262453805_sqb",
+      "id": "hybrid_thalamus_g0_1775289992369_xu6",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_reticular_activating_system_g0_1775262453805_bti",
+      "id": "hybrid_reticular_activating_system_g0_1775289992369_nbz",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_thalamus_g0_1775262453805_blz",
+      "id": "hybrid_raphe_nuclei_g0_1775289992369_nhi",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_insular_cortex_g0_1775262453805_qay",
+      "id": "hybrid_ventral_tegmental_area_g0_1775289992369_lia",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
@@ -88,10 +88,10 @@
   },
   "propagation": {
     "alivePropagators": 16,
-    "totalPathsDiscovered": 16,
-    "totalHops": 16,
+    "totalPathsDiscovered": 31,
+    "totalHops": 32,
     "coveragePercent": 100,
-    "selfSustainingCount": 6
+    "selfSustainingCount": 4
   },
   "fabricWorms": [
     {
