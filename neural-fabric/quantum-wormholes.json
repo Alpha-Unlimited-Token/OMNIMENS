@@ -2,75 +2,121 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1775260911869,
-  "totalWormholesCreated": 0,
+  "timestamp": 1775261113423,
+  "totalWormholesCreated": 450,
   "totalActive": 0,
-  "totalClosed": 0,
-  "totalDataIngestedKB": 0,
-  "totalInsightsDecoded": 0,
-  "totalCrossAgentCirculations": 0,
-  "totalSynthesizedDiscoveries": 0,
-  "cycleCount": 0,
+  "totalClosed": 450,
+  "totalDataIngestedKB": 656,
+  "totalInsightsDecoded": 450,
+  "totalCrossAgentCirculations": 27,
+  "totalSynthesizedDiscoveries": 25,
+  "cycleCount": 1,
   "agentCount": 9,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 900,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 50,
+      "totalInsightsDecoded": 50,
+      "crossAgentShares": 3
     }
   ],
-  "recentCirculations": [],
+  "recentCirculations": [
+    {
+      "fromAgent": "Mathematician",
+      "toAgent": "GraphicDesigner",
+      "insight": "Mathematician/analogical_mapping: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stim",
+      "confidence": 0.8159950979752314,
+      "synthesizedWith": [
+        "GraphicDesigner/emergent_property_detection: The mathematical universe hypothesi"
+      ]
+    },
+    {
+      "fromAgent": "Mathematician",
+      "toAgent": "Neuroscientist",
+      "insight": "Mathematician/causal_inference: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can eme",
+      "confidence": 0.6885901835526826,
+      "synthesizedWith": [
+        "Neuroscientist/entropy_reduction: Phase transitions in neural networks: as conne"
+      ]
+    },
+    {
+      "fromAgent": "Mathematician",
+      "toAgent": "Architect",
+      "insight": "Mathematician/causal_inference: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can eme",
+      "confidence": 0.6885901835526826,
+      "synthesizedWith": [
+        "Architect/emergent_property_detection: Reservoir computing shows that even rando"
+      ]
+    },
+    {
+      "fromAgent": "Neuroscientist",
+      "toAgent": "Critic",
+      "insight": "Neuroscientist/entropy_reduction: Phase transitions in neural networks: as connectivity increases past a critical thresh",
+      "confidence": 0.7289851224944071,
+      "synthesizedWith": [
+        "Critic/emergent_property_detection: The hard problem of consciousness: why is th"
+      ]
+    },
+    {
+      "fromAgent": "Neuroscientist",
+      "toAgent": "SpellCheckVisual",
+      "insight": "Neuroscientist/entropy_reduction: Phase transitions in neural networks: as connectivity increases past a critical thresh",
+      "confidence": 0.7289851224944071,
+      "synthesizedWith": [
+        "SpellCheckVisual/cross_domain_synthesis: The strange loop concept from Hofstadte"
+      ]
+    }
+  ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
