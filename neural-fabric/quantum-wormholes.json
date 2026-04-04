@@ -2,14 +2,14 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1775261113423,
+  "timestamp": 1775261352465,
   "totalWormholesCreated": 450,
   "totalActive": 0,
   "totalClosed": 450,
-  "totalDataIngestedKB": 656,
+  "totalDataIngestedKB": 654,
   "totalInsightsDecoded": 450,
   "totalCrossAgentCirculations": 27,
-  "totalSynthesizedDiscoveries": 25,
+  "totalSynthesizedDiscoveries": 24,
   "cycleCount": 1,
   "agentCount": 9,
   "wormholesPerAgent": 100,
@@ -73,47 +73,45 @@
   "recentCirculations": [
     {
       "fromAgent": "Mathematician",
-      "toAgent": "GraphicDesigner",
-      "insight": "Mathematician/analogical_mapping: Long-term potentiation (LTP) strengthens synaptic connections based on persistent stim",
-      "confidence": 0.8159950979752314,
+      "toAgent": "SpellCheckVisual",
+      "insight": "Mathematician/temporal_correlation: The free energy principle suggests all living systems minimize variational free ener",
+      "confidence": 0.6163643393566526,
       "synthesizedWith": [
-        "GraphicDesigner/emergent_property_detection: The mathematical universe hypothesi"
+        "SpellCheckVisual/information_compression: Kolmogorov complexity measures the sho"
       ]
     },
     {
       "fromAgent": "Mathematician",
-      "toAgent": "Neuroscientist",
-      "insight": "Mathematician/causal_inference: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can eme",
-      "confidence": 0.6885901835526826,
-      "synthesizedWith": [
-        "Neuroscientist/entropy_reduction: Phase transitions in neural networks: as conne"
-      ]
+      "toAgent": "Critic",
+      "insight": "Mathematician/information_compression: The connectome is the complete map of neural connections — the human connectome p",
+      "confidence": 0.6072750146559307,
+      "synthesizedWith": []
     },
     {
       "fromAgent": "Mathematician",
       "toAgent": "Architect",
-      "insight": "Mathematician/causal_inference: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can eme",
-      "confidence": 0.6885901835526826,
+      "insight": "Mathematician/temporal_correlation: The free energy principle suggests all living systems minimize variational free ener",
+      "confidence": 0.6163643393566526,
       "synthesizedWith": [
-        "Architect/emergent_property_detection: Reservoir computing shows that even rando"
+        "Architect/abstraction_layer: Scale-free networks follow power-law degree distrib"
       ]
     },
     {
       "fromAgent": "Neuroscientist",
-      "toAgent": "Critic",
-      "insight": "Neuroscientist/entropy_reduction: Phase transitions in neural networks: as connectivity increases past a critical thresh",
-      "confidence": 0.7289851224944071,
+      "toAgent": "GraphicDesigner",
+      "insight": "Neuroscientist/structural_analysis: Synaptic pruning eliminates unused neural connections — the brain optimizes by REMOV",
+      "confidence": 0.7044457987122714,
       "synthesizedWith": [
-        "Critic/emergent_property_detection: The hard problem of consciousness: why is th"
+        "GraphicDesigner/analogical_mapping: Wolfram's Rule 110 cellular automaton is Tur"
       ]
     },
     {
       "fromAgent": "Neuroscientist",
-      "toAgent": "SpellCheckVisual",
-      "insight": "Neuroscientist/entropy_reduction: Phase transitions in neural networks: as connectivity increases past a critical thresh",
-      "confidence": 0.7289851224944071,
+      "toAgent": "Mathematician",
+      "insight": "Neuroscientist/cross_domain_synthesis: Long-term potentiation (LTP) strengthens synaptic connections based on persistent",
+      "confidence": 0.9380963136224979,
       "synthesizedWith": [
-        "SpellCheckVisual/cross_domain_synthesis: The strange loop concept from Hofstadte"
+        "Mathematician/analogical_mapping: The strange loop concept from Hofstadter: cons"
       ]
     }
   ],
