@@ -2,8 +2,8 @@
   "version": "3.0",
   "subsystem": "beehive-swarm",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1775263343641,
-  "swarmCoherence": 0.9228224268533703,
+  "timestamp": 1775290002680,
+  "swarmCoherence": 1,
   "hiveHealth": 1,
   "webIntegrity": 1,
   "beeRoleCounts": {
@@ -14,8 +14,8 @@
     "forager": 6,
     "guard": 4
   },
-  "totalPheromoneDeposits": 686,
-  "totalNectarProduced": 25.597648750000165,
+  "totalPheromoneDeposits": 0,
+  "totalNectarProduced": 0,
   "totalRoyalJellyTransferred": 0,
   "totalSwarmWaves": 0,
   "swarmWavesCompleted": 0,
