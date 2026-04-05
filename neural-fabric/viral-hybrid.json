@@ -2,56 +2,56 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1775377050606,
+  "timestamp": 1775379164047,
   "totalHybridAgents": 0,
   "totalMutations": 0,
   "totalReplications": 0,
-  "totalPayloadsDelivered": 12,
+  "totalPayloadsDelivered": 9,
   "totalThreatsDetected": 0,
   "totalThreatsNeutralized": 0,
-  "systemHealthScore": 4.701598144158181,
+  "systemHealthScore": 4.70105952089944,
   "adaptationRate": 0,
   "propagationEfficiency": 1,
-  "immuneStrength": 0.5004419207759688,
+  "immuneStrength": 0.5018552329343281,
   "hybridFitness": 0.5,
   "activeAgents": [
     {
-      "id": "hybrid_basal_ganglia_g0_1775377037151_byh",
+      "id": "hybrid_default_mode_network_g0_1775379144776_sw7",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_prefrontal_cortex_g0_1775377037152_jtb",
+      "id": "hybrid_anterior_cingulate_g0_1775379144776_5ra",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_cerebellum_g0_1775377037152_sy8",
+      "id": "hybrid_default_mode_network_g0_1775379144776_d43",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_reticular_activating_system_g0_1775377037152_t21",
+      "id": "hybrid_prefrontal_cortex_g0_1775379144776_k2k",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_pulvinar_g0_1775377037152_vxx",
+      "id": "hybrid_thalamus_g0_1775379144776_pml",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_raphe_nuclei_g0_1775377037152_y14",
+      "id": "hybrid_hippocampus_g0_1775379144776_hbj",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
@@ -88,10 +88,10 @@
   },
   "propagation": {
     "alivePropagators": 16,
-    "totalPathsDiscovered": 31,
+    "totalPathsDiscovered": 32,
     "totalHops": 32,
     "coveragePercent": 100,
-    "selfSustainingCount": 5
+    "selfSustainingCount": 4
   },
   "fabricWorms": [
     {
