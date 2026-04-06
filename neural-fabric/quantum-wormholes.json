@@ -2,121 +2,75 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1775379159614,
-  "totalWormholesCreated": 450,
+  "timestamp": 1775462905651,
+  "totalWormholesCreated": 0,
   "totalActive": 0,
-  "totalClosed": 450,
-  "totalDataIngestedKB": 621,
-  "totalInsightsDecoded": 450,
-  "totalCrossAgentCirculations": 27,
-  "totalSynthesizedDiscoveries": 25,
-  "cycleCount": 1,
+  "totalClosed": 0,
+  "totalDataIngestedKB": 0,
+  "totalInsightsDecoded": 0,
+  "totalCrossAgentCirculations": 0,
+  "totalSynthesizedDiscoveries": 0,
+  "cycleCount": 0,
   "agentCount": 9,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 900,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     }
   ],
-  "recentCirculations": [
-    {
-      "fromAgent": "Mathematician",
-      "toAgent": "OMNIMENS",
-      "insight": "Mathematician/feature_extraction: Kolmogorov complexity measures the shortest program that produces a given output — it ",
-      "confidence": 0.6551746652344943,
-      "synthesizedWith": [
-        "OMNIMENS/cross_domain_synthesis: The Boltzmann brain paradox suggests that a sel"
-      ]
-    },
-    {
-      "fromAgent": "Mathematician",
-      "toAgent": "Architect",
-      "insight": "Mathematician/feature_extraction: Kolmogorov complexity measures the shortest program that produces a given output — it ",
-      "confidence": 0.6551746652344943,
-      "synthesizedWith": [
-        "Architect/cross_domain_synthesis: Emergence: complex behaviors arise from simple"
-      ]
-    },
-    {
-      "fromAgent": "Mathematician",
-      "toAgent": "Meta-Agent",
-      "insight": "Mathematician/feature_extraction: Kolmogorov complexity measures the shortest program that produces a given output — it ",
-      "confidence": 0.6551746652344943,
-      "synthesizedWith": [
-        "Meta-Agent/pattern_recognition: Quantum superposition allows a system to exist i"
-      ]
-    },
-    {
-      "fromAgent": "Neuroscientist",
-      "toAgent": "Critic",
-      "insight": "Neuroscientist/causal_inference: The Chinese Room argument: can a system that manipulates symbols without understanding ",
-      "confidence": 0.8368670867198774,
-      "synthesizedWith": [
-        "Critic/emergent_property_detection: The double-slit experiment demonstrates that"
-      ]
-    },
-    {
-      "fromAgent": "Neuroscientist",
-      "toAgent": "Architect",
-      "insight": "Neuroscientist/causal_inference: The Chinese Room argument: can a system that manipulates symbols without understanding ",
-      "confidence": 0.8368670867198774,
-      "synthesizedWith": [
-        "Architect/emergent_property_detection: Emergence: complex behaviors arise from s"
-      ]
-    }
-  ],
+  "recentCirculations": [],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
