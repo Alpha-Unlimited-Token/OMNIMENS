@@ -2,56 +2,56 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1775462906319,
+  "timestamp": 1775464888579,
   "totalHybridAgents": 0,
   "totalMutations": 0,
   "totalReplications": 0,
-  "totalPayloadsDelivered": 8,
+  "totalPayloadsDelivered": 13,
   "totalThreatsDetected": 0,
   "totalThreatsNeutralized": 0,
-  "systemHealthScore": 6.6451504281505365,
+  "systemHealthScore": 6.654347651928363,
   "adaptationRate": 0,
   "propagationEfficiency": 1,
-  "immuneStrength": 0.5004416834000538,
+  "immuneStrength": 0.5004428832980984,
   "hybridFitness": 0.5,
   "activeAgents": [
     {
-      "id": "hybrid_ventral_tegmental_area_g0_1775462892372_ulc",
+      "id": "hybrid_anterior_cingulate_g0_1775464874843_uoe",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_basal_ganglia_g0_1775462892372_n6e",
+      "id": "hybrid_reticular_activating_system_g0_1775464874843_wzt",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_basal_ganglia_g0_1775462892372_e2o",
+      "id": "hybrid_raphe_nuclei_g0_1775464874843_d6r",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_ventral_tegmental_area_g0_1775462892372_8fp",
+      "id": "hybrid_insular_cortex_g0_1775464874843_ddu",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_ventral_tegmental_area_g0_1775462892372_xih",
+      "id": "hybrid_pulvinar_g0_1775464874843_pxa",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_anterior_cingulate_g0_1775462892372_bce",
+      "id": "hybrid_anterior_cingulate_g0_1775464874843_7xs",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
@@ -91,7 +91,7 @@
     "totalPathsDiscovered": 32,
     "totalHops": 32,
     "coveragePercent": 100,
-    "selfSustainingCount": 5
+    "selfSustainingCount": 8
   },
   "fabricWorms": [
     {
