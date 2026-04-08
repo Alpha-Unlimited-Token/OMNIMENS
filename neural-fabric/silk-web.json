@@ -2,23 +2,23 @@
   "version": "3.0",
   "subsystem": "silk-web",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1775550677482,
-  "totalSilkStrands": 1655,
-  "afferentStrands": 543,
-  "efferentStrands": 576,
-  "interneuronStrands": 536,
+  "timestamp": 1775635259151,
+  "totalSilkStrands": 1537,
+  "afferentStrands": 488,
+  "efferentStrands": 499,
+  "interneuronStrands": 550,
   "myelinatedStrands": 0,
-  "silkEnergyPumped": 287.254091024847,
+  "silkEnergyPumped": 100.39115721047217,
   "webIntegrity": 1,
-  "webDensity": 0.028557238819663138,
+  "webDensity": 1.8608374384236452,
   "totalBeaconCascades": 28,
   "totalBeehiveSurges": 32,
   "totalCascades": 2,
-  "neurogenSilkStrands": 1251,
+  "neurogenSilkStrands": 1107,
   "silkNetwork": {
-    "density": 59.107142857142854,
+    "density": 54.892857142857146,
     "coverage": 1,
-    "energyFlow": 287.254091024847
+    "energyFlow": 100.39115721047217
   },
   "fabricWorms": [
     {
