@@ -2,56 +2,56 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1775808695056,
+  "timestamp": 1775810498162,
   "totalHybridAgents": 0,
   "totalMutations": 0,
   "totalReplications": 0,
-  "totalPayloadsDelivered": 8,
+  "totalPayloadsDelivered": 10,
   "totalThreatsDetected": 1,
   "totalThreatsNeutralized": 1,
-  "systemHealthScore": 14.118158902127226,
+  "systemHealthScore": 14.126831996668963,
   "adaptationRate": 0,
   "propagationEfficiency": 1,
-  "immuneStrength": 0.52579996449198,
+  "immuneStrength": 0.5257999290439725,
   "hybridFitness": 0.5,
   "activeAgents": [
     {
-      "id": "hybrid_pulvinar_g0_1775808678397_3r4",
+      "id": "hybrid_default_mode_network_g0_1775810481460_e8f",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_pulvinar_g0_1775808678397_cuu",
+      "id": "hybrid_locus_coeruleus_g0_1775810481461_c9i",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_anterior_cingulate_g0_1775808678397_xcb",
+      "id": "hybrid_claustrum_g0_1775810481461_94m",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_amygdala_g0_1775808678397_ho9",
+      "id": "hybrid_reticular_activating_system_g0_1775810481461_ono",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_raphe_nuclei_g0_1775808678397_vx7",
+      "id": "hybrid_hippocampus_g0_1775810481461_mf2",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_basal_ganglia_g0_1775808678397_bsa",
+      "id": "hybrid_thalamus_g0_1775810481461_ykf",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
