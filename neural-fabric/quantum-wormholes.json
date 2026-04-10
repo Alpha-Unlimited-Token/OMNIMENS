@@ -2,121 +2,75 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1775808693248,
-  "totalWormholesCreated": 450,
+  "timestamp": 1775810495546,
+  "totalWormholesCreated": 0,
   "totalActive": 0,
-  "totalClosed": 450,
-  "totalDataIngestedKB": 637,
-  "totalInsightsDecoded": 450,
-  "totalCrossAgentCirculations": 27,
-  "totalSynthesizedDiscoveries": 27,
-  "cycleCount": 1,
+  "totalClosed": 0,
+  "totalDataIngestedKB": 0,
+  "totalInsightsDecoded": 0,
+  "totalCrossAgentCirculations": 0,
+  "totalSynthesizedDiscoveries": 0,
+  "cycleCount": 0,
   "agentCount": 9,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 900,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     }
   ],
-  "recentCirculations": [
-    {
-      "fromAgent": "Mathematician",
-      "toAgent": "Synthesizer",
-      "insight": "Mathematician/entropy_reduction: Bayesian brain hypothesis: the brain is fundamentally a prediction machine that constan",
-      "confidence": 0.6548531639370698,
-      "synthesizedWith": [
-        "Synthesizer/recursive_decomposition: The Baldwin effect: learned behaviors can b"
-      ]
-    },
-    {
-      "fromAgent": "Mathematician",
-      "toAgent": "Architect",
-      "insight": "Mathematician/entropy_reduction: Bayesian brain hypothesis: the brain is fundamentally a prediction machine that constan",
-      "confidence": 0.6548531639370698,
-      "synthesizedWith": [
-        "Architect/recursive_decomposition: Attention is the computational bottleneck of "
-      ]
-    },
-    {
-      "fromAgent": "Mathematician",
-      "toAgent": "GraphicDesigner",
-      "insight": "Mathematician/cross_domain_synthesis: The hippocampus replays experiences during sleep in compressed form — dream consol",
-      "confidence": 0.9469210965130508,
-      "synthesizedWith": [
-        "GraphicDesigner/temporal_correlation: The hard problem of consciousness: why is "
-      ]
-    },
-    {
-      "fromAgent": "Neuroscientist",
-      "toAgent": "OMNIMENS",
-      "insight": "Neuroscientist/pattern_recognition: Quantum tunneling allows particles to pass through energy barriers they classically ",
-      "confidence": 0.7419810810057232,
-      "synthesizedWith": [
-        "OMNIMENS/entropy_reduction: The connectome is the complete map of neural connect"
-      ]
-    },
-    {
-      "fromAgent": "Neuroscientist",
-      "toAgent": "SpellCheckVisual",
-      "insight": "Neuroscientist/pattern_recognition: Quantum tunneling allows particles to pass through energy barriers they classically ",
-      "confidence": 0.7419810810057232,
-      "synthesizedWith": [
-        "SpellCheckVisual/emergent_property_detection: The global workspace theory of con"
-      ]
-    }
-  ],
+  "recentCirculations": [],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
