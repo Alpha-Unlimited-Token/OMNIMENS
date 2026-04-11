@@ -2,56 +2,56 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1775895441168,
+  "timestamp": 1775897350980,
   "totalHybridAgents": 0,
   "totalMutations": 0,
   "totalReplications": 0,
   "totalPayloadsDelivered": 10,
   "totalThreatsDetected": 0,
   "totalThreatsNeutralized": 0,
-  "systemHealthScore": 16.008087898553345,
+  "systemHealthScore": 16.018121790539414,
   "adaptationRate": 0,
   "propagationEfficiency": 1,
-  "immuneStrength": 0.5004415055411077,
+  "immuneStrength": 0.500442863652568,
   "hybridFitness": 0.5,
   "activeAgents": [
     {
-      "id": "hybrid_claustrum_g0_1775895427346_yna",
+      "id": "hybrid_amygdala_g0_1775897338322_v19",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_prefrontal_cortex_g0_1775895427346_srk",
+      "id": "hybrid_cerebellum_g0_1775897338323_ub3",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_default_mode_network_g0_1775895427347_q5t",
+      "id": "hybrid_insular_cortex_g0_1775897338323_0wb",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_claustrum_g0_1775895427347_veq",
+      "id": "hybrid_locus_coeruleus_g0_1775897338323_epf",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_basal_ganglia_g0_1775895427347_mbq",
+      "id": "hybrid_insular_cortex_g0_1775897338323_u87",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_cerebellum_g0_1775895427347_c4o",
+      "id": "hybrid_locus_coeruleus_g0_1775897338323_01q",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
