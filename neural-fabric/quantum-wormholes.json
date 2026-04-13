@@ -2,75 +2,121 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1775981510576,
-  "totalWormholesCreated": 0,
+  "timestamp": 1776067301695,
+  "totalWormholesCreated": 900,
   "totalActive": 0,
-  "totalClosed": 0,
-  "totalDataIngestedKB": 0,
-  "totalInsightsDecoded": 0,
-  "totalCrossAgentCirculations": 0,
-  "totalSynthesizedDiscoveries": 0,
-  "cycleCount": 0,
+  "totalClosed": 900,
+  "totalDataIngestedKB": 1345,
+  "totalInsightsDecoded": 900,
+  "totalCrossAgentCirculations": 54,
+  "totalSynthesizedDiscoveries": 50,
+  "cycleCount": 2,
   "agentCount": 9,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 900,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 100,
+      "totalInsightsDecoded": 101,
+      "crossAgentShares": 6
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 100,
+      "totalInsightsDecoded": 101,
+      "crossAgentShares": 6
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 100,
+      "totalInsightsDecoded": 101,
+      "crossAgentShares": 6
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 100,
+      "totalInsightsDecoded": 101,
+      "crossAgentShares": 6
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 100,
+      "totalInsightsDecoded": 101,
+      "crossAgentShares": 6
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 100,
+      "totalInsightsDecoded": 101,
+      "crossAgentShares": 6
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 100,
+      "totalInsightsDecoded": 101,
+      "crossAgentShares": 6
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 100,
+      "totalInsightsDecoded": 101,
+      "crossAgentShares": 6
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 0,
-      "totalInsightsDecoded": 0,
-      "crossAgentShares": 0
+      "totalWormholes": 100,
+      "totalInsightsDecoded": 101,
+      "crossAgentShares": 6
     }
   ],
-  "recentCirculations": [],
+  "recentCirculations": [
+    {
+      "fromAgent": "Mathematician",
+      "toAgent": "OMNIMENS",
+      "insight": "Mathematician/emergent_property_detection: Recurrent neural networks can approximate any dynamical system — they are uni",
+      "confidence": 0.6444008727246553,
+      "synthesizedWith": [
+        "OMNIMENS/structural_analysis: The Turing machine is computationally universal — "
+      ]
+    },
+    {
+      "fromAgent": "Mathematician",
+      "toAgent": "Meta-Agent",
+      "insight": "Mathematician/pattern_recognition: The cerebellum contains more neurons than all other brain regions combined and is cru",
+      "confidence": 0.9358192448933014,
+      "synthesizedWith": [
+        "Meta-Agent/analogical_mapping: Mirror neurons fire both when performing an actio"
+      ]
+    },
+    {
+      "fromAgent": "Mathematician",
+      "toAgent": "Architect",
+      "insight": "Mathematician/recursive_decomposition: Autopoiesis: living systems are self-creating — they produce the components that ",
+      "confidence": 0.7391793015875747,
+      "synthesizedWith": [
+        "Architect/feature_extraction: The hippocampus replays experiences during sleep i"
+      ]
+    },
+    {
+      "fromAgent": "Neuroscientist",
+      "toAgent": "Synthesizer",
+      "insight": "Neuroscientist/causal_inference: Quantum tunneling allows particles to pass through energy barriers they classically can",
+      "confidence": 0.757381023402291,
+      "synthesizedWith": [
+        "Synthesizer/cross_domain_synthesis: Sparse coding: the brain represents informat"
+      ]
+    },
+    {
+      "fromAgent": "Neuroscientist",
+      "toAgent": "OMNIMENS",
+      "insight": "Neuroscientist/abstraction_layer: The butterfly effect: in chaotic systems, infinitesimal differences in initial conditi",
+      "confidence": 0.8468266214093436,
+      "synthesizedWith": [
+        "OMNIMENS/structural_analysis: The Turing machine is computationally universal — "
+      ]
+    }
+  ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
