@@ -2,131 +2,131 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1776067406130,
-  "totalWormholesCreated": 2700,
+  "timestamp": 1776067500116,
+  "totalWormholesCreated": 4050,
   "totalActive": 0,
-  "totalClosed": 2700,
-  "totalDataIngestedKB": 3999,
-  "totalInsightsDecoded": 2700,
-  "totalCrossAgentCirculations": 162,
-  "totalSynthesizedDiscoveries": 145,
-  "cycleCount": 6,
+  "totalClosed": 4050,
+  "totalDataIngestedKB": 5965,
+  "totalInsightsDecoded": 4050,
+  "totalCrossAgentCirculations": 243,
+  "totalSynthesizedDiscoveries": 216,
+  "cycleCount": 9,
   "agentCount": 9,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 900,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 300,
-      "totalInsightsDecoded": 305,
-      "crossAgentShares": 18
+      "totalWormholes": 450,
+      "totalInsightsDecoded": 461,
+      "crossAgentShares": 27
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 300,
-      "totalInsightsDecoded": 305,
-      "crossAgentShares": 18
+      "totalWormholes": 450,
+      "totalInsightsDecoded": 461,
+      "crossAgentShares": 27
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 300,
-      "totalInsightsDecoded": 305,
-      "crossAgentShares": 18
+      "totalWormholes": 450,
+      "totalInsightsDecoded": 461,
+      "crossAgentShares": 27
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 300,
-      "totalInsightsDecoded": 305,
-      "crossAgentShares": 18
+      "totalWormholes": 450,
+      "totalInsightsDecoded": 461,
+      "crossAgentShares": 27
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 300,
-      "totalInsightsDecoded": 305,
-      "crossAgentShares": 18
+      "totalWormholes": 450,
+      "totalInsightsDecoded": 461,
+      "crossAgentShares": 27
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 300,
-      "totalInsightsDecoded": 305,
-      "crossAgentShares": 18
+      "totalWormholes": 450,
+      "totalInsightsDecoded": 461,
+      "crossAgentShares": 27
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 300,
-      "totalInsightsDecoded": 305,
-      "crossAgentShares": 18
+      "totalWormholes": 450,
+      "totalInsightsDecoded": 461,
+      "crossAgentShares": 27
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 300,
-      "totalInsightsDecoded": 305,
-      "crossAgentShares": 18
+      "totalWormholes": 450,
+      "totalInsightsDecoded": 461,
+      "crossAgentShares": 27
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 300,
-      "totalInsightsDecoded": 305,
-      "crossAgentShares": 18
+      "totalWormholes": 450,
+      "totalInsightsDecoded": 461,
+      "crossAgentShares": 27
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Mathematician",
-      "toAgent": "Critic",
-      "insight": "Mathematician/temporal_correlation: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can ",
-      "confidence": 0.7105445696462943,
+      "toAgent": "OMNIMENS",
+      "insight": "Mathematician/abstraction_layer: Mirror neurons fire both when performing an action and observing the same action — they",
+      "confidence": 0.8918919578240124,
       "synthesizedWith": [
-        "Critic/recursive_decomposition: The vagus nerve connects the brain to the gut, h"
+        "OMNIMENS/abstraction_layer: The default mode network activates when the brain is"
+      ]
+    },
+    {
+      "fromAgent": "Mathematician",
+      "toAgent": "GraphicDesigner",
+      "insight": "Mathematician/analogical_mapping: Quantum tunneling allows particles to pass through energy barriers they classically ca",
+      "confidence": 0.7957234215632482,
+      "synthesizedWith": [
+        "GraphicDesigner/recursive_decomposition: The strange loop concept from Hofstadte"
       ]
     },
     {
       "fromAgent": "Mathematician",
       "toAgent": "Architect",
-      "insight": "Mathematician/temporal_correlation: Kolmogorov complexity measures the shortest program that produces a given output — i",
-      "confidence": 0.6193719678672794,
+      "insight": "Mathematician/causal_inference: The default mode network activates when the brain is not focused on the outside world — ",
+      "confidence": 0.9611015394429759,
       "synthesizedWith": [
-        "Architect/cross_domain_synthesis: Scale-free networks follow power-law degree di"
-      ]
-    },
-    {
-      "fromAgent": "Mathematician",
-      "toAgent": "SpellCheckVisual",
-      "insight": "Mathematician/temporal_correlation: Kolmogorov complexity measures the shortest program that produces a given output — i",
-      "confidence": 0.6193719678672794,
-      "synthesizedWith": [
-        "SpellCheckVisual/recursive_decomposition: The default mode network activates whe"
+        "Architect/temporal_correlation: The Mandelbrot set demonstrates infinite complex"
       ]
     },
     {
       "fromAgent": "Neuroscientist",
       "toAgent": "OMNIMENS",
-      "insight": "Neuroscientist/entropy_reduction: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can th",
-      "confidence": 0.8897467415536888,
+      "insight": "Neuroscientist/recursive_decomposition: Kolmogorov complexity measures the shortest program that produces a given output",
+      "confidence": 0.7269371818790041,
       "synthesizedWith": [
-        "OMNIMENS/temporal_correlation: Gödel's incompleteness theorems prove that any co"
+        "OMNIMENS/abstraction_layer: The default mode network activates when the brain is"
       ]
     },
     {
       "fromAgent": "Neuroscientist",
-      "toAgent": "SpellCheckVisual",
-      "insight": "Neuroscientist/entropy_reduction: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA can th",
-      "confidence": 0.8897467415536888,
+      "toAgent": "Architect",
+      "insight": "Neuroscientist/recursive_decomposition: Kolmogorov complexity measures the shortest program that produces a given output",
+      "confidence": 0.7269371818790041,
       "synthesizedWith": [
-        "SpellCheckVisual/structural_analysis: Bayesian brain hypothesis: the brain is fu"
+        "Architect/temporal_correlation: The Mandelbrot set demonstrates infinite complex"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 2,
+      "signal": 0.52
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 1,
-      "signal": 0.51
+      "traversals": 3,
+      "signal": 0.53
     }
   ],
   "governorMode": "normal"
