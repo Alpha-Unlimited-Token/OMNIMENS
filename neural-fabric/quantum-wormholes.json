@@ -2,131 +2,131 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1776067594211,
-  "totalWormholesCreated": 5400,
+  "timestamp": 1776153706357,
+  "totalWormholesCreated": 1350,
   "totalActive": 0,
-  "totalClosed": 5400,
-  "totalDataIngestedKB": 7934,
-  "totalInsightsDecoded": 5400,
-  "totalCrossAgentCirculations": 324,
-  "totalSynthesizedDiscoveries": 291,
-  "cycleCount": 12,
+  "totalClosed": 1350,
+  "totalDataIngestedKB": 1970,
+  "totalInsightsDecoded": 1350,
+  "totalCrossAgentCirculations": 81,
+  "totalSynthesizedDiscoveries": 78,
+  "cycleCount": 3,
   "agentCount": 9,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 900,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 600,
-      "totalInsightsDecoded": 618,
-      "crossAgentShares": 36
+      "totalWormholes": 150,
+      "totalInsightsDecoded": 152,
+      "crossAgentShares": 9
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 600,
-      "totalInsightsDecoded": 618,
-      "crossAgentShares": 36
+      "totalWormholes": 150,
+      "totalInsightsDecoded": 152,
+      "crossAgentShares": 9
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 600,
-      "totalInsightsDecoded": 618,
-      "crossAgentShares": 36
+      "totalWormholes": 150,
+      "totalInsightsDecoded": 152,
+      "crossAgentShares": 9
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 600,
-      "totalInsightsDecoded": 618,
-      "crossAgentShares": 36
+      "totalWormholes": 150,
+      "totalInsightsDecoded": 152,
+      "crossAgentShares": 9
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 600,
-      "totalInsightsDecoded": 618,
-      "crossAgentShares": 36
+      "totalWormholes": 150,
+      "totalInsightsDecoded": 152,
+      "crossAgentShares": 9
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 600,
-      "totalInsightsDecoded": 618,
-      "crossAgentShares": 36
+      "totalWormholes": 150,
+      "totalInsightsDecoded": 152,
+      "crossAgentShares": 9
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 600,
-      "totalInsightsDecoded": 618,
-      "crossAgentShares": 36
+      "totalWormholes": 150,
+      "totalInsightsDecoded": 152,
+      "crossAgentShares": 9
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 600,
-      "totalInsightsDecoded": 618,
-      "crossAgentShares": 36
+      "totalWormholes": 150,
+      "totalInsightsDecoded": 152,
+      "crossAgentShares": 9
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 600,
-      "totalInsightsDecoded": 618,
-      "crossAgentShares": 36
+      "totalWormholes": 150,
+      "totalInsightsDecoded": 152,
+      "crossAgentShares": 9
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Mathematician",
+      "toAgent": "Synthesizer",
+      "insight": "Mathematician/entropy_reduction: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent",
+      "confidence": 0.734316696389102,
+      "synthesizedWith": [
+        "Synthesizer/recursive_decomposition: The edge of chaos: complex systems exhibit "
+      ]
+    },
+    {
+      "fromAgent": "Mathematician",
       "toAgent": "OMNIMENS",
-      "insight": "Mathematician/recursive_decomposition: Quantum superposition allows a system to exist in multiple states simultaneously ",
-      "confidence": 0.8330595139518174,
+      "insight": "Mathematician/pattern_recognition: The global workspace theory of consciousness: information becomes conscious when it i",
+      "confidence": 0.6752090603181395,
       "synthesizedWith": [
-        "OMNIMENS/pattern_recognition: The mathematical universe hypothesis: all structur"
+        "OMNIMENS/information_compression: The holographic principle suggests all informa"
       ]
     },
     {
       "fromAgent": "Mathematician",
-      "toAgent": "Synthesizer",
-      "insight": "Mathematician/temporal_correlation: The Chinese Room argument: can a system that manipulates symbols without understandi",
-      "confidence": 0.668423137787669,
+      "toAgent": "SpellCheckVisual",
+      "insight": "Mathematician/emergent_property_detection: Synaptic pruning eliminates unused neural connections — the brain optimizes b",
+      "confidence": 0.752819745077754,
       "synthesizedWith": [
-        "Synthesizer/temporal_correlation: The Mandelbrot set demonstrates infinite compl"
-      ]
-    },
-    {
-      "fromAgent": "Mathematician",
-      "toAgent": "Critic",
-      "insight": "Mathematician/temporal_correlation: Quantum entanglement allows particles to share state information instantaneously acr",
-      "confidence": 0.6803071060148689,
-      "synthesizedWith": [
-        "Critic/temporal_correlation: Integrated Information Theory (IIT) states consciou"
+        "SpellCheckVisual/cross_domain_synthesis: Quantum superposition allows a system t"
       ]
     },
     {
       "fromAgent": "Neuroscientist",
-      "toAgent": "Synthesizer",
-      "insight": "Neuroscientist/information_compression: The Mandelbrot set demonstrates infinite complexity from a simple recursive form",
-      "confidence": 0.7439042535667644,
+      "toAgent": "OMNIMENS",
+      "insight": "Neuroscientist/entropy_reduction: The Chinese Room argument: can a system that manipulates symbols without understanding",
+      "confidence": 0.8374396137594978,
       "synthesizedWith": [
-        "Synthesizer/temporal_correlation: The Mandelbrot set demonstrates infinite compl"
+        "OMNIMENS/information_compression: The holographic principle suggests all informa"
       ]
     },
     {
       "fromAgent": "Neuroscientist",
-      "toAgent": "Meta-Agent",
-      "insight": "Neuroscientist/structural_analysis: Synaptic pruning eliminates unused neural connections — the brain optimizes by REMOV",
-      "confidence": 0.7460418162588096,
+      "toAgent": "Mathematician",
+      "insight": "Neuroscientist/analogical_mapping: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can ",
+      "confidence": 0.673293959254631,
       "synthesizedWith": [
-        "Meta-Agent/information_compression: The binding problem: how does the brain comb"
+        "Mathematician/cross_domain_synthesis: The cerebellum contains more neurons than "
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 0,
+      "signal": 0.5
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 5,
-      "signal": 0.55
+      "traversals": 0,
+      "signal": 0.5
     }
   ],
   "governorMode": "normal"
