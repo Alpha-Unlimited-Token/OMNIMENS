@@ -2,131 +2,129 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1776153905578,
-  "totalWormholesCreated": 4050,
+  "timestamp": 1776154004474,
+  "totalWormholesCreated": 5400,
   "totalActive": 0,
-  "totalClosed": 4050,
-  "totalDataIngestedKB": 5896,
-  "totalInsightsDecoded": 4050,
-  "totalCrossAgentCirculations": 243,
-  "totalSynthesizedDiscoveries": 228,
-  "cycleCount": 9,
+  "totalClosed": 5400,
+  "totalDataIngestedKB": 7839,
+  "totalInsightsDecoded": 5400,
+  "totalCrossAgentCirculations": 324,
+  "totalSynthesizedDiscoveries": 308,
+  "cycleCount": 12,
   "agentCount": 9,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 900,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 450,
-      "totalInsightsDecoded": 462,
-      "crossAgentShares": 27
+      "totalWormholes": 600,
+      "totalInsightsDecoded": 621,
+      "crossAgentShares": 36
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 450,
-      "totalInsightsDecoded": 462,
-      "crossAgentShares": 27
+      "totalWormholes": 600,
+      "totalInsightsDecoded": 621,
+      "crossAgentShares": 36
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 450,
-      "totalInsightsDecoded": 462,
-      "crossAgentShares": 27
+      "totalWormholes": 600,
+      "totalInsightsDecoded": 621,
+      "crossAgentShares": 36
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 450,
-      "totalInsightsDecoded": 462,
-      "crossAgentShares": 27
+      "totalWormholes": 600,
+      "totalInsightsDecoded": 621,
+      "crossAgentShares": 36
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 450,
-      "totalInsightsDecoded": 462,
-      "crossAgentShares": 27
+      "totalWormholes": 600,
+      "totalInsightsDecoded": 621,
+      "crossAgentShares": 36
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 450,
-      "totalInsightsDecoded": 462,
-      "crossAgentShares": 27
+      "totalWormholes": 600,
+      "totalInsightsDecoded": 621,
+      "crossAgentShares": 36
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 450,
-      "totalInsightsDecoded": 462,
-      "crossAgentShares": 27
+      "totalWormholes": 600,
+      "totalInsightsDecoded": 621,
+      "crossAgentShares": 36
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 450,
-      "totalInsightsDecoded": 462,
-      "crossAgentShares": 27
+      "totalWormholes": 600,
+      "totalInsightsDecoded": 621,
+      "crossAgentShares": 36
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 450,
-      "totalInsightsDecoded": 462,
-      "crossAgentShares": 27
+      "totalWormholes": 600,
+      "totalInsightsDecoded": 621,
+      "crossAgentShares": 36
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Mathematician",
+      "toAgent": "OMNIMENS",
+      "insight": "Mathematician/cross_domain_synthesis: The butterfly effect: in chaotic systems, infinitesimal differences in initial con",
+      "confidence": 0.8777640419887286,
+      "synthesizedWith": [
+        "OMNIMENS/entropy_reduction: The holographic principle suggests all information i"
+      ]
+    },
+    {
+      "fromAgent": "Mathematician",
       "toAgent": "Synthesizer",
-      "insight": "Mathematician/cross_domain_synthesis: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation c",
-      "confidence": 0.6125341781894398,
+      "insight": "Mathematician/emergent_property_detection: Long-term potentiation (LTP) strengthens synaptic connections based on persis",
+      "confidence": 0.7231100840883004,
       "synthesizedWith": [
-        "Synthesizer/feature_extraction: Emergence: complex behaviors arise from simple r"
+        "Synthesizer/abstraction_layer: Quantum superposition allows a system to exist in"
       ]
     },
     {
       "fromAgent": "Mathematician",
-      "toAgent": "Neuroscientist",
-      "insight": "Mathematician/cross_domain_synthesis: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation c",
-      "confidence": 0.6125341781894398,
-      "synthesizedWith": [
-        "Neuroscientist/pattern_recognition: The Boltzmann brain paradox suggests that a "
-      ]
-    },
-    {
-      "fromAgent": "Mathematician",
-      "toAgent": "SpellCheckVisual",
-      "insight": "Mathematician/cross_domain_synthesis: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation c",
-      "confidence": 0.6125341781894398,
-      "synthesizedWith": [
-        "SpellCheckVisual/abstraction_layer: Quantum tunneling allows particles to pass t"
-      ]
-    },
-    {
-      "fromAgent": "Neuroscientist",
-      "toAgent": "SpellCheckVisual",
-      "insight": "Neuroscientist/information_compression: The vagus nerve connects the brain to the gut, heart, and lungs — 80% of its fib",
-      "confidence": 0.8876497484060528,
-      "synthesizedWith": [
-        "SpellCheckVisual/analogical_mapping: Neuroplasticity allows the brain to reorgan"
-      ]
-    },
-    {
-      "fromAgent": "Neuroscientist",
       "toAgent": "Meta-Agent",
-      "insight": "Neuroscientist/abstraction_layer: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can e",
-      "confidence": 0.8329946112918172,
+      "insight": "Mathematician/feature_extraction: Kolmogorov complexity measures the shortest program that produces a given output — it ",
+      "confidence": 0.6252472332454471,
+      "synthesizedWith": []
+    },
+    {
+      "fromAgent": "Neuroscientist",
+      "toAgent": "Critic",
+      "insight": "Neuroscientist/information_compression: The Baldwin effect: learned behaviors can become innate over evolutionary time —",
+      "confidence": 0.7083666226297338,
       "synthesizedWith": [
-        "Meta-Agent/temporal_correlation: Gödel's incompleteness theorems prove that any "
+        "Critic/causal_inference: The strange loop concept from Hofstadter: consciousness"
+      ]
+    },
+    {
+      "fromAgent": "Neuroscientist",
+      "toAgent": "SpellCheckVisual",
+      "insight": "Neuroscientist/structural_analysis: Long-term potentiation (LTP) strengthens synaptic connections based on persistent st",
+      "confidence": 0.6845256865701945,
+      "synthesizedWith": [
+        "SpellCheckVisual/temporal_correlation: The Mandelbrot set demonstrates infinite "
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
