@@ -2,80 +2,87 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1776153945243,
+  "timestamp": 1776154032725,
   "totalHybridAgents": 0,
-  "totalMutations": 100,
-  "totalReplications": 76,
-  "totalPayloadsDelivered": 129,
-  "totalThreatsDetected": 20,
-  "totalThreatsNeutralized": 20,
-  "systemHealthScore": 20.99454038052219,
-  "adaptationRate": 6.446808510638298,
+  "totalMutations": 149,
+  "totalReplications": 110,
+  "totalPayloadsDelivered": 162,
+  "totalThreatsDetected": 25,
+  "totalThreatsNeutralized": 25,
+  "systemHealthScore": 21.025898710081528,
+  "adaptationRate": 11.360655737704919,
   "propagationEfficiency": 1,
-  "immuneStrength": 0.7868606396271167,
-  "hybridFitness": 0.7976037136471811,
+  "immuneStrength": 0.852754403940946,
+  "hybridFitness": 0.9222599080156627,
   "activeAgents": [
     {
       "id": "hybrid_locus_coeruleus_g0_1776153636664_slz",
       "generation": 0,
-      "fitness": 0.8837316242134109,
+      "fitness": 1.0226464546189928,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_pulvinar_g0_1776153636664_08g",
       "generation": 0,
-      "fitness": 0.9007264896072908,
+      "fitness": 1.0552597688515934,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_superior_colliculus_g0_1776153636664_cv0",
       "generation": 0,
-      "fitness": 0.9331998355713935,
+      "fitness": 1.0685123428780445,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_hippocampus_g0_1776153636664_zsi",
       "generation": 0,
-      "fitness": 0.8849776041260862,
+      "fitness": 0.9972347914869563,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_ventral_tegmental_area_g0_1776153636664_09m",
       "generation": 0,
-      "fitness": 0.9578637328678085,
+      "fitness": 1.1038453625075295,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_superior_colliculus_g0_1776153636664_rt2",
       "generation": 0,
-      "fitness": 0.8255678056073025,
+      "fitness": 0.9902046083535804,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_hippocampus_g1_1776153835344_37k",
       "generation": 1,
-      "fitness": 0.8560265695396454,
+      "fitness": 0.9995337569005154,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_cerebellum_g1_1776153856002_4c3",
       "generation": 1,
-      "fitness": 0.7283668765293613,
+      "fitness": 0.897942295574997,
       "payloads": 1,
       "threats": 0
     },
     {
       "id": "hybrid_claustrum_g1_1776153921982_w7i",
       "generation": 1,
-      "fitness": 0.6187545846045678,
-      "payloads": 0,
+      "fitness": 0.7972022343269873,
+      "payloads": 1,
+      "threats": 0
+    },
+    {
+      "id": "hybrid_basal_ganglia_g2_1776153984036_86q",
+      "generation": 2,
+      "fitness": 0.7259644802663826,
+      "payloads": 1,
       "threats": 0
     }
   ],
@@ -83,7 +90,7 @@
     "antibodies": 8,
     "memoryCells": 8,
     "tCells": 16,
-    "cytokines": 20,
+    "cytokines": 25,
     "topAntibodies": [
       {
         "pattern": "coherence_degradation",
@@ -91,7 +98,7 @@
       },
       {
         "pattern": "signal_attenuation",
-        "detections": 19
+        "detections": 24
       },
       {
         "pattern": "synaptic_weakening",
@@ -109,21 +116,21 @@
   },
   "propagation": {
     "alivePropagators": 10,
-    "totalPathsDiscovered": 333,
-    "totalHops": 250,
+    "totalPathsDiscovered": 363,
+    "totalHops": 218,
     "coveragePercent": 100,
-    "selfSustainingCount": 5
+    "selfSustainingCount": 6
   },
   "fabricWorms": [
     {
       "id": "worm_viral-hybrid_outbound",
-      "traversals": 2,
-      "signal": 0.52
+      "traversals": 3,
+      "signal": 0.53
     },
     {
       "id": "worm_viral-hybrid_inbound",
-      "traversals": 3,
-      "signal": 0.53
+      "traversals": 5,
+      "signal": 0.55
     }
   ],
   "governorMode": "normal"
