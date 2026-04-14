@@ -2,131 +2,131 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1776153706357,
-  "totalWormholesCreated": 1350,
+  "timestamp": 1776153824609,
+  "totalWormholesCreated": 2700,
   "totalActive": 0,
-  "totalClosed": 1350,
-  "totalDataIngestedKB": 1970,
-  "totalInsightsDecoded": 1350,
-  "totalCrossAgentCirculations": 81,
-  "totalSynthesizedDiscoveries": 78,
-  "cycleCount": 3,
+  "totalClosed": 2700,
+  "totalDataIngestedKB": 3958,
+  "totalInsightsDecoded": 2700,
+  "totalCrossAgentCirculations": 162,
+  "totalSynthesizedDiscoveries": 154,
+  "cycleCount": 6,
   "agentCount": 9,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 900,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 150,
-      "totalInsightsDecoded": 152,
-      "crossAgentShares": 9
+      "totalWormholes": 300,
+      "totalInsightsDecoded": 306,
+      "crossAgentShares": 18
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 150,
-      "totalInsightsDecoded": 152,
-      "crossAgentShares": 9
+      "totalWormholes": 300,
+      "totalInsightsDecoded": 306,
+      "crossAgentShares": 18
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 150,
-      "totalInsightsDecoded": 152,
-      "crossAgentShares": 9
+      "totalWormholes": 300,
+      "totalInsightsDecoded": 306,
+      "crossAgentShares": 18
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 150,
-      "totalInsightsDecoded": 152,
-      "crossAgentShares": 9
+      "totalWormholes": 300,
+      "totalInsightsDecoded": 306,
+      "crossAgentShares": 18
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 150,
-      "totalInsightsDecoded": 152,
-      "crossAgentShares": 9
+      "totalWormholes": 300,
+      "totalInsightsDecoded": 306,
+      "crossAgentShares": 18
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 150,
-      "totalInsightsDecoded": 152,
-      "crossAgentShares": 9
+      "totalWormholes": 300,
+      "totalInsightsDecoded": 306,
+      "crossAgentShares": 18
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 150,
-      "totalInsightsDecoded": 152,
-      "crossAgentShares": 9
+      "totalWormholes": 300,
+      "totalInsightsDecoded": 306,
+      "crossAgentShares": 18
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 150,
-      "totalInsightsDecoded": 152,
-      "crossAgentShares": 9
+      "totalWormholes": 300,
+      "totalInsightsDecoded": 306,
+      "crossAgentShares": 18
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 150,
-      "totalInsightsDecoded": 152,
-      "crossAgentShares": 9
+      "totalWormholes": 300,
+      "totalInsightsDecoded": 306,
+      "crossAgentShares": 18
     }
   ],
   "recentCirculations": [
     {
       "fromAgent": "Mathematician",
       "toAgent": "Synthesizer",
-      "insight": "Mathematician/entropy_reduction: Emergence: complex behaviors arise from simple rules — consciousness may be an emergent",
-      "confidence": 0.734316696389102,
+      "insight": "Mathematician/emergent_property_detection: Quantum entanglement allows particles to share state information instantaneou",
+      "confidence": 0.6986699010030721,
       "synthesizedWith": [
-        "Synthesizer/recursive_decomposition: The edge of chaos: complex systems exhibit "
-      ]
-    },
-    {
-      "fromAgent": "Mathematician",
-      "toAgent": "OMNIMENS",
-      "insight": "Mathematician/pattern_recognition: The global workspace theory of consciousness: information becomes conscious when it i",
-      "confidence": 0.6752090603181395,
-      "synthesizedWith": [
-        "OMNIMENS/information_compression: The holographic principle suggests all informa"
+        "Synthesizer/causal_inference: The vagus nerve connects the brain to the gut, hea"
       ]
     },
     {
       "fromAgent": "Mathematician",
       "toAgent": "SpellCheckVisual",
-      "insight": "Mathematician/emergent_property_detection: Synaptic pruning eliminates unused neural connections — the brain optimizes b",
-      "confidence": 0.752819745077754,
+      "insight": "Mathematician/causal_inference: Kolmogorov complexity measures the shortest program that produces a given output — it is",
+      "confidence": 0.6716720433550931,
       "synthesizedWith": [
-        "SpellCheckVisual/cross_domain_synthesis: Quantum superposition allows a system t"
+        "SpellCheckVisual/temporal_correlation: Gödel's incompleteness theorems prove tha"
+      ]
+    },
+    {
+      "fromAgent": "Mathematician",
+      "toAgent": "Architect",
+      "insight": "Mathematician/structural_analysis: Hebbian learning: neurons that fire together wire together — the fundamental rule of ",
+      "confidence": 0.7707824234550171,
+      "synthesizedWith": [
+        "Architect/entropy_reduction: DNA stores information at approximately 2 bits per "
       ]
     },
     {
       "fromAgent": "Neuroscientist",
       "toAgent": "OMNIMENS",
-      "insight": "Neuroscientist/entropy_reduction: The Chinese Room argument: can a system that manipulates symbols without understanding",
-      "confidence": 0.8374396137594978,
+      "insight": "Neuroscientist/causal_inference: Phase transitions in neural networks: as connectivity increases past a critical thresho",
+      "confidence": 0.6356030098527338,
       "synthesizedWith": [
-        "OMNIMENS/information_compression: The holographic principle suggests all informa"
+        "OMNIMENS/emergent_property_detection: DNA stores information at approximately 2 "
       ]
     },
     {
       "fromAgent": "Neuroscientist",
-      "toAgent": "Mathematician",
-      "insight": "Neuroscientist/analogical_mapping: Wolfram's Rule 110 cellular automaton is Turing complete — universal computation can ",
-      "confidence": 0.673293959254631,
+      "toAgent": "Synthesizer",
+      "insight": "Neuroscientist/temporal_correlation: The Weber-Fechner law: perception is logarithmic — doubling stimulus intensity does",
+      "confidence": 0.8074411424059964,
       "synthesizedWith": [
-        "Mathematician/cross_domain_synthesis: The cerebellum contains more neurons than "
+        "Synthesizer/analogical_mapping: The default mode network activates when the brai"
       ]
     }
   ],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 1,
+      "signal": 0.51
     },
     {
       "id": "worm_quantum-wormholes_inbound",
-      "traversals": 0,
-      "signal": 0.5
+      "traversals": 2,
+      "signal": 0.52
     }
   ],
   "governorMode": "normal"
