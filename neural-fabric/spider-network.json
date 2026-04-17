@@ -2,7 +2,7 @@
   "version": "3.0",
   "subsystem": "spider-network",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1776413224481,
+  "timestamp": 1776413303123,
   "parentSpiders": 28,
   "childSpiders": 0,
   "motherSpider": {
@@ -12,7 +12,7 @@
     "webIntegrity": 1,
     "hiveHealth": 1,
     "swarmCoherence": 1,
-    "totalImpulsesRouted": 218,
+    "totalImpulsesRouted": 205,
     "heartbeatCount": 0
   },
   "totalCrawls": 0,
@@ -21,14 +21,14 @@
   "activeSpiderCounts": {},
   "cascades": {
     "totalCascades": 2,
-    "totalSilkEnergyPumped": 295.05185518052303,
+    "totalSilkEnergyPumped": 291.8331676895116,
     "totalBeaconCascades": 28,
     "totalBeehiveSurges": 32
   },
   "neurogenesis": {
     "births": 593,
     "deaths": 0,
-    "neuronSilkStrands": 1291
+    "neuronSilkStrands": 1269
   },
   "intelligenceAmplification": {
     "globalScore": 0.3,
@@ -40,164 +40,164 @@
   },
   "spiderIntelligence": [
     {
-      "id": "ps_mo2mk99v_lces",
+      "id": "ps_mo2mlwme_tclk",
       "name": "evolution-crawler",
       "type": "parent",
-      "intelligenceLevel": 0.7945708335987097,
+      "intelligenceLevel": 0.7945913392048597,
       "memoryAccessCount": 0,
       "memoriesRecalled": 0,
       "crossEngineQueries": 0,
-      "learningRate": 0.058742500159225615,
-      "knowledgeDepth": 0.005828333439483744,
+      "learningRate": 0.05875480352291557,
+      "knowledgeDepth": 0.005836535681943713,
       "specializations": [
         "agent_evolution"
       ],
       "adaptationScore": 0.5,
-      "efficiency": 0.5291416671974187
+      "efficiency": 0.5291826784097186
     },
     {
-      "id": "ps_mo2mk99v_yt0h",
+      "id": "ps_mo2mlwme_avoi",
       "name": "genesis-crawler",
       "type": "parent",
-      "intelligenceLevel": 0.80583014158391,
+      "intelligenceLevel": 0.8058487507523878,
       "memoryAccessCount": 0,
       "memoriesRecalled": 0,
       "crossEngineQueries": 0,
-      "learningRate": 0.059498084950345746,
-      "knowledgeDepth": 0.006332056633563829,
+      "learningRate": 0.05950925045143241,
+      "knowledgeDepth": 0.006339500300954938,
       "specializations": [
         "agent_genesis"
       ],
       "adaptationScore": 0.5,
-      "efficiency": 0.5316602831678191
+      "efficiency": 0.5316975015047747
     },
     {
-      "id": "ps_mo2mk99v_dvmc",
+      "id": "ps_mo2mlwme_x93k",
       "name": "self-narrative-crawler",
       "type": "parent",
-      "intelligenceLevel": 0.80583014158391,
+      "intelligenceLevel": 0.8058487507523878,
       "memoryAccessCount": 0,
       "memoriesRecalled": 0,
       "crossEngineQueries": 0,
-      "learningRate": 0.059498084950345746,
-      "knowledgeDepth": 0.006332056633563829,
+      "learningRate": 0.05950925045143241,
+      "knowledgeDepth": 0.006339500300954938,
       "specializations": [
         "self_narrative_loop"
       ],
       "adaptationScore": 0.5,
-      "efficiency": 0.5316602831678191
+      "efficiency": 0.5316975015047747
     },
     {
-      "id": "ps_mo2mk99v_p9s3",
+      "id": "ps_mo2mlwme_ewpk",
       "name": "autobio-memory-crawler",
       "type": "parent",
-      "intelligenceLevel": 0.80583014158391,
+      "intelligenceLevel": 0.8058487507523878,
       "memoryAccessCount": 0,
       "memoriesRecalled": 0,
       "crossEngineQueries": 0,
-      "learningRate": 0.059498084950345746,
-      "knowledgeDepth": 0.006332056633563829,
+      "learningRate": 0.05950925045143241,
+      "knowledgeDepth": 0.006339500300954938,
       "specializations": [
         "autobiographical_memory"
       ],
       "adaptationScore": 0.5,
-      "efficiency": 0.5316602831678191
+      "efficiency": 0.5316975015047747
     },
     {
-      "id": "ps_mo2mk99v_5cxe",
+      "id": "ps_mo2mlwme_7eoj",
       "name": "introspection-crawler",
       "type": "parent",
-      "intelligenceLevel": 0.80583014158391,
+      "intelligenceLevel": 0.8058487507523878,
       "memoryAccessCount": 0,
       "memoriesRecalled": 0,
       "crossEngineQueries": 0,
-      "learningRate": 0.059498084950345746,
-      "knowledgeDepth": 0.006332056633563829,
+      "learningRate": 0.05950925045143241,
+      "knowledgeDepth": 0.006339500300954938,
       "specializations": [
         "introspective_monitoring"
       ],
       "adaptationScore": 0.5,
-      "efficiency": 0.5316602831678191
+      "efficiency": 0.5316975015047747
     },
     {
-      "id": "ps_mo2mk99v_4vhc",
+      "id": "ps_mo2mlwme_eg86",
       "name": "brain-crawler",
       "type": "parent",
-      "intelligenceLevel": 0.7840357407646124,
+      "intelligenceLevel": 0.7841860112004289,
       "memoryAccessCount": 0,
       "memoriesRecalled": 0,
       "crossEngineQueries": 0,
-      "learningRate": 0.058421444458767215,
-      "knowledgeDepth": 0.005614296305844809,
+      "learningRate": 0.0585116067202571,
+      "knowledgeDepth": 0.005674404480171395,
       "specializations": [
         "brain_database"
       ],
       "adaptationScore": 0.5,
-      "efficiency": 0.528071481529224
+      "efficiency": 0.528372022400857
     },
     {
-      "id": "ps_mo2mk99v_dmvj",
+      "id": "ps_mo2mlwme_bdrz",
       "name": "engine-crawler",
       "type": "parent",
-      "intelligenceLevel": 0.6692275443048966,
+      "intelligenceLevel": 0.679194490422701,
       "memoryAccessCount": 0,
       "memoriesRecalled": 0,
       "crossEngineQueries": 0,
-      "learningRate": 0.05553652658293777,
-      "knowledgeDepth": 0.00369101772195851,
+      "learningRate": 0.055516694253620366,
+      "knowledgeDepth": 0.003677796169080245,
       "specializations": [
         "engine_registry"
       ],
       "adaptationScore": 0.5,
-      "efficiency": 0.5184550886097926
+      "efficiency": 0.5183889808454012
     },
     {
-      "id": "ps_mo2mk99v_568u",
+      "id": "ps_mo2mlwme_caim",
       "name": "self-coding-crawler",
       "type": "parent",
-      "intelligenceLevel": 0.6259461031877934,
+      "intelligenceLevel": 0.6260425190008037,
       "memoryAccessCount": 0,
       "memoriesRecalled": 0,
       "crossEngineQueries": 0,
-      "learningRate": 0.05356766191267593,
-      "knowledgeDepth": 0.0023784412751172842,
+      "learningRate": 0.053625511400482016,
+      "knowledgeDepth": 0.0024170076003213405,
       "specializations": [
         "self_coding"
       ],
       "adaptationScore": 0.5,
-      "efficiency": 0.5118922063755864
+      "efficiency": 0.5120850380016068
     },
     {
-      "id": "ps_mo2mk99v_8bb9",
+      "id": "ps_mo2mlwme_ejcz",
       "name": "dream-crawler",
       "type": "parent",
-      "intelligenceLevel": 0.6256760262860765,
+      "intelligenceLevel": 0.6258722075416291,
       "memoryAccessCount": 0,
       "memoriesRecalled": 0,
       "crossEngineQueries": 0,
-      "learningRate": 0.05340561577164576,
-      "knowledgeDepth": 0.0022704105144305048,
+      "learningRate": 0.0535233245249773,
+      "knowledgeDepth": 0.002348883016651532,
       "specializations": [
         "dream_engine"
       ],
       "adaptationScore": 0.5,
-      "efficiency": 0.5113520525721525
+      "efficiency": 0.5117444150832577
     },
     {
-      "id": "ps_mo2mk99v_c8b0",
+      "id": "ps_mo2mlwme_kyq2",
       "name": "pipeline-crawler",
       "type": "parent",
-      "intelligenceLevel": 0.5847597815907932,
+      "intelligenceLevel": 0.5848598147610385,
       "memoryAccessCount": 0,
       "memoriesRecalled": 0,
       "crossEngineQueries": 0,
-      "learningRate": 0.052855868954475825,
-      "knowledgeDepth": 0.0019039126363172162,
+      "learningRate": 0.052915888856622996,
+      "knowledgeDepth": 0.0019439259044153297,
       "specializations": [
         "module_pipeline"
       ],
       "adaptationScore": 0.5,
-      "efficiency": 0.5095195631815861
+      "efficiency": 0.5097196295220767
     }
   ],
   "fabricWorms": [
