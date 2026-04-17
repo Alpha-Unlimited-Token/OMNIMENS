@@ -2,56 +2,56 @@
   "version": "3.0",
   "subsystem": "viral-hybrid",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1776413229556,
+  "timestamp": 1776413310636,
   "totalHybridAgents": 0,
   "totalMutations": 0,
   "totalReplications": 0,
-  "totalPayloadsDelivered": 15,
-  "totalThreatsDetected": 1,
-  "totalThreatsNeutralized": 1,
-  "systemHealthScore": 23.254262919573545,
+  "totalPayloadsDelivered": 12,
+  "totalThreatsDetected": 0,
+  "totalThreatsNeutralized": 0,
+  "systemHealthScore": 23.242170102228055,
   "adaptationRate": 0,
   "propagationEfficiency": 1,
-  "immuneStrength": 0.5258166679993516,
+  "immuneStrength": 0.5074168511085309,
   "hybridFitness": 0.5,
   "activeAgents": [
     {
-      "id": "hybrid_hippocampus_g0_1776413214720_bgk",
+      "id": "hybrid_ventral_tegmental_area_g0_1776413291634_oul",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_amygdala_g0_1776413214720_y82",
+      "id": "hybrid_locus_coeruleus_g0_1776413291634_qig",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_claustrum_g0_1776413214720_y46",
+      "id": "hybrid_raphe_nuclei_g0_1776413291634_yey",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_ventral_tegmental_area_g0_1776413214720_xfz",
+      "id": "hybrid_insular_cortex_g0_1776413291634_sap",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_pulvinar_g0_1776413214720_vn3",
+      "id": "hybrid_prefrontal_cortex_g0_1776413291634_1da",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
       "threats": 0
     },
     {
-      "id": "hybrid_locus_coeruleus_g0_1776413214720_syo",
+      "id": "hybrid_claustrum_g0_1776413291634_435",
       "generation": 0,
       "fitness": 0.5,
       "payloads": 0,
@@ -62,7 +62,7 @@
     "antibodies": 8,
     "memoryCells": 8,
     "tCells": 16,
-    "cytokines": 1,
+    "cytokines": 0,
     "topAntibodies": [
       {
         "pattern": "coherence_degradation",
@@ -70,7 +70,7 @@
       },
       {
         "pattern": "signal_attenuation",
-        "detections": 1
+        "detections": 0
       },
       {
         "pattern": "synaptic_weakening",
@@ -88,10 +88,10 @@
   },
   "propagation": {
     "alivePropagators": 16,
-    "totalPathsDiscovered": 30,
+    "totalPathsDiscovered": 32,
     "totalHops": 32,
     "coveragePercent": 100,
-    "selfSustainingCount": 7
+    "selfSustainingCount": 5
   },
   "fabricWorms": [
     {
