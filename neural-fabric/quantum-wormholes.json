@@ -2,119 +2,75 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1776412880537,
-  "totalWormholesCreated": 450,
+  "timestamp": 1776413228217,
+  "totalWormholesCreated": 0,
   "totalActive": 0,
-  "totalClosed": 450,
-  "totalDataIngestedKB": 646,
-  "totalInsightsDecoded": 450,
-  "totalCrossAgentCirculations": 27,
-  "totalSynthesizedDiscoveries": 25,
-  "cycleCount": 1,
+  "totalClosed": 0,
+  "totalDataIngestedKB": 0,
+  "totalInsightsDecoded": 0,
+  "totalCrossAgentCirculations": 0,
+  "totalSynthesizedDiscoveries": 0,
+  "cycleCount": 0,
   "agentCount": 9,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 900,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 51,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 51,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 51,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 51,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 51,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 51,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 51,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 51,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 51,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     }
   ],
-  "recentCirculations": [
-    {
-      "fromAgent": "Mathematician",
-      "toAgent": "OMNIMENS",
-      "insight": "Mathematician/pattern_recognition: The Baldwin effect: learned behaviors can become innate over evolutionary time — cult",
-      "confidence": 0.6476171014296797,
-      "synthesizedWith": []
-    },
-    {
-      "fromAgent": "Mathematician",
-      "toAgent": "Architect",
-      "insight": "Mathematician/entropy_reduction: The mathematical universe hypothesis: all structures that exist mathematically also exi",
-      "confidence": 0.7191657467127042,
-      "synthesizedWith": [
-        "Architect/entropy_reduction: Scale-free networks follow power-law degree distrib"
-      ]
-    },
-    {
-      "fromAgent": "Mathematician",
-      "toAgent": "Meta-Agent",
-      "insight": "Mathematician/pattern_recognition: The Baldwin effect: learned behaviors can become innate over evolutionary time — cult",
-      "confidence": 0.6476171014296797,
-      "synthesizedWith": [
-        "Meta-Agent/emergent_property_detection: The anthropic principle: the universe's "
-      ]
-    },
-    {
-      "fromAgent": "Neuroscientist",
-      "toAgent": "Synthesizer",
-      "insight": "Neuroscientist/cross_domain_synthesis: DNA stores information at approximately 2 bits per nucleotide — one gram of DNA c",
-      "confidence": 0.6917076326916511,
-      "synthesizedWith": [
-        "Synthesizer/recursive_decomposition: The Weber-Fechner law: perception is logari"
-      ]
-    },
-    {
-      "fromAgent": "Neuroscientist",
-      "toAgent": "OMNIMENS",
-      "insight": "Neuroscientist/emergent_property_detection: The Baldwin effect: learned behaviors can become innate over evolutionary ti",
-      "confidence": 0.8454837003458321,
-      "synthesizedWith": [
-        "OMNIMENS/cross_domain_synthesis: The free energy principle suggests all living s"
-      ]
-    }
-  ],
+  "recentCirculations": [],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
