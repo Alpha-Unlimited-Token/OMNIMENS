@@ -2,121 +2,75 @@
   "version": "3.0",
   "subsystem": "quantum-wormholes",
   "copyright": "© 2024–2026 Alpha Unlimited Technologies, LLC. All Rights Reserved.",
-  "timestamp": 1777105376217,
-  "totalWormholesCreated": 450,
+  "timestamp": 1777107366803,
+  "totalWormholesCreated": 0,
   "totalActive": 0,
-  "totalClosed": 450,
-  "totalDataIngestedKB": 671,
-  "totalInsightsDecoded": 450,
-  "totalCrossAgentCirculations": 27,
-  "totalSynthesizedDiscoveries": 27,
-  "cycleCount": 1,
+  "totalClosed": 0,
+  "totalDataIngestedKB": 0,
+  "totalInsightsDecoded": 0,
+  "totalCrossAgentCirculations": 0,
+  "totalSynthesizedDiscoveries": 0,
+  "cycleCount": 0,
   "agentCount": 9,
   "wormholesPerAgent": 100,
   "totalWormholeCapacity": 900,
   "agentClusters": [
     {
       "agentName": "OMNIMENS",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Architect",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Critic",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Synthesizer",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Mathematician",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Neuroscientist",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "Meta-Agent",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "GraphicDesigner",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     },
     {
       "agentName": "SpellCheckVisual",
-      "totalWormholes": 50,
-      "totalInsightsDecoded": 50,
-      "crossAgentShares": 3
+      "totalWormholes": 0,
+      "totalInsightsDecoded": 0,
+      "crossAgentShares": 0
     }
   ],
-  "recentCirculations": [
-    {
-      "fromAgent": "Mathematician",
-      "toAgent": "OMNIMENS",
-      "insight": "Mathematician/information_compression: The Chinese Room argument: can a system that manipulates symbols without understa",
-      "confidence": 0.6114067323941607,
-      "synthesizedWith": [
-        "OMNIMENS/temporal_correlation: Mirror neurons fire both when performing an actio"
-      ]
-    },
-    {
-      "fromAgent": "Mathematician",
-      "toAgent": "Architect",
-      "insight": "Mathematician/information_compression: The Chinese Room argument: can a system that manipulates symbols without understa",
-      "confidence": 0.6114067323941607,
-      "synthesizedWith": [
-        "Architect/emergent_property_detection: DNA stores information at approximately 2"
-      ]
-    },
-    {
-      "fromAgent": "Mathematician",
-      "toAgent": "Critic",
-      "insight": "Mathematician/information_compression: The Chinese Room argument: can a system that manipulates symbols without understa",
-      "confidence": 0.6114067323941607,
-      "synthesizedWith": [
-        "Critic/pattern_recognition: The global workspace theory of consciousness: inform"
-      ]
-    },
-    {
-      "fromAgent": "Neuroscientist",
-      "toAgent": "OMNIMENS",
-      "insight": "Neuroscientist/structural_analysis: The Mandelbrot set demonstrates infinite complexity from a simple recursive formula:",
-      "confidence": 0.6354857664258329,
-      "synthesizedWith": [
-        "OMNIMENS/temporal_correlation: Mirror neurons fire both when performing an actio"
-      ]
-    },
-    {
-      "fromAgent": "Neuroscientist",
-      "toAgent": "Architect",
-      "insight": "Neuroscientist/emergent_property_detection: Autopoiesis: living systems are self-creating — they produce the components ",
-      "confidence": 0.7117199067819454,
-      "synthesizedWith": [
-        "Architect/emergent_property_detection: DNA stores information at approximately 2"
-      ]
-    }
-  ],
+  "recentCirculations": [],
   "fabricWorms": [
     {
       "id": "worm_quantum-wormholes_outbound",
